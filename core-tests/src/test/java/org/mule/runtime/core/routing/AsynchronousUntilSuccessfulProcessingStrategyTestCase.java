@@ -395,13 +395,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   }
 
   private AsynchronousUntilSuccessfulProcessingStrategy createProcessingStrategy() throws Exception {
-    AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = new AsynchronousUntilSuccessfulProcessingStrategy() {
-
-      @Override
-      protected MuleEvent threadSafeCopy(MuleEvent event) {
-        return event;
-      }
-    };
+    AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = new AsynchronousUntilSuccessfulProcessingStrategy();
     processingStrategy.setUntilSuccessfulConfiguration(mockUntilSuccessfulConfiguration);
     processingStrategy.setMessagingExceptionHandler(mockFlow.getExceptionListener());
     processingStrategy.setMuleContext(muleContext);
