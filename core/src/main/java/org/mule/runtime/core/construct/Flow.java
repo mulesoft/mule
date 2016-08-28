@@ -130,8 +130,8 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     return new ExceptionHandlingReplyToHandlerDecorator(new NonBlockingReplyToHandler() {
 
       @Override
-      public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
-        replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
+      public MuleEvent processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
+        return replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
       }
 
       @Override

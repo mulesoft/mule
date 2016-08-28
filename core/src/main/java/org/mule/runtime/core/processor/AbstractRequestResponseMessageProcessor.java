@@ -80,14 +80,16 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     return new NonBlockingReplyToHandler() {
 
       @Override
-      public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+      public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
         try {
           MuleEvent response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler), request);
           if (!NonBlockingVoidMuleEvent.getInstance().equals(response)) {
-            originalReplyToHandler.processReplyTo(response, null, null);
+            response = originalReplyToHandler.processReplyTo(response, null, null);
           }
+          return response;
         } catch (Exception e) {
           processExceptionReplyTo(new MessagingException(event, e), null);
+          return event;
         } finally {
           processFinally(event, null);
         }

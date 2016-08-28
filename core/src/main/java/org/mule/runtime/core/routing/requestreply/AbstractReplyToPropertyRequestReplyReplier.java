@@ -32,7 +32,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
       // Allow components to stop processing of the ReplyTo property (e.g. CXF)
       if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
         // reply-to processing should not resurrect a dead event
-        processReplyTo(event, resultEvent, replyToHandler, replyTo);
+        event = processReplyTo(event, resultEvent, replyToHandler, replyTo);
       }
     } else {
       resultEvent = processNext(event);
@@ -42,13 +42,17 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
 
   protected abstract boolean shouldProcessEvent(MuleEvent event);
 
-  protected void processReplyTo(MuleEvent event, MuleEvent result, ReplyToHandler replyToHandler, Object replyTo)
+  protected MuleEvent processReplyTo(MuleEvent event, MuleEvent result, ReplyToHandler replyToHandler, Object replyTo)
       throws MuleException {
     if (result != null && replyToHandler != null) {
       String requestor = result.getMessage().getOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY);
       if ((requestor != null && !requestor.equals(flowConstruct.getName())) || requestor == null) {
-        replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
+        return replyToHandler.processReplyTo(event, result.getMessage(), replyTo);
+      } else {
+        return event;
       }
+    } else {
+      return event;
     }
   }
 

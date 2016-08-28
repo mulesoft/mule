@@ -65,13 +65,13 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
       eventToProcess = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
         @Override
-        public void processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
+        public MuleEvent processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
 
           if (fireNotification) {
             fireNotification(notificationManager, flowConstruct, result != null ? result : event, messageProcessor, null,
                              MESSAGE_PROCESSOR_POST_INVOKE);
           }
-          originalReplyToHandler.processReplyTo(result, returnMessage, replyTo);
+          return originalReplyToHandler.processReplyTo(result, returnMessage, replyTo);
         }
 
         @Override

@@ -87,7 +87,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         // Only process reply-to if non-blocking is not enabled. Checking the exchange pattern is not sufficient
         // because JMS inbound endpoints for example use a REQUEST_RESPONSE exchange pattern and async processing.
         if (!(request.isAllowNonBlocking() && request.getReplyToHandler() instanceof NonBlockingReplyToHandler)) {
-          processReplyTo(response, exception);
+          response = processReplyTo(response, exception);
         }
         closeStream(response.getMessage());
         nullifyExceptionPayloadIfRequired(response);
@@ -134,11 +134,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  protected void processReplyTo(MuleEvent event, Exception e) {
+  protected MuleEvent processReplyTo(MuleEvent event, Exception e) {
     try {
-      replyToMessageProcessor.process(event);
+      return replyToMessageProcessor.process(event);
     } catch (MuleException ex) {
       logFatal(event, ex);
+      return event;
     }
   }
 

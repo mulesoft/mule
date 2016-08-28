@@ -24,11 +24,11 @@ import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 
+import java.io.Serializable;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-
-import java.io.Serializable;
 
 public class EndpointReplyToHandler extends DefaultReplyToHandler {
 
@@ -48,8 +48,8 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
   }
 
   @Override
-  public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
-    super.processReplyTo(event, returnMessage, replyTo);
+  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    event = super.processReplyTo(event, returnMessage, replyTo);
 
     String replyToEndpoint = replyTo.toString();
 
@@ -76,10 +76,10 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
 
     // dispatch the event
     try {
-      endpoint.process(replyToEvent);
       if (logger.isInfoEnabled()) {
         logger.info("reply to sent: " + endpoint);
       }
+      return endpoint.process(replyToEvent);
     } catch (Exception e) {
       throw new DispatchException(TransportCoreMessages.failedToDispatchToReplyto(endpoint), replyToEvent, endpoint, e);
     }

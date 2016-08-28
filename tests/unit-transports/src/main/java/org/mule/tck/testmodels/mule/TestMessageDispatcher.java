@@ -67,11 +67,12 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher {
         event = new DefaultMuleEvent(event, new ReplyToHandler() {
 
           @Override
-          public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) {
+          public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) {
             completionHandler.onCompletion(response, (ExceptionCallback<Void, Exception>) (exception -> {
               // TODO MULE-9629
               return null;
             }));
+            return event;
           }
 
           @Override

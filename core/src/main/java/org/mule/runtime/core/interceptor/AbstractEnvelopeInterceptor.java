@@ -95,15 +95,15 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
     }
 
     @Override
-    public void processReplyTo(final MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    public MuleEvent processReplyTo(final MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
       MuleEvent response = event;
       boolean exceptionWasThrown = true;
       try {
         response = after(event);
-        originalReplyToHandler.processReplyTo(response, null, replyTo);
+        response = originalReplyToHandler.processReplyTo(response, null, replyTo);
         exceptionWasThrown = false;
       } finally {
-        last(response, time, startTime, false);
+        return last(response, time, startTime, false);
       }
     }
 

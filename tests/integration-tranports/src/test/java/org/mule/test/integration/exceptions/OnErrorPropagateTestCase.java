@@ -6,8 +6,9 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.hamcrest.Matchers.instanceOf;
+import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
@@ -36,7 +37,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.mutable.MutableInt;
-import org.hamcrest.core.IsNull;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -122,7 +122,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     }
     assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
     MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT).getRight().get();
-    assertThat(dlqMessage, IsNull.<Object>notNullValue());
+    assertThat(dlqMessage, notNullValue());
     assertThat(getPayloadAsString(dlqMessage), is(MESSAGE_EXPECTED));
   }
 
@@ -142,7 +142,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
       fail("message should have been delivered at least 5 times");
     }
     MuleMessage result = client.send("vm://in5", MESSAGE, null, TIMEOUT).getRight();
-    assertThat(result, IsNull.<Object>notNullValue());
+    assertThat(result, notNullValue());
     assertThat(getPayloadAsString(result), is(MESSAGE + " Rolled Back"));
   }
 
@@ -152,12 +152,12 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     MuleMessage result = null;
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
       result = client.send("vm://in6", MESSAGE, null, TIMEOUT).getRight();
-      assertThat(result, IsNull.<Object>notNullValue());
-      assertThat(result.getExceptionPayload(), IsNull.<Object>notNullValue());
+      assertThat(result, notNullValue());
+      assertThat(result.getExceptionPayload(), notNullValue());
       assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2 apt3"));
     }
     result = client.send("vm://in6", MESSAGE, null, TIMEOUT).getRight();
-    assertThat(result, IsNull.<Object>notNullValue());
+    assertThat(result, notNullValue());
     assertThat(getPayloadAsString(result), is(MESSAGE + " apt4 groovified"));
   }
 
@@ -180,7 +180,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     }
     assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
     MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT).getRight().get();
-    assertThat(dlqMessage, IsNull.<Object>notNullValue());
+    assertThat(dlqMessage, notNullValue());
     assertThat(getPayloadAsString(dlqMessage), is(MESSAGE_EXPECTED));
   }
 
@@ -188,7 +188,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   public void testHttpAlwaysRollbackUsingMuleClient() throws Exception {
     MuleClient client = muleContext.getClient();
     MuleMessage response =
-        client.send(String.format("http://localhost:%s", dynamicPort1.getNumber()), getTestMuleMessage(JSON_REQUEST),
+        client.send(format("http://localhost:%s", dynamicPort1.getNumber()), getTestMuleMessage(JSON_REQUEST),
                     newOptions().disableStatusCodeValidation().responseTimeout(TIMEOUT).build())
             .getRight();
     assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(500));
@@ -197,7 +197,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   @Test
   public void testHttpAlwaysRollbackUsingHttpClient() throws Exception {
     HttpClient httpClient = new HttpClient();
-    GetMethod getMethod = new GetMethod(String.format("http://localhost:%s", dynamicPort1.getNumber()));
+    GetMethod getMethod = new GetMethod(format("http://localhost:%s", dynamicPort1.getNumber()));
     int status = httpClient.executeMethod(getMethod);
     assertThat(status, is(500));
     getMethod.releaseConnection();
@@ -211,12 +211,12 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).disableStatusCodeValidation().responseTimeout(TIMEOUT).build();
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
-      response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), getTestMuleMessage(MESSAGE),
+      response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), getTestMuleMessage(MESSAGE),
                              httpRequestOptions)
           .getRight();
       assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(500));
     }
-    response = client.send(String.format("http://localhost:%s", dynamicPort2.getNumber()), getTestMuleMessage(MESSAGE),
+    response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), getTestMuleMessage(MESSAGE),
                            httpRequestOptions)
         .getRight();
     assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(200));
@@ -227,7 +227,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   @Test
   public void testHttpRedeliveryExhaustedRollbackUsingHttpClient() throws Exception {
     HttpClient httpClient = new HttpClient();
-    PostMethod postMethod = new PostMethod(String.format("http://localhost:%s", dynamicPort2.getNumber()));
+    PostMethod postMethod = new PostMethod(format("http://localhost:%s", dynamicPort2.getNumber()));
     postMethod.setRequestEntity(new StringRequestEntity(MESSAGE, "html/text", CharSetUtils.defaultCharsetName()));
     int status;
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
@@ -247,12 +247,12 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     MuleMessage result = null;
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
       result = client.send("vm://in2", MESSAGE, null, TIMEOUT).getRight();
-      assertThat(result, IsNull.<Object>notNullValue());
-      assertThat(result.getExceptionPayload(), IsNull.<Object>notNullValue());
+      assertThat(result, notNullValue());
+      assertThat(result.getExceptionPayload(), notNullValue());
       assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2 apt3"));
     }
     result = client.send("vm://in2", MESSAGE, null, TIMEOUT).getRight();
-    assertThat(result, IsNull.<Object>notNullValue());
+    assertThat(result, notNullValue());
     assertThat(getPayloadAsString(result), is(MESSAGE + " apt4 apt5"));
   }
 

@@ -115,7 +115,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.flowConstruct = flowConstruct;
     this.session = session;
     setMessage(message);
-    
+
     this.exchangePattern = exchangePattern;
     this.replyToHandler = null;
     this.replyToDestination = null;
@@ -181,8 +181,9 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars) {
-    this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus, rewriteEvent.getReplyToHandler(),
-     rewriteEvent.getReplyToDestination(), shareFlowVars, rewriteEvent.getExchangePattern());
+    this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus,
+         rewriteEvent.getReplyToHandler(),
+         rewriteEvent.getReplyToDestination(), shareFlowVars, rewriteEvent.getExchangePattern());
   }
 
   /**

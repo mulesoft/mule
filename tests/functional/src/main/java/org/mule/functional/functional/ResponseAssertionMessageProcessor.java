@@ -65,8 +65,8 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
       event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler() {
 
         @Override
-        public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
-          originalReplyToHandler.processReplyTo(processResponse(event), null, null);
+        public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+          return originalReplyToHandler.processReplyTo(processResponse(event), null, null);
         }
 
         @Override

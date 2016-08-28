@@ -181,7 +181,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
         reqEvent = new DefaultMuleEvent(reqEvent, new NonBlockingReplyToHandler() {
 
           @Override
-          public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+          public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
             try {
               Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
               holder.value = event;
@@ -189,6 +189,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
             } catch (IOException e) {
               processExceptionReplyTo(new MessagingException(event, e), replyTo);
             }
+            return event;
           }
 
           @Override

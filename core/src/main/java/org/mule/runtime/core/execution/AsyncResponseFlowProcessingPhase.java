@@ -189,10 +189,10 @@ public class AsyncResponseFlowProcessingPhase
     }
 
     @Override
-    public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
       fireNotification(null, event, flow, MESSAGE_RESPONSE);
-      template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier,
-                                                                              exceptionHandler));
+      template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
+      return event;
     }
 
     @Override
