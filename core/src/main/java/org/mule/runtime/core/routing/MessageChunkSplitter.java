@@ -65,7 +65,8 @@ public class MessageChunkSplitter extends AbstractSplitter {
       buffer = new byte[len];
       System.arraycopy(data, pos, buffer, 0, buffer.length);
       pos += len;
-      final DefaultMuleEvent childEvent = new DefaultMuleEvent(MuleMessage.builder(message).payload(buffer).build(), event);
+      final DefaultMuleEvent childEvent =
+          (DefaultMuleEvent) MuleEvent.builder(event).message(MuleMessage.builder(message).payload(buffer).build()).build();
       childEvent.setParent(event);
       childEvent.setCorrelation(new Correlation(parts, count));
 

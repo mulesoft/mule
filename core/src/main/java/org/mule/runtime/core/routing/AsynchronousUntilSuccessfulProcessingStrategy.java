@@ -12,7 +12,6 @@ import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTE
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -98,7 +97,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   @Override
   protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MessagingException {
     try {
-      final Serializable eventStoreKey = storeEvent(threadSafeCopy(event), flow);
+      final MuleEvent event1 = event;
+      final Serializable eventStoreKey = storeEvent(event1, flow);
       scheduleForProcessing(eventStoreKey, true);
       if (getUntilSuccessfulConfiguration().getAckExpression() == null) {
         return VoidMuleEvent.getInstance();
@@ -154,7 +154,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                                                                           Exception lastException) {
     try {
       final MuleEvent event = getUntilSuccessfulConfiguration().getObjectStore().remove(eventStoreKey);
-      final MuleEvent mutableEvent = threadSafeCopy(event);
+      final MuleEvent mutableEvent = event;
 
       final Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, mutableEvent);
       final Integer deliveryAttemptCount =
@@ -207,7 +207,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       return;
     }
     //we need another local copy in case mutableEvent is modified in the DLQ
-    MuleEvent eventCopy = threadSafeCopy(event);
+    MuleEvent eventCopy = event;
     logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
     try {
       RetryPolicyExhaustedException exception = buildRetryPolicyExhaustedException(lastException);
@@ -258,13 +258,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   private void retrieveAndProcessEvent(final Serializable eventStoreKey) throws ObjectStoreException {
     final MuleEvent persistedEvent = getUntilSuccessfulConfiguration().getObjectStore().retrieve(eventStoreKey);
-    final MuleEvent mutableEvent = threadSafeCopy(persistedEvent);
+    final MuleEvent mutableEvent = persistedEvent;
     processEvent(mutableEvent);
     removeFromStore(eventStoreKey);
-  }
-
-  protected MuleEvent threadSafeCopy(final MuleEvent event) {
-    return new DefaultMuleEvent(event.getMessage(), event);
   }
 
   @Override

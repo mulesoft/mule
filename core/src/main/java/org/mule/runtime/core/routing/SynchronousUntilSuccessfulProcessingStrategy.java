@@ -48,6 +48,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
             for (String flowVar : successEvent.getFlowVariableNames()) {
               event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
             }
+            // TODO org.mule.test.routing.ForeachUntilSuccessfulTestCase.flowVariablesSyncArePropagated()
             finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);
           }
           setCurrentEvent(finalEvent);

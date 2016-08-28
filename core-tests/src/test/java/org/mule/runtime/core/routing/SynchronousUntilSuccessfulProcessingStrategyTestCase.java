@@ -114,7 +114,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(event)).thenAnswer(invocation -> (MuleEvent) invocation.getArguments()[0]);
     MuleEvent response = processingStrategy.route(event, getTestFlow());
-    assertThat(response, is(event));
+    assertThat(response.getMessage(), is(event.getMessage()));
     verify(mockRoute).process(event);
     assertThat(getCurrentEvent(), sameInstance(response));
   }

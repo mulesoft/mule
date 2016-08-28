@@ -7,11 +7,10 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
@@ -43,16 +42,15 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
 
   protected MessageProcessor filteredTap = new WireTapFilter();
 
+  @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (tap == null) {
       return event;
     }
 
     try {
-      MuleEvent tapEvent = DefaultMuleEvent.copy(event);
       // Tap should not respond to reply to handler
-      // TODO: Combine this with copy once we have MuleEventBuilder to avoid second copy
-      tapEvent = new DefaultMuleEvent(tapEvent, (ReplyToHandler) null);
+      MuleEvent tapEvent = MuleEvent.builder(event).replyToHandler(null).build();
       setCurrentEvent(tapEvent);
       filteredTap.process(tapEvent);
       setCurrentEvent(event);

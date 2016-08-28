@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -38,22 +37,21 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
- * ` * The <code>Foreach</code> MessageProcessor allows iterating over a collection payload, or any collection obtained by an
+ * The {@code foreach} {@link MessageProcessor} allows iterating over a collection payload, or any collection obtained by an
  * expression, generating a message for each element.
- * <p/>
- * The number of the message being processed is stored in <code>#[variable:counter]</code> and the root message is store in
- * <code>#[flowVars.rootMessage]</code>. Both variables may be renamed by means of {@link #setCounterVariableName(String)} and
+ * <p>
+ * The number of the message being processed is stored in {@code #[variable:counter]} and the root message is store in
+ * {@code #[flowVars.rootMessage]}. Both variables may be renamed by means of {@link #setCounterVariableName(String)} and
  * {@link #setRootMessageVariableName(String)}.
- * <p/>
+ * <p>
  * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.
- * <p/>
+ * <p>
  * The {@link MuleEvent} sent to the next message processor is the same that arrived to foreach.
  */
 public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, MessageProcessor, NonBlockingSupported {
 
   public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
   public static final String COUNTER_PROPERTY = "counter";
-  private static final String XPATH_PREFIX = "xpath";
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -212,9 +210,8 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         List<MuleEvent> list = new LinkedList<>();
         Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
         for (Entry<?, ?> entry : set) {
-          MuleEvent splitEvent = new DefaultMuleEvent(MuleMessage.builder().payload(entry.getValue()).build(), event);
           // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
-          list.add(splitEvent);
+          list.add(MuleEvent.builder(event).message(MuleMessage.builder().payload(entry.getValue()).build()).build());
         }
         return new CollectionMessageSequence(list);
       }
