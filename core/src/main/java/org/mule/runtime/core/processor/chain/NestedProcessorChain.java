@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NestedProcessor;
@@ -55,35 +54,25 @@ public class NestedProcessorChain implements NestedProcessor {
 
   @Override
   public Object process() throws Exception {
-    MuleEvent muleEvent;
-    muleEvent = new DefaultMuleEvent(event.getMessage(), event);
-    return chain.process(muleEvent).getMessage().getPayload();
+    return chain.process(event).getMessage().getPayload();
   }
 
   @Override
   public Object process(Object payload) throws Exception {
-    MuleEvent muleEvent = new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), event);
+    MuleEvent muleEvent = MuleEvent.builder(event).message(MuleMessage.builder().payload(payload).build()).build();
     return chain.process(muleEvent).getMessage().getPayload();
   }
 
   @Override
   public Object processWithExtraProperties(Map<String, Object> properties) throws Exception {
-    MuleMessage muleMessage;
-    muleMessage = event.getMessage();
-    for (String property : properties.keySet()) {
-      event.setFlowVariable(property, properties.get(property));
-    }
-    MuleEvent muleEvent;
-    muleEvent = new DefaultMuleEvent(muleMessage, event);
+    MuleEvent muleEvent = MuleEvent.builder(event).flowVariables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload();
   }
 
   @Override
   public Object process(Object payload, Map<String, Object> properties) throws Exception {
-    MuleEvent muleEvent = new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), event);
-    for (String property : properties.keySet()) {
-      muleEvent.setFlowVariable(property, properties.get(property));
-    }
+    MuleEvent muleEvent =
+        MuleEvent.builder(event).message(MuleMessage.builder().payload(payload).build()).flowVariables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload();
   }
 }

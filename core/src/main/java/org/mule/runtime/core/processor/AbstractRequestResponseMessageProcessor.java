@@ -20,13 +20,11 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 /**
  * Base implementation of a {@link org.mule.runtime.core.api.processor.MessageProcessor} that may performs processing during both
  * the request and response processing phases while supporting non-blocking execution.
- * <p/>
- *
+ * <p>
  * In order to define the process during the request phase you should override the
  * {@link #processRequest(org.mule.runtime.core.api.MuleEvent)} method. Symmetrically, if you need to define a process to be
  * executed during the response phase, then you should override the {@link #processResponse(MuleEvent, MuleEvent)} method.
- * <p/>
- *
+ * <p>
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you should
  * override the {@link #processFinally(org.mule.runtime.core.api.MuleEvent, MessagingException)} method.
  *

@@ -14,6 +14,7 @@ public class SleepyFileMessageDispatcher extends FileMessageDispatcher {
 
   public SleepyFileMessageDispatcher(OutboundEndpoint endpoint) {
     super(endpoint);
+    setMuleContext(endpoint.getMuleContext());
   }
 
   @Override

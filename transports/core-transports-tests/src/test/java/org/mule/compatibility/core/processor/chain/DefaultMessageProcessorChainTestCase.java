@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -114,7 +115,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
 
     MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
     MuleEvent response = chain.process(event);
-    assertThat(event.getId(), is(response.getId()));
     assertThat(event.getMessage(), is(response.getMessage()));
 
     assertEquals(1, threads);
@@ -126,6 +126,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     when(event.getId()).thenReturn(randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());

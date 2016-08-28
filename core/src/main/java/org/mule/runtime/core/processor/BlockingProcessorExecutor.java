@@ -8,6 +8,7 @@ package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -22,11 +23,10 @@ import org.mule.runtime.core.routing.MessageFilter;
 import java.util.List;
 
 /**
- * This {@link org.mule.runtime.core.api.processor.ProcessorExecutor} implementation executes each
- * {@link org.mule.runtime.core.api.processor.MessageProcessor} in sucession in the same thread until or processors have been
- * invoked or one of the following is returned by a processor:
+ * This {@link ProcessorExecutor} implementation executes each {@link MessageProcessor} in succession in the same thread until or
+ * processors have been invoked or one of the following is returned by a processor:
  * <li>{@link org.mule.runtime.core.VoidMuleEvent}</li>
- * <li><code>null</code></li>
+ * <li>{@code null}</li>
  */
 public class BlockingProcessorExecutor implements ProcessorExecutor {
 
@@ -74,8 +74,15 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
     if (copyOnVoidEvent
         && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
             || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent()))) {
-      MuleEvent copy = MuleEvent.builder(event).build();
+      /*
+       * TODO migrating this to the builder breaks the following tests:
+       * 
+       * org.mule.test.routing.ForeachUntilSuccessfulTestCase.flowVariablesAsyncArePropagated()
+       * org.mule.test.construct.FlowSyncAsyncProcessingStrategyTestCase
+       */
+      MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event);
       MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
+
       if (isUseEventCopy(result)) {
         setCurrentEvent(copy);
         result = copy;
