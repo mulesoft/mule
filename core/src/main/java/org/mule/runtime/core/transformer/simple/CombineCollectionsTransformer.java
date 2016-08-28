@@ -8,7 +8,6 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -53,7 +52,7 @@ public class CombineCollectionsTransformer implements MessageProcessor {
     }
 
     MuleMessage listMessage = MuleMessage.builder(msg).collectionPayload(payload, itemType).build();
-    return new DefaultMuleEvent(listMessage, event);
+    return MuleEvent.builder(event).message(listMessage).build();
   }
 
   private void add(List<Object> newPayload, Collection existingPayload) {
