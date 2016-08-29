@@ -22,7 +22,9 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.util.CharSetUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -71,7 +73,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   public void testAlwaysRollback() throws Exception {
     final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
     MuleClient client = muleContext.getClient();
-    muleContext.registerListener(notification -> latch.countDown());
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> latch.countDown());
     client.dispatch("vm://in", "some message", null);
     if (!latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("message should have been delivered at least 5 times");
@@ -83,7 +85,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   public void testAlwaysRollbackJmsNoTransaction() throws Exception {
     final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
     MuleClient client = muleContext.getClient();
-    muleContext.registerListener(notification -> latch.countDown());
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> latch.countDown());
     client.dispatch("jms://in?connector=activeMq", "some message", null);
     if (!latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("message should have been delivered at least 5 times");
@@ -96,7 +98,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
     final MutableInt deliveredTimes = new MutableInt(0);
     MuleClient client = muleContext.getClient();
-    muleContext.registerListener(notification -> {
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> {
       deliveredTimes.increment();
       latch.countDown();
     });
@@ -114,7 +116,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   public void testRollbackWithComponent() throws Exception {
     final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
     MuleClient client = muleContext.getClient();
-    muleContext.registerListener(notification -> latch.countDown());
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> latch.countDown());
     client.dispatch("vm://in5", "some message", null);
     if (!latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("message should have been delivered at least 5 times");
@@ -144,7 +146,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
     final MutableInt deliveredTimes = new MutableInt(0);
     MuleClient client = muleContext.getClient();
-    muleContext.registerListener(notification -> {
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> {
       deliveredTimes.increment();
       latch.countDown();
     });
@@ -236,7 +238,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
     final MutableInt deliveredTimes = new MutableInt(0);
     MuleClient client = muleContext.getClient();
-    muleContext.registerListener(notification -> {
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> {
       deliveredTimes.increment();
       latch.countDown();
     });
@@ -253,7 +255,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     final CountDownLatch latch = new CountDownLatch(EXPECTED_DELIVERED_TIMES);
     final MutableInt deliveredTimes = new MutableInt(0);
     MuleClient client = muleContext.getClient();
-    muleContext.registerListener(notification -> {
+    muleContext.registerListener((ExceptionNotificationListener<ExceptionNotification>) notification -> {
       deliveredTimes.increment();
       latch.countDown();
     });
