@@ -136,8 +136,15 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
             if (requestConfig == null)
             {
-                requestConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext).build();
-                muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+                synchronized (this)
+                {
+                    requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
+                    if (requestConfig == null)
+                    {
+                        requestConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext).build();
+                        muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+                    }
+                }
             }
 
             httpRequester.setConfig(requestConfig);
