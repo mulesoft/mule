@@ -15,6 +15,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
@@ -104,6 +105,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                                                                                                endpoint.getMuleContext());
       requestEvent.getSession().merge(storedSession);
       MuleEvent resultEvent = MuleEvent.builder(requestEvent).message(resultMessage).build();
+      ((DefaultMuleEvent) resultEvent).setLegacyCorrelationId(((DefaultMuleEvent) requestEvent).getLegacyCorrelationId());
       setCurrentEvent(resultEvent);
       return resultEvent;
     } else {
