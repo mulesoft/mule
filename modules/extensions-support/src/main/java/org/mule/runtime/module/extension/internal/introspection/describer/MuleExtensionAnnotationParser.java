@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.core.util.ClassUtils;
@@ -41,6 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Utilities for reading annotations as a mean to describe extensions
@@ -49,16 +53,23 @@ import java.util.function.Function;
  */
 public final class MuleExtensionAnnotationParser {
 
+  private static final Logger logger = LoggerFactory.getLogger(MuleExtensionAnnotationParser.class);
+
   public static String getMemberName(BaseDeclaration<?> declaration, String defaultName) {
     return declaration.getModelProperty(DeclaringMemberModelProperty.class).map(p -> p.getDeclaringField().getName())
         .orElse(defaultName);
   }
 
   public static Extension getExtension(Class<?> extensionType) {
-    Extension extension = extensionType.getAnnotation(Extension.class);
-    checkState(extension != null, String.format("%s is not a Mule extension since it's not annotated with %s",
-                                                extensionType.getName(), Extension.class.getName()));
-    return extension;
+    try {
+      Extension extension = extensionType.getAnnotation(Extension.class);
+      checkState(extension != null, format("%s is not a Mule extension since it's not annotated with %s", extensionType.getName(),
+                                           Extension.class.getName()));
+      return extension;
+    } catch (Exception e) {
+      logger.error(format("%s getting '@Extension' annotation from %s", e.getClass().getName(), extensionType.getName()), e);
+      throw e;
+    }
   }
 
   public static <T extends Annotation> List<T> parseRepeatableAnnotation(Class<?> extensionType, Class<T> annotation,
