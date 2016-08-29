@@ -13,7 +13,6 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.service.TransportFactory;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -24,11 +23,11 @@ import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 
-import java.io.Serializable;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+
+import java.io.Serializable;
 
 public class EndpointReplyToHandler extends DefaultReplyToHandler {
 
@@ -57,7 +56,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
     returnMessage = MuleMessage.builder(returnMessage).payload(returnMessage.getPayload()).build();
 
     // Create the replyTo event asynchronous
-    MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, event);
+    MuleEvent replyToEvent = MuleEvent.builder(event).message(returnMessage).build();
 
     // get the endpoint for this url
     OutboundEndpoint endpoint = getEndpoint(event, replyToEndpoint);

@@ -11,7 +11,6 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGI
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGINAL_FILENAME;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_DIRECTORY;
 import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_SOURCE_FILENAME;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -20,7 +19,7 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -254,8 +253,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
         MuleMessage.builder().nullPayload().addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
             .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory).build();
 
-    final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct, endpoint.getAddress()), fileParserMessasge, flowConstruct);
+    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
+        .message(fileParserMessasge).flow(flowConstruct).build();
 
     final File sourceFile;
     if (workDir != null) {

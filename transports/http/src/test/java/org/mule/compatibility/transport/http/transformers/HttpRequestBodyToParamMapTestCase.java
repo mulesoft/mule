@@ -21,7 +21,6 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -66,25 +65,25 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
   @Test
   public void validGet() throws Exception {
     MuleMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
-    verifyTransformation(transform(new DefaultMuleEvent(context, msg, flow)));
+    verifyTransformation(transform(MuleEvent.builder(context).message(msg).flow(flow).build()));
   }
 
   @Test
   public void validPost() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
-    verifyTransformation(transform(new DefaultMuleEvent(context, msg, flow)));
+    verifyTransformation(transform(MuleEvent.builder(context).message(msg).flow(flow).build()));
   }
 
   @Test
   public void validPut() throws Exception {
     MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
-    verifyTransformation(transform(new DefaultMuleEvent(context, msg, flow)));
+    verifyTransformation(transform(MuleEvent.builder(context).message(msg).flow(flow).build()));
   }
 
   @Test(expected = TransformerException.class)
   public void invalidContentType() throws Exception {
     MuleMessage msg = createMessage(METHOD_POST, "application/json");
-    transform(new DefaultMuleEvent(context, msg, flow));
+    transform(MuleEvent.builder(context).message(msg).flow(flow).build());
   }
 
   private Object transform(MuleEvent event) throws TransformerException {

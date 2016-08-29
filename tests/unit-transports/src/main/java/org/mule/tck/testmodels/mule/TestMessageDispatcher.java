@@ -10,7 +10,6 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -64,7 +63,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher {
     } else {
       try {
         final MuleMessage response = event.getMessage();
-        event = new DefaultMuleEvent(event, new ReplyToHandler() {
+        event = MuleEvent.builder(event).replyToHandler(new ReplyToHandler() {
 
           @Override
           public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) {
@@ -79,7 +78,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher {
           public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
             completionHandler.onFailure(exception);
           }
-        });
+        }).build();
         nonBlockingProcessor.process(event);
       } catch (Exception e) {
         completionHandler.onFailure(e);

@@ -14,8 +14,8 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -85,9 +85,8 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
       String epUri;
       if (ep instanceof DynamicOutboundEndpoint) {
         Flow flow = getTestFlow();
-        epUri = muleContext.getExpressionManager()
-            .parse(ep.getAddress(), new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow), flow,
-                   true);
+        epUri = muleContext.getExpressionManager().parse(ep.getAddress(), MuleEvent
+            .builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build(), flow, true);
       } else {
         epUri = ep.getAddress();
       }

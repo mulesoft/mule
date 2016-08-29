@@ -7,9 +7,9 @@
 package org.mule.compatibility.core.component;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -35,7 +35,7 @@ public class BindingInvocationHandler implements InvocationHandler {
   protected Map<String, InterfaceBinding> routers = null;
 
   public BindingInvocationHandler(InterfaceBinding router) {
-    this.routers = new ConcurrentHashMap<String, InterfaceBinding>();
+    this.routers = new ConcurrentHashMap<>();
     addRouterForInterface(router);
   }
 
@@ -69,7 +69,7 @@ public class BindingInvocationHandler implements InvocationHandler {
     }
 
     MuleEvent currentEvent = getCurrentEvent();
-    MuleEvent replyEvent = router.process(new DefaultMuleEvent(message, currentEvent));
+    MuleEvent replyEvent = router.process(MuleEvent.builder(currentEvent).message(message).build());
 
     if (replyEvent != null && !VoidMuleEvent.getInstance().equals(replyEvent)
         && replyEvent.getMessage() != null) {
@@ -104,8 +104,8 @@ public class BindingInvocationHandler implements InvocationHandler {
       // Try to find a matching exception type from the method's "throws" clause, and if so
       // return that exception.
       Class<?>[] exceptions = method.getExceptionTypes();
-      for (int i = 0; i < exceptions.length; i++) {
-        if (cause.getClass().equals(exceptions[i])) {
+      for (Class<?> exception : exceptions) {
+        if (cause.getClass().equals(exception)) {
           return cause;
         }
       }

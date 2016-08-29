@@ -10,7 +10,6 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -149,8 +148,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
           }
         };
 
-        MuleEvent event = new DefaultMuleEvent(create(flowConstruct, "EndpointNotificationLoggerAgent"), msg,
-                                               endpoint.getExchangePattern(), flowConstruct);
+        MuleEvent event = MuleEvent.builder(create(flowConstruct, "EndpointNotificationLoggerAgent")).message(msg)
+            .exchangePattern(endpoint.getExchangePattern()).flow(flowConstruct).build();
         event.setEnableNotifications(false);
         endpoint.process(event);
       } catch (Exception e1) {

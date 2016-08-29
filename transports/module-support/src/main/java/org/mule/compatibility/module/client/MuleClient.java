@@ -8,7 +8,6 @@ package org.mule.compatibility.module.client;
 
 import static java.util.Collections.EMPTY_MAP;
 import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY;
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
@@ -23,7 +22,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.FutureMessageResult;
@@ -433,7 +432,8 @@ public class MuleClient implements Disposable {
           .addOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword())).build();
     }
     MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-    return new DefaultMuleEvent(create(flowConstruct, "MuleClient"), message, exchangePattern, flowConstruct);
+    return MuleEvent.builder(DefaultMessageContext.create(flowConstruct, "MuleClient")).message(message)
+        .exchangePattern(exchangePattern).flow(flowConstruct).build();
   }
 
   protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException {

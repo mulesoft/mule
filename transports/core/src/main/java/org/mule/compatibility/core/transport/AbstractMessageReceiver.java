@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
@@ -14,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MES
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
-import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
@@ -250,7 +250,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       newEvent.setLegacyCorrelationId(message.getCorrelationId());
     }
     newEvent.setCorrelation(message.getCorrelation());
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
+    populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
     setCurrentEvent(event);
     if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null) {

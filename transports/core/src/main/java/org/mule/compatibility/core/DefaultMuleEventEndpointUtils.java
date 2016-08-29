@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPER
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
 public class DefaultMuleEventEndpointUtils {
@@ -19,9 +20,9 @@ public class DefaultMuleEventEndpointUtils {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  public static void populateFieldsFromInboundEndpoint(DefaultMuleEvent event, InboundEndpoint endpoint) {
-    event.setEndpointFields(endpoint.getEncoding(), endpoint.getExchangePattern(),
-                            endpoint.getTransactionConfig().isTransacted());
+  public static void populateFieldsFromInboundEndpoint(MuleEvent event, InboundEndpoint endpoint) {
+    ((DefaultMuleEvent) event).setEndpointFields(endpoint.getEncoding(), endpoint.getExchangePattern(),
+                                                 endpoint.getTransactionConfig().isTransacted());
 
     fillProperties(event, endpoint);
   }
@@ -30,7 +31,7 @@ public class DefaultMuleEventEndpointUtils {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  protected static void fillProperties(DefaultMuleEvent event, InboundEndpoint endpoint) {
+  protected static void fillProperties(MuleEvent event, InboundEndpoint endpoint) {
     if (endpoint != null && endpoint.getProperties() != null) {
       for (Object name : endpoint.getProperties().keySet()) {
         String prop = (String) name;

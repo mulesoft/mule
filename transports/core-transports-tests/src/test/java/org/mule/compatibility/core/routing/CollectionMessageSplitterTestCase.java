@@ -15,10 +15,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 
-import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -125,8 +124,9 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     MuleMessage toSplit = MuleMessage.builder().payload(payload).build();
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(fc, TEST_CONNECTOR), toSplit, fc, session);
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
+    MuleEvent event =
+        MuleEvent.builder(DefaultMessageContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session).build();
+    populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
   }
 
@@ -165,8 +165,9 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     splitter.setMuleContext(muleContext);
     Grabber grabber = new Grabber();
     splitter.setListener(grabber);
-    DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(fc, TEST_CONNECTOR), toSplit, fc, session);
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
+    MuleEvent event =
+        MuleEvent.builder(DefaultMessageContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session).build();
+    populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
       event.setFlowVariable(entry.getKey(), entry.getValue());
     }
