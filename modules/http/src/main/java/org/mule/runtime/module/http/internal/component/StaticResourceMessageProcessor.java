@@ -17,7 +17,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -91,7 +90,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
           .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(MOVED_TEMPORARILY.getStatusCode()))
           .addOutboundProperty(CONTENT_LENGTH, 0)
           .addOutboundProperty(LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/").build();
-      resultEvent = new DefaultMuleEvent(message, event);
+      resultEvent = MuleEvent.builder(event).message(message).build();
     }
 
     InputStream in = null;
@@ -111,7 +110,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
       MuleMessage message = MuleMessage.builder().nullPayload().mediaType(MediaType.parse(mimetype))
           .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(OK.getStatusCode()))
           .addOutboundProperty(CONTENT_LENGTH, buffer.length).build();
-      resultEvent = new DefaultMuleEvent(message, event);
+      resultEvent = MuleEvent.builder(event).message(message).build();
     } catch (IOException e) {
       throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBase + path)), event,
                                           this);

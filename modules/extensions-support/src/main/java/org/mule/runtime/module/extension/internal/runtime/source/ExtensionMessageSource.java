@@ -20,7 +20,6 @@ import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -103,8 +102,8 @@ public class ExtensionMessageSource extends ExtensionComponent
   @Override
   public void handle(MuleMessage message,
                      CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> completionHandler) {
-    MuleEvent event = new DefaultMuleEvent(create(flowConstruct, getConfigurationProviderName()),
-                                           (org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
+    MuleEvent event = MuleEvent.builder(create(flowConstruct, getConfigurationProviderName()))
+        .message((org.mule.runtime.core.api.MuleMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, downCast(completionHandler)),
                         createProcessingContext());
@@ -112,8 +111,8 @@ public class ExtensionMessageSource extends ExtensionComponent
 
   @Override
   public void handle(MuleMessage message) {
-    MuleEvent event = new DefaultMuleEvent(create(flowConstruct, getConfigurationProviderName()),
-                                           (org.mule.runtime.core.api.MuleMessage) message, REQUEST_RESPONSE, flowConstruct);
+    MuleEvent event = MuleEvent.builder(create(flowConstruct, getConfigurationProviderName()))
+        .message((org.mule.runtime.core.api.MuleMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()),
                         createProcessingContext());

@@ -20,7 +20,6 @@ import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -92,8 +91,9 @@ public class HttpRequester {
     MuleMessage responseMessage = httpResponseToMuleMessage.convert(muleEvent, response, httpRequest.getUri());
 
     // Create a new muleEvent based on the old and the response so that the auth can use it
-    MuleEvent responseEvent = new DefaultMuleEvent(org.mule.runtime.core.api.MuleMessage.builder(responseMessage).build(),
-                                                   muleEvent, muleEvent.isSynchronous());
+    MuleEvent responseEvent =
+        MuleEvent.builder(muleEvent).message(org.mule.runtime.core.api.MuleMessage.builder(responseMessage).build())
+            .synchronous(muleEvent.isSynchronous()).build();
     if (resendRequest(responseEvent, checkRetry, authentication)) {
       consumePayload(responseEvent, muleContext);
       responseMessage = doRequest(responseEvent, client, requestBuilder, false, muleContext, flowConstruct);

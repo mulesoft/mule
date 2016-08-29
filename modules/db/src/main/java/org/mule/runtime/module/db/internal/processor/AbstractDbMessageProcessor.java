@@ -13,7 +13,6 @@ import static org.mule.runtime.module.db.internal.domain.transaction.Transaction
 import org.mule.common.Result;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.OperationMetaDataEnabled;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -108,7 +107,7 @@ public abstract class AbstractDbMessageProcessor extends AbstractInterceptingMes
 
     if (!StringUtils.isEmpty(source) && !("#[payload]".equals(source))) {
       Object payload = muleContext.getExpressionManager().evaluate(source, muleEvent, flowConstruct);
-      eventToUse = new DefaultMuleEvent(MuleMessage.builder().payload(payload).build(), muleEvent);
+      eventToUse = MuleEvent.builder(muleEvent).message(MuleMessage.builder().payload(payload).build()).build();
     }
     return eventToUse;
   }

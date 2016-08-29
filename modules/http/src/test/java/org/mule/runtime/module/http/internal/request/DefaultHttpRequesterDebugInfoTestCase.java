@@ -34,7 +34,6 @@ import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
@@ -88,7 +87,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
   private DefaultHttpRequester requester = new DefaultHttpRequester();
   private DefaultHttpRequesterConfig config = new DefaultHttpRequesterConfig();
   private MuleMessage message;
-  private DefaultMuleEvent event;
+  private MuleEvent event;
 
   @Before
   public void setup() throws Exception {
@@ -100,7 +99,8 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
 
     message = MuleMessage.builder().payload(TEST_MESSAGE).build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, REQUEST_RESPONSE, flow);
+    event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message)
+        .exchangePattern(REQUEST_RESPONSE).flow(flow).build();
   }
 
   @Test
@@ -116,8 +116,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     doDebugInfoTest(message, event, null);
   }
 
-  private void doDebugInfoTest(MuleMessage message, DefaultMuleEvent event,
-                               List<Matcher<FieldDebugInfo<?>>> securityFieldMatchers)
+  private void doDebugInfoTest(MuleMessage message, MuleEvent event, List<Matcher<FieldDebugInfo<?>>> securityFieldMatchers)
       throws InitialisationException {
     configureRequesterExpressions();
     addRequesterProperties(message);

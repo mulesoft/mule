@@ -18,7 +18,6 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -233,7 +232,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       if (event.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
 
-        event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler() {
+        event = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
           @Override
           public MuleEvent processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo)
@@ -265,7 +264,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
           public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
             originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
           }
-        });
+        }).build();
         // Update RequestContext ThreadLocal for backwards compatibility
         setCurrentEvent(event);
       }
