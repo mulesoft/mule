@@ -6,6 +6,7 @@
  */
 package org.mule.test.xml.functional;
 
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 
@@ -16,7 +17,7 @@ public class HideExceptions implements MessagingExceptionHandler {
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  public MuleEvent handleException(Exception exception, MuleEvent event) {
+  public MuleEvent handleException(MessagingException exception, MuleEvent event) {
     logger.debug("Hiding exception: " + exception);
     logger.debug("(see config for test - some exceptions expected)");
     return null;

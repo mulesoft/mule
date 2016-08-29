@@ -120,8 +120,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     configureExceptionStrategyToReleaseLatchWhenExecuted();
     configureDLQToReleaseLatchWhenExecuted();
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.transform(any(MuleMessage.class), any(DataType.class)))
-        .thenAnswer(invocation -> MuleMessage.builder().payload(invocation.getArguments()[0].toString().getBytes()).build());
+    when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer(
+                                                                                                  invocation -> MuleMessage
+                                                                                                      .builder()
+                                                                                                      .payload(invocation
+                                                                                                          .getArguments()[0]
+                                                                                                              .toString()
+                                                                                                              .getBytes())
+                                                                                                      .build());
   }
 
   @Test(expected = InitialisationException.class)
@@ -148,12 +154,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
 
-    verify(mockFlow.getExceptionListener(), times(1)).handleException(argThat(new ArgumentMatcher<Exception>() {
+    verify(mockFlow.getExceptionListener(), times(1)).handleException(argThat(new ArgumentMatcher<MessagingException>() {
 
       @Override
       public boolean matches(Object item) {
-        return item instanceof RetryPolicyExhaustedException
-            && EXPECTED_FAILURE_MSG.equals(((RetryPolicyExhaustedException) item).getCause().getMessage());
+        return item instanceof MessagingException
+            && ((MessagingException) item).getCause() instanceof RetryPolicyExhaustedException
+            && EXPECTED_FAILURE_MSG.equals(((MessagingException) item).getCauseException().getMessage());
       }
     }), eq(mockEvent));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
@@ -169,12 +176,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
 
-    verify(mockFlow.getExceptionListener(), times(1)).handleException(argThat(new ArgumentMatcher<Exception>() {
+    verify(mockFlow.getExceptionListener(), times(1)).handleException(argThat(new ArgumentMatcher<MessagingException>() {
 
       @Override
       public boolean matches(Object item) {
-        return item instanceof RetryPolicyExhaustedException && ((RetryPolicyExhaustedException) item).getMessage()
-            .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
+        return item instanceof MessagingException
+            && ((MessagingException) item).getCauseException() instanceof RetryPolicyExhaustedException
+            && ((MessagingException) item).getCauseException().getMessage()
+                .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
     }), eq(mockEvent));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
@@ -190,12 +199,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
 
-    verify(mockFlow.getExceptionListener(), times(1)).handleException(argThat(new ArgumentMatcher<Exception>() {
+    verify(mockFlow.getExceptionListener(), times(1)).handleException(argThat(new ArgumentMatcher<MessagingException>() {
 
       @Override
       public boolean matches(Object item) {
-        return item instanceof RetryPolicyExhaustedException && ((RetryPolicyExhaustedException) item).getMessage()
-            .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
+        return item instanceof MessagingException
+            && ((MessagingException) item).getCauseException() instanceof RetryPolicyExhaustedException
+            && (((MessagingException) item).getCauseException()).getMessage()
+                .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
     }), eq(mockEvent));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
@@ -211,7 +222,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
 
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class),
+                                                                     any(MuleEvent.class));
     verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>() {
 
       @Override
@@ -243,7 +255,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
 
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class),
+                                                                     any(MuleEvent.class));
     verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>() {
 
       @Override
@@ -276,7 +289,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
 
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(Exception.class), any(MuleEvent.class));
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class),
+                                                                     any(MuleEvent.class));
     verify(mockDLQ, times(1)).process(argThat(new ArgumentMatcher<MuleEvent>() {
 
       @Override
@@ -303,7 +317,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     executeUntilSuccessful();
     waitUntilRouteIsExecuted();
     verify(mockRoute, times(1)).process(mockEvent);
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(Exception.class), eq(mockEvent));
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(mockEvent));
   }
 
   @Test
@@ -326,7 +340,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         return true;
       }
     }));
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(Exception.class), eq(mockEvent));
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(mockEvent));
   }
 
   private void executeUntilSuccessfulFailingRoute(FailCallback failCallback) throws Exception {
@@ -401,7 +415,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   }
 
   private void configureExceptionStrategyToReleaseLatchWhenExecuted() {
-    when(mockFlow.getExceptionListener().handleException(any(Exception.class), any(MuleEvent.class)))
+    when(mockFlow.getExceptionListener().handleException(any(MessagingException.class), any(MuleEvent.class)))
         .thenAnswer(invocationOnMock -> {
           exceptionHandlingLatch.release();
           return null;

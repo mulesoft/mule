@@ -73,6 +73,7 @@ public class ApplicationModel {
   public static final String DEFAULT_EXCEPTION_STRATEGY = "default-exception-strategy";
   public static final String MAX_REDELIVERY_ATTEMPTS_ROLLBACK_ES_ATTRIBUTE = "maxRedeliveryAttempts";
   public static final String WHEN_CHOICE_ES_ATTRIBUTE = "when";
+  public static final String TYPE_ES_ATTRIBUTE = "type";
   public static final String EXCEPTION_STRATEGY_REFERENCE_ELEMENT = "exception-strategy";
   public static final String SPRING_NAMESPACE = "spring";
   public static final String SPRING_CONTEXT_NAMESPACE = "context";
@@ -476,8 +477,9 @@ public class ApplicationModel {
   private void validateExceptionStrategiesHaveWhenAttribute(ComponentModel component) {
     List<ComponentModel> innerComponents = component.getInnerComponents();
     for (int i = 0; i < innerComponents.size() - 1; i++) {
-      if (innerComponents.get(i).getParameters().get(WHEN_CHOICE_ES_ATTRIBUTE) == null) {
-        throw new MuleRuntimeException(createStaticMessage("Every handler (except for the last one) within an error-handler must specify the when attribute"));
+      Map<String, String> parameters = innerComponents.get(i).getParameters();
+      if (parameters.get(WHEN_CHOICE_ES_ATTRIBUTE) == null && parameters.get(TYPE_ES_ATTRIBUTE) == null) {
+        throw new MuleRuntimeException(createStaticMessage("Every handler (except for the last one) within an error-handler must specify the when or type attribute"));
       }
     }
   }

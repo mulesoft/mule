@@ -49,11 +49,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Until successful asynchronous processing strategy.
  * <p/>
- * It will return successfully to the flow executing the router once it was able to store the message in the object store.
+ * It will return successfully to the flow executing the router once it was able to
+ * store the message in the object store.
  * <p/>
- * After that it will asynchronously try to process the message through the internal route. If route was not successfully executed
- * after the configured retry count then the message will be routed to the defined dead letter queue route or in case there is no
- * dead letter queue route then it will be handled by the flow exception strategy.
+ * After that it will asynchronously try to process the message through the internal route.
+ * If route was not successfully executed after the configured retry count then the message
+ * will be routed to the defined dead letter queue route or in case there is no dead letter
+ * queue route then it will be handled by the flow exception strategy.
  */
 public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy
     implements Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware {
@@ -68,8 +70,10 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   @Override
   public void initialise() throws InitialisationException {
     if (getUntilSuccessfulConfiguration().getObjectStore() == null) {
-      throw new InitialisationException(MessageFactory
-          .createStaticMessage("A ListableObjectStore must be configured on UntilSuccessful."), this);
+      throw new InitialisationException(
+                                        MessageFactory
+                                            .createStaticMessage("A ListableObjectStore must be configured on UntilSuccessful."),
+                                        this);
     }
   }
 
@@ -102,7 +106,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       }
       return processResponseThroughAckResponseExpression(event);
     } catch (final Exception e) {
-      throw new MessagingException(MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, e,
+      throw new MessagingException(
+                                   MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, e,
                                    getUntilSuccessfulConfiguration().getRouter());
     }
   }
@@ -197,11 +202,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   private void abandonRetries(final MuleEvent event, final MuleEvent mutableEvent, final Exception lastException) {
     if (getUntilSuccessfulConfiguration().getDlqMP() == null) {
       logger.info("Retry attempts exhausted and no DLQ defined");
-      // mutableEvent should be a local copy of event
-      messagingExceptionHandler.handleException(buildRetryPolicyExhaustedException(lastException), mutableEvent);
+      //mutableEvent should be a local copy of event
+      messagingExceptionHandler
+          .handleException(new MessagingException(mutableEvent, buildRetryPolicyExhaustedException(lastException)), mutableEvent);
       return;
     }
-    // we need another local copy in case mutableEvent is modified in the DLQ
+    //we need another local copy in case mutableEvent is modified in the DLQ
     MuleEvent eventCopy = threadSafeCopy(event);
     logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
     try {
@@ -221,26 +227,19 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     MuleException muleException = ExceptionHelper.getRootMuleException(e);
 
     if (muleException == null) {
-      return new RetryPolicyExhaustedException(CoreMessages.createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, e.getMessage()), e,
-                                               this);
+      return new RetryPolicyExhaustedException(CoreMessages.createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, e.getMessage()),
+                                               e, this);
     } else {
-      // the logger processes only the inner-most MuleException, which should be a MessagingException. In order to not lose
-      // information, we have to re-wrap its cause with this new exception.
+      // the logger processes only the inner-most MuleException, which should be a MessagingException. In order to not lose information, we have to re-wrap its cause with this new exception.
       if (muleException.getCause() != null) {
-        RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(
-                                                                                                        CoreMessages
-                                                                                                            .createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                                                                 muleException
-                                                                                                                                     .getMessage()),
+        RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages
+            .createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
                                                                                                         muleException.getCause());
         retryPolicyExhaustedException.getInfo().putAll(muleException.getInfo());
         return retryPolicyExhaustedException;
       } else {
-        RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(
-                                                                                                        CoreMessages
-                                                                                                            .createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX,
-                                                                                                                                 muleException
-                                                                                                                                     .getMessage()),
+        RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages
+            .createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
                                                                                                         muleException);
         retryPolicyExhaustedException.getInfo().putAll(muleException.getInfo());
         return retryPolicyExhaustedException;

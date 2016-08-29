@@ -9,7 +9,7 @@ package org.mule.runtime.core.exception;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -43,11 +43,13 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   private MuleEvent mockMuleEvent;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
-  private Exception mockException = new Exception();
+  private MessagingException mockException;
 
   @Before
   public void before() {
     when(mockMuleEvent.getMessage()).thenReturn(MuleMessage.builder().payload("").build());
+    when(mockMuleEvent.getMuleContext()).thenReturn(mockMuleContext);
+    mockException = new MessagingException(mockMuleEvent, new Exception());
   }
 
   @Test
@@ -62,9 +64,9 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(false);
     when(mockDefaultTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(true);
     errorHandler.handleException(mockException, mockMuleEvent);
-    verify(mockTestExceptionStrategy1, VerificationModeFactory.times(0)).handleException(any(Exception.class),
+    verify(mockTestExceptionStrategy1, VerificationModeFactory.times(0)).handleException(any(MessagingException.class),
                                                                                          any(MuleEvent.class));
-    verify(mockTestExceptionStrategy2, VerificationModeFactory.times(0)).handleException(any(Exception.class),
+    verify(mockTestExceptionStrategy2, VerificationModeFactory.times(0)).handleException(any(MessagingException.class),
                                                                                          any(MuleEvent.class));
     verify(mockDefaultTestExceptionStrategy2, VerificationModeFactory.times(1)).handleException(mockException, mockMuleEvent);
   }
@@ -81,9 +83,9 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     when(mockTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(true);
     when(mockDefaultTestExceptionStrategy2.accept(mockMuleEvent)).thenReturn(true);
     errorHandler.handleException(mockException, mockMuleEvent);
-    verify(mockTestExceptionStrategy1, VerificationModeFactory.times(0)).handleException(any(Exception.class),
+    verify(mockTestExceptionStrategy1, VerificationModeFactory.times(0)).handleException(any(MessagingException.class),
                                                                                          any(MuleEvent.class));
-    verify(mockDefaultTestExceptionStrategy2, VerificationModeFactory.times(0)).handleException(any(Exception.class),
+    verify(mockDefaultTestExceptionStrategy2, VerificationModeFactory.times(0)).handleException(any(MessagingException.class),
                                                                                                 any(MuleEvent.class));
     verify(mockTestExceptionStrategy2, VerificationModeFactory.times(1)).handleException(mockException, mockMuleEvent);
   }

@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -15,6 +18,7 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -39,6 +43,12 @@ public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCa
   public void onException() {
     final Exception exception = new Exception();
     callback.onException(exception);
-    verify(responseCallback).responseSentWithFailure(exception, event);
+    verify(responseCallback).responseSentWithFailure(argThat(new ArgumentMatcher<MessagingException>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return o instanceof MessagingException && ((MessagingException) o).getCauseException().equals(exception);
+      }
+    }), eq(event));
   }
 }

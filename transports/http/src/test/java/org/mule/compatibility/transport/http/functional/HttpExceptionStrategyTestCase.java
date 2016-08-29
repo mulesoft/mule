@@ -19,6 +19,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
@@ -47,8 +48,8 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
     assertThat(response, notNullValue());
     assertThat(response.getPayload(), not(nullValue()));
     assertThat(getPayloadAsString(response), not(TEST_MESSAGE));
-    assertThat(response.getExceptionPayload(), notNullValue()); // to be fixed
-    assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); // to be review/fixed
+    assertThat(response.getExceptionPayload(), notNullValue()); //to be fixed
+    assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); //to be review/fixed
   }
 
   @Test
@@ -62,7 +63,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
   public static class CustomExceptionStrategy extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(Exception ex, MuleEvent event) {
+    public MuleEvent handleException(MessagingException ex, MuleEvent event) {
       event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_FORBIDDEN))
           .build());
       return event;

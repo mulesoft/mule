@@ -23,8 +23,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Assert that flows do not propagate exceptions via runFlow or use of flow-ref. Also assert that a sub-flow/processor-chain does
- * not handle it's own exception but they are rather handled by calling flow.
+ * Assert that flows do not propagate exceptions via runFlow or use of flow-ref. Also
+ * assert that a sub-flow/processor-chain does not handle it's own exception but they are rather handled by
+ * calling flow.
  */
 public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTestCase {
 
@@ -58,8 +59,9 @@ public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTes
 
   @Test
   public void testFlowWithSubFlowExceptionPropagation() throws Exception {
-    SensingExceptionStrategy parentES =
-        (SensingExceptionStrategy) muleContext.getRegistry().lookupFlowConstruct("flowWithSubFlow").getExceptionListener();
+    SensingExceptionStrategy parentES = (SensingExceptionStrategy) muleContext.getRegistry()
+        .lookupFlowConstruct("flowWithSubFlow")
+        .getExceptionListener();
 
     runFlow("flowWithSubFlow");
 
@@ -68,10 +70,12 @@ public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTes
 
   @Test
   public void testFlowWithChildServiceExceptionPropagation() throws Exception {
-    SensingExceptionStrategy parentES =
-        (SensingExceptionStrategy) muleContext.getRegistry().lookupFlowConstruct("flowWithChildService").getExceptionListener();
-    SensingExceptionStrategy childServiceES =
-        (SensingExceptionStrategy) muleContext.getRegistry().lookupFlowConstruct("childService").getExceptionListener();
+    SensingExceptionStrategy parentES = (SensingExceptionStrategy) muleContext.getRegistry()
+        .lookupFlowConstruct("flowWithChildService")
+        .getExceptionListener();
+    SensingExceptionStrategy childServiceES = (SensingExceptionStrategy) muleContext.getRegistry()
+        .lookupFlowConstruct("childService")
+        .getExceptionListener();
 
     runFlow("flowWithChildService");
 
@@ -88,12 +92,12 @@ public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTes
     boolean caught;
 
     @Override
-    public MuleEvent handleException(Exception e, MuleEvent event) {
+    public MuleEvent handleException(MessagingException e, MuleEvent event) {
       caught = true;
       MuleEvent resultEvent = super.handleException(e, event);
       event.setError(null);
       event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
-      ((MessagingException) e).setHandled(true);
+      e.setHandled(true);
       return resultEvent;
     }
 

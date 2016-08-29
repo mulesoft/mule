@@ -9,7 +9,8 @@ package org.mule.runtime.core.exception;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
-
+import static org.mule.runtime.core.message.ErrorTypeBuilder.ANY;
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MessagingException;
@@ -26,8 +27,8 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
@@ -38,11 +39,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private MessageProcessorChain configuredMessageProcessors;
   private MessageProcessor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
+  private ErrorType errorType = ANY;
   private String when;
   private boolean handleException;
 
   @Override
-  final public MuleEvent handleException(Exception exception, MuleEvent event) {
+  final public MuleEvent handleException(MessagingException exception, MuleEvent event) {
     try {
       return new ExceptionMessageProcessor(exception, muleContext, flowConstruct).process(event);
     } catch (MuleException e) {
@@ -52,9 +54,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private class ExceptionMessageProcessor extends AbstractRequestResponseMessageProcessor {
 
-    private Exception exception;
+    private MessagingException exception;
 
-    public ExceptionMessageProcessor(Exception exception, MuleContext muleContext, FlowConstruct flowConstruct) {
+    public ExceptionMessageProcessor(MessagingException exception, MuleContext muleContext, FlowConstruct flowConstruct) {
       this.exception = exception;
       setMuleContext(muleContext);
       setFlowConstruct(flowConstruct);
@@ -107,7 +109,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         doLogException(exception);
         TransactionCoordination.getInstance().rollbackCurrentTransaction();
       } catch (Exception ex) {
-        // Do nothing
+        //Do nothing
       }
 
       event.setError(builder(exception).build());
@@ -119,6 +121,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     protected void processFinally(MuleEvent event, MessagingException exception) {
       muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_END));
     }
+
   }
 
   private void markExceptionAsHandledIfRequired(Exception exception) {
@@ -155,7 +158,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  protected MuleEvent route(MuleEvent event, Exception t) {
+  protected MuleEvent route(MuleEvent event, MessagingException t) {
     if (!getMessageProcessors().isEmpty()) {
       try {
         event.setError(builder(t).build());
@@ -168,7 +171,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
     return event;
   }
-
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
@@ -187,9 +189,16 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     this.when = when;
   }
 
+
   @Override
   public boolean accept(MuleEvent event) {
-    return acceptsAll() || acceptsEvent(event) || muleContext.getExpressionManager().evaluateBoolean(when, event, flowConstruct);
+    return acceptsAll() || acceptsEvent(event) || acceptsErrorType(event)
+        || (when != null && muleContext.getExpressionManager().evaluateBoolean(when, event, flowConstruct));
+  }
+
+  private boolean acceptsErrorType(MuleEvent event) {
+    //For now, match by representation, since we can't assign the exact type when parsing
+    return event.getError().getErrorType().getStringRepresentation().equals(errorType.getStringRepresentation());
   }
 
   /**
@@ -197,8 +206,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
    * <p>
    * Useful for exception strategies which ALWAYS must accept certain types of events despite when condition is not true.
    *
-   * @param event The MuleEvent being processed
-   * @return true if it should process the exception for the current event, false otherwise.
+   * @param event   The MuleEvent being processed
+   * @return  true if it should process the exception for the current event, false otherwise.
    */
   protected boolean acceptsEvent(MuleEvent event) {
     return false;
@@ -206,14 +215,14 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Override
   public boolean acceptsAll() {
-    return when == null;
+    return ANY.equals(errorType) && when == null;
   }
 
-  protected MuleEvent afterRouting(Exception exception, MuleEvent event) {
+  protected MuleEvent afterRouting(MessagingException exception, MuleEvent event) {
     return event;
   }
 
-  protected MuleEvent beforeRouting(Exception exception, MuleEvent event) {
+  protected MuleEvent beforeRouting(MessagingException exception, MuleEvent event) {
     return event;
   }
 
@@ -225,4 +234,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   public void setHandleException(boolean handleException) {
     this.handleException = handleException;
   }
+
+  public void setErrorType(ErrorType errorType) {
+    this.errorType = errorType;
+  }
+
 }

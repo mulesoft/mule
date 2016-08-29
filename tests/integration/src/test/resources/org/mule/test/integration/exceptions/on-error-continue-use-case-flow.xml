@@ -87,4 +87,33 @@
         </error-handler>
     </flow>
 
+    <flow name="onErrorTypeMatch">
+        <append-string-transformer message=" apt1"/>
+        <test:component throwException="true"/>
+        <error-handler>
+            <on-error-continue type="MULE:CUSTOM">
+                <append-string-transformer message=" nope"/>
+            </on-error-continue>
+            <on-error-continue type="MULE:GENERAL">
+                <append-string-transformer message=" apt2"/>
+            </on-error-continue>
+            <on-error-continue type="ANY">
+                <append-string-transformer message=" nope2"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="onErrorTypeMatchAny">
+        <append-string-transformer message=" apt1"/>
+        <test:component throwException="true"/>
+        <error-handler>
+            <on-error-continue type="MULE:CUSTOM">
+                <append-string-transformer message=" nope"/>
+            </on-error-continue>
+            <on-error-continue type="ANY">
+                <append-string-transformer message=" apt2"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
 </mule>

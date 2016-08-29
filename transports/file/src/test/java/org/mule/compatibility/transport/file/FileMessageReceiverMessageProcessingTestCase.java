@@ -80,7 +80,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   * Message processed successfully
+   *  Message processed successfully
    */
   @Test
   public void testProcessFileAndDeleteIt() throws Exception {
@@ -94,7 +94,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   * Message processing fails but exception is handled
+   *  Message processing fails but exception is handled
    */
   @Test
   public void testProcessFileThatFailsThrowHandleExceptionThenDeleteIt() throws Exception {
@@ -109,7 +109,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   * Message processing fails and exception is not handled
+   *  Message processing fails and exception is not handled
    */
   @Test
   public void testProcessFileThatFailsThrowsUnhandledExceptionThenDoNotDeleteIt() throws Exception {
@@ -124,7 +124,8 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   * Streaming file Message processed successfully
+   *  Streaming file
+   *  Message processed successfully
    */
   @Test
   public void testProcessStreamingFileTheDoNotDeleteIt() throws Exception {
@@ -135,13 +136,14 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     FileMessageReceiver fileMessageReceiver = createFileMessageReceiver();
     File file = createMockFile("text.csv");
     fileMessageReceiver.processFile(file);
-    // Using streaming, files can't be removed since the stream can still
-    // in used, for instance, if we sent the payload to a vm queue
+    //Using streaming, files can't be removed since the stream can still
+    //in used, for instance, if we sent the payload to a vm queue
     assertThat(file.exists(), is(true));
   }
 
   /**
-   * Streaming file Message processing fails but exception is handled
+   *  Streaming file
+   *  Message processing fails but exception is handled
    */
   @Test
   public void testProcessStreamingFileThatFailsThrowHandleExceptionThenDoNotDeleteIt() throws Exception {
@@ -157,7 +159,8 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   * Streaming file Message processing fails and exception is not handled
+   *  Streaming file
+   *  Message processing fails and exception is not handled
    */
   @Test
   public void testProcessStreamingFileThatFailsThrowsUnhandledExceptionThenDoNotDeleteIt() throws Exception {
@@ -213,7 +216,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockFlowConstruct.getExceptionListener()).thenReturn(mockMessagingExceptionHandler);
     when(mockHandledMessagingException.causedRollback()).thenReturn(false);
     when(mockUnhandledMessagingException.causedRollback()).thenReturn(true);
-    when(mockMessagingExceptionHandler.handleException(any(Exception.class), any(MuleEvent.class)))
+    when(mockMessagingExceptionHandler.handleException(any(MessagingException.class), any(MuleEvent.class)))
         .thenAnswer(invocationOnMock -> {
           if (invocationOnMock.getArguments()[0] == mockHandledMessagingException) {
             return mockMuleEvent;

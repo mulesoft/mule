@@ -20,8 +20,8 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 
 /**
- * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing
- * should be performed blocking or non-blocking..
+ * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing should
+ * be performed blocking or non-blocking..
  */
 public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnotatedObject
     implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware {
@@ -32,7 +32,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (isNonBlocking(event)) {
       processNonBlocking(event, createNonBlockingCompletionHandler(event));
-      // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with this
+      // Update RequestContext ThreadLocal for backwards compatibility.  Clear event as we are done with this
       // thread.
       setCurrentEvent(null);
       return NonBlockingVoidMuleEvent.getInstance();
@@ -54,8 +54,8 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
 
   abstract protected MuleEvent processBlocking(MuleEvent event) throws MuleException;
 
-  protected ExceptionCallback<Void, ? extends Exception> createCompletionExceptionCallback(MuleEvent event) {
-    return (ExceptionCallback<Void, Exception>) exception -> {
+  protected ExceptionCallback<Void, ? extends MessagingException> createCompletionExceptionCallback(MuleEvent event) {
+    return (ExceptionCallback<Void, MessagingException>) exception -> {
       messagingExceptionHandler.handleException(exception, event);
       return null;
     };

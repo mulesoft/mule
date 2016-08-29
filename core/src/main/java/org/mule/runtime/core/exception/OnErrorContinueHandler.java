@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -27,12 +28,12 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent afterRouting(Exception exception, MuleEvent event) {
+  protected MuleEvent afterRouting(MessagingException exception, MuleEvent event) {
     return event;
   }
 
   @Override
-  protected MuleEvent beforeRouting(Exception exception, MuleEvent event) {
+  protected MuleEvent beforeRouting(MessagingException exception, MuleEvent event) {
     return event;
   }
 

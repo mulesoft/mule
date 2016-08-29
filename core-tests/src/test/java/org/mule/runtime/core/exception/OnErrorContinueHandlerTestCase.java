@@ -18,11 +18,11 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -48,7 +48,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
   @Mock
-  private Exception mockException;
+  private MessagingException mockException;
 
   private MuleEvent mockMuleEvent;
 
@@ -132,8 +132,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   }
 
   /**
-   * On fatal error, the exception strategies are not supposed to use MuleMessage.toString() as it could potentially log sensible
-   * data.
+   *  On fatal error, the exception strategies are not supposed to use MuleMessage.toString() as it could
+   * potentially log sensible data.
    */
   @Test
   public void testMessageToStringNotCalledOnFailure() throws Exception {
@@ -147,7 +147,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
                                                                                              flow)),
                                      createFailingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.initialise();
-
     when(mockMuleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
 
     MuleEvent exceptionHandlingResult =
