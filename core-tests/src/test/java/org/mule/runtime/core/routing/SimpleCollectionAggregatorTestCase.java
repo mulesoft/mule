@@ -56,13 +56,9 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
 
-
-    DefaultMuleEvent event1 =
-        new DefaultMuleEvent(executionContext, message1, flow);
-    event1.setCorrelation(new Correlation(1, null));
-    MuleEvent event2 = new DefaultMuleEvent(executionContext, message2, flow);
-    event1.setCorrelation(new Correlation(2, null));
-    MuleEvent event3 = new DefaultMuleEvent(executionContext, message3, flow);
+    DefaultMuleEvent event1 = (DefaultMuleEvent) MuleEvent.builder(executionContext).message(message1).flow(flow).build();
+    DefaultMuleEvent event2 = (DefaultMuleEvent) MuleEvent.builder(executionContext).message(message2).flow(flow).build();
+    DefaultMuleEvent event3 = (DefaultMuleEvent) MuleEvent.builder(executionContext).message(message3).flow(flow).build();
     event1.setCorrelation(new Correlation(3, null));
 
     assertNull(router.process(event1));
@@ -102,7 +98,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
     MuleMessage message1 = MuleMessage.of("test event A");
 
-    DefaultMuleEvent event1 = new DefaultMuleEvent(executionContext, message1, flow);
+    DefaultMuleEvent event1 = (DefaultMuleEvent) MuleEvent.builder(executionContext).message(message1).flow(flow).build();
     event1.setCorrelation(new Correlation(1, null));
 
     MuleEvent resultEvent = router.process(event1);
@@ -144,10 +140,10 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     MuleMessage messageCollection2 = MuleMessage.builder().payload(list2).build();
 
     DefaultMuleEvent event1 =
-        new DefaultMuleEvent(executionContext, messageCollection1, flow);
+        (DefaultMuleEvent) MuleEvent.builder(executionContext).message(messageCollection1).flow(flow).build();
     event1.setCorrelation(new Correlation(2, null));
     DefaultMuleEvent event2 =
-        new DefaultMuleEvent(executionContext, messageCollection2, flow);
+        (DefaultMuleEvent) MuleEvent.builder(executionContext).message(messageCollection2).flow(flow).build();
     event2.setCorrelation(new Correlation(2, null));
 
     assertNull(router.process(event1));

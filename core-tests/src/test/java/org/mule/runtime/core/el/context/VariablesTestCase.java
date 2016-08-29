@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
@@ -46,16 +45,16 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void flowVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
-    event.setFlowVariable("foo", "bar");
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct)
+        .addFlowVariable("foo", "bar").build();
     assertEquals(event.getFlowVariable("foo"), evaluate("flowVars['foo']", event));
   }
 
   @Test
   public void assignValueToFlowVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
-    event.setFlowVariable("foo", "bar_old");
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct)
+        .addFlowVariable("foo", "bar_old").build();
     evaluate("flowVars['foo']='bar'", event);
     assertEquals("bar", event.getFlowVariable("foo"));
   }
@@ -63,7 +62,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToNewFlowVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     evaluate("flowVars['foo']='bar'", event);
     assertEquals("bar", event.getFlowVariable("foo"));
   }
@@ -71,7 +70,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void sessionVariablesMap() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar");
     assertTrue(evaluate("sessionVars", event) instanceof Map);
   }
@@ -84,7 +83,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void sessionVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar");
     assertEquals(event.getSession().getProperty("foo"), evaluate("sessionVars['foo']", event));
   }
@@ -92,7 +91,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToSessionVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar_old");
     evaluate("sessionVars['foo']='bar'", event);
     assertEquals("bar", event.getSession().getProperty("foo"));
@@ -101,7 +100,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToNewSessionVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     evaluate("sessionVars['foo']='bar'", event);
     assertEquals("bar", event.getSession().getProperty("foo"));
   }
@@ -109,8 +108,8 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void variableFromFlowScope() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
-    event.setFlowVariable("foo", "bar");
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct)
+        .addFlowVariable("foo", "bar").build();
     event.getSession().setProperty("foo", "NOTbar");
     assertEquals(event.getFlowVariable("foo"), evaluate("foo", event));
   }
@@ -118,15 +117,15 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void updateVariableFromFlowScope() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
-    event.setFlowVariable("foo", "bar");
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct)
+        .addFlowVariable("foo", "bar").build();
     assertEquals("bar_new", evaluate("foo='bar_new'", event));
   }
 
   @Test
   public void variableFromSessionScope() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar");
     assertEquals(event.getSession().getProperty("foo"), evaluate("foo", event));
   }
@@ -134,7 +133,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void updateVariableFromSessionScope() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     event.getSession().setProperty("foo", "bar");
     assertEquals("bar_new", evaluate("foo='bar_new'", event));
   }
@@ -142,8 +141,8 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
-    event.setFlowVariable("foo", "bar_old");
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct)
+        .addFlowVariable("foo", "bar_old").build();
     evaluate("foo='bar'", event);
     assertEquals("bar", event.getFlowVariable("foo"));
   }
@@ -151,7 +150,7 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void assignValueToLocalVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     evaluate("localVar='bar'", event);
   }
 
@@ -161,14 +160,14 @@ public class VariablesTestCase extends AbstractELTestCase {
   @Test
   public void reassignValueToLocalVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     evaluate("localVar='bar';localVar='bar2'", event);
   }
 
   @Test
   public void localVariable() throws Exception {
     MuleMessage message = MuleMessage.builder().payload("").build();
-    MuleEvent event = new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct);
+    MuleEvent event = MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build();
     assertEquals("bar", evaluate("localVar='bar';localVar", event));
   }
 }

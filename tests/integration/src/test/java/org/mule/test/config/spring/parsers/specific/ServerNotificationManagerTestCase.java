@@ -12,8 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -197,9 +197,9 @@ public class ServerNotificationManagerTestCase extends AbstractIntegrationTestCa
 
     public TestSecurityEvent(MuleContext muleContext) throws Exception {
       super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
-                                      new DefaultMuleEvent(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR),
-                                                           MuleMessage.builder().nullPayload().build(), REQUEST_RESPONSE,
-                                                           getTestFlow(), getTestSession(null, muleContext))),
+                                      MuleEvent.builder(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR))
+                                          .message(MuleMessage.builder().nullPayload().build()).exchangePattern(REQUEST_RESPONSE)
+                                          .flow(getTestFlow()).session(getTestSession(null, muleContext)).build()),
             0);
     }
 

@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -121,8 +120,8 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
         fc = event.getFlowConstruct();
       }
 
-      MuleMessage msg = MuleMessage.builder().payload(eventList).build();
-      return new DefaultMuleEvent(executionContext, msg, ONE_WAY, fc);
+      return MuleEvent.builder(executionContext).message(MuleMessage.builder().payload(eventList).build())
+          .exchangePattern(ONE_WAY).flow(fc).build();
     }
   }
 }

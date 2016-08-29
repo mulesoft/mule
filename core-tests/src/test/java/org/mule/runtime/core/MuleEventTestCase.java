@@ -152,7 +152,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     MuleEvent event = getTestEvent("whatever");
     event.setFlowVariable("foo", "bar");
 
-    MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event, false, false);
+    MuleEvent copy = MuleEvent.builder(event).build();
 
     copy.setFlowVariable("foo", "bar2");
 

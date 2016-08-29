@@ -26,8 +26,6 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -298,9 +296,8 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MuleEvent in = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
-                                        MuleMessage.builder().payload(TEST_MESSAGE).build(),
-                                        MessageExchangePattern.REQUEST_RESPONSE, flow);
+    MuleEvent in = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(MuleMessage.builder().payload(TEST_MESSAGE).build()).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     MuleEvent out = enricher.process(in);
 
     assertThat(out, is(sameInstance(in)));

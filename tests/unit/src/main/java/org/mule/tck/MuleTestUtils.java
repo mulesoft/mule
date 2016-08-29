@@ -14,7 +14,6 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Injector;
@@ -28,13 +27,10 @@ import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.session.DefaultMuleSession;
-import org.mule.tck.testmodels.mule.TestAgent;
-import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -49,46 +45,6 @@ public final class MuleTestUtils {
   public static final String APPLE_SERVICE = "appleService";
   public static final String APPLE_FLOW = "appleFlow";
 
-  // public static Endpoint getTestEndpoint(String name, String type, MuleContext
-  // context) throws Exception
-  // {
-  // Map props = new HashMap();
-  // props.put("name", name);
-  // props.put("type", type);
-  // props.put("endpointURI", new MuleEndpointURI("test://test"));
-  // props.put("connector", "testConnector");
-  // // need to build endpoint this way to avoid depenency to any endpoint jars
-  // AbstractConnector connector = null;
-  // connector =
-  // (AbstractConnector)ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
-  // AbstractMuleTestCase.class).newInstance();
-  //
-  // connector.setName("testConnector");
-  // connector.setMuleContext(context);
-  // context.applyLifecycle(connector);
-  //
-  // EndpointBuilder endpointBuilder = new
-  // EndpointURIEndpointBuilder("test://test", context);
-  // endpointBuilder.setConnector(connector);
-  // endpointBuilder.setName(name);
-  // if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
-  // {
-  // return (Endpoint)
-  // context.getEndpointFactory().getInboundEndpoint(endpointBuilder);
-  // }
-  // else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-  // {
-  // return (Endpoint)
-  // context.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-  // }
-  // else
-  // {
-  // throw new IllegalArgumentException("The endpoint type: " + type +
-  // "is not recognized.");
-  //
-  // }
-  // }
-
   /**
    * Creates an {@link Error} mock that will return the provided exception when calling {@link Error#getException()}
    * 
@@ -101,51 +57,12 @@ public final class MuleTestUtils {
     return errorMock;
   }
 
-
   public static Injector spyInjector(MuleContext muleContext) {
     Injector spy = spy(muleContext.getInjector());
     ((DefaultMuleContext) muleContext).setInjector(spy);
 
     return spy;
   }
-
-  // public static Endpoint getTestSchemeMetaInfoEndpoint(String name, String type,
-  // String protocol, MuleContext context)
-  // throws Exception
-  // {
-  // // need to build endpoint this way to avoid depenency to any endpoint jars
-  // AbstractConnector connector = null;
-  // connector = (AbstractConnector)
-  // ClassUtils.loadClass("org.mule.tck.testmodels.mule.TestConnector",
-  // AbstractMuleTestCase.class).newInstance();
-  //
-  // connector.setName("testConnector");
-  // connector.setMuleContext(context);
-  // context.applyLifecycle(connector);
-  // connector.registerSupportedProtocol(protocol);
-  //
-  // EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("test:" +
-  // protocol + "://test", context);
-  // endpointBuilder.setConnector(connector);
-  // endpointBuilder.setName(name);
-  // if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
-  // {
-  // return (Endpoint)
-  // context.getEndpointFactory().getInboundEndpoint(endpointBuilder);
-  // }
-  // else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
-  // {
-  // return (Endpoint)
-  // context.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-  // }
-  // else
-  // {
-  // throw new IllegalArgumentException("The endpoint type: " + type +
-  // "is not recognized.");
-  //
-  // }
-  // }
-
 
   /**
    * Supply no service, no endpoint
@@ -154,38 +71,9 @@ public final class MuleTestUtils {
     return getTestEvent(data, getTestFlow(context), MessageExchangePattern.REQUEST_RESPONSE, context);
   }
 
-  public static MuleEvent getTestEvent(MuleMessage message, MessageExchangePattern mep, MuleContext context)
-      throws Exception {
-    return getTestEvent(message, getTestFlow(context), mep, context);
-  }
-
   public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
       throws Exception {
     return getTestEvent(data, getTestFlow(context), mep, context);
-  }
-
-  // public static MuleEvent getTestInboundEvent(Object data, MuleContext context) throws Exception
-  // {
-  // return getTestInboundEvent(data, getTestService(context), MessageExchangePattern.REQUEST_RESPONSE,
-  // context);
-  // }
-  //
-  // public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep, MuleContext context)
-  // throws Exception
-  // {
-  // return getTestInboundEvent(data, getTestService(context), mep, context);
-  // }
-
-
-  public static MuleEvent getTestEvent(MuleMessage message,
-                                       FlowConstruct flowConstruct,
-                                       MessageExchangePattern mep,
-                                       MuleContext context)
-      throws Exception {
-    final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event =
-        new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR), message, mep, flowConstruct, session);
-    return event;
   }
 
   public static MuleEvent getTestEvent(Object data,
@@ -193,23 +81,11 @@ public final class MuleTestUtils {
                                        MessageExchangePattern mep,
                                        MuleContext context)
       throws Exception {
-    final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR),
-                                                        MuleMessage.builder().payload(data).build(), mep, flowConstruct, session);
-    return event;
+    return MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(MuleMessage.builder().payload(data).build()).exchangePattern(mep).flow(flowConstruct)
+        .session(getTestSession(flowConstruct, context)).build();
   }
 
-
-  /**
-   * Supply endpoint but no service
-   */
-  public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, MuleContext context)
-      throws Exception {
-    final MuleSession session = getTestSession(flowConstruct, context);
-    final DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR),
-                                                        MuleMessage.builder().payload(data).build(), flowConstruct, session);
-    return event;
-  }
 
   public static MuleEventContext getTestEventContext(Object data,
                                                      MessageExchangePattern mep,
@@ -222,12 +98,6 @@ public final class MuleTestUtils {
     } finally {
       setCurrentEvent(null);
     }
-  }
-
-  public static Transformer getTestTransformer() throws Exception {
-    final Transformer t = new TestCompressionTransformer();
-    t.initialise();
-    return t;
   }
 
   public static MuleSession getTestSession(FlowConstruct flowConstruct, MuleContext context) {
@@ -294,12 +164,6 @@ public final class MuleTestUtils {
       context.getRegistry().registerFlowConstruct(flow);
     }
     return flow;
-  }
-
-  public static TestAgent getTestAgent() throws Exception {
-    final TestAgent t = new TestAgent();
-    t.initialise();
-    return t;
   }
 
   /**

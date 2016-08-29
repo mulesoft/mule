@@ -47,13 +47,13 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   private MuleMessage muleMessage = MuleMessage.builder().payload("test-data").build();
   private Flow flow;
   private MessageContext messageContext;
-  private DefaultMuleEvent muleEvent;
+  private MuleEvent muleEvent;
 
   @Before
   public void before() throws Exception {
     flow = getTestFlow();
     messageContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
-    muleEvent = new DefaultMuleEvent(messageContext, muleMessage, REQUEST_RESPONSE, flow);
+    muleEvent = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
   }
 
   @Test
@@ -97,7 +97,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = spy(this.flow);
     when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, REQUEST_RESPONSE, flow);
+    MuleEvent event = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -107,7 +107,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = spy(this.flow);
     when(flow.getProcessingStrategy()).thenReturn(new DefaultFlowProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, ONE_WAY, flow);
+    MuleEvent event = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -117,7 +117,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = spy(this.flow);
     when(flow.isSynchronous()).thenReturn(true);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, REQUEST_RESPONSE, flow);
+    MuleEvent event = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -127,7 +127,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     Flow flow = spy(this.flow);
     when(flow.isSynchronous()).thenReturn(true);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, ONE_WAY, flow);
+    MuleEvent event = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -160,7 +160,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, REQUEST_RESPONSE, flow);
+    MuleEvent event = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
     assertThat(event.isTransacted(), equalTo(false));
   }
@@ -171,7 +171,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     when(flow.isSynchronous()).thenReturn(false);
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
-    DefaultMuleEvent event = new DefaultMuleEvent(messageContext, muleMessage, ONE_WAY, flow);
+    MuleEvent event = MuleEvent.builder(messageContext).message(muleMessage).exchangePattern(ONE_WAY).flow(flow).build();
     assertThat(event.isSynchronous(), equalTo(false));
     assertThat(event.isTransacted(), equalTo(false));
   }

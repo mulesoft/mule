@@ -15,20 +15,17 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
@@ -48,7 +45,6 @@ import org.mule.tck.TriggerableMessageSource;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -178,12 +174,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   protected void doSetUp() throws Exception {
     // template method
-  }
-
-  private void addIfPresent(List<ConfigurationBuilder> builders, String builderClassName) throws Exception {
-    if (ClassUtils.isClassOnPath(builderClassName, getClass())) {
-      builders.add((ConfigurationBuilder) ClassUtils.instanciateClass(builderClassName, ClassUtils.NO_ARGS, getClass()));
-    }
   }
 
   protected MuleContext createMuleContext() throws Exception {
@@ -321,16 +311,15 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return MuleTestUtils.getTestEvent(data, service, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
   }
 
-  public static MuleEvent getTestEvent(Object data, FlowConstruct service, MessageExchangePattern mep) throws Exception {
-    return MuleTestUtils.getTestEvent(data, service, mep, muleContext);
-  }
-
   public static MuleEvent getTestEvent(Object data, MuleContext muleContext) throws Exception {
     return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
   }
 
   public static MuleEvent getTestEvent(MuleMessage data) throws Exception {
-    return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    return MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(data)
+        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(MuleTestUtils.getTestSession(flowConstruct, muleContext))
+        .build();
   }
 
   public static MuleEvent getTestEvent(Object data) throws Exception {
@@ -339,18 +328,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep) throws Exception {
     return MuleTestUtils.getTestEvent(data, mep, muleContext);
-  }
-
-  public static MuleEventContext getTestEventContext(Object data) throws Exception {
-    return MuleTestUtils.getTestEventContext(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-  }
-
-  public static MuleEventContext getTestEventContext(Object data, MessageExchangePattern mep) throws Exception {
-    return MuleTestUtils.getTestEventContext(data, mep, muleContext);
-  }
-
-  public static Transformer getTestTransformer() throws Exception {
-    return MuleTestUtils.getTestTransformer();
   }
 
   public static MuleSession getTestSession(Flow flow, MuleContext context) {
@@ -363,14 +340,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static Flow getTestFlow(String name, Class<?> clazz) throws Exception {
     return MuleTestUtils.getTestFlow(name, clazz, muleContext);
-  }
-
-  public static Flow getTestFlow(String name, Class<?> clazz, Map<?, ?> props) throws Exception {
-    return MuleTestUtils.getTestFlow(name, clazz, props, muleContext);
-  }
-
-  public static Flow getTestFlow(Object component) throws Exception {
-    return MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_FLOW, component, false, muleContext);
   }
 
   protected boolean isStartContext() {
@@ -521,12 +490,5 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   protected <T> T getPayload(MuleMessage message, Class<T> clazz) throws Exception {
     return (T) getPayload(message, DataType.fromType(clazz));
-  }
-
-  protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
-      throws Exception {
-    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(payload).build())
-        .exchangePattern(REQUEST_RESPONSE).replyToHandler(replyToHandler).flow(flow).build();
   }
 }

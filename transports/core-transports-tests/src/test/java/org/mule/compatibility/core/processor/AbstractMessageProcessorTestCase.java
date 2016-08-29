@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.processor;
 
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
@@ -39,6 +40,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
@@ -336,5 +338,12 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     public void setMuleContext(MuleContext context) {
       this.context = context;
     }
+  }
+
+  protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
+      throws Exception {
+    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(MuleMessage.builder().payload(payload).build())
+        .exchangePattern(REQUEST_RESPONSE).replyToHandler(replyToHandler).flow(flow).build();
   }
 }

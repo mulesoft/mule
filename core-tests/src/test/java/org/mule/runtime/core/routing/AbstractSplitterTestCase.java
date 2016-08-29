@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -48,7 +47,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    MuleEvent inEvent = new DefaultMuleEvent(MuleMessage.builder().payload(fruitBowl).build(), getTestEvent(""));
+    MuleEvent inEvent = MuleEvent.builder(getTestEvent("")).message(MuleMessage.builder().payload(fruitBowl).build()).build();
 
     MuleEvent resultEvent = splitter.process(inEvent);
 
@@ -78,7 +77,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    MuleEvent inEvent = new DefaultMuleEvent(MuleMessage.builder().payload(fruitBowl).build(), getTestEvent(""));
+    MuleEvent inEvent = MuleEvent.builder(getTestEvent("")).message(MuleMessage.builder().payload(fruitBowl).build()).build();
 
     MuleEvent resultEvent = splitter.process(inEvent);
 
@@ -103,7 +102,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
       FruitBowl bowl = (FruitBowl) event.getMessage().getPayload();
       List<MuleEvent> parts = new ArrayList<>();
       for (Fruit fruit : bowl.getFruit()) {
-        parts.add(new DefaultMuleEvent(MuleMessage.builder().payload(fruit).build(), event));
+        parts.add(MuleEvent.builder(event).message(MuleMessage.builder().payload(fruit).build()).build());
       }
       return parts;
     }

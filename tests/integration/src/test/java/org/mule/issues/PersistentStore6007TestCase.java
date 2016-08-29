@@ -12,7 +12,6 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -76,9 +75,9 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
     static void addEvents() throws Exception {
       for (String str : new String[] {"A", "B", "C"}) {
         Flow flow = getTestFlow();
-        MuleEvent event =
-            new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), MuleMessage.builder().payload(str).build(),
-                                 ONE_WAY, flow, new DefaultMuleSession());
+        MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+            .message(MuleMessage.builder().payload(str).build()).exchangePattern(ONE_WAY).flow(flow)
+            .session(new DefaultMuleSession()).build();
         events.put(buildQueueKey(event, getTestFlow(), muleContext), event);
       }
     }

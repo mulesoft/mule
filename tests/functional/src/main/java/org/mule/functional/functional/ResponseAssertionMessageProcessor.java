@@ -9,7 +9,6 @@ package org.mule.functional.functional;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
@@ -62,7 +61,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
 
     if (event.isAllowNonBlocking() && event.getReplyToHandler() != null) {
       final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-      event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler() {
+      event = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
         @Override
         public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
@@ -73,7 +72,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
         public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
           originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
         }
-      });
+      }).build();
     }
     MuleEvent result = processNext(processRequest(event));
     if (!(result instanceof NonBlockingVoidMuleEvent)) {

@@ -7,7 +7,6 @@
 package org.mule.tck;
 
 import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -88,7 +87,8 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
   }
 
   private MuleEvent append(MuleEvent event) {
-    return new DefaultMuleEvent(MuleMessage.builder().payload(event.getMessage().getPayload() + appendString).build(), event);
+    return MuleEvent.builder(event).message(MuleMessage.builder().payload(event.getMessage().getPayload() + appendString).build())
+        .build();
   }
 
   private void sleepIfNeeded() {

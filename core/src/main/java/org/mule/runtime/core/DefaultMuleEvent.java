@@ -180,12 +180,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
   }
 
-  public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus, boolean shareFlowVars) {
-    this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus,
-         rewriteEvent.getReplyToHandler(),
-         rewriteEvent.getReplyToDestination(), shareFlowVars, rewriteEvent.getExchangePattern());
-  }
-
   /**
    * A helper constructor used to rewrite an event payload
    *
