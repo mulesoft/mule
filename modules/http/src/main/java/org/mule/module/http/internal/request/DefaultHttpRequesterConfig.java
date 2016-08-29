@@ -71,9 +71,15 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
 
     private MuleContext muleContext;
 
+    private boolean initialised = false;
+
     @Override
     public void initialise() throws InitialisationException
     {
+        if (initialised)
+        {
+            return;
+        }
         LifecycleUtils.initialiseIfNeeded(authentication);
         verifyConnectionsParameters();
 
@@ -121,6 +127,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
             httpClient = httpClientFactory.create(configuration);
         }
 
+        initialised = true;
     }
 
     private void verifyConnectionsParameters() throws InitialisationException

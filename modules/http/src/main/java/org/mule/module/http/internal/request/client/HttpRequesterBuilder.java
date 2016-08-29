@@ -8,13 +8,12 @@ package org.mule.module.http.internal.request.client;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.module.http.api.HttpConstants;
 import org.mule.module.http.api.client.HttpRequestOptions;
 import org.mule.module.http.api.requester.HttpRequestOperationConfig;
 import org.mule.module.http.api.requester.HttpRequesterConfig;
+import org.mule.module.http.api.requester.HttpRequesterConfigBuilder;
 import org.mule.module.http.api.requester.HttpStreamingType;
 import org.mule.module.http.internal.request.DefaultHttpRequester;
 import org.mule.module.http.internal.request.DefaultHttpRequesterConfig;
@@ -124,9 +123,10 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
         }
         if (tlsContextFactory != null)
         {
-            DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
-            requesterConfig.setTlsContext(tlsContextFactory);
-            requesterConfig.setProtocol(HTTPS);
+            DefaultHttpRequesterConfig requesterConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext)
+                    .setProtocol(HTTPS)
+                    .setTlsContext(tlsContextFactory)
+                    .build();
             muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"), requesterConfig);
             httpRequester.setConfig(requesterConfig);
         }
@@ -136,7 +136,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
             if (requestConfig == null)
             {
-                requestConfig = new DefaultHttpRequesterConfig();
+                requestConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext).build();
                 muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
             }
 
