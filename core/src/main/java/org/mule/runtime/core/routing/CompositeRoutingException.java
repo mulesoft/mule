@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

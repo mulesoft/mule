@@ -7,9 +7,11 @@
 package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -36,6 +38,8 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import org.mockito.Mockito;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -84,6 +88,18 @@ public final class MuleTestUtils {
   //
   // }
   // }
+
+  /**
+   * Creates an {@link Error} mock that will return the provided exception when calling {@link Error#getException()}
+   * 
+   * @param exception the exception to use to create the mock
+   * @return a mocked {@link Error}
+   */
+  public static Error createErrorMock(Exception exception) {
+    Error errorMock = Mockito.mock(Error.class);
+    when(errorMock.getException()).thenReturn(exception);
+    return errorMock;
+  }
 
 
   public static Injector spyInjector(MuleContext muleContext) {

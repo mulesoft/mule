@@ -21,7 +21,7 @@ import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.get
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getFailureTransactionCallback;
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -135,7 +135,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
   public void testTransactionIsNotRollbackOnMatcherRegexPatternException() throws Exception {
     ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    configureExceptionListener(null, "org.mule.runtime.core.ap*");
+    configureExceptionListener(null, "org.mule.runtime.core.excep*");
     try {
       executionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
       fail("MessagingException must be thrown");
@@ -165,7 +165,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
   public void testTransactionIsNotRollbackOnClassExactlyPatternException() throws Exception {
     ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    configureExceptionListener(null, "org.mule.runtime.core.api.MessagingException");
+    configureExceptionListener(null, "org.mule.runtime.core.exception.MessagingException");
     try {
       executionTemplate.execute(getFailureTransactionCallback(new MessagingException(mockEvent, null)));
       fail("MessagingException must be thrown");
@@ -180,7 +180,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
   public void testTransactionIsRollbackOnPatternAppliesToRollbackAndCommit() throws Exception {
     ExecutionTemplate executionTemplate = createExceptionHandlingTransactionTemplate();
     TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-    configureExceptionListener("org.mule.runtime.core.api.MuleException+", "org.mule.runtime.core.api.MessagingException");
+    configureExceptionListener("org.mule.runtime.core.api.MuleException+", "org.mule.runtime.core.exception.MessagingException");
     try {
       executionTemplate.execute(getFailureTransactionCallback(mockMessagingException));
       fail("MessagingException must be thrown");

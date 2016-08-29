@@ -10,11 +10,8 @@ import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
-import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -24,7 +21,6 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 /**
@@ -60,14 +56,11 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       doHandleException(ex, event);
 
       ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
-      Error error = builder(ex).build();
       if (getCurrentEvent() != null) {
         MuleEvent currentEvent = getCurrentEvent();
-        currentEvent.setError(error);
         currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build());
         setCurrentEvent(currentEvent);
       }
-      event.setError(error);
       event.setMessage(MuleMessage.builder(event.getMessage())
           .nullPayload()
           .exceptionPayload(exceptionPayload)

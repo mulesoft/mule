@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.exception.MessagingException;
 
 public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor {
 

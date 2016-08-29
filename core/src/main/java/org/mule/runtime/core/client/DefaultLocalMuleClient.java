@@ -18,9 +18,13 @@ import static org.mule.runtime.core.functional.Either.left;
 import static org.mule.runtime.core.functional.Either.right;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
+import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -43,9 +47,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
-
-import java.io.Serializable;
-import java.util.Map;
 
 public class DefaultLocalMuleClient implements MuleClient {
 
@@ -100,7 +101,9 @@ public class DefaultLocalMuleClient implements MuleClient {
     if (muleEvent == null) {
       //This should never return a null event. This happen because of mule 3.x behaviour with filters.
       //We will just return an error in this case.
-      return left(builder(new MuleRuntimeException(createStaticMessage(MESSAGE_FILTERED_ERROR_MESSAGE))).build());
+      ErrorType anyErrorType = muleContext.getErrorTypeLocator().getAnyErrorType();
+      return left(builder(new MuleRuntimeException(createStaticMessage(MESSAGE_FILTERED_ERROR_MESSAGE))).errorType(anyErrorType)
+          .build());
     }
     if (muleEvent.getError() == null) {
       return right(muleEvent.getMessage());

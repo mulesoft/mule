@@ -6,10 +6,10 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
 
 public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy {
 

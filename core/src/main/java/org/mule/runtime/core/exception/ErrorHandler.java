@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.exception;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.mule.runtime.core.api.GlobalNameableObject;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -20,11 +22,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3.
@@ -53,11 +51,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   @Override
   public MuleEvent handleException(MessagingException exception, MuleEvent event) {
     event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build());
-    event.setError(ErrorBuilder.builder(exception).build());
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
-        event.setError(null);
         return exceptionListener.handleException(exception, event);
       }
     }
@@ -74,8 +69,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Override
   public void initialise() throws InitialisationException {
-    addDefaultExceptionStrategyIfRequired();
     super.initialise();
+    addDefaultExceptionStrategyIfRequired();
     validateConfiguredExceptionStrategies();
   }
 

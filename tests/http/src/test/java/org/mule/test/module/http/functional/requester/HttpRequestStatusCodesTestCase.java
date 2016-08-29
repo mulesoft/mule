@@ -9,8 +9,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.request.validator.ResponseValidatorException;
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.io.IOException;
 

@@ -14,6 +14,8 @@ import static org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory.SP
 import static org.mule.runtime.config.spring.parsers.generic.AutoIdUtils.uniqueValue;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
+import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
+import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
@@ -27,7 +29,8 @@ import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.config.spring.dsl.api.xml.XmlNamespaceInfoProvider;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+import org.mule.runtime.core.DefaultMuleContext;
+import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ArtifactConfig;
 import org.mule.runtime.config.spring.dsl.processor.ConfigFile;
@@ -48,6 +51,7 @@ import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
@@ -87,9 +91,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * <code>MuleArtifactContext</code> is a simple extension application context
- * that allows resources to be loaded from the Classpath of file system using the
- * MuleBeanDefinitionReader.
+ * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
+ * Classpath of file system using the MuleBeanDefinitionReader.
  */
 public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
@@ -116,13 +119,13 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   private ArtifactType artifactType;
 
   /**
-   * Parses configuration files creating a spring ApplicationContext which is used
-   * as a parent registry using the SpringRegistry registry implementation to wraps
-   * the spring ApplicationContext
+   * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
+   * registry implementation to wraps the spring ApplicationContext
    *
-   * @param muleContext               the {@link MuleContext} that own this context
-   * @param artifactConfiguration     the mule configuration defined programmatically
-   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null}  @see org.mule.runtime.config.spring.SpringRegistry
+   * @param muleContext the {@link MuleContext} that own this context
+   * @param artifactConfiguration the mule configuration defined programmatically
+   * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
+   *        org.mule.runtime.config.spring.SpringRegistry
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
@@ -150,12 +153,19 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
           .forEach(componentBuildingDefinitionRegistry::register);
     });
 
+    ErrorTypeLocator errorTypeLocator = createComponentErrorTypeLocator();
+    ((DefaultMuleContext) muleContext).setErrorTypeLocator(errorTypeLocator);
+
     xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
 
     this.beanDefinitionFactory = new BeanDefinitionFactory(componentBuildingDefinitionRegistry);
 
     createApplicationModel();
     determineIfOnlyNewParsingMechanismCanBeUsed();
+  }
+
+  private ErrorTypeLocator createComponentErrorTypeLocator() {
+    return createDefaultErrorTypeLocator(createDefaultErrorTypeRepository());
   }
 
   private void determineIfOnlyNewParsingMechanismCanBeUsed() {
@@ -284,7 +294,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
                                                                       .equals(CONFIGURATION_IDENTIFIER)) {
                                                                     nameAttribute = OBJECT_MULE_CONFIGURATION;
                                                                   } else if (nameAttribute == null) {
-                                                                    //This may be a configuration that does not requires a name.
+                                                                    // This may be a configuration that does not requires a name.
                                                                     nameAttribute = uniqueValue(resolvedComponentModel
                                                                         .getBeanDefinition().getBeanClassName());
                                                                   }
@@ -387,7 +397,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   @Override
   protected DefaultListableBeanFactory createBeanFactory() {
-    //Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
+    // Copy all postProcessors defined in the defaultMuleConfig so that they get applied to the child container
     DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(getInternalParentBeanFactory());
     beanFactory.setAutowireCandidateResolver(new ContextAnnotationAutowireCandidateResolver());
     beanFactory.setInstantiationStrategy(new LaxInstantiationStrategyWrapper(new CglibSubclassingInstantiationStrategy(),
@@ -397,11 +407,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   }
 
   /**
-   * {@inheritDoc}
-   * This implementation returns {@code false} if the
-   * context hasn't been initialised yet, in opposition
-   * to the default implementation which throws
-   * an exception
+   * {@inheritDoc} This implementation returns {@code false} if the context hasn't been initialised yet, in opposition to the
+   * default implementation which throws an exception
    */
   @Override
   public boolean isRunning() {
@@ -413,10 +420,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
   }
 
   /**
-   * Forces the registration of instances of {@link TransformerResolver}
-   * and {@link Converter} to be created, so that
-   * {@link PostRegistrationActionsPostProcessor} can work
-   * its magic and add them to the transformation graph
+   * Forces the registration of instances of {@link TransformerResolver} and {@link Converter} to be created, so that
+   * {@link PostRegistrationActionsPostProcessor} can work its magic and add them to the transformation graph
    */
   protected static void postProcessBeanDefinition(ComponentModel resolvedComponent, BeanDefinitionRegistry registry,
                                                   String beanName) {

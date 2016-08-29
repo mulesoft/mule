@@ -31,11 +31,12 @@ import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.MAP;
 import static org.mule.runtime.config.spring.dsl.spring.WrapperElementType.SINGLE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.api.AttributeDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.model.ComponentBuildingDefinitionRegistry;
-import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.AbstractAttributeDefinitionVisitor;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -52,6 +53,9 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import javax.xml.namespace.QName;
+
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -150,6 +154,22 @@ public class BeanDefinitionFactory {
     // TODO MULE-9638: Once we migrate all core definitions we need to define a mechanism for customizing
     // how core constructs are processed.
     processMuleConfiguration(componentModel, registry);
+    componentBuildingDefinitionRegistry.getBuildingDefinition(componentModel.getIdentifier())
+        .ifPresent(componentBuildingDefinition -> {
+          if ((componentModel.getType() != null) && AnnotatedObject.class.isAssignableFrom(componentModel.getType())) {
+            PropertyValue propertyValue =
+                componentModel.getBeanDefinition().getPropertyValues().getPropertyValue(AnnotatedObject.PROPERTY_NAME);
+            Map<QName, Object> annotations;
+            if (propertyValue == null) {
+              annotations = new HashMap<>();
+              propertyValue = new PropertyValue(AnnotatedObject.PROPERTY_NAME, annotations);
+              componentModel.getBeanDefinition().getPropertyValues().addPropertyValue(propertyValue);
+            } else {
+              annotations = (Map<QName, Object>) propertyValue.getValue();
+            }
+            annotations.put(ComponentIdentifier.ANNOTATION_NAME, componentModel.getIdentifier());
+          }
+        });
     BeanDefinition beanDefinition = componentModel.getBeanDefinition();
     return beanDefinition;
   }

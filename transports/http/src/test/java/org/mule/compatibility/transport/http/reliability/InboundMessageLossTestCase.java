@@ -8,26 +8,24 @@ package org.mule.compatibility.transport.http.reliability;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.message.ErrorBuilder.builder;
-
-import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
-import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
-import org.mule.runtime.core.message.ErrorBuilder;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.runtime.core.routing.filters.WildcardFilter;
-import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.mule.compatibility.transport.http.HttpConstants;
+import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.routing.filters.WildcardFilter;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.
@@ -142,7 +140,6 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
           .exceptionPayload(new DefaultExceptionPayload(exception))
           .build();
       DefaultMuleEvent resultEvent = new DefaultMuleEvent(message, event);
-      resultEvent.setError(builder(exception).build());
       return resultEvent;
     }
   }

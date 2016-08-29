@@ -21,7 +21,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_R
 import org.mule.runtime.core.DataTypeConversionResolver;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DynamicDataTypeConversionResolver;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;

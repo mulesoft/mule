@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing.filter;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
 import org.mule.runtime.core.api.processor.MessageProcessor;

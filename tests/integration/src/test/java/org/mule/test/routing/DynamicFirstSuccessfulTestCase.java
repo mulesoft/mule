@@ -6,7 +6,7 @@
  */
 package org.mule.test.routing;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Test;
 

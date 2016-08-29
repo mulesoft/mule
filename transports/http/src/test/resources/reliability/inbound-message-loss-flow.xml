@@ -51,7 +51,10 @@
         <test:component>
             <test:return-data>Here you go</test:return-data>
         </test:component>
-        <custom-exception-strategy
-                class="org.mule.compatibility.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
+        <error-handler>
+            <on-error-propagate>
+                <test:component throwException="true" exceptionText="Bad news!"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
 </mule>

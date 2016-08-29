@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;

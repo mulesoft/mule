@@ -7,7 +7,7 @@
 package org.mule.extension.socket;
 
 import static org.hamcrest.Matchers.instanceOf;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Ignore;
 import org.junit.Test;

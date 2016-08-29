@@ -10,9 +10,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.message.ErrorBuilder.builder;
-import static org.mule.runtime.core.message.ErrorTypeBuilder.GENERAL;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
@@ -26,32 +26,33 @@ import org.mule.tck.size.SmallTest;
 public class ErrorBuilderTestCase extends AbstractMuleTestCase {
 
   private static final String EXCEPTION_MESSAGE = "message";
+  private final ErrorType mockErrorType = Mockito.mock(ErrorType.class);
 
   @Test
   public void buildErrorFromException() {
     RuntimeException exception = new RuntimeException(EXCEPTION_MESSAGE);
-    Error error = builder(exception).build();
+    Error error = builder(exception).errorType(mockErrorType).build();
     assertThat(error.getException(), is(exception));
     assertThat(error.getDescription(), is(EXCEPTION_MESSAGE));
     assertThat(error.getDetailedDescription(), is(EXCEPTION_MESSAGE));
-    assertThat(error.getErrorType(), is(GENERAL));
+    assertThat(error.getErrorType(), is(mockErrorType));
   }
 
   @Test
   public void buildErrorFromMuleException() {
     MuleException exception = new DefaultMuleException(new RuntimeException(EXCEPTION_MESSAGE));
-    Error error = builder(exception).build();
+    Error error = builder(exception).errorType(mockErrorType).build();
     assertThat(error.getException(), is(exception));
     assertThat(error.getDescription(), containsString(EXCEPTION_MESSAGE));
     assertThat(error.getDetailedDescription(), containsString(EXCEPTION_MESSAGE));
-    assertThat(error.getErrorType(), is(GENERAL));
+    assertThat(error.getErrorType(), is(mockErrorType));
   }
 
   @Test
   public void buildError() {
     String detailedDescription = "detailed description";
     String description = "description";
-    ErrorType errorType = GENERAL;
+    ErrorType errorType = mockErrorType;
     MuleMessage errorMessage = MuleMessage.builder().nullPayload().build();
     IllegalArgumentException exception = new IllegalArgumentException("some message");
     Error error = builder()

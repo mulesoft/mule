@@ -8,18 +8,22 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.message.ErrorBuilder;
 
 import org.junit.Test;
 
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
+
 public class ExceptionTestCase extends AbstractELTestCase {
+
+  private Error mockError = mock(Error.class);
 
   public ExceptionTestCase(Variant variant, String mvelOptimizer) {
     super(variant, mvelOptimizer);
@@ -32,30 +36,37 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Test
   public void exception() throws Exception {
-    MuleEvent event = getTestEvent("");
+    MuleEvent event = createEvent();
     RuntimeException rte = new RuntimeException();
-    event.setError(ErrorBuilder.builder(rte).build());
+    when(mockError.getException()).thenReturn(rte);
     event.setMessage(MuleMessage.builder(event.getMessage()).build());
     assertEquals(rte, evaluate("exception", event));
   }
 
   @Test
   public void assignException() throws Exception {
-    MuleEvent event = getTestEvent("");
+    MuleEvent event = createEvent();
     event.setMessage(MuleMessage.builder(event.getMessage()).build());
-    event.setError(ErrorBuilder.builder(new RuntimeException()).build());
+    RuntimeException runtimeException = new RuntimeException();
+    when(mockError.getException()).thenReturn(runtimeException);
     assertImmutableVariable("exception='other'", event);
   }
 
   @Test
   public void exceptionCausedBy() throws Exception {
-    MuleEvent event = getTestEvent("");
+    MuleEvent event = createEvent();
     MuleMessage message = event.getMessage();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),
                                new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct),
                                new IllegalAccessException());
-    event.setError(ErrorBuilder.builder(me).build());
+    when(mockError.getException()).thenReturn(me);
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
+  }
+
+  private MuleEvent createEvent() throws Exception {
+    MuleEvent testEvent = getTestEvent("");
+    testEvent.setError(mockError);
+    return testEvent;
   }
 }

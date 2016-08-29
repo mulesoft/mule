@@ -9,7 +9,7 @@ package org.mule.runtime.core.processor;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
  * <p/>
  *
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you should
- * override the {@link #processFinally(org.mule.runtime.core.api.MuleEvent, org.mule.runtime.core.api.MessagingException)} method.
+ * override the {@link #processFinally(org.mule.runtime.core.api.MuleEvent, MessagingException)} method.
  *
  * @since 3.7.0
  */

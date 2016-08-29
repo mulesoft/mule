@@ -10,7 +10,7 @@ import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.net.SocketTimeoutException;
 

@@ -19,7 +19,7 @@ import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.functional.listener.SystemExceptionListener;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transaction.Transaction;

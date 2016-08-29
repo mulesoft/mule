@@ -13,9 +13,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 

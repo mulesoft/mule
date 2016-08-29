@@ -6,12 +6,12 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.exception.AbstractExceptionListener;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

@@ -51,7 +51,8 @@ public class TransformerConfigurator implements ObjectFactoryCommonConfigurator<
     String mimeType = (String) parameters.get("mimeType");
     String name = (String) parameters.get("name");
     String encoding = (String) parameters.get("encoding");
-    Boolean ignoreBadInput = (Boolean) parameters.get("ignoreBadInput");
+    Boolean ignoreBadInput =
+        parameters.get("ignoreBadInput") == null ? null : Boolean.valueOf((String) parameters.get("ignoreBadInput"));
     if (returnClass != null || mimeType != null) {
       DataTypeParamsBuilder builder = DataType.builder().type(getReturnType(returnClass));
       if (isNotEmpty(mimeType)) {

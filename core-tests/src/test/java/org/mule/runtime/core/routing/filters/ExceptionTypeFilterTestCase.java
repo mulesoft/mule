@@ -8,23 +8,20 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.ErrorBuilder.builder;
+import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import java.io.IOException;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsNull;
 import org.junit.Test;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
@@ -54,7 +51,8 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
     assertThat(filter.accept(m), is(false));
 
     Exception exception = new IllegalArgumentException("test");
-    when(event.getError()).thenReturn(builder(exception).build());
+    Error mockError = createErrorMock(exception);
+    when(event.getError()).thenReturn(mockError);
     m = MuleMessage.builder(m).build();
     assertThat(filter.accept(event), is(true));
 
@@ -63,7 +61,8 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
     filter = new ExceptionTypeFilter(IOException.class);
     assertThat(filter.accept(event), is(false));
     exception = new IOException("test");
-    when(event.getError()).thenReturn(builder(exception).build());
+    mockError = createErrorMock(exception);
+    when(event.getError()).thenReturn(mockError);
     assertThat(filter.accept(event), is(true));
   }
 

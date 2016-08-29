@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * Callback to be used to notify of the result of an asynchronous response writing task.

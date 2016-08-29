@@ -7,6 +7,7 @@
 package org.mule.runtime.config.spring.dsl.model;
 
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
+import org.mule.runtime.core.config.ComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;

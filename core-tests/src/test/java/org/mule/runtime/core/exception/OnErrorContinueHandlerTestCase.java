@@ -10,6 +10,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
@@ -18,11 +19,21 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
+
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -35,18 +46,14 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
-
 @RunWith(MockitoJUnitRunner.class)
 public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase {
 
   private MuleContext mockMuleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS.get());
+
+  @Rule
+  public ExpectedException expectedException = none();
+
   @Mock
   private MessagingException mockException;
 
@@ -139,6 +146,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   public void testMessageToStringNotCalledOnFailure() throws Exception {
     mockMuleEvent.setMessage(spy(muleMessage));
     mockMuleEvent = spy(mockMuleEvent);
+    when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
 
     MuleEvent lastEventCreated = new DefaultMuleEvent(context, muleMessage, flow);
     onErrorContinueHandler
@@ -149,8 +157,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.initialise();
     when(mockMuleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
 
-    MuleEvent exceptionHandlingResult =
-        exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, mockMuleEvent);
+    expectedException.expect(Exception.class);
+    onErrorContinueHandler.handleException(mockException, mockMuleEvent);
   }
 
   private MessageProcessor createChagingEventMessageProcessor(final MuleEvent lastEventCreated) {

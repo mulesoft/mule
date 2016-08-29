@@ -55,7 +55,11 @@
             <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer"/>
         </http:inbound-endpoint>
         <echo-component/>
-        <custom-exception-strategy
-                class="org.mule.compatibility.transport.http.reliability.InboundMessageLossTestCase$BadHandler"/>
+        <error-handler>
+            <on-error-propagate>
+                <test:component throwException="true" exceptionText="Bad news!"/>
+            </on-error-propagate>
+        </error-handler>
     </flow>
+
 </mule>
