@@ -8,7 +8,6 @@ package org.mule.runtime.module.http.internal.request.client;
 
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
-
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -16,6 +15,7 @@ import org.mule.runtime.core.util.ObjectNameHelper;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.requester.HttpRequestOperationConfig;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
+import org.mule.runtime.module.http.api.requester.HttpRequesterConfigBuilder;
 import org.mule.runtime.module.http.api.requester.HttpStreamingType;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
@@ -107,9 +107,10 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
       throw new IllegalStateException("The request config and the TLS context factory cannot be configured at the same time");
     }
     if (tlsContextFactory != null) {
-      DefaultHttpRequesterConfig requesterConfig = new DefaultHttpRequesterConfig();
-      requesterConfig.setTlsContext(tlsContextFactory);
-      requesterConfig.setProtocol(HTTPS);
+      DefaultHttpRequesterConfig requesterConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext)
+          .setProtocol(HTTPS)
+          .setTlsContext(tlsContextFactory)
+          .build();
       muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName("auto-generated-request-config"),
                                                requesterConfig);
       httpRequester.setConfig(requesterConfig);
@@ -117,8 +118,13 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
       DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
 
       if (requestConfig == null) {
-        requestConfig = new DefaultHttpRequesterConfig();
-        muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+        synchronized (this) {
+          requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
+          if (requestConfig == null) {
+            requestConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext).build();
+            muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+          }
+        }
       }
 
       httpRequester.setConfig(requestConfig);

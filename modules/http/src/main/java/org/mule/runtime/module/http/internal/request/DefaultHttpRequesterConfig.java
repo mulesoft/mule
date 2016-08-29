@@ -73,6 +73,8 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
   private boolean enableCookies = false;
   private CookieManager cookieManager;
 
+  private boolean initialised = false;
+
   @Inject
   @DefaultTlsContextFactoryBuilder
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
@@ -81,6 +83,9 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
 
   @Override
   public void initialise() throws InitialisationException {
+    if (initialised) {
+      return;
+    }
     LifecycleUtils.initialiseIfNeeded(authentication);
     verifyConnectionsParameters();
 
@@ -114,6 +119,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
     } else {
       httpClient = httpClientFactory.create(configuration);
     }
+    initialised = true;
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
