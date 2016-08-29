@@ -65,9 +65,15 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
 
     private MuleContext muleContext;
 
+    private boolean initialised = false;
+
     @Override
     public void initialise() throws InitialisationException
     {
+        if (initialised)
+        {
+            return;
+        }
         LifecycleUtils.initialiseIfNeeded(authentication);
         verifyConnectionsParameters();
 
@@ -101,6 +107,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
 
         httpClient = new GrizzlyHttpClient(configuration);
 
+        initialised = true;
     }
 
     private void verifyConnectionsParameters() throws InitialisationException
