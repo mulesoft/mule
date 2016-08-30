@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.el.mvel;
+package org.mule.test.core.el.mvel;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
@@ -13,6 +13,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Random;

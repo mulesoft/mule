@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+    <file:config name="file" workingDir="${workingDir}" />
+
+
+    <flow name="read-write">
+        <file:read path="files/hello.json" />
+        <file:write path="output" content="#[payload]" mode="OVERWRITE" lock="false" />
+    </flow>
+
+    <flow name="read-write-1K">
+        <file:read path="1K/file" />
+        <file:write path="output" content="#[payload]" mode="OVERWRITE" lock="false" />
+    </flow>
+
+    <flow name="read-write-1M">
+        <file:read path="1M/file" />
+        <file:write path="output" content="#[payload]" mode="OVERWRITE" lock="false" />
+    </flow>
+
+    <flow name="read">
+        <file:read path="files/hello.json" />
+    </flow>
+
+    <flow name="read-1K">
+        <file:read path="1K/file" />
+    </flow>
+
+    <flow name="read-1M">
+        <file:read path="1M/file" />
+    </flow>
+
+
+    <flow name="write">
+        <file:write path="write-test-file.txt" content="This is the file content" mode="OVERWRITE" lock="false" />
+    </flow>
+
+    <flow name="write-with-absolute-path">
+        <file:write content="my content" path="/temp/my file.txt" mode="OVERWRITE" createParentDirectories="true" lock="true" />
+    </flow>
+
+    <flow name="write-bytearray">
+        <expression-transformer expression="#[result = '\u0003H\u0001e\u0002l\u0004l\u0005o\u0008\u0020\u0040\u0035北\u0003'.getBytes('ASCII'); return result[1]]"/>
+        <file:write content="#[payload]" path="byte-array.txt" mode="OVERWRITE" createParentDirectories="false" lock="false" />
+    </flow>
+
+    <flow name="write-iterable">
+        <set-payload value="#[['1','2','3','4']]" />
+        <file:write path="iterable.txt"  mode="OVERWRITE" createParentDirectories="false" lock="false" />
+    </flow>
+
+    <flow name="write-lock">
+        <file:write path="write-test-file.txt" content="This is the file content" mode="OVERWRITE" lock="true" />
+    </flow>
+
+</mule>
+

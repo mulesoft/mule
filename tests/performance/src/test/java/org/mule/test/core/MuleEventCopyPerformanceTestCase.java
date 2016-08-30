@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core;
+package org.mule.test.core;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
