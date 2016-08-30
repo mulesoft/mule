@@ -50,14 +50,14 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
 
   @Override
   public int compareTo(ExceptionMapping exceptionMapping) {
+    if (exceptionType.equals(exceptionMapping.exceptionType)) {
+      return 0;
+    }
     if (this.exceptionType.isAssignableFrom(exceptionMapping.exceptionType)) {
       return 1;
     }
     if (exceptionMapping.exceptionType.isAssignableFrom(this.exceptionType)) {
       return -1;
-    }
-    if (exceptionType.equals(exceptionMapping.exceptionType)) {
-      return 0;
     }
     return 1;
   }

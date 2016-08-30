@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 public class ExceptionMapperTestCase extends AbstractMuleTestCase {
@@ -48,6 +49,13 @@ public class ExceptionMapperTestCase extends AbstractMuleTestCase {
     assertThat(exceptionMapper.resolveErrorType(new ArrayStoreException()).get(), is(arrayStoreExceptionErrorType));
     assertThat(exceptionMapper.resolveErrorType(new ClassCastException()).get(), is(classCastExceptionErrorType));
     assertThat(exceptionMapper.resolveErrorType(new Exception()).isPresent(), is(false));
+  }
+
+  @Test(expected = MuleRuntimeException.class)
+  public void sameExceptionWithDifferentErrorTypes() {
+    ExceptionMapper.builder()
+        .addExceptionMapping(NumberFormatException.class, numberFormatExceptionErrorType)
+        .addExceptionMapping(NumberFormatException.class, illegalArgumentExceptionErrorType);
   }
 
 }

@@ -58,7 +58,7 @@ public class ErrorTypeLocator {
   /**
    * Gets the {@code ErrorType} instance for UNKNOWN error type.
    *
-   * @return the ANY error type
+   * @return the UNKNOWN error type
    */
   public ErrorType getUnknownErrorType() {
     return errorTypeRepository.getUnkonwnErrorType();
@@ -79,11 +79,11 @@ public class ErrorTypeLocator {
    * Finds the {@code ErrorType} related to a component defined by the {@link ComponentIdentifier} based on the exception thrown
    * by the component and the mappings configured in the {@code ErrorTypeLocator}.
    * 
-   * If no mapping is available then the {@link #getAnyErrorType()} rules applies.
+   * If no mapping is available then the {@link #lookupErrorType(Exception)} rules applies.
    * 
    * @param componentIdentifier the identifier of the component that throw the exception.
    * @param exception the exception thrown by the component.
-   * @return the error type realted to the exception based on the component mappings. If there's no mapping then the error type
+   * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
   public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Exception exception) {

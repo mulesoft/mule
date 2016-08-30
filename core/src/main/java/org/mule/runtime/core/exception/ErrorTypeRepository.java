@@ -18,7 +18,7 @@ import org.mule.runtime.core.message.ErrorTypeBuilder;
 /**
  * Repository for the different {@link ErrorType}s in a mule artifact.
  *
- * Only once instance of {@link ErrorType} must exists describing the same
+ * Only one instance of {@link ErrorType} must exists describing the same
  * combination of error identifier and namespace.
  *
  * @since 4.0
@@ -48,7 +48,7 @@ public class ErrorTypeRepository {
         ErrorTypeBuilder.builder().namespace(namespace).stringRepresentation(stringRepresentation)
             .parentErrorType(parentErrorType);
     if (this.errorTypes.put(new ErrorTypeKey(namespace, stringRepresentation), errorTypeBuilder.build()) != null) {
-      throw new IllegalStateException(format("Already exists an error type with namespace %s and string representation",
+      throw new IllegalStateException(format("An error type with namespace %s and string representation %s already exists",
                                              namespace, stringRepresentation));
     }
   }
@@ -89,8 +89,7 @@ public class ErrorTypeRepository {
         return false;
       }
 
-      ErrorTypeKey that =
-          (ErrorTypeKey) o;
+      ErrorTypeKey that = (ErrorTypeKey) o;
 
       if (!namespace.equals(that.namespace)) {
         return false;
