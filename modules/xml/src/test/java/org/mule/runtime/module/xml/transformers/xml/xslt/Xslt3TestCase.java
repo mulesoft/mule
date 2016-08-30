@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
 

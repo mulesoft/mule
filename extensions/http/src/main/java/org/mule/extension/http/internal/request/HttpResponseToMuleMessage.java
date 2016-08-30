@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.MuleMessage.Builder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.IOUtils;

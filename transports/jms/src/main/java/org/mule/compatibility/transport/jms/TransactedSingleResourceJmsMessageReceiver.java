@@ -14,7 +14,7 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;

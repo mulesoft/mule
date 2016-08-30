@@ -8,7 +8,7 @@ package org.mule.test.core.context.notification;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;

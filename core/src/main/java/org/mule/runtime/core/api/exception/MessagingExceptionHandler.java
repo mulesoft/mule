@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.exception;
 
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).

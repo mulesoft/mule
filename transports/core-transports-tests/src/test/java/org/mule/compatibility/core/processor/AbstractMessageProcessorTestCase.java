@@ -6,7 +6,19 @@
  */
 package org.mule.compatibility.core.processor;
 
-import static org.mule.runtime.core.message.ErrorBuilder.builder;
+import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.createErrorMock;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
@@ -19,10 +31,10 @@ import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -40,21 +52,13 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
-import org.mockito.stubbing.Answer;
 
 public abstract class AbstractMessageProcessorTestCase extends AbstractMuleContextEndpointTestCase {
 
@@ -300,11 +304,12 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     @Override
     public MuleEvent handleException(MessagingException exception, MuleEvent event) {
       sensedException = exception;
-      event.setError(builder(exception).build());
+      event.setError(createErrorMock(exception));
       event.setMessage(MuleMessage.builder(event.getMessage()).nullPayload()
           .exceptionPayload(new DefaultExceptionPayload(exception)).build());
       return event;
     }
+
   }
 
   public class ObjectAwareProcessor implements MessageProcessor, EndpointAware, MuleContextAware {

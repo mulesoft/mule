@@ -14,7 +14,7 @@ import static org.mule.functional.functional.FlowAssert.verify;
 
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;

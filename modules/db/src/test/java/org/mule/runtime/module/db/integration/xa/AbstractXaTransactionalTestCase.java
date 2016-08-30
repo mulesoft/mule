@@ -14,7 +14,7 @@ import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_ALWAYS_BEG
 import static org.mule.runtime.module.db.integration.DbTestUtil.selectData;
 import static org.mule.runtime.module.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.runtime.module.db.integration.model.Planet.MARS;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;

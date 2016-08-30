@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Test;
 

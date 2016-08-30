@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 
 /**

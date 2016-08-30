@@ -27,25 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.core.routing.filters.ExpressionFilter;
-import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -57,9 +38,29 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.routing.filters.ExpressionFilter;
+import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -120,6 +121,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     configureExceptionStrategyToReleaseLatchWhenExecuted();
     configureDLQToReleaseLatchWhenExecuted();
     when(muleContext.getTransformationService()).thenReturn(transformationService);
+    when(muleContext.getErrorTypeLocator()).thenReturn(mock(ErrorTypeLocator.class, RETURNS_DEEP_STUBS.get()));
     when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenAnswer(
                                                                                                   invocation -> MuleMessage
                                                                                                       .builder()
@@ -230,11 +232,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
 
-        verify(argEvent, times(1)).setError(argThat(new ArgumentMatcher<Error>() {
+        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
 
           @Override
           public boolean matches(Object argument) {
-            assertThat(((Error) argument).getException().getMessage(),
+            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
                        containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
             return true;
           }
@@ -264,11 +266,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         MuleEvent argEvent = (MuleEvent) argument;
         assertThat(argEvent, sameInstance(mockEvent));
 
-        verify(argEvent, times(1)).setError(argThat(new ArgumentMatcher<Error>() {
+        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
 
           @Override
           public boolean matches(Object argument) {
-            assertThat(((Error) argument).getException().getMessage(),
+            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
                        containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
             return true;
           }
@@ -297,11 +299,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
 
-        verify(argEvent, times(1)).setError(argThat(new ArgumentMatcher<Error>() {
+        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
 
           @Override
           public boolean matches(Object argument) {
-            assertThat(((Error) argument).getException().getMessage(),
+            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
                        containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
             return true;
           }

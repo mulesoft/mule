@@ -24,7 +24,12 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.message.ErrorBuilder.builder;
+import static org.mule.tck.MuleTestUtils.createErrorMock;
+
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import org.mockito.Mockito;
 
 import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -35,6 +40,7 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.compatibility.core.transformer.simple.InboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
@@ -48,11 +54,8 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.security.TestSecurityFilter;
-
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
 
 public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
@@ -237,7 +240,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage())
         .exceptionPayload(new DefaultExceptionPayload(exception))
         .build());
-    responseEvent.setError(builder(exception).build());
+    responseEvent.setError(createErrorMock(exception));
 
     MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(endpoint.getFlowConstruct());
     result = mpChain.process(requestEvent);

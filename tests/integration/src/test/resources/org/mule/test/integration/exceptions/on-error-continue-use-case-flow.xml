@@ -94,7 +94,7 @@
             <on-error-continue type="MULE:CUSTOM">
                 <append-string-transformer message=" nope"/>
             </on-error-continue>
-            <on-error-continue type="MULE:GENERAL">
+            <on-error-continue type="UNKNOWN">
                 <append-string-transformer message=" apt2"/>
             </on-error-continue>
             <on-error-continue type="ANY">

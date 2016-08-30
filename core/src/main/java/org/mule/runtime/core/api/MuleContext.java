@@ -36,6 +36,7 @@ import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.util.lock.LockFactory;
@@ -405,5 +406,7 @@ public interface MuleContext extends Lifecycle {
    * @since 4.0
    */
   String getId();
+
+  ErrorTypeLocator getErrorTypeLocator();
 }
 

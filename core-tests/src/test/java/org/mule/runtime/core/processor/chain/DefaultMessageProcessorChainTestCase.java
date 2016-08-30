@@ -18,17 +18,33 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.Mockito;
+
+import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -47,6 +63,8 @@ import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
@@ -58,21 +76,6 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -111,11 +114,15 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   @Before
   public void before() {
     muleContext = mock(MuleContext.class);
+    ErrorTypeLocator errorTypeLocator = mock(ErrorTypeLocator.class);
+    ErrorType errorType = mock(ErrorType.class);
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleConfiguration.isContainerMode()).thenReturn(false);
     when(muleConfiguration.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(muleConfiguration.getShutdownTimeout()).thenReturn(1000);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+    when(muleContext.getErrorTypeLocator()).thenReturn(errorTypeLocator);
+    when(errorTypeLocator.lookupErrorType(any())).thenReturn(errorType);
   }
 
   @After

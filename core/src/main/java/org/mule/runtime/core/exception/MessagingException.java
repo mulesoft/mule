@@ -5,12 +5,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.api;
+package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.abbreviate;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.ExceptionHelper;

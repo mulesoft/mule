@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.db.integration.config;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.module.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.runtime.module.db.integration.TestDbConfig;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;

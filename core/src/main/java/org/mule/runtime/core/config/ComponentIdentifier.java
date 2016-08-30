@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.spring.dsl.model;
+package org.mule.runtime.core.config;
 
-import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.core.util.Preconditions;
+
+import javax.xml.namespace.QName;
 
 /**
  * Unique identifier for a configuration option.
@@ -16,6 +16,8 @@ import org.mule.runtime.core.util.Preconditions;
  * @since 4.0
  */
 public class ComponentIdentifier {
+
+  public static QName ANNOTATION_NAME = new QName("config", "componentIdentifier");
 
   private String namespace;
   private String identifier;
@@ -92,6 +94,6 @@ public class ComponentIdentifier {
 
   @Override
   public String toString() {
-    return getNamespace().equals(CORE_NAMESPACE_NAME) ? getName() : getNamespace() + ":" + getName();
+    return getNamespace().equals("mule") ? getName() : getNamespace() + ":" + getName();
   }
 }

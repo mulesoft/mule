@@ -16,7 +16,7 @@ import org.mule.extension.socket.api.config.ListenerConfig;
 import org.mule.extension.socket.api.connection.ListenerConnection;
 import org.mule.extension.socket.api.worker.SocketWorker;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;

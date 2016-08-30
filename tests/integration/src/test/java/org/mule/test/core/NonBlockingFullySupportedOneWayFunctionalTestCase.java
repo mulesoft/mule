@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Test;
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -17,7 +18,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware {
+public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware {
 
   protected List messageProcessors;
   private MuleContext muleContext;
@@ -47,6 +48,7 @@ public class ResponseMessageProcessorsFactoryBean implements FactoryBean, MuleCo
     ResponseMessageProcessorAdapter responseAdapter = new ResponseMessageProcessorAdapter();
     responseAdapter.setProcessor(builder.build());
     responseAdapter.setMuleContext(muleContext);
+    responseAdapter.setAnnotations(getAnnotations());
     return responseAdapter;
   }
 

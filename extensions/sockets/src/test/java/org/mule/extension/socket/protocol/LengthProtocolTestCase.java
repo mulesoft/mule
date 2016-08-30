@@ -9,7 +9,7 @@ package org.mule.extension.socket.protocol;
 import static org.hamcrest.Matchers.instanceOf;
 import org.mule.extension.socket.SocketExtensionTestCase;
 import org.mule.extension.socket.api.exceptions.LengthExceededException;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Test;
 

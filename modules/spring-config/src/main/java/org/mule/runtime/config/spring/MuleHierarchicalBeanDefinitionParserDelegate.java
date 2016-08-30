@@ -20,7 +20,7 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.spring.CommonBeanDefinitionCreator.adaptFilterBeanDefinitions;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import org.mule.runtime.config.spring.dsl.model.ApplicationModel;
-import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.spring.parsers.generic.AutoIdUtils;

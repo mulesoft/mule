@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
-import static org.mule.runtime.core.api.MessagingException.PAYLOAD_INFO_KEY;
+import static org.mule.runtime.core.exception.MessagingException.PAYLOAD_INFO_KEY;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.metadata.DataType;
@@ -33,6 +33,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.tck.SerializationTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.core.message;
 
+import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_IDENTIFIER;
+import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 
 /**
  * Builder for {@link ErrorType}. This must be the only mechanism to create an instance
@@ -17,15 +20,6 @@ import org.mule.runtime.api.message.ErrorType;
  * @since 4.0
  */
 public final class ErrorTypeBuilder {
-
-  private static final String MULE_NAMESPACE = "mule";
-  private static final String ANY_STRING_REPRESENTATION = "ANY";
-  private static final String GENERAL_STRING_REPRESENTATION = "GENERAL";
-
-  public static final ErrorType ANY =
-      ErrorTypeBuilder.builder().namespace(MULE_NAMESPACE).stringRepresentation(ANY_STRING_REPRESENTATION).build();
-  public static final ErrorType GENERAL = ErrorTypeBuilder.builder().namespace(MULE_NAMESPACE)
-      .stringRepresentation(GENERAL_STRING_REPRESENTATION).parentErrorType(ANY).build();
 
   private String stringRepresentation;
   private String namespace;
@@ -78,7 +72,7 @@ public final class ErrorTypeBuilder {
   public ErrorType build() {
     checkState(stringRepresentation != null, "string representation cannot be null");
     checkState(namespace != null, "namespace representation cannot be null");
-    if (!stringRepresentation.equals(ANY_STRING_REPRESENTATION)) {
+    if (!(stringRepresentation.equals(ANY_IDENTIFIER) && namespace.equals(CORE_NAMESPACE_NAME))) {
       checkState(parentErrorType != null, "parent error type cannot be null");
     }
     return new ErrorTypeImplementation(stringRepresentation, namespace, parentErrorType);

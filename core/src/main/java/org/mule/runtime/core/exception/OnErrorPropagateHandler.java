@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.exception;
 
-import org.mule.runtime.core.api.MessagingException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -15,9 +17,6 @@ import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -88,15 +87,18 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent route(MuleEvent event, MessagingException t) {
+  protected MuleEvent route(MuleEvent event, MessagingException t) throws MessagingException {
     MuleEvent resultEvent = event;
     if (isRedeliveryExhausted(t)) {
       if (redeliveryExceeded != null) {
+        markExceptionAsHandled(t);
         try {
-          markExceptionAsHandled(t);
           resultEvent = redeliveryExceeded.process(event);
         } catch (MuleException e) {
-          logFatal(event, t);
+          if (e instanceof MessagingException) {
+            throw (MessagingException) e;
+          }
+          throw new MessagingException(event, e);
         }
       } else {
         logger.info("Message redelivery exhausted. No redelivery exhausted actions configured. Message consumed.");

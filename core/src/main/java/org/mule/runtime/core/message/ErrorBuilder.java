@@ -7,7 +7,6 @@
 package org.mule.runtime.core.message;
 
 import static org.mule.runtime.core.config.ExceptionHelper.getRootMuleException;
-import static org.mule.runtime.core.message.ErrorTypeBuilder.GENERAL;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.api.message.Error;
@@ -57,7 +56,6 @@ public final class ErrorBuilder {
     if (muleRoot != null && muleRoot.getMessage() != null) {
       this.description = muleRoot.getMessage();
     }
-    this.errorType = GENERAL;
   }
 
   /**

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 /**

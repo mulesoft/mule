@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -22,11 +22,11 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
  * <p>
  * Invocations of {@link #processReplyTo(org.mule.runtime.core.api.MuleEvent, org.mule.runtime.core.api.MuleMessage, Object)} are
  * passed straight through to the delegate ReplyToHandler where as invocations of
- * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(org.mule.runtime.core.api.MessagingException, Object)}
+ * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(MessagingException, Object)}
  * may result in a delegation to either
  * {@link #processReplyTo(org.mule.runtime.core.api.MuleEvent, org.mule.runtime.core.api.MuleMessage, Object)} or
- * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(org.mule.runtime.core.api.MessagingException, Object)}
- * depending on the result of {@link org.mule.runtime.core.api.MessagingException#handled()} after the MessagingExceptionHandler
+ * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(MessagingException, Object)}
+ * depending on the result of {@link MessagingException#handled()} after the MessagingExceptionHandler
  * has been invoked.
  */
 public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingReplyToHandler {

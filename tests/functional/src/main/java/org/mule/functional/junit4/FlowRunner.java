@@ -11,7 +11,7 @@ import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.cre
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;

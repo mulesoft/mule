@@ -14,7 +14,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.compatibility.transport.ssl.MockSslSocket;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;

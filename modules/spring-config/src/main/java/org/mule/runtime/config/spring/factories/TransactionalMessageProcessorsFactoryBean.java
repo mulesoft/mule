@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -22,7 +23,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class TransactionalMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware {
+public class TransactionalMessageProcessorsFactoryBean extends AbstractAnnotatedObject implements FactoryBean, MuleContextAware {
 
   protected List messageProcessors;
   protected MessagingExceptionHandler exceptionListener;
@@ -43,6 +44,7 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean, M
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.setName("'transaction' child processor chain");
     TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
+    txProcessor.setAnnotations(getAnnotations());
     txProcessor.setExceptionListener(this.exceptionListener);
     MuleTransactionConfig transactionConfig = createTransactionConfig(this.action);
     txProcessor.setTransactionConfig(transactionConfig);

@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.dsl.spring;
 
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.core.api.MuleRuntimeException;
 

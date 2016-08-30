@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.WorkManagerSource;

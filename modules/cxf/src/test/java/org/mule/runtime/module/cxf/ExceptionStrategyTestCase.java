@@ -15,7 +15,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.H
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;

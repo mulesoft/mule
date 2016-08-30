@@ -9,14 +9,6 @@ package org.mule.runtime.core.exception;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +20,14 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest

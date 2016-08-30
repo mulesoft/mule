@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;

@@ -15,15 +15,13 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;

@@ -15,7 +15,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

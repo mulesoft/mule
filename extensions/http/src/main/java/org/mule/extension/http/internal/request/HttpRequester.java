@@ -21,7 +21,7 @@ import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

@@ -11,7 +11,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

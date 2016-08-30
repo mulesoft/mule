@@ -8,14 +8,13 @@ package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
-import static org.mule.runtime.core.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -31,8 +30,8 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
@@ -211,9 +210,11 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     MuleEvent eventCopy = threadSafeCopy(event);
     logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
     try {
+      RetryPolicyExhaustedException exception = buildRetryPolicyExhaustedException(lastException);
       mutableEvent.setMessage(MuleMessage.builder(mutableEvent.getMessage())
-          .exceptionPayload(new DefaultExceptionPayload(buildRetryPolicyExhaustedException(lastException))).build());
-      mutableEvent.setError(builder(buildRetryPolicyExhaustedException(lastException)).build());
+          .exceptionPayload(new DefaultExceptionPayload(exception)).build());
+      mutableEvent.setError(ErrorBuilder.builder(exception)
+          .errorType(muleContext.getErrorTypeLocator().lookupErrorType(exception)).build());
 
       getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
     } catch (MessagingException e) {

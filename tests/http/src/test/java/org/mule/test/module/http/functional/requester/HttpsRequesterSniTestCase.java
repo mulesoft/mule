@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;

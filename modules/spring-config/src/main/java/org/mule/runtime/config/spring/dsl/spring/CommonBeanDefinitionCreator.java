@@ -28,7 +28,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
-import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
 import org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler;

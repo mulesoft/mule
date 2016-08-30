@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 
 public interface Aggregator {
 

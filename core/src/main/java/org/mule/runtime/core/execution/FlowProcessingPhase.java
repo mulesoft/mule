@@ -11,7 +11,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;

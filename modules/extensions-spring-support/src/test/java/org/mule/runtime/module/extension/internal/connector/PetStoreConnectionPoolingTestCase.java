@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.tck.junit4.rule.SystemProperty;

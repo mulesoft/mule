@@ -61,6 +61,7 @@ import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
@@ -207,6 +208,8 @@ public class DefaultMuleContext implements MuleContext {
    * The {@link ArtifactType} indicating if this configuration object is for an application or a domain.
    */
   private ArtifactType artifactType;
+
+  private ErrorTypeLocator errorTypeLocator;
 
   /**
    * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -1037,5 +1040,13 @@ public class DefaultMuleContext implements MuleContext {
   public String getId() {
     MuleConfiguration conf = getConfiguration();
     return format("%s.%s.%s", conf.getDomainId(), getClusterId(), conf.getId());
+  }
+
+  public void setErrorTypeLocator(ErrorTypeLocator errorTypeLocator) {
+    this.errorTypeLocator = errorTypeLocator;
+  }
+
+  public ErrorTypeLocator getErrorTypeLocator() {
+    return errorTypeLocator;
   }
 }

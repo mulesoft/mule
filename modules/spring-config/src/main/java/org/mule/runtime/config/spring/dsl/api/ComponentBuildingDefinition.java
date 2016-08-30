@@ -13,7 +13,7 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import org.mule.runtime.config.spring.dsl.model.ComponentIdentifier;
+import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.processor.TypeDefinitionVisitor;
 
 import java.util.ArrayList;

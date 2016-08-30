@@ -9,6 +9,7 @@ package org.mule.runtime.config.spring.dsl.model;
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.NAME_ATTRIBUTE;
 import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.core.util.Preconditions;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import org.springframework.beans.factory.config.BeanReference;
  * <p/>
  * Every {@code ComponentModel} represents the configuration of a core configuration or an extension configuration. Which
  * configuration element this object represents is identified by a
- * {@link org.mule.runtime.config.spring.dsl.model.ComponentIdentifier} that can be retrieved using {@code #getIdentifier}.
+ * {@link ComponentIdentifier} that can be retrieved using {@code #getIdentifier}.
  * <p/>
  * It may have simple configuration parameters which are retrieve by using {@code #getParameters} or complex parameters which are
  * retrieved using {@code #getInnerComponents}.

@@ -10,7 +10,7 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

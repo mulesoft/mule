@@ -18,7 +18,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MES
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;

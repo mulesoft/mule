@@ -7,7 +7,9 @@
 package org.mule.runtime.config.spring.dsl.spring;
 
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
+import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.LifecycleAdapterFactory;
 import org.mule.runtime.core.api.interceptor.Interceptor;
@@ -25,7 +27,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class PooledComponentObjectFactory implements ObjectFactory<Component> {
+public class PooledComponentObjectFactory extends AbstractAnnotatedObject implements ObjectFactory<Component> {
 
   private Class clazz;
   private org.mule.runtime.core.api.object.ObjectFactory objectFactory = new PrototypeObjectFactory();
@@ -52,6 +54,7 @@ public class PooledComponentObjectFactory implements ObjectFactory<Component> {
       pooledJavaComponent = new PooledJavaComponent();
     }
     pooledJavaComponent.setInterceptors(interceptors);
+    pooledJavaComponent.setAnnotations(getAnnotations());
     return pooledJavaComponent;
   }
 

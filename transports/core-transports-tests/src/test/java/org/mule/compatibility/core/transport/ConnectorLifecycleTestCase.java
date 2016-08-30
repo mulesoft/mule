@@ -23,7 +23,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequester;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;

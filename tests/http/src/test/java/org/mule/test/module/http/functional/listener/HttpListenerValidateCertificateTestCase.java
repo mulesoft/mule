@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.FlowAssert.verify;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MessagingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
