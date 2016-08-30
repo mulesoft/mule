@@ -28,6 +28,7 @@ import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
@@ -200,7 +201,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     }
 
     private MuleEvent copyEventForEnrichment(MuleEvent event) {
-      MuleEvent copy = DefaultMuleEvent.copy(event);
+      MuleEvent copy = (DefaultMuleEvent) MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
       setCurrentEvent(copy);
       return copy;
     }

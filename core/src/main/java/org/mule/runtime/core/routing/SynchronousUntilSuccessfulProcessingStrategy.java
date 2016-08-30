@@ -11,6 +11,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -74,7 +75,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   }
 
   private MuleEvent copyEventForRetry(MuleEvent event) {
-    MuleEvent copy = DefaultMuleEvent.copy(event);
+    MuleEvent copy = (DefaultMuleEvent) MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
     setCurrentEvent(copy);
     return copy;
   }

@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 /**
  * Writes {@link MuleEvent} to a test connector's queue.
@@ -26,7 +27,7 @@ public class QueueWriterMessageProcessor implements MessageProcessor, MuleContex
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
-    MuleEvent copy = DefaultMuleEvent.copy(event);
+    MuleEvent copy = (DefaultMuleEvent) MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
     //Queue works based on MuleEvent for testing purposes. A real operation
     //would not be aware of the error field and just the plain message would be sent.
     copy.setError(null);

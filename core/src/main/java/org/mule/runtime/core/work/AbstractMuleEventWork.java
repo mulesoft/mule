@@ -7,8 +7,9 @@
 package org.mule.runtime.core.work;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 import javax.resource.spi.work.Work;
 
@@ -34,7 +35,7 @@ public abstract class AbstractMuleEventWork implements Work {
    * {@link org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor}
    */
   public AbstractMuleEventWork(MuleEvent event, boolean copyEvent) {
-    this.event = copyEvent ? DefaultMuleEvent.copy(event) : event;
+    this.event = copyEvent ? MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build() : event;
   }
 
   @Override

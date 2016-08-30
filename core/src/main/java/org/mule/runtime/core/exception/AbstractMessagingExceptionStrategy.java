@@ -25,13 +25,14 @@ import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 /**
- * Fire a notification, log exception, increment statistics, route the problematic message to a destination 
- * if one is configured (DLQ pattern), commit or rollback transaction if one exists, close any open streams.
+ * Fire a notification, log exception, increment statistics, route the problematic message to a destination if one is configured
+ * (DLQ pattern), commit or rollback transaction if one exists, close any open streams.
  */
 public abstract class AbstractMessagingExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler {
 
-  /** 
-   * Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX). 
+  /**
+   * Stop the flow/service when an exception occurs. You will need to restart the flow/service manually after this (e.g, using
+   * JMX).
    */
   private boolean stopMessageProcessing;
 
@@ -47,18 +48,18 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       muleContext.getNotificationManager()
           .fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_START));
 
-      //keep legacy notifications
+      // keep legacy notifications
       fireNotification(ex);
 
       // Work with the root exception, not anything that wraps it
-      //Throwable t = ExceptionHelper.getRootException(ex);
+      // Throwable t = ExceptionHelper.getRootException(ex);
 
       logException(ex, event);
       MuleEvent handledEvent = doHandleException(ex, event);
       if (!(handledEvent instanceof VoidMuleEvent)) {
         event = handledEvent;
       }
-      
+
       ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
       if (getCurrentEvent() != null) {
         MuleEvent currentEvent = getCurrentEvent();

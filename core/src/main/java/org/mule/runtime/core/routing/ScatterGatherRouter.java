@@ -32,6 +32,7 @@ import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.work.ProcessingMuleEventWork;
@@ -130,7 +131,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       // use a copy instead of a resetAccessControl
       // to assure that all property changes
       // are flushed from the worker thread to this one
-      response = DefaultMuleEvent.copy(response);
+      response = (DefaultMuleEvent) MuleEvent.builder(response).session(new DefaultMuleSession(response.getSession())).build();
       setCurrentEvent(response);
     }
 
@@ -176,9 +177,10 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         }
 
         if (exception instanceof MessagingException) {
-          response = DefaultMuleEvent.copy(((MessagingException) exception).getEvent());
+          MuleEvent event1 = ((MessagingException) exception).getEvent();
+          response = (DefaultMuleEvent) MuleEvent.builder(event1).session(new DefaultMuleSession(event1.getSession())).build();
         } else {
-          response = DefaultMuleEvent.copy(event);
+          response = (DefaultMuleEvent) MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
         }
 
         if (response.getError() == null) {
