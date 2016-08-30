@@ -19,7 +19,6 @@ import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -90,7 +89,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
           response = processReplyTo(response, exception);
         }
         closeStream(response.getMessage());
-        nullifyExceptionPayloadIfRequired(response);
+        return nullifyExceptionPayloadIfRequired(response);
       }
       return response;
     }
@@ -143,10 +142,12 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     }
   }
 
-  protected void nullifyExceptionPayloadIfRequired(MuleEvent event) {
+  protected MuleEvent nullifyExceptionPayloadIfRequired(MuleEvent event) {
     if (this.handleException) {
-      event.setError(null);
-      event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
+      return MuleEvent.builder(event).error(null).message(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build())
+          .build();
+    } else {
+      return event;
     }
   }
 

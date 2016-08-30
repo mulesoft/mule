@@ -21,9 +21,9 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected void nullifyExceptionPayloadIfRequired(MuleEvent event) {
-    event.setError(null);
-    event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
+  protected MuleEvent nullifyExceptionPayloadIfRequired(MuleEvent event) {
+    return MuleEvent.builder(event).error(null).message(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build())
+        .build();
   }
 
   @Override

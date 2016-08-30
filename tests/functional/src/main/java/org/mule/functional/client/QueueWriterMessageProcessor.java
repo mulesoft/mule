@@ -8,7 +8,7 @@
 package org.mule.functional.client;
 
 import static org.mule.functional.client.TestConnectorConfig.DEFAULT_CONFIG_ID;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -27,10 +27,11 @@ public class QueueWriterMessageProcessor implements MessageProcessor, MuleContex
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(DEFAULT_CONFIG_ID);
-    MuleEvent copy = (DefaultMuleEvent) MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
-    //Queue works based on MuleEvent for testing purposes. A real operation
-    //would not be aware of the error field and just the plain message would be sent.
-    copy.setError(null);
+    MuleEvent copy = MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession()))
+        // Queue works based on MuleEvent for testing purposes. A real operation
+        // would not be aware of the error field and just the plain message would be sent.
+        .error(null)
+        .build();
     connectorConfig.write(name, copy);
 
     return event;

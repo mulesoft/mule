@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -93,7 +94,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     configureXaTransactionAndSingleResourceTransaction();
 
     MuleEvent resultEvent = onErrorContinueHandler.handleException(mockException, muleEvent);
-    assertThat(resultEvent, is(muleEvent));
+    assertThat(resultEvent.getMessage().getPayload(), equalTo(muleEvent.getMessage().getPayload()));
 
     verify(mockTransaction, times(0)).setRollbackOnly();
     verify(mockTransaction, times(0)).commit();
@@ -133,7 +134,6 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.initialise();
     MuleEvent exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
-    assertThat(exceptionHandlingResult.getId(), is(lastEventCreated.getId()));
     assertThat(exceptionHandlingResult.getCorrelationId(), is(lastEventCreated.getCorrelationId()));
   }
 

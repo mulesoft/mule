@@ -27,22 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -61,6 +45,21 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -232,15 +231,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
 
-        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
-
-          @Override
-          public boolean matches(Object argument) {
-            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
-                       containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
-            return true;
-          }
-        }));
+        assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
+                   containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
         return true;
       }
@@ -264,17 +256,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       @Override
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
-        assertThat(argEvent, sameInstance(mockEvent));
-
-        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
-
-          @Override
-          public boolean matches(Object argument) {
-            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
-                       containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
-            return true;
-          }
-        }));
+        assertThat(argEvent.getMessage().getPayload(), sameInstance(mockEvent.getMessage().getPayload()));
+        assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
+                   containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
         return true;
       }
@@ -299,15 +283,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
 
-        verify(argEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
-
-          @Override
-          public boolean matches(Object argument) {
-            assertThat(((MuleMessage) argument).getExceptionPayload().getException().getMessage(),
-                       containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
-            return true;
-          }
-        }));
+        assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
+                   containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
         return true;
       }

@@ -8,14 +8,14 @@ package org.mule.runtime.core.execution;
 
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.config.ComponentIdentifier;
-import org.mule.runtime.core.exception.ErrorTypeLocator;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.ErrorBuilder;
 
 import java.util.Map.Entry;
@@ -43,6 +43,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         } else {
           messagingException = new MessagingException(event, exception, messageProcessor);
         }
+        // TODO these break some tests and rely on the event mutability, check with PLG
+        // event = MuleEvent.builder(event).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
         event.setError(ErrorBuilder.builder(exception).errorType(errorType).build());
       } else {
         messagingException = (MessagingException) exception;
@@ -50,6 +52,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         if (event.getError() == null || !(event.getError().getException().equals(exception)
             || messagingException.causedExactlyBy(event.getError().getException().getClass()))) {
           ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, exception);
+          // TODO these break some tests and rely on the event mutability, check with PLG
+          // event = MuleEvent.builder(event).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
           event.setError(ErrorBuilder.builder(exception).errorType(errorType).build());
         }
       }

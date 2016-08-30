@@ -13,7 +13,6 @@ import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUN
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -29,6 +28,7 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.ErrorBuilder;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
@@ -211,12 +211,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
     try {
       RetryPolicyExhaustedException exception = buildRetryPolicyExhaustedException(lastException);
-      mutableEvent.setMessage(MuleMessage.builder(mutableEvent.getMessage())
-          .exceptionPayload(new DefaultExceptionPayload(exception)).build());
-      mutableEvent.setError(ErrorBuilder.builder(exception)
-          .errorType(muleContext.getErrorTypeLocator().lookupErrorType(exception)).build());
 
-      getUntilSuccessfulConfiguration().getDlqMP().process(mutableEvent);
+      MuleEvent mutatedEvent = MuleEvent.builder(mutableEvent)
+          .message(MuleMessage.builder(mutableEvent.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
+              .build())
+          .error(ErrorBuilder.builder(exception).errorType(muleContext.getErrorTypeLocator().lookupErrorType(exception)).build())
+          .build();
+
+      getUntilSuccessfulConfiguration().getDlqMP().process(mutatedEvent);
     } catch (MessagingException e) {
       messagingExceptionHandler.handleException(e, eventCopy);
     } catch (Exception e) {
