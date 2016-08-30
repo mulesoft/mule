@@ -10,13 +10,13 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.routing.MessageFilter;
 
@@ -75,7 +75,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
         && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
             || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent()))) {
       /*
-       * TODO migrating this to the builder breaks the following tests:
+       * TODO MULE-9342 migrating this to the builder breaks the following tests:
        * 
        * org.mule.test.routing.ForeachUntilSuccessfulTestCase.flowVariablesAsyncArePropagated()
        * org.mule.test.construct.FlowSyncAsyncProcessingStrategyTestCase

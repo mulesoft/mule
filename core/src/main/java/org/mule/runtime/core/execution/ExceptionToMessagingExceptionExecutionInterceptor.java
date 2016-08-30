@@ -52,7 +52,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         if (event.getError() == null || !(event.getError().getException().equals(exception)
             || messagingException.causedExactlyBy(event.getError().getException().getClass()))) {
           ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, exception);
-          // TODO these break some tests and rely on the event mutability, check with PLG
+          // TODO MULE-9342 these break some tests and rely on the event mutability, check with PLG
           // event = MuleEvent.builder(event).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
           event.setError(ErrorBuilder.builder(exception).errorType(errorType).build());
         }

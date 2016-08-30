@@ -10,8 +10,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -19,6 +17,8 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.io.NotSerializableException;
 
@@ -49,7 +49,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
             for (String flowVar : successEvent.getFlowVariableNames()) {
               event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
             }
-            // TODO org.mule.test.routing.ForeachUntilSuccessfulTestCase.flowVariablesSyncArePropagated()
+            // TODO MULE-9342 org.mule.test.routing.ForeachUntilSuccessfulTestCase.flowVariablesSyncArePropagated()
             finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);
           }
           setCurrentEvent(finalEvent);
@@ -75,7 +75,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   }
 
   private MuleEvent copyEventForRetry(MuleEvent event) {
-    MuleEvent copy = (DefaultMuleEvent) MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
+    MuleEvent copy = MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
     setCurrentEvent(copy);
     return copy;
   }

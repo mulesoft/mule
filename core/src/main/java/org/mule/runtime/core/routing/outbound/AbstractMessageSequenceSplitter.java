@@ -107,7 +107,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
   private DefaultMuleEvent createEvent(Object payload, MuleEvent originalEvent) {
     /*
-     * TODO: These breaK:
+     * TODO MULE-9342 These breaK:
      * 
      * org.mule.test.routing.ForeachTestCase, org.mule.test.routing.ForeachUntilSuccessfulTestCase,
      * org.mule.test.integration.exceptions.ExceptionHandlingTestCase

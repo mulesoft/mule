@@ -21,9 +21,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
@@ -38,6 +38,8 @@ import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.probe.JUnitProbe;
+import org.mule.tck.probe.PollingProber;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,15 +107,21 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessOneWayEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    MuleEvent event = MuleTestUtils.getTestEvent("hello", MessageExchangePattern.ONE_WAY, muleContext);
+    MuleEvent event = MuleTestUtils.getTestEvent("hello", ONE_WAY, muleContext);
     MuleEvent response = directInboundMessageSource.process(event);
-    Thread.sleep(50);
 
-    // While a SedaService returns null, a Flow echos the request when there is async hand-off
-    assertEquals(event.getMessage(), response.getMessage());
+    new PollingProber(50, 5).check(new JUnitProbe() {
 
-    assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
-    assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
+      @Override
+      protected boolean test() throws Exception {
+        // While a SedaService returns null, a Flow echos the request when there is async hand-off
+        assertEquals(event.getMessage(), response.getMessage());
+
+        assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
+        assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
+        return true;
+      }
+    });
   }
 
   @Test
@@ -125,8 +133,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     assertEquals("helloabcdef", response.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), response.getFlowVariable("thread"));
 
-    // Sensed (out) event also is appended with 'def' because it's the same event
-    // instance
+    // Sensed (out) event also is appended with 'def' because it's the same event instance
     assertEquals("helloabcdef", sensingMessageProcessor.event.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
 

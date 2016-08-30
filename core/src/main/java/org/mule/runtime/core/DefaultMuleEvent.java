@@ -122,8 +122,9 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
     this.exchangePattern = rewriteEvent.getExchangePattern();
     if (rewriteEvent instanceof DefaultMuleEvent) {
-      this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
+      // TODO MULE-9342 always clone the flowvars
       // this.flowVariables.putAll(((DefaultMuleEvent) rewriteEvent).flowVariables);
+      this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
       this.legacyCorrelationId = ((DefaultMuleEvent) rewriteEvent).getLegacyCorrelationId();
     }
     setMessage(message);
