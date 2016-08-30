@@ -17,6 +17,7 @@ import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
+import org.mule.runtime.module.db.internal.processor.DbConnectionException;
 
 public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTestCase {
 
@@ -39,7 +40,7 @@ public class DatasourcePoolingLimitTestCase extends AbstractDatasourcePoolingTes
       MuleClient client = muleContext.getClient();
       MuleMessage muleMessage = client.request("test://connectionError", RECEIVE_TIMEOUT).getRight().get();
 
-      assertThat(muleMessage.getPayload(), is(instanceOf(MessagingException.class)));
+      assertThat(muleMessage.getPayload(), is(instanceOf(DbConnectionException.class)));
     } finally {
       connectionLatch.countDown();
     }
