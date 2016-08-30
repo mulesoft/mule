@@ -186,7 +186,7 @@
             <on-error-propagate type="MULE:CUSTOM">
                 <test:queue name="custom1"/>
             </on-error-propagate>
-            <on-error-propagate type="MULE:GENERAL">
+            <on-error-propagate type="UNKNOWN">
                 <custom-processor class="org.mule.test.integration.exceptions.OnErrorPropagateTestCase$CallMessageProcessor"/>
             </on-error-propagate>
             <on-error-propagate type="ANY">

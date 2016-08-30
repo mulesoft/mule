@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import java.util.Collections;
 import java.util.List;
 
 import org.mule.runtime.core.api.GlobalNameableObject;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -69,8 +72,8 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     addDefaultExceptionStrategyIfRequired();
+    super.initialise();
     validateConfiguredExceptionStrategies();
   }
 

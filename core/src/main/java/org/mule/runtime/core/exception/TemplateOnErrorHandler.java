@@ -175,8 +175,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
+    if (this.errorType == null) {
+      this.errorType = muleContext.getErrorTypeLocator().getAnyErrorType();
+    }
     super.doInitialise(muleContext);
-    this.errorType = muleContext.getErrorTypeLocator().getAnyErrorType();
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder =
         new DefaultMessageProcessorChainBuilder(this.flowConstruct);
     try {

@@ -56,6 +56,15 @@ public class ErrorTypeLocator {
   }
 
   /**
+   * Gets the {@code ErrorType} instance for UNKNOWN error type.
+   *
+   * @return the ANY error type
+   */
+  public ErrorType getUnknownErrorType() {
+    return errorTypeRepository.getUnkonwnErrorType();
+  }
+
+  /**
    * Finds the {@code ErrorType} related to the provided {@code exception} based on the general mapping rules of the runtime.
    * 
    * @param exception the exception related to the error type

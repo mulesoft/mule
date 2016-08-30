@@ -34,6 +34,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYP
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_IDENTIFIER;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkState;
@@ -108,6 +109,8 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
+import org.mule.runtime.core.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.exception.RedeliveryExceeded;
@@ -263,13 +266,15 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(OnErrorContinueHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition("errorType", fromSimpleParameter("type", getErrorTypeConverter()).build())
+        .withSetterParameterDefinition("errorType", fromSimpleParameter(TYPE, getErrorTypeConverter())
+            .withDefaultValue(ANY_IDENTIFIER).build())
         .asPrototype().build());
     componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy().withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE, getErrorTypeConverter()).build())
+        .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE, getErrorTypeConverter())
+            .withDefaultValue(ANY_IDENTIFIER).build())
         .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
         .withSetterParameterDefinition("redeliveryExceeded", fromChildConfiguration(RedeliveryExceeded.class).build())
         .asPrototype().build());
@@ -562,8 +567,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private TypeConverter<String, ErrorType> getErrorTypeConverter() {
     return (value) -> {
       ErrorType anyErrorType = muleContext.getErrorTypeLocator().getAnyErrorType();
+      ErrorType unknownErrorType = muleContext.getErrorTypeLocator().getUnknownErrorType();
       if (anyErrorType.getStringRepresentation().equals(value)) {
         return anyErrorType;
+      } else if (unknownErrorType.getStringRepresentation().equals(value)) {
+        return unknownErrorType;
       } else {
         String[] values = value.split(":");
         // For now, let's make a namespace mandatory and everything inherit from ANY

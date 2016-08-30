@@ -31,7 +31,7 @@ public class ErrorTypeRepository {
   public static final String ANY_IDENTIFIER = "ANY";
   public static final String CORE_NAMESPACE_NAME = "mule";
 
-  public static final ErrorType ANY_ERROR_TYPE =
+  private static final ErrorType ANY_ERROR_TYPE =
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).stringRepresentation(ANY_IDENTIFIER).build();
   private Map<ErrorTypeKey, ErrorType> errorTypes = new HashMap<>();
 
@@ -64,6 +64,10 @@ public class ErrorTypeRepository {
 
   public ErrorType getAnyErrorType() {
     return ANY_ERROR_TYPE;
+  }
+
+  public ErrorType getUnkonwnErrorType() {
+    return errorTypes.get(new ErrorTypeKey(CORE_NAMESPACE_NAME, UNKNOWN_ERROR_IDENTIFIER));
   }
 
   private static final class ErrorTypeKey {

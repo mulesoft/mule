@@ -38,7 +38,6 @@ class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent> {
           result = flow.getExceptionListener().handleException(e, e.getEvent());
         }
         e.setProcessedEvent(result);
-        throw e;
       } catch (Exception messagingExceptionHandlerException) {
         //TODO MULE-10370 - Once custom-exception-strategy gets removed we need to allow the inner exception handler to throw
         //MessagingException for the cases where there's a failure inside the on-error-* element.
@@ -47,6 +46,7 @@ class HandleExceptionInterceptor implements ExecutionInterceptor<MuleEvent> {
         }
         throw messagingExceptionHandlerException;
       }
+      throw e;
     } catch (Exception e) {
       throw e;
     }
