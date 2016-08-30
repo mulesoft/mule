@@ -130,13 +130,16 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
   public void serverClosesConnectionAfterSendingData() throws Exception {
     // Apache Fluent doesn't fail while other clients such as curl, postman and this one do
     AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
-    AsyncHttpClient asyncHttpClient =
-        new AsyncHttpClient(new GrizzlyAsyncHttpProvider(asyncHttpClientConfig), asyncHttpClientConfig);
-    ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.preparePost(getListenerUrl())
-        .setBody("a=1&b=2").addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()).execute();
-    com.ning.http.client.Response response = responseFuture.get();
+    GrizzlyAsyncHttpProvider httpProvider = new GrizzlyAsyncHttpProvider(asyncHttpClientConfig);
 
-    assertThat(response.getStatusCode(), is(200));
+    try (AsyncHttpClient asyncHttpClient =
+        new AsyncHttpClient(httpProvider, asyncHttpClientConfig)) {
+      ListenableFuture<com.ning.http.client.Response> responseFuture = asyncHttpClient.preparePost(getListenerUrl())
+          .setBody("a=1&b=2").addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString()).execute();
+      com.ning.http.client.Response response = responseFuture.get();
+
+      assertThat(response.getStatusCode(), is(200));
+    }
   }
 
   @Test

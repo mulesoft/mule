@@ -222,13 +222,14 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
         if (HEADER_EXPECT_CONTINUE_REQUEST_VALUE.equals(expectHeaderValue)) {
           HttpResponse expected = new HttpResponse();
           expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
+          expected.setKeepAlive(true);
           final DefaultMuleEvent event =
               new DefaultMuleEvent(muleEvent.getContext(), MuleMessage.builder().payload(expected).build(),
                                    getFlowConstruct());
           DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 
           setCurrentEvent(event);
-          httpServerConnection.writeResponse(transformResponse(expected));
+          httpServerConnection.writeResponse(expected);
         }
       }
     }
