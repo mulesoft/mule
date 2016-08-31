@@ -110,7 +110,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
    */
   @Test
   public void testRouterMesseageSequence() throws Exception {
-    assertRouted(new IteratorMessageSequence<>(TEST_LIST_MULTIPLE.iterator()), 3, false);
+    assertRouted(new IteratorMessageSequence(TEST_LIST_MULTIPLE.iterator()), 3, false);
   }
 
   /**
@@ -132,7 +132,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
 
   @Test
   public void testSingleMesseageSequence() throws Exception {
-    assertRouted(new IteratorMessageSequence<>(TEST_LIST_SINGLE.iterator()), 1, false);
+    assertRouted(new IteratorMessageSequence(TEST_LIST_SINGLE.iterator()), 1, false);
   }
 
   private void assertRouted(Object payload, int count, boolean counted) throws Exception, MuleException {

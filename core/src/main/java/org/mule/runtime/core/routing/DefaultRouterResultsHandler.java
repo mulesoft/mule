@@ -12,6 +12,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 
@@ -100,15 +101,21 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
 
   private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults,
                                             final MuleEvent previous) {
+    final Builder resultBuilder = MuleEvent.builder(previous);
+
     List<MuleMessage> list = new ArrayList<>();
     for (MuleEvent event : nonNullResults) {
+      for (String flowVarName : event.getFlowVariableNames()) {
+        resultBuilder.addFlowVariable(flowVarName, event.getFlowVariable(flowVarName),
+                                      event.getFlowVariableDataType(flowVarName));
+      }
       list.add(event.getMessage());
     }
     final MuleMessage coll = MuleMessage.builder()
         .collectionPayload(list, MuleMessage.class)
         .build();
 
-    MuleEvent resultEvent = MuleEvent.builder(previous).message(coll).build();
+    MuleEvent resultEvent = resultBuilder.message(coll).build();
     setCurrentEvent(resultEvent);
     return resultEvent;
   }

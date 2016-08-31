@@ -24,6 +24,7 @@ import org.w3c.dom.NodeList;
 
 public class EventToMessageSequenceSplittingStrategy implements SplittingStrategy<MuleEvent, MessageSequence<?>> {
 
+  @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public MessageSequence<?> split(MuleEvent event) {
     MuleMessage msg = event.getMessage();
@@ -32,13 +33,13 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
       return ((MessageSequence<?>) payload);
     }
     if (payload instanceof Iterator<?>) {
-      return new IteratorMessageSequence<>(((Iterator<Object>) payload));
+      return new IteratorMessageSequence(((Iterator<Object>) payload));
     }
     if (payload instanceof Collection) {
       return new CollectionMessageSequence(copyCollection((Collection) payload));
     }
     if (payload instanceof Iterable<?>) {
-      return new IteratorMessageSequence<>(((Iterable<Object>) payload).iterator());
+      return new IteratorMessageSequence(((Iterable<Object>) payload).iterator());
     }
     if (payload instanceof Object[]) {
       return new ArrayMessageSequence((Object[]) payload);

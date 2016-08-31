@@ -10,6 +10,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -75,7 +76,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
   protected abstract MessageSequence<?> splitMessageIntoSequence(MuleEvent event) throws MuleException;
 
   protected List<MuleEvent> processParts(MessageSequence<?> seq, MuleEvent originalEvent) throws MuleException {
-    String correlationId = originalEvent.getCorrelationId();
     List<MuleEvent> resultEvents = new ArrayList<>();
     int correlationSequence = 0;
     MessageSequence<?> messageSequence = seq;
@@ -83,20 +83,33 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       messageSequence = new PartitionedMessageSequence(seq, batchSize);
     }
     Integer count = messageSequence.size();
+    MuleEvent lastResult = null;
     for (; messageSequence.hasNext();) {
       correlationSequence++;
 
-      DefaultMuleEvent event = createEvent(messageSequence.next(), originalEvent);
-      event.setParent(originalEvent);
-      event.setCorrelation(new Correlation(count, correlationSequence));
+      final Builder builder = MuleEvent.builder(originalEvent);
 
+      initEventBuilder(messageSequence.next(), originalEvent, builder);
+      if (lastResult != null) {
+        for (String flowVarName : lastResult.getFlowVariableNames()) {
+          // TODO MULE-9342 temporary workaround for batch
+          if (!"record".equals(flowVarName)) {
+            builder.addFlowVariable(flowVarName, lastResult.getFlowVariable(flowVarName),
+                                    lastResult.getFlowVariableDataType(flowVarName));
+          }
+        }
+      }
       if (counterVariableName != null) {
-        originalEvent.setFlowVariable(counterVariableName, correlationSequence);
+        builder.addFlowVariable(counterVariableName, correlationSequence);
       }
 
+      final MuleEvent event = builder.build();
+      ((DefaultMuleEvent) event).setParent(originalEvent);
+      ((DefaultMuleEvent) event).setCorrelation(new Correlation(count, correlationSequence));
       MuleEvent resultEvent = processNext(event);
       if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
         resultEvents.add(resultEvent);
+        lastResult = resultEvent;
       }
     }
     if (correlationSequence == 1) {
@@ -105,19 +118,18 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     return resultEvents;
   }
 
-  private DefaultMuleEvent createEvent(Object payload, MuleEvent originalEvent) {
-    /*
-     * TODO MULE-9342 These breaK:
-     * 
-     * org.mule.test.routing.ForeachTestCase, org.mule.test.routing.ForeachUntilSuccessfulTestCase,
-     * org.mule.test.integration.exceptions.ExceptionHandlingTestCase
-     */
+  private void initEventBuilder(Object payload, MuleEvent originalEvent, Builder builder) {
     if (payload instanceof MuleEvent) {
-      return new DefaultMuleEvent(((MuleEvent) payload).getMessage(), originalEvent);
+      final MuleEvent payloadAsEvent = (MuleEvent) payload;
+      builder.message(payloadAsEvent.getMessage());
+      for (String flowVarName : payloadAsEvent.getFlowVariableNames()) {
+        builder.addFlowVariable(flowVarName, payloadAsEvent.getFlowVariable(flowVarName),
+                                payloadAsEvent.getFlowVariableDataType(flowVarName));
+      }
     } else if (payload instanceof MuleMessage) {
-      return new DefaultMuleEvent((MuleMessage) payload, originalEvent);
+      builder.message((MuleMessage) payload);
     } else {
-      return new DefaultMuleEvent(MuleMessage.builder(originalEvent.getMessage()).payload(payload).build(), originalEvent);
+      builder.message(MuleMessage.builder(originalEvent.getMessage()).payload(payload).build());
     }
   }
 

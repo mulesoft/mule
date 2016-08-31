@@ -20,11 +20,11 @@ import org.apache.commons.lang.Validate;
  * @author flbulgarelli
  * @param <T>
  */
-public final class IteratorMessageSequence<T> extends AbstractMessageSequence<T> {
+public final class IteratorMessageSequence extends AbstractMessageSequence {
 
-  private final Iterator<T> iter;
+  private final Iterator iter;
 
-  public IteratorMessageSequence(Iterator<T> iter) {
+  public IteratorMessageSequence(Iterator iter) {
     Validate.notNull(iter);
     this.iter = iter;
   }
@@ -40,8 +40,12 @@ public final class IteratorMessageSequence<T> extends AbstractMessageSequence<T>
   }
 
   @Override
-  public T next() {
-    return iter.next();
+  public Object next() {
+    if (iter instanceof EventFactoryIterator) {
+      return ((EventFactoryIterator) iter).nextEvent();
+    } else {
+      return iter.next();
+    }
   }
 
 }

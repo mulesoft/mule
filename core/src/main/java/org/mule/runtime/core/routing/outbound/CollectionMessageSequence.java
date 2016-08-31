@@ -28,7 +28,11 @@ public final class CollectionMessageSequence<T> extends AbstractMessageSequence<
 
   public CollectionMessageSequence(Collection<T> collection) {
     Validate.notNull(collection);
-    this.iter = collection.iterator();
+    if (collection instanceof EventFactoryList) {
+      this.iter = ((EventFactoryList) collection).eventIterator();
+    } else {
+      this.iter = collection.iterator();
+    }
     this.remaining = collection.size();
   }
 
