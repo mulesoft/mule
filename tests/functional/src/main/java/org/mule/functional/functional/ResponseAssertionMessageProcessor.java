@@ -7,11 +7,14 @@
 package org.mule.functional.functional;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExceptionTransformerExecutionTemplate;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -23,12 +26,11 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.chain.ProcessorExecutorFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
 
 public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     implements InterceptingMessageProcessor, FlowConstructAware, Startable, NonBlockingSupported {
@@ -114,14 +116,16 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   public void verify() throws InterruptedException {
     super.verify();
     if (responseCountFailOrNullEvent()) {
-      Assert.fail("Flow assertion '" + message + "' failed. No response message received or if responseCount "
+      fail(failureMessagePrefix() + "No response message received or if responseCount "
           + "attribute was set then it was no matched.");
     } else if (responseExpressionFailed()) {
-      Assert.fail("Flow assertion '" + message + "' failed. Response expression " + expression + " evaluated false.");
+      fail(failureMessagePrefix() + "Response expression " + expression + " evaluated false.");
     } else if (responseCount > 0 && responseSameThread && (requestThread != responseThread)) {
-      Assert.fail("Flow assertion '" + message + "' failed. Response thread was not same as request thread");
-    } else if (responseCount > 0 && !responseSameThread && (requestThread == responseThread)) {
-      Assert.fail("Flow assertion '" + message + "' failed. Response thread was same as request thread");
+      assertThat(failureMessagePrefix() + "Response thread was not same as request thread", responseThread,
+                 sameInstance(requestThread));
+    } else if (responseCount > 0 && !responseSameThread) {
+      assertThat(failureMessagePrefix() + "Response thread was same as request thread", responseThread,
+                 not(sameInstance(requestThread)));
     }
   }
 
@@ -129,8 +133,8 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     return !isResponseProcessesCountCorrect();
   }
 
-  public Boolean responseExpressionFailed() // added for testing (cant assert on asserts)
-  {
+  // added for testing (can't assert on asserts)
+  public Boolean responseExpressionFailed() {
     return !responseResult;
   }
 

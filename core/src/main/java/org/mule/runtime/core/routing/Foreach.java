@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
@@ -79,40 +78,38 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     if (event.getFlowVariableNames().contains(parentMessageProp)) {
       previousRootMessageVar = event.getFlowVariable(parentMessageProp);
     }
+    // TODO MULE-9281 migrating this breaks org.mule.test.core.NonBlockingPartlySupportedFunctionalTestCase.foreach()
     MuleMessage message = event.getMessage();
-    final Builder requestBuilder = MuleEvent.builder(event);
     boolean transformed = false;
     if (xpathCollection) {
       MuleMessage transformedMessage = transformPayloadIfNeeded(message);
       if (transformedMessage != message) {
         transformed = true;
         message = transformedMessage;
-        requestBuilder.message(transformedMessage);
+        event.setMessage(transformedMessage);
       }
     }
-    requestBuilder.addFlowVariable(parentMessageProp, message);
-    final Builder responseBuilder = MuleEvent.builder(doProcess(requestBuilder.build()));
+    event.setFlowVariable(parentMessageProp, message);
+    doProcess(event);
     if (transformed) {
-      responseBuilder.message(transformBack(message));
-    } else {
-      responseBuilder.message(message);
+      event.setMessage(transformBack(message));
     }
     if (previousCounterVar != null) {
-      responseBuilder.addFlowVariable(counterVariableName, previousCounterVar);
+      event.setFlowVariable(counterVariableName, previousCounterVar);
     } else {
-      responseBuilder.removeFlowVariable(counterVariableName);
+      event.removeFlowVariable(counterVariableName);
     }
     if (previousRootMessageVar != null) {
-      responseBuilder.addFlowVariable(parentMessageProp, previousRootMessageVar);
+      event.setFlowVariable(parentMessageProp, previousRootMessageVar);
     } else {
-      responseBuilder.removeFlowVariable(parentMessageProp);
+      event.removeFlowVariable(parentMessageProp);
     }
-    return responseBuilder.build();
+    return event;
   }
 
-  protected MuleEvent doProcess(MuleEvent event) throws MuleException, MessagingException {
+  protected void doProcess(MuleEvent event) throws MuleException, MessagingException {
     try {
-      return ownedMessageProcessor.process(event);
+      ownedMessageProcessor.process(event);
     } catch (MessagingException e) {
       if (splitter.equals(e.getFailingMessageProcessor()) || filter.equals(e.getFailingMessageProcessor())) {
         // Make sure the context information for the exception is relative to the ForEach.
@@ -173,7 +170,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     splitter.setCounterVariableName(counterVariableName);
     splitter.setMuleContext(muleContext);
     messageProcessors.add(0, splitter);
-    filter = new MessageFilter(message -> true);
+    filter = new MessageFilter(message -> false);
     messageProcessors.add(filter);
     messageProcessorInitialized = true;
 
