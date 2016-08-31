@@ -10,6 +10,7 @@ import org.mule.api.processor.InternalMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorContainer;
 import org.mule.api.processor.MessageProcessorPathElement;
+import org.mule.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,8 +36,17 @@ public class NotificationUtils
         {
             if (!(mp instanceof InternalMessageProcessor))
             {
+                MessageProcessorPathElement messageProcessorPathElement;
 
-                MessageProcessorPathElement messageProcessorPathElement = parentElement.addChild(mp);
+                // To avoid adding a level in some path elements:
+                if (!(mp instanceof InterceptingChainLifecycleWrapperPathSkip))
+                {
+                    messageProcessorPathElement = parentElement.addChild(mp);
+                }
+                else
+                {
+                    messageProcessorPathElement = parentElement;
+                }
                 if (mp instanceof MessageProcessorContainer)
                 {
                     ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
