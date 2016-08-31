@@ -17,7 +17,7 @@
                         <xs:element minOccurs="0" maxOccurs="1" name="required-extensible-pojo">
                             <xs:complexType>
                                 <xs:sequence minOccurs="1" maxOccurs="1">
-                                <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" minOccurs="0" maxOccurs="1" ref="global-pojo:abstract-extensible-owner"></xs:element>
+                                    <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" minOccurs="0" maxOccurs="1" ref="global-pojo:abstract-extensible-owner"></xs:element>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -44,10 +44,10 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-owner"></xs:element>
-  <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" substitutionGroup="global-pojo:abstract-owner" name="owner">
+    <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" substitutionGroup="global-pojo:abstract-owner" name="owner">
         <xs:complexType>
             <xs:complexContent>
-        <xs:extension base="global-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner">
+                <xs:extension base="global-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner">
                     <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
@@ -68,25 +68,19 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-extensible-owner"></xs:element>
-  <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" substitutionGroup="global-pojo:abstract-extensible-owner" name="extensible-owner">
+    <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" substitutionGroup="global-pojo:abstract-extensible-owner" name="extensible-owner">
         <xs:complexType>
             <xs:complexContent>
-        <xs:extension base="global-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ExtensibleOwner">
+                <xs:extension base="global-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ExtensibleOwner">
                     <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-  <xs:element xmlns="http://www.mulesoft.org/schema/mule/global-pojo" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-message-processor" name="foo"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/global-pojo" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FooType" substitutionGroup="mule:abstract-message-processor" name="foo"></xs:element>
     <xs:complexType name="FooType">
         <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
-                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
-                    <xs:annotation>
-                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType"></xs:extension>
         </xs:complexContent>
     </xs:complexType>
 </xs:schema>
