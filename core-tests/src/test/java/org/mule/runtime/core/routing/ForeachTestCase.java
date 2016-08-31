@@ -206,22 +206,6 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     assertAddedPathElements(processors, mpPathElement);
   }
 
-  @Test
-  public void addProcessorPathElementsAfterInit() throws MuleException {
-    Foreach foreachMp = new Foreach();
-    foreachMp.setMuleContext(muleContext);
-    List<MessageProcessor> processors = getSimpleMessageProcessors();
-    foreachMp.setMessageProcessors(processors);
-    foreachMp.initialise();
-
-    MessageProcessorPathElement mpPathElement = mock(MessageProcessorPathElement.class);
-    foreachMp.addMessageProcessorPathElements(mpPathElement);
-
-    // Remove MPs added by the foreach as it does not copies the list
-    final List<MessageProcessor> originalMessageProcessors = processors.subList(1, 3);
-    assertAddedPathElements(originalMessageProcessors, mpPathElement);
-  }
-
   protected void assertAddedPathElements(List<MessageProcessor> processors, MessageProcessorPathElement mpPathElement) {
     verify(mpPathElement, times(processors.size())).addChild(any(MessageProcessor.class));
     verify(mpPathElement).addChild(processors.get(0));

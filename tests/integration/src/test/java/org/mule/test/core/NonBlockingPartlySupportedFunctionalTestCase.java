@@ -19,13 +19,6 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends AbstractIntegr
   }
 
   @Test
-  @Ignore("Non-blocking support")
-  public void foreach() throws Exception {
-    flowRunner("foreach").withPayload(TEST_MESSAGE).nonBlocking().run();
-
-  }
-
-  @Test
   public void wiretap() throws Exception {
     flowRunner("wiretap").withPayload(TEST_MESSAGE).nonBlocking().run();
   }

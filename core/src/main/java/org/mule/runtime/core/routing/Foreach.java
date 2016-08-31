@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -22,11 +23,15 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
+import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
 import org.mule.runtime.core.util.NotificationUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +54,7 @@ import org.w3c.dom.Document;
  * <p>
  * The {@link MuleEvent} sent to the next message processor is the same that arrived to foreach.
  */
-public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, MessageProcessor, NonBlockingSupported {
+public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, MessageProcessor {
 
   public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
   public static final String COUNTER_PROPERTY = "counter";
@@ -66,7 +71,6 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private String rootMessageVariableName;
   private String counterVariableName;
   private boolean xpathCollection;
-  private volatile boolean messageProcessorInitialized;
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
@@ -139,19 +143,12 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
   @Override
   protected List<MessageProcessor> getOwnedMessageProcessors() {
-    return messageProcessors;
+    return singletonList(ownedMessageProcessor);
   }
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    List<MessageProcessor> processors;
-    if (messageProcessorInitialized) {
-      // Skips the splitter that is added at the beginning and the filter at the end
-      processors = getOwnedMessageProcessors().subList(1, getOwnedMessageProcessors().size() - 1);
-    } else {
-      processors = getOwnedMessageProcessors();
-    }
-    NotificationUtils.addMessageProcessorPathElements(processors, pathElement);
+    NotificationUtils.addMessageProcessorPathElements(messageProcessors, pathElement);
   }
 
   public void setMessageProcessors(List<MessageProcessor> messageProcessors) throws MuleException {
@@ -172,13 +169,13 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     splitter.setBatchSize(batchSize);
     splitter.setCounterVariableName(counterVariableName);
     splitter.setMuleContext(muleContext);
-    messageProcessors.add(0, splitter);
-    filter = new MessageFilter(message -> true);
-    messageProcessors.add(filter);
-    messageProcessorInitialized = true;
 
     try {
-      this.ownedMessageProcessor = new DefaultMessageProcessorChainBuilder(muleContext).chain(messageProcessors).build();
+
+      List<MessageProcessor> chainProcessors = new ArrayList<>();
+      chainProcessors.add(splitter);
+      chainProcessors.add(DefaultMessageProcessorChain.from(muleContext, messageProcessors));
+      ownedMessageProcessor = new DefaultMessageProcessorChainBuilder(muleContext).chain(chainProcessors).build();
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }

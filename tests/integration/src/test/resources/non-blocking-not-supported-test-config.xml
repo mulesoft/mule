@@ -154,4 +154,14 @@
         </error-handler>
     </flow>
 
+    <flow name="foreach">
+        <test:assert-intercepting  message="TWO" responseSameThread="true" responseExpression="#[assertPayload()]"/>
+        <foreach collection="#[payload]">
+            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
+            <test:non-blocking-processor/>
+            <test:assert count="1" message="ONE" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
+        </foreach>
+        <test:non-blocking-processor/>
+    </flow>
+
 </mule>
