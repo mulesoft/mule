@@ -72,7 +72,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       fireNotification(exception);
       logException(exception, request);
       processStatistics();
-      request.setMessage(MuleMessage.builder(request.getMessage()).build());
 
       markExceptionAsHandledIfRequired(exception);
       return beforeRouting(exception, request);
@@ -161,7 +160,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   protected MuleEvent route(MuleEvent event, MessagingException t) throws MessagingException {
     if (!getMessageProcessors().isEmpty()) {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(t)).build());
+        event = MuleEvent.builder(event)
+            .message(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(t)).build()).build();
         MuleEvent result = configuredMessageProcessors.process(event);
         return result;
       } catch (MessagingException e) {

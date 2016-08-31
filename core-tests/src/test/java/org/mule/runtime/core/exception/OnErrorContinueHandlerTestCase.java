@@ -14,7 +14,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -41,7 +40,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -107,20 +105,11 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testHandleExceptionWithConfiguredMessageProcessors() throws Exception {
-    muleEvent = spy(muleEvent);
-
     onErrorContinueHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
     onErrorContinueHandler.initialise();
     final MuleEvent result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
-    verify(muleEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
-
-      @Override
-      public boolean matches(Object argument) {
-        return ((MuleMessage) argument).getPayload().equals("A");
-      }
-    }));
     assertThat(result.getMessage().getPayload(), is("B"));
     assertThat(result.getError(), is(nullValue()));
   }
@@ -172,8 +161,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   private MessageProcessor createSetStringMessageProcessor(final String appendText) {
     return event -> {
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(appendText).build());
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(appendText).build()).build();
     };
   }
 

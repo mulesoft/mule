@@ -8,7 +8,6 @@ package org.mule.runtime.core.enricher;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -87,10 +86,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     if (!StringUtils.isEmpty(targetExpressionArg)) {
       expressionManager.enrichTyped(targetExpressionArg, currentEvent, flowConstruct, typedValue);
     } else {
-      currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage())
-          .payload(typedValue.getValue())
-          .mediaType(typedValue.getDataType().getMediaType())
-          .build());
+      currentEvent = MuleEvent.builder(currentEvent).message(MuleMessage.builder(currentEvent.getMessage())
+          .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }
 
@@ -201,7 +198,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
     }
 
     private MuleEvent copyEventForEnrichment(MuleEvent event) {
-      MuleEvent copy = (DefaultMuleEvent) MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
+      MuleEvent copy = MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
       setCurrentEvent(copy);
       return copy;
     }

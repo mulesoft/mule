@@ -41,7 +41,8 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
     if (getCurrentEvent() != null) {
       MuleEvent currentEvent = getCurrentEvent();
-      currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build());
+      currentEvent = MuleEvent.builder(currentEvent)
+          .message(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
       setCurrentEvent(currentEvent);
     }
 
