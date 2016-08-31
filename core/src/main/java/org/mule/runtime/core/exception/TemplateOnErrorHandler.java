@@ -176,7 +176,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
     if (this.errorType == null) {
-      this.errorType = muleContext.getErrorTypeLocator().getAnyErrorType();
+      this.errorType = muleContext.getErrorTypeRepository().getAnyErrorType();
     }
     super.doInitialise(muleContext);
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder =
@@ -196,30 +196,18 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Override
   public boolean accept(MuleEvent event) {
-    return acceptsAll() || acceptsEvent(event) || acceptsErrorType(event)
+    return acceptsAll() || acceptsErrorType(event)
         || (when != null && muleContext.getExpressionManager().evaluateBoolean(when, event, flowConstruct));
   }
 
   private boolean acceptsErrorType(MuleEvent event) {
     //For now, match by representation, since we can't assign the exact type when parsing
-    return event.getError().getErrorType().getStringRepresentation().equals(errorType.getStringRepresentation());
-  }
-
-  /**
-   * Determines if the exception strategy should process or not a message inside a choice exception strategy.
-   * <p>
-   * Useful for exception strategies which ALWAYS must accept certain types of events despite when condition is not true.
-   *
-   * @param event   The MuleEvent being processed
-   * @return  true if it should process the exception for the current event, false otherwise.
-   */
-  protected boolean acceptsEvent(MuleEvent event) {
-    return false;
+    return event.getError().getErrorType().equals(errorType);
   }
 
   @Override
   public boolean acceptsAll() {
-    return muleContext.getErrorTypeLocator().getAnyErrorType().equals(errorType) && when == null;
+    return muleContext.getErrorTypeRepository().getAnyErrorType().equals(errorType) && when == null;
   }
 
   protected MuleEvent afterRouting(MessagingException exception, MuleEvent event) {

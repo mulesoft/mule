@@ -33,6 +33,7 @@ import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.PROTOTYPE_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETON_OBJECT_ELEMENT;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.config.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_IDENTIFIER;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
@@ -109,8 +110,6 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
-import org.mule.runtime.core.exception.ErrorTypeRepositoryFactory;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.exception.RedeliveryExceeded;
@@ -121,7 +120,6 @@ import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
 import org.mule.runtime.core.interceptor.LoggingInterceptor;
 import org.mule.runtime.core.interceptor.TimerInterceptor;
-import org.mule.runtime.core.message.ErrorTypeBuilder;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.CallableEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.DefaultEntryPointResolverSet;
@@ -484,7 +482,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("count", fromFixedValue(RETRY_COUNT_FOREVER).build()).build());
     componentBuildingDefinitions.add(baseReconnectDefinition.copy().withIdentifier("reconnect")
         .withSetterParameterDefinition("count", fromSimpleParameter("count").build()).build());
-    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("idempotent-redelivery-policy")
+    componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("redelivery-policy")
         .withTypeDefinition(fromType(IdempotentRedeliveryPolicy.class))
         .withSetterParameterDefinition("useSecureHash", fromSimpleParameter("useSecureHash").build())
         .withSetterParameterDefinition("messageDigestAlgorithm", fromSimpleParameter("messageDigestAlgorithm").build())
@@ -565,21 +563,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   }
 
   private TypeConverter<String, ErrorType> getErrorTypeConverter() {
-    return (value) -> {
-      ErrorType anyErrorType = muleContext.getErrorTypeLocator().getAnyErrorType();
-      ErrorType unknownErrorType = muleContext.getErrorTypeLocator().getUnknownErrorType();
-      if (anyErrorType.getStringRepresentation().equals(value)) {
-        return anyErrorType;
-      } else if (unknownErrorType.getStringRepresentation().equals(value)) {
-        return unknownErrorType;
-      } else {
-        String[] values = value.split(":");
-        // For now, let's make a namespace mandatory and everything inherit from ANY
-        checkState(values.length == 2, "error type must include namespace and name");
-        return ErrorTypeBuilder.builder().namespace(values[0]).stringRepresentation(values[1]).parentErrorType(anyErrorType)
-            .build();
-      }
-    };
+    return (value) -> muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(value));
   }
 
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {

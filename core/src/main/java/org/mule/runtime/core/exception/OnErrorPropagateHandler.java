@@ -13,7 +13,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -75,15 +74,6 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
   private boolean isRedeliveryExhausted(Exception exception) {
     return (exception instanceof MessageRedeliveredException);
-  }
-
-  /**
-   * Always accept MessageRedeliveryException exceptions if this rollback exception strategy handles redelivery.
-   */
-  @Override
-  protected boolean acceptsEvent(MuleEvent event) {
-    return event.getError().getException() instanceof MessageRedeliveredException
-        && this.hasMaxRedeliveryAttempts();
   }
 
   @Override

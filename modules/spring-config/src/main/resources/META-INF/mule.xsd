@@ -1670,7 +1670,7 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="abstractNotificationExceptionStrategyType">
-                <xsd:attribute name="type" type="xsd:string" use="optional">
+                <xsd:attribute name="type" type="errorIdentifierType" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The full name of the error type to match against.
@@ -1680,6 +1680,59 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:simpleType name="errorIdentifierType">
+        <xsd:union>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The full name of the error type to match against.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="ANY">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Used to match against any error type.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="UNKNOWN">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Error type for which there's no a clear reason of the failure/
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="REDELIVERY_EXHAUSTED">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's a source that has a redelivery policy and the message has exceeded the maximum supported redelivery count.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="TRANSFORMATION">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's a transformation that fails.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="EXPRESSION">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's an error execting an expression.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:union>
+    </xsd:simpleType>
 
     <xsd:complexType name="referenceExceptionStrategyType">
         <xsd:annotation>
@@ -4142,13 +4195,6 @@
                         </xsd:complexType>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attribute name="maxRedeliveryAttempts" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Times a message will be redelivery until it's consider a poison message. Once maxRedeliveryAttempts is exceeded on-redelivery-attempts-exceeded child message processors will be executed.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -4551,7 +4597,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="idempotent-redelivery-policy" type="idempotentRedeliveryPolicyType"
+    <xsd:element name="redelivery-policy" type="idempotentRedeliveryPolicyType"
                  substitutionGroup="abstract-redelivery-policy">
         <xsd:annotation>
             <xsd:documentation>

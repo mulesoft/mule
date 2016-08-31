@@ -52,6 +52,7 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
@@ -153,8 +154,10 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
           .forEach(componentBuildingDefinitionRegistry::register);
     });
 
-    ErrorTypeLocator errorTypeLocator = createComponentErrorTypeLocator();
+    ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
+    ErrorTypeLocator errorTypeLocator = createComponentErrorTypeLocator(errorTypeRepository);
     ((DefaultMuleContext) muleContext).setErrorTypeLocator(errorTypeLocator);
+    ((DefaultMuleContext) muleContext).setErrorTypeRepository(errorTypeRepository);
 
     xmlApplicationParser = new XmlApplicationParser(new XmlServiceRegistry(serviceRegistry, muleContext));
 
@@ -164,8 +167,8 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     determineIfOnlyNewParsingMechanismCanBeUsed();
   }
 
-  private ErrorTypeLocator createComponentErrorTypeLocator() {
-    return createDefaultErrorTypeLocator(createDefaultErrorTypeRepository());
+  private ErrorTypeLocator createComponentErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
+    return createDefaultErrorTypeLocator(errorTypeRepository);
   }
 
   private void determineIfOnlyNewParsingMechanismCanBeUsed() {

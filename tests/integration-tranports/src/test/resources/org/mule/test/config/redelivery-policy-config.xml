@@ -21,33 +21,33 @@
 
     <flow name="inMemoryStore">
         <transports:inbound-endpoint ref="global">
-            <idempotent-redelivery-policy maxRedeliveryCount="12">
+            <redelivery-policy maxRedeliveryCount="12">
                 <dead-letter-queue>
                     <transports:outbound-endpoint address="test://dead-letter-queue"/>
                 </dead-letter-queue>
-            </idempotent-redelivery-policy>
+            </redelivery-policy>
         </transports:inbound-endpoint>
         <test:component/>
     </flow>
 
     <flow name="simpleTextFileStore">
         <transports:inbound-endpoint address="test://foo">
-            <idempotent-redelivery-policy useSecureHash="false" idExpression="#[message:id]">
+            <redelivery-policy useSecureHash="false" idExpression="#[message:id]">
                 <dead-letter-queue>
                     <transports:outbound-endpoint address="test://dead-letter-queue"/>
                 </dead-letter-queue>
-            </idempotent-redelivery-policy>
+            </redelivery-policy>
         </transports:inbound-endpoint>
         <test:component/>
     </flow>
 
     <flow name="customObjectStore">
         <transports:inbound-endpoint address="test://foo">
-            <idempotent-redelivery-policy>
+            <redelivery-policy>
                 <dead-letter-queue>
                     <transports:outbound-endpoint address="test://dead-letter-queue"/>
                 </dead-letter-queue>
-            </idempotent-redelivery-policy>
+            </redelivery-policy>
         </transports:inbound-endpoint>
         <test:component/>
     </flow>

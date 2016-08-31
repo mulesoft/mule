@@ -34,34 +34,13 @@ import org.mule.runtime.core.config.ComponentIdentifier;
  */
 public class ErrorTypeLocator {
 
-  private final ErrorTypeRepository errorTypeRepository;
   private ExceptionMapper defaultExceptionMapper;
   private Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers;
 
   private ErrorTypeLocator(ExceptionMapper defaultExceptionMapper,
-                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers,
-                           ErrorTypeRepository errorTypeRepository) {
+                           Map<ComponentIdentifier, ExceptionMapper> componentExceptionMappers) {
     this.defaultExceptionMapper = defaultExceptionMapper;
     this.componentExceptionMappers = componentExceptionMappers;
-    this.errorTypeRepository = errorTypeRepository;
-  }
-
-  /**
-   * Gets the {@code ErrorType} instance for ANY error type.
-   * 
-   * @return the ANY error type
-   */
-  public ErrorType getAnyErrorType() {
-    return errorTypeRepository.getAnyErrorType();
-  }
-
-  /**
-   * Gets the {@code ErrorType} instance for UNKNOWN error type.
-   *
-   * @return the UNKNOWN error type
-   */
-  public ErrorType getUnknownErrorType() {
-    return errorTypeRepository.getUnkonwnErrorType();
   }
 
   /**
@@ -112,16 +91,11 @@ public class ErrorTypeLocator {
    */
   public static class Builder {
 
-    private final ErrorTypeRepository errorTypeRepository;
-
     /**
      * Creates a builder instance.
-     * 
-     * @param errorTypeRepository error type repository used to locate {@link ErrorType} instances.
      */
     public Builder(ErrorTypeRepository errorTypeRepository) {
       checkArgument(errorTypeRepository != null, "error type repository cannot be null");
-      this.errorTypeRepository = errorTypeRepository;
     }
 
     private ExceptionMapper defaultExceptionMapper;
@@ -158,7 +132,7 @@ public class ErrorTypeLocator {
     public ErrorTypeLocator build() {
       checkState(defaultExceptionMapper != null, "default exception mapper cannot not be null");
       checkState(componentExceptionMappers != null, "component exception mappers cannot not be null");
-      return new ErrorTypeLocator(defaultExceptionMapper, componentExceptionMappers, errorTypeRepository);
+      return new ErrorTypeLocator(defaultExceptionMapper, componentExceptionMappers);
     }
   }
 }

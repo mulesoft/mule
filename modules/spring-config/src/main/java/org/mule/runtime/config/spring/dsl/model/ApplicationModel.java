@@ -95,6 +95,8 @@ public class ApplicationModel {
   public static final String CUSTOM_TRANSFORMER = "custom-transformer";
   public static final String DESCRIPTION_ELEMENT = "description";
   public static final String PROPERTIES_ELEMENT = "properties";
+  public static final String FLOW_ELEMENT = "flow";
+  public static final String REDELIVERY_POLICY_ELEMENT = "redelivery-policy";
 
   // TODO MULE-9638 Remove once all bean definitions parsers where migrated
   public static final String TEST_NAMESPACE = "test";
@@ -174,6 +176,10 @@ public class ApplicationModel {
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(SINGLETON_OBJECT_ELEMENT).build();
   public static final ComponentIdentifier INTERCEPTOR_STACK_IDENTIFIER =
       new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(INTERCEPTOR_STACK_ELEMENT).build();
+  public static final ComponentIdentifier FLOW_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(FLOW_ELEMENT).build();
+  public static final ComponentIdentifier REDELIVERY_POLICY_IDENTIFIER =
+      new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_POLICY_ELEMENT).build();
 
   private static ImmutableSet<ComponentIdentifier> ignoredNameValidationComponentList =
       ImmutableSet.<ComponentIdentifier>builder()
@@ -272,7 +278,34 @@ public class ApplicationModel {
     convertConfigFileToComponentModel(artifactConfig);
     convertArtifactConfigurationToComponentModel(artifactConfiguration);
     validateModel(componentBuildingDefinitionRegistry);
+    createEffectiveModel();
   }
+
+  /**
+   * Creates the effective application model to be used to generate
+   * the runtime objects of the mule configuration.
+   */
+  private void createEffectiveModel() {
+    processSourcesRedeliveryPolicy();
+  }
+
+  /**
+   * Process from any message source the redelivery-policy to make it part of the final
+   * pipeline.
+   */
+  private void processSourcesRedeliveryPolicy() {
+    executeOnEveryFlow(flowComponentModel -> {
+      ComponentModel possibleSourceComponent = flowComponentModel.getInnerComponents().get(0);
+      possibleSourceComponent.getInnerComponents().stream()
+          .filter(childComponent -> childComponent.getIdentifier().equals(REDELIVERY_POLICY_IDENTIFIER))
+          .findAny()
+          .ifPresent(redeliveryPolicyComponentModel -> {
+            possibleSourceComponent.getInnerComponents().remove(redeliveryPolicyComponentModel);
+            flowComponentModel.getInnerComponents().add(1, redeliveryPolicyComponentModel);
+          });
+    });
+  }
+
 
   private void convertArtifactConfigurationToComponentModel(ArtifactConfiguration artifactConfiguration) {
     if (artifactConfiguration != null) {
@@ -549,6 +582,16 @@ public class ApplicationModel {
   public void executeOnEveryMuleComponentTree(final Consumer<ComponentModel> task) {
     for (ComponentModel componentModel : muleComponentModels) {
       executeOnComponentTree(componentModel, task, true);
+    }
+  }
+
+  private void executeOnEveryFlow(final Consumer<ComponentModel> task) {
+    for (ComponentModel muleComponentModel : muleComponentModels) {
+      for (ComponentModel componentModel : muleComponentModel.getInnerComponents()) {
+        if (ApplicationModel.FLOW_IDENTIFIER.equals(componentModel.getIdentifier())) {
+          task.accept(componentModel);
+        }
+      }
     }
   }
 

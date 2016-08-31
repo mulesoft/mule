@@ -52,11 +52,11 @@
     </flow>
     <flow name="RollbackExceptionStrategyCommit" >
         <file:inbound-endpoint path="${workingDirectory}/rollbackOnException" >
-            <idempotent-redelivery-policy idExpression="#[header:inbound:originalFilename]"/>
+            <redelivery-policy idExpression="#[header:inbound:originalFilename]" maxRedeliveryCount="2"/>
         </file:inbound-endpoint>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="2"/>
+            <on-error-propagate/>
         </error-handler>
     </flow>
 </mule>

@@ -37,6 +37,7 @@ import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
 import org.mule.runtime.core.util.lock.LockFactory;
@@ -407,6 +408,14 @@ public interface MuleContext extends Lifecycle {
    */
   String getId();
 
+  /**
+   * @return a locator for discovering {@link org.mule.runtime.api.message.ErrorType}s related to exceptions and components.
+   */
   ErrorTypeLocator getErrorTypeLocator();
+
+  /**
+   * @return an error type repository to get access to the {@link org.mule.runtime.api.message.ErrorType} instances of this artifact.
+   */
+  ErrorTypeRepository getErrorTypeRepository();
 }
 

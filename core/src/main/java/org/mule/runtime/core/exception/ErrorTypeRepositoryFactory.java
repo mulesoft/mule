@@ -8,8 +8,9 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.EXPRESSION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.ErrorTypeRepository.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.TRANSFORMATION_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.UNKNOWN_ERROR_IDENTIFIER;
+import org.mule.runtime.core.config.ComponentIdentifier;
 
 /**
  * Factory for {@link ErrorTypeRepository}.
@@ -27,9 +28,16 @@ public class ErrorTypeRepositoryFactory {
    */
   public static ErrorTypeRepository createDefaultErrorTypeRepository() {
     ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();
-    errorTypeRepository.addErrorType(CORE_NAMESPACE_NAME, TRANSFORMATION_ERROR_IDENTIFIER, errorTypeRepository.getAnyErrorType());
-    errorTypeRepository.addErrorType(CORE_NAMESPACE_NAME, EXPRESSION_ERROR_IDENTIFIER, errorTypeRepository.getAnyErrorType());
-    errorTypeRepository.addErrorType(CORE_NAMESPACE_NAME, UNKNOWN_ERROR_IDENTIFIER, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(
+                                     new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME)
+                                         .withName(TRANSFORMATION_ERROR_IDENTIFIER).build(),
+                                     errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME)
+        .withName(EXPRESSION_ERROR_IDENTIFIER).build(), errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(
+                                     new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME)
+                                         .withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build(),
+                                     errorTypeRepository.getAnyErrorType());
     return errorTypeRepository;
   }
 
