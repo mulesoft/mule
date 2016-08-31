@@ -94,7 +94,19 @@ public class MuleEventToHttpRequest
         {
             if (isNotIgnoredProperty(outboundProperty))
             {
-                builder.addHeader(outboundProperty, event.getMessage().getOutboundProperty(outboundProperty).toString());
+                Object outboundPropertyValue = event.getMessage().getOutboundProperty(outboundProperty);
+                if (outboundPropertyValue instanceof Iterable)
+                {
+                    Iterable outboundIterable = (Iterable)outboundPropertyValue;
+                    for (Object value : outboundIterable)
+                    {
+                        builder.addHeader(outboundProperty, value.toString());
+                    }
+                }
+                else
+                {
+                    builder.addHeader(outboundProperty, outboundPropertyValue.toString());
+                }
             }
         }
 
