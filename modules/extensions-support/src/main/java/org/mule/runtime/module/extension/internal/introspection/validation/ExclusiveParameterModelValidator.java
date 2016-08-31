@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
+import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 
 import java.lang.reflect.Field;
 import java.util.Set;

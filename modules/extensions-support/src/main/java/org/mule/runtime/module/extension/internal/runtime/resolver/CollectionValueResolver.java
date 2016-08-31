@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import com.google.common.collect.ImmutableList;
 
@@ -35,16 +35,6 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
   private final List<ValueResolver<T>> resolvers;
   private final Class<? extends Collection> collectionType;
 
-  public static <T> CollectionValueResolver<T> of(Class<? extends Collection> collectionType, List<ValueResolver<T>> resolvers) {
-    if (List.class.equals(collectionType) || Collection.class.equals(collectionType) || Iterable.class.equals(collectionType)) {
-      return new CollectionValueResolver<>(ArrayList.class, resolvers);
-    } else if (Set.class.equals(collectionType)) {
-      return new CollectionValueResolver<>(HashSet.class, resolvers);
-    } else {
-      return new CollectionValueResolver<>(collectionType, resolvers);
-    }
-  }
-
   /**
    * Creates a new instance
    *
@@ -57,6 +47,16 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
 
     this.collectionType = collectionType;
     this.resolvers = ImmutableList.copyOf(resolvers);
+  }
+
+  public static <T> CollectionValueResolver<T> of(Class<? extends Collection> collectionType, List<ValueResolver<T>> resolvers) {
+    if (List.class.equals(collectionType) || Collection.class.equals(collectionType) || Iterable.class.equals(collectionType)) {
+      return new CollectionValueResolver<>(ArrayList.class, resolvers);
+    } else if (Set.class.equals(collectionType)) {
+      return new CollectionValueResolver<>(HashSet.class, resolvers);
+    } else {
+      return new CollectionValueResolver<>(collectionType, resolvers);
+    }
   }
 
   /**
@@ -81,7 +81,7 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
    */
   @Override
   public boolean isDynamic() {
-    return MuleExtensionUtils.hasAnyDynamic(resolvers);
+    return hasAnyDynamic(resolvers);
   }
 
   private Collection<T> instantiateCollection() {

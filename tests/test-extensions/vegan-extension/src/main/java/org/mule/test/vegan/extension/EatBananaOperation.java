@@ -8,16 +8,18 @@ package org.mule.test.vegan.extension;
 
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Connection;
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.tck.testmodels.fruit.Banana;
 
 public class EatBananaOperation {
 
-  public Banana eatBanana(@Connection Banana banana) {
+  public Banana eatBanana(@Connection Banana banana, @UseConfig BananaConfig config) {
     banana.bite();
     return banana;
   }
 
-  public Banana eatPealed(@XmlHints(allowInlineDefinition = false, allowReferences = false) Banana attributeOnlyBanana) {
-    return eatBanana(attributeOnlyBanana);
+  public Banana eatPealed(@XmlHints(allowInlineDefinition = false, allowReferences = false) Banana attributeOnlyBanana,
+                          @UseConfig BananaConfig config) {
+    return eatBanana(attributeOnlyBanana, config);
   }
 }

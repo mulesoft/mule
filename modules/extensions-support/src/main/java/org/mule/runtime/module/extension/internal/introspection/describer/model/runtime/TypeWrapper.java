@@ -73,7 +73,7 @@ public class TypeWrapper implements Type {
    * {@inheritDoc}
    */
   @Override
-  public Class<?> getDeclaredClass() {
+  public Class<?> getDeclaringClass() {
     return aClass;
   }
 }

@@ -27,6 +27,6 @@ interface WithType {
    * @return The {@link MetadataType} representation of the component type
    */
   default MetadataType getMetadataType(ClassTypeLoader typeLoader) {
-    return typeLoader.load(getType().getDeclaredClass());
+    return typeLoader.load(getType().getDeclaringClass());
   }
 }

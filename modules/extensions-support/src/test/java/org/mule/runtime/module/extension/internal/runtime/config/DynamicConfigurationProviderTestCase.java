@@ -86,7 +86,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
   @Test
   public void resolveCached() throws Exception {
     final int count = 10;
-    HeisenbergExtension config = provider.get(event).getValue();
+    HeisenbergExtension config = (HeisenbergExtension) provider.get(event).getValue();
     for (int i = 1; i < count; i++) {
       assertThat(provider.get(event).getValue(), is(sameInstance(config)));
     }
@@ -96,7 +96,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   @Test
   public void resolveDifferentInstances() throws Exception {
-    HeisenbergExtension instance1 = provider.get(event).getValue();
+    HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(event).getValue();
     HeisenbergExtension instance2 = makeAlternateInstance();
 
     assertThat(instance2, is(not(sameInstance(instance1))));
@@ -104,13 +104,13 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
 
   @Test
   public void getExpired() throws Exception {
-    HeisenbergExtension instance1 = provider.get(event).getValue();
+    HeisenbergExtension instance1 = (HeisenbergExtension) provider.get(event).getValue();
     HeisenbergExtension instance2 = makeAlternateInstance();
 
     DynamicConfigurationProvider provider = (DynamicConfigurationProvider) this.provider;
     timeSupplier.move(1, TimeUnit.MINUTES);
 
-    List<ConfigurationInstance<Object>> expired = provider.getExpired();
+    List<ConfigurationInstance> expired = provider.getExpired();
     assertThat(expired.isEmpty(), is(true));
 
     timeSupplier.move(10, TimeUnit.MINUTES);
@@ -126,7 +126,7 @@ public class DynamicConfigurationProviderTestCase extends AbstractConfigurationP
     ResolverSetResult alternateResult = mock(ResolverSetResult.class, Mockito.RETURNS_DEEP_STUBS);
     when(resolverSet.resolve(event)).thenReturn(alternateResult);
 
-    return provider.get(event).getValue();
+    return (HeisenbergExtension) provider.get(event).getValue();
   }
 
   @Test

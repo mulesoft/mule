@@ -9,11 +9,11 @@ package org.mule.test.vegan.extension;
 import static org.mule.test.vegan.extension.VeganExtension.KIWI;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 
 @Configuration(name = KIWI)
 @Operations(EatKiwiOperation.class)
-@Providers(VeganKiwiConnectionProvider.class)
+@ConnectionProviders(VeganKiwiConnectionProvider.class)
 public class KiwiConfig {
 
 }

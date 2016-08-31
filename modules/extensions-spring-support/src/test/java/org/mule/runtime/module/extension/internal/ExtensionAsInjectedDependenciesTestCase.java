@@ -65,7 +65,7 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
     assertThat(heisenberg.getPersonalInfo().getAge(), is(age));
   }
 
-  private void assertCorrectProviderInjected(String key, ConfigurationProvider<?> expected) {
+  private void assertCorrectProviderInjected(String key, ConfigurationProvider expected) {
     assertThat(expected, is(sameInstance(muleContext.getRegistry().get(key))));
   }
 
@@ -73,17 +73,17 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
 
     @Inject
     @Named(STATIC_HEISENBERG)
-    private ConfigurationProvider<HeisenbergExtension> staticHeisenberg;
+    private ConfigurationProvider staticHeisenberg;
 
     @Inject
     @Named(DYNAMIC_AGE_HEISENBERG)
-    private ConfigurationProvider<HeisenbergExtension> dynamicAgeHeisenberg;
+    private ConfigurationProvider dynamicAgeHeisenberg;
 
-    public ConfigurationProvider<HeisenbergExtension> getStaticHeisenberg() {
+    public ConfigurationProvider getStaticHeisenberg() {
       return staticHeisenberg;
     }
 
-    public ConfigurationProvider<HeisenbergExtension> getDynamicAgeHeisenberg() {
+    public ConfigurationProvider getDynamicAgeHeisenberg() {
       return dynamicAgeHeisenberg;
     }
   }

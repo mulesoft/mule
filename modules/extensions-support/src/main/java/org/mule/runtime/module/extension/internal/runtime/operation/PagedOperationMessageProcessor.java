@@ -40,6 +40,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   @Override
   protected org.mule.runtime.api.message.MuleEvent doProcess(MuleEvent event, OperationContextAdapter operationContext)
       throws MuleException {
+
     MuleEvent resultEvent = (MuleEvent) super.doProcess(event, operationContext);
     PagingProvider pagingProvider = resultEvent.getMessage().getPayload();
 
@@ -47,7 +48,8 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
       throw new IllegalStateException("Obtained paging delegate cannot be null");
     }
 
-    Producer<?> producer = new PagingProviderProducer(pagingProvider, operationContext.getConfiguration(), connectionManager);
+    Producer<?> producer =
+        new PagingProviderProducer(pagingProvider, operationContext.getConfiguration().get(), connectionManager);
     Consumer<?> consumer = new ListConsumer(producer);
 
     return returnDelegate.asReturnValue(new ConsumerIterator<>(consumer), operationContext);

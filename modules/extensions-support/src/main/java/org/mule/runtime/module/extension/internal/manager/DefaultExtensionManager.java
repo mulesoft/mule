@@ -41,6 +41,7 @@ import org.mule.runtime.module.extension.internal.config.ExtensionConfig;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
+import org.mule.runtime.module.extension.internal.runtime.exception.TooManyConfigsException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -145,17 +146,17 @@ public final class DefaultExtensionManager
    * {@inheritDoc}
    */
   @Override
-  public <C> void registerConfigurationProvider(ConfigurationProvider<C> configurationProvider) {
+  public void registerConfigurationProvider(ConfigurationProvider configurationProvider) {
     extensionRegistry.registerConfigurationProvider(configurationProvider);
   }
 
   /**
    * {@inheritDoc}
    */
-  // TODO: MULE-8946
   @Override
-  public <C> ConfigurationInstance<C> getConfiguration(String configurationProviderName, Object muleEvent) {
-    return (ConfigurationInstance<C>) getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
+  public ConfigurationInstance getConfiguration(String configurationProviderName,
+                                                org.mule.runtime.api.message.MuleEvent muleEvent) {
+    return getConfigurationProvider(configurationProviderName).map(provider -> provider.get(muleEvent))
         .orElseThrow(() -> new IllegalArgumentException(String
             .format("There is no registered configurationProvider under name '%s'", configurationProviderName)));
   }
@@ -163,10 +164,9 @@ public final class DefaultExtensionManager
   /**
    * {@inheritDoc}
    */
-  // TODO: MULE-8946
   @Override
-  public <C> ConfigurationInstance<C> getConfiguration(ExtensionModel extensionModel, Object muleEvent) {
-    Optional<ConfigurationProvider<C>> provider = getConfigurationProvider(extensionModel);
+  public ConfigurationInstance getConfiguration(ExtensionModel extensionModel, org.mule.runtime.api.message.MuleEvent muleEvent) {
+    Optional<ConfigurationProvider> provider = getConfigurationProvider(extensionModel);
     if (provider.isPresent()) {
       return provider.get().get(muleEvent);
     }
@@ -175,8 +175,11 @@ public final class DefaultExtensionManager
     return getConfiguration(extensionModel, muleEvent);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(ExtensionModel extensionModel) {
+  public Optional<ConfigurationProvider> getConfigurationProvider(ExtensionModel extensionModel) {
     List<ConfigurationProvider> providers = extensionRegistry.getConfigurationProviders(extensionModel);
 
     int matches = providers.size();
@@ -184,16 +187,17 @@ public final class DefaultExtensionManager
     if (matches == 1) {
       return Optional.of(providers.get(0));
     } else if (matches > 1) {
-      throw new IllegalStateException(String.format(
-                                                    "No config-ref was specified for operation of extension '%s', but %d are registered. Please specify which to use",
-                                                    extensionModel.getName(), matches));
+      throw new TooManyConfigsException("Too many configs found", extensionModel, matches);
     }
 
     return Optional.empty();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <C> Optional<ConfigurationProvider<C>> getConfigurationProvider(String configurationProviderName) {
+  public Optional<ConfigurationProvider> getConfigurationProvider(String configurationProviderName) {
     checkArgument(!StringUtils.isBlank(configurationProviderName), "cannot get configuration from a blank provider name");
     return extensionRegistry.getConfigurationProvider(configurationProviderName);
   }
@@ -244,7 +248,7 @@ public final class DefaultExtensionManager
     }
   }
 
-  private void disposeConfiguration(String key, ConfigurationInstance<Object> configuration) {
+  private void disposeConfiguration(String key, ConfigurationInstance configuration) {
     try {
       stopIfNeeded(configuration);
       disposeIfNeeded(configuration, LOGGER);

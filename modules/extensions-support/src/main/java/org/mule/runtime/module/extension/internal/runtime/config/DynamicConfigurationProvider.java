@@ -44,18 +44,17 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * This is so because {@link ResolverSetResult} instances are put in a cache to guarantee that equivalent evaluations of the
  * {@code resolverSet} return the same instance.
  *
- * @param <T> the generic type of the provided {@link ConfigurationInstance}
  * @since 4.0.0
  */
-public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigurationProvider<T>
-    implements ExpirableConfigurationProvider<T> {
+public final class DynamicConfigurationProvider extends LifecycleAwareConfigurationProvider
+    implements ExpirableConfigurationProvider {
 
-  private final ConfigurationInstanceFactory<T> configurationInstanceFactory;
+  private final ConfigurationInstanceFactory configurationInstanceFactory;
   private final ResolverSet resolverSet;
   private final ValueResolver<ConnectionProvider> connectionProviderResolver;
   private final ExpirationPolicy expirationPolicy;
 
-  private final Map<ResolverSetResult, ConfigurationInstance<T>> cache = new ConcurrentHashMap<>();
+  private final Map<ResolverSetResult, ConfigurationInstance> cache = new ConcurrentHashMap<>();
   private final ReadWriteLock cacheLock = new ReentrantReadWriteLock();
   private final Lock cacheReadLock = cacheLock.readLock();
   private final Lock cacheWriteLock = cacheLock.writeLock();
@@ -87,15 +86,15 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
    * @return the resolved {@link ConfigurationInstance}
    */
   @Override
-  public ConfigurationInstance<T> get(Object muleEvent) {
+  public ConfigurationInstance get(Object muleEvent) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
       ResolverSetResult result = resolverSet.resolve((MuleEvent) muleEvent);
       return getConfiguration(result, (MuleEvent) muleEvent);
     });
   }
 
-  private ConfigurationInstance<T> getConfiguration(ResolverSetResult resolverSetResult, MuleEvent event) throws Exception {
-    ConfigurationInstance<T> configuration;
+  private ConfigurationInstance getConfiguration(ResolverSetResult resolverSetResult, MuleEvent event) throws Exception {
+    ConfigurationInstance configuration;
     cacheReadLock.lock();
     try {
       configuration = cache.get(resolverSetResult);
@@ -125,13 +124,13 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
     }
   }
 
-  private void updateUsageStatistic(ConfigurationInstance<T> configuration) {
+  private void updateUsageStatistic(ConfigurationInstance configuration) {
     MutableConfigurationStats stats = (MutableConfigurationStats) configuration.getStatistics();
     stats.updateLastUsed();
   }
 
-  private ConfigurationInstance<T> createConfiguration(ResolverSetResult result, MuleEvent event) throws MuleException {
-    ConfigurationInstance<T> configuration = configurationInstanceFactory
+  private ConfigurationInstance createConfiguration(ResolverSetResult result, MuleEvent event) throws MuleException {
+    ConfigurationInstance configuration = configurationInstanceFactory
         .createConfiguration(getName(), result, Optional.ofNullable(connectionProviderResolver.resolve(event)));
 
     registerConfiguration(configuration);
@@ -140,7 +139,7 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
   }
 
   @Override
-  protected void registerConfiguration(ConfigurationInstance<T> configuration) {
+  protected void registerConfiguration(ConfigurationInstance configuration) {
     try {
       withContextClassLoader(getExtensionClassLoader(), () -> {
         if (lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME)) {
@@ -161,7 +160,7 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
   }
 
   @Override
-  public List<ConfigurationInstance<T>> getExpired() {
+  public List<ConfigurationInstance> getExpired() {
     cacheWriteLock.lock();
     try {
       return cache.entrySet().stream().filter(entry -> isExpired(entry.getValue())).map(entry -> {
@@ -173,7 +172,7 @@ public final class DynamicConfigurationProvider<T> extends LifecycleAwareConfigu
     }
   }
 
-  private boolean isExpired(ConfigurationInstance<T> configuration) {
+  private boolean isExpired(ConfigurationInstance configuration) {
     ConfigurationStats stats = configuration.getStatistics();
     return stats.getInflightOperations() == 0 && expirationPolicy.isExpired(stats.getLastUsedMillis(), TimeUnit.MILLISECONDS);
   }

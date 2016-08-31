@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
@@ -32,9 +33,10 @@ public class TestMetadataResolverUtils {
   public static final String AGE = "Age";
 
   public static Set<MetadataKey> getKeys(MetadataContext context) throws ConnectionException {
-    MetadataConnection connection = (MetadataConnection) context.getConnection().get();
-
-    return connection.getEntities().stream().map(e -> MetadataKeyBuilder.newKey(e).build()).collect(toSet());
+    return context.getConnection().map(c -> {
+      MetadataConnection connection = (MetadataConnection) c;
+      return connection.getEntities().stream().map(e -> MetadataKeyBuilder.newKey(e).build()).collect(toSet());
+    }).orElse(emptySet());
   }
 
   public static MetadataType getMetadata(String key) throws MetadataResolvingException {

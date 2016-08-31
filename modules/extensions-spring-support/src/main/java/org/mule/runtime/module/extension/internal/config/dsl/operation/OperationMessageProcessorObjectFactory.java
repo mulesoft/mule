@@ -16,7 +16,7 @@ import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationMo
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.PagedOperationModelProperty;
+import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.operation.InterceptingOperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.PagedOperationMessageProcessor;

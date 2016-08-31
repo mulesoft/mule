@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
+import static java.util.Optional.of;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -20,11 +21,10 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.Optional;
 
 import javax.transaction.TransactionManager;
 
@@ -56,13 +56,15 @@ public class ExtensionsConnectionAdapterTestCase extends AbstractMuleContextTest
 
     OperationContextAdapter operationContext = mock(OperationContextAdapter.class, RETURNS_DEEP_STUBS);
     ConnectionProvider connectionProvider = mock(ConnectionProvider.class);
-    when(operationContext.getConfiguration().getConnectionProvider()).thenReturn(Optional.of(connectionProvider));
-    when(operationContext.getConfiguration().getValue()).thenReturn(config);
+    ConfigurationInstance configurationInstance = mock(ConfigurationInstance.class);
+    when(configurationInstance.getConnectionProvider()).thenReturn(of(connectionProvider));
+    when(operationContext.getConfiguration()).thenReturn(of(configurationInstance));
+    when(configurationInstance.getValue()).thenReturn(config);
     when(connectionProvider.connect()).thenReturn(connection);
 
     TransactionConfig transactionConfig = mock(TransactionConfig.class);
     when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_JOIN);
-    when(operationContext.getTransactionConfig()).thenReturn(Optional.of(transactionConfig));
+    when(operationContext.getTransactionConfig()).thenReturn(of(transactionConfig));
 
     muleContext.getRegistry().lookupObject(ConnectionManager.class).bind(config, connectionProvider);
 

@@ -70,11 +70,11 @@
     </flow>
 
     <flow name="messageAttributesNullTypeMetadata">
-        <metadata:message-attributes-null-type-metadata config-ref="config"/>
+        <metadata:message-attributes-null-type-metadata />
     </flow>
 
     <flow name="messageAttributesPersonTypeMetadata">
-        <metadata:message-attributes-person-type-metadata config-ref="config" type="PERSON"/>
+        <metadata:message-attributes-person-type-metadata type="PERSON"/>
     </flow>
 
     <flow name="contentAndOutputWithCacheResolver">
@@ -90,15 +90,15 @@
     </flow>
 
     <flow name="resolverTypeKeysWithContextClassLoader">
-        <metadata:resolver-type-keys-with-context-class-loader config-ref="config" type="PERSON"/>
+        <metadata:resolver-type-keys-with-context-class-loader type="PERSON"/>
     </flow>
 
     <flow name="resolverContentWithContextClassLoader">
-        <metadata:resolver-content-with-context-class-loader config-ref="config" type="PERSON"/>
+        <metadata:resolver-content-with-context-class-loader type="PERSON"/>
     </flow>
 
     <flow name="resolverOutputWithContextClassLoader">
-        <metadata:resolver-output-with-context-class-loader config-ref="config" type="PERSON"/>
+        <metadata:resolver-output-with-context-class-loader type="PERSON"/>
     </flow>
 
     <flow name="outputAndMetadataKeyCacheResolver">
@@ -132,11 +132,11 @@
     </flow>
 
     <flow name="outputAttributesWithDeclaredSubtypesMetadata">
-        <metadata:output-attributes-with-declared-subtypes-metadata config-ref="config"/>
+        <metadata:output-attributes-with-declared-subtypes-metadata />
     </flow>
 
     <flow name="outputAttributesWithDynamicMetadata">
-        <metadata:output-attributes-with-dynamic-metadata config-ref="config" type="PERSON"/>
+        <metadata:output-attributes-with-dynamic-metadata type="PERSON"/>
     </flow>
 
     <flow name="simpleMultiLevelKeyResolver">
@@ -144,13 +144,12 @@
     </flow>
 
     <flow name="sourceMetadataWithMultilevel" initialState="stopped">
-        <metadata:metadata-source-with-multilevel config-ref="config" continent="AMERICA" country="ARGENTINA" city="BA"/>
+        <metadata:metadata-source-with-multilevel continent="AMERICA" country="ARGENTINA" city="BA"/>
         <logger/>
     </flow>
 
     <flow name="typeWithDeclaredSubtypesMetadata">
-        <metadata:type-with-declared-subtypes-metadata config-ref="config"
-                                                       plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
+        <metadata:type-with-declared-subtypes-metadata plainShape="#[new org.mule.test.metadata.extension.model.shapes.Circle()]"
                                                        rectangleSubtype="#[new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
                                                        animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
     </flow>

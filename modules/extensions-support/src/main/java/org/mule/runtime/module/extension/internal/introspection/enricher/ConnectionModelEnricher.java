@@ -28,7 +28,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.ParameterizableTypeWrapper;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
@@ -65,6 +65,7 @@ public class ConnectionModelEnricher extends AbstractAnnotatedModelEnricher {
         public void onOperation(OperationDeclaration declaration) {
           final Optional<ImplementingMethodModelProperty> implementingProperty =
               declaration.getModelProperty(ImplementingMethodModelProperty.class);
+
           if (implementingProperty.isPresent()) {
             final Optional<ConnectivityModelProperty> connectivityModelProperty =
                 addModelProperty(declaration, new MethodWrapper(implementingProperty.get().getMethod()));

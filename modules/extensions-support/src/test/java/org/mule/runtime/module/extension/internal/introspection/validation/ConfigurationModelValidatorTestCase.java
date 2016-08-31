@@ -23,6 +23,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.Annota
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.testmodels.fruit.Apple;
 
 import org.junit.Test;
 
@@ -42,29 +43,55 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
     validate(InvalidExtension.class);
   }
 
+  private ExtensionModel modelFor(Class<?> connectorClass) {
+    DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
+    return extensionFactory
+        .createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
+            .describe(context), context);
+  }
+
+  private void validate(Class<?> connectorClass) {
+    validator.validate(modelFor(connectorClass));
+  }
+
+  interface Config {
+
+  }
+
+
   @Extension(name = "invalidExtension")
-  @Configurations({TestConfig.class})
-  @Operations(InvalidTestOperations.class)
+  @Configurations({InvalidTestConfig.class})
   public static class InvalidExtension {
 
   }
 
+
   @Extension(name = "validExtension")
   @Configurations({TestConfig.class, TestConfig2.class})
-  @Operations(ValidTestOperations.class)
   public static class ValidExtension {
 
   }
 
+
   @Configuration(name = "config")
+  @Operations(ValidTestOperations.class)
   public static class TestConfig implements Config {
 
   }
 
+
+  @Operations(InvalidTestOperations.class)
+  public static class InvalidTestConfig implements Config {
+
+  }
+
+
   @Configuration(name = "config2")
+  @Operations(ValidTestOperations.class)
   public static class TestConfig2 implements Config {
 
   }
+
 
   public static class ValidTestOperations {
 
@@ -77,29 +104,15 @@ public class ConfigurationModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
+
   public static class InvalidTestOperations {
 
-    public void foo(@UseConfig Config connection) {
+    public void foo(@UseConfig Config config) {
 
     }
 
-    public void bar(@UseConfig TestConfig2 connection) {
+    public void bar(@UseConfig Apple config) {
 
     }
-  }
-
-  interface Config {
-
-  }
-
-  private ExtensionModel modelFor(Class<?> connectorClass) {
-    DescribingContext context = new DefaultDescribingContext(connectorClass.getClassLoader());
-    return extensionFactory
-        .createFrom(new AnnotationsBasedDescriber(connectorClass, new StaticVersionResolver(getProductVersion()))
-            .describe(context), context);
-  }
-
-  private void validate(Class<?> connectorClass) {
-    validator.validate(modelFor(connectorClass));
   }
 }

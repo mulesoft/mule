@@ -29,7 +29,7 @@ import java.util.function.Function;
 public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
   private PagingProvider<Object, T> delegate;
-  private final ConfigurationInstance<?> config;
+  private final ConfigurationInstance config;
   private final ConnectionManager connectionManager;
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate, ConfigurationInstance config, ConnectionManager manager) {

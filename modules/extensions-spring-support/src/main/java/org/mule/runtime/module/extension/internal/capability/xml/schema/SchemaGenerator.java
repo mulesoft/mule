@@ -21,7 +21,7 @@ import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.builder.SchemaBuilder;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamespaceFilter;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
-import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
+import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 
 import java.io.StringWriter;
 

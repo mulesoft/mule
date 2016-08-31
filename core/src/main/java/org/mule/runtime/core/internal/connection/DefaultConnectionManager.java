@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.api.util.Reference;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 
 import java.util.HashMap;

@@ -97,7 +97,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
   @Test
   public void initialise() throws Exception {
     provider.initialise();
-    HeisenbergExtension config = provider.get(operationContext).getValue();
+    HeisenbergExtension config = (HeisenbergExtension) provider.get(operationContext).getValue();
     verify(muleContext.getInjector()).inject(config);
     assertLifecycle(HeisenbergExtension::getInitialise);
   }
@@ -128,7 +128,7 @@ public class StaticConfigurationProviderTestCase extends AbstractConfigurationPr
 
 
   private void assertLifecycle(Function<HeisenbergExtension, Integer> testFunction) {
-    HeisenbergExtension config = provider.get(operationContext).getValue();
+    HeisenbergExtension config = (HeisenbergExtension) provider.get(operationContext).getValue();
     assertThat(testFunction.apply(config), is(1));
   }
 }

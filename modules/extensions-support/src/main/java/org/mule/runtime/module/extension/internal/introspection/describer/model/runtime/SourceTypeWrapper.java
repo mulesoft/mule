@@ -32,7 +32,7 @@ final class SourceTypeWrapper<T extends Source> extends TypeWrapper implements S
    * {@inheritDoc}
    */
   @Override
-  public Class<? extends Source> getDeclaredClass() {
+  public Class<? extends Source> getDeclaringClass() {
     return aClass;
   }
 

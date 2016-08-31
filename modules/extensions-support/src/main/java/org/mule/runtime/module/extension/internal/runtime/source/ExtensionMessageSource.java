@@ -324,7 +324,7 @@ public class ExtensionMessageSource extends ExtensionComponent
    * a {@link IllegalSourceException}
    */
   @Override
-  protected void validateOperationConfiguration(ConfigurationProvider<Object> configurationProvider) {
+  protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {
     RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
     if (!configurationModel.getSourceModel(sourceModel.getName()).isPresent()
         && !configurationModel.getExtensionModel().getSourceModel(sourceModel.getName()).isPresent()) {

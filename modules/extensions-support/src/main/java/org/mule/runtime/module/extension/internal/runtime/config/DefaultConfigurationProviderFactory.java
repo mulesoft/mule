@@ -32,31 +32,31 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
    * {@inheritDoc}
    */
   @Override
-  public <T> ConfigurationProvider<T> createDynamicConfigurationProvider(String name,
-                                                                         RuntimeConfigurationModel configurationModel,
-                                                                         ResolverSet resolverSet,
-                                                                         ValueResolver<ConnectionProvider> connectionProviderResolver,
-                                                                         DynamicConfigPolicy dynamicConfigPolicy)
+  public ConfigurationProvider createDynamicConfigurationProvider(String name,
+                                                                  RuntimeConfigurationModel configurationModel,
+                                                                  ResolverSet resolverSet,
+                                                                  ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                                  DynamicConfigPolicy dynamicConfigPolicy)
       throws Exception {
     configureConnectionProviderResolver(name, connectionProviderResolver);
-    return new DynamicConfigurationProvider<>(name, configurationModel, resolverSet, connectionProviderResolver,
-                                              dynamicConfigPolicy.getExpirationPolicy());
+    return new DynamicConfigurationProvider(name, configurationModel, resolverSet, connectionProviderResolver,
+                                            dynamicConfigPolicy.getExpirationPolicy());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public <T> ConfigurationProvider<T> createStaticConfigurationProvider(String name, RuntimeConfigurationModel configurationModel,
-                                                                        ResolverSet resolverSet,
-                                                                        ValueResolver<ConnectionProvider> connectionProviderResolver,
-                                                                        MuleContext muleContext)
+  public ConfigurationProvider createStaticConfigurationProvider(String name, RuntimeConfigurationModel configurationModel,
+                                                                 ResolverSet resolverSet,
+                                                                 ValueResolver<ConnectionProvider> connectionProviderResolver,
+                                                                 MuleContext muleContext)
       throws Exception {
     return withExtensionClassLoader(configurationModel.getExtensionModel(), () -> {
       configureConnectionProviderResolver(name, connectionProviderResolver);
-      ConfigurationInstance<T> configuration;
+      ConfigurationInstance configuration;
       try {
-        configuration = new ConfigurationInstanceFactory<T>(configurationModel, resolverSet)
+        configuration = new ConfigurationInstanceFactory(configurationModel, resolverSet)
             .createConfiguration(name, getInitialiserEvent(muleContext), connectionProviderResolver);
       } catch (MuleException e) {
         throw new ConfigurationException(createStaticMessage(String
@@ -64,7 +64,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                          e);
       }
 
-      return new ConfigurationProviderMetadataAdapter<>(name, configurationModel, configuration);
+      return new ConfigurationProviderMetadataAdapter(name, configurationModel, configuration);
     });
   }
 

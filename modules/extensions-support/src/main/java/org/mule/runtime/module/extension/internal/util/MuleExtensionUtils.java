@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
@@ -14,10 +13,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALW
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT_SUPPORTED;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.springframework.util.ReflectionUtils.setField;
-
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -32,7 +28,6 @@ import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.InterceptableModel;
@@ -42,15 +37,11 @@ import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationM
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ClassLoaderModelProperty;
-import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.InterceptorFactory;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.RequireNameField;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -62,7 +53,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -72,8 +62,6 @@ import java.util.concurrent.Callable;
  * @since 3.7.0
  */
 public class MuleExtensionUtils {
-
-  private MuleExtensionUtils() {}
 
   /**
    * Returns {@code true} if any of the items in {@code resolvers} return true for the {@link ValueResolver#isDynamic()} method
@@ -91,55 +79,6 @@ public class MuleExtensionUtils {
     return false;
   }
 
-  /**
-   * Collects the {@link ParameterModel parameters} from {@code model} which supports or requires expressions
-   *
-   * @param model a {@link ParameterizedModel}
-   * @return a {@link List} of {@link ParameterModel}. Can be empty but will never be {@code null}
-   */
-  public static List<ParameterModel> getDynamicParameters(ParameterizedModel model) {
-    return model.getParameterModels().stream().filter(parameter -> acceptsExpressions(parameter.getExpressionSupport()))
-        .collect(toList());
-  }
-
-  /**
-   * @param support a {@link ExpressionSupport}
-   * @return Whether or not the given {@code support} is one which accepts or requires expressions
-   */
-  public static boolean acceptsExpressions(ExpressionSupport support) {
-    return support == SUPPORTED || support == REQUIRED;
-  }
-
-  /**
-   * Returns a {@link List} with all the {@link ComponentModel} available to the {@code configurationModel} which requires a
-   * connection. This includes both {@link SourceModel} and {@link OperationModel}.
-   *
-   * @param configurationModel a {@link RuntimeConfigurationModel}
-   * @return a {@link List} of {@link ComponentModel}. It might be empty but will never be {@code null}
-   */
-  public static List<ComponentModel> getConnectedComponents(RuntimeConfigurationModel configurationModel) {
-    List<ComponentModel> connectedModels = new LinkedList<>();
-    new IdempotentExtensionWalker() {
-
-      @Override
-      public void onOperation(OperationModel model) {
-        collect(model);
-      }
-
-      @Override
-      public void onSource(SourceModel model) {
-        collect(model);
-      }
-
-      private void collect(EnrichableModel model) {
-        if (MuleExtensionUtils.isConnected(model)) {
-          connectedModels.add((ComponentModel) model);
-        }
-      }
-    }.walk(configurationModel.getExtensionModel());
-
-    return connectedModels;
-  }
 
   /**
    * Returns all the {@link ConnectionProviderModel} instances available for the given {@code configurationModel}. The
@@ -349,10 +288,6 @@ public class MuleExtensionUtils {
    */
   public static IllegalModelDefinitionException noClassLoaderException(String extensionName) {
     return new IllegalModelDefinitionException("No ClassLoader was specified for extension " + extensionName);
-  }
-
-  private static boolean isConnected(EnrichableModel o) {
-    return o.getModelProperty(ConnectivityModelProperty.class).isPresent();
   }
 
   private static class NamedComparator implements Comparator<Named> {

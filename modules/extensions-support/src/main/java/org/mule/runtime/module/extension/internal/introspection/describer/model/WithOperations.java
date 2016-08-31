@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.MethodWrapper;
-
 import java.util.List;
 
 /**
@@ -18,7 +16,7 @@ import java.util.List;
 interface WithOperations {
 
   /**
-   * @return a list of {@link MethodWrapper}
+   * @return a list of {@link MethodElement}
    */
   List<MethodElement> getOperations();
 }

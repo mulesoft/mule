@@ -272,13 +272,13 @@ public final class SchemaBuilder {
   }
 
   public SchemaBuilder registerOperation(OperationModel operationModel) {
-    operationSchemaDelegate.registerOperation(operationModel);
+    operationSchemaDelegate.registerOperation(operationModel, dslResolver.resolve(operationModel));
     return this;
   }
 
   public SchemaBuilder registerMessageSource(SourceModel sourceModel) {
 
-    sourceSchemaDelegate.registerMessageSource(sourceModel);
+    sourceSchemaDelegate.registerMessageSource(sourceModel, dslResolver.resolve(sourceModel));
     return this;
   }
 
@@ -478,7 +478,8 @@ public final class SchemaBuilder {
     return name + GROUP_SUFFIX;
   }
 
-  ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base) {
+  ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base,
+                                       DslElementSyntax dslSyntax) {
     TopLevelComplexType complexType = new TopLevelComplexType();
     complexType.setName(name);
 
@@ -488,8 +489,10 @@ public final class SchemaBuilder {
     complexContentExtension.setBase(base);
     complexContent.setExtension(complexContentExtension);
 
-    Attribute configAttr = createAttribute(CONFIG_ATTRIBUTE, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
-    complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
+    if (dslSyntax.requiresConfig()) {
+      Attribute configAttr = createAttribute(CONFIG_ATTRIBUTE, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
+      complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
+    }
 
     final ExplicitGroup all = new ExplicitGroup();
     complexContentExtension.setSequence(all);

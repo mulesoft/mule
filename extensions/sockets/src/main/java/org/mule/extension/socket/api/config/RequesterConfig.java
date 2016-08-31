@@ -11,7 +11,7 @@ import org.mule.extension.socket.api.provider.udp.UdpRequesterProvider;
 import org.mule.extension.socket.api.SocketOperations;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 
 /**
  * Implementation of {@link AbstractSocketConfig} for requester sockets
@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.annotation.connector.Providers;
  */
 @Configuration(name = "request-config")
 @Operations({SocketOperations.class})
-@Providers({TcpRequesterProvider.class, UdpRequesterProvider.class})
+@ConnectionProviders({TcpRequesterProvider.class, UdpRequesterProvider.class})
 public class RequesterConfig extends AbstractSocketConfig {
 
 }

@@ -11,7 +11,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.core.api.util.Reference;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.Described;

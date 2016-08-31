@@ -25,9 +25,9 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.module.extension.internal.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
+import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

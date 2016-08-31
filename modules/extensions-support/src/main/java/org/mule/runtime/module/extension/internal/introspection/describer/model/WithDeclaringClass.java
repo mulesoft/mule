@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer.model;
 
-import java.util.List;
-
 /**
- * A contract for an element from which an Extension can be derived
+ * A generic contract for any kind of component which is derived
+ * from a declaration inside a {@link Class}
  *
  * @since 4.0
  */
-public interface ExtensionElement extends ParameterizableTypeElement, ComponentElement, WithOperations {
+public interface WithDeclaringClass {
 
   /**
-   * @return A list {@link ConfigurationElement} of declared configurations
+   * @return the class that this {@link Type} represents
    */
-  List<ConfigurationElement> getConfigurations();
+  // TODO MULE-10137 - Adapt logic to AST
+  Class getDeclaringClass();
 }

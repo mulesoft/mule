@@ -49,13 +49,13 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterceptable implements ConfigurationInstance<T> {
+public final class LifecycleAwareConfigurationInstance extends AbstractInterceptable implements ConfigurationInstance {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationInstance.class);
 
   private final String name;
   private final RuntimeConfigurationModel model;
-  private final T value;
+  private final Object value;
   private final Optional<ConnectionProvider> connectionProvider;
 
   private ConfigurationStats configurationStats;
@@ -78,7 +78,7 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
    * @param interceptors the {@link List} of {@link Interceptor interceptors} that applies
    * @param connectionProvider an {@link Optional} containing the {@link ConnectionProvider} to use
    */
-  public LifecycleAwareConfigurationInstance(String name, RuntimeConfigurationModel model, T value,
+  public LifecycleAwareConfigurationInstance(String name, RuntimeConfigurationModel model, Object value,
                                              List<Interceptor> interceptors, Optional<ConnectionProvider> connectionProvider) {
     super(interceptors);
     this.name = name;
@@ -196,7 +196,7 @@ public final class LifecycleAwareConfigurationInstance<T> extends AbstractInterc
    * {@inheritDoc}
    */
   @Override
-  public T getValue() {
+  public Object getValue() {
     return value;
   }
 

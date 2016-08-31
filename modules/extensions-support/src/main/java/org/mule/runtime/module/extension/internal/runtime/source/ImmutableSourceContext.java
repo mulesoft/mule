@@ -11,14 +11,18 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.MessageHandler;
 import org.mule.runtime.extension.api.runtime.source.SourceContext;
 
+import java.util.Optional;
+
 final class ImmutableSourceContext implements SourceContext {
 
   private final MessageHandler messageHandler;
   private final ExceptionCallback<Void, Throwable> exceptionCallback;
-  private final ConfigurationInstance<Object> configurationInstance;
+  private final Optional<ConfigurationInstance> configurationInstance;
 
-  ImmutableSourceContext(MessageHandler messageHandler, ExceptionCallback<Void, Throwable> exceptionCallback,
-                         ConfigurationInstance<Object> configurationInstance) {
+  ImmutableSourceContext(MessageHandler messageHandler,
+                         ExceptionCallback<Void, Throwable> exceptionCallback,
+                         Optional<ConfigurationInstance> configurationInstance) {
+
     this.messageHandler = messageHandler;
     this.exceptionCallback = exceptionCallback;
     this.configurationInstance = configurationInstance;
@@ -34,8 +38,11 @@ final class ImmutableSourceContext implements SourceContext {
     return exceptionCallback;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public ConfigurationInstance<Object> getConfigurationInstance() {
+  public Optional<ConfigurationInstance> getConfigurationInstance() {
     return configurationInstance;
   }
 }

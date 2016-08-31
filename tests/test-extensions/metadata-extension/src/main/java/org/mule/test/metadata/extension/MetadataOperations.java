@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension;
 
+import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
@@ -42,7 +43,8 @@ public class MetadataOperations extends MetadataOperationsParent {
 
   @MetadataScope(keysResolver = TestContentResolverWithKeyResolver.class,
       contentResolver = TestContentResolverWithKeyResolver.class, outputResolver = TestOutputNullTypeResolver.class)
-  public Object contentMetadataWithKeyId(@Connection MetadataConnection connection, @MetadataKeyId String type,
+  public Object contentMetadataWithKeyId(@UseConfig Object object, @Connection MetadataConnection connection,
+                                         @MetadataKeyId String type,
                                          @Optional @Content Object content) {
     return null;
   }

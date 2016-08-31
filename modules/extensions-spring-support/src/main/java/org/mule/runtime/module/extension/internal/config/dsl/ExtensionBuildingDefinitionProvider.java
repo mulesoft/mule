@@ -57,7 +57,7 @@ import org.mule.runtime.module.extension.internal.config.dsl.operation.Operation
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
-import org.mule.runtime.module.extension.internal.util.IdempotentExtensionWalker;
+import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
 
 import java.util.LinkedList;

@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.of;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -66,19 +67,20 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase {
   private ExtensionManager extensionManager;
 
   private Object configurationInstance = new Object();
-  private ConfigurationInstance<Object> configuration;
+  private ConfigurationInstance configuration;
   private DefaultOperationContext operationContext;
 
 
   @Before
   public void before() {
-    configuration = new LifecycleAwareConfigurationInstance<>(CONFIG_NAME, configurationModel, configurationInstance, emptyList(),
-                                                              Optional.empty());
+    configuration = new LifecycleAwareConfigurationInstance(CONFIG_NAME, configurationModel, configurationInstance, emptyList(),
+                                                            Optional.empty());
     Map<String, Object> parametersMap = new HashMap<>();
     parametersMap.put(PARAM_NAME, VALUE);
     when(resolverSetResult.asMap()).thenReturn(parametersMap);
 
-    operationContext = new DefaultOperationContext(configuration, resolverSetResult, operationModel, event, muleContext);
+    operationContext =
+        new DefaultOperationContext(extensionModel, of(configuration), resolverSetResult, operationModel, event, muleContext);
   }
 
   @Test

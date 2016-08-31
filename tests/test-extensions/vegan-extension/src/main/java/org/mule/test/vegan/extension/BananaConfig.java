@@ -10,13 +10,13 @@ import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration(name = BANANA)
 @Operations({EatBananaOperation.class, SpreadVeganismOperation.class, InterceptingBananaOperations.class})
-@Providers(VeganBananaConnectionProvider.class)
+@ConnectionProviders(VeganBananaConnectionProvider.class)
 @Sources(PaulMcCartneySource.class)
 public class BananaConfig {
 

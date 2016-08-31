@@ -28,7 +28,7 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.module.extension.internal.model.property.ConnectivityModelProperty;
+import org.mule.runtime.extension.api.introspection.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase;
 import org.mule.runtime.module.extension.internal.runtime.executor.ConfigurationObjectBuilderTestCase.TestConfig;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -99,7 +99,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createFromEvent() throws Exception {
-    ConfigurationInstance<TestConfig> configurationInstance =
+    ConfigurationInstance configurationInstance =
         factory.createConfiguration(CONFIG_NAME, event, new StaticValueResolver<>(null));
 
     assertConfiguration(configurationInstance);
@@ -108,13 +108,13 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void createFromResolverSetResult() throws Exception {
     ResolverSetResult result = ResolverSetResult.newBuilder().build();
-    ConfigurationInstance<TestConfig> configurationInstance = factory.createConfiguration(CONFIG_NAME, result, Optional.empty());
+    ConfigurationInstance configurationInstance = factory.createConfiguration(CONFIG_NAME, result, Optional.empty());
 
     assertConfiguration(configurationInstance);
     assertThat(configurationInstance.getConnectionProvider().isPresent(), is(false));
   }
 
-  private void assertConfiguration(ConfigurationInstance<TestConfig> configurationInstance) {
+  private void assertConfiguration(ConfigurationInstance configurationInstance) {
     assertThat(configurationInstance, is(notNullValue()));
     assertThat(configurationInstance.getName(), is(CONFIG_NAME));
     assertThat(configurationInstance.getModel(), is(sameInstance(configurationModel)));

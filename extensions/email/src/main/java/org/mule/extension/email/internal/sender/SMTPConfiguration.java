@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -32,7 +32,7 @@ import javax.inject.Inject;
  * @since 4.0
  */
 @Operations(SenderOperations.class)
-@Providers({SMTPProvider.class, SMTPSProvider.class})
+@ConnectionProviders({SMTPProvider.class, SMTPSProvider.class})
 @Configuration(name = "smtp")
 @DisplayName("SMTP")
 public class SMTPConfiguration implements Initialisable {

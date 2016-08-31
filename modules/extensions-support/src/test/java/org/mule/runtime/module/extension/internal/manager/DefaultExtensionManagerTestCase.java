@@ -108,10 +108,10 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private OperationContextAdapter extension1OperationContext;
 
   @Mock
-  private ConfigurationProvider<Object> extension1ConfigurationProvider;
+  private ConfigurationProvider extension1ConfigurationProvider;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private ConfigurationInstance<Object> extension1ConfigurationInstance = mock(ConfigurationInstance.class);
+  private ConfigurationInstance extension1ConfigurationInstance = mock(ConfigurationInstance.class);
 
   @Mock
   private OperationExecutorFactory executorFactory;
@@ -221,7 +221,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void getConfigurationByName() throws Exception {
     registerConfigurationProvider();
 
-    ConfigurationInstance<Object> configurationInstance =
+    ConfigurationInstance configurationInstance =
         extensionsManager.getConfiguration(EXTENSION1_CONFIG_INSTANCE_NAME, event);
     assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));
   }
@@ -230,7 +230,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void getConfigurationThroughDefaultConfig() throws Exception {
     registerConfigurationProvider();
 
-    ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    ConfigurationInstance configInstance = extensionsManager.getConfiguration(extensionModel1, event);
     assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
   }
 
@@ -238,7 +238,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   public void getConfigurationThroughImplicitConfiguration() throws Exception {
     when(extension1ConfigurationModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
     registerConfigurationProvider();
-    ConfigurationInstance<Object> configInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    ConfigurationInstance configInstance = extensionsManager.getConfiguration(extensionModel1, event);
     assertThat(configInstance.getValue(), is(sameInstance(this.configInstance)));
   }
 
@@ -260,7 +260,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
       return null;
     }).when(registry).registerObject(anyString(), anyObject());
 
-    ConfigurationInstance<Object> configurationInstance = extensionsManager.getConfiguration(extensionModel1, event);
+    ConfigurationInstance configurationInstance = extensionsManager.getConfiguration(extensionModel1, event);
     joinerLatch.countDown();
     assertThat(joinerLatch.await(5, TimeUnit.SECONDS), is(true));
     assertThat(configurationInstance.getValue(), is(sameInstance(configInstance)));

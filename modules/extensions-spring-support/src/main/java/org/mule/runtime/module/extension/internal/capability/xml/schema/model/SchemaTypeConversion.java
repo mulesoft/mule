@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.extension.internal.capability.xml.schema.model;
 
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.acceptsExpressions;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_BOOLEAN;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_DATE_TIME;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.EXPRESSION_DECIMAL;
@@ -36,14 +37,13 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import javax.xml.namespace.QName;
 
 public final class SchemaTypeConversion {
 
   public static QName convertType(final MetadataType type, ExpressionSupport expressionSupport) {
-    final boolean dynamic = MuleExtensionUtils.acceptsExpressions(expressionSupport);
+    final boolean dynamic = acceptsExpressions(expressionSupport);
     final ValueHolder<QName> qName = new ValueHolder<>();
     type.accept(new MetadataTypeVisitor() {
 

@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  *
  * @since 4.0
  */
-public interface MethodElement extends WithParameters, WithReturnType, Named, WithAnnotations, WithAlias {
+public interface MethodElement extends WithParameters, WithReturnType, Named, WithAnnotations, WithAlias, WithDeclaringClass {
 
   /**
    * @return The represented method

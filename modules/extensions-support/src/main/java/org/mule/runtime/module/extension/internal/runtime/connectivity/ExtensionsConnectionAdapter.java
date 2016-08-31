@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
@@ -62,25 +63,43 @@ public class ExtensionsConnectionAdapter {
 
   private <T> ConnectionHandler<T> getTransactionlessConnectionHandler(OperationContext operationContext)
       throws ConnectionException {
-    Optional<ConnectionProvider> connectionProvider = operationContext.getConfiguration().getConnectionProvider();
+
+
+    final Optional<ConfigurationInstance> configuration = operationContext.getConfiguration();
+    Optional<ConnectionProvider> connectionProvider = configuration
+        .map(config -> config.getConnectionProvider())
+        .map(Optional::get);
+
     if (!connectionProvider.isPresent()) {
-      throw new IllegalStateException(format("Operation '%s' of extension '%s' requires a connection but was executed with config '%s' which "
-          + "is not associated to a connection provider", operationContext.getOperationModel().getName(),
-                                             operationContext.getConfiguration().getModel().getExtensionModel().getName(),
-                                             operationContext.getConfiguration().getName()));
+      String configRef = configuration
+          .map(config -> format("with config '%s' which is not associated to a connection provider", config.getName()))
+          .orElse("without a config");
+
+      throw new IllegalStateException(format("Operation '%s' of extension '%s' requires a connection but was executed %s",
+                                             operationContext.getOperationModel().getName(),
+                                             operationContext.getExtensionModel().getName(),
+                                             configRef));
     }
 
-    return connectionManager.getConnection(operationContext.getConfiguration().getValue());
+    return connectionManager.getConnection(configuration.get().getValue());
   }
 
   private <T extends TransactionalConnection> ConnectionHandler<T> getTransactedConnectionHandler(OperationContextAdapter operationContext,
                                                                                                   TransactionConfig transactionConfig)
       throws ConnectionException, TransactionException {
+
     if (transactionConfig.getAction() == ACTION_NOT_SUPPORTED) {
       return getTransactionlessConnectionHandler(operationContext);
     }
 
-    final ExtensionTransactionKey txKey = new ExtensionTransactionKey(operationContext.getConfiguration());
+    ConfigurationInstance configuration = operationContext.getConfiguration()
+        .orElseThrow(() -> new IllegalStateException(format("Operation '%s' of extension '%s' cannot participate in a transaction because"
+            + "it doesn't have a config",
+                                                            operationContext.getOperationModel().getName(),
+                                                            operationContext.getExtensionModel().getName())));
+
+
+    final ExtensionTransactionKey txKey = new ExtensionTransactionKey(configuration);
     final Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
 
     if (currentTx != null) {
@@ -100,8 +119,7 @@ public class ExtensionsConnectionAdapter {
         } else if (transactionConfig.isTransacted()) {
           throw new TransactionException(createStaticMessage(format("Operation '%s' of extension '%s' is transactional but current transaction doesn't "
               + "support connections of type '%s'", operationContext.getOperationModel().getName(),
-                                                                    operationContext.getConfiguration().getModel()
-                                                                        .getExtensionModel().getName(),
+                                                                    operationContext.getExtensionModel().getName(),
                                                                     connectionHandler.getClass().getName())));
         }
       } finally {

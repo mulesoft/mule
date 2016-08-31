@@ -9,11 +9,11 @@ package org.mule.test.vegan.extension;
 import static org.mule.test.vegan.extension.VeganExtension.PEACH;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.mule.runtime.extension.api.annotation.connector.Providers;
+import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 
 @Configuration(name = PEACH)
 // No operations defined on purpose
-@Providers(VeganPeachConnectionProvider.class)
+@ConnectionProviders(VeganPeachConnectionProvider.class)
 @Sources({HarvestPeachesSource.class})
 public class PeachConfig {
 

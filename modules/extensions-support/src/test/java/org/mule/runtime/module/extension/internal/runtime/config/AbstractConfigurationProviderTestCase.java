@@ -46,7 +46,7 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleCont
   protected MuleEvent event;
 
   protected TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
-  protected LifecycleAwareConfigurationProvider<T> provider;
+  protected LifecycleAwareConfigurationProvider provider;
 
   @Before
   public void before() throws Exception {

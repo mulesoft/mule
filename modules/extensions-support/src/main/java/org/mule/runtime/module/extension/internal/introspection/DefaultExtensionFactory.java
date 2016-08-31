@@ -106,11 +106,18 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
    */
   public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader) {
     modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
-    modelValidators = ImmutableList.<ModelValidator>builder().add(new SubtypesModelValidator()).add(new NameClashModelValidator())
-        .add(new ParameterModelValidator()).add(new ConnectionProviderModelValidator()).add(new ConfigurationModelValidator())
-        .add(new OperationReturnTypeModelValidator()).add(new OperationParametersModelValidator())
-        .add(new MetadataComponentModelValidator()).add(new ExclusiveParameterModelValidator())
-        .add(new ConnectionProviderNameModelValidator()).build();
+    modelValidators = ImmutableList.<ModelValidator>builder()
+        .add(new SubtypesModelValidator())
+        .add(new NameClashModelValidator())
+        .add(new ParameterModelValidator())
+        .add(new ConnectionProviderModelValidator())
+        .add(new ConfigurationModelValidator())
+        .add(new OperationReturnTypeModelValidator())
+        .add(new OperationParametersModelValidator())
+        .add(new MetadataComponentModelValidator())
+        .add(new ExclusiveParameterModelValidator())
+        .add(new ConnectionProviderNameModelValidator())
+        .build();
   }
 
   /**

@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectedComponents;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -56,7 +55,7 @@ public final class ConfigurationInstanceFactory<T> {
   public ConfigurationInstanceFactory(RuntimeConfigurationModel configurationModel, ResolverSet resolverSet) {
     this.configurationModel = configurationModel;
     configurationObjectBuilder = new ConfigurationObjectBuilder<>(configurationModel, resolverSet);
-    requiresConnection = !getConnectedComponents(configurationModel).isEmpty();
+    requiresConnection = !getConnectedComponents(configurationModel.getExtensionModel(), configurationModel).isEmpty();
   }
 
   /**
@@ -72,7 +71,7 @@ public final class ConfigurationInstanceFactory<T> {
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event, MuleContext muleContext)
+  public ConfigurationInstance createConfiguration(String name, MuleEvent event, MuleContext muleContext)
       throws MuleException {
     ValueResolver<ConnectionProvider> providerResolver;
     if (requiresConnection) {
@@ -97,14 +96,14 @@ public final class ConfigurationInstanceFactory<T> {
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance<T> createConfiguration(String name, MuleEvent event,
-                                                      ValueResolver<ConnectionProvider> connectionProviderResolver)
+  public ConfigurationInstance createConfiguration(String name, MuleEvent event,
+                                                   ValueResolver<ConnectionProvider> connectionProviderResolver)
       throws MuleException {
     Optional<ConnectionProvider> connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(event));
     T configValue = createConfigurationInstance(name, event);
 
-    return new LifecycleAwareConfigurationInstance<>(name, configurationModel, configValue,
-                                                     createInterceptors(configurationModel), connectionProvider);
+    return new LifecycleAwareConfigurationInstance(name, configurationModel, configValue,
+                                                   createInterceptors(configurationModel), connectionProvider);
   }
 
   /**
@@ -115,13 +114,13 @@ public final class ConfigurationInstanceFactory<T> {
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance<T> createConfiguration(String name, ResolverSetResult resolverSetResult,
-                                                      Optional<ConnectionProvider> connectionProvider)
+  public ConfigurationInstance createConfiguration(String name, ResolverSetResult resolverSetResult,
+                                                   Optional<ConnectionProvider> connectionProvider)
       throws MuleException {
     T configValue = createConfigurationInstance(name, resolverSetResult);
 
-    return new LifecycleAwareConfigurationInstance<>(name, configurationModel, configValue,
-                                                     createInterceptors(configurationModel), connectionProvider);
+    return new LifecycleAwareConfigurationInstance(name, configurationModel, configValue,
+                                                   createInterceptors(configurationModel), connectionProvider);
   }
 
   private T createConfigurationInstance(String name, ResolverSetResult resolverSetResult) throws MuleException {

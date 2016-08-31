@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
 import static org.apache.commons.lang.StringUtils.capitalize;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
@@ -32,23 +32,24 @@ class SourceSchemaDelegate {
     this.builder = builder;
   }
 
-  public void registerMessageSource(SourceModel sourceModel) {
+  public void registerMessageSource(SourceModel sourceModel, DslElementSyntax dslSyntax) {
     String typeName = capitalize(sourceModel.getName()) + TYPE_SUFFIX;
-    registerSourceElement(sourceModel, typeName);
-    registerSourceType(typeName, sourceModel);
+    registerSourceElement(sourceModel, typeName, dslSyntax);
+    registerSourceType(typeName, sourceModel, dslSyntax);
   }
 
-  private void registerSourceElement(SourceModel sourceModel, String typeName) {
+  private void registerSourceElement(SourceModel sourceModel, String typeName, DslElementSyntax dslSyntax) {
     Element element = new TopLevelElement();
-    element.setName(hyphenize(sourceModel.getName()));
+    element.setName(dslSyntax.getElementName());
     element.setType(new QName(builder.getSchema().getTargetNamespace(), typeName));
     element.setAnnotation(builder.createDocAnnotation(sourceModel.getDescription()));
     element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_SOURCE);
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(element);
   }
 
-  private void registerSourceType(String name, SourceModel sourceModel) {
-    final ExtensionType extensionType = builder.registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE);
+  private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax) {
+    final ExtensionType extensionType =
+        builder.registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
     ExplicitGroup sequence = extensionType.getSequence();
 
     if (sequence == null) {

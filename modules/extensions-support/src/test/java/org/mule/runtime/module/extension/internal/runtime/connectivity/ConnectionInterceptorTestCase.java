@@ -24,6 +24,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.CON
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -52,6 +53,9 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
   private OperationContextAdapter operationContext;
 
   @Mock
+  private ConfigurationInstance configurationInstance;
+
+  @Mock
   private PetStoreConnector config;
 
   private PetStoreConnectionProvider<? extends PetStoreClient> connectionProvider;
@@ -59,7 +63,9 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void before() throws Exception {
-    when(operationContext.getConfiguration().getValue()).thenReturn(config);
+
+    when(operationContext.getConfiguration()).thenReturn(Optional.of(configurationInstance));
+    when(configurationInstance.getValue()).thenReturn(config);
     setupConnectionProvider(new SimplePetStoreConnectionProvider());
 
     when(operationContext.getVariable(CONNECTION_PARAM)).thenReturn(null);
@@ -71,7 +77,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
 
   private void setupConnectionProvider(PetStoreConnectionProvider<?> aConnectionProvider) throws Exception {
     this.connectionProvider = spy(aConnectionProvider);
-    when(operationContext.getConfiguration().getConnectionProvider()).thenReturn(Optional.of(connectionProvider));
+    when(configurationInstance.getConnectionProvider()).thenReturn(Optional.of(connectionProvider));
     connectionProvider.setUsername(USER);
     connectionProvider.setPassword(PASSWORD);
 
