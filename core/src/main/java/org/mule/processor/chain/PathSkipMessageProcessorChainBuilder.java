@@ -7,7 +7,13 @@
 package org.mule.processor.chain;
 
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessor;
 
+/**
+ * Constructs a chain of {@link MessageProcessor}s and wraps the invocation of the chain in a composite
+ * MessageProcessor. This Builder wrapps the chain in an {@link InterceptingChainLifecycleWrapperPathSkip},
+ * so it does not add a level into the path elements.
+ */
 public class PathSkipMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder
 {
     @Override

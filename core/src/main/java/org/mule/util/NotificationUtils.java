@@ -97,6 +97,8 @@ public class NotificationUtils
             if (!(mp instanceof InternalMessageProcessor))
             {
                 MessageProcessorPathElement messageProcessorPathElement;
+
+                // To avoid adding a level in some path elements:
                 if (!(mp instanceof InterceptingChainLifecycleWrapperPathSkip))
                 {
                     messageProcessorPathElement = parentElement.addChild(mp);
