@@ -12,14 +12,14 @@
     </flow>
 
     <flow name="selectExceptionClosesPreviousResultSets">
-        <transactional>
+        <block>
             <db:select config-ref="pooledJdbcConfig" target="#[flowVars.planets]" streaming="true">
                 <db:parameterized-query>select * from PLANET order by ID</db:parameterized-query>
             </db:select>
             <db:select config-ref="pooledJdbcConfig">
                 <db:parameterized-query>select * from NOT_EXISTS order by ID</db:parameterized-query>
             </db:select>
-        </transactional>
+        </block>
         <set-payload value="#[true]"/>
         <error-handler>
             <on-error-continue>

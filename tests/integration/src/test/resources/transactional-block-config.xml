@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:test="http://www.mulesoft.org/schema/mule/test"
-    xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <flow name="in-flow">
-        <block transactionalAction="BEGIN_OR_JOIN">
-            <test:component throwException="true"
-                exceptionToThrow="java.lang.RuntimeException" />
+    <flow name="standardBlock">
+        <block transactionalAction="BEGIN_OR_JOIN" transactionType="STANDARD">
+            <test:component throwException="true" exceptionToThrow="java.lang.RuntimeException" />
             <error-handler>
                 <on-error-continue>
-                    <flow-ref name="dlq-out"/>
+                    <append-string-transformer message=" hi"/>
                 </on-error-continue>
             </error-handler>
         </block>
-    </flow>
-
-    <flow name="dlq-out">
-        <test:component/>
     </flow>
 
 </mule>

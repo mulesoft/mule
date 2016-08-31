@@ -71,7 +71,7 @@ import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
+import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.EncryptionStrategy;
@@ -126,13 +126,13 @@ import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
-import org.mule.runtime.core.processor.TransactionalMessageProcessor;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
+import org.mule.runtime.core.processor.BlockMessageProcessor;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.FirstSuccessful;
@@ -152,6 +152,7 @@ import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
+import org.mule.runtime.core.transaction.TransactionType;
 import org.mule.runtime.core.transaction.lookup.GenericTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JBossTransactionManagerLookupFactory;
 import org.mule.runtime.core.transaction.lookup.JRunTransactionManagerLookupFactory;
@@ -224,7 +225,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String WIRE_TAP = "wire-tap";
   private static final String ENRICHER = "enricher";
   private static final String ASYNC = "async";
-  private static final String TRANSACTIONAL = "transactional";
+  private static final String BLOCK = "block";
   private static final String UNTIL_SUCCESSFUL = "until-successful";
   private static final String FOREACH = "foreach";
   private static final String FIRST_SUCCESSFUL = "first-successful";
@@ -236,6 +237,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String REQUEST_REPLY = "request-reply";
   private static final String ERROR_TYPE = "errorType";
   private static final String TYPE = "type";
+  private static final String TX_ACTION = "transactionalAction";
+  private static final String TX_TYPE = "transactionType";
 
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(CORE_NAMESPACE_NAME);
@@ -438,11 +441,12 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
             .withSetterParameterDefinition(NAME, fromSimpleParameter(NAME).build()).build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(TRANSACTIONAL).withTypeDefinition(fromType(TransactionalMessageProcessor.class))
-            .withObjectFactoryType(TransactionalMessageProcessorsFactoryBean.class)
+        .add(baseDefinition.copy().withIdentifier(BLOCK).withTypeDefinition(fromType(BlockMessageProcessor.class))
+            .withObjectFactoryType(BlockMessageProcessorFactoryBean.class)
             .withSetterParameterDefinition("exceptionListener", fromChildConfiguration(MessagingExceptionHandler.class).build())
             .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
-            .withSetterParameterDefinition("action", fromSimpleParameter("action").build()).build());
+            .withSetterParameterDefinition(TX_ACTION, fromSimpleParameter(TX_ACTION).build())
+            .withSetterParameterDefinition(TX_TYPE, fromSimpleParameter(TX_TYPE, getTransactionTypeConverter()).build()).build());
 
     componentBuildingDefinitions
         .add(baseDefinition.copy().withIdentifier(UNTIL_SUCCESSFUL).withTypeDefinition(fromType(UntilSuccessful.class))
@@ -606,6 +610,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.addAll(getEntryPointResolversDefinitions());
 
     return componentBuildingDefinitions;
+  }
+
+  private TypeConverter<String, TransactionType> getTransactionTypeConverter() {
+    return TransactionType::valueOf;
   }
 
   private TypeConverter<String, ErrorType> getErrorTypeConverter() {

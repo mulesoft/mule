@@ -15,171 +15,171 @@
 
     <flow name="transactional">
         <append-string-transformer message=" a"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out2"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailInTheMiddle">
         <append-string-transformer message=" b"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <transports:outbound-endpoint ref="out2"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailAtEnd">
         <append-string-transformer message=" c"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailAfterEnd">
         <append-string-transformer message=" d"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out2"/>
-        </transactional>
+        </block>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="transactionalFailInTheMiddleWithCatchExceptionStrategy">
         <append-string-transformer message=" e"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <transports:outbound-endpoint ref="out2"/>
             <error-handler>
                 <on-error-continue/>
             </error-handler>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailAtEndWithCatchExceptionStrategy">
         <append-string-transformer message=" f"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
             <error-handler>
                 <on-error-continue/>
             </error-handler>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailsWithAnotherResourceType">
         <append-string-transformer message=" g"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out2"/>
             <transports:outbound-endpoint ref="out3"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalDoesntFailWithAnotherResourceType">
         <append-string-transformer message=" h"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out2"/>
             <transports:outbound-endpoint ref="out3NotSupported"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalWithAnotherResourceTypeAndExceptionAtEnd">
         <append-string-transformer message=" i"/>
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
             <transports:outbound-endpoint ref="out3NotSupported"/>
             <transports:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
-        </transactional>
+        </block>
     </flow>
 
 
     <flow name="nestedTransactional">
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
-            <transactional>
+            <block>
                 <transports:outbound-endpoint ref="out2"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalFail">
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
-            <transactional>
+            <block>
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalFailWithCatch">
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
-            <transactional>
+            <block>
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <error-handler>
                     <on-error-continue/>
                 </error-handler>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoin">
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
-            <transactional action="BEGIN_OR_JOIN">
+            <block transactionalAction="BEGIN_OR_JOIN">
                 <transports:outbound-endpoint ref="out2"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFail">
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
-            <transactional action="BEGIN_OR_JOIN">
+            <block transactionalAction="BEGIN_OR_JOIN">
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFailWithCatch">
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
-            <transactional action="BEGIN_OR_JOIN">
+            <block transactionalAction="BEGIN_OR_JOIN">
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <error-handler>
                     <on-error-continue/>
                 </error-handler>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFailWithCatchAndRollback">
-        <transactional>
+        <block>
             <transports:outbound-endpoint ref="out1"/>
-            <transactional action="BEGIN_OR_JOIN">
+            <block transactionalAction="BEGIN_OR_JOIN">
                 <transports:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <error-handler>
                     <on-error-continue/>
                 </error-handler>
-            </transactional>
+            </block>
             <test:component throwException="true"/>
             <error-handler>
                 <on-error-propagate/>
             </error-handler>
-        </transactional>
+        </block>
         <error-handler>
             <on-error-continue/>
         </error-handler>

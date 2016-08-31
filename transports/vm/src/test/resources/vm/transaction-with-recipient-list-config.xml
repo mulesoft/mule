@@ -22,9 +22,9 @@
                                 action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <echo-component/>
-        <transactional action="BEGIN_OR_JOIN">
+        <block transactionalAction="BEGIN_OR_JOIN">
             <transports:recipient-list expression="['vm://output?exchangePattern=request-response']"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="OutputService">

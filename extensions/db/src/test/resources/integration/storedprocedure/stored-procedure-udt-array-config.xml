@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
 
     <flow name="returnsDefaultArrayValue">
-        <transactional>
+        <block>
             <dbn:stored-procedure>
                 <dbn:sql>{ CALL getZipCodes('Southwest', :out) }</dbn:sql>
                 <dbn:output-parameters>
@@ -16,11 +16,11 @@
 
             <!--Obtains the java array from the array field-->
             <set-payload value="#[payload['out'].getArray()]"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="returnsCustomArrayValue">
-        <transactional>
+        <block>
             <dbn:stored-procedure>
                 <dbn:sql>{ CALL getContactDetails('Contact1', :out) }</dbn:sql>
                 <dbn:output-parameters>
@@ -30,6 +30,6 @@
 
             <!--Obtains the java array from the array field-->
             <set-payload value="#[payload['out'].getArray()]"/>
-        </transactional>
+        </block>
     </flow>
 </mule>

@@ -114,10 +114,10 @@
 
     <flow name="transactional">
         <test:assert-intercepting responseSameThread="true" responseExpression="#[assertPayload()]"/>
-        <transactional>
+        <block>
             <test:assert-intercepting responseSameThread="true"/>
             <test:non-blocking-processor/>
-        </transactional>
+        </block>
         <test:assert-intercepting responseSameThread="true"/>
         <test:non-blocking-processor/>
     </flow>

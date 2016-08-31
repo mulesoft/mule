@@ -22,6 +22,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 /**
@@ -59,6 +60,10 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
 
   public void setTransactionConfig(MuleTransactionConfig transactionConfig) {
     this.transactionConfig = transactionConfig;
+  }
+
+  public TransactionConfig getTransactionConfig() {
+    return this.transactionConfig;
   }
 
   @Override

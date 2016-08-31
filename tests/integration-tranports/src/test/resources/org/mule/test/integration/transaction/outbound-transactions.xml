@@ -22,7 +22,7 @@
     <flow name="component1">
         <vm:inbound-endpoint path="component1" exchange-pattern="one-way"/>
         <component class="org.mule.functional.testmodels.services.TestReceiver"/>
-        <transactional action="ALWAYS_BEGIN">
+        <block transactionalAction="ALWAYS_BEGIN">
             <all>
                 <jms:outbound-endpoint queue="my.queue1" exchange-pattern="one-way">
                     <jms:transaction action="ALWAYS_JOIN"/>
@@ -31,7 +31,7 @@
                     <jms:transaction action="ALWAYS_JOIN"/>
                 </jms:outbound-endpoint>
             </all>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="component2">

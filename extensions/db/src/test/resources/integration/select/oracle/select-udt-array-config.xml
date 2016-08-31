@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
 
     <flow name="returnsDefaultArray">
-        <transactional>
+        <block>
             <dbn:select>
                 <dbn:sql>select * from regions</dbn:sql>
             </dbn:select>
@@ -17,12 +17,12 @@
                     payload.put("ZIPS", payload.get("ZIPS").getArray())
                 </expression-component>
             </foreach>
-        </transactional>
+        </block>
 
     </flow>
 
     <flow name="returnsCustomArray">
-        <transactional>
+        <block>
             <dbn:select>
                 <dbn:sql>select * from contacts</dbn:sql>
             </dbn:select>
@@ -33,6 +33,6 @@
                     payload.put("DETAILS", payload.get("DETAILS").getArray())
                 </expression-component>
             </foreach>
-        </transactional>
+        </block>
     </flow>
 </mule>

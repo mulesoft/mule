@@ -896,10 +896,10 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="transactional" type="abstractTransactional" substitutionGroup="abstract-message-processor">
+    <xsd:element name="block" type="abstractTransactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Processes the nest list of message processors within a transaction
+                Processes the nested list of message processors, within a transaction and with it's own error handler if required.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -911,7 +911,8 @@
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="action" type="transactionalActionType" default="ALWAYS_BEGIN"/>
+                <xsd:attribute name="transactionalAction" type="transactionalActionType" default="ALWAYS_BEGIN"/>
+                <xsd:attribute name="transactionType" type="transactionType" default="STANDARD"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -920,6 +921,19 @@
         <xsd:restriction base="xsd:NMTOKEN">
             <xsd:enumeration value="ALWAYS_BEGIN"/>
             <xsd:enumeration value="BEGIN_OR_JOIN"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="transactionType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Transaction types supported. Availability will depend on the runtime version, though STANDARD is always available.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="STANDARD"/>
+            <xsd:enumeration value="MULTI"/>
+            <xsd:enumeration value="XA"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -6256,5 +6270,5 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-        
+
 </xsd:schema>
