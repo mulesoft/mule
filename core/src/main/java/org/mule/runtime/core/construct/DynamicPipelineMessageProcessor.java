@@ -96,11 +96,12 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
   }
 
   private synchronized void checkPipelineId(String id) throws DynamicPipelineException {
-    if (!StringUtils.equals(pipelineId, id)) {
-      throw new DynamicPipelineException(CoreMessages.createStaticMessage("Invalid Dynamic Pipeline ID"));
-    }
-    if (pipelineId == null && id == null) {
-      pipelineId = UUID.getUUID();
+    if (pipelineId != null) {
+      if (!StringUtils.equals(pipelineId, id)) {
+        throw new DynamicPipelineException(CoreMessages.createStaticMessage("Invalid Dynamic Pipeline ID"));
+      }
+    } else {
+      pipelineId = (id != null) ? id : UUID.getUUID();
     }
   }
 

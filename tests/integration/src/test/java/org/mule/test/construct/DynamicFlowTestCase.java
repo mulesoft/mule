@@ -24,6 +24,7 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -114,6 +115,34 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
   }
 
   @Test
+  public void proposeInitialPipelineIdSucceeds() throws Exception {
+    String proposedId = "valid-id";
+    String pipelineId = getFlow("dynamicFlow").dynamicPipeline(proposedId).resetAndUpdate();
+
+    assertEquals(pipelineId, proposedId);
+  }
+
+  @Test
+  public void dynamicPipelineCanBeUpdatedAfterFailure() throws Exception {
+    String proposedId = "ID";
+    Flow flow = getFlow("dynamicFlow");
+    try {
+      MessageProcessor invalidProcessor = new ParseTemplateTransformer();
+      flow.dynamicPipeline(proposedId).injectBefore(invalidProcessor).resetAndUpdate();
+    } catch (MuleException e) {
+      //Expected failure
+    }
+
+    flow.dynamicPipeline(proposedId).injectBefore(new StringAppendTransformer("(pre)"))
+        .injectAfter(new StringAppendTransformer("(post)"))
+        .resetAndUpdate();
+
+    //    MuleMessage result = client.send("vm://dynamic", "source->", null);
+    MuleMessage result = flowRunner("dynamicFlow").withPayload("source->").run().getMessage();
+    assertEquals("source->(pre)(static)(post)", getPayloadAsString(result));
+  }
+
+  @Test
   public void applyLifecycle() throws Exception {
     StringBuilder expected = new StringBuilder();
 
@@ -149,11 +178,6 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     assertEquals("source->(pre)(static)", getPayloadAsString(result));
     assertNotNull(awareMessageProcessor.getFlowConstruct());
     assertNotNull(awareMessageProcessor.getMuleContext());
-  }
-
-  @Test(expected = DynamicPipelineException.class)
-  public void invalidInitialPipelineId() throws Exception {
-    getFlow("dynamicFlow").dynamicPipeline("invalid-id").resetAndUpdate();
   }
 
   @Test(expected = DynamicPipelineException.class)
@@ -211,7 +235,6 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     @Override
     public void start() throws MuleException {
       steps.append("S");
-
     }
 
     @Override
