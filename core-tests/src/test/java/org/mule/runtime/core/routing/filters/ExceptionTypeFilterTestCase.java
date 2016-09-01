@@ -15,15 +15,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
+import java.io.IOException;
+
+import org.junit.Test;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import java.io.IOException;
-
-import org.junit.Test;
 
 public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
 
