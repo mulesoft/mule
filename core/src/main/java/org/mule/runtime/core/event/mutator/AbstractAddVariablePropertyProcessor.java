@@ -4,59 +4,72 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.simple;
+package org.mule.runtime.core.event.mutator;
+
+import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.metadata.TypedValue;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
-public abstract class AbstractAddVariablePropertyTransformer<T> extends AbstractMessageTransformer {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public abstract class AbstractAddVariablePropertyProcessor<T> extends AbstractEventMutatorProcessor {
+
+  private static final Logger logger = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
 
   private AttributeEvaluator identifierEvaluator;
   private AttributeEvaluator valueEvaluator;
-
-  public AbstractAddVariablePropertyTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
+  private DataType returnType = DataType.OBJECT;
 
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     identifierEvaluator.initialize(muleContext.getExpressionManager());
     valueEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
     Object keyValue = identifierEvaluator.resolveValue(event);
     String key = (keyValue == null ? null : keyValue.toString());
     if (key == null) {
       logger.error("Setting Null variable keys is not supported, this entry is being ignored");
+      return event;
     } else {
       TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
       if (typedValue.getValue() == null) {
-        removeProperty(event, key);
-
         if (logger.isDebugEnabled()) {
           logger.debug(MessageFormat.format(
                                             "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
                                             key, valueEvaluator.getRawValue()));
         }
+        return removeProperty(event, key);
       } else {
-        addProperty(event, key, typedValue.getValue(), DataType.builder().type(typedValue.getValue().getClass())
+        return addProperty(event, key, typedValue.getValue(), DataType.builder().type(typedValue.getValue().getClass())
             .mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
       }
     }
-    return event.getMessage();
+  }
+
+  protected Charset resolveEncoding(Object src) {
+    return getReturnDataType().getMediaType().getCharset().orElse(getEncoding(src));
+  }
+
+  private Charset getEncoding(Object src) {
+    if (src instanceof MuleMessage) {
+      return ((MuleMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
+    } else {
+      return getDefaultEncoding(muleContext);
+    }
   }
 
   /**
@@ -67,7 +80,7 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
    * @param value value of the property or variable to add
    * @param dataType data type of the property or variable to add
    */
-  protected abstract void addProperty(MuleEvent event, String propertyName, T value, DataType dataType);
+  protected abstract MuleEvent addProperty(MuleEvent event, String propertyName, T value, DataType dataType);
 
   /**
    * Removes the property from a property or variables scope.
@@ -75,15 +88,7 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
    * @param event event to which property is to be removed
    * @param propertyName name of the property or variable to remove
    */
-  protected abstract void removeProperty(MuleEvent event, String propertyName);
-
-  @Override
-  public Object clone() throws CloneNotSupportedException {
-    AbstractAddVariablePropertyTransformer clone = (AbstractAddVariablePropertyTransformer) super.clone();
-    clone.setIdentifier(this.identifierEvaluator.getRawValue());
-    clone.setValue(this.valueEvaluator.getRawValue());
-    return clone;
-  }
+  protected abstract MuleEvent removeProperty(MuleEvent event, String propertyName);
 
   public void setIdentifier(String identifier) {
     if (StringUtils.isBlank(identifier)) {
@@ -99,4 +104,11 @@ public abstract class AbstractAddVariablePropertyTransformer<T> extends Abstract
     this.valueEvaluator = new AttributeEvaluator(value);
   }
 
+  public void setReturnDataType(DataType type) {
+    this.returnType = type;
+  }
+
+  public DataType getReturnDataType() {
+    return returnType;
+  }
 }

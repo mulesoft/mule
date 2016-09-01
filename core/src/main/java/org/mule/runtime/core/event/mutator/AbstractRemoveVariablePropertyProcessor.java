@@ -4,62 +4,61 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.simple;
+package org.mule.runtime.core.event.mutator;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
-import java.nio.charset.Charset;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class AbstractRemoveVariablePropertyTransformer extends AbstractMessageTransformer {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public abstract class AbstractRemoveVariablePropertyProcessor extends AbstractEventMutatorProcessor {
+
+  private static final Logger logger = LoggerFactory.getLogger(AbstractRemoveVariablePropertyProcessor.class);
 
   private AttributeEvaluator identifierEvaluator;
   private WildcardAttributeEvaluator wildcardAttributeEvaluator;
 
-  public AbstractRemoveVariablePropertyTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
-
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     this.identifierEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
     if (wildcardAttributeEvaluator.hasWildcards()) {
+      AtomicReference<MuleEvent> resultEvent = new AtomicReference<>(event);
       wildcardAttributeEvaluator.processValues(getPropertyNames(event), matchedValue -> {
-        removeProperty(event, matchedValue);
         if (logger.isDebugEnabled()) {
           logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScopeName()));
         }
+        resultEvent.set(removeProperty(event, matchedValue));
       });
+      return resultEvent.get();
     } else {
       Object keyValue = identifierEvaluator.resolveValue(event);
       if (keyValue != null) {
-        removeProperty(event, keyValue.toString());
+        return removeProperty(event, keyValue.toString());
       } else {
         logger.info("Key expression return null, no property will be removed");
+        return event;
       }
     }
-    return event.getMessage();
   }
 
   protected abstract Set<String> getPropertyNames(MuleEvent event);
 
-  protected abstract void removeProperty(MuleEvent event, String propertyName);
+  protected abstract MuleEvent removeProperty(MuleEvent event, String propertyName);
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    AbstractRemoveVariablePropertyTransformer clone = (AbstractRemoveVariablePropertyTransformer) super.clone();
+    AbstractRemoveVariablePropertyProcessor clone = (AbstractRemoveVariablePropertyProcessor) super.clone();
     clone.setIdentifier(this.identifierEvaluator.getRawValue());
     return clone;
   }
@@ -73,5 +72,4 @@ public abstract class AbstractRemoveVariablePropertyTransformer extends Abstract
   }
 
   protected abstract String getScopeName();
-
 }

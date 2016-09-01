@@ -4,62 +4,60 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.core.transformer.simple;
+package org.mule.compatibility.core.event.mutator;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.event.mutator.AbstractEventMutatorProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
-import java.nio.charset.Charset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RemoveAttachmentTransformer extends AbstractMessageTransformer {
+public class RemoveAttachmentProcessor extends AbstractEventMutatorProcessor {
+
+  private static final Logger logger = LoggerFactory.getLogger(RemoveAttachmentProcessor.class);
 
   private AttributeEvaluator nameEvaluator;
   private WildcardAttributeEvaluator wildcardAttributeEvaluator;
 
-  public RemoveAttachmentTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
-
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     nameEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
     MuleMessage message = event.getMessage();
     try {
       if (wildcardAttributeEvaluator.hasWildcards()) {
         final Builder builder = MuleMessage.builder(event.getMessage());
         wildcardAttributeEvaluator.processValues(message.getOutboundAttachmentNames(),
                                                  matchedValue -> builder.removeOutboundAttachment(matchedValue));
-        event.setMessage(builder.build());
+        return MuleEvent.builder(event).message(builder.build()).build();
       } else {
         Object keyValue = nameEvaluator.resolveValue(event);
         if (keyValue != null) {
-          event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(keyValue.toString()).build());
+          return MuleEvent.builder(event)
+              .message(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(keyValue.toString()).build()).build();
         } else {
           logger.info("Attachment key expression return null, no attachment will be removed");
         }
       }
-      return message;
+      return event;
     } catch (Exception e) {
-      throw new TransformerException(this, e);
+      throw new MessagingException(event, e);
     }
   }
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    RemoveAttachmentTransformer clone = (RemoveAttachmentTransformer) super.clone();
+    RemoveAttachmentProcessor clone = (RemoveAttachmentProcessor) super.clone();
     clone.setAttachmentName(this.nameEvaluator.getRawValue());
     return clone;
   }
@@ -68,5 +66,4 @@ public class RemoveAttachmentTransformer extends AbstractMessageTransformer {
     this.nameEvaluator = new AttributeEvaluator(attachmentName);
     this.wildcardAttributeEvaluator = new WildcardAttributeEvaluator(attachmentName);
   }
-
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.api;
 
 import static org.mule.runtime.core.functional.Either.left;
 import static org.mule.runtime.core.functional.Either.right;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.util.concurrent.DaemonThreadFactory;
@@ -110,7 +111,7 @@ public class FutureMessageResult extends FutureTask {
 
         synchronized (this) {
           if (transformers != null) {
-            result = right(muleContext.getTransformationService().applyTransformers(result.getRight(), null, transformers));
+            result = right(muleContext.getTransformationService().applyTransformers(result.getRight(), null, null, transformers));
           }
         }
       }

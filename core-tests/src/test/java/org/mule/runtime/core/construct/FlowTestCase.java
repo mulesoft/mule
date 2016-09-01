@@ -133,8 +133,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     assertEquals("helloabcdef", response.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), response.getFlowVariable("thread"));
 
-    // Sensed (out) event also is appended with 'def' because it's the same event instance
-    assertEquals("helloabcdef", sensingMessageProcessor.event.getMessageAsString(muleContext));
+    assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
 
   }

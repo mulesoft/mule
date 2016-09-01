@@ -15,6 +15,7 @@ import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.component.Component;
@@ -140,8 +141,9 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     } else {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
-      return MuleEvent.builder(event)
-          .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)))
+      final Builder builder = MuleEvent.builder(event);
+      return builder.message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, builder,
+                                                                                      singletonList(template)))
           .build();
     }
   }

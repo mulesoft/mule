@@ -9,36 +9,36 @@ package org.mule.runtime.core.transformer.simple;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyTransformerTestCase;
+import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.event.mutator.RemoveFlowVariableProcessor;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashSet;
 
 @SmallTest
-public class RemovePropertyTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase {
+public class RemoveFlowVariableProcessorTestCase extends AbstractRemoveVariablePropertyProcessorTestCase {
 
-  public RemovePropertyTransformerTestCase() {
-    super(new RemovePropertyTransformer());
+  public RemoveFlowVariableProcessorTestCase() {
+    super(new RemoveFlowVariableProcessor());
   }
 
   @Override
   protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties) {
-    MuleMessage mockMessage = mockEvent.getMessage();
-    when(mockMessage.getOutboundPropertyNames()).thenReturn(properties);
+    when(mockEvent.getFlowVariableNames()).thenReturn(properties);
   }
 
   @Override
   protected void verifyRemoved(MuleEvent mockEvent, String key) {
-    assertThat(mockEvent.getMessage().getOutboundProperty(key), is(nullValue()));
+    assertThat(mockEvent.getFlowVariableNames(), not(contains(key)));
   }
 
   @Override
   protected void verifyNotRemoved(MuleEvent mockEvent, String key) {
-    assertThat(mockEvent.getMessage().getOutboundProperty(key), not(nullValue()));
+    assertThat(mockEvent.getFlowVariable(key), not(nullValue()));
   }
 }

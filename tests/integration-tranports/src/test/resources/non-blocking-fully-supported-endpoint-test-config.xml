@@ -21,10 +21,12 @@
         <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <set-property propertyName="foo" value="bar"/>
         <transports:outbound-endpoint address="test://test" exchange-pattern="request-response">
-            <set-variable variableName="endpointRequestMPInvoked" value="true"/>
-            <transports:response>
+            <transports:mutator>
+                <set-variable variableName="endpointRequestMPInvoked" value="true"/>
+            </transports:mutator>
+            <transports:mutator>
                 <set-variable variableName="endpointResponseMPInvoked" value="true"/>
-            </transports:response>
+            </transports:mutator>
             <property key="responseProperties" value="foo"/>
         </transports:outbound-endpoint>
         <test:assert expression="#[assertPayload()]" />

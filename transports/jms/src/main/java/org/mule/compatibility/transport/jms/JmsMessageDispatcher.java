@@ -375,8 +375,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
    * @param message the current MuleMessage Being processed
    * @throws Exception
    */
-  protected void preTransformMessage(MuleMessage message) throws Exception {
-    // nothing to do
+  protected MuleMessage preTransformMessage(MuleMessage message) throws Exception {
+    return message;
   }
 
   @Deprecated
@@ -563,13 +563,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected void applyOutboundTransformers(MuleEvent event) throws MuleException {
+  protected MuleEvent applyOutboundTransformers(MuleEvent event) throws MuleException {
     try {
-      preTransformMessage(event.getMessage());
+      event = MuleEvent.builder(event).message(preTransformMessage(event.getMessage())).build();
     } catch (Exception e) {
       throw new TransformerException(CoreMessages.failedToInvoke("preTransformMessage"), e);
     }
-    super.applyOutboundTransformers(event);
+    return super.applyOutboundTransformers(event);
   }
 
   @Override

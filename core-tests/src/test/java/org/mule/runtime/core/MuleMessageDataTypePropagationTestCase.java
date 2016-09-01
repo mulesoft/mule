@@ -27,6 +27,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_RET
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -131,7 +132,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
 
     assertDataType(result, Integer.class, APPLICATION_XML, DEFAULT_ENCODING);
   }
@@ -148,7 +149,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
 
     assertDataType(result, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
   }
@@ -165,7 +166,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
 
     assertDataType(result, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
   }
@@ -182,7 +183,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
 
     assertDataType(result, String.class, ANY, DEFAULT_ENCODING);
   }

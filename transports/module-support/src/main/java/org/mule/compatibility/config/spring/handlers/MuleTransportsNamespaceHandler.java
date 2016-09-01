@@ -21,14 +21,15 @@ import org.mule.compatibility.core.component.DefaultJavaWithBindingComponent;
 import org.mule.compatibility.core.component.PooledJavaWithBindingsComponent;
 import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.core.event.mutator.AddAttachmentProcessor;
+import org.mule.compatibility.core.event.mutator.AddSessionVariableProcessor;
+import org.mule.compatibility.core.event.mutator.CopyAttachmentsProcessor;
+import org.mule.compatibility.core.event.mutator.RemoveAttachmentProcessor;
+import org.mule.compatibility.core.event.mutator.RemoveSessionVariableProcessor;
 import org.mule.compatibility.core.routing.EndpointDlqUntilSuccessful;
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.core.routing.requestreply.SimpleAsyncEndpointRequestReplyRequester;
-import org.mule.compatibility.core.transformer.simple.AddAttachmentTransformer;
-import org.mule.compatibility.core.transformer.simple.AddSessionVariableTransformer;
-import org.mule.compatibility.core.transformer.simple.CopyAttachmentsTransformer;
-import org.mule.compatibility.core.transformer.simple.RemoveAttachmentTransformer;
-import org.mule.compatibility.core.transformer.simple.RemoveSessionVariableTransformer;
+import org.mule.compatibility.core.transformer.simple.MutatorTransformerWrapper;
 import org.mule.compatibility.core.transformer.simple.SetCorrelationIdTransformer;
 import org.mule.compatibility.module.cxf.builder.WebServiceMessageProcessorWithInboundEndpointBuilder;
 import org.mule.compatibility.module.cxf.component.WebServiceWrapperComponent;
@@ -68,15 +69,17 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
     registerBeanDefinitionParser("default-exception-strategy",
                                  new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
 
+    registerBeanDefinitionParser("mutator", new MessageProcessorDefinitionParser(MutatorTransformerWrapper.class));
+
     registerMuleBeanDefinitionParser("set-session-variable",
-                                     new MessageProcessorWithDataTypeDefinitionParser(AddSessionVariableTransformer.class))
+                                     new MessageProcessorWithDataTypeDefinitionParser(AddSessionVariableProcessor.class))
                                          .addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
     registerMuleBeanDefinitionParser("remove-session-variable",
-                                     new MessageProcessorDefinitionParser(RemoveSessionVariableTransformer.class))
+                                     new MessageProcessorDefinitionParser(RemoveSessionVariableProcessor.class))
                                          .addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
-    registerBeanDefinitionParser("set-attachment", new MessageProcessorDefinitionParser(AddAttachmentTransformer.class));
-    registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentTransformer.class));
-    registerBeanDefinitionParser("copy-attachments", new MessageProcessorDefinitionParser(CopyAttachmentsTransformer.class));
+    registerBeanDefinitionParser("set-attachment", new MessageProcessorDefinitionParser(AddAttachmentProcessor.class));
+    registerBeanDefinitionParser("remove-attachment", new MessageProcessorDefinitionParser(RemoveAttachmentProcessor.class));
+    registerBeanDefinitionParser("copy-attachments", new MessageProcessorDefinitionParser(CopyAttachmentsProcessor.class));
     // TODO MULE-10192
     registerBeanDefinitionParser("set-correlation-id", new MessageProcessorDefinitionParser(SetCorrelationIdTransformer.class));
 

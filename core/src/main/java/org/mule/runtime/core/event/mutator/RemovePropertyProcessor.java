@@ -4,29 +4,30 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.core.transformer.simple;
+package org.mule.runtime.core.event.mutator;
 
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.transformer.simple.AbstractRemoveVariablePropertyTransformer;
+import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Set;
 
-public class RemoveSessionVariableTransformer extends AbstractRemoveVariablePropertyTransformer {
+public class RemovePropertyProcessor extends AbstractRemoveVariablePropertyProcessor {
 
   @Override
-  protected void removeProperty(MuleEvent event, String propertyName) {
-    event.getSession().removeProperty(propertyName);
+  protected MuleEvent removeProperty(MuleEvent event, String propertyName) {
+    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build())
+        .build();
   }
 
   @Override
   protected Set<String> getPropertyNames(MuleEvent event) {
-    return event.getSession().getPropertyNamesAsSet();
+    return event.getMessage().getOutboundPropertyNames();
   }
 
   @Override
   protected String getScopeName() {
-    return PropertyScope.SESSION_VAR_NAME;
+    return PropertyScope.OUTBOUND_NAME;
   }
 
 }

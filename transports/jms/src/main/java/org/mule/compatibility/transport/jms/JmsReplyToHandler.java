@@ -12,6 +12,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.connector.EndpointReplyToHandler;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
+import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.transport.jms.i18n.JmsMessages;
 import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
 import org.mule.runtime.core.api.MuleContext;
@@ -70,17 +71,16 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
         return super.processReplyTo(event, returnMessage, replyTo);
       }
 
-      Class srcType = returnMessage.getDataType().getType();
-
       EndpointBuilder endpointBuilder =
           new EndpointURIEndpointBuilder(String.format("%s://temporary", connector.getProtocol()), muleContext);
       endpointBuilder.setConnector(jmsConnector);
       OutboundEndpoint tempEndpoint = getEndpointFactory().getOutboundEndpoint(endpointBuilder);
 
       List<Transformer> defaultTransportTransformers =
-          ((org.mule.compatibility.core.transport.AbstractConnector) jmsConnector).getDefaultOutboundTransformers(tempEndpoint);
+          ((AbstractConnector) jmsConnector).getDefaultOutboundTransformers(tempEndpoint);
 
-      returnMessage = muleContext.getTransformationService().applyTransformers(returnMessage, null, defaultTransportTransformers);
+      returnMessage =
+          muleContext.getTransformationService().applyTransformers(returnMessage, null, null, defaultTransportTransformers);
       Object payload = returnMessage.getPayload();
 
       if (replyToDestination instanceof Topic && replyToDestination instanceof Queue

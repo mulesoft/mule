@@ -83,8 +83,8 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
       return true;
     }
 
-    event = MuleEvent.builder(event)
-        .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers)).build();
+    event = MuleEvent.builder(event).message(muleContext.getTransformationService()
+        .applyTransformers(event.getMessage(), null, MuleEvent.builder(event), transformers)).build();
 
     return getFilter().accept(event);
   }

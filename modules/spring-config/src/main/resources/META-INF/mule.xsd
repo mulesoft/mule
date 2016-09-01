@@ -3281,9 +3281,9 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="abstractAddPropertyTransformerType">
+    <xsd:complexType name="abstractAddPropertyProcessorType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractMessageProcessorType">
                 <xsd:attributeGroup ref="mimeTypeAttributes">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -3302,92 +3302,78 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-property" type="setPropertyType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-property" type="setPropertyType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that adds outbound message properties.
+                A processor that adds outbound message properties.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="setPropertyType">
         <xsd:complexContent>
-            <xsd:extension base="abstractAddPropertyTransformerType">
+            <xsd:extension base="abstractAddPropertyProcessorType">
                 <xsd:attribute name="propertyName" type="nonEmptyAttributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="remove-property" type="removePropertyType" substitutionGroup="abstract-transformer">
+    <xsd:element name="remove-property" type="removePropertyType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that remove outbound message properties by name or regular expression.
+                A processor that remove outbound message properties by name or regular expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="removePropertyType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractMessageProcessorType">
                 <xsd:attribute name="propertyName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="copy-properties" type="copyPropertiesType" substitutionGroup="abstract-transformer">
+    <xsd:element name="copy-properties" type="copyPropertiesType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that copy properties from inbound to outbound scope by name or regular expression.
+                A processor that copy properties from inbound to outbound scope by name or regular expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="copyPropertiesType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractMessageProcessorType">
                 <xsd:attribute name="propertyName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="set-variable" type="setVariableType" substitutionGroup="abstract-transformer">
+    <xsd:element name="set-variable" type="setVariableType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that adds variables.
+                A processor that adds variables.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="setVariableType">
         <xsd:complexContent>
-            <xsd:extension base="abstractAddPropertyTransformerType">
+            <xsd:extension base="abstractAddPropertyProcessorType">
                 <xsd:attribute name="variableName" type="nonEmptyAttributeType" use="required"/>
                 <xsd:attribute name="value" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="commonMessagePartTransformerType">
-        <xsd:complexContent>
-            <xsd:extension base="commonTransformerType">
-                <xsd:attribute name="name" type="substitutableName">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Identifies the transformer so that other elements can reference it. Required if the transformer is defined at the global level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <xsd:element name="remove-variable" type="removeVariableType" substitutionGroup="abstract-transformer">
+    <xsd:element name="remove-variable" type="removeVariableType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that remove variables by name or regular expression.
+                A processor that remove variables by name or regular expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="removeVariableType">
         <xsd:complexContent>
-            <xsd:extension base="commonMessagePartTransformerType">
+            <xsd:extension base="abstractMessageProcessorType">
                 <xsd:attribute name="variableName" type="attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>

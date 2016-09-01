@@ -5,32 +5,25 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.transformer.simple;
+package org.mule.runtime.core.event.mutator;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**
  * Modifies the payload of a {@link MuleMessage} according to the provided value.
  */
-public class SetPayloadMessageProcessor extends AbstractAnnotatedObject
-    implements MessageProcessor, MuleContextAware, Initialisable {
+public class SetPayloadMessageProcessor extends AbstractEventMutatorProcessor {
 
   private DataType dataType;
   private AttributeEvaluator valueEvaluator = new AttributeEvaluator(null);
-  private MuleContext muleContext;
 
 
   @Override
@@ -87,11 +80,6 @@ public class SetPayloadMessageProcessor extends AbstractAnnotatedObject
 
   public void setValue(String value) {
     valueEvaluator = new AttributeEvaluator(value);
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    muleContext = context;
   }
 
   @Override

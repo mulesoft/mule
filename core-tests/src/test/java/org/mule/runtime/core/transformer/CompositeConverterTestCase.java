@@ -170,6 +170,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
     compositeConverter.process(event);
 
-    verify(transformationService, times(1)).applyTransformers(event.getMessage(), event, compositeConverter);
+    verify(transformationService, times(1)).applyTransformers(eq(event.getMessage()), eq(event), any(MuleEvent.Builder.class),
+                                                              eq(compositeConverter));
   }
 }

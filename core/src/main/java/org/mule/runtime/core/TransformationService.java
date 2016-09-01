@@ -7,12 +7,15 @@
 package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Converter;
@@ -25,7 +28,6 @@ import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -51,15 +53,16 @@ public class TransformationService {
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
    *
    * @param event the event being processed
+   * @param eventBuilder the builder holding the result of the transformation
    * @param transformers the transformers to apply to the message payload
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event,
+  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, MuleEvent.Builder eventBuilder,
                                        final List<? extends Transformer> transformers)
       throws MuleException {
-    return applyAllTransformers(message, event, transformers);
+    return applyAllTransformers(message, event, eventBuilder, transformers);
   }
 
   /**
@@ -67,14 +70,16 @@ public class TransformationService {
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
    *
    * @param event the event being processed
+   * @param eventBuilder the builder holding the result of the transformation
    * @param transformers the transformers to apply to the message payload
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final Transformer... transformers)
+  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, MuleEvent.Builder eventBuilder,
+                                       final Transformer... transformers)
       throws MuleException {
-    return applyAllTransformers(message, event, Arrays.asList(transformers));
+    return applyAllTransformers(message, event, eventBuilder, asList(transformers));
   }
 
   /**
@@ -136,7 +141,7 @@ public class TransformationService {
   }
 
   private MuleMessage applyAllTransformers(final MuleMessage message, final MuleEvent event,
-                                           final List<? extends Transformer> transformers)
+                                           Builder eventBuilder, final List<? extends Transformer> transformers)
       throws MuleException {
     MuleMessage result = message;
     if (!transformers.isEmpty()) {
@@ -175,6 +180,9 @@ public class TransformationService {
           }
         }
       }
+    }
+    if (eventBuilder != null) {
+      eventBuilder.message(message);
     }
     return result;
   }

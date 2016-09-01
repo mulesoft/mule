@@ -12,17 +12,19 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Ignore;
-import org.mule.functional.transformer.simple.AbstractAddVariablePropertyTransformerTestCase;
+
+import org.mule.compatibility.core.event.mutator.AddSessionVariableProcessor;
+import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @Ignore("MULE-9072 - Remove MuleSession")
-public class AddSessionVariableTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase {
+public class AddSessionVariableProcessorTestCase extends AbstractAddVariablePropertyProcessorTestCase {
 
-  public AddSessionVariableTransformerTestCase() {
-    super(new AddSessionVariableTransformer());
+  public AddSessionVariableProcessorTestCase() {
+    super(new AddSessionVariableProcessor());
   }
 
   @Override

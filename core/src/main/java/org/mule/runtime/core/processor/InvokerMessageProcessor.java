@@ -11,7 +11,6 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEvent.Builder;
@@ -27,6 +26,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transformer.TransformerTemplate;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.TemplateParser;
@@ -244,8 +244,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     } else if (result != null) {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
-      eventBuilder
-          .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
+      eventBuilder.message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, eventBuilder,
+                                                                                    singletonList(template)));
     } else {
       eventBuilder.message(MuleMessage.builder().nullPayload().build());
     }

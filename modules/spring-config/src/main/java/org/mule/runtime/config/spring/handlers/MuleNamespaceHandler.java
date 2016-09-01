@@ -98,11 +98,16 @@ import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.el.ExpressionLanguageComponent;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.runtime.core.exception.OnErrorContinueHandler;
-import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.event.mutator.AddFlowVariableProcessor;
+import org.mule.runtime.core.event.mutator.AddPropertyProcessor;
+import org.mule.runtime.core.event.mutator.RemoveFlowVariableProcessor;
+import org.mule.runtime.core.event.mutator.RemovePropertyProcessor;
+import org.mule.runtime.core.event.mutator.SetPayloadMessageProcessor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
-import org.mule.runtime.core.exception.RedeliveryExceeded;
+import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.exception.RedeliveryExceeded;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
@@ -174,24 +179,19 @@ import org.mule.runtime.core.transformer.compression.GZipCompressTransformer;
 import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.encryption.DecryptionTransformer;
 import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
-import org.mule.runtime.core.transformer.simple.AddFlowVariableTransformer;
-import org.mule.runtime.core.transformer.simple.AddPropertyTransformer;
 import org.mule.runtime.core.transformer.simple.AutoTransformer;
 import org.mule.runtime.core.transformer.simple.BeanToMap;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
-import org.mule.runtime.core.transformer.simple.CopyPropertiesTransformer;
+import org.mule.runtime.core.transformer.simple.CopyPropertiesProcessor;
 import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
-import org.mule.runtime.core.transformer.simple.RemoveFlowVariableTransformer;
-import org.mule.runtime.core.transformer.simple.RemovePropertyTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
-import org.mule.runtime.core.transformer.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
 import org.mule.runtime.core.util.store.ManagedObjectStore;
@@ -289,15 +289,15 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("custom-transformer", new TransformerMessageProcessorDefinitionParser());
     registerBeanDefinitionParser("auto-transformer", new TransformerMessageProcessorDefinitionParser(AutoTransformer.class));
     registerMuleBeanDefinitionParser("set-property",
-                                     new MessageProcessorWithDataTypeDefinitionParser(AddPropertyTransformer.class))
+                                     new MessageProcessorWithDataTypeDefinitionParser(AddPropertyProcessor.class))
                                          .addAlias(PROPERTY_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
-    registerMuleBeanDefinitionParser("remove-property", new MessageProcessorDefinitionParser(RemovePropertyTransformer.class))
+    registerMuleBeanDefinitionParser("remove-property", new MessageProcessorDefinitionParser(RemovePropertyProcessor.class))
         .addAlias(PROPERTY_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
-    registerBeanDefinitionParser("copy-properties", new MessageProcessorDefinitionParser(CopyPropertiesTransformer.class));
+    registerBeanDefinitionParser("copy-properties", new MessageProcessorDefinitionParser(CopyPropertiesProcessor.class));
     registerMuleBeanDefinitionParser("set-variable",
-                                     new MessageProcessorWithDataTypeDefinitionParser(AddFlowVariableTransformer.class))
+                                     new MessageProcessorWithDataTypeDefinitionParser(AddFlowVariableProcessor.class))
                                          .addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
-    registerMuleBeanDefinitionParser("remove-variable", new MessageProcessorDefinitionParser(RemoveFlowVariableTransformer.class))
+    registerMuleBeanDefinitionParser("remove-variable", new MessageProcessorDefinitionParser(RemoveFlowVariableProcessor.class))
         .addAlias(VARIABLE_NAME_ATTRIBUTE, IDENTIFIER_PROPERTY);
 
     registerMuleBeanDefinitionParser("expression-transformer",
@@ -349,7 +349,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerBeanDefinitionParser("string-to-byte-array-transformer",
                                  new TransformerMessageProcessorDefinitionParser(ObjectToByteArray.class));
     registerBeanDefinitionParser("parse-template", new MessageProcessorDefinitionParser(ParseTemplateTransformer.class));
-    registerBeanDefinitionParser("set-payload", new MessageProcessorDefinitionParser(SetPayloadMessageProcessor.class));
+    registerBeanDefinitionParser("set-payload",
+                                 new MessageProcessorWithDataTypeDefinitionParser(SetPayloadMessageProcessor.class));
 
     registerBeanDefinitionParser("append-string-transformer",
                                  new TransformerMessageProcessorDefinitionParser(StringAppendTransformer.class));

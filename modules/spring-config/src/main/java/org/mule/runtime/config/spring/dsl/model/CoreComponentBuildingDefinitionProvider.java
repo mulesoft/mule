@@ -40,13 +40,6 @@ import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RET
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
@@ -57,6 +50,7 @@ import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
+import org.mule.runtime.config.spring.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.spring.dsl.processor.ExplicitMethodEntryPointResolverObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageEnricherObjectFactory;
 import org.mule.runtime.config.spring.dsl.processor.MessageProcessorWrapperObjectFactory;
@@ -108,6 +102,12 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
+import org.mule.runtime.core.event.mutator.AbstractAddVariablePropertyProcessor;
+import org.mule.runtime.core.event.mutator.AddFlowVariableProcessor;
+import org.mule.runtime.core.event.mutator.AddPropertyProcessor;
+import org.mule.runtime.core.event.mutator.RemoveFlowVariableProcessor;
+import org.mule.runtime.core.event.mutator.RemovePropertyProcessor;
+import org.mule.runtime.core.event.mutator.SetPayloadMessageProcessor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
@@ -168,26 +168,27 @@ import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.encryption.AbstractEncryptionTransformer;
 import org.mule.runtime.core.transformer.encryption.DecryptionTransformer;
 import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
-import org.mule.runtime.core.transformer.simple.AbstractAddVariablePropertyTransformer;
-import org.mule.runtime.core.transformer.simple.AddFlowVariableTransformer;
-import org.mule.runtime.core.transformer.simple.AddPropertyTransformer;
 import org.mule.runtime.core.transformer.simple.AutoTransformer;
 import org.mule.runtime.core.transformer.simple.BeanToMap;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
-import org.mule.runtime.core.transformer.simple.CopyPropertiesTransformer;
+import org.mule.runtime.core.transformer.simple.CopyPropertiesProcessor;
 import org.mule.runtime.core.transformer.simple.HexStringToByteArray;
 import org.mule.runtime.core.transformer.simple.MapToBean;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
-import org.mule.runtime.core.transformer.simple.RemoveFlowVariableTransformer;
-import org.mule.runtime.core.transformer.simple.RemovePropertyTransformer;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
-import org.mule.runtime.core.transformer.simple.SetPayloadMessageProcessor;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} definitions for the components provided by the core
@@ -310,6 +311,51 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .withSetterParameterDefinition("value", fromSimpleParameter("value").build())
             .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
             .withSetterParameterDefinition("encoding", fromSimpleParameter("encoding").build()).build());
+
+    componentBuildingDefinitions
+        .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddPropertyProcessor.class),
+                                               AddPropertyProcessor.class,
+                                               newBuilder()
+                                                   .withKey("identifier")
+                                                   .withAttributeDefinition(fromSimpleParameter("propertyName").build())
+                                                   .build(),
+                                               newBuilder()
+                                                   .withKey("value")
+                                                   .withAttributeDefinition(fromSimpleParameter("value").build())
+                                                   .build())
+                                                       .withIdentifier("set-property")
+                                                       .withTypeDefinition(fromType(AddPropertyProcessor.class))
+                                                       .build());
+    componentBuildingDefinitions
+        .add(getSetVariablePropertyBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddFlowVariableProcessor.class),
+                                               AddFlowVariableProcessor.class,
+                                               newBuilder()
+                                                   .withKey("identifier")
+                                                   .withAttributeDefinition(fromSimpleParameter("variableName").build())
+                                                   .build(),
+                                               newBuilder()
+                                                   .withKey("value")
+                                                   .withAttributeDefinition(fromSimpleParameter("value").build())
+                                                   .build())
+                                                       .withIdentifier("set-variable")
+                                                       .withTypeDefinition(fromType(AddFlowVariableProcessor.class))
+                                                       .build());
+    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+        .withIdentifier("remove-property")
+        .withTypeDefinition(fromType(RemovePropertyProcessor.class))
+        .withSetterParameterDefinition("identifier", fromSimpleParameter("propertyName").build())
+        .build());
+    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+        .withIdentifier("remove-variable")
+        .withTypeDefinition(fromType(RemoveFlowVariableProcessor.class))
+        .withSetterParameterDefinition("identifier", fromSimpleParameter("variableName").build())
+        .build());
+    componentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
+        .withIdentifier("copy-properties")
+        .withTypeDefinition(fromType(CopyPropertiesProcessor.class))
+        .withSetterParameterDefinition("propertyName", fromSimpleParameter("propertyName").build())
+        .build());
+
     componentBuildingDefinitions
         // TODO add support for environment
         .add(createTransactionManagerDefinitionBuilder("jndi-transaction-manager", GenericTransactionManagerLookupFactory.class)
@@ -682,49 +728,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                               .build())
                                                                                   .withIdentifier("bean-builder-transformer")
                                                                                   .build());
-    transformerComponentBuildingDefinitions
-        .add(getTransformerBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddPropertyTransformer.class),
-                                       AddPropertyTransformer.class,
-                                       newBuilder()
-                                           .withKey("identifier")
-                                           .withAttributeDefinition(fromSimpleParameter("propertyName").build())
-                                           .build(),
-                                       newBuilder()
-                                           .withKey("value")
-                                           .withAttributeDefinition(fromSimpleParameter("value").build())
-                                           .build())
-                                               .withIdentifier("set-property")
-                                               .withTypeDefinition(fromType(AddPropertyTransformer.class))
-                                               .build());
-    transformerComponentBuildingDefinitions
-        .add(getTransformerBaseBuilder(getAddFlowVariableTransformerInstanceFactory(AddFlowVariableTransformer.class),
-                                       AddFlowVariableTransformer.class,
-                                       newBuilder()
-                                           .withKey("identifier")
-                                           .withAttributeDefinition(fromSimpleParameter("variableName").build())
-                                           .build(),
-                                       newBuilder()
-                                           .withKey("value")
-                                           .withAttributeDefinition(fromSimpleParameter("value").build())
-                                           .build())
-                                               .withIdentifier("set-variable")
-                                               .withTypeDefinition(fromType(AddFlowVariableTransformer.class))
-                                               .build());
-    transformerComponentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
-        .withIdentifier("remove-property")
-        .withTypeDefinition(fromType(RemovePropertyTransformer.class))
-        .withSetterParameterDefinition("identifier", fromSimpleParameter("propertyName").build())
-        .build());
-    transformerComponentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
-        .withIdentifier("remove-variable")
-        .withTypeDefinition(fromType(RemoveFlowVariableTransformer.class))
-        .withSetterParameterDefinition("identifier", fromSimpleParameter("variableName").build())
-        .build());
-    transformerComponentBuildingDefinitions.add(getMuleMessageTransformerBaseBuilder()
-        .withIdentifier("copy-properties")
-        .withTypeDefinition(fromType(CopyPropertiesTransformer.class))
-        .withSetterParameterDefinition("propertyName", fromSimpleParameter("propertyName").build())
-        .build());
 
     transformerComponentBuildingDefinitions.add(getTransformerBaseBuilder(getExpressionTransformerConfigurationfactory(),
                                                                           ExpressionTransformer.class,
@@ -801,10 +804,10 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return transformerComponentBuildingDefinitions;
   }
 
-  private ConfigurableInstanceFactory getAddFlowVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyTransformer> transformerType) {
+  private ConfigurableInstanceFactory getAddFlowVariableTransformerInstanceFactory(Class<? extends AbstractAddVariablePropertyProcessor> transformerType) {
     return parameters -> {
-      AbstractAddVariablePropertyTransformer transformer =
-          (AbstractAddVariablePropertyTransformer) createNewInstance(transformerType);
+      AbstractAddVariablePropertyProcessor transformer =
+          (AbstractAddVariablePropertyProcessor) createNewInstance(transformerType);
       transformer.setIdentifier((String) parameters.get("identifier"));
       transformer.setValue((String) parameters.get("value"));
       return transformer;
@@ -890,6 +893,35 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
       abstractExpressionTransformer.setArguments(arguments);
       return abstractExpressionTransformer;
     };
+  }
+
+  public static ComponentBuildingDefinition.Builder getSetVariablePropertyBaseBuilder(ConfigurableInstanceFactory configurableInstanceFactory,
+                                                                                      Class<? extends AbstractAddVariablePropertyProcessor> setterClass,
+                                                                                      KeyAttributeDefinitionPair... configurationAttributes) {
+    KeyAttributeDefinitionPair[] commonTransformerParameters = {
+        newBuilder()
+            .withKey("encoding")
+            .withAttributeDefinition(fromSimpleParameter("encoding").build())
+            .build(),
+        newBuilder()
+            .withKey("mimeType")
+            .withAttributeDefinition(fromSimpleParameter("mimeType").build())
+            .build(),
+        newBuilder()
+            .withKey("muleContext")
+            .withAttributeDefinition(fromReferenceObject(MuleContext.class).build())
+            .build()
+    };
+    return baseDefinition.copy()
+        .withTypeDefinition(fromType(setterClass))
+        .withObjectFactoryType(new ConfigurableObjectFactory<>().getClass())
+        .withSetterParameterDefinition("factory", fromFixedValue(configurableInstanceFactory).build())
+        .withSetterParameterDefinition("commonConfiguratorType", fromFixedValue(AddVariablePropertyConfigurator.class).build())
+        .withSetterParameterDefinition("parameters",
+                                       fromMultipleDefinitions(addAll(commonTransformerParameters, configurationAttributes))
+                                           .build())
+        .asPrototype()
+        .copy();
   }
 
   public static ComponentBuildingDefinition.Builder getTransformerBaseBuilder(ConfigurableInstanceFactory configurableInstanceFactory,

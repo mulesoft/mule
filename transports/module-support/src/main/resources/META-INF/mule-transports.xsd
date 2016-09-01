@@ -122,8 +122,34 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
+    
+    <xsd:element name="mutator" type="mutatorType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                A transformer that wraps a mutator of event or message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="mutatorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+                <xsd:choice>
+                    <xsd:element ref="mule:set-property"/>
+                    <xsd:element ref="mule:remove-property"/>
+                    <xsd:element ref="mule:copy-properties"/>
+                    <xsd:element ref="mule:set-variable"/>
+                    <xsd:element ref="mule:remove-variable"/>
+                    <xsd:element ref="set-session-variable"/>
+                    <xsd:element ref="remove-session-variable"/>
+                    <xsd:element ref="set-attachment"/>
+                    <xsd:element ref="remove-attachment"/>
+                    <xsd:element ref="copy-attachments"/>
+                </xsd:choice>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="set-session-variable" type="mule:setVariableType" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="set-session-variable" type="mule:setVariableType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that adds session variables.
@@ -131,7 +157,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="remove-session-variable" type="mule:removeVariableType" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="remove-session-variable" type="mule:removeVariableType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that remove session variables by name or regular expression.
@@ -139,16 +165,16 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="set-attachment" type="setAttachmentType" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="set-attachment" type="setAttachmentType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that adds an attachment to the outbound scope.
+                A processor that adds an attachment to the outbound scope.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="setAttachmentType">
         <xsd:complexContent>
-            <xsd:extension base="mule:commonMessagePartTransformerType">
+            <xsd:extension base="mule:abstractMessageProcessorType">
                 <xsd:attribute name="attachmentName" type="mule:attributeType" use="required"/>
                 <xsd:attribute name="value" type="mule:attributeType" use="required"/>
                 <xsd:attribute name="contentType" type="mule:attributeType" use="required"/>
@@ -156,31 +182,31 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="remove-attachment" type="removeAttachmentType" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="remove-attachment" type="removeAttachmentType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that removes an attachment in the outbound scope.
+                A processor that removes an attachment in the outbound scope.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="removeAttachmentType">
         <xsd:complexContent>
-            <xsd:extension base="mule:commonMessagePartTransformerType">
+            <xsd:extension base="mule:abstractMessageProcessorType">
                 <xsd:attribute name="attachmentName" type="mule:attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="copy-attachments" type="copyAttachmentType" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="copy-attachments" type="copyAttachmentType" substitutionGroup="mule:abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that copy inbound attachment to outbound attachment scope by name or regular expression.
+                A processor that copy inbound attachment to outbound attachment scope by name or regular expression.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="copyAttachmentType">
         <xsd:complexContent>
-            <xsd:extension base="mule:commonMessagePartTransformerType">
+            <xsd:extension base="mule:abstractMessageProcessorType">
                 <xsd:attribute name="attachmentName" type="mule:attributeType" use="required"/>
             </xsd:extension>
         </xsd:complexContent>

@@ -67,6 +67,9 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
     this.replyToDestination = event.getReplyToDestination();
     this.message = event.getMessage();
 
+    if (event.isSynchronous()) {
+      this.synchronous = event.isSynchronous();
+    }
     this.transacted = event.isTransacted();
     this.nonBlocking = event.isAllowNonBlocking();
 

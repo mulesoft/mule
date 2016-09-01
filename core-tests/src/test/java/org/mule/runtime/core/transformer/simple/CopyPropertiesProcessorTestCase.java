@@ -13,16 +13,18 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -39,7 +41,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
-public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase {
+public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
 
   public static final Charset ENCODING = US_ASCII;
   public static final String INBOUND_PROPERTY_KEY = "propKey";
@@ -49,7 +51,10 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase {
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
 
+  private FlowConstruct flow;
+
   private MuleMessage muleMessage;
+
   @Mock
   private ExpressionManager mockExpressionManager;
 
@@ -60,46 +65,48 @@ public class CopyPropertiesTransformerTestCase extends AbstractMuleTestCase {
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
     muleMessage = MuleMessage.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();
+    flow = mock(FlowConstruct.class);
+    when(flow.getMuleContext()).thenReturn(mockMuleContext);
   }
 
   @Test
-  public void testCopySingleProperty() throws TransformerException, InitialisationException {
-    CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
+  public void testCopySingleProperty() throws MuleException {
+    CopyPropertiesProcessor copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
     muleMessage =
         MuleMessage.builder(muleMessage).addInboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
-
-    final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
+    MuleEvent muleEvent = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
+    final MuleMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getOutboundProperty(INBOUND_PROPERTY_KEY), is(PROPERTY_VALUE));
     assertThat(transformed.getInboundPropertyNames(), hasSize(1));
   }
 
   @Test
-  public void testCopyNonExistentProperty() throws TransformerException, InitialisationException {
-    CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
-
-    final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
+  public void testCopyNonExistentProperty() throws MuleException {
+    CopyPropertiesProcessor copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
+    MuleEvent muleEvent = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
+    final MuleMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getInboundPropertyNames(), hasSize(0));
   }
 
   @Test
-  public void testCopyUsingRegex() throws InitialisationException, TransformerException {
-    CopyPropertiesTransformer copyPropertiesTransformer = createCopyPropertiesTransformer("MULE_*");
+  public void testCopyUsingRegex() throws MuleException {
+    CopyPropertiesProcessor copyPropertiesTransformer = createCopyPropertiesTransformer("MULE_*");
 
     muleMessage = MuleMessage.builder(muleMessage).addInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
         .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
         .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
-
-    final MuleMessage transformed = (MuleMessage) copyPropertiesTransformer.transform(muleMessage, ENCODING);
+    MuleEvent muleEvent = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
+    final MuleMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getOutboundProperty("SomeVar"), is(nullValue()));
     assertThat(transformed.getOutboundProperty("MULE_ID"), is(PROPERTY_VALUE));
     assertThat(transformed.getOutboundProperty("MULE_GROUP_ID"), is(PROPERTY_VALUE));
   }
 
-  public CopyPropertiesTransformer createCopyPropertiesTransformer(String inboundPropertyKey) throws InitialisationException {
-    CopyPropertiesTransformer copyPropertiesTransformer = new CopyPropertiesTransformer();
+  public CopyPropertiesProcessor createCopyPropertiesTransformer(String inboundPropertyKey) throws InitialisationException {
+    CopyPropertiesProcessor copyPropertiesTransformer = new CopyPropertiesProcessor();
     copyPropertiesTransformer.setMuleContext(mockMuleContext);
     copyPropertiesTransformer.setPropertyName(inboundPropertyKey);
     copyPropertiesTransformer.initialise();

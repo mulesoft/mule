@@ -25,9 +25,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -58,9 +58,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -79,7 +77,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   private UntilSuccessfulConfiguration mockUntilSuccessfulConfiguration =
       mock(UntilSuccessfulConfiguration.class, RETURNS_DEEP_STUBS.get());
   private FlowConstruct mockFlow = mock(FlowConstruct.class, RETURNS_DEEP_STUBS.get());
-  private MuleEvent mockEvent = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
+  private MuleEvent event;
   private MessageProcessor mockRoute = mock(MessageProcessor.class, RETURNS_DEEP_STUBS.get());
   private ExpressionFilter mockAlwaysTrueFailureExpressionFilter = mock(ExpressionFilter.class, RETURNS_DEEP_STUBS.get());
   private ThreadPoolExecutor mockPool = mock(ThreadPoolExecutor.class, RETURNS_DEEP_STUBS.get());
@@ -101,17 +99,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
     final MuleMessage mockMessage = MuleMessage.builder().payload("").build();
-    when(mockEvent.getMessage()).thenReturn(mockMessage);
-    when(mockEvent.getError()).thenReturn(empty());
-    when(mockEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME)).thenAnswer(new Answer<Object>() {
-
-      private int numberOfAttempts = 0;
-
-      @Override
-      public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-        return numberOfAttempts++;
-      }
-    });
+    event = MuleEvent.builder(DefaultMessageContext.create(mockFlow, TEST_CONNECTOR)).message(mockMessage).build();
     when(mockUntilSuccessfulConfiguration.getThreadingProfile().createPool(anyString())).thenReturn(mockPool);
     when(mockUntilSuccessfulConfiguration.createScheduledRetriesPool(anyString())).thenReturn(mockScheduledPool);
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);
@@ -165,7 +153,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             && ((MessagingException) item).getCause() instanceof RetryPolicyExhaustedException
             && EXPECTED_FAILURE_MSG.equals(((MessagingException) item).getCauseException().getMessage());
       }
-    }), eq(mockEvent));
+    }), eq(event));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
   }
 
@@ -174,7 +162,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
     executeUntilSuccessfulFailingRoute(() -> {
-      throw new MessagingException(CoreMessages.createStaticMessage(EXPECTED_FAILURE_MSG), mockEvent, mockRoute);
+      throw new MessagingException(CoreMessages.createStaticMessage(EXPECTED_FAILURE_MSG), event, mockRoute);
     });
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
@@ -188,7 +176,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             && ((MessagingException) item).getCauseException().getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
-    }), eq(mockEvent));
+    }), eq(event));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
   }
 
@@ -197,7 +185,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
     executeUntilSuccessfulFailingRoute(() -> {
-      throw new MessagingException(mockEvent, new RuntimeException(EXPECTED_FAILURE_MSG));
+      throw new MessagingException(event, new RuntimeException(EXPECTED_FAILURE_MSG));
     });
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
@@ -211,7 +199,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             && (((MessagingException) item).getCauseException()).getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
-    }), eq(mockEvent));
+    }), eq(event));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
   }
 
@@ -246,7 +234,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
     when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
     executeUntilSuccessfulFailingRoute(() -> {
-      throw new MessagingException(CoreMessages.createStaticMessage(EXPECTED_FAILURE_MSG), mockEvent, mockRoute);
+      throw new MessagingException(CoreMessages.createStaticMessage(EXPECTED_FAILURE_MSG), event, mockRoute);
     });
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
@@ -258,7 +246,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       @Override
       public boolean matches(Object argument) {
         MuleEvent argEvent = (MuleEvent) argument;
-        assertThat(argEvent.getMessage().getPayload(), sameInstance(mockEvent.getMessage().getPayload()));
+        assertThat(argEvent.getMessage().getPayload(), sameInstance(event.getMessage().getPayload()));
         assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
                    containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
@@ -272,7 +260,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(mockDLQ);
     when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
     executeUntilSuccessfulFailingRoute(() -> {
-      throw new MessagingException(mockEvent, new RuntimeException(EXPECTED_FAILURE_MSG));
+      throw new MessagingException(event, new RuntimeException(EXPECTED_FAILURE_MSG));
     });
     waitUntilRouteIsExecuted();
     waitUntilExceptionIsHandled();
@@ -297,8 +285,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   public void successfulExecution() throws Exception {
     executeUntilSuccessful();
     waitUntilRouteIsExecuted();
-    verify(mockRoute, times(1)).process(mockEvent);
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(mockEvent));
+    verify(mockRoute, times(1)).process(event);
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));
   }
 
   @Test
@@ -306,29 +294,29 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     String ackExpression = "some-expression";
     String expressionEvalutaionResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, mockEvent, null))
+    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, event, null))
         .thenReturn(expressionEvalutaionResult);
     final MuleEvent result = executeUntilSuccessful();
     waitUntilRouteIsExecuted();
-    verify(mockRoute, times(1)).process(mockEvent);
-    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1)).evaluate(ackExpression, mockEvent,
+    verify(mockRoute, times(1)).process(event);
+    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1)).evaluate(ackExpression, event,
                                                                                                         null);
 
     assertThat(result.getMessage().getPayload(), is(expressionEvalutaionResult));
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(mockEvent));
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));
   }
 
   private void executeUntilSuccessfulFailingRoute(FailCallback failCallback) throws Exception {
     failRoute = failCallback;
     routeCountDownLatch = new CountDownLatch(DEFAULT_TRIES);
     AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    processingStrategy.route(mockEvent, mock(FlowConstruct.class));
+    processingStrategy.route(event, mock(FlowConstruct.class));
   }
 
   private MuleEvent executeUntilSuccessful() throws Exception {
     routeCountDownLatch = new Latch();
     AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    return processingStrategy.route(mockEvent, mock(FlowConstruct.class));
+    return processingStrategy.route(event, mock(FlowConstruct.class));
   }
 
   private void configureMockRouteToCountDownRouteLatch() throws MuleException {
