@@ -67,9 +67,9 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
             .message(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
         setCurrentEvent(currentEvent);
       }
-      event = MuleEvent.builder(event)
+
+      return MuleEvent.builder(event)
           .message(MuleMessage.builder(event.getMessage()).nullPayload().exceptionPayload(exceptionPayload).build()).build();
-      return event;
     } finally {
       muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_END));
     }
