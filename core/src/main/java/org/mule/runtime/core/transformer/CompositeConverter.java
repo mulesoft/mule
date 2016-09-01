@@ -131,7 +131,8 @@ public class CompositeConverter implements Converter, MuleContextAware {
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this));
+        event = MuleEvent.builder(event)
+            .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (Exception e) {
         throw new TransformerMessagingException(event, this, e);
       }

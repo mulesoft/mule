@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -309,19 +308,13 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
     when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, mockEvent, null))
         .thenReturn(expressionEvalutaionResult);
-    executeUntilSuccessful();
+    final MuleEvent result = executeUntilSuccessful();
     waitUntilRouteIsExecuted();
     verify(mockRoute, times(1)).process(mockEvent);
     verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1)).evaluate(ackExpression, mockEvent,
                                                                                                         null);
-    verify(mockEvent, times(1)).setMessage(argThat(new ArgumentMatcher<MuleMessage>() {
 
-      @Override
-      public boolean matches(Object argument) {
-        assertThat(((MuleMessage) argument).getPayload(), equalTo(expressionEvalutaionResult));
-        return true;
-      }
-    }));
+    assertThat(result.getMessage().getPayload(), is(expressionEvalutaionResult));
     verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(mockEvent));
   }
 
@@ -332,10 +325,10 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     processingStrategy.route(mockEvent, mock(FlowConstruct.class));
   }
 
-  private void executeUntilSuccessful() throws Exception {
+  private MuleEvent executeUntilSuccessful() throws Exception {
     routeCountDownLatch = new Latch();
     AsynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
-    processingStrategy.route(mockEvent, mock(FlowConstruct.class));
+    return processingStrategy.route(mockEvent, mock(FlowConstruct.class));
   }
 
   private void configureMockRouteToCountDownRouteLatch() throws MuleException {

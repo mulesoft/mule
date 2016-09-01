@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
@@ -24,6 +25,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
@@ -31,7 +34,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 @SmallTest
-public class CompositeConverterTestCase {
+public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
   private Converter mockConverterA = mock(Converter.class);
   private Converter mockConverterB = mock(Converter.class);
@@ -156,6 +159,8 @@ public class CompositeConverterTestCase {
   public void appliesTransformerChainOnMessage() throws Exception {
     CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
     MuleEvent event = mock(MuleEvent.class);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
     MuleMessage message = mock(MuleMessage.class);
     MuleContext muleContext = mock(MuleContext.class);
     compositeConverter.setMuleContext(muleContext);

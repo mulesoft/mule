@@ -109,7 +109,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         logger.warn(ex.getMessage());
       }
 
-      event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build());
+      // event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new
+      // DefaultExceptionPayload(exception)).build());
       throw exception;
     }
 

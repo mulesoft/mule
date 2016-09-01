@@ -11,7 +11,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -21,6 +20,7 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.util.lock.LockFactory;
@@ -228,7 +228,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       if (payload instanceof InputStream) {
         // We've consumed the stream.
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(bytes).build());
+        event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(bytes).build()).build();
       }
       MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
       byte[] digestedBytes = md.digest(bytes);

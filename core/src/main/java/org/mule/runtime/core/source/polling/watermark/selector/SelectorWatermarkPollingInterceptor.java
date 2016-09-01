@@ -7,6 +7,8 @@
 
 package org.mule.runtime.core.source.polling.watermark.selector;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -68,12 +70,12 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         selector.acceptValue(object);
       }
     } else if (payload instanceof Iterator) {
-      event.setMessage(MuleMessage.builder(event.getMessage())
-          .payload(new SelectorIteratorProxy<>((Iterator<Object>) payload, selector)).build());
+      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+          .payload(new SelectorIteratorProxy<>((Iterator<Object>) payload, selector)).build()).build();
     } else {
-      throw new ConfigurationException(CoreMessages.createStaticMessage(String.format(
-                                                                                      "Poll executing with payload of class %s but selector can only handle Iterator and Iterable objects when watermark is to be updated via selectors",
-                                                                                      payload.getClass().getCanonicalName())));
+      throw new ConfigurationException(CoreMessages
+          .createStaticMessage(format("Poll executing with payload of class %s but selector can only handle Iterator and Iterable objects when watermark is to be updated via selectors",
+                                      payload.getClass().getCanonicalName())));
     }
 
     return event;
