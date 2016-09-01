@@ -1704,7 +1704,7 @@
                     <xsd:enumeration value="UNKNOWN">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Error type for which there's no a clear reason of the failure/
+                                Error type for which there's no a clear reason of the failure.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
@@ -1725,7 +1725,7 @@
                     <xsd:enumeration value="EXPRESSION">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Occurs when there's an error execting an expression.
+                                Occurs when there's an error executing an expression.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
@@ -4177,23 +4177,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:group>
-                    <xsd:element name="on-redelivery-attempts-exceeded" minOccurs="0">
-                        <xsd:complexType>
-                            <xsd:complexContent>
-                                <xsd:extension base="annotatedType">
-                                    <xsd:sequence>
-                                        <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" minOccurs="0" maxOccurs="unbounded">
-                                            <xsd:annotation>
-                                                <xsd:documentation>Destination to which the message will be sent in case that max redelivery attempts configured is exceeded, this
-                                                    could be any sequence of router, or message processor.
-                                                </xsd:documentation>
-                                            </xsd:annotation>
-                                        </xsd:group>
-                                    </xsd:sequence>
-                                </xsd:extension>
-                            </xsd:complexContent>
-                        </xsd:complexType>
-                    </xsd:element>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>

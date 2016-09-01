@@ -59,7 +59,7 @@ public class ErrorTypeRepository {
             .stringRepresentation(errorTypeIdentifier.getName())
             .parentErrorType(parentErrorType);
     if (this.errorTypes.put(errorTypeIdentifier, errorTypeBuilder.build()) != null) {
-      throw new IllegalStateException(format("An error type with identifier %s", errorTypeIdentifier));
+      throw new IllegalStateException(format("An error type with identifier %s already exists", errorTypeIdentifier));
     }
   }
 
