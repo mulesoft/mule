@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
@@ -14,7 +15,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
@@ -31,7 +30,6 @@ import org.mule.runtime.core.routing.outbound.CollectionMessageSequence;
 import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -159,7 +157,22 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   public void initialise() throws InitialisationException {
     if (collectionExpression != null) {
       expressionConfig.setExpression(collectionExpression);
-      splitter = new ExpressionSplitter(expressionConfig);
+      splitter = new ExpressionSplitter(expressionConfig) {
+
+        @Override
+        protected void propagateFlowVars(MuleEvent previousResult, final Builder builder) {
+          for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
+            builder.addFlowVariable(flowVarName, previousResult.getFlowVariable(flowVarName),
+                                    previousResult.getFlowVariableDataType(flowVarName));
+          }
+        }
+
+        @Override
+        protected Set<String> resolvePropagatedFlowVars(MuleEvent previousResult) {
+          return previousResult != null ? previousResult.getFlowVariableNames() : emptySet();
+        }
+
+      };
       if (isXPathExpression(expressionConfig.getExpression())) {
         xpathCollection = true;
       }
@@ -217,6 +230,19 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         return new CollectionMessageSequence(list);
       }
       return super.splitMessageIntoSequence(event);
+    }
+
+    @Override
+    protected void propagateFlowVars(MuleEvent previousResult, final Builder builder) {
+      for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
+        builder.addFlowVariable(flowVarName, previousResult.getFlowVariable(flowVarName),
+                                previousResult.getFlowVariableDataType(flowVarName));
+      }
+    }
+
+    @Override
+    protected Set<String> resolvePropagatedFlowVars(MuleEvent previousResult) {
+      return previousResult != null ? previousResult.getFlowVariableNames() : emptySet();
     }
 
   }

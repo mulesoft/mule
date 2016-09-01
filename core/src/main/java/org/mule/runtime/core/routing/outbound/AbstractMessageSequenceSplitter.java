@@ -92,19 +92,13 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       final Builder builder = MuleEvent.builder(originalEvent);
 
-      if (lastResult != null) {
-        for (String flowVarName : lastResult.getFlowVariableNames()) {
-          builder.addFlowVariable(flowVarName, lastResult.getFlowVariable(flowVarName),
-                                  lastResult.getFlowVariableDataType(flowVarName));
-        }
-      }
+      propagateFlowVars(lastResult, builder);
       if (counterVariableName != null) {
         builder.addFlowVariable(counterVariableName, correlationSequence);
       }
 
       builder.correlation(new Correlation(count, correlationSequence));
-      initEventBuilder(messageSequence.next(), originalEvent, builder,
-                       lastResult != null ? lastResult.getFlowVariableNames() : emptySet());
+      initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
       final MuleEvent event = builder.build();
       ((DefaultMuleEvent) event).setParent(originalEvent);
       MuleEvent resultEvent = processNext(event);
@@ -117,6 +111,14 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       logger.debug("Splitter only returned a single result. If this is not expected, please check your split expression");
     }
     return resultEvents;
+  }
+
+  protected Set<String> resolvePropagatedFlowVars(MuleEvent lastResult) {
+    return emptySet();
+  }
+
+  protected void propagateFlowVars(MuleEvent previousResult, final Builder builder) {
+    // Nothing to do
   }
 
   private void initEventBuilder(Object payload, MuleEvent originalEvent, Builder builder, Set<String> flowVarsFromLastResult) {
