@@ -22,7 +22,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
-import org.mule.runtime.module.launcher.application.CompositeApplicationClassLoader;
+import org.mule.runtime.core.util.ValueHolder;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -31,7 +32,6 @@ import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.size.SmallTest;
-import org.mule.runtime.core.util.ValueHolder;
 
 import java.io.File;
 
@@ -60,7 +60,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   private ArtifactAwareContextSelector selector;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private CompositeApplicationClassLoader classLoader;
+  private RegionClassLoader classLoader;
 
   @Before
   public void before() throws Exception {
@@ -74,7 +74,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
     MuleLoggerContext context = (MuleLoggerContext) selector.getContext(EMPTY, classLoader, true);
     assertThat(context, is(sameInstance(selector.getContext(EMPTY, classLoader, true))));
 
-    classLoader = mock(CompositeApplicationClassLoader.class, RETURNS_DEEP_STUBS);
+    classLoader = mock(RegionClassLoader.class, RETURNS_DEEP_STUBS);
     when(classLoader.getArtifactName()).thenReturn(getClass().getName());
     assertThat(context, not(sameInstance(selector.getContext(EMPTY, classLoader, true))));
   }

@@ -10,7 +10,7 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.classloader.DirectoryResourceLocator;
 import org.mule.runtime.module.artifact.classloader.LocalResourceLocator;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
@@ -158,7 +158,7 @@ public class MuleLoggerContextFactory {
   public ApplicationDescriptor fetchApplicationDescriptor(ArtifactClassLoader muleCL) throws IOException {
     // TODO(pablo.kraan): MULE-9778 - MuleLoggerContextFactory should not create artifact descriptors
     ArtifactDescriptorFactory<ApplicationDescriptor> applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
                                          new ArtifactPluginRepository() {
 
                                            public List<ArtifactPluginDescriptor> getContainerArtifactPluginDescriptors() {

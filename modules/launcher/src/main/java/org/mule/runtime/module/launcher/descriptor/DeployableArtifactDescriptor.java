@@ -8,6 +8,8 @@ package org.mule.runtime.module.launcher.descriptor;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
+import java.net.URL;
+
 /**
  * Describes an artifact that is deployable on the container
  */
@@ -16,6 +18,8 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   public static final String DEFAULT_DEPLOY_PROPERTIES_RESOURCE = "mule-deploy.properties";
 
   private boolean redeploymentEnabled = true;
+  private URL[] runtimeLibs = new URL[0];
+  private URL[] sharedRuntimeLibs = new URL[0];
 
   public boolean isRedeploymentEnabled() {
     return redeploymentEnabled;
@@ -23,5 +27,21 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public void setRedeploymentEnabled(boolean redeploymentEnabled) {
     this.redeploymentEnabled = redeploymentEnabled;
+  }
+
+  public URL[] getRuntimeLibs() {
+    return runtimeLibs;
+  }
+
+  public void setRuntimeLibs(URL[] runtimeLibs) {
+    this.runtimeLibs = runtimeLibs;
+  }
+
+  public URL[] getSharedRuntimeLibs() {
+    return sharedRuntimeLibs;
+  }
+
+  public void setSharedRuntimeLibs(URL[] sharedRuntimeLibs) {
+    this.sharedRuntimeLibs = sharedRuntimeLibs;
   }
 }

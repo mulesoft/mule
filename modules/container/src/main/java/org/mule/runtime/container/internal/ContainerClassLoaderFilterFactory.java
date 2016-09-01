@@ -10,6 +10,7 @@ package org.mule.runtime.container.internal;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderFilter;
 
@@ -32,7 +33,7 @@ public class ContainerClassLoaderFilterFactory {
   public ClassLoaderFilter create(Set<String> bootPackages, List<MuleModule> muleModules) {
     final Set<String> resources = getExportedResourcePaths(muleModules);
     final Set<String> packages = getModuleExportedPackages(muleModules);
-    final ArtifactClassLoaderFilter artifactClassLoaderFilter = new ArtifactClassLoaderFilter(packages, resources);
+    final ArtifactClassLoaderFilter artifactClassLoaderFilter = new DefaultArtifactClassLoaderFilter(packages, resources);
 
     return new ContainerClassLoaderFilter(artifactClassLoaderFilter, bootPackages);
   }

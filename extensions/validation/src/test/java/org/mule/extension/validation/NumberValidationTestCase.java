@@ -8,15 +8,15 @@ package org.mule.extension.validation;
 
 import org.mule.extension.validation.api.NumberType;
 import org.mule.functional.junit4.FlowRunner;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
+@RunnerDelegateTo(Parameterized.class)
 public class NumberValidationTestCase extends ValidationTestCase {
 
   private static final String FLOW_NAME = "validateNumber";

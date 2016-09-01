@@ -24,13 +24,16 @@ public class TestClassLoader extends ClassLoader {
   private Map<String, String> libraries = new HashMap<>();
 
   @Override
-  public Class<?> loadClass(String s) throws ClassNotFoundException {
+  public Class<?> loadClass(String name) throws ClassNotFoundException {
+    return findClass(name);
+  }
 
-    Class aClass = classes.get(s);
+  @Override
+  protected Class<?> findClass(String name) throws ClassNotFoundException {
+    Class aClass = classes.get(name);
     if (aClass == null) {
-      throw new TestClassNotFoundException(s, this);
+      throw new TestClassNotFoundException(name, this);
     }
-
     return aClass;
   }
 
@@ -46,6 +49,11 @@ public class TestClassLoader extends ClassLoader {
 
   @Override
   public Enumeration<URL> getResources(String s) throws IOException {
+    return findResources(s);
+  }
+
+  @Override
+  protected Enumeration<URL> findResources(String name) throws IOException {
     return new EnumerationAdapter<>(resources.values());
   }
 

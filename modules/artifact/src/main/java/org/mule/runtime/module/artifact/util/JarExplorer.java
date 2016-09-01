@@ -5,21 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.launcher.application;
+package org.mule.runtime.module.artifact.util;
 
 import java.net.URL;
-import java.util.Set;
 
 /**
- * Discovers Java packages
+ * Explores jar files or exploded jar folders to find packages and resources.
  */
-public interface PackageDiscoverer {
+public interface JarExplorer {
 
   /**
    * Finds the packages defined in a given resource
    *
    * @param library folder or JAR file to explore. Non null
-   * @return the packages found on the resource or an empty set if the resource is not of an expected type.
+   * @return the {@link JarInfo} containing the found resources and packages. Non null.
    */
-  Set<String> findPackages(URL library);
+  JarInfo explore(URL library);
 }

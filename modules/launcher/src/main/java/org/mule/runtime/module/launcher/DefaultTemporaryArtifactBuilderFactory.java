@@ -120,7 +120,7 @@ public class DefaultTemporaryArtifactBuilderFactory implements TemporaryArtifact
           temporaryContextClassLoader = muleArtifactResourcesRegistry.getTemporaryArtifactClassLoaderBuilderFactory()
               .createArtifactClassLoaderBuilder().setParentClassLoader(muleArtifactResourcesRegistry.getContainerClassLoader())
               .addArtifactPluginDescriptors(this.artifactPluginDescriptors.toArray(new ArtifactPluginDescriptor[0]))
-              .setArtifactId(artifactId).setPluginsSharedLibFolder(tempPluginsFolder).build();
+              .setArtifactId(artifactId).build();
 
           List<ArtifactPlugin> artifactPlugins = temporaryContextClassLoader.getArtifactPluginClassLoaders()
               .stream().map(artifactClassLoader -> new DefaultArtifactPlugin(

@@ -8,40 +8,28 @@ package org.mule.runtime.module.launcher;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.launcher.application.ArtifactPlugin;
 import org.mule.runtime.module.launcher.application.ArtifactPluginFactory;
-import org.mule.runtime.module.launcher.application.CompositeArtifactClassLoader;
-import org.mule.runtime.module.launcher.application.FilePackageDiscoverer;
-import org.mule.runtime.module.launcher.application.PackageDiscoverer;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.launcher.plugin.NamePluginDependenciesResolver;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -52,14 +40,10 @@ import java.util.Set;
  */
 public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtifactClassLoaderBuilder> {
 
-  private static final String SHARED_LIB_ARTIFACT_NAME = "sharedLibs";
-
   private final DeployableArtifactClassLoaderFactory artifactClassLoaderFactory;
-  private final PackageDiscoverer packageDiscoverer = new FilePackageDiscoverer();
   private final ArtifactPluginRepository artifactPluginRepository;
   private final ArtifactPluginFactory artifactPluginFactory;
   private Set<ArtifactPluginDescriptor> artifactPluginDescriptors = new HashSet<>();
-  private File pluginsSharedLibFolder;
   private String artifactId = UUID.getUUID();
   private ArtifactDescriptor artifactDescriptor;
   private ArtifactClassLoader parentClassLoader;
@@ -104,16 +88,6 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
   }
 
   /**
-   * @param pluginsSharedLibFolder folder in which libraries shared by the plugins are located
-   * @return the builder
-   */
-  public T setPluginsSharedLibFolder(File pluginsSharedLibFolder) {
-    checkArgument(pluginsSharedLibFolder != null, "plugins shared lib folder cannot be null");
-    this.pluginsSharedLibFolder = pluginsSharedLibFolder;
-    return (T) this;
-  }
-
-  /**
    * @param artifactPluginDescriptors set of plugins descriptors that will be used by the application.
    * @return the builder
    */
@@ -143,50 +117,25 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     checkState(artifactDescriptor != null, "artifact descriptor cannot be null");
     parentClassLoader = getParentClassLoader();
     checkState(parentClassLoader != null, "parent class loader cannot be null");
-
-    parentClassLoader = getSharedLibClassLoader(parentClassLoader);
+    RegionClassLoader regionClassLoader = new RegionClassLoader("Region" + artifactId, parentClassLoader.getClassLoader(),
+                                                                parentClassLoader.getClassLoaderLookupPolicy());
 
     List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = createContainerApplicationPlugins();
     effectiveArtifactPluginDescriptors.addAll(artifactPluginDescriptors);
+    effectiveArtifactPluginDescriptors = new NamePluginDependenciesResolver().resolve(effectiveArtifactPluginDescriptors);
 
-    if (!effectiveArtifactPluginDescriptors.isEmpty()) {
-      parentClassLoader = createCompositePluginClassLoader(parentClassLoader, effectiveArtifactPluginDescriptors);
+    final List<ArtifactClassLoader> pluginClassLoaders =
+        createPluginClassLoaders(regionClassLoader, effectiveArtifactPluginDescriptors);
+
+    final ArtifactClassLoader artifactClassLoader =
+        artifactClassLoaderFactory.create(regionClassLoader, artifactDescriptor, artifactPluginClassLoaders);
+    regionClassLoader.addClassLoader(artifactClassLoader, artifactDescriptor.getClassLoaderFilter());
+
+    for (int i = 0; i < effectiveArtifactPluginDescriptors.size(); i++) {
+      final ArtifactClassLoaderFilter classLoaderFilter = effectiveArtifactPluginDescriptors.get(i).getClassLoaderFilter();
+      regionClassLoader.addClassLoader(pluginClassLoaders.get(i), classLoaderFilter);
     }
-    return artifactClassLoaderFactory.create(parentClassLoader, artifactDescriptor, artifactPluginClassLoaders);
-  }
-
-  private ArtifactClassLoader getSharedLibClassLoader(ArtifactClassLoader parent) throws MalformedURLException {
-    Set<URL> urls = new HashSet<>();
-
-    if (pluginsSharedLibFolder.exists()) {
-      Collection<File> jars = FileUtils.listFiles(pluginsSharedLibFolder, new String[] {"jar"}, false);
-
-      for (File jar : jars) {
-        urls.add(jar.toURI().toURL());
-      }
-    }
-
-    URL[] pluginLibs = urls.toArray(new URL[0]);
-    Map<String, ClassLoaderLookupStrategy> lookupStrategies = emptyMap();
-    if (pluginLibs != null && pluginLibs.length != 0) {
-      lookupStrategies = getLookStrategiesFrom(pluginLibs);
-    }
-    ClassLoaderLookupPolicy lookupPolicy = parent.getClassLoaderLookupPolicy().extend(lookupStrategies);
-
-    return new MuleArtifactClassLoader(SHARED_LIB_ARTIFACT_NAME, pluginLibs, parent.getClassLoader(), lookupPolicy);
-  }
-
-  private Map<String, ClassLoaderLookupStrategy> getLookStrategiesFrom(URL[] libraries) {
-    final Map<String, ClassLoaderLookupStrategy> result = new HashMap<>();
-
-    for (URL library : libraries) {
-      Set<String> packages = packageDiscoverer.findPackages(library);
-      for (String packageName : packages) {
-        result.put(packageName, PARENT_FIRST);
-      }
-    }
-
-    return result;
+    return artifactClassLoader;
   }
 
   private List<ArtifactPluginDescriptor> createContainerApplicationPlugins() {
@@ -213,14 +162,13 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
                 object -> ((ArtifactPluginDescriptor) object).getName().equals(appPluginDescriptor.getName())) != null;
   }
 
-  private ArtifactClassLoader createCompositePluginClassLoader(ArtifactClassLoader parent,
-                                                               List<ArtifactPluginDescriptor> artifactPluginDescriptors) {
+  private List<ArtifactClassLoader> createPluginClassLoaders(ArtifactClassLoader parent,
+                                                             List<ArtifactPluginDescriptor> artifactPluginDescriptors) {
     List<ArtifactClassLoader> classLoaders = new LinkedList<>();
 
-    // Adds parent classloader first to use parent-first lookup approach
-    classLoaders.add(parent);
-
     for (ArtifactPluginDescriptor artifactPluginDescriptor : artifactPluginDescriptors) {
+      artifactPluginDescriptor.setArtifactPluginDescriptors(artifactPluginDescriptors);
+
       ArtifactPlugin artifactPlugin = artifactPluginFactory.create(artifactPluginDescriptor, parent);
       artifactPluginClassLoaders.add(artifactPlugin.getArtifactClassLoader());
 
@@ -229,8 +177,6 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
                                            artifactPlugin.getDescriptor().getClassLoaderFilter());
       classLoaders.add(filteringPluginClassLoader);
     }
-    return new CompositeArtifactClassLoader("appPlugins", parent.getClassLoader(), classLoaders,
-                                            parent.getClassLoaderLookupPolicy());
+    return classLoaders;
   }
-
 }

@@ -87,8 +87,7 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     }
 
     MuleApplicationClassLoader applicationClassLoader = applicationClassLoaderBuilderFactory.createArtifactClassLoaderBuilder()
-        .setDomain(domain).setPluginsSharedLibFolder(descriptor.getSharedPluginFolder())
-        .addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]))
+        .setDomain(domain).addArtifactPluginDescriptors(descriptor.getPlugins().toArray(new ArtifactPluginDescriptor[0]))
         .setArtifactId(descriptor.getName()).setArtifactDescriptor(descriptor).build();
 
     List<ArtifactPluginDescriptor> applicationPluginDescriptors =

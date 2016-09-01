@@ -30,5 +30,13 @@ public enum ClassLoaderLookupStrategy {
    * process will continue on the parent classloader. If the class is found, then it will be returned, otherwise a
    * {@link ClassNotFoundException} will be thrown.
    */
-  CHILD_FIRST
+  CHILD_FIRST,
+
+  /**
+   * Class will be looked up from the child classloader only. If the class is found, then it will be returned, otherwise a
+   * {@link ClassNotFoundException} will be thrown.
+   */
+  CHILD_ONLY
+
+
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.launcher.application;
 
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.ApplicationClassLoaderBuilderFactory;
 import org.mule.runtime.module.launcher.ApplicationDescriptorFactory;
 import org.mule.runtime.module.launcher.domain.DomainManager;
@@ -41,7 +41,7 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   public static TestApplicationFactory createTestApplicationFactory(MuleApplicationClassLoaderFactory applicationClassLoaderFactory,
                                                                     DomainManager domainManager,
                                                                     ServiceRepository serviceRepository) {
-    DefaultArtifactClassLoaderFilterFactory classLoaderFilterFactory = new DefaultArtifactClassLoaderFilterFactory();
+    ArtifactClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
     ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
         new ArtifactPluginDescriptorFactory(classLoaderFilterFactory);
     ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader =

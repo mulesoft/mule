@@ -21,6 +21,7 @@ import org.mule.tck.size.SmallTest;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.Driver;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -93,7 +94,18 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     private ResourceReleaser resourceReleaserInstance;
 
     public TestArtifactClassLoader(ClassLoader parentCl) {
-      super("testArtifact", new URL[0], parentCl, mock(ClassLoaderLookupPolicy.class));
+      super("testArtifact", new URL[0], parentCl, new ClassLoaderLookupPolicy() {
+
+        @Override
+        public ClassLoaderLookupStrategy getLookupStrategy(String className) {
+          return ClassLoaderLookupStrategy.PARENT_FIRST;
+        }
+
+        @Override
+        public ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies) {
+          return null;
+        }
+      });
     }
 
     @Override

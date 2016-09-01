@@ -8,14 +8,14 @@
 package org.mule.runtime.module.artifact.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mule.tck.ZipUtils.compress;
-import org.mule.tck.ZipUtils.ZipResource;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.FilenameUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,7 +47,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
    * @param id artifact identifier. Non empty.
    */
   public AbstractArtifactFileBuilder(String id) {
-    checkArgument(!StringUtils.isEmpty(id), "ID cannot be empty");
+    checkArgument(!isEmpty(id), "ID cannot be empty");
     this.id = id;
     this.fileName = id + ".zip";
   }
@@ -81,7 +81,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
    */
   public T usingLibrary(String jarFile) {
     checkImmutable();
-    checkArgument(!StringUtils.isEmpty(jarFile), "Jar file cannot be empty");
+    checkArgument(!isEmpty(jarFile), "Jar file cannot be empty");
     resources.add(new ZipResource(jarFile, "lib/" + FilenameUtils.getName(jarFile)));
 
     return getThis();
@@ -126,7 +126,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   @Override
   public File getArtifactFile() throws Exception {
     if (artifactFile == null) {
-      checkArgument(!StringUtils.isEmpty(fileName), "Filename cannot be empty");
+      checkArgument(!isEmpty(fileName), "Filename cannot be empty");
 
       final File tempFile = new File(getTempFolder(), fileName);
       tempFile.deleteOnExit();

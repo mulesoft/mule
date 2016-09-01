@@ -50,4 +50,9 @@ public class TestArtifactClassLoader extends TestClassLoader implements Artifact
   public Enumeration<URL> findResources(String name) throws IOException {
     return super.findResources(name);
   }
+
+  @Override
+  public Class<?> findLocalClass(String name) throws ClassNotFoundException {
+    return super.findClass(name);
+  }
 }

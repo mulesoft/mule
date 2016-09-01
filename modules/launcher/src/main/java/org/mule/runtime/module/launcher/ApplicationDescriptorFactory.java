@@ -8,14 +8,23 @@ package org.mule.runtime.module.launcher;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static java.util.Collections.emptySet;
+import static org.apache.commons.io.FileUtils.listFiles;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppSharedPluginLibsFolder;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.launcher.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.util.PropertiesUtils;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
+import org.mule.runtime.module.artifact.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.util.JarExplorer;
+import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser;
@@ -26,8 +35,10 @@ import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,13 +93,70 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       final Set<ArtifactPluginDescriptor> plugins = parsePluginDescriptors(artifactFolder, desc);
       verifyPluginExportedPackages(getAllApplicationPlugins(plugins));
       desc.setPlugins(plugins);
-
-      desc.setSharedPluginFolder(getAppSharedPluginLibsFolder(appName));
+      desc.setRuntimeLibs(findLibraries(appName));
+      desc.setSharedRuntimeLibs(findSharedLibraries(appName));
+      desc.setClassLoaderFilter(createApplicationClassLoaderFilter(desc));
     } catch (IOException e) {
       throw new ArtifactDescriptorCreateException("Unable to create application descriptor", e);
     }
 
     return desc;
+  }
+
+  private URL[] findLibraries(String appName) throws MalformedURLException {
+    return findJars(getAppLibFolder(appName)).toArray(new URL[0]);
+  }
+
+  private URL[] findSharedLibraries(String appName) throws MalformedURLException {
+    return findJars(getAppSharedPluginLibsFolder(appName)).toArray(new URL[0]);
+  }
+
+  private ArtifactClassLoaderFilter createApplicationClassLoaderFilter(ApplicationDescriptor descriptor) {
+    final JarInfo librariesInfo = findExportedResources(descriptor.getSharedRuntimeLibs());
+    final JarInfo classesInfo;
+    try {
+      final File appClassesFolder = getAppClassesFolder(descriptor.getName());
+      if (appClassesFolder.exists()) {
+        classesInfo = findExportedResources(appClassesFolder.toURI().toURL());
+      } else {
+        classesInfo = new JarInfo(emptySet(), emptySet());
+      }
+    } catch (MalformedURLException e) {
+      throw new RuntimeException("Cannot read application classes folder", e);
+    }
+    librariesInfo.getPackages().addAll(classesInfo.getPackages());
+    librariesInfo.getResources().addAll(classesInfo.getResources());
+
+    return new DefaultArtifactClassLoaderFilter(librariesInfo.getPackages(), librariesInfo.getResources());
+  }
+
+  private JarInfo findExportedResources(URL... libraries) {
+    Set<String> packages = new HashSet<>();
+    Set<String> resources = new HashSet<>();
+    final JarExplorer jarExplorer = new FileJarExplorer();
+
+    for (URL library : libraries) {
+      final JarInfo jarInfo = jarExplorer.explore(library);
+      packages.addAll(jarInfo.getPackages());
+      resources.addAll(jarInfo.getResources());
+    }
+
+    return new JarInfo(packages, resources);
+  }
+
+  private List<URL> findJars(File dir) throws MalformedURLException {
+    List<URL> result = new LinkedList<>();
+
+    if (dir.exists() && dir.canRead()) {
+      @SuppressWarnings("unchecked")
+      Collection<File> jars = listFiles(dir, new String[] {"jar"}, false);
+
+      for (File jar : jars) {
+        result.add(jar.toURI().toURL());
+      }
+    }
+
+    return result;
   }
 
   private List<ArtifactPluginDescriptor> getAllApplicationPlugins(Set<ArtifactPluginDescriptor> plugins) {
@@ -134,7 +202,7 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
     final File pluginsDir = new File(appDir, PLUGINS_FOLDER);
     String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
     if (pluginZips == null || pluginZips.length == 0) {
-      return Collections.emptySet();
+      return emptySet();
     }
 
     Arrays.sort(pluginZips);
