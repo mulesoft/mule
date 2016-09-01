@@ -42,10 +42,12 @@
         </default-exception-strategy>
     </flow>
     <flow name="RollbackExceptionStrategyCommit">
-        <jms:inbound-endpoint queue="rollbackOnException" connector-ref="jmsConnectorNoRedelivery"/>
+        <jms:inbound-endpoint queue="rollbackOnException" connector-ref="jmsConnectorNoRedelivery">
+            <redelivery-policy maxRedeliveryCount="2"/>
+        </jms:inbound-endpoint>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="2"/>
+            <on-error-continue type="REDELIVERY_EXHAUSTED"/>
         </error-handler>
     </flow>
 </mule>
