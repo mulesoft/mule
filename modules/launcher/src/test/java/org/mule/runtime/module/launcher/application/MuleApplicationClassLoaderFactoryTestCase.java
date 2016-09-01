@@ -10,16 +10,15 @@ package org.mule.runtime.module.launcher.application;
 import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getMulePerAppLibFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
@@ -51,7 +50,6 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
   private final ClassLoaderLookupPolicy classLoaderLookupPolicy = mock(ClassLoaderLookupPolicy.class);
   private URL classesFolderUrl;
   private URL appLibraryUrl;
-  private URL perAppLibraryUrl;
 
   @Before
   public void createAppClassLoader() throws IOException {
@@ -64,18 +62,13 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
     final File appLibrary = new File(libDir, "appLibrary.jar");
     stringToFile(appLibrary.getAbsolutePath(), "Some text");
 
-    // Add jar file on container's per-app folder
-    File perAppLibFolder = getMulePerAppLibFolder();
-    assertThat(perAppLibFolder.mkdirs(), is(true));
-    final File perAppLibrary = new File(perAppLibFolder, "perAppLibrary.jar");
-    stringToFile(perAppLibrary.getAbsolutePath(), "Some text");
-
     when(parentArtifactClassLoader.getClassLoaderLookupPolicy()).thenReturn(classLoaderLookupPolicy);
     when(parentArtifactClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
 
     classesFolderUrl = getAppClassesFolder(APP_NAME).toURI().toURL();
     appLibraryUrl = appLibrary.toURI().toURL();
-    perAppLibraryUrl = perAppLibrary.toURI().toURL();
+
+    when(classLoaderLookupPolicy.extend(anyMap())).thenReturn(classLoaderLookupPolicy);
   }
 
   @After
@@ -101,6 +94,5 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
     verify(nativeLibraryFinderFactory).create(APP_NAME);
     assertThat(artifactClassLoader.getParent(), is(parentArtifactClassLoader.getClassLoader()));
-    assertThat(artifactClassLoader.getURLs(), arrayContaining(classesFolderUrl, appLibraryUrl, perAppLibraryUrl));
   }
 }

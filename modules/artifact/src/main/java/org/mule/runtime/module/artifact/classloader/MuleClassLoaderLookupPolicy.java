@@ -27,9 +27,9 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
 
   private static final String PACKAGE_SEPARATOR = ".";
 
-  private final Map<String, ClassLoaderLookupStrategy> configuredlookupStrategies;
+  private final Map<String, ClassLoaderLookupStrategy> configuredLookupStrategies;
   private final Set<String> rootSystemPackages;
-  private final HashMap<String, ClassLoaderLookupStrategy> lookupStrategies;
+  private final Map<String, ClassLoaderLookupStrategy> lookupStrategies;
 
   /**
    * Creates a new lookup policy based on the provided configuration.
@@ -42,8 +42,8 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
     checkArgument(lookupStrategies != null, "Lookup strategies cannot be null");
     checkArgument(rootSystemPackages != null, "System packages cannot be null");
     this.rootSystemPackages = normalizeRootSystemPackages(rootSystemPackages);
-    this.configuredlookupStrategies = normalizeLookupStrategies(lookupStrategies);
-    this.lookupStrategies = new HashMap<>(configuredlookupStrategies);
+    this.configuredLookupStrategies = normalizeLookupStrategies(lookupStrategies);
+    this.lookupStrategies = new HashMap<>(configuredLookupStrategies);
   }
 
   private Map<String, ClassLoaderLookupStrategy> normalizeLookupStrategies(Map<String, ClassLoaderLookupStrategy> lookupStrategies) {
@@ -109,7 +109,7 @@ public class MuleClassLoaderLookupPolicy implements ClassLoaderLookupPolicy {
   @Override
   public ClassLoaderLookupPolicy extend(Map<String, ClassLoaderLookupStrategy> lookupStrategies) {
     validateLookupPolicies(lookupStrategies);
-    final HashMap<String, ClassLoaderLookupStrategy> newLookupStraetgies = new HashMap<>(this.configuredlookupStrategies);
+    final HashMap<String, ClassLoaderLookupStrategy> newLookupStraetgies = new HashMap<>(this.configuredLookupStrategies);
 
     for (String packageName : lookupStrategies.keySet()) {
       if (!newLookupStraetgies.containsKey(normalizePackageName(packageName))) {

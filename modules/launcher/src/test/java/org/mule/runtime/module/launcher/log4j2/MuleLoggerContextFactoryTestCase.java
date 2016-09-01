@@ -14,9 +14,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.launcher.application.CompositeApplicationClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.tck.size.SmallTest;
 
@@ -38,7 +37,7 @@ public class MuleLoggerContextFactoryTestCase {
   private static final File CONFIG_LOCATION = new File("my/local/log4j2.xml");
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private CompositeApplicationClassLoader classLoader;
+  private RegionClassLoader classLoader;
 
   @Before
   public void before() throws Exception {

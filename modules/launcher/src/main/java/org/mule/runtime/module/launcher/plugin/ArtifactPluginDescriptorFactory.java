@@ -7,12 +7,13 @@
 
 package org.mule.runtime.module.launcher.plugin;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ClassLoaderFilterFactory;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorFactory;
 
@@ -21,7 +22,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
@@ -29,15 +32,16 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
 
   public static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
+  public static final String PLUGIN_DEPENDENCIES = "plugin.dependencies";
 
-  private final ArtifactClassLoaderFilterFactory classLoaderFilterFactory;
+  private final ClassLoaderFilterFactory classLoaderFilterFactory;
 
   /**
    * Creates a new instance
    * 
    * @param classLoaderFilterFactory creates classloader filters for the created descriptors. Not null.
    */
-  public ArtifactPluginDescriptorFactory(ArtifactClassLoaderFilterFactory classLoaderFilterFactory) {
+  public ArtifactPluginDescriptorFactory(ClassLoaderFilterFactory classLoaderFilterFactory) {
     checkArgument(classLoaderFilterFactory != null, "ClassLoaderFilterFactory cannot be null");
 
     this.classLoaderFilterFactory = classLoaderFilterFactory;
@@ -64,6 +68,11 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
 
       final ArtifactClassLoaderFilter classLoaderFilter = classLoaderFilterFactory.create(exportedClasses, exportedResources);
       descriptor.setClassLoaderFilter(classLoaderFilter);
+
+      String pluginDependencies = props.getProperty(PLUGIN_DEPENDENCIES);
+      if (!isEmpty(pluginDependencies)) {
+        descriptor.setPluginDependencies(getPluginDependencies(pluginDependencies));
+      }
     }
 
     try {
@@ -83,5 +92,14 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
     }
 
     return descriptor;
+  }
+
+  private Set<String> getPluginDependencies(String pluginDependencies) {
+    Set<String> plugins = new HashSet<>();
+    final String[] split = pluginDependencies.split(",");
+    for (String plugin : split) {
+      plugins.add(plugin.trim());
+    }
+    return plugins;
   }
 }

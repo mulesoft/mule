@@ -8,7 +8,7 @@ package org.mule.runtime.module.launcher;
 
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.application.ArtifactPluginClassLoaderFactory;
 import org.mule.runtime.module.launcher.application.DefaultApplicationFactory;
 import org.mule.runtime.module.launcher.application.DefaultArtifactPluginFactory;
@@ -55,7 +55,7 @@ public class MuleArtifactResourcesRegistry {
     domainFactory = new DefaultDomainFactory(domainClassLoaderFactory, domainManager, containerClassLoader);
     artifactPluginFactory = new DefaultArtifactPluginFactory(new ArtifactPluginClassLoaderFactory());
     final ArtifactPluginDescriptorFactory artifactPluginDescriptorFactory =
-        new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory());
+        new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory());
     artifactPluginRepository = new DefaultArtifactPluginRepository(artifactPluginDescriptorFactory);
     artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
     final ApplicationDescriptorFactory applicationDescriptorFactory =

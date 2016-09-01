@@ -24,8 +24,8 @@ import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.launcher.DeploymentException;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.launcher.MuleSharedDomainClassLoader;
-import org.mule.runtime.module.launcher.application.FilePackageDiscoverer;
-import org.mule.runtime.module.launcher.application.PackageDiscoverer;
+import org.mule.runtime.module.artifact.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.util.JarExplorer;
 import org.mule.runtime.module.launcher.descriptor.DomainDescriptor;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
@@ -53,7 +53,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   private final ClassLoader parentClassLoader;
 
   private Map<String, ArtifactClassLoader> domainArtifactClassLoaders = new HashMap<>();
-  private PackageDiscoverer packageDiscoverer = new FilePackageDiscoverer();
+  private JarExplorer jarExplorer = new FileJarExplorer();
 
   /**
    * Creates a new instance
@@ -64,8 +64,8 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     this.parentClassLoader = parentClassLoader;
   }
 
-  public void setPackageDiscoverer(PackageDiscoverer packageDiscoverer) {
-    this.packageDiscoverer = packageDiscoverer;
+  public void setJarExplorer(JarExplorer jarExplorer) {
+    this.jarExplorer = jarExplorer;
   }
 
   @Override
@@ -110,7 +110,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     final Map<String, ClassLoaderLookupStrategy> result = new HashMap<>();
 
     for (URL library : libraries) {
-      Set<String> packages = packageDiscoverer.findPackages(library);
+      Set<String> packages = jarExplorer.explore(library).getPackages();
       for (String packageName : packages) {
         result.put(packageName, PARENT_FIRST);
       }
@@ -181,6 +181,11 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
       @Override
       public Enumeration<URL> findResources(String name) throws IOException {
         return classLoader.findResources(name);
+      }
+
+      @Override
+      public Class<?> findLocalClass(String name) throws ClassNotFoundException {
+        return classLoader.findLocalClass(name);
       }
 
       @Override

@@ -7,12 +7,16 @@
 
 package org.mule.runtime.module.artifact.descriptor;
 
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+
 import java.io.File;
 
 public class ArtifactDescriptor {
 
   private String name;
   private File rootFolder;
+  private ArtifactClassLoaderFilter classLoaderFilter = DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
   public String getName() {
     return name;
@@ -32,5 +36,13 @@ public class ArtifactDescriptor {
     }
 
     this.rootFolder = rootFolder;
+  }
+
+  public ArtifactClassLoaderFilter getClassLoaderFilter() {
+    return classLoaderFilter;
+  }
+
+  public void setClassLoaderFilter(ArtifactClassLoaderFilter classLoaderFilter) {
+    this.classLoaderFilter = classLoaderFilter;
   }
 }

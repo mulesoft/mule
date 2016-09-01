@@ -10,14 +10,14 @@ package org.mule.runtime.module.service;
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.service.ServiceClassLoaderFactory;
-import org.mule.runtime.module.service.ServiceDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -45,6 +45,7 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
     parentClassLoader = mock(ArtifactClassLoader.class);
     when(parentClassLoader.getClassLoader()).thenReturn(getClass().getClassLoader());
+    when(lookupPolicy.getLookupStrategy(anyString())).thenReturn(PARENT_FIRST);
     when(parentClassLoader.getClassLoaderLookupPolicy()).thenReturn(lookupPolicy);
   }
 

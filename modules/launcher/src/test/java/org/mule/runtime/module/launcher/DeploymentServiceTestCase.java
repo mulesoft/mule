@@ -12,6 +12,8 @@ import static java.util.Collections.emptyList;
 import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
@@ -42,8 +44,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.launcher.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.launcher.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.launcher.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
@@ -51,7 +53,6 @@ import static org.mule.runtime.module.launcher.domain.Domain.DEFAULT_DOMAIN_NAME
 import static org.mule.runtime.module.launcher.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -61,6 +62,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
+import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.FileUtils;
@@ -159,6 +161,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   private final ArtifactPluginFileBuilder pluginWithResource =
       new ArtifactPluginFileBuilder("resourcePlugin").configuredWith(EXPORTED_RESOURCE_PROPERTY, "/pluginResource.properties")
           .containingResource("pluginResourceSource.properties", "pluginResource.properties");
+
+  private final ArtifactPluginFileBuilder pluginUsingAppResource =
+      new ArtifactPluginFileBuilder("appResourcePlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.resource")
+          .containingClass("org/foo/resource/ResourceConsumer.clazz");
 
   // Application file builders
   private final ApplicationFileBuilder emptyAppFileBuilder =
@@ -1405,31 +1411,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppFileBuilder.getId());
     assertAppsDir(NONE, new String[] {sharedLibPluginAppFileBuilder.getId()}, true);
     assertApplicationAnchorFileExists(sharedLibPluginAppFileBuilder.getId());
-  }
 
-  @Test
-  public void deploysAppWithAppSharedLibPrecedenceOverPluginLib() throws Exception {
-    final ArtifactPluginFileBuilder echoPlugin1WithLib2 =
-        new ArtifactPluginFileBuilder("echoPlugin1").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-            .containingClass("org/foo/Plugin1Echo.clazz").usingLibrary("lib/bar-2.0.jar");
-    final ApplicationFileBuilder sharedLibPluginAppPrecedenceFileBuilder =
-        new ApplicationFileBuilder("shared-plugin-lib-precedence-app").definedBy("app-shared-lib-precedence-config.xml")
-            .containingPlugin(echoPlugin1WithLib2).sharingLibrary("lib/bar-1.0.jar");
-
-    addPackedAppFromBuilder(sharedLibPluginAppPrecedenceFileBuilder);
-
-    startDeployment();
-
-    assertApplicationDeploymentSuccess(applicationDeploymentListener, sharedLibPluginAppPrecedenceFileBuilder.getId());
-    assertAppsDir(NONE, new String[] {sharedLibPluginAppPrecedenceFileBuilder.getId()}, true);
-    assertApplicationAnchorFileExists(sharedLibPluginAppPrecedenceFileBuilder.getId());
-
-    Application application = deploymentService.getApplications().get(0);
-    Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
-
-    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
-        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+    executeApplicationFlow("main");
   }
 
   @Test
@@ -1488,12 +1471,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    Application application = deploymentService.getApplications().get(0);
-    Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
-
-    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
-        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+    executeApplicationFlow("main");
   }
 
   @Test
@@ -1511,12 +1489,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    Application application = deploymentService.getApplications().get(0);
-    Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
-
-    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
-        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+    executeApplicationFlow("main");
   }
 
   @Test
@@ -1537,12 +1510,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentSuccess(domainDeploymentListener, domainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    Application application = deploymentService.getApplications().get(0);
-    Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
-
-    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
-        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+    executeApplicationFlow("main");
   }
 
   @Test
@@ -1553,12 +1521,49 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentSuccess(applicationDeploymentListener, multiLibPluginAppFileBuilder.getId());
 
-    Application application = deploymentService.getApplications().get(0);
-    Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    executeApplicationFlow("main");
+  }
 
-    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
-        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+  @Test
+  public void deploysApplicationWithPluginDependingOnPlugin() throws Exception {
+
+    ArtifactPluginFileBuilder dependantPlugin =
+        new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+            .containingClass("org/foo/echo/Plugin3Echo.clazz").dependingOn(echoPlugin.getId());
+
+    final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
+        .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(echoPlugin).containingPlugin(dependantPlugin);
+    addPackedAppFromBuilder(artifactFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+
+    executeApplicationFlow("main");
+  }
+
+  @Test
+  public void failsToDeployApplicationWithMissingPluginDependencyOnPlugin() throws Exception {
+
+    ArtifactPluginFileBuilder dependantPlugin =
+        new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
+            .containingClass("org/foo/echo/Plugin3Echo.clazz");
+
+    final TestArtifactDescriptor artifactFileBuilder = new ApplicationFileBuilder("plugin-depending-on-plugin-app")
+        .definedBy("plugin-depending-on-plugin-app-config.xml").containingPlugin(echoPlugin).containingPlugin(dependantPlugin);
+    addPackedAppFromBuilder(artifactFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+
+    try {
+      executeApplicationFlow("main");
+      fail("Expected to fail as there should be a missing class");
+    } catch (ComponentException e) {
+      assertThat(e.getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getMessage(), containsString("org/foo/EchoTest"));
+    }
   }
 
   @Test
@@ -1569,12 +1574,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentSuccess(applicationDeploymentListener, differentLibPluginAppFileBuilder.getId());
 
-    Application application = deploymentService.getApplications().get(0);
-    Flow mainFlow = (Flow) application.getMuleContext().getRegistry().lookupFlowConstruct("main");
-    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
-
-    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
-        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+    executeApplicationFlow("main");
   }
 
   @Test
@@ -1584,6 +1584,20 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, resourcePluginAppFileBuilder.getId());
+  }
+
+  @Test
+  public void deploysAppProvidingResourceForPlugin() throws Exception {
+    final TestArtifactDescriptor artifactFileBuilder =
+        new ApplicationFileBuilder("appProvidingResourceForPlugin").definedBy("app-providing-resource-for-plugin.xml")
+            .containingPlugin(pluginUsingAppResource).usingResource("test-resource.txt", "META-INF/app-resource.txt");
+    addPackedAppFromBuilder(artifactFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, artifactFileBuilder.getId());
+
+    executeApplicationFlow("main");
   }
 
   @Test
@@ -3178,6 +3192,16 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     File appFolder = new File(artifactDir, artifactName);
     prober.check(new FileExists(appFolder));
   }
+
+  private void executeApplicationFlow(String flowName) throws MuleException {
+    Flow mainFlow =
+        (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
+    MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
+
+    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
+                       .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+  }
+
 
   /**
    * Allows to execute custom actions before or after executing logic or checking preconditions / verifications.

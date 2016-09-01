@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilterFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorLoader;
@@ -62,7 +62,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     output.close();
     ApplicationDescriptor descriptor = new ApplicationDescriptor();
     ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new DefaultArtifactClassLoaderFilterFactory())),
+        new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
                                          applicationPluginRepository);
     applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
     Map<String, String> appProps = descriptor.getAppProperties();

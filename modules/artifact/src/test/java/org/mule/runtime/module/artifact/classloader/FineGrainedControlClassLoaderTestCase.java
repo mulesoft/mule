@@ -96,6 +96,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
 
     final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
+    when(lookupPolicy.getLookupStrategy(Object.class.getName())).thenReturn(PARENT_ONLY);
+    when(lookupPolicy.getLookupStrategy(String.class.getName())).thenReturn(PARENT_ONLY);
 
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
@@ -129,6 +131,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
 
     final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(CHILD_FIRST);
+    when(lookupPolicy.getLookupStrategy(Object.class.getName())).thenReturn(PARENT_ONLY);
+    when(lookupPolicy.getLookupStrategy(String.class.getName())).thenReturn(PARENT_ONLY);
 
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
@@ -173,9 +177,9 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
     return new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy) {
 
       @Override
-      protected Class<?> findClass(String name) throws ClassNotFoundException {
+      public Class<?> findLocalClass(String name) throws ClassNotFoundException {
         try {
-          return super.findClass(name);
+          return super.findLocalClass(name);
         } catch (ClassNotFoundException e) {
           throw new TestClassLoader.TestClassNotFoundException(name, this);
         }

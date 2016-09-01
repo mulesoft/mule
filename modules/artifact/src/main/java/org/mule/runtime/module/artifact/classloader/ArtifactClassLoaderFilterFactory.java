@@ -7,17 +7,46 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
-/**
- * Creates {@link ArtifactClassLoaderFilter} instances
- */
-public interface ArtifactClassLoaderFilterFactory {
+import org.mule.runtime.core.util.StringUtils;
 
-  /**
-   * Creates a filter based on the provided configuration
-   *
-   * @param exportedClassPackages comma separated list of class packages to export. Can be null
-   * @param exportedResources comma separated list of resources to export. Can be null
-   * @return a class loader filter that matches the provided configuration
-   */
-  ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources);
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Creates {@link DefaultArtifactClassLoaderFilter} instances
+ */
+public class ArtifactClassLoaderFilterFactory implements ClassLoaderFilterFactory {
+
+  private static final String PACKAGE_SEPARATOR = "/";
+
+  @Override
+  public ArtifactClassLoaderFilter create(String exportedClassPackages, String exportedResources) {
+    Set<String> exportedArtifactPackages = getPackages(exportedClassPackages);
+    Set<String> exportedArtifactResources = getPackages(exportedResources);
+
+    if (exportedArtifactPackages.isEmpty() && exportedArtifactResources.isEmpty()) {
+      return DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+    } else {
+      return new DefaultArtifactClassLoaderFilter(exportedArtifactPackages, exportedArtifactResources);
+    }
+  }
+
+  private Set<String> getPackages(String exportedPackages) {
+    Set<String> exported = new HashSet<>();
+    if (StringUtils.isNotBlank(exportedPackages)) {
+      final String[] exports = exportedPackages.split(",");
+      for (String export : exports) {
+        export = export.trim();
+        if (export.startsWith(PACKAGE_SEPARATOR)) {
+          export = export.substring(1);
+        }
+        if (export.endsWith(PACKAGE_SEPARATOR)) {
+          export = export.substring(0, export.length() - 1);
+        }
+        exported.add(export);
+      }
+    }
+
+    return exported;
+  }
 }

@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.annotation.Annotation;
@@ -19,7 +19,7 @@ import org.junit.Test;
 
 public class DefaultArtifactClassLoaderFilterFactoryTestCase extends AbstractMuleTestCase {
 
-  private final DefaultArtifactClassLoaderFilterFactory factory = new DefaultArtifactClassLoaderFilterFactory();
+  private final ArtifactClassLoaderFilterFactory factory = new ArtifactClassLoaderFilterFactory();
 
   @Test
   public void createsNullFilter() throws Exception {

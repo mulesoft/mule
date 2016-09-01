@@ -18,10 +18,10 @@ import java.lang.annotation.Annotation;
 import org.junit.Test;
 
 @SmallTest
-public class ArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase {
+public class DefaultArtifactClassLoaderFilterTestCase extends AbstractMuleTestCase {
 
   private ArtifactClassLoaderFilter filter =
-      new ArtifactClassLoaderFilter(singleton("java.lang"), singleton("META-INF/schema.xsd"));
+      new DefaultArtifactClassLoaderFilter(singleton("java.lang"), singleton("META-INF/schema.xsd"));
 
   @Test
   public void filtersClassWhenPackageNotExported() throws Exception {

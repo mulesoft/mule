@@ -6,18 +6,21 @@
  */
 package org.mule.runtime.module.launcher.plugin;
 
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.launcher.descriptor.DeployableArtifactDescriptor;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
 
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
 
   private URL runtimeClassesDir;
-  private URL[] runtimeLibs = new URL[0];
-  private ArtifactClassLoaderFilter classLoaderFilter = ArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
+  private Set<String> pluginDependencies = new HashSet<>();
+  private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
 
   public URL getRuntimeClassesDir() {
     return runtimeClassesDir;
@@ -27,19 +30,19 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
     this.runtimeClassesDir = runtimeClassesDir;
   }
 
-  public URL[] getRuntimeLibs() {
-    return runtimeLibs;
+  public Set<String> getPluginDependencies() {
+    return pluginDependencies;
   }
 
-  public void setRuntimeLibs(URL[] runtimeLibs) {
-    this.runtimeLibs = runtimeLibs;
+  public void setPluginDependencies(Set<String> pluginDependencies) {
+    this.pluginDependencies = pluginDependencies;
   }
 
-  public ArtifactClassLoaderFilter getClassLoaderFilter() {
-    return classLoaderFilter;
+  public List<ArtifactPluginDescriptor> getArtifactPluginDescriptors() {
+    return artifactPluginDescriptors;
   }
 
-  public void setClassLoaderFilter(ArtifactClassLoaderFilter classLoaderFilter) {
-    this.classLoaderFilter = classLoaderFilter;
+  public void setArtifactPluginDescriptors(List<ArtifactPluginDescriptor> pluginDependencyDescriptors) {
+    this.artifactPluginDescriptors = pluginDependencyDescriptors;
   }
 }

@@ -8,8 +8,9 @@
 package org.mule.runtime.module.launcher.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
-import org.mule.runtime.core.util.StringUtils;
+import static org.mule.runtime.module.launcher.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
 import org.mule.tck.ZipUtils.ZipResource;
 
@@ -68,7 +69,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    */
   public ArtifactPluginFileBuilder configuredWith(String propertyName, String propertyValue) {
     checkImmutable();
-    checkArgument(!StringUtils.isEmpty(propertyName), "Property name cannot be empty");
+    checkArgument(!isEmpty(propertyName), "Property name cannot be empty");
     checkArgument(propertyValue != null, "Property value cannot be null");
     properties.put(propertyName, propertyValue);
     return this;
@@ -82,7 +83,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    */
   public ArtifactPluginFileBuilder containingClass(String classFile) {
     checkImmutable();
-    checkArgument(!StringUtils.isEmpty(classFile), "Class file cannot be empty");
+    checkArgument(!isEmpty(classFile), "Class file cannot be empty");
     String alias = classFile.replace(".clazz", ".class");
     resources.add(new ZipResource(classFile, "classes/" + alias));
     return this;
@@ -96,8 +97,29 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
    */
   public ArtifactPluginFileBuilder containingResource(String resourceFile, String alias) {
     checkImmutable();
-    checkArgument(!StringUtils.isEmpty(resourceFile), "Resource file cannot be empty");
+    checkArgument(!isEmpty(resourceFile), "Resource file cannot be empty");
     resources.add(new ZipResource(resourceFile, "classes/" + alias));
+    return this;
+  }
+
+  /**
+   * Adds a dependency against another plugin
+   *
+   * @param pluginName name of the plugin to be dependent. Non empty.
+   * @return the same builder instance
+   */
+  public ArtifactPluginFileBuilder dependingOn(String pluginName) {
+    checkImmutable();
+    checkArgument(!isEmpty(pluginName), "Plugin name cannot be empty");
+    String plugins = properties.getProperty(PLUGIN_DEPENDENCIES);
+    if (isEmpty(plugins)) {
+      plugins = pluginName;
+    } else {
+      plugins = plugins + ", " + pluginName;
+    }
+
+    properties.setProperty(PLUGIN_DEPENDENCIES, plugins);
+
     return this;
   }
 
