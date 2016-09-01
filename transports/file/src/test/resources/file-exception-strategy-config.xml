@@ -52,15 +52,17 @@
         </error-handler>
     </flow>
 
-    <flow name="consumeFileWithStreamingAndRollbackWithRedelivery" processingStrategy="synchronous">
+    <!-- TODO - MULE-9638 - Doesn't work because old parsing mechanism is used. Uncomment once all old parsers get removed-->
+    <!--<flow name="consumeFileWithStreamingAndRollbackWithRedelivery" processingStrategy="synchronous">
         <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-rollback-with-redelivery" connector-ref="fileConnectorStreaming">
-            <idempotent-redelivery-policy idExpression="#['fixedValue']"/>
+            <redelivery-policy idExpression="#['fixedValue']" maxRedeliveryCount="2"/>
         </file:inbound-endpoint>
         <test:component/>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="2"/>
+            <on-error-continue type="REDELIVERY_EXHAUSTED"/>
+            <on-error-propagate/>
         </error-handler>
-    </flow>
+    </flow>-->
 
     <flow name="consumefileWithStreamingAndAsyncProcessingStrategy" processingStrategy="asynchronous">
         <file:inbound-endpoint path="${workingDirectory}/temp/input-streaming-and-async-processing-strategy" connector-ref="fileConnectorStreamingLongPolling"/>

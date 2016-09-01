@@ -97,11 +97,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");
   }
 
-  @Test(expected = ConfigurationException.class)
-  public void testErrorHandlerWithMultipleHandleRedeliveryExceptionStrategies() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/error-handler-multiple-propagate.xml");
-  }
-
   private void loadConfiguration(String configuration) throws MuleException, InterruptedException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();

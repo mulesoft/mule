@@ -64,6 +64,7 @@ import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
@@ -210,6 +211,7 @@ public class DefaultMuleContext implements MuleContext {
   private ArtifactType artifactType;
 
   private ErrorTypeLocator errorTypeLocator;
+  private ErrorTypeRepository errorTypeRepository;
 
   /**
    * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -1046,7 +1048,22 @@ public class DefaultMuleContext implements MuleContext {
     this.errorTypeLocator = errorTypeLocator;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public ErrorTypeLocator getErrorTypeLocator() {
     return errorTypeLocator;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ErrorTypeRepository getErrorTypeRepository() {
+    return errorTypeRepository;
+  }
+
+  public void setErrorTypeRepository(ErrorTypeRepository errorTypeRepository) {
+    this.errorTypeRepository = errorTypeRepository;
   }
 }

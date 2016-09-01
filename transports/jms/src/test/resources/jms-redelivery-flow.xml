@@ -36,6 +36,7 @@
 
     <flow name="Bouncer2">
         <jms:inbound-endpoint queue="in2" connector-ref="jmsConnectorNoRedelivery">
+            <redelivery-policy maxRedeliveryCount="${maxRedeliveryAttempts}"/>
             <jms:transaction action="ALWAYS_BEGIN" />
         </jms:inbound-endpoint>
         <test:component />
@@ -43,13 +44,11 @@
             <jms:transaction action="ALWAYS_JOIN" />
         </jms:outbound-endpoint>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="${maxRedeliveryAttempts}">
-                <on-redelivery-attempts-exceeded>
-                    <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorNoRedelivery">
-                        <jms:transaction action="ALWAYS_JOIN" />
-                    </jms:outbound-endpoint>
-                </on-redelivery-attempts-exceeded>
-            </on-error-propagate>
+            <on-error-continue type="REDELIVERY_EXHAUSTED">
+                <jms:outbound-endpoint queue="dead.letter" connector-ref="jmsConnectorNoRedelivery">
+                    <jms:transaction action="ALWAYS_JOIN" />
+                </jms:outbound-endpoint>
+            </on-error-continue>
         </error-handler>
     </flow>
 

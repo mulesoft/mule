@@ -8,11 +8,13 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.EXPRESSION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.ErrorTypeRepository.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.exception.ErrorTypeRepository.UNKNOWN_ERROR_IDENTIFIER;
 
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.config.ComponentIdentifier;
 
 /**
  * Factory for {@link ErrorTypeLocator}.
@@ -31,11 +33,17 @@ public class ErrorTypeLocatorFactory {
     return ErrorTypeLocator.builder(errorTypeRepository)
         .defaultExceptionMapper(ExceptionMapper.builder()
             .addExceptionMapping(TransformerMessagingException.class,
-                                 errorTypeRepository.lookupErrorType(CORE_NAMESPACE_NAME, TRANSFORMATION_ERROR_IDENTIFIER))
+                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+                                     .withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build()))
             .addExceptionMapping(ExpressionRuntimeException.class,
-                                 errorTypeRepository.lookupErrorType(CORE_NAMESPACE_NAME, EXPRESSION_ERROR_IDENTIFIER))
+                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+                                     .withNamespace(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build()))
+            .addExceptionMapping(MessageRedeliveredException.class,
+                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+                                     .withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build()))
             .addExceptionMapping(Exception.class,
-                                 errorTypeRepository.lookupErrorType(CORE_NAMESPACE_NAME, UNKNOWN_ERROR_IDENTIFIER))
+                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
+                                     .withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build()))
             .build())
         .build();
   }

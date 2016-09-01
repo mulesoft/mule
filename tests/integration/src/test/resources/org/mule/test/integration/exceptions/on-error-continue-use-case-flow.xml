@@ -91,7 +91,7 @@
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-continue type="MULE:CUSTOM">
+            <on-error-continue type="EXPRESSION">
                 <append-string-transformer message=" nope"/>
             </on-error-continue>
             <on-error-continue type="UNKNOWN">
@@ -107,7 +107,7 @@
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-continue type="MULE:CUSTOM">
+            <on-error-continue type="EXPRESSION">
                 <append-string-transformer message=" nope"/>
             </on-error-continue>
             <on-error-continue type="ANY">

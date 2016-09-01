@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -101,7 +100,7 @@ public class DefaultLocalMuleClient implements MuleClient {
     if (muleEvent == null) {
       //This should never return a null event. This happen because of mule 3.x behaviour with filters.
       //We will just return an error in this case.
-      ErrorType anyErrorType = muleContext.getErrorTypeLocator().getAnyErrorType();
+      ErrorType anyErrorType = muleContext.getErrorTypeRepository().getAnyErrorType();
       return left(builder(new MuleRuntimeException(createStaticMessage(MESSAGE_FILTERED_ERROR_MESSAGE))).errorType(anyErrorType)
           .build());
     }

@@ -6,12 +6,21 @@
  */
 package org.mule.runtime.core.config;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 
 import javax.xml.namespace.QName;
 
 /**
- * Unique identifier for a configuration option.
+ * Unique identifier for a configuration option. Every configuration option
+ * has a namespace and an identifier.
+ *
+ * The namespace define the extension that defines the component. Even
+ * core configuration has a namespace even though there's no namespace
+ * used in the configuration files.
  *
  * @since 4.0
  */
@@ -36,6 +45,21 @@ public class ComponentIdentifier {
    */
   public String getName() {
     return identifier;
+  }
+
+  public static ComponentIdentifier parseComponentIdentifier(String errorTypeIdentifier) {
+    checkArgument(!isEmpty(errorTypeIdentifier), "error type identifier cannot be an empty string or null");
+    String[] values = errorTypeIdentifier.split(":");
+    String namespace;
+    String identifier;
+    if (values.length == 2) {
+      namespace = values[0];
+      identifier = values[1];
+    } else {
+      namespace = ErrorTypeRepository.CORE_NAMESPACE_NAME;
+      identifier = values[0];
+    }
+    return new ComponentIdentifier.Builder().withNamespace(namespace).withName(identifier).build();
   }
 
   public static class Builder {

@@ -28,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase {
@@ -135,6 +136,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase 
     }
   }
 
+  @Ignore("MULE-9638 - Doesn't work because old parsing mechanism is used. Uncomment once all old parsers get removed")
   @Test
   public void testConsumeFileWithExAndRollbackWithRedelivery() throws Exception {
     final CountDownLatch countDownLatch = new CountDownLatch(3);

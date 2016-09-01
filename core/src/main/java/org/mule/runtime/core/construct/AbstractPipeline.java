@@ -42,6 +42,7 @@ import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -281,22 +282,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected boolean isRedeliveryPolicyConfigured() {
-    boolean isRedeliveredPolicyConfigured = false;
-    if (this.exceptionListener instanceof OnErrorPropagateHandler
-        && ((OnErrorPropagateHandler) exceptionListener).hasMaxRedeliveryAttempts()) {
-      isRedeliveredPolicyConfigured = true;
-    } else if (this.exceptionListener instanceof ErrorHandler) {
-      ErrorHandler errorHandler =
-          (ErrorHandler) this.exceptionListener;
-      for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : errorHandler
-          .getExceptionListeners()) {
-        if (messagingExceptionHandlerAcceptor instanceof OnErrorPropagateHandler) {
-          isRedeliveredPolicyConfigured = true;
-          break;
-        }
-      }
+    if (getMessageProcessors().isEmpty()) {
+      return false;
     }
-    return isRedeliveredPolicyConfigured;
+    return getMessageProcessors().get(0) instanceof IdempotentRedeliveryPolicy;
   }
 
   @Override

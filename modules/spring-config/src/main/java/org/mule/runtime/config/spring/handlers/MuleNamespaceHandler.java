@@ -378,7 +378,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
     registerBeanDefinitionParser("xa-transaction", new XaTransactionDefinitionParser(XaTransactionFactory.class));
-    registerBeanDefinitionParser("idempotent-redelivery-policy",
+    registerBeanDefinitionParser("redelivery-policy",
                                  new ChildDefinitionParser("redeliveryPolicy", IdempotentRedeliveryPolicy.class));
 
     // Message Processors

@@ -85,10 +85,9 @@ public class MessageProcessorNotificationPathTestCase extends AbstractIntegratio
   @Test
   public void exceptionStrategies() throws Exception {
     testFlowPaths("catch-es", "/0", "es/0/0");
-    testFlowPaths("rollback-es", "/0", "es/0/0", "es/0/1");
-    testFlowPaths("choice-es", "/0", "es/0/0", "es/0/1", "es/1/0");
+    testFlowPaths("rollback-es", "/0", "es/0/0", "es/1/0");
+    testFlowPaths("choice-es", "/0", "es/0/0", "es/1/0", "es/2/0");
     testFlowPaths("global-es", "/0", "Global_Exception_Strategy/es/0/0", "Global_Exception_Strategy/es/0/1");
-
   }
 
   @Test

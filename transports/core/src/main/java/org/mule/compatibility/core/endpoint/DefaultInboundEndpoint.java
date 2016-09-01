@@ -150,36 +150,8 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
 
   @Override
   public AbstractRedeliveryPolicy getRedeliveryPolicy() {
-    /*
-     * TODO Next commit will fix this horrible thing: inbound endpoint should only be aware of a redelivery policy configured on
-     * it flowConstruct should be responsible of redelivery policy use
-     */
-    AbstractRedeliveryPolicy redeliveryPolicy = super.getRedeliveryPolicy();
-    OnErrorPropagateHandler onErrorPropagateHandler = null;
-    if (flowConstruct != null && flowConstruct.getExceptionListener() != null) {
-      MessagingExceptionHandler exceptionListener = flowConstruct.getExceptionListener();
-      if (exceptionListener instanceof OnErrorPropagateHandler) {
-        onErrorPropagateHandler = (OnErrorPropagateHandler) exceptionListener;
-      } else if (exceptionListener instanceof ErrorHandler) {
-        ErrorHandler errorHandler = (ErrorHandler) exceptionListener;
-        for (MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor : errorHandler
-            .getExceptionListeners()) {
-          if (messagingExceptionHandlerAcceptor instanceof OnErrorPropagateHandler
-              && ((OnErrorPropagateHandler) messagingExceptionHandlerAcceptor).hasMaxRedeliveryAttempts()) {
-            onErrorPropagateHandler = (OnErrorPropagateHandler) messagingExceptionHandlerAcceptor;
-            break;
-          }
-        }
-      }
-    }
-    if (onErrorPropagateHandler != null && onErrorPropagateHandler.hasMaxRedeliveryAttempts()) {
-      if (redeliveryPolicy == null) {
-        redeliveryPolicy = createDefaultRedeliveryPolicy(onErrorPropagateHandler.getMaxRedeliveryAttempts());
-      } else {
-        redeliveryPolicy.setMaxRedeliveryCount(onErrorPropagateHandler.getMaxRedeliveryAttempts());
-      }
-    }
-    return redeliveryPolicy;
+    //No need to return a redelivery policy since this is managed when processing the DSL
+    return null;
   }
 
   @Override

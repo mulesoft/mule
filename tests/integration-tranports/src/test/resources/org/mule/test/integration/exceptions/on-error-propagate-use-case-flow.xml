@@ -56,21 +56,23 @@
     </flow>
 
     <flow name="fullyDefinedRollbackExceptionStrategyWithComponent">
-        <vm:inbound-endpoint path="in6" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="in6" exchange-pattern="request-response">
+            <redelivery-policy maxRedeliveryCount="${shortMaxRedelivery}"/>
+        </vm:inbound-endpoint>
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="${shortMaxRedelivery}">
+            <on-error-continue type="REDELIVERY_EXHAUSTED">
+                <append-string-transformer message=" apt4"/>
+                <script:component>
+                    <script:script engine="groovy">
+                        return "$payload groovified"
+                    </script:script>
+                </script:component>
+            </on-error-continue>
+            <on-error-propagate>
                 <append-string-transformer message=" apt2"/>
                 <append-string-transformer message=" apt3"/>
-                <on-redelivery-attempts-exceeded>
-                    <append-string-transformer message=" apt4"/>
-                    <script:component>
-                        <script:script engine="groovy">
-                            return "$payload groovified"
-                        </script:script>
-                    </script:component>
-                </on-redelivery-attempts-exceeded>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -81,28 +83,26 @@
        </jms:inbound-endpoint>
        <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate>
-                <on-redelivery-attempts-exceeded>
-                    <jms:jmsmessage-to-object-transformer/>
-                    <append-string-transformer message=" consumed successfully"/>
-                    <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery">
-                        <jms:transaction action="ALWAYS_JOIN"/>
-                    </jms:outbound-endpoint>
-                </on-redelivery-attempts-exceeded>
-            </on-error-propagate>
+            <on-error-continue type="REDELIVERY_EXHAUSTED">
+                <jms:jmsmessage-to-object-transformer/>
+                <append-string-transformer message=" consumed successfully"/>
+                <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery">
+                    <jms:transaction action="ALWAYS_JOIN"/>
+                </jms:outbound-endpoint>
+            </on-error-continue>
         </error-handler>
     </flow>
 
     <flow name="redeliveryExhaustedNoTransaction">
-       <jms:inbound-endpoint queue="in3" connector-ref="activeMq"/>
+       <jms:inbound-endpoint queue="in3" connector-ref="activeMq">
+           <redelivery-policy maxRedeliveryCount="${maxRedelivery}"/>
+       </jms:inbound-endpoint>
        <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="${maxRedelivery}">
-                <on-redelivery-attempts-exceeded>
-                    <append-string-transformer message=" consumed successfully"/>
-                    <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery"/>
-                </on-redelivery-attempts-exceeded>
-            </on-error-propagate>
+            <on-error-continue type="REDELIVERY_EXHAUSTED">
+                <append-string-transformer message=" consumed successfully"/>
+                <jms:outbound-endpoint queue="dlq" connector-ref="activeMqRedelivery"/>
+            </on-error-continue>
         </error-handler>
     </flow>
 
@@ -114,37 +114,39 @@
         </error-handler>
     </flow>
 
-    <flow name="httpWithRedeliveryExhausted">
-        <http:listener path="*" config-ref="listenerConfig2"/>
-        <test:component throwException="true"/>
-        <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="${shortMaxRedelivery}">
-                <on-redelivery-attempts-exceeded>
-                    <append-string-transformer message=" consumed successfully"/>
-                </on-redelivery-attempts-exceeded>
-            </on-error-propagate>
-        </error-handler>
-    </flow>
+    <!--<flow name="httpWithRedeliveryExhausted">-->
+        <!--<http:listener path="*" config-ref="listenerConfig2"/>-->
+        <!--<test:component throwException="true"/>-->
+        <!--<error-handler>-->
+            <!--<on-error-propagate maxRedeliveryAttempts="${shortMaxRedelivery}">-->
+                <!--<on-redelivery-attempts-exceeded>-->
+                    <!--<append-string-transformer message=" consumed successfully"/>-->
+                <!--</on-redelivery-attempts-exceeded>-->
+            <!--</on-error-propagate>-->
+        <!--</error-handler>-->
+    <!--</flow>-->
 
     <flow name="fullyDefinedRollbackExceptionStrategy">
-        <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="in2" exchange-pattern="request-response">
+            <redelivery-policy maxRedeliveryCount="${shortMaxRedelivery}"/>
+        </vm:inbound-endpoint>
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="${shortMaxRedelivery}">
+            <on-error-continue type="REDELIVERY_EXHAUSTED">
+                <append-string-transformer message=" apt4"/>
+                <append-string-transformer message=" apt5"/>
+            </on-error-continue>
+            <on-error-propagate>
                 <append-string-transformer message=" apt2"/>
                 <append-string-transformer message=" apt3"/>
-                <on-redelivery-attempts-exceeded>
-                    <append-string-transformer message=" apt4"/>
-                    <append-string-transformer message=" apt5"/>
-                </on-redelivery-attempts-exceeded>
             </on-error-propagate>
         </error-handler>
     </flow>
 
     <flow name="redeliveryPolicyRedefinition">
         <vm:inbound-endpoint path="in3">
-            <idempotent-redelivery-policy idExpression="#[payload:]" useSecureHash="false"/>
+            <redelivery-policy idExpression="#[payload:]" useSecureHash="false"/>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component throwException="true"/>
@@ -155,27 +157,26 @@
 
     <flow name="inboundEndpointMaxRedeliveryTakesPrecendence">
         <vm:inbound-endpoint path="in4">
-            <idempotent-redelivery-policy maxRedeliveryCount="4"/>
+            <redelivery-policy maxRedeliveryCount="7"/>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate maxRedeliveryAttempts="7"/>
+            <!--MULE-10415 - Remove exception handler once this gets implemented. Default error-handler with no config should manage the REDELIVERY_EXHAUSTED case by default -->
+            <on-error-continue type="REDELIVERY_EXHAUSTED"/>
         </error-handler>
     </flow>
 
     <flow name="rollbackExceptionStrategyCatchMessageRedeliveryDespiteChoiceConfiguration">
         <vm:inbound-endpoint path="in7">
+            <redelivery-policy maxRedeliveryCount="2"/>
             <vm:transaction action="ALWAYS_BEGIN"/>
         </vm:inbound-endpoint>
         <test:component throwException="true" exceptionToThrow="java.io.IOException"/>
         <error-handler>
-            <on-error-propagate when="#[exception.causedBy(java.io.IOException)]" maxRedeliveryAttempts="2">
-                <on-redelivery-attempts-exceeded>
-                    <custom-processor class="org.mule.test.integration.exceptions.OnErrorPropagateTestCase$CallMessageProcessor"/>
-                </on-redelivery-attempts-exceeded>
-            </on-error-propagate>
-            <on-error-continue/>
+            <on-error-continue type="REDELIVERY_EXHAUSTED">
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorPropagateTestCase$CallMessageProcessor"/>
+            </on-error-continue>
         </error-handler>
     </flow>
 
@@ -183,7 +184,7 @@
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate type="MULE:CUSTOM">
+            <on-error-propagate type="REDELIVERY_EXHAUSTED">
                 <test:queue name="custom1"/>
             </on-error-propagate>
             <on-error-propagate type="UNKNOWN">
@@ -199,7 +200,7 @@
         <append-string-transformer message=" apt1"/>
         <test:component throwException="true"/>
         <error-handler>
-            <on-error-propagate type="MULE:CUSTOM">
+            <on-error-propagate type="REDELIVERY_EXHAUSTED">
                 <test:queue name="custom2"/>
             </on-error-propagate>
             <on-error-propagate type="ANY">

@@ -6,14 +6,17 @@
  */
 package org.mule.test.config;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
@@ -22,6 +25,7 @@ import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 
 /**
@@ -65,14 +69,10 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
   }
 
   private IdempotentRedeliveryPolicy redeliveryPolicyFromFlow(String flowName) throws Exception {
-    FlowConstruct flow = getFlowConstruct(flowName);
-    assertTrue(flow instanceof Flow);
-
-    MessageSource source = ((Flow) flow).getMessageSource();
-    assertTrue(source instanceof InboundEndpoint);
-    AbstractRedeliveryPolicy redeliveryPolicy = ((InboundEndpoint) source).getRedeliveryPolicy();
-    assertTrue(redeliveryPolicy instanceof IdempotentRedeliveryPolicy);
-    return (IdempotentRedeliveryPolicy) redeliveryPolicy;
+    Flow flow = (Flow) getFlowConstruct(flowName);
+    MessageProcessor messageProcessor = flow.getMessageProcessors().get(0);
+    assertThat(messageProcessor, instanceOf(IdempotentRedeliveryPolicy.class));
+    return (IdempotentRedeliveryPolicy) messageProcessor;
   }
 
   public static class CustomObjectStore extends SimpleMemoryObjectStore<Serializable> {
