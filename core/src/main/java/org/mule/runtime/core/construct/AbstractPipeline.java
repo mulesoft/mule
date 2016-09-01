@@ -282,6 +282,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected boolean isRedeliveryPolicyConfigured() {
+    if (getMessageProcessors().isEmpty()) {
+      return false;
+    }
     return getMessageProcessors().get(0) instanceof IdempotentRedeliveryPolicy;
   }
 

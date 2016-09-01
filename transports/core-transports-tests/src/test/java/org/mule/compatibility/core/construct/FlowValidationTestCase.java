@@ -16,9 +16,12 @@ import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
+import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,10 +67,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   private void configureFlowForRedelivery() {
     when(inboundEndpoint.getTransactionConfig().isConfigured()).thenReturn(false);
     when(inboundEndpoint.getExchangePattern().hasResponse()).thenReturn(false);
-    flow.setExceptionListener(onErrorPropagateHandler);
-    when(onErrorPropagateHandler.hasMaxRedeliveryAttempts()).thenReturn(true);
-    when(onErrorPropagateHandler.acceptsAll()).thenReturn(true);
-    when(inboundEndpoint.getRedeliveryPolicy()).thenReturn(mockRedeliveryPolicy);
+    flow.setMessageProcessors(Arrays.asList(new IdempotentRedeliveryPolicy()));
     flow.setMessageSource(inboundEndpoint);
     // flow.setMessageSource(Mockito.mock(MessageSource.class));
   }

@@ -98,26 +98,6 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
 
   private void validateConfiguredExceptionStrategies() {
     validateOnlyLastAcceptsAll();
-    validateOnlyOneHandlesRedelivery();
-  }
-
-  private void validateOnlyOneHandlesRedelivery() {
-    boolean rollbackWithRedelivery = false;
-    for (int i = 0; i < exceptionListeners.size(); i++) {
-      MessagingExceptionHandler messagingExceptionHandler = exceptionListeners.get(i);
-      if (messagingExceptionHandler instanceof MessagingExceptionStrategyAcceptorDelegate) {
-        messagingExceptionHandler =
-            ((MessagingExceptionStrategyAcceptorDelegate) messagingExceptionHandler).getExceptionListener();
-      }
-      if (messagingExceptionHandler instanceof OnErrorPropagateHandler
-          && ((OnErrorPropagateHandler) messagingExceptionHandler).hasMaxRedeliveryAttempts()) {
-        if (rollbackWithRedelivery) {
-          throw new MuleRuntimeException(CoreMessages
-              .createStaticMessage("Only one rollback exception strategy inside <error-handler> can handle message redelivery."));
-        }
-        rollbackWithRedelivery = true;
-      }
-    }
   }
 
   private void validateOnlyLastAcceptsAll() {

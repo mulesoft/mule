@@ -8,6 +8,7 @@ package org.mule.runtime.core.construct;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -17,10 +18,13 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
+import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.processor.strategy.SynchronousProcessingStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -85,10 +89,8 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
   }
 
   private void configureFlowForRedelivery() {
-    flow.setExceptionListener(onErrorPropagateHandler);
-    when(onErrorPropagateHandler.hasMaxRedeliveryAttempts()).thenReturn(true);
-    when(onErrorPropagateHandler.acceptsAll()).thenReturn(true);
-    flow.setMessageSource(Mockito.mock(MessageSource.class));
+    flow.setMessageProcessors(Arrays.asList(new IdempotentRedeliveryPolicy()));
+    flow.setMessageSource(mock(MessageSource.class));
   }
 
 }
