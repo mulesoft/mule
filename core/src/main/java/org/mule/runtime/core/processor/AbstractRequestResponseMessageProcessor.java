@@ -9,13 +9,13 @@ package org.mule.runtime.core.processor;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * Base implementation of a {@link org.mule.runtime.core.api.processor.MessageProcessor} that may performs processing during both
@@ -44,13 +44,19 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   protected MuleEvent processBlocking(MuleEvent event) throws MuleException {
     MessagingException exception = null;
+    MuleEvent response = null;
     try {
-      return processResponse(processNext(processRequest(event)), event);
+      response = processResponse(processNext(processRequest(event)), event);
+      return response;
     } catch (MessagingException e) {
       exception = e;
       return processCatch(event, e);
     } finally {
-      processFinally(event, exception);
+      if (response == null) {
+        processFinally(event, exception);
+      } else {
+        processFinally(response, exception);
+      }
     }
   }
 

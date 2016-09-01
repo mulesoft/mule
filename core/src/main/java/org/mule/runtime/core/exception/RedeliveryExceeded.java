@@ -59,7 +59,7 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
     }
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
       result = MuleEvent.builder(result).error(null)
-          .message(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build()).build();
+          .message(MuleMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
     }
     return result;
   }
