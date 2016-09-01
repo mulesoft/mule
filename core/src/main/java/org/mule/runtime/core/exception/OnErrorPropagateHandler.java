@@ -100,9 +100,11 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected void processReplyTo(MuleEvent event, Exception e) {
+  protected MuleEvent processReplyTo(MuleEvent event, Exception e) {
     if (isRedeliveryExhausted(e)) {
-      super.processReplyTo(event, e);
+      return super.processReplyTo(event, e);
+    } else {
+      return event;
     }
   }
 

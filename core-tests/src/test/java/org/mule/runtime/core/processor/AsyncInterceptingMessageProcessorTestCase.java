@@ -31,6 +31,7 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -115,7 +116,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     flow.setExceptionListener(exceptionListener);
     initialiseObject(flow);
 
-    MuleEvent event = getTestEvent(TEST_MESSAGE, flow, ONE_WAY);
+    MuleEvent event = MuleTestUtils.getTestEvent(TEST_MESSAGE, flow, ONE_WAY, muleContext);
 
     MessageProcessor next = event1 -> {
       throw new MessagingException(event1, null);
@@ -137,7 +138,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     flow.setExceptionListener(exceptionListener);
     initialiseObject(flow);
 
-    MuleEvent event = getTestEvent(TEST_MESSAGE, flow, ONE_WAY);
+    MuleEvent event = MuleTestUtils.getTestEvent(TEST_MESSAGE, flow, ONE_WAY, muleContext);
 
     MessageProcessor next = event1 -> {
       throw new DefaultMuleException("failure");

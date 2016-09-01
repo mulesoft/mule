@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldD
 import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.QUERIES_DEBUG_FIELD;
 import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.QUERY_DEBUG_FIELD;
 import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.createQueryFieldDebugInfo;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
@@ -61,8 +61,8 @@ public class DynamicBulkUpdateMessageProcessor extends AbstractBulkUpdateMessage
 
     BulkQuery bulkQuery = new BulkQuery();
     while (paramsIterator.hasNext()) {
-      MuleMessage itemMessage = MuleMessage.builder().payload(paramsIterator.next()).build();
-      MuleEvent itemEvent = new DefaultMuleEvent(itemMessage, muleEvent);
+      MuleEvent itemEvent =
+          MuleEvent.builder(muleEvent).message(MuleMessage.builder().payload(paramsIterator.next()).build()).build();
       Query query = queryResolver.resolve(connection, itemEvent);
       bulkQuery.add(query.getQueryTemplate());
     }

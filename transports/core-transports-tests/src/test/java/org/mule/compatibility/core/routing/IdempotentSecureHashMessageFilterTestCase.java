@@ -9,11 +9,10 @@ package org.mule.compatibility.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 
-import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -48,8 +47,8 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
 
     MuleMessage okMessage = MuleMessage.builder().payload("OK").build();
-    DefaultMuleEvent event = new DefaultMuleEvent(context, okMessage, getTestFlow(), session);
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
+    MuleEvent event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    populateFieldsFromInboundEndpoint(event, endpoint1);
 
     // This one will process the event on the target endpoint
     MuleEvent processedEvent = ir.process(event);
@@ -57,15 +56,15 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
 
     // This will not process, because the message is a duplicate
     okMessage = MuleMessage.builder().payload("OK").build();
-    event = new DefaultMuleEvent(context, okMessage, getTestFlow(), session);
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
+    event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNull(processedEvent);
 
     // This will process, because the message is not a duplicate
     okMessage = MuleMessage.builder().payload("Not OK").build();
-    event = new DefaultMuleEvent(context, okMessage, getTestFlow(), session);
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, endpoint1);
+    event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNotNull(processedEvent);
   }

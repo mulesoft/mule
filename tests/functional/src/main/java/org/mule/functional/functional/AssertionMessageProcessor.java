@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -72,12 +73,21 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
    */
   public void verify() throws InterruptedException {
     if (countFailOrNullEvent()) {
-      fail("Flow assertion '" + message + "' failed. No message received or if count attribute was "
-          + "set then it was no matched.");
+      fail(failureMessagePrefix() + "No message received or if count attribute was " + "set then it was no matched.");
     } else if (expressionFailed()) {
-      fail("Flow assertion '" + message + "' failed. Expression " + expression + " evaluated false.");
+      fail(failureMessagePrefix() + "Expression " + expression + " evaluated false.");
     }
   }
+
+  protected String failureMessagePrefix() {
+    String processorPath = "?";
+    if (flowConstruct instanceof MessageProcessorPathResolver) {
+      processorPath = ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(this);
+    }
+
+    return "Flow assertion '" + message + "' failed @ '" + processorPath + "'. ";
+  }
+
 
   public Boolean countFailOrNullEvent() throws InterruptedException // added for testing (cant assert on asserts)
   {

@@ -320,7 +320,79 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder removeFlowVariable(String key);
 
     /**
-     * Build a new {@link MuleEvent} based on the state confgured in the {@link Builder}.
+     * Sets the correlation information to the produced event.
+     *
+     * @param correlation the object containing the correlation information to set on the produced event
+     * @return the builder instance
+     */
+    Builder correlation(Correlation correlation);
+
+    /**
+     * Sets an error related to the produced event.
+     *
+     * @param error the error associated with the produced event
+     * @return the builder instance
+     */
+    Builder error(Error error);
+
+    /**
+     * 
+     * @param synchronous
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder synchronous(boolean synchronous);
+
+    /**
+     * 
+     * @param exchangePattern
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder exchangePattern(MessageExchangePattern exchangePattern);
+
+    /**
+     * 
+     * @param replyToHandler
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder replyToHandler(ReplyToHandler replyToHandler);
+
+    /**
+     * 
+     * @param replyToDestination
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder replyToDestination(Object replyToDestination);
+
+    /**
+     * 
+     * @param flow
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder flow(FlowConstruct flow);
+
+    /**
+     * 
+     * @param transacted
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder transacted(boolean transacted);
+
+    /**
+     * 
+     * @param session
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder session(MuleSession session);
+
+    /**
+     * Build a new {@link MuleEvent} based on the state configured in the {@link Builder}.
      *
      * @return new {@link MuleEvent} instance.
      */

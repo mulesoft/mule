@@ -22,7 +22,7 @@ import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
@@ -130,7 +130,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow));
+    setCurrentEvent(MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
@@ -156,7 +156,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
     Flow flow = getTestFlow();
-    setCurrentEvent(new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow));
+    setCurrentEvent(MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
     oos.writeObject(message);
     oos.flush();
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));

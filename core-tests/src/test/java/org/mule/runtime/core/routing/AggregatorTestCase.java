@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -52,9 +51,9 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
 
-    MuleEvent event1 = new DefaultMuleEvent(context, message1, flow, session);
-    MuleEvent event2 = new DefaultMuleEvent(context, message2, flow, session);
-    MuleEvent event3 = new DefaultMuleEvent(context, message3, flow, session);
+    MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).session(session).build();
+    MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(flow).session(session).build();
+    MuleEvent event3 = MuleEvent.builder(context).message(message3).flow(flow).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
@@ -116,8 +115,8 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
             throw new AggregationException(events, next, e);
           }
 
-          return new DefaultMuleEvent(MuleMessage.builder().payload(newPayload.toString()).build(),
-                                      events.getMessageCollectionEvent());
+          return MuleEvent.builder(events.getMessageCollectionEvent())
+              .message(MuleMessage.builder().payload(newPayload.toString()).build()).build();
         }
       };
     }

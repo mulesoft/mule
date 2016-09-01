@@ -110,9 +110,10 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     MuleEvent response = endpoint.process(event);
     assertThat(response, equalTo(NonBlockingVoidMuleEvent.getInstance()));
 
-    assertThat(getNonBlockingResponse(nullReplyToHandler, response), equalTo(event));
-    verify(reqTransformer, times(1)).process(event);
-    verify(resTransformer, times(1)).process(event);
+    assertThat(getNonBlockingResponse(nullReplyToHandler, response).getMessage().getPayload(),
+               equalTo(event.getMessage().getPayload()));
+    verify(reqTransformer, times(1)).process(any());
+    verify(resTransformer, times(1)).process(any());
   }
 
   @Test

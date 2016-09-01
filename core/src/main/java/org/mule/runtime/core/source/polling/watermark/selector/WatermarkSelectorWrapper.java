@@ -9,10 +9,10 @@ package org.mule.runtime.core.source.polling.watermark.selector;
 
 import static java.lang.String.format;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.source.polling.watermark.WatermarkUtils;
 
 import java.io.NotSerializableException;
@@ -34,7 +34,7 @@ public class WatermarkSelectorWrapper extends WatermarkSelector {
                                      MuleContext muleContext) {
     this.selectorExpression = selectorExpression;
     this.wrapped = wrapped;
-    this.muleEvent = DefaultMuleEvent.copy(muleEvent);
+    this.muleEvent = MuleEvent.builder(muleEvent).session(new DefaultMuleSession(muleEvent.getSession())).build();
     this.muleContext = muleContext;
   }
 

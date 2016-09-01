@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.DefaultMuleEvent;
+import static org.mule.runtime.core.config.i18n.CoreMessages.objectNotOfCorrectType;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,14 +34,12 @@ public class MapSplitter extends AbstractSplitter {
       List<MuleEvent> list = new LinkedList<>();
       Set<Map.Entry<?, ?>> set = ((Map) message.getPayload()).entrySet();
       for (Entry<?, ?> entry : set) {
-        MuleEvent splitEvent = new DefaultMuleEvent(MuleMessage.builder().payload(entry.getValue()).build(), event);
         // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
-        list.add(splitEvent);
+        list.add(MuleEvent.builder(event).message(MuleMessage.builder().payload(entry.getValue()).build()).build());
       }
       return list;
     } else {
-      throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(message.getDataType().getType(), Map.class)
-          .getMessage());
+      throw new IllegalArgumentException(objectNotOfCorrectType(message.getDataType().getType(), Map.class).getMessage());
     }
   }
 }

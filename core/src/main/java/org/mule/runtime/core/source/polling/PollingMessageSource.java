@@ -13,7 +13,6 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedN
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
@@ -211,7 +210,8 @@ public class PollingMessageSource
 
         @Override
         public MuleEvent process() throws Exception {
-          MuleEvent event = new DefaultMuleEvent(create(flowConstruct, getPollingUniqueName()), request, ONE_WAY, flowConstruct);
+          MuleEvent event = MuleEvent.builder(create(flowConstruct, getPollingUniqueName())).message(request)
+              .exchangePattern(ONE_WAY).flow(flowConstruct).build();
           event = interceptor.prepareSourceEvent(event);
 
           setCurrentEvent(event);
@@ -221,7 +221,7 @@ public class PollingMessageSource
             muleContext.getNotificationManager()
                 .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
                                                                    flowConstruct, MESSAGE_RECEIVED));
-            event = interceptor.prepareRouting(sourceEvent, new DefaultMuleEvent(sourceEvent.getMessage(), sourceEvent));
+            event = interceptor.prepareRouting(sourceEvent, sourceEvent);
             listener.process(event);
             interceptor.postProcessRouting(event);
           } else {

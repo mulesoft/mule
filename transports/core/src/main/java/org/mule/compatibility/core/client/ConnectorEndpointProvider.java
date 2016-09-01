@@ -15,8 +15,8 @@ import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.SimpleEndpointCache;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.RequestCacheKey;
@@ -86,8 +86,7 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
           throw new ReceiveException(inboundEndpoint, timeout, e);
         }
         MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-        return message != null ? new DefaultMuleEvent(event.getContext(), message, flowConstruct)
-            : null;
+        return message != null ? MuleEvent.builder(event.getContext()).message(message).flow(flowConstruct).build() : null;
       };
     }
   }

@@ -6,14 +6,13 @@
  */
 package org.mule.compatibility.transport.file;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
-
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -205,8 +204,8 @@ public class FileMessageRequester extends AbstractMessageRequester {
         return null;
       }
     };
-    final DefaultMuleEvent event =
-        new DefaultMuleEvent(create(flowConstruct, endpoint.getAddress()), fileParserMessasge, flowConstruct);
+    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
+        .message(fileParserMessasge).flow(flowConstruct).build();
 
     return fileConnector.getFilenameParser().getFilename(event, pattern);
   }

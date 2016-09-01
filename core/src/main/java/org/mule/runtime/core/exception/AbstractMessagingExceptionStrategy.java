@@ -11,6 +11,7 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -24,13 +25,14 @@ import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 /**
- * Fire a notification, log exception, increment statistics, route the problematic message to a destination 
- * if one is configured (DLQ pattern), commit or rollback transaction if one exists, close any open streams.
+ * Fire a notification, log exception, increment statistics, route the problematic message to a destination if one is configured
+ * (DLQ pattern), commit or rollback transaction if one exists, close any open streams.
  */
 public abstract class AbstractMessagingExceptionStrategy extends AbstractExceptionListener implements MessagingExceptionHandler {
 
-  /** 
-   * Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX). 
+  /**
+   * Stop the flow/service when an exception occurs. You will need to restart the flow/service manually after this (e.g, using
+   * JMX).
    */
   private boolean stopMessageProcessing;
 
@@ -46,32 +48,34 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       muleContext.getNotificationManager()
           .fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_START));
 
-      //keep legacy notifications
+      // keep legacy notifications
       fireNotification(ex);
 
       // Work with the root exception, not anything that wraps it
-      //Throwable t = ExceptionHelper.getRootException(ex);
+      // Throwable t = ExceptionHelper.getRootException(ex);
 
       logException(ex, event);
-      doHandleException(ex, event);
+      MuleEvent handledEvent = doHandleException(ex, event);
+      if (!(handledEvent instanceof VoidMuleEvent)) {
+        event = handledEvent;
+      }
 
       ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
       if (getCurrentEvent() != null) {
         MuleEvent currentEvent = getCurrentEvent();
-        currentEvent.setMessage(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build());
+        currentEvent = MuleEvent.builder(currentEvent)
+            .message(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
         setCurrentEvent(currentEvent);
       }
-      event.setMessage(MuleMessage.builder(event.getMessage())
-          .nullPayload()
-          .exceptionPayload(exceptionPayload)
-          .build());
-      return event;
+
+      return MuleEvent.builder(event)
+          .message(MuleMessage.builder(event.getMessage()).nullPayload().exceptionPayload(exceptionPayload).build()).build();
     } finally {
       muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_END));
     }
   }
 
-  protected void doHandleException(Exception ex, MuleEvent event) {
+  protected MuleEvent doHandleException(Exception ex, MuleEvent event) {
     FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incExecutionError();
@@ -80,15 +84,17 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     // Left this here for backwards-compatibility, remove in the next major version.
     defaultHandler(ex);
 
+    MuleEvent result;
+
     if (isRollback(ex)) {
       logger.debug("Rolling back transaction");
       rollback(ex);
 
       logger.debug("Routing exception message");
-      routeException(event, flowConstruct, ex);
+      result = routeException(event, flowConstruct, ex);
     } else {
       logger.debug("Routing exception message");
-      routeException(event, flowConstruct, ex);
+      result = routeException(event, flowConstruct, ex);
     }
 
     closeStream(event.getMessage());
@@ -96,6 +102,8 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     if (stopMessageProcessing) {
       stopFlow();
     }
+
+    return result;
   }
 
   protected void stopFlow() {

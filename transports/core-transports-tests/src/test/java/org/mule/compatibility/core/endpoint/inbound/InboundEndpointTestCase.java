@@ -21,17 +21,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
@@ -40,9 +35,7 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.compatibility.core.transformer.simple.InboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -54,8 +47,11 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.security.TestSecurityFilter;
+
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
 
 public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
@@ -237,10 +233,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     requestEvent = createTestRequestEvent(endpoint);
     responseEvent = createTestResponseEvent(endpoint);
     RuntimeException exception = new RuntimeException();
-    responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage())
-        .exceptionPayload(new DefaultExceptionPayload(exception))
-        .build());
-    responseEvent.setError(createErrorMock(exception));
+    responseEvent = MuleEvent.builder(responseEvent)
+        .message(MuleMessage.builder(responseEvent.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+        .error(createErrorMock(exception)).build();
 
     MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(endpoint.getFlowConstruct());
     result = mpChain.process(requestEvent);
@@ -345,18 +340,18 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
   protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
-    final DefaultMuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), inMessage, flow,
-                                                        getTestSession(null, muleContext));
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
+    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
+        .session(getTestSession(null, muleContext)).build();
+    populateFieldsFromInboundEndpoint(event, ep);
     return event;
   }
 
   protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
-    final DefaultMuleEvent event =
-        new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR),
-                             MuleMessage.builder().payload(RESPONSE_MESSAGE).build(), flow, getTestSession(null, muleContext));
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(event, ep);
+    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(MuleMessage.builder().payload(RESPONSE_MESSAGE).build()).flow(flow).session(getTestSession(null, muleContext))
+        .build();
+    populateFieldsFromInboundEndpoint(event, ep);
     return event;
   }
 

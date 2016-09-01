@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util.store;
 
+import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -18,10 +19,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -32,7 +34,6 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 import org.mule.tck.NonSerializableObject;
@@ -165,7 +166,8 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     QueueKey key = new QueueKey(QUEUE_NAME, id);
     MuleMessage msg = MuleMessage.builder().payload("Hello").build();
     Flow flow = getTestFlow();
-    MuleEvent event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), msg, ONE_WAY, flow);
+    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(msg).exchangePattern(ONE_WAY)
+        .flow(flow).build();
 
     ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
     monitored.store(key, event);
@@ -207,11 +209,9 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
   }
 
   private File createStoreFile(String id) {
-    String path = String.format("%1s/%2s/%3s/%4s.msg", persistenceFolder.getAbsolutePath(),
-                                QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE, QUEUE_NAME, id);
-    return FileUtils.newFile(path);
+    String path = format("%1s/%2s/%3s/%4s.msg", persistenceFolder.getAbsolutePath(), DEFAULT_QUEUE_STORE, QUEUE_NAME, id);
+    return newFile(path);
   }
-
 
   private static class SerializableWrapper implements Serializable {
 

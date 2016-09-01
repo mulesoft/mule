@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -23,6 +25,7 @@ import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base implementation of a {@link MuleMessage} splitter, that converts its payload in a {@link MessageSequence}, and process each
@@ -76,7 +79,6 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
   protected abstract MessageSequence<?> splitMessageIntoSequence(MuleEvent event) throws MuleException;
 
   protected List<MuleEvent> processParts(MessageSequence<?> seq, MuleEvent originalEvent) throws MuleException {
-    String correlationId = originalEvent.getCorrelationId();
     List<MuleEvent> resultEvents = new ArrayList<>();
     int correlationSequence = 0;
     MessageSequence<?> messageSequence = seq;
@@ -84,20 +86,25 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       messageSequence = new PartitionedMessageSequence(seq, batchSize);
     }
     Integer count = messageSequence.size();
+    MuleEvent lastResult = null;
     for (; messageSequence.hasNext();) {
       correlationSequence++;
 
-      DefaultMuleEvent event = createEvent(messageSequence.next(), originalEvent);
-      event.setParent(originalEvent);
-      event.setCorrelation(new Correlation(count, correlationSequence));
+      final Builder builder = MuleEvent.builder(originalEvent);
 
+      propagateFlowVars(lastResult, builder);
       if (counterVariableName != null) {
-        originalEvent.setFlowVariable(counterVariableName, correlationSequence);
+        builder.addFlowVariable(counterVariableName, correlationSequence);
       }
 
+      builder.correlation(new Correlation(count, correlationSequence));
+      initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
+      final MuleEvent event = builder.build();
+      ((DefaultMuleEvent) event).setParent(originalEvent);
       MuleEvent resultEvent = processNext(event);
       if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
         resultEvents.add(resultEvent);
+        lastResult = resultEvent;
       }
     }
     if (correlationSequence == 1) {
@@ -106,13 +113,30 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     return resultEvents;
   }
 
-  private DefaultMuleEvent createEvent(Object payload, MuleEvent originalEvent) {
-    if (payload instanceof MuleEvent) {
-      return new DefaultMuleEvent(((MuleEvent) payload).getMessage(), originalEvent);
+  protected Set<String> resolvePropagatedFlowVars(MuleEvent lastResult) {
+    return emptySet();
+  }
+
+  protected void propagateFlowVars(MuleEvent previousResult, final Builder builder) {
+    // Nothing to do
+  }
+
+  private void initEventBuilder(Object payload, MuleEvent originalEvent, Builder builder, Set<String> flowVarsFromLastResult) {
+    if (payload instanceof EventBuilderConfigurer) {
+      ((EventBuilderConfigurer) payload).configure(builder);
+    } else if (payload instanceof MuleEvent) {
+      final MuleEvent payloadAsEvent = (MuleEvent) payload;
+      builder.message(payloadAsEvent.getMessage());
+      for (String flowVarName : payloadAsEvent.getFlowVariableNames()) {
+        if (!flowVarsFromLastResult.contains(flowVarName)) {
+          builder.addFlowVariable(flowVarName, payloadAsEvent.getFlowVariable(flowVarName),
+                                  payloadAsEvent.getFlowVariableDataType(flowVarName));
+        }
+      }
     } else if (payload instanceof MuleMessage) {
-      return new DefaultMuleEvent((MuleMessage) payload, originalEvent);
+      builder.message((MuleMessage) payload);
     } else {
-      return new DefaultMuleEvent(MuleMessage.builder(originalEvent.getMessage()).payload(payload).build(), originalEvent);
+      builder.message(MuleMessage.builder(originalEvent.getMessage()).payload(payload).build());
     }
   }
 

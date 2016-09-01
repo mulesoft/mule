@@ -43,8 +43,8 @@ public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingRepl
   }
 
   @Override
-  public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
-    delegate.processReplyTo(event, returnMessage, replyTo);
+  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    return delegate.processReplyTo(event, returnMessage, replyTo);
   }
 
   @Override

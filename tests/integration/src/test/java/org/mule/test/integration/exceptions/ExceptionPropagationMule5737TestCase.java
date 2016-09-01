@@ -9,13 +9,14 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Rule;
@@ -95,10 +96,9 @@ public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTes
     public MuleEvent handleException(MessagingException e, MuleEvent event) {
       caught = true;
       MuleEvent resultEvent = super.handleException(e, event);
-      event.setError(null);
-      event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build());
       e.setHandled(true);
-      return resultEvent;
+      return MuleEvent.builder(resultEvent).message(MuleMessage.builder(resultEvent.getMessage()).exceptionPayload(null).build())
+          .error(null).build();
     }
 
   }

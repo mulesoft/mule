@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -150,7 +150,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
   private void evaluateFooFromPayload(Object payload) throws Exception {
     MuleMessage message = MuleMessage.builder().payload(payload).build();
-    MuleEvent event = new DefaultMuleEvent(message, getTestEvent(""));
+    MuleEvent event = MuleEvent.builder(getTestEvent("")).message(message).build();
 
     assertThat((String) doEvaluate("xpath3('/root/@foo')", event), equalTo(BAR));
   }

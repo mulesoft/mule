@@ -57,7 +57,7 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
   }
 
   @Override
-  public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
     Destination replyToDestination = null;
     MessageProducer replyToProducer = null;
     Session session = null;
@@ -67,8 +67,7 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
         replyToDestination = (Destination) replyTo;
       }
       if (replyToDestination == null) {
-        super.processReplyTo(event, returnMessage, replyTo);
-        return;
+        return super.processReplyTo(event, returnMessage, replyTo);
       }
 
       Class srcType = returnMessage.getDataType().getType();
@@ -140,6 +139,8 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
       if (logger.isInfoEnabled()) {
         logger.info(String.format("Reply Message sent to: %s with correlationID:%s", replyToDestination, correlationIDString));
       }
+
+      return event;
     } catch (Exception e) {
       throw new DispatchException(JmsMessages.failedToCreateAndDispatchResponse(replyToDestination), event, null, e);
     } finally {

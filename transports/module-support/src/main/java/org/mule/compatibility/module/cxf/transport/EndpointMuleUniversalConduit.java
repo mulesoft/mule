@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.module.cxf.transport;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 
@@ -14,7 +13,7 @@ import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -139,8 +138,8 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
             return null;
           }
         };
-        event = new DefaultMuleEvent(event == null ? create(flowConstruct, "EndpointMuleUniversalConduit") : event.getContext(),
-                                     muleMsg, ep.getExchangePattern(), flowConstruct);
+        event = MuleEvent.builder(event == null ? DefaultMessageContext.create(flowConstruct, "EndpointMuleUniversalConduit")
+            : event.getContext()).message(muleMsg).exchangePattern(ep.getExchangePattern()).flow(flowConstruct).build();
       } catch (Exception e) {
         throw new Fault(e);
       }
@@ -178,10 +177,10 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
       if (reqEvent.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-        reqEvent = new DefaultMuleEvent(reqEvent, new NonBlockingReplyToHandler() {
+        reqEvent = MuleEvent.builder(reqEvent).replyToHandler(new NonBlockingReplyToHandler() {
 
           @Override
-          public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+          public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
             try {
               Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
               holder.value = event;
@@ -189,13 +188,14 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
             } catch (IOException e) {
               processExceptionReplyTo(new MessagingException(event, e), replyTo);
             }
+            return event;
           }
 
           @Override
           public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
             originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
           }
-        });
+        }).build();
       }
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(reqEvent);

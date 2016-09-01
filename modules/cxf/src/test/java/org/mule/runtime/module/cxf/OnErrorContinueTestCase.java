@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -168,8 +169,8 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
   public static class RethrowExceptionStrategy extends TemplateOnErrorHandler {
 
     @Override
-    protected void nullifyExceptionPayloadIfRequired(MuleEvent event) {
-      // does nothing
+    protected MuleEvent nullifyExceptionPayloadIfRequired(MuleEvent event) {
+      return event;
     }
 
     @Override

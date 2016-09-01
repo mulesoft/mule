@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
+import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
@@ -14,7 +15,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MES
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
-import org.mule.compatibility.core.DefaultMuleEventEndpointUtils;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
@@ -27,6 +27,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -235,28 +236,31 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       session = new DefaultMuleSession();
     }
     final Object replyToFromMessage = getReplyToDestination(message);
-    DefaultMuleEvent newEvent = null;
 
     final MessageContext executionContext = create(flowConstruct, getEndpoint().getAddress(), message.getCorrelationId());
 
+    final Builder builder = MuleEvent.builder(executionContext).message(message).flow(flowConstruct).session(session);
     if (replyToFromMessage != null) {
-      newEvent =
-          new DefaultMuleEvent(executionContext, message, flowConstruct, session, replyToHandler, replyToFromMessage);
-    } else {
-      newEvent =
-          new DefaultMuleEvent(executionContext, message, flowConstruct, session, null, null);
+      builder.replyToHandler(replyToHandler).replyToDestination(replyToFromMessage);
     }
+    configureMuleEventBuilder(builder);
+    DefaultMuleEvent newEvent = (DefaultMuleEvent) builder.build();
+
     if (message.getCorrelationId() != null) {
       newEvent.setLegacyCorrelationId(message.getCorrelationId());
     }
     newEvent.setCorrelation(message.getCorrelation());
-    DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
+    populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
     setCurrentEvent(event);
     if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null) {
       session.getSecurityContext().getAuthentication().setEvent(event);
     }
     return event;
+  }
+
+  protected void configureMuleEventBuilder(Builder builder) {
+    // Nothing to do, subclasses may override
   }
 
   protected Object getReplyToDestination(MuleMessage message) {

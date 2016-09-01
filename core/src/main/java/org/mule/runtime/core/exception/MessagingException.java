@@ -172,7 +172,7 @@ public class MessagingException extends MuleException {
   @Deprecated
   public MuleMessage getMuleMessage() {
     if ((getEvent() != null)) {
-      return event.getMessage();
+      return getEvent().getMessage();
     }
     return muleMessage;
   }

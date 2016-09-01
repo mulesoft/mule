@@ -14,7 +14,6 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -24,7 +23,6 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.message.Correlation;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
@@ -300,10 +298,9 @@ public class TestEventBuilder {
     }
     final MuleMessage muleMessage = messageBuilder.build();
 
-    DefaultMuleEvent event =
-        new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR, sourceCorrelationId),
-                             (MuleMessage) spyTransformer.transform(muleMessage), exchangePattern, flow, new DefaultMuleSession(),
-                             transacted, null, replyToHandler);
+    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
+        .message((MuleMessage) spyTransformer.transform(muleMessage)).exchangePattern(exchangePattern).flow(flow)
+        .replyToHandler(replyToHandler).transacted(transacted).build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());

@@ -10,10 +10,7 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
-import java.util.regex.Pattern;
-
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -28,6 +25,9 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.ClassUtils;
+
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,8 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   public boolean accept(MuleMessage message) {
     // TODO MULE-9341 Remove Filters that are not needed
     Flow flowConstruct = new Flow("", muleContext);
-    return accept(new DefaultMuleEvent(create(flowConstruct, "RegExFilter"), message, ONE_WAY, flowConstruct));
+    return accept(MuleEvent.builder(create(flowConstruct, "RegExFilter")).message(message).exchangePattern(ONE_WAY)
+        .flow(flowConstruct).build());
   }
 
   @Override

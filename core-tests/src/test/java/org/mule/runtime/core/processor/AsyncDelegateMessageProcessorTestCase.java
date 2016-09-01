@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -59,8 +62,8 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
     MuleEvent result = messageProcessor.process(event);
 
-    latch.await(10000, TimeUnit.MILLISECONDS);
-    assertNotNull(target.sensedEvent);
+    assertThat(latch.await(10000, TimeUnit.MILLISECONDS), is(true));
+    assertThat(target.sensedEvent, notNullValue());
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
     assertNotSame(event, target.sensedEvent);

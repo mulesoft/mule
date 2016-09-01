@@ -12,11 +12,12 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_LOCATION;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_MOVED_TEMPORARILY;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_OK;
+import static org.mule.compatibility.transport.http.i18n.HttpMessages.fileNotFound;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -95,8 +96,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
       MuleMessage message = MuleMessage.builder().nullPayload()
           .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_MOVED_TEMPORARILY)).addOutboundProperty(HEADER_CONTENT_LENGTH, 0)
           .addOutboundProperty(HEADER_LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/").build();
-      resultEvent = new DefaultMuleEvent(message, event);
-      return resultEvent;
+      return MuleEvent.builder(event).message(message).build();
     }
 
     InputStream in = null;
@@ -116,9 +116,9 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
       MuleMessage message = MuleMessage.builder().payload(buffer).mediaType(MediaType.parse(mimetype))
           .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_OK)).addOutboundProperty(HEADER_CONTENT_LENGTH, buffer.length)
           .build();
-      resultEvent = new DefaultMuleEvent(message, event);
+      resultEvent = MuleEvent.builder(event).message(message).build();
     } catch (IOException e) {
-      throw new ResourceNotFoundException(HttpMessages.fileNotFound(resourceBase + path), event, this);
+      throw new ResourceNotFoundException(fileNotFound(resourceBase + path), event, this);
     } finally {
       IOUtils.closeQuietly(in);
     }

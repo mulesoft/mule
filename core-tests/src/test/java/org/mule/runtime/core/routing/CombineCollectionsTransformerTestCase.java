@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
@@ -42,7 +41,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
     list.add(MuleMessage.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
     MuleMessage collection = MuleMessage.builder().collectionPayload(list, MuleMessage.class).build();
 
-    event = new DefaultMuleEvent(collection, event);
+    event = MuleEvent.builder(event).message(collection).build();
 
     MuleEvent response = merger.process(event);
 

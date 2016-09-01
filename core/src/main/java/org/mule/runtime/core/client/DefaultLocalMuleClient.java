@@ -20,20 +20,16 @@ import static org.mule.runtime.core.message.ErrorBuilder.builder;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Optional;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
@@ -46,6 +42,10 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
+
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Optional;
 
 public class DefaultLocalMuleClient implements MuleClient {
 
@@ -201,15 +201,15 @@ public class DefaultLocalMuleClient implements MuleClient {
   }
 
   protected MuleEvent createRequestResponseMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(createMuleClientMessageContext(), message, REQUEST_RESPONSE, flowConstruct);
+    return baseEventBuilder(message).exchangePattern(REQUEST_RESPONSE).build();
   }
 
   protected MuleEvent createOneWayMuleEvent(MuleMessage message) throws MuleException {
-    return new DefaultMuleEvent(createMuleClientMessageContext(), message, ONE_WAY, flowConstruct);
+    return baseEventBuilder(message).exchangePattern(ONE_WAY).build();
   }
 
-  protected MessageContext createMuleClientMessageContext() {
-    return create(flowConstruct, "muleClient");
+  private org.mule.runtime.core.api.MuleEvent.Builder baseEventBuilder(MuleMessage message) {
+    return MuleEvent.builder(create(flowConstruct, "muleClient")).message(message).flow(flowConstruct);
   }
 
   protected MuleEvent returnEvent(MuleEvent event) {

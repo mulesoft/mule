@@ -116,5 +116,10 @@ public class NonBlockingNotSupportedFunctionalTestCase extends AbstractIntegrati
     verify("rollbackExceptionStrategyChild");
   }
 
+  @Test
+  public void foreach() throws Exception {
+    flowRunner("foreach").withPayload(TEST_MESSAGE).nonBlocking().run();
+  }
+
 }
 

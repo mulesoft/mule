@@ -51,20 +51,19 @@ public class DefaultReplyToHandler implements ReplyToHandler, Serializable, Dese
   }
 
   @Override
-  public void processReplyTo(final MuleEvent event, final MuleMessage returnMessage, final Object replyTo) throws MuleException {
+  public MuleEvent processReplyTo(final MuleEvent event, final MuleMessage returnMessage, final Object replyTo)
+      throws MuleException {
     if (logger.isDebugEnabled()) {
       logger.debug("sending reply to: " + replyTo);
     }
 
-    // make sure remove the replyTo property as not cause a a forever
-    // replyto loop
-    event.removeFlowVariable(MULE_REPLY_TO_PROPERTY);
-
-    // MULE-4617. This is fixed with MULE-4620, but lets remove this property
-    // anyway as it should never be true from a replyTo dispatch
-    event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
-
-    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY).build());
+    return MuleEvent.builder(event)
+        // make sure remove the replyTo property as not cause a a forever replyto loop
+        .removeFlowVariable(MULE_REPLY_TO_PROPERTY)
+        // MULE-4617. This is fixed with MULE-4620, but lets remove this property anyway as it should never be true from a replyTo
+        // dispatch
+        .removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY)
+        .message(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY).build()).build();
 
     // TODO See MULE-9307 - re-add behaviour to process reply to destination dispatching with new connectors
   }

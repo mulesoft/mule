@@ -11,7 +11,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.construct.Flow;
@@ -48,7 +47,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
     message =
         MuleMessage.builder().payload("hello").inboundProperties(inboundProperties).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow);
+    event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build();
   }
 
   @Test

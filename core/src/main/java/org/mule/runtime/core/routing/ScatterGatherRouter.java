@@ -12,7 +12,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,9 +28,11 @@ import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.work.ProcessingMuleEventWork;
@@ -130,7 +131,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       // use a copy instead of a resetAccessControl
       // to assure that all property changes
       // are flushed from the worker thread to this one
-      response = DefaultMuleEvent.copy(response);
+      response = MuleEvent.builder(response).session(new DefaultMuleSession(response.getSession())).build();
       setCurrentEvent(response);
     }
 
@@ -176,15 +177,14 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         }
 
         if (exception instanceof MessagingException) {
-          response = DefaultMuleEvent.copy(((MessagingException) exception).getEvent());
+          MuleEvent event1 = ((MessagingException) exception).getEvent();
+          response = MuleEvent.builder(event1).session(new DefaultMuleSession(event1.getSession())).build();
         } else {
-          response = DefaultMuleEvent.copy(event);
+          response = MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
         }
 
         if (response.getError() == null) {
-          event.setMessage(MuleMessage.builder(event.getMessage())
-              .build());
-          ((DefaultMuleEvent) event).setError(response.getError());
+          event = MuleEvent.builder(event).error(response.getError()).build();
         }
       } else {
         if (logger.isDebugEnabled()) {

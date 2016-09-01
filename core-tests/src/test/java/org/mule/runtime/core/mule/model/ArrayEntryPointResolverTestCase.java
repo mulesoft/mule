@@ -7,10 +7,12 @@
 package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -24,7 +26,9 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[] {new Apple(), new Orange()}));
+    InvocationResult ctx = resolver
+        .invoke(new FruitBowl(),
+                MuleTestUtils.getTestEventContext(new Fruit[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext));
     assertEquals(ctx.getState(), InvocationResult.State.SUCCESSFUL);
 
   }
@@ -32,7 +36,9 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchGenericFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    InvocationResult ctx = resolver.invoke(new FruitBowl(), getTestEventContext(new Object[] {new Apple(), new Orange()}));
+    InvocationResult ctx = resolver
+        .invoke(new FruitBowl(),
+                MuleTestUtils.getTestEventContext(new Object[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext));
     assertEquals(ctx.getState(), InvocationResult.State.FAILED);
   }
 
@@ -40,7 +46,8 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    InvocationResult ctx = resolver.invoke(new Apple(), getTestEventContext(new Object[] {"blah"}));
+    InvocationResult ctx =
+        resolver.invoke(new Apple(), MuleTestUtils.getTestEventContext(new Object[] {"blah"}, REQUEST_RESPONSE, muleContext));
     assertEquals(ctx.getState(), InvocationResult.State.FAILED);
   }
 }

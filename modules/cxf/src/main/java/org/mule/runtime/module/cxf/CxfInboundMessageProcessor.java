@@ -15,6 +15,31 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
+import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.NonBlockingVoidMuleEvent;
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.NonBlockingSupported;
+import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
+import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
+import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
+import org.mule.runtime.module.xml.stax.StaxSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,7 +53,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.mule.extension.http.api.HttpRequestAttributes;
 
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
@@ -52,32 +76,6 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.wsdl.http.AddressType;
-
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.NonBlockingSupported;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.runtime.core.message.OutputHandler;
-import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
-import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
-import org.mule.runtime.module.xml.stax.StaxSource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -233,10 +231,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       if (event.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
 
-        event = new DefaultMuleEvent(event, new NonBlockingReplyToHandler() {
+        event = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
           @Override
-          public void processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo) throws MuleException {
+          public MuleEvent processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo)
+              throws MuleException {
             try {
               // CXF execution chain was suspended, so we need to resume it.
               // The MuleInvoker component will be recalled, by using the CxfConstants.NON_BLOCKING_RESPONSE flag we force using
@@ -257,13 +256,14 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                   .addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build());
               processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
             }
+            return responseEvent;
           }
 
           @Override
           public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
             originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
           }
-        });
+        }).build();
         // Update RequestContext ThreadLocal for backwards compatibility
         setCurrentEvent(event);
       }

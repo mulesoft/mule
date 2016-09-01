@@ -14,16 +14,6 @@
         </expression-language>
     </configuration>
 
-    <flow name="foreach">
-        <test:assert-intercepting responseSameThread="false" responseExpression="#[assertPayload()]"/>
-        <foreach collection="#[payload]">
-            <set-variable variableName="beforeThread" value="#[Thread.currentThread()]"/>
-            <test:non-blocking-processor/>
-            <test:assert count="1" expression="#[Thread.currentThread()==beforeThread  and assertPayload()]"/>
-        </foreach>
-        <test:non-blocking-processor/>
-    </flow>
-
     <flow name="wiretap">
         <test:assert-intercepting message="before" responseSameThread="false" responseExpression="#[assertPayload()]"/>
         <wire-tap>

@@ -13,7 +13,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -172,8 +171,8 @@ public class MuleUniversalConduit extends AbstractConduit {
             return null;
           }
         };
-        event = new DefaultMuleEvent(event == null ? create(flowConstruct, "MuleUniversalConduit") : event.getContext(), muleMsg,
-                                     flowConstruct);
+        event = MuleEvent.builder(event == null ? create(flowConstruct, "MuleUniversalConduit") : event.getContext())
+            .message(muleMsg).flow(flowConstruct).build();
       } catch (Exception e) {
         throw new Fault(e);
       }
@@ -232,10 +231,10 @@ public class MuleUniversalConduit extends AbstractConduit {
       if (reqEvent.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-        reqEvent = new DefaultMuleEvent(reqEvent, new NonBlockingReplyToHandler() {
+        reqEvent = MuleEvent.builder(reqEvent).replyToHandler(new NonBlockingReplyToHandler() {
 
           @Override
-          public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+          public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
             try {
               Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
               holder.value = event;
@@ -243,13 +242,14 @@ public class MuleUniversalConduit extends AbstractConduit {
             } catch (IOException e) {
               processExceptionReplyTo(new MessagingException(event, e), replyTo);
             }
+            return event;
           }
 
           @Override
           public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
             originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
           }
-        });
+        }).build();
       }
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(reqEvent);

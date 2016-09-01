@@ -11,22 +11,19 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.MuleTestUtils;
 import org.mule.test.AbstractIntegrationTestCase;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegrationTestCase {
 
@@ -77,9 +74,9 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
       try {
         if (!latch.await(TIMEOUT, TimeUnit.SECONDS)) {
           RuntimeException exception = new RuntimeException();
-          event.setError(createErrorMock(exception));
-          event.setMessage(MuleMessage.builder(event.getMessage())
-              .exceptionPayload(new DefaultExceptionPayload(exception)).build());
+          event = MuleEvent.builder(event)
+              .message(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+              .error(createErrorMock(exception)).build();
         }
       } catch (InterruptedException e) {
         // do nothing

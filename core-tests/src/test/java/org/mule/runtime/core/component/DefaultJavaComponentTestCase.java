@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.lifecycle.LifecycleTrackerComponent;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import org.junit.Test;
@@ -82,7 +83,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
   public void testServicePropagatedLifecycle() throws Exception {
 
     LifecycleTrackerComponent component = new LifecycleTrackerComponent();
-    Flow flow = getTestFlow(component);
+    Flow flow = MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_FLOW, component, false, muleContext);
     flow.initialise();
     assertTrue(component.getTracker().contains("initialise"));
   }

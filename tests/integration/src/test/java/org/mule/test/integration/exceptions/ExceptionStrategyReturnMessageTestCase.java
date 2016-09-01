@@ -10,13 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.test.AbstractIntegrationTestCase;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.exception.MessagingException;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -54,7 +55,7 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
     @Override
     public MuleEvent handleException(MessagingException exception, MuleEvent event) {
       MuleEvent result = super.handleException(exception, event);
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload("Ka-boom!").build());
+      result = MuleEvent.builder(result).message(MuleMessage.builder(event.getMessage()).payload("Ka-boom!").build()).build();
       exception.setHandled(true);
       return result;
     }

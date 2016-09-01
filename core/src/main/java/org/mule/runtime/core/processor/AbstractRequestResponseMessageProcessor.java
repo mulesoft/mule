@@ -7,26 +7,24 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * Base implementation of a {@link org.mule.runtime.core.api.processor.MessageProcessor} that may performs processing during both
  * the request and response processing phases while supporting non-blocking execution.
- * <p/>
- *
+ * <p>
  * In order to define the process during the request phase you should override the
  * {@link #processRequest(org.mule.runtime.core.api.MuleEvent)} method. Symmetrically, if you need to define a process to be
  * executed during the response phase, then you should override the {@link #processResponse(MuleEvent, MuleEvent)} method.
- * <p/>
- *
+ * <p>
  * In some cases you'll have some code that should be always executed, even if an error occurs, for those cases you should
  * override the {@link #processFinally(org.mule.runtime.core.api.MuleEvent, MessagingException)} method.
  *
@@ -46,19 +44,25 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   protected MuleEvent processBlocking(MuleEvent event) throws MuleException {
     MessagingException exception = null;
+    MuleEvent response = null;
     try {
-      return processResponse(processNext(processRequest(event)), event);
+      response = processResponse(processNext(processRequest(event)), event);
+      return response;
     } catch (MessagingException e) {
       exception = e;
       return processCatch(event, e);
     } finally {
-      processFinally(event, exception);
+      if (response == null) {
+        processFinally(event, exception);
+      } else {
+        processFinally(response, exception);
+      }
     }
   }
 
   protected MuleEvent processNonBlocking(final MuleEvent request) throws MuleException {
     MessagingException exception = null;
-    MuleEvent eventToProcess = new DefaultMuleEvent(request, createReplyToHandler(request));
+    MuleEvent eventToProcess = MuleEvent.builder(request).replyToHandler(createReplyToHandler(request)).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(eventToProcess);
 
@@ -82,14 +86,16 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
     return new NonBlockingReplyToHandler() {
 
       @Override
-      public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+      public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
         try {
           MuleEvent response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler), request);
           if (!NonBlockingVoidMuleEvent.getInstance().equals(response)) {
-            originalReplyToHandler.processReplyTo(response, null, null);
+            response = originalReplyToHandler.processReplyTo(response, null, null);
           }
+          return response;
         } catch (Exception e) {
           processExceptionReplyTo(new MessagingException(event, e), null);
+          return event;
         } finally {
           processFinally(event, null);
         }
@@ -111,7 +117,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 
   private MuleEvent recreateEventWithOriginalReplyToHandler(MuleEvent event, ReplyToHandler originalReplyToHandler) {
     if (event != null) {
-      event = new DefaultMuleEvent(event, originalReplyToHandler);
+      event = MuleEvent.builder(event).replyToHandler(originalReplyToHandler).build();
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(event);
     }

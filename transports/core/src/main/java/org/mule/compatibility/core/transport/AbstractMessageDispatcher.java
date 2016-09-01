@@ -104,7 +104,8 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                                                                                                resultMessage,
                                                                                                endpoint.getMuleContext());
       requestEvent.getSession().merge(storedSession);
-      MuleEvent resultEvent = new DefaultMuleEvent(resultMessage, requestEvent);
+      MuleEvent resultEvent = MuleEvent.builder(requestEvent).message(resultMessage).build();
+      ((DefaultMuleEvent) resultEvent).setLegacyCorrelationId(((DefaultMuleEvent) requestEvent).getLegacyCorrelationId());
       setCurrentEvent(resultEvent);
       return resultEvent;
     } else {

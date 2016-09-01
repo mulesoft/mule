@@ -13,7 +13,6 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.service.TransportFactory;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -48,8 +47,8 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
   }
 
   @Override
-  public void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
-    super.processReplyTo(event, returnMessage, replyTo);
+  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    event = super.processReplyTo(event, returnMessage, replyTo);
 
     String replyToEndpoint = replyTo.toString();
 
@@ -57,7 +56,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
     returnMessage = MuleMessage.builder(returnMessage).payload(returnMessage.getPayload()).build();
 
     // Create the replyTo event asynchronous
-    MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, event);
+    MuleEvent replyToEvent = MuleEvent.builder(event).message(returnMessage).build();
 
     // get the endpoint for this url
     OutboundEndpoint endpoint = getEndpoint(event, replyToEndpoint);
@@ -76,10 +75,10 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
 
     // dispatch the event
     try {
-      endpoint.process(replyToEvent);
       if (logger.isInfoEnabled()) {
         logger.info("reply to sent: " + endpoint);
       }
+      return endpoint.process(replyToEvent);
     } catch (Exception e) {
       throw new DispatchException(TransportCoreMessages.failedToDispatchToReplyto(endpoint), replyToEvent, endpoint, e);
     }

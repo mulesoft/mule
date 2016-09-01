@@ -6,7 +6,6 @@
  */
 package org.mule.test.integration.routing;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -44,7 +43,8 @@ public class TestAggregator extends AbstractAggregator {
         }
 
         logger.debug("event payload is: " + buffer.toString());
-        return new DefaultMuleEvent(MuleMessage.builder().payload(buffer.toString()).build(), events.getMessageCollectionEvent());
+        return MuleEvent.builder(events.getMessageCollectionEvent())
+            .message(MuleMessage.builder().payload(buffer.toString()).build()).build();
       }
     };
   }

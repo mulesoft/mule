@@ -11,7 +11,6 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang.StringUtils.defaultString;
 import static org.mule.runtime.core.context.notification.SecurityNotification.SECURITY_AUTHENTICATION_FAILED;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -166,7 +165,9 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param t the exception thrown. This will be sent with the ExceptionMessage
    * @see ExceptionMessage
    */
-  protected void routeException(MuleEvent event, FlowConstruct flowConstruct, Throwable t) {
+  protected MuleEvent routeException(MuleEvent event, FlowConstruct flowConstruct, Throwable t) {
+    MuleEvent result = event;
+
     if (!messageProcessors.isEmpty()) {
       try {
         if (logger.isDebugEnabled()) {
@@ -184,13 +185,14 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         router.setMuleContext(muleContext);
 
         // Route the ExceptionMessage to the new router
-        router.route(new DefaultMuleEvent(exceptionMessage, event));
+        result = router.route(MuleEvent.builder(event).message(exceptionMessage).build());
       } catch (Exception e) {
         logFatal(event, e);
       }
     }
 
     processOutboundRouterStatistics();
+    return result;
   }
 
   protected MulticastingRouter buildRouter() {

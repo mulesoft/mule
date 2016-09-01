@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
@@ -122,7 +121,7 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
     public MuleEvent handleException(MessagingException ex, MuleEvent event) {
       doHandleException(ex, event);
       ex.setHandled(true);
-      return new DefaultMuleEvent(MuleMessage.builder().payload("Success!").build(), event);
+      return MuleEvent.builder(event).message(MuleMessage.builder().payload("Success!").build()).build();
     }
   }
 
@@ -139,8 +138,7 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
           .nullPayload()
           .exceptionPayload(new DefaultExceptionPayload(exception))
           .build();
-      DefaultMuleEvent resultEvent = new DefaultMuleEvent(message, event);
-      return resultEvent;
+      return MuleEvent.builder(event).message(message).build();
     }
   }
 }

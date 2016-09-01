@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.MuleMessage;
 
 public interface ReplyToHandler {
 
-  void processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
+  MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
 
   /**
    * Processes replyTo in the case an exception occurred. Not all implementations will implement this if for example they should

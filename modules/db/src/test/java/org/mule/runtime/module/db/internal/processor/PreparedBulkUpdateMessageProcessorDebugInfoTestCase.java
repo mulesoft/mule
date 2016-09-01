@@ -15,6 +15,7 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.module.db.integration.model.Planet.EARTH;
 import static org.mule.runtime.module.db.integration.model.Planet.MARS;
 import static org.mule.runtime.module.db.internal.domain.query.QueryType.UPDATE;
@@ -27,10 +28,12 @@ import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.SQL
 import static org.mule.runtime.module.db.internal.processor.DbDebugInfoUtils.TYPE_DEBUG_FIELD;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.module.db.internal.domain.connection.DbConnection;
 import org.mule.runtime.module.db.internal.domain.connection.DbConnectionFactory;
 import org.mule.runtime.module.db.internal.domain.database.DbConfig;
@@ -51,6 +54,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
@@ -71,6 +75,12 @@ public class PreparedBulkUpdateMessageProcessorDebugInfoTestCase extends Abstrac
   private final DbConfig dbConfig = mock(DbConfig.class);
   private final QueryResolver queryResolver = mock(QueryResolver.class);
   private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
+
+  @Before
+  public void before() {
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
+  }
 
   @Test
   public void returnDebugInfo() throws Exception {

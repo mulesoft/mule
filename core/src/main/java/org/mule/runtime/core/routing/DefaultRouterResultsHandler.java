@@ -10,9 +10,9 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 
@@ -101,17 +101,21 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
 
   private MuleEvent createMessageCollection(final List<MuleEvent> nonNullResults,
                                             final MuleEvent previous) {
+    final Builder resultBuilder = MuleEvent.builder(previous);
+
     List<MuleMessage> list = new ArrayList<>();
     for (MuleEvent event : nonNullResults) {
+      for (String flowVarName : event.getFlowVariableNames()) {
+        resultBuilder.addFlowVariable(flowVarName, event.getFlowVariable(flowVarName),
+                                      event.getFlowVariableDataType(flowVarName));
+      }
       list.add(event.getMessage());
     }
     final MuleMessage coll = MuleMessage.builder()
         .collectionPayload(list, MuleMessage.class)
         .build();
-    MuleEvent resultEvent = new DefaultMuleEvent(coll, previous, previous.getSession());
-    for (String name : previous.getFlowVariableNames()) {
-      resultEvent.setFlowVariable(name, previous.getFlowVariable(name), previous.getFlowVariableDataType(name));
-    }
+
+    MuleEvent resultEvent = resultBuilder.message(coll).build();
     setCurrentEvent(resultEvent);
     return resultEvent;
   }

@@ -25,7 +25,6 @@ import static org.mule.runtime.module.oauth2.internal.OAuthConstants.STATE_PARAM
 import static org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID;
 import static org.springframework.util.StringUtils.isEmpty;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -34,6 +33,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.oauth2.internal.MuleEventLogger;
@@ -259,8 +259,9 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   @Override
   public void doRefreshToken(final MuleEvent currentEvent, final ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
     try {
-      final MuleEvent muleEvent = DefaultMuleEvent.copy(currentEvent);
-      muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).outboundProperties(emptyMap()).build());
+      final MuleEvent muleEvent = MuleEvent.builder(currentEvent)
+          .message(MuleMessage.builder(currentEvent.getMessage()).outboundProperties(emptyMap()).build())
+          .session(new DefaultMuleSession(currentEvent.getSession())).build();
       final String userRefreshToken = resourceOwnerOAuthContext.getRefreshToken();
       if (userRefreshToken == null) {
         throw new DefaultMuleException(CoreMessages.createStaticMessage(

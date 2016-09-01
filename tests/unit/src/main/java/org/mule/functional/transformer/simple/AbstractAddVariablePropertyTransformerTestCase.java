@@ -21,7 +21,6 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -83,7 +82,8 @@ public abstract class AbstractAddVariablePropertyTransformerTestCase extends Abs
 
     message = MuleMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    event = new DefaultMuleEvent(DefaultMessageContext.create(flow, TEST_CONNECTOR), message, flow, mockSession);
+    event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).session(mockSession)
+        .build();
   }
 
   @Test

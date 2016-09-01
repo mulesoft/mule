@@ -10,7 +10,6 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -93,8 +92,8 @@ public class MessageProcessorNotification extends ServerNotification implements 
       return sourceEvent;
     } else if (rootId != null && flowConstruct != null) {
       final MuleMessage msg = MuleMessage.builder().nullPayload().build();
-      return new DefaultMuleEvent(create(flowConstruct, "MessageProcessorNotification", lastRootMessageId.get()), msg,
-                                  REQUEST_RESPONSE, flowConstruct);
+      return MuleEvent.builder(create(flowConstruct, "MessageProcessorNotification", lastRootMessageId.get())).message(msg)
+          .flow(flowConstruct).exchangePattern(REQUEST_RESPONSE).build();
     } else {
       return null;
     }

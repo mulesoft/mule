@@ -12,14 +12,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.junit.Test;
-
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
+
+import org.junit.Test;
 
 public class ExceptionTestCase extends AbstractELTestCase {
 
@@ -58,15 +58,14 @@ public class ExceptionTestCase extends AbstractELTestCase {
     MuleMessage message = event.getMessage();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),
-                               new DefaultMuleEvent(context, message, ONE_WAY, flowConstruct),
+                               MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build(),
                                new IllegalAccessException());
     when(mockError.getException()).thenReturn(me);
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
   }
 
   private MuleEvent createEvent() throws Exception {
-    MuleEvent testEvent = getTestEvent("");
-    testEvent.setError(mockError);
-    return testEvent;
+    return MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(MuleMessage.builder().payload("").build()).flow(flowConstruct).error(mockError).build();
   }
 }

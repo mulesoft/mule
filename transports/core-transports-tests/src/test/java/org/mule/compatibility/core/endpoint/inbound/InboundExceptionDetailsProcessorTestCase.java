@@ -8,19 +8,15 @@ package org.mule.compatibility.core.endpoint.inbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.tck.MuleTestUtils;
+
+import org.junit.Test;
 
 public class InboundExceptionDetailsProcessorTestCase extends AbstractMessageProcessorTestCase {
 
@@ -32,9 +28,9 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractMessagePro
     MuleEvent event = createTestInboundEvent(endpoint);
 
     RuntimeException exception = new RuntimeException();
-    event.setMessage(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
-        .build());
-    event.setError(createErrorMock(exception));
+    event = MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+        .error(createErrorMock(exception)).build();
 
     MuleEvent result = mp.process(event);
 

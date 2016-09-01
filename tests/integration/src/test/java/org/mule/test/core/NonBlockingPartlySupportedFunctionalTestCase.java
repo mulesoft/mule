@@ -8,6 +8,7 @@ package org.mule.test.core;
 
 import org.mule.test.AbstractIntegrationTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class NonBlockingPartlySupportedFunctionalTestCase extends AbstractIntegrationTestCase {
@@ -15,12 +16,6 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends AbstractIntegr
   @Override
   protected String getConfigFile() {
     return "non-blocking-partly-supported-test-config.xml";
-  }
-
-  @Test
-  public void foreach() throws Exception {
-    flowRunner("foreach").withPayload(TEST_MESSAGE).nonBlocking().run();
-
   }
 
   @Test

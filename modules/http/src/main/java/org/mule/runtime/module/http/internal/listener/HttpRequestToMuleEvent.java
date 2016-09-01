@@ -19,7 +19,6 @@ import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -109,10 +108,9 @@ public class HttpRequestToMuleEvent {
 
     final MuleMessage message = MuleMessage.builder().payload(payload).mediaType(mediaType).inboundProperties(inboundProperties)
         .outboundProperties(outboundProperties).build();
-    return new DefaultMuleEvent(
-                                // TODO does a correlation id come as a header that we may use?
-                                create(flowConstruct, resolveUri(requestContext).toString()), message,
-                                REQUEST_RESPONSE, flowConstruct, new DefaultMuleSession());
+    // TODO does a correlation id come as a header that we may use?
+    return MuleEvent.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(message)
+        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(new DefaultMuleSession()).build();
   }
 
   private static URI resolveUri(final HttpRequestContext requestContext) {

@@ -10,7 +10,6 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
@@ -123,7 +122,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     if (event == null) {
       DefaultLocalMuleClient.MuleClientFlowConstruct flowConstruct =
           new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext);
-      event = new DefaultMuleEvent(create(flowConstruct, "AbstractMessageTransformer"), message, REQUEST_RESPONSE, flowConstruct);
+      event = MuleEvent.builder(create(flowConstruct, "AbstractMessageTransformer")).message(message)
+          .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
     }
     try {
       result = transformMessage(event, enc);
