@@ -320,6 +320,14 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder removeFlowVariable(String key);
 
     /**
+     * Sets the correlation information to the produced event.
+     *
+     * @param correlation the object containing the correlation information to set on the produced event
+     * @return the builder instance
+     */
+    Builder correlation(Correlation correlation);
+
+    /**
      * Sets an error related to the produced event.
      *
      * @param error the error associated with the produced event

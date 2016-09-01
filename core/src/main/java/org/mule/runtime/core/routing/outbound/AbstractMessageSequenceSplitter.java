@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -23,6 +25,7 @@ import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base implementation of a {@link MuleMessage} splitter, that converts its payload in a {@link MessageSequence}, and process each
@@ -89,23 +92,21 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
 
       final Builder builder = MuleEvent.builder(originalEvent);
 
-      initEventBuilder(messageSequence.next(), originalEvent, builder);
       if (lastResult != null) {
         for (String flowVarName : lastResult.getFlowVariableNames()) {
-          // TODO MULE-9342 temporary workaround for batch
-          if (!"record".equals(flowVarName)) {
-            builder.addFlowVariable(flowVarName, lastResult.getFlowVariable(flowVarName),
-                                    lastResult.getFlowVariableDataType(flowVarName));
-          }
+          builder.addFlowVariable(flowVarName, lastResult.getFlowVariable(flowVarName),
+                                  lastResult.getFlowVariableDataType(flowVarName));
         }
       }
       if (counterVariableName != null) {
         builder.addFlowVariable(counterVariableName, correlationSequence);
       }
 
+      builder.correlation(new Correlation(count, correlationSequence));
+      initEventBuilder(messageSequence.next(), originalEvent, builder,
+                       lastResult != null ? lastResult.getFlowVariableNames() : emptySet());
       final MuleEvent event = builder.build();
       ((DefaultMuleEvent) event).setParent(originalEvent);
-      ((DefaultMuleEvent) event).setCorrelation(new Correlation(count, correlationSequence));
       MuleEvent resultEvent = processNext(event);
       if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
         resultEvents.add(resultEvent);
@@ -118,13 +119,17 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     return resultEvents;
   }
 
-  private void initEventBuilder(Object payload, MuleEvent originalEvent, Builder builder) {
-    if (payload instanceof MuleEvent) {
+  private void initEventBuilder(Object payload, MuleEvent originalEvent, Builder builder, Set<String> flowVarsFromLastResult) {
+    if (payload instanceof EventBuilderConfigurer) {
+      ((EventBuilderConfigurer) payload).configure(builder);
+    } else if (payload instanceof MuleEvent) {
       final MuleEvent payloadAsEvent = (MuleEvent) payload;
       builder.message(payloadAsEvent.getMessage());
       for (String flowVarName : payloadAsEvent.getFlowVariableNames()) {
-        builder.addFlowVariable(flowVarName, payloadAsEvent.getFlowVariable(flowVarName),
-                                payloadAsEvent.getFlowVariableDataType(flowVarName));
+        if (!flowVarsFromLastResult.contains(flowVarName)) {
+          builder.addFlowVariable(flowVarName, payloadAsEvent.getFlowVariable(flowVarName),
+                                  payloadAsEvent.getFlowVariableDataType(flowVarName));
+        }
       }
     } else if (payload instanceof MuleMessage) {
       builder.message((MuleMessage) payload);

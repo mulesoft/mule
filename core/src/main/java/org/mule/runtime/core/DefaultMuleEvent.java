@@ -143,7 +143,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
                           FlowConstruct flowConstruct, MuleSession session, boolean transacted, boolean synchronous,
                           boolean nonBlocking, Object replyToDestination, ReplyToHandler replyToHandler,
-                          FlowCallStack flowCallStack) {
+                          FlowCallStack flowCallStack, Correlation correlation, Error error) {
     this.context = context;
     this.correlation = NO_CORRELATION;
     // this.id = generateEventId(flowConstruct.getMuleContext());
@@ -160,6 +160,9 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.nonBlocking = nonBlocking;
 
     this.flowCallStack = flowCallStack;
+
+    this.correlation = correlation;
+    this.error = error;
   }
 
   protected boolean resolveEventSynchronicity() {

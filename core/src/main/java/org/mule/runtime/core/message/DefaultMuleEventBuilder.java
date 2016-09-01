@@ -110,6 +110,12 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   }
 
   @Override
+  public Builder correlation(Correlation correlation) {
+    this.correlation = correlation;
+    return this;
+  }
+
+  @Override
   public Builder error(Error error) {
     this.error = error;
     return this;
@@ -163,10 +169,8 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
         new DefaultMuleEvent(context, message, exchangePattern, flow, session, transacted,
                              synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
                              nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
-                             replyToDestination, replyToHandler, flowCallStack);
+                             replyToDestination, replyToHandler, flowCallStack, correlation, error);
     this.flowVariables.forEach((s, value) -> event.setFlowVariable(s, value.getValue(), value.getDataType()));
-    event.setCorrelation(correlation);
-    event.setError(error);
     return event;
   }
 

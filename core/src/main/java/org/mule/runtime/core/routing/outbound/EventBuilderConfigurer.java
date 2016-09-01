@@ -7,16 +7,21 @@
 package org.mule.runtime.core.routing.outbound;
 
 import org.mule.runtime.core.api.MuleEvent;
-
-import java.util.Iterator;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 
 /**
- * Implementations must provide a way to wrap each element in a {@link MuleEvent}.
+ * Provides a way to define callbacks that work on instances of {@link MuleEvent} {@link Builder}s.
  *
  * @since 4.0
  */
-public interface EventFactoryIterator<T> extends Iterator<T> {
+@FunctionalInterface
+public interface EventBuilderConfigurer {
 
-  MuleEvent nextEvent();
+  /**
+   * Applies changes on the given {@code builder}.
+   * 
+   * @param builder the {@link MuleEvent} builder to configure.
+   */
+  void configure(Builder builder);
 
 }

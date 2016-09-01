@@ -9,15 +9,14 @@ package org.mule.runtime.core.routing.outbound;
 import org.mule.runtime.core.api.MuleEvent;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Implementations must provide a way to wrap each element in a {@link MuleEvent}.
  *
  * @since 4.0
  */
-public interface EventFactoryList<T> extends List<T> {
+public interface EventBuilderConfigurerIterator<T> extends Iterator<T> {
 
-  Iterator<MuleEvent> eventIterator();
+  EventBuilderConfigurer nextEventBuilderConfigurer();
 
 }

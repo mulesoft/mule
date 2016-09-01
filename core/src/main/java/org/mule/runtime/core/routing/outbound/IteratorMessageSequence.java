@@ -41,8 +41,8 @@ public final class IteratorMessageSequence extends AbstractMessageSequence {
 
   @Override
   public Object next() {
-    if (iter instanceof EventFactoryIterator) {
-      return ((EventFactoryIterator) iter).nextEvent();
+    if (iter instanceof EventBuilderConfigurerIterator) {
+      return ((EventBuilderConfigurerIterator) iter).nextEventBuilderConfigurer();
     } else {
       return iter.next();
     }
