@@ -76,11 +76,11 @@ public class ObjectToJson extends AbstractJsonTransformer {
     }
 
     // Checks if there's an exception
-    if (event.getError() != null && this.isHandleException()) {
+    if (event.getError().isPresent() && this.isHandleException()) {
       if (logger.isDebugEnabled()) {
         logger.debug("Found exception with null payload");
       }
-      src = this.getException(event.getError().getException());
+      src = this.getException(event.getError().get().getException());
     }
 
     StringWriter writer = new StringWriter();

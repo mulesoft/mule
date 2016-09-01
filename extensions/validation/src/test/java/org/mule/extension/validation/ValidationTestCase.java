@@ -37,7 +37,7 @@ abstract class ValidationTestCase extends MuleArtifactFunctionalTestCase {
   }
 
   protected void assertValid(FlowRunner runner) throws Exception {
-    assertThat(runner.run().getError(), is(nullValue()));
+    assertThat(!runner.run().getError().isPresent(), is(true));
     runner.reset();
   }
 

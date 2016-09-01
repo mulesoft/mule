@@ -12,6 +12,8 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.ClassUtils;
 
+import java.util.Optional;
+
 /**
  * A filter that accepts messages that have an exception payload. An Exception type can also be set on this filter to allow it to
  * accept Exception messages of a particular Exception class only.
@@ -39,11 +41,11 @@ public class ExceptionTypeFilter extends PayloadTypeFilter {
    */
   @Override
   public boolean accept(MuleEvent event) {
-    Error error = event.getError();
+    Optional<Error> errorOptional = event.getError();
     if (getExpectedType() == null) {
-      return error != null;
-    } else if (error != null) {
-      return getExpectedType().isAssignableFrom(error.getException().getClass());
+      return errorOptional.isPresent();
+    } else if (errorOptional.isPresent()) {
+      return getExpectedType().isAssignableFrom(errorOptional.get().getException().getClass());
     } else {
       return accept(event.getMessage());
     }

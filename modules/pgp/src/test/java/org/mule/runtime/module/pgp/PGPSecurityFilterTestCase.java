@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.pgp;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.ExceptionPayload;
@@ -23,6 +25,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hamcrest.core.Is;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -56,8 +59,8 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase {
   public void testAuthenticationNotAuthorised() throws Exception {
     MuleEvent replyEvent =
         flowRunner("echo").withPayload("An unsigned message").withInboundProperties(createMessageProperties()).run();
-    assertNotNull(replyEvent.getError());
-    assertEquals(MESSAGE_EXCEPTION, replyEvent.getError().getDetailedDescription());
+    assertThat(replyEvent.getError().isPresent(), is(true));
+    assertThat(replyEvent.getError().get().getDetailedDescription(), is(MESSAGE_EXCEPTION));
   }
 
   private byte[] loadEncryptedMessage() throws IOException {

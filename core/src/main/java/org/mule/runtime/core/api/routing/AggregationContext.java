@@ -7,12 +7,6 @@
 
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.util.Preconditions;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.NavigableMap;
@@ -20,6 +14,11 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.Preconditions;
 
 /**
  * Immutable object used to provide all the necessary information to perform an aggregation operation in one single parameter,
@@ -40,8 +39,7 @@ public final class AggregationContext {
       }
 
       MuleEvent event = (MuleEvent) object;
-      Error error = event.getError();
-      return error != null;
+      return event.getError().isPresent();
     }
   };
 
@@ -92,7 +90,7 @@ public final class AggregationContext {
     for (int i = 0; i < this.events.size(); i++) {
       MuleEvent event = this.events.get(i);
       if (failedEventsPredicate.evaluate(event)) {
-        routes.put(i, event.getError().getException());
+        routes.put(i, event.getError().get().getException());
       }
     }
 

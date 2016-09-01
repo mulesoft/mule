@@ -63,7 +63,7 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
   private void testHandlingOfFailures(String entryPoint) throws Exception {
     MuleEvent event = flowRunner(entryPoint).withPayload(getTestMuleMessage()).run();
     MuleMessage response = event.getMessage();
-    assertThat(event.getError(), is(nullValue()));
+    assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(response), is("ok"));
   }
 

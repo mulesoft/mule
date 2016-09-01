@@ -129,7 +129,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
       MuleEvent event = mp.process(MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(msg)
           .exchangePattern(REQUEST_RESPONSE).flow(flow).session(session).build());
       MuleMessage returnedMessage = event.getMessage();
-      if (event.getError() != null) {
+      if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
       } else {
         return getPayloadAsString(returnedMessage);

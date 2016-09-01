@@ -95,7 +95,7 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
 
     ponderUntilMessageCountReceivedByCustomMP(1);
 
-    Error error = CustomMP.getProcessedEvents().get(0).getError();
+    Error error = CustomMP.getProcessedEvents().get(0).getError().get();
     assertThat(error, is(notNullValue()));
     assertThat(error.getException(), instanceOf(RetryPolicyExhaustedException.class));
     assertThat(error.getException().getMessage(),

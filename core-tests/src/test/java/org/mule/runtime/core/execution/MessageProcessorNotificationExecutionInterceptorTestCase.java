@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -19,21 +20,6 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
-import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.context.notification.MessageProcessorNotification;
-import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
-import org.mule.runtime.core.util.UUID;
-import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.size.SmallTest;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +30,21 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.construct.Pipeline;
+import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.context.notification.MessageProcessorNotification;
+import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.util.UUID;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -170,6 +171,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
     when(mockMuleEvent.getReplyToHandler()).thenReturn(mockReplyToHandler);
     when(mockMuleEvent.getId()).thenReturn(muleEventIdToProcess);
+    when(mockMuleEvent.getError()).thenReturn(empty());
 
     when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
     doAnswer(invocationOnMock -> {

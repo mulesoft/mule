@@ -21,6 +21,8 @@ import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ExceptionUtils;
 
+import java.util.Optional;
+
 public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
 
   private static Throwable exceptionFromFlow = null;
@@ -49,8 +51,8 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      Error error = event.getError();
-      exceptionFromFlow = error.getException();
+      Optional<Error> error = event.getError();
+      exceptionFromFlow = error.get().getException();
 
       return null;
     }

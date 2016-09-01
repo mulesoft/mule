@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -34,6 +35,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.Matcher;
@@ -75,6 +77,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     when(event.getId()).thenReturn(RandomStringUtils.randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getError()).thenReturn(empty());
     when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class)))
         .thenAnswer(invocation -> ((MessageProcessor) invocation.getArguments()[0]).process((MuleEvent) invocation
             .getArguments()[1]));

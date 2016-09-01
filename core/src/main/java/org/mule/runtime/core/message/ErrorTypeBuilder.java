@@ -11,7 +11,6 @@ import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.exception.ErrorTypeRepository;
 
 /**
  * Builder for {@link ErrorType}. This must be the only mechanism to create an instance
@@ -21,7 +20,7 @@ import org.mule.runtime.core.exception.ErrorTypeRepository;
  */
 public final class ErrorTypeBuilder {
 
-  private String stringRepresentation;
+  private String identifier;
   private String namespace;
   private ErrorType parentErrorType;
 
@@ -32,13 +31,15 @@ public final class ErrorTypeBuilder {
   private ErrorTypeBuilder() {}
 
   /**
-   * Sets the error type string representation. @see {@link ErrorType#getStringRepresentation()}
+   * Sets the error type identifier. @see {@link ErrorType#getIdentifier()}.
    *
-   * @param stringRepresentation the string representation
+   * The identifier must be unique within the same namespace.
+   *
+   * @param identifier the string representation
    * @return {@code this} builder
      */
-  public ErrorTypeBuilder stringRepresentation(String stringRepresentation) {
-    this.stringRepresentation = stringRepresentation;
+  public ErrorTypeBuilder identifier(String identifier) {
+    this.identifier = identifier;
     return this;
   }
 
@@ -70,12 +71,12 @@ public final class ErrorTypeBuilder {
    * @return the error type with the provided configuration.
      */
   public ErrorType build() {
-    checkState(stringRepresentation != null, "string representation cannot be null");
+    checkState(identifier != null, "string representation cannot be null");
     checkState(namespace != null, "namespace representation cannot be null");
-    if (!(stringRepresentation.equals(ANY_IDENTIFIER) && namespace.equals(CORE_NAMESPACE_NAME))) {
+    if (!(identifier.equals(ANY_IDENTIFIER) && namespace.equals(CORE_NAMESPACE_NAME))) {
       checkState(parentErrorType != null, "parent error type cannot be null");
     }
-    return new ErrorTypeImplementation(stringRepresentation, namespace, parentErrorType);
+    return new ErrorTypeImplementation(identifier, namespace, parentErrorType);
   }
 
   /**
@@ -83,12 +84,12 @@ public final class ErrorTypeBuilder {
    */
   private final static class ErrorTypeImplementation implements ErrorType {
 
-    private String stringRepresentation;
+    private String identifier;
     private String namespace;
     private ErrorType parentErrorType;
 
-    private ErrorTypeImplementation(String stringRepresentation, String namespace, ErrorType parentErrorType) {
-      this.stringRepresentation = stringRepresentation;
+    private ErrorTypeImplementation(String identifier, String namespace, ErrorType parentErrorType) {
+      this.identifier = identifier;
       this.namespace = namespace;
       this.parentErrorType = parentErrorType;
     }
@@ -97,8 +98,8 @@ public final class ErrorTypeBuilder {
      * {@inheritDoc}
      */
     @Override
-    public String getStringRepresentation() {
-      return stringRepresentation;
+    public String getIdentifier() {
+      return identifier;
     }
 
     /**

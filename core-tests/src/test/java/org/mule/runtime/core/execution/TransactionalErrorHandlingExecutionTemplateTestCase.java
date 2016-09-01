@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -26,7 +27,13 @@ import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutio
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
 import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.getFailureTransactionCallbackStartsTransaction;
 
-import org.mule.runtime.core.exception.MessagingException;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -36,21 +43,15 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.transaction.TransactionTemplateTestUtils;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Answers;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -193,6 +194,7 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
   private MuleEvent configureExceptionListenerCall() {
     final MuleEvent mockResultEvent = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
     when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
+    when(mockEvent.getError()).thenReturn(empty());
     when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(invocationOnMock -> {
       DefaultMessagingExceptionStrategy defaultMessagingExceptionStrategy = new DefaultMessagingExceptionStrategy();
       when(mockMuleContext.getNotificationManager()).thenReturn(mock(ServerNotificationManager.class));
@@ -209,6 +211,8 @@ public class TransactionalErrorHandlingExecutionTemplateTestCase extends Transac
   private MuleEvent configureCatchExceptionListenerCall() {
     final MuleEvent mockResultEvent = mock(MuleEvent.class, RETURNS_DEEP_STUBS.get());
     when(mockMessagingException.getEvent()).thenReturn(mockEvent).thenReturn(mockResultEvent);
+    when(mockEvent.getError()).thenReturn(empty());
+    when(mockResultEvent.getError()).thenReturn(empty());
     when(mockMessagingExceptionHandler.handleException(mockMessagingException, mockEvent)).thenAnswer(invocationOnMock -> {
       OnErrorContinueHandler exceptionStrategy = new OnErrorContinueHandler();
       exceptionStrategy.setMuleContext(mockMuleContext);

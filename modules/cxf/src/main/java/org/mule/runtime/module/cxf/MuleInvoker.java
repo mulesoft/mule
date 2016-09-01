@@ -131,8 +131,8 @@ public class MuleInvoker implements Invoker {
       exchange.put(CxfConstants.MULE_EVENT, responseEvent);
       MuleMessage resMessage = responseEvent.getMessage();
 
-      if (responseEvent.getError() != null) {
-        Throwable cause = responseEvent.getError().getException();
+      if (responseEvent.getError().isPresent()) {
+        Throwable cause = responseEvent.getError().get().getException();
         if (cause instanceof ComponentException) {
           cause = cause.getCause();
         }

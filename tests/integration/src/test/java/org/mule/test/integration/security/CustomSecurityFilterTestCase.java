@@ -7,6 +7,7 @@
 package org.mule.test.integration.security;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.MuleEvent;
@@ -18,6 +19,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 
@@ -39,7 +41,7 @@ public class CustomSecurityFilterTestCase extends AbstractIntegrationTestCase {
 
     MuleEvent event = flowRunner("test").withPayload("hi").withInboundProperties(props).run();
 
-    assertNull(event.getError());
+    assertThat(event.getError().isPresent(), is(false));
 
     props.put("pass", "badpass");
 

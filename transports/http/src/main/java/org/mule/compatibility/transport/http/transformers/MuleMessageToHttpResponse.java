@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -156,7 +157,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
 
   }
 
-  protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg, Error error, String correlationId,
+  protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg, Optional<Error> errorOptional,
+                                        String correlationId,
                                         Correlation correlation)
       throws IOException, TransformerException {
     HttpResponse response = new HttpResponse();
@@ -166,7 +168,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
 
     if (tmp != null) {
       status = Integer.valueOf(tmp.toString());
-    } else if (error != null) {
+    } else if (errorOptional.isPresent()) {
       status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
     }
 

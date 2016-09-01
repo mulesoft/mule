@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -37,6 +38,8 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
+
+import java.util.Optional;
 
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
@@ -75,6 +78,7 @@ public class ErrorHandlingExecutionTemplateTestCase extends AbstractMuleTestCase
       TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
     }
     when(mockMessagingException.getStackTrace()).thenReturn(new StackTraceElement[0]);
+    when(mockEvent.getError()).thenReturn(empty());
   }
 
   @Test

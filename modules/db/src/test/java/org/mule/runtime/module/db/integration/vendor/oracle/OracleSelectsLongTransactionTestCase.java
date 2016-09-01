@@ -8,6 +8,7 @@
 package org.mule.runtime.module.db.integration.vendor.oracle;
 
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleEvent;
@@ -19,6 +20,7 @@ import org.mule.runtime.module.db.integration.model.AbstractTestDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -45,6 +47,6 @@ public class OracleSelectsLongTransactionTestCase extends AbstractDbIntegrationT
       sequence.add(i);
     }
     final MuleEvent responseEvent = flowRunner("longTransaction").withPayload(sequence).run();
-    assertThat(responseEvent.getError(), nullValue());
+    assertThat(responseEvent.getError().isPresent(), is(false));
   }
 }

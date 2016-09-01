@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.processor.chain;
 
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -27,6 +28,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -1106,6 +1108,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     when(event.getSession()).thenReturn(mock(MuleSession.class));
     when(event.isSynchronous()).thenReturn(synchronous);
     when(event.isAllowNonBlocking()).thenReturn(!synchronous && nonBlocking);
+    when(event.getError()).thenReturn(empty());
     // when(event.isNonBlocking()).thenReturn(nonBlocking);
     return event;
   }

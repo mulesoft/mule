@@ -43,8 +43,8 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
     MuleMessage msg = event.getMessage();
 
     assertNotNull(msg);
-    assertNotNull(event.getError());
-    assertEquals("Functional Test Service Exception", event.getError().getDescription());
+    assertThat(event.getError().isPresent(), is(true));
+    assertEquals("Functional Test Service Exception", event.getError().get().getDescription());
 
     assertNotNull(msg.getPayload());
     assertEquals("Ka-boom!", msg.getPayload());

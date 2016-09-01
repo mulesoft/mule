@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.exception;
 
+import static java.util.Optional.empty;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -21,6 +22,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +52,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   public void before() {
     when(mockMuleEvent.getMessage()).thenReturn(MuleMessage.builder().payload("").build());
     when(mockMuleEvent.getMuleContext()).thenReturn(mockMuleContext);
+    when(mockMuleEvent.getError()).thenReturn(empty());
     mockException = new MessagingException(mockMuleEvent, new Exception());
   }
 

@@ -111,7 +111,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     final MuleEvent result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     assertThat(result.getMessage().getPayload(), is("B"));
-    assertThat(result.getError(), is(nullValue()));
+    assertThat(result.getError().isPresent(), is(false));
   }
 
   @Test

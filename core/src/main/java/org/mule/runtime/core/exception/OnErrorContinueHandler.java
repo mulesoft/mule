@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.core.exception;
 
+import static java.util.Optional.empty;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+
+import java.util.Optional;
 
 /**
  * Handler that will consume errors and finally commit transactions. Replaces the catch-exception-strategy from Mule 3.

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -46,6 +47,7 @@ import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -101,6 +103,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
     final MuleMessage mockMessage = MuleMessage.builder().payload("").build();
     when(mockEvent.getMessage()).thenReturn(mockMessage);
+    when(mockEvent.getError()).thenReturn(empty());
     when(mockEvent.getFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME)).thenAnswer(new Answer<Object>() {
 
       private int numberOfAttempts = 0;

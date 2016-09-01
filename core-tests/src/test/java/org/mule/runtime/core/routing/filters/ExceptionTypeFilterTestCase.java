@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -14,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -52,17 +55,17 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
 
     Exception exception = new IllegalArgumentException("test");
     Error mockError = createErrorMock(exception);
-    when(event.getError()).thenReturn(mockError);
+    when(event.getError()).thenReturn(of(mockError));
     m = MuleMessage.builder(m).build();
     assertThat(filter.accept(event), is(true));
 
     when(event.getMessage()).thenReturn(m);
-    when(event.getError()).thenReturn(null);
+    when(event.getError()).thenReturn(empty());
     filter = new ExceptionTypeFilter(IOException.class);
     assertThat(filter.accept(event), is(false));
     exception = new IOException("test");
     mockError = createErrorMock(exception);
-    when(event.getError()).thenReturn(mockError);
+    when(event.getError()).thenReturn(of(mockError));
     assertThat(filter.accept(event), is(true));
   }
 

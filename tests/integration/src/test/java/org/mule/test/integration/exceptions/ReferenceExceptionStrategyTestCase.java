@@ -55,7 +55,7 @@ public class ReferenceExceptionStrategyTestCase extends AbstractIntegrationTestC
     assertThat(e, instanceOf(ComponentException.class));
     assertThat(e.getEvent().getMessage(), notNullValue());
     assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
-    assertThat(e.getEvent().getError(), notNullValue());
+    assertThat(e.getEvent().getError().isPresent(), is(true));
   }
 
   @Test

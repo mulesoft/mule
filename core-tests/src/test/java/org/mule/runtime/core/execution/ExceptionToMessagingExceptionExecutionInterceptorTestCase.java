@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.util.Optional.of;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -25,6 +26,8 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +67,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
     when(mockMuleContext.getErrorTypeLocator()).thenReturn(mockErrorTypeLocator);
     when(mockMuleEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(mockMuleEvent.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
-    when(mockMuleEvent.getError()).thenReturn(mockError);
+    when(mockMuleEvent.getError()).thenReturn(of(mockError));
     when(mockErrorTypeLocator.lookupErrorType(any())).thenReturn(mockErrorType);
 
     cut = new ExceptionToMessagingExceptionExecutionInterceptor();

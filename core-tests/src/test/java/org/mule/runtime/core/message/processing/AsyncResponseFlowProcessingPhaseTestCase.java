@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.message.processing;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -42,6 +43,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.concurrent.Latch;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
@@ -89,6 +91,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   @Before
   public void before() {
     phase.setMuleContext(mock(MuleContext.class));
+    when(mockMuleEvent.getError()).thenReturn(empty());
   }
 
   @Before

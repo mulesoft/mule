@@ -74,8 +74,8 @@ public class BindingInvocationHandler implements InvocationHandler {
     if (replyEvent != null && !VoidMuleEvent.getInstance().equals(replyEvent)
         && replyEvent.getMessage() != null) {
       MuleMessage reply = replyEvent.getMessage();
-      if (replyEvent.getError() != null) {
-        throw findDeclaredMethodException(method, replyEvent.getError().getException());
+      if (replyEvent.getError().isPresent()) {
+        throw findDeclaredMethodException(method, replyEvent.getError().get().getException());
       } else {
         return determineReply(reply, method);
       }

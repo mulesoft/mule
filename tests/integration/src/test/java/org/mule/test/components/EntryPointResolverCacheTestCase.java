@@ -41,12 +41,12 @@ public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
     response = flowRunner("refServiceTwo").withPayload("another request").withInboundProperty("method", "retrieveReferenceData")
         .run().getMessage();
     payload = response.getPayload();
-    if ((payload == null) || (responseEvent.getError() != null)) {
-      Throwable exception = responseEvent.getError().getException();
+    if ((payload == null) || (responseEvent.getError().isPresent())) {
+      Throwable exception = responseEvent.getError().get().getException();
       if (exception != null) {
         fail(exception.getMessage());
       } else {
-        fail(responseEvent.getError().toString());
+        fail(responseEvent.getError().get().toString());
       }
     }
     assertThat(payload, instanceOf(String.class));
