@@ -3199,7 +3199,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
     mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR)).message(muleMessage)
-                       .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
+        .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
   }
 
 
