@@ -327,7 +327,8 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     }
 
     built = true;
-    return dataTypeCache.getUnchecked(this);
+    //TODO(pablo.kraan): MULE-10452 - re-add the dataType cache but avoiding the memory-leak
+    return this.doBuild();
   }
 
   protected DataType doBuild() {
