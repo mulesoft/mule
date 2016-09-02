@@ -6,10 +6,11 @@
             http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
 
     <dbn:config name="dbConfig">
-        <dbn:derby-connection url="jdbc:derby:muleEmbeddedDB;create=true" />
-        <dbn:custom-data-types>
-            <!-- Derby uses JAVA_OBJECT for UDT-->
-            <dbn:custom-data-type typeName="CONTACT_DETAILS" id="2000"/>
-        </dbn:custom-data-types>
+        <dbn:derby-connection url="jdbc:derby:muleEmbeddedDB;create=true">
+            <dbn:custom-data-types>
+                <!-- Derby uses JAVA_OBJECT for UDT-->
+                <dbn:custom-data-type typeName="CONTACT_DETAILS" id="2000"/>
+            </dbn:custom-data-types>
+        </dbn:derby-connection>
     </dbn:config>
 </mule>

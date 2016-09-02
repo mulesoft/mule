@@ -6,12 +6,19 @@
  */
 package org.mule.extension.db.internal.domain.connection;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.exception.connection.ConnectionClosingException;
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
 import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
+import org.mule.extension.db.api.param.CustomDataType;
+import org.mule.extension.db.internal.domain.type.ArrayResolvedDbType;
+import org.mule.extension.db.internal.domain.type.DbType;
+import org.mule.extension.db.internal.domain.type.MappedStructResolvedDbType;
+import org.mule.extension.db.internal.domain.type.ResolvedDbType;
 import org.mule.extension.db.internal.domain.xa.XADbConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -20,17 +27,24 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.annotation.Expression;
+import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import javax.sql.XAConnection;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,17 +67,23 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
   @ParameterGroup
   protected ConnectionParameters connectionParameters;
 
+  /**
+   * Specifies non-standard custom data types
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  private List<CustomDataType> customDataTypes = emptyList();
+
   private DataSourceFactory dataSourceFactory;
+  private List<DbType> resolvedCustomTypes = emptyList();
   private DataSource dataSource = null;
+  private JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory();
 
   @Override
   public final DbConnection connect() throws ConnectionException {
     try {
-      Connection jdbcConnection = dataSource.getConnection();
-
-      if (jdbcConnection == null) {
-        throw new ConnectionCreationException("Unable to create connection to the provided dataSource: " + dataSource);
-      }
+      Connection jdbcConnection = jdbcConnectionFactory.createConnection(dataSource, resolvedCustomTypes);
 
       DbConnection connection = createDbConnection(jdbcConnection);
 
@@ -78,7 +98,7 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
   }
 
   protected DbConnection createDbConnection(Connection connection) throws Exception {
-    return new DefaultDbConnection(connection);
+    return new DefaultDbConnection(connection, resolvedCustomTypes);
   }
 
   @Override
@@ -130,6 +150,8 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
     } catch (SQLException e) {
       throw new InitialisationException(createStaticMessage("Could not create DataSource for DB config " + configName), e, this);
     }
+
+    resolvedCustomTypes = resolveCustomTypes();
   }
 
   @Override
@@ -152,6 +174,32 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
   protected DataSource createDataSource() throws SQLException {
     connectionParameters.getDataSourceConfig().setUrl(getEffectiveUrl());
     return dataSourceFactory.create(connectionParameters.getDataSourceConfig());
+  }
+
+  private List<DbType> resolveCustomTypes() {
+    return customDataTypes.stream().map(type -> {
+      final String name = type.getTypeName();
+      final int id = type.getId();
+      if (id == Types.ARRAY) {
+        return new ArrayResolvedDbType(id, name);
+      } else if (id == Types.STRUCT) {
+        final String className = type.getClassName();
+        if (!StringUtils.isEmpty(className)) {
+          Class<?> mappedClass;
+          try {
+            mappedClass = Class.forName(className);
+          } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("Cannot find mapped class: " + className);
+          }
+          return new MappedStructResolvedDbType<>(id, name, mappedClass);
+        } else {
+          return new ResolvedDbType(id, name);
+        }
+      } else {
+        return new ResolvedDbType(id, name);
+      }
+    })
+        .collect(new ImmutableListCollector<>());
   }
 
   protected ConnectionParameters getConnectionParameters() {

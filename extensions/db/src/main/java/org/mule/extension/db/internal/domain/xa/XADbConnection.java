@@ -84,6 +84,11 @@ public class XADbConnection implements DbConnection, XATransactionalConnection {
   }
 
   @Override
+  public List<DbType> getCustomDataTypes() {
+    return connection.getCustomDataTypes();
+  }
+
+  @Override
   public Connection getJdbcConnection() {
     return connection.getJdbcConnection();
   }

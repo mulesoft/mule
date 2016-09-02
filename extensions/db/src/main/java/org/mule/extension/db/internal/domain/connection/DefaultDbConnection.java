@@ -24,9 +24,11 @@ public class DefaultDbConnection implements DbConnection {
 
   private final Connection jdbcConnection;
   private AtomicInteger streamsCount = new AtomicInteger(0);
+  private final List<DbType> customDataTypes;
 
-  public DefaultDbConnection(Connection jdbcConnection) {
+  public DefaultDbConnection(Connection jdbcConnection, List<DbType> customDataTypes) {
     this.jdbcConnection = jdbcConnection;
+    this.customDataTypes = customDataTypes;
   }
 
   /**
@@ -45,9 +47,20 @@ public class DefaultDbConnection implements DbConnection {
     return ImmutableList.of();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Connection getJdbcConnection() {
     return jdbcConnection;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<DbType> getCustomDataTypes() {
+    return customDataTypes;
   }
 
   /**

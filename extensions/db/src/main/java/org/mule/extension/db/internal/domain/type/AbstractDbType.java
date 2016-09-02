@@ -35,7 +35,7 @@ public abstract class AbstractDbType implements DbType {
 
   @Override
   public void registerOutParameter(CallableStatement statement, int index) throws SQLException {
-    statement.registerOutParameter(index, id);
+    statement.registerOutParameter(index, id, name);
   }
 
   @Override

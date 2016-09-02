@@ -6,7 +6,7 @@
  */
 package org.mule.extension.db.internal.resolver.query;
 
-import static java.util.Arrays.asList;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.extension.db.api.param.StatementDefinition;
@@ -40,6 +40,7 @@ import com.google.common.cache.CacheBuilder;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -126,13 +127,19 @@ abstract class AbstractQueryResolver<T extends StatementDefinition> implements Q
   }
 
   private DbTypeManager createTypeManager(DbConnector connector, DbConnection connection) {
-    final DbTypeManager baseTypeManager = connector.getTypeManager();
-    List<DbType> vendorDataTypes = connection.getVendorDataTypes();
-    if (vendorDataTypes.size() > 0) {
-      return new CompositeDbTypeManager(asList(baseTypeManager, new StaticDbTypeManager(connection.getVendorDataTypes())));
-    }
+    List<DbTypeManager> typeManagers = new LinkedList<>();
+    typeManagers.add(connector.getTypeManager());
 
-    return baseTypeManager;
+    collectTypeManager(typeManagers, connection.getVendorDataTypes());
+    collectTypeManager(typeManagers, connection.getCustomDataTypes());
+
+    return new CompositeDbTypeManager(typeManagers);
+  }
+
+  private void collectTypeManager(List<DbTypeManager> collector, List<DbType> extraDataTypes) {
+    if (!isEmpty(extraDataTypes)) {
+      collector.add(new StaticDbTypeManager(extraDataTypes));
+    }
   }
 
 }
