@@ -10,6 +10,7 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.exception.connection.ConnectionClosingException;
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
 import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
+import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
@@ -70,6 +72,7 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
    */
   @Parameter
   @Optional
+  @Expression(NOT_SUPPORTED)
   private List<CustomDataType> customDataTypes = emptyList();
 
   private DataSourceFactory dataSourceFactory;
