@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.simple;
+package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.MuleEvent;
@@ -12,11 +12,12 @@ import org.mule.runtime.core.api.MuleMessage;
 
 import java.util.Set;
 
-public class RemovePropertyTransformer extends AbstractRemoveVariablePropertyTransformer {
+public class RemovePropertyProcessor extends AbstractRemoveVariablePropertyProcessor {
 
   @Override
-  protected void removeProperty(MuleEvent event, String propertyName) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build());
+  protected MuleEvent removeProperty(MuleEvent event, String propertyName) {
+    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build())
+        .build();
   }
 
   @Override

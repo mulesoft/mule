@@ -6,37 +6,39 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
 import java.io.Serializable;
-import java.nio.charset.Charset;
 
-public class CopyPropertiesTransformer extends AbstractMessageTransformer {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CopyPropertiesProcessor implements MessageProcessor, MuleContextAware, Initialisable {
+
+  private static final Logger logger = LoggerFactory.getLogger(CopyPropertiesProcessor.class);
 
   private AttributeEvaluator propertyNameEvaluator;
   private WildcardAttributeEvaluator wildcardPropertyNameEvaluator;
-
-  public CopyPropertiesTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
+  private MuleContext muleContext;
 
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     this.propertyNameEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
-  public Object transformMessage(final MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
+    final MuleEvent.Builder resultBuilder = MuleEvent.builder(event);
     MuleMessage message = event.getMessage();
     if (wildcardPropertyNameEvaluator.hasWildcards()) {
       final Builder builder = MuleMessage.builder(message);
@@ -44,14 +46,14 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer {
           .processValues(message.getInboundPropertyNames(),
                          matchedValue -> builder.addOutboundProperty(matchedValue, message.getInboundProperty(matchedValue),
                                                                      message.getInboundPropertyDataType(matchedValue)));
-      event.setMessage(builder.build());
+      resultBuilder.message(builder.build());
     } else {
       Object keyValue = propertyNameEvaluator.resolveValue(event);
       if (keyValue != null) {
         String propertyName = keyValue.toString();
         Serializable propertyValue = message.getInboundProperty(propertyName);
         if (propertyValue != null) {
-          event.setMessage(MuleMessage.builder(message)
+          resultBuilder.message(MuleMessage.builder(message)
               .addOutboundProperty(propertyName, propertyValue, message.getInboundPropertyDataType(propertyName)).build());
         } else {
           logger.info("Property value for is null, no property will be copied");
@@ -60,12 +62,12 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer {
         logger.info("Key expression return null, no property will be copied");
       }
     }
-    return event.getMessage();
+    return resultBuilder.build();
   }
 
   @Override
   public Object clone() throws CloneNotSupportedException {
-    CopyPropertiesTransformer clone = (CopyPropertiesTransformer) super.clone();
+    CopyPropertiesProcessor clone = (CopyPropertiesProcessor) super.clone();
     clone.setPropertyName(this.propertyNameEvaluator.getRawValue());
     return clone;
   }
@@ -78,4 +80,8 @@ public class CopyPropertiesTransformer extends AbstractMessageTransformer {
     this.wildcardPropertyNameEvaluator = new WildcardAttributeEvaluator(propertyName);
   }
 
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }

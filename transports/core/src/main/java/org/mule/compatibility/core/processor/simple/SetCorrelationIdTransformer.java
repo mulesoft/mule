@@ -4,38 +4,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.core.transformer.simple;
+package org.mule.compatibility.core.processor.simple;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.Correlation;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
-import java.nio.charset.Charset;
-
-public class SetCorrelationIdTransformer extends AbstractMessageTransformer {
+public class SetCorrelationIdTransformer extends SimpleMessageProcessor {
 
   private AttributeEvaluator correlationIdEvaluator;
 
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     correlationIdEvaluator.initialize(muleContext.getExpressionManager());
   }
 
-  public SetCorrelationIdTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
-
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
     ((DefaultMuleEvent) event).setLegacyCorrelationId(correlationIdEvaluator.resolveValue(event).toString());
-    return event.getMessage();
+    return event;
   }
 
 

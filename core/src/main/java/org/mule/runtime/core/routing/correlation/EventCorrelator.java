@@ -6,16 +6,14 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
+import static org.mule.runtime.core.context.notification.RoutingNotification.CORRELATION_TIMEOUT;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -30,6 +28,7 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.RoutingNotification;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.routing.EventProcessingThread;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -193,8 +192,6 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         if (callback.shouldAggregateEvents(group)) {
           // create the response event
           MuleEvent returnEvent = callback.aggregateEvents(group);
-          final Builder builder = MuleMessage.builder(returnEvent.getMessage());
-          returnEvent.setMessage(builder.build());
 
           // remove the eventGroup as no further message will be received
           // for this group once we aggregate
@@ -286,8 +283,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
     if (isFailOnTimeout()) {
       MuleEvent messageCollectionEvent = group.getMessageCollectionEvent();
-      muleContext.fireNotification(new RoutingNotification(messageCollectionEvent.getMessage(), null,
-                                                           RoutingNotification.CORRELATION_TIMEOUT));
+      muleContext.fireNotification(new RoutingNotification(messageCollectionEvent.getMessage(), null, CORRELATION_TIMEOUT));
       try {
         group.clear();
       } catch (ObjectStoreException e) {
@@ -306,9 +302,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
 
       try {
         if (!(group.getCreated() + groupTimeToLive < System.currentTimeMillis())) {
-          MuleEvent newEvent = callback.aggregateEvents(group);
+          MuleEvent newEvent = MuleEvent.builder(callback.aggregateEvents(group)).build();
           group.clear();
-          newEvent.setMessage(MuleMessage.builder(newEvent.getMessage()).build());
 
           if (!correlatorStore.contains((Serializable) group.getGroupId(), getExpiredAndDispatchedPartitionKey())) {
             // TODO which use cases would need a sync reply event

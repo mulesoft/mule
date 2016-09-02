@@ -37,7 +37,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
   }
 
   @Override
-  protected void authenticateInbound(MuleEvent event) throws SecurityException, SecurityProviderNotFoundException,
+  protected MuleEvent authenticateInbound(MuleEvent event) throws SecurityException, SecurityProviderNotFoundException,
       CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     String userHeader = (String) getCredentialsAccessor().getCredentials(event);
     if (userHeader == null) {
@@ -65,6 +65,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
     SecurityContext context = getSecurityManager().createSecurityContext(authentication);
     context.setAuthentication(authentication);
     event.getSession().setSecurityContext(context);
+    return event;
   }
 
   @Override

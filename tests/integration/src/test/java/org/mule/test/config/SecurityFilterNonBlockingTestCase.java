@@ -6,7 +6,6 @@
  */
 package org.mule.test.config;
 
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -14,6 +13,7 @@ import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -41,10 +41,9 @@ public class SecurityFilterNonBlockingTestCase extends AbstractIntegrationTestCa
     protected void doInitialise() throws InitialisationException {}
 
     @Override
-    public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+    public MuleEvent authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
         CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
-      // TODO Auto-generated method stub
-
+      return event;
     }
   }
 }

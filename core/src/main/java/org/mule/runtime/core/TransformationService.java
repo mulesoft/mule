@@ -7,8 +7,10 @@
 package org.mule.runtime.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Arrays.asList;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,7 +27,6 @@ import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -49,9 +50,10 @@ public class TransformationService {
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
-   *
+   * 
    * @param event the event being processed
    * @param transformers the transformers to apply to the message payload
+   *
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
@@ -65,16 +67,17 @@ public class TransformationService {
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
-   *
+   * 
    * @param event the event being processed
    * @param transformers the transformers to apply to the message payload
+   *
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
   public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final Transformer... transformers)
       throws MuleException {
-    return applyAllTransformers(message, event, Arrays.asList(transformers));
+    return applyAllTransformers(message, event, asList(transformers));
   }
 
   /**

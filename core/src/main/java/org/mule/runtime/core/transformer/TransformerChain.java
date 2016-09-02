@@ -63,7 +63,7 @@ public class TransformerChain extends AbstractMessageTransformer {
         result = (MuleMessage) temp;
       } else {
         result = MuleMessage.builder(event.getMessage()).payload(temp).build();
-        event.setMessage(result);
+        event = MuleEvent.builder(event).message(result).build();
       }
     }
     if (lastTransformer != null && MuleMessage.class.isAssignableFrom(lastTransformer.getReturnDataType().getType())) {

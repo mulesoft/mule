@@ -11,6 +11,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -19,11 +20,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
@@ -31,7 +35,7 @@ import java.util.Arrays;
 import org.junit.Test;
 
 @SmallTest
-public class CompositeConverterTestCase {
+public class CompositeConverterTestCase extends AbstractMuleTestCase {
 
   private Converter mockConverterA = mock(Converter.class);
   private Converter mockConverterB = mock(Converter.class);
@@ -155,16 +159,16 @@ public class CompositeConverterTestCase {
   @Test
   public void appliesTransformerChainOnMessage() throws Exception {
     CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
-    MuleEvent event = mock(MuleEvent.class);
+    MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     MuleMessage message = mock(MuleMessage.class);
-    MuleContext muleContext = mock(MuleContext.class);
+    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(MuleTestUtils.getTestFlow(muleContext), TEST_CONNECTOR))
+        .message(message).build();
     compositeConverter.setMuleContext(muleContext);
     TransformationService transformationService = mock(TransformationService.class);
-    doReturn(message).when(event).getMessage();
     doReturn(transformationService).when(muleContext).getTransformationService();
 
     compositeConverter.process(event);
 
-    verify(transformationService, times(1)).applyTransformers(event.getMessage(), event, compositeConverter);
+    verify(transformationService, times(1)).applyTransformers(eq(event.getMessage()), eq(event), eq(compositeConverter));
   }
 }

@@ -4,66 +4,49 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.core.transformer.simple;
+package org.mule.compatibility.core.processor.simple;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
-import java.nio.charset.Charset;
-
-public class CopyAttachmentsTransformer extends AbstractMessageTransformer {
+public class CopyAttachmentsProcessor extends SimpleMessageProcessor {
 
   private AttributeEvaluator attachmentNameEvaluator;
   private WildcardAttributeEvaluator wildcardAttachmentNameEvaluator;
 
-  public CopyAttachmentsTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
-
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     this.attachmentNameEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
     final MuleMessage message = event.getMessage();
     try {
       if (wildcardAttachmentNameEvaluator.hasWildcards()) {
         final Builder builder = MuleMessage.builder(message);
         wildcardAttachmentNameEvaluator.processValues(message.getInboundAttachmentNames(), matchedValue -> builder
             .addOutboundAttachment(matchedValue, message.getInboundAttachment(matchedValue)));
-        event.setMessage(builder.build());
+        return MuleEvent.builder(event).message(builder.build()).build();
       } else {
         String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
-        event.setMessage(MuleMessage.builder(message)
-            .addOutboundAttachment(attachmentName, message.getInboundAttachment(attachmentName)).build());
+        return MuleEvent.builder(event).message(MuleMessage.builder(message)
+            .addOutboundAttachment(attachmentName, message.getInboundAttachment(attachmentName)).build()).build();
       }
     } catch (Exception e) {
-      throw new TransformerException(this, e);
+      throw new MessagingException(event, e);
     }
-    return event.getMessage();
-  }
-
-  @Override
-  public Object clone() throws CloneNotSupportedException {
-    CopyAttachmentsTransformer clone = (CopyAttachmentsTransformer) super.clone();
-    clone.setAttachmentName(this.attachmentNameEvaluator.getRawValue());
-    return clone;
   }
 
   public void setAttachmentName(String attachmentName) {
     this.attachmentNameEvaluator = new AttributeEvaluator(attachmentName);
     this.wildcardAttachmentNameEvaluator = new WildcardAttributeEvaluator(attachmentName);
   }
-
 }

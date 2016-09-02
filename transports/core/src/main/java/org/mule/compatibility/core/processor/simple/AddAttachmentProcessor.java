@@ -4,43 +4,42 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.core.transformer.simple;
+package org.mule.compatibility.core.processor.simple;
 
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
-public class AddAttachmentTransformer extends AbstractMessageTransformer {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class AddAttachmentProcessor extends SimpleMessageProcessor {
+
+  private static final Logger logger = LoggerFactory.getLogger(AddAttachmentProcessor.class);
 
   private AttributeEvaluator nameEvaluator;
   private AttributeEvaluator valueEvaluator;
   private AttributeEvaluator contentTypeEvaluator;
 
-  public AddAttachmentTransformer() {
-    registerSourceType(DataType.OBJECT);
-    setReturnDataType(DataType.OBJECT);
-  }
-
   @Override
   public void initialise() throws InitialisationException {
-    super.initialise();
     nameEvaluator.initialize(muleContext.getExpressionManager());
     valueEvaluator.initialize(muleContext.getExpressionManager());
     contentTypeEvaluator.initialize(muleContext.getExpressionManager());
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
     try {
       Object keyValue = nameEvaluator.resolveValue(event);
       if (keyValue == null) {
@@ -55,23 +54,15 @@ public class AddAttachmentTransformer extends AbstractMessageTransformer {
         } else {
           MediaType contentType =
               DataType.builder().mediaType(contentTypeEvaluator.resolveStringValue(event)).build().getMediaType();
-          event.setMessage(MuleMessage.builder(event.getMessage())
-              .addOutboundAttachment(key, toDataHandler(key, value, contentType)).build());
+          return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+              .addOutboundAttachment(key, toDataHandler(key, value, contentType)).build()).build();
         }
       }
 
-      return event.getMessage();
+      return event;
     } catch (Exception e) {
-      throw new TransformerException(this, e);
+      throw new MessagingException(event, e);
     }
-  }
-
-  @Override
-  public Object clone() throws CloneNotSupportedException {
-    AddAttachmentTransformer clone = (AddAttachmentTransformer) super.clone();
-    clone.setName(this.nameEvaluator.getRawValue());
-    clone.setValue(this.valueEvaluator.getRawValue());
-    return clone;
   }
 
   public void setAttachmentName(String attachmentName) {

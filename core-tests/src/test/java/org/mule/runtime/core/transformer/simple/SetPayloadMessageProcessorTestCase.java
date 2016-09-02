@@ -28,6 +28,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.component;
 
+import static java.util.Collections.singletonList;
+
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -21,12 +23,9 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.registry.ServiceException;
-import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.transformer.TransformerTemplate;
-
-import java.util.Collections;
 
 /**
  * Simple {@link JavaComponent} implementation to be used when {@link LifecycleAdapter} is not required because i) the object
@@ -139,8 +138,9 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent {
       if (result instanceof MuleMessage) {
         return result;
       } else {
-        return muleContext.getTransformationService().applyTransformers(event.getMessage(), event, Collections
-            .<Transformer>singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result))));
+        return muleContext.getTransformationService()
+            .applyTransformers(event.getMessage(), event,
+                               singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result))));
       }
     } else {
       return null;

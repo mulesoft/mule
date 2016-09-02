@@ -18,7 +18,6 @@ import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -27,6 +26,7 @@ import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -61,7 +61,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
   }
 
   @Override
-  public MuleEvent process(final MuleEvent event) throws MuleException {
+  public MuleEvent process(MuleEvent event) throws MuleException {
     try {
       connect();
 
@@ -70,7 +70,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
           || endpoint.isDisableTransportTransformer();
 
       if (!disableTransportTransformer) {
-        applyOutboundTransformers(event);
+        event = applyOutboundTransformers(event);
       }
       boolean hasResponse = endpoint.getExchangePattern().hasResponse();
 
@@ -185,8 +185,10 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     return (OutboundEndpoint) super.getEndpoint();
   }
 
-  protected void applyOutboundTransformers(MuleEvent event) throws MuleException {
-    event.setMessage(getTransformationService().applyTransformers(event.getMessage(), event, defaultOutboundTransformers));
+  protected MuleEvent applyOutboundTransformers(MuleEvent event) throws MuleException {
+    return MuleEvent.builder(event)
+        .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultOutboundTransformers))
+        .build();
   }
 
   protected abstract void doDispatch(MuleEvent event) throws Exception;

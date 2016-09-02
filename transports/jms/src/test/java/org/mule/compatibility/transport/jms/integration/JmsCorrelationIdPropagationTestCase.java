@@ -8,14 +8,6 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.mule.functional.functional.FlowAssert.verify;
 
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.Correlation;
-import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-
-import java.nio.charset.Charset;
-
 import org.junit.Test;
 
 /**
@@ -49,36 +41,5 @@ public class JmsCorrelationIdPropagationTestCase extends AbstractJmsFunctionalTe
   protected void verifyPropagation() throws Exception {
     verify("withCorrelationIdBridge");
     verify("withCorrelationIdOut");
-  }
-
-  public static class SetCorrelationIdTransformer extends AbstractMessageTransformer {
-
-    @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      ((DefaultMuleEvent) event).setLegacyCorrelationId(getCid());
-      ((DefaultMuleEvent) event).setCorrelation(new Correlation(event.getCorrelation().getGroupSize().orElse(null),
-                                                                event.getCorrelation().getSequence().orElse(null)));
-      return event.getMessage();
-    }
-
-    protected String getCid() {
-      return "custom-cid";
-    }
-  }
-
-  public static class SetCorrelationId2Transformer extends SetCorrelationIdTransformer {
-
-    @Override
-    protected String getCid() {
-      return "custom-cid-2";
-    }
-  }
-
-  public static class SetCorrelationId3Transformer extends SetCorrelationIdTransformer {
-
-    @Override
-    protected String getCid() {
-      return "custom-cid-3";
-    }
   }
 }

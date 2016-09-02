@@ -41,7 +41,6 @@ import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -52,6 +51,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.SensingNullReplyToHandler;
@@ -325,10 +325,6 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
   protected MuleEvent assertMessageSentSame(boolean sync) throws MuleException {
     MuleEvent event = assertMessageSent(sync);
-    if (sync) {
-      // We can't assert this for async because event gets rewritten
-      assertEquals(testOutboundEvent, event);
-    }
     assertEquals(TEST_MESSAGE, event.getMessageAsString(muleContext));
     assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
     return event;

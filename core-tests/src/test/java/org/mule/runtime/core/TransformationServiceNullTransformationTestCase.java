@@ -37,12 +37,12 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
     Transformer transformer1 = mock(Transformer.class);
     when(transformer1.transform(any(Object.class))).thenReturn(null);
     when(transformer1.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
-    when(transformer1.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
+    when(transformer1.getReturnDataType()).thenReturn(DataType.OBJECT);
 
     Transformer transformer2 = mock(Transformer.class);
     when(transformer2.transform(any(Object.class))).thenReturn("foo");
     when(transformer2.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
-    when(transformer2.getReturnDataType()).thenReturn((DataType) DataType.OBJECT);
+    when(transformer2.getReturnDataType()).thenReturn(DataType.OBJECT);
 
     MuleMessage message = MuleMessage.builder().payload("").build();
     message = transformationService.applyTransformers(message, null, transformer1, transformer2);

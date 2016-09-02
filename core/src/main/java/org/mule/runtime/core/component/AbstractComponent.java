@@ -140,9 +140,8 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     } else {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
-      return MuleEvent.builder(event)
-          .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)))
-          .build();
+      return MuleEvent.builder(event).message(muleContext.getTransformationService()
+          .applyTransformers(event.getMessage(), event, singletonList(template))).build();
     }
   }
 

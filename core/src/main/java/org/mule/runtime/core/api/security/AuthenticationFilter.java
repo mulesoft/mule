@@ -18,6 +18,6 @@ public interface AuthenticationFilter extends SecurityFilter {
 
   CredentialsAccessor getCredentialsAccessor();
 
-  void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  MuleEvent authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 }

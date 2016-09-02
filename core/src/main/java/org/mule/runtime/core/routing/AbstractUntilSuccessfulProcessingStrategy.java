@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -16,6 +15,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.io.NotSerializableException;
 import java.io.Serializable;
@@ -80,10 +80,9 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
       return event;
     }
 
-    event.setMessage(MuleMessage.builder(event.getMessage())
+    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
         .payload(getUntilSuccessfulConfiguration().getMuleContext().getExpressionManager().evaluate(ackExpression, event, null))
-        .build());
-    return event;
+        .build()).build();
   }
 
   /**

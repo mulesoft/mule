@@ -12,7 +12,6 @@ import static org.mule.runtime.core.context.notification.AsyncMessageNotificatio
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
@@ -28,6 +27,7 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.work.AbstractMuleEventWork;
@@ -154,7 +154,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         executionTemplate.execute(() -> {
           MessagingException exceptionThrown = null;
           try {
-            processNextTimed(event);
+            event = processNextTimed(event);
           } catch (MessagingException e1) {
             exceptionThrown = e1;
             throw e1;

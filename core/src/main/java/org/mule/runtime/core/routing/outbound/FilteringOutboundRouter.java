@@ -32,7 +32,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
 
   protected ExpressionManager expressionManager;
 
-  private List<Transformer> transformers = new LinkedList<Transformer>();
+  private List<Transformer> transformers = new LinkedList<>();
 
   private Filter filter;
 
@@ -83,7 +83,8 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
       return true;
     }
 
-    event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers));
+    event = MuleEvent.builder(event)
+        .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers)).build();
 
     return getFilter().accept(event);
   }

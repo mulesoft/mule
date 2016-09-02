@@ -35,9 +35,10 @@ import org.springframework.security.core.GrantedAuthority;
 public class AuthorizationFilter extends AbstractSecurityFilter {
 
   protected final Logger logger = LoggerFactory.getLogger(getClass());
-  private Collection<String> requiredAuthorities = new HashSet<String>();
+  private Collection<String> requiredAuthorities = new HashSet<>();
 
-  public void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  @Override
+  public MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     Authentication auth = event.getSession().getSecurityContext().getAuthentication();
     if (auth == null) {
@@ -74,6 +75,8 @@ public class AuthorizationFilter extends AbstractSecurityFilter {
                   principalName, Arrays.toString(requiredAuthorities.toArray()), Arrays.toString(authorities)));
       throw new NotPermittedException(SpringSecurityMessages.noGrantedAuthority(principalName));
     }
+
+    return event;
   }
 
   public Collection<String> getRequiredAuthorities() {

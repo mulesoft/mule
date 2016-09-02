@@ -49,7 +49,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (filter != null) {
-      filter.doFilter(event);
+      event = filter.doFilter(event);
     }
     return processNext(event);
   }

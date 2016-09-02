@@ -29,13 +29,11 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
 
   @Override
   protected void sendAsyncRequest(MuleEvent event) throws MuleException {
-    setAsyncReplyProperties(event);
+    event = MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
+            .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, flowConstruct.getName()).build())
+        .build();
     requestMessageProcessor.process(event);
-  }
-
-  protected void setAsyncReplyProperties(MuleEvent event) throws MuleException {
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
-        .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, flowConstruct.getName()).build());
   }
 
   protected String getReplyTo() {

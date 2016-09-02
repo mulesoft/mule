@@ -94,7 +94,7 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
     final MuleMessage coll = MuleMessage.builder()
         .collectionPayload(singletonList(event.getMessage()), MuleMessage.class)
         .build();
-    event.setMessage(coll);
+    event = MuleEvent.builder(event).message(coll).build();
     setCurrentEvent(event);
     return event;
   }

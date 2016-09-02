@@ -82,9 +82,8 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        MuleMessage message = muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this);
-        // TODO MULE-9342 The returned event seems to be ignored and discarded by some caller.
-        event.setMessage(message);
+        return MuleEvent.builder(event)
+            .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (Exception e) {
         throw new TransformerMessagingException(event, this, e);
       }

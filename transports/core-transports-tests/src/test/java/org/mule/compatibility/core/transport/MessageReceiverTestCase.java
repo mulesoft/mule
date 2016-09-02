@@ -12,6 +12,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -70,7 +71,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void routeMessageOneWayReturnsNotNull() throws MuleException {
-    MessageReceiver receiver = createMessageReciever(MessageExchangePattern.ONE_WAY);
+    MessageReceiver receiver = createMessageReciever(ONE_WAY);
 
     assertNotNull(receiver.routeMessage(createRequestMessage()));
   }

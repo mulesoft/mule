@@ -40,9 +40,12 @@ public class WatermarkSelectorWrapper extends WatermarkSelector {
 
   @Override
   public void acceptValue(Object value) {
-    muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(value).build());
     try {
-      Serializable evaluated = WatermarkUtils.evaluate(this.selectorExpression, muleEvent, muleContext);
+      Serializable evaluated =
+          WatermarkUtils.evaluate(this.selectorExpression,
+                                  MuleEvent.builder(muleEvent)
+                                      .message(MuleMessage.builder(muleEvent.getMessage()).payload(value).build()).build(),
+                                  muleContext);
       this.wrapped.acceptValue(evaluated);
     } catch (NotSerializableException e) {
       logger.warn(format("Watermark selector expression '%s' did not resolved to a Serializable value. Value will be ignored",

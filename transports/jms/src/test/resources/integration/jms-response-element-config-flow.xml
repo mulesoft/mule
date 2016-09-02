@@ -17,12 +17,12 @@
     <jms:endpoint name="in" queue="in" exchange-pattern="request-response"/>
     <jms:endpoint name="out" queue="out" exchange-pattern="request-response"/>
 
-    <!-- Reseponse tag in jms outbound endpoint -->
+    <!-- Response tag in jms outbound endpoint -->
     <flow name="vm-in-flow-case-1">
         <vm:inbound-endpoint name="vm.in" path="vminbound" exchange-pattern="request-response"/>
         <transports:outbound-endpoint ref="in" exchange-pattern="request-response">
             <transports:response>
-                <set-property propertyName="test" value="test"/>
+                <transports:mutator-transformer><set-property propertyName="test" value="test"/></transports:mutator-transformer>
                 <append-string-transformer message=" jms flow content" />
             </transports:response>
         </transports:outbound-endpoint>
@@ -35,7 +35,7 @@
         </test:component>
     </flow>
 
-    <!-- Reseponse tag in jms inbound endpoint -->
+    <!-- Response tag in jms inbound endpoint -->
     <flow name="vm-in-flow-case-2">
         <vm:inbound-endpoint name="vm.in2" path="vminbound2" exchange-pattern="request-response"/>
         <jms:outbound-endpoint ref="out" exchange-pattern="request-response"/>

@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.transformer;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -95,7 +95,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
       Transformer trans = this.getTransformer();
       Transformer trans2 = this.getRoundTripTransformer();
       MuleMessage message = MuleMessage.builder().payload(getTestData()).build();
-      message = muleContext.getTransformationService().applyTransformers(message, null, Arrays.asList(trans, trans2));
+      message = muleContext.getTransformationService().applyTransformers(message, null, asList(trans, trans2));
       Object result = message.getPayload();
       this.compareRoundtripResults(this.getTestData(), result);
     }

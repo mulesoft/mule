@@ -3,9 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:http="http://www.mulesoft.org/schema/mule/transport/http" 
     xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
+    xmlns:transports="http://www.mulesoft.org/schema/mule/transports"
     xsi:schemaLocation="
           http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
           http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
+          http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
           
     <http:connector name="connector" enableCookies="true"/>
@@ -17,62 +19,62 @@
 			<gzip-compress-transformer/>
             
 			<!-- add all request http headers -->
-			<set-property propertyName="Accept" value="gzip"/>
-			<set-property propertyName="Accept-Charset" value="gzip"/>
-			<set-property propertyName="Accept-Encoding" value="gzip"/>
-			<set-property propertyName="Accept-Language" value="gzip"/>
-			<set-property propertyName="Authorization" value="gzip"/>
-			<set-property propertyName="Expect" value="foobar"/>
-			<set-property propertyName="From" value="gzip"/>
-			<set-property propertyName="Host" value="gzip"/>
-			<set-property propertyName="If-Match" value="gzip"/>
-			<set-property propertyName="If-Modified-Since" value="gzip"/>
-			<set-property propertyName="If-None-Match" value="gzip"/>
-			<set-property propertyName="If-Range" value="gzip"/>
-			<set-property propertyName="If-Unmodified-Since" value="gzip"/>
-			<set-property propertyName="Max-Forwards" value="gzip"/>
-			<set-property propertyName="Proxy-Authorization" value="gzip"/>
-			<set-property propertyName="X-Forwarded-For" value="1.1.1.1,2.2.2.2"/>
-			<set-property propertyName="Range" value="gzip"/>
-			<set-property propertyName="Referer" value="gzip"/>
-			<set-property propertyName="TE" value="gzip"/>
-			<set-property propertyName="User-Agent" value="gzip"/>
-			<set-property propertyName="Cookie" value="value1=a; value2=b"/>
-			<set-property propertyName="Slug" value="slug"/>
+			<transports:mutator-transformer><set-property propertyName="Accept" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Accept-Charset" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Accept-Encoding" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Accept-Language" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Authorization" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Expect" value="foobar"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="From" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Host" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="If-Match" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="If-Modified-Since" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="If-None-Match" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="If-Range" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="If-Unmodified-Since" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Max-Forwards" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Proxy-Authorization" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="X-Forwarded-For" value="1.1.1.1,2.2.2.2"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Range" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Referer" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="TE" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="User-Agent" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Cookie" value="value1=a; value2=b"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Slug" value="slug"/></transports:mutator-transformer>
 			
 			<!-- add all response http headers -->
-			<set-property propertyName="Accept-Ranges" value="gzip"/>
-			<set-property propertyName="Age" value="gzip"/>
-			<set-property propertyName="ETag" value="gzip"/>
-			<set-property propertyName="Location" value="gzip"/>
-			<set-property propertyName="Proxy-Authenticate" value="gzip"/>
-			<set-property propertyName="Retry-After" value="gzip"/>
-			<set-property propertyName="Server" value="gzip"/>
-			<set-property propertyName="Vary" value="gzip"/>
-			<set-property propertyName="WWW-Authenticate" value="gzip"/>
-			<set-property propertyName="Set-Cookie" value="gzip"/>
+			<transports:mutator-transformer><set-property propertyName="Accept-Ranges" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Age" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="ETag" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Location" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Proxy-Authenticate" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Retry-After" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Server" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Vary" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="WWW-Authenticate" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Set-Cookie" value="gzip"/></transports:mutator-transformer>
 
 			<!-- add all general http headers -->
-			<set-property propertyName="Cache-Control" value="gzip"/>
-			<set-property propertyName="Connection" value="gzip"/>
-			<set-property propertyName="Date" value="gzip"/>
-			<set-property propertyName="Pragma" value="gzip"/>
-			<set-property propertyName="Trailer" value="gzip"/>
-			<set-property propertyName="Transfer-Encoding" value="gzip"/>
-			<set-property propertyName="Upgrade" value="gzip"/>
-			<set-property propertyName="Via" value="gzip"/>
-			<set-property propertyName="Warning" value="gzip"/>
+			<transports:mutator-transformer><set-property propertyName="Cache-Control" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Connection" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Date" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Pragma" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Trailer" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Transfer-Encoding" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Upgrade" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Via" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Warning" value="gzip"/></transports:mutator-transformer>
                   
            	<!-- add all entity http headers -->
-			<set-property propertyName="Allow" value="gzip"/>
-			<set-property propertyName="Content-Encoding" value="gzip"/>
-			<set-property propertyName="Content-Language" value="gzip"/>
-			<set-property propertyName="Content-Length" value="gzip"/>
-			<set-property propertyName="Content-Location" value="gzip"/>
-			<set-property propertyName="Content-MD5" value="gzip"/>
-			<set-property propertyName="Content-Range" value="gzip"/>
-			<set-property propertyName="Expires" value="gzip"/>
-			<set-property propertyName="Last-Modified" value="gzip"/>
+			<transports:mutator-transformer><set-property propertyName="Allow" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Content-Encoding" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Content-Language" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Content-Length" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Content-Location" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Content-MD5" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Content-Range" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Expires" value="gzip"/></transports:mutator-transformer>
+			<transports:mutator-transformer><set-property propertyName="Last-Modified" value="gzip"/></transports:mutator-transformer>
 		</http:outbound-endpoint>	
 	</flow>
 	

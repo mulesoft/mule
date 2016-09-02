@@ -4,24 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.core.transformer.simple;
+package org.mule.compatibility.core.processor.simple;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.transformer.simple.AbstractAddVariablePropertyTransformer;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 
 import java.io.Serializable;
 
-public class AddSessionVariableTransformer extends AbstractAddVariablePropertyTransformer<Object> {
+public class AddSessionVariableProcessor extends AbstractAddVariablePropertyProcessor<Object> {
 
   @Override
-  protected void addProperty(MuleEvent event, String propertyName, Object value, DataType dataType) {
+  protected MuleEvent addProperty(MuleEvent event, String propertyName, Object value, DataType dataType) {
     event.getSession().setProperty(propertyName, (Serializable) value, dataType);
+    return event;
   }
 
   @Override
-  protected void removeProperty(MuleEvent event, String propertyName) {
+  protected MuleEvent removeProperty(MuleEvent event, String propertyName) {
     event.getSession().removeProperty(propertyName);
+    return event;
   }
 
 }

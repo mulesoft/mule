@@ -40,10 +40,12 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
 
   private String securityProviders;
 
+  @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }
 
+  @Override
   public final void initialise() throws InitialisationException {
     if (securityManager == null) {
       securityManager = muleContext.getSecurityManager();
@@ -75,33 +77,34 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
   protected void doInitialise() throws InitialisationException {}
 
   /** @param manager */
+  @Override
   public void setSecurityManager(SecurityManager manager) {
     securityManager = manager;
   }
 
+  @Override
   public SecurityManager getSecurityManager() {
     return securityManager;
   }
 
+  @Override
   public String getSecurityProviders() {
     return securityProviders;
   }
 
+  @Override
   public void setSecurityProviders(String providers) {
     securityProviders = providers;
   }
 
-  public abstract void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+  @Override
+  public abstract MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
-  protected void updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException {
-    TransformerTemplate trans = new TransformerTemplate(new TransformerTemplate.TransformerCallback() {
+  protected MuleEvent updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException {
+    TransformerTemplate trans = new TransformerTemplate(message1 -> payload);
 
-      public Object doTransform(MuleMessage message) throws Exception {
-        return payload;
-      }
-    });
-
-    event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans));
+    return MuleEvent.builder(event)
+        .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans)).build();
   }
 }

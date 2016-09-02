@@ -13,17 +13,19 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import java.util.HashSet;
 
 import org.junit.Ignore;
-import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyTransformerTestCase;
+
+import org.mule.compatibility.core.processor.simple.RemoveSessionVariableProcessor;
+import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
 @Ignore("MULE-9072 - Remove MuleSession")
-public class RemoveSessionVariableTransformerTestCase extends AbstractRemoveVariablePropertyTransformerTestCase {
+public class RemoveSessionVariableProcessorTestCase extends AbstractRemoveVariablePropertyProcessorTestCase {
 
-  public RemoveSessionVariableTransformerTestCase() {
-    super(new RemoveSessionVariableTransformer());
+  public RemoveSessionVariableProcessorTestCase() {
+    super(new RemoveSessionVariableProcessor());
   }
 
   @Override

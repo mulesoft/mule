@@ -36,7 +36,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
   private PGPKeyRing keyManager;
 
   @Override
-  protected void authenticateInbound(MuleEvent event)
+  protected MuleEvent authenticateInbound(MuleEvent event)
       throws SecurityException, UnauthorisedException, UnknownAuthenticationTypeException {
     MuleMessage message = event.getMessage();
 
@@ -78,7 +78,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
     event.getSession().setSecurityContext(context);
 
     try {
-      updatePayload(message, getUnencryptedMessageWithoutSignature((PGPAuthentication) authResult), event);
+      return updatePayload(message, getUnencryptedMessageWithoutSignature((PGPAuthentication) authResult), event);
       // TODO RequestContext.rewriteEvent(new DefaultMuleMessage(
       // getUnencryptedMessageWithoutSignature((PGPAuthentication)authResult)));
     } catch (Exception e2) {

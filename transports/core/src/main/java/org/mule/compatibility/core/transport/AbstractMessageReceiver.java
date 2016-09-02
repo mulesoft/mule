@@ -192,7 +192,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     MuleEvent muleEvent = createMuleEvent(message, outputStream);
 
     if (!endpoint.isDisableTransportTransformer()) {
-      applyInboundTransformers(muleEvent);
+      muleEvent = applyInboundTransformers(muleEvent);
     }
 
     return routeEvent(muleEvent);
@@ -210,13 +210,17 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return messageBuilder.build();
   }
 
-  protected void applyInboundTransformers(MuleEvent event) throws MuleException {
-    event.setMessage(getTransformationService().applyTransformers(event.getMessage(), event, defaultInboundTransformers));
+  protected MuleEvent applyInboundTransformers(MuleEvent event) throws MuleException {
+    return MuleEvent.builder(event)
+        .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultInboundTransformers))
+        .build();
 
   }
 
-  protected void applyResponseTransformers(MuleEvent event) throws MuleException {
-    event.setMessage(getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers));
+  protected MuleEvent applyResponseTransformers(MuleEvent event) throws MuleException {
+    return MuleEvent.builder(event)
+        .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers))
+        .build();
   }
 
   protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
@@ -428,7 +432,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       connector.getSessionHandler().storeSessionInfoToMessage(resultSession, resultEvent.getMessage(), endpoint.getMuleContext());
 
       if (resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer()) {
-        applyResponseTransformers(resultEvent);
+        resultEvent = applyResponseTransformers(resultEvent);
       }
 
       if (connector.isEnableMessageEvents(endpoint.getMuleContext())) {

@@ -9,8 +9,12 @@ package org.mule.runtime.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -26,7 +30,6 @@ import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class TransformationServiceTestCase extends AbstractMuleTestCase {
@@ -82,7 +85,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter1 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
     Transformer converter2 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).build();
 
-    when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(converter2);
+    when(conversionResolver.resolve(any(DataType.class), anyList())).thenReturn(converter2);
 
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
 
@@ -415,7 +418,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
   public void failsWhenNoImplicitConversionAvailable() throws MuleException {
     Transformer transformer = new MockTransformerBuilder().from(DataType.BYTE_ARRAY).to(DataType.STRING).build();
 
-    when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(null);
+    when(conversionResolver.resolve(any(DataType.class), anyList())).thenReturn(null);
 
     MuleMessage message = MuleMessage.builder().payload("TEST").build();
 
@@ -433,7 +436,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter =
         new MockConverterBuilder().from(DataType.STRING).to(DataType.BYTE_ARRAY).returning("bar".getBytes()).build();
 
-    when(conversionResolver.resolve(Mockito.any(DataType.class), Mockito.anyList())).thenReturn(converter);
+    when(conversionResolver.resolve(any(DataType.class), anyList())).thenReturn(converter);
 
     MuleMessage message = MuleMessage.builder().payload("TEST").build();
 
@@ -445,10 +448,10 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
   }
 
   private void verifyTransformerNotExecuted(Transformer converter1) throws TransformerException {
-    Mockito.verify(converter1, Mockito.times(0)).transform(Mockito.any(Object.class));
+    verify(converter1, times(0)).transform(any(Object.class));
   }
 
   private void verifyTransformerExecuted(Transformer converter1) throws TransformerException {
-    Mockito.verify(converter1, Mockito.times(1)).transform(Mockito.any(Object.class));
+    verify(converter1, times(1)).transform(any(Object.class));
   }
 }

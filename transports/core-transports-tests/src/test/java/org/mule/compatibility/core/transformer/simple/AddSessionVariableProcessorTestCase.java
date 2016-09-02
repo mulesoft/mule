@@ -4,50 +4,46 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.simple;
+package org.mule.compatibility.core.transformer.simple;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.transformer.simple.AbstractAddVariablePropertyTransformerTestCase;
+import org.junit.Ignore;
+
+import org.mule.compatibility.core.processor.simple.AddSessionVariableProcessor;
+import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.tck.size.SmallTest;
 
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
-
 @SmallTest
-public class AddFlowVariableTransformerTestCase extends AbstractAddVariablePropertyTransformerTestCase {
+@Ignore("MULE-9072 - Remove MuleSession")
+public class AddSessionVariableProcessorTestCase extends AbstractAddVariablePropertyProcessorTestCase {
 
-  public AddFlowVariableTransformerTestCase() {
-    super(new AddFlowVariableTransformer());
+  public AddSessionVariableProcessorTestCase() {
+    super(new AddSessionVariableProcessor());
   }
 
   @Override
   protected void verifyAdded(MuleEvent event, String key, String value) {
-    assertThat(event.getFlowVariable(key), is(value));
+    assertThat(event.getSession().getProperty(key), is(value));
   }
 
   @Override
   protected void verifyNotAdded(MuleEvent event) {
-    assertThat(event.getFlowVariableNames(), empty());
+    assertThat(event.getSession().getPropertyNamesAsSet(), empty());
   }
 
   @Override
   protected void verifyRemoved(MuleEvent event, String key) {
-    assertThat(event.getFlowVariableNames(), not(contains(key)));
+    assertThat(event.getSession().getProperty(key), is(nullValue()));
   }
 
   @Override
   protected DataType getVariableDataType(MuleEvent event, String key) {
-    return event.getFlowVariableDataType(key);
+    return event.getSession().getPropertyDataType(key);
   }
-
 }
