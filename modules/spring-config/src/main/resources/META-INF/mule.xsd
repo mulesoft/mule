@@ -1172,10 +1172,10 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="defaultExceptionStrategy-ref" type="xsd:string">
+                <xsd:attribute name="defaultErrorHandler-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The default exception strategy for every flow / service. This must be a reference to a global exception strategy.
+                            The default error handler for every flow. This must be a reference to a global error handler.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1733,25 +1733,6 @@
             </xsd:simpleType>
         </xsd:union>
     </xsd:simpleType>
-
-    <xsd:complexType name="referenceExceptionStrategyType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Used to reference another exception strategy within flow, service or global exception strategy.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="exceptionStrategyType">
-                <xsd:attribute name="ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the filter to use.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:complexType name="abstractNotificationExceptionStrategyType">
         <xsd:complexContent>
@@ -4107,15 +4088,6 @@
         <xsd:annotation>
             <xsd:documentation>
                 Error handler used to propagate errors. It will rollback any transaction and not consume messages.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-
-    <xsd:element name="exception-strategy" type="referenceExceptionStrategyType"
-                 substitutionGroup="abstract-exception-strategy">
-        <xsd:annotation>
-            <xsd:documentation>
-                Exception strategy used to reference global exceptions within a flow or service.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

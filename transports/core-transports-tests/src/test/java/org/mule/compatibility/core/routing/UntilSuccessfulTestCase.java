@@ -74,7 +74,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   private EndpointDlqUntilSuccessful buildUntiSuccessful(Long millisBetweenRetries) throws Exception {
     EndpointDlqUntilSuccessful untilSuccessful = new EndpointDlqUntilSuccessful();
     untilSuccessful.setMuleContext(muleContext);
-    untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultExceptionStrategy());
+    untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultErrorHandler());
     untilSuccessful.setFlowConstruct(getTestFlow());
     untilSuccessful.setMaxRetries(2);
 

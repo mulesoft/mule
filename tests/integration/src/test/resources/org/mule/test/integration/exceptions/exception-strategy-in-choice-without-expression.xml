@@ -4,14 +4,12 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <error-handler name="choice">
-        <on-error-continue/>
-        <on-error-continue/>
-    </error-handler>
-
     <flow name="flowA">
         <logger/>
-        <exception-strategy ref="choice"/>
+        <error-handler>
+            <on-error-continue/>
+            <on-error-continue/>
+        </error-handler>
     </flow>
 
 </mule>

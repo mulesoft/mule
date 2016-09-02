@@ -837,13 +837,13 @@ public class DefaultMuleContext implements MuleContext {
   }
 
   @Override
-  public MessagingExceptionHandler getDefaultExceptionStrategy() {
+  public MessagingExceptionHandler getDefaultErrorHandler() {
     MessagingExceptionHandler defaultExceptionStrategy;
-    if (config.getDefaultExceptionStrategyName() != null) {
-      defaultExceptionStrategy = getRegistry().lookupObject(config.getDefaultExceptionStrategyName());
+    if (config.getDefaultErrorHandlerName() != null) {
+      defaultExceptionStrategy = getRegistry().lookupObject(config.getDefaultErrorHandlerName());
       if (defaultExceptionStrategy == null) {
         throw new MuleRuntimeException(CoreMessages.createStaticMessage(String.format("No global exception strategy named %s",
-                                                                                      config.getDefaultExceptionStrategyName())));
+                                                                                      config.getDefaultErrorHandlerName())));
       }
     } else {
       defaultExceptionStrategy = new DefaultMessagingExceptionStrategy(this);

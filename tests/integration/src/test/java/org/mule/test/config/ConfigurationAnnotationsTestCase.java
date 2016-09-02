@@ -76,8 +76,8 @@ public class ConfigurationAnnotationsTestCase extends AbstractIntegrationTestCas
                is("<flow name=\"WithRefExceptionStrategy\" doc:name=\"With Referenced Exception Strategy\">"
                    + SystemUtils.LINE_SEPARATOR + "<echo-component doc:name=\"echo_ex\">" + "</echo-component>"
                    + SystemUtils.LINE_SEPARATOR
-                   + "<exception-strategy ref=\"On_Error_Continue\" doc:name=\"Reference Exception Strategy\">"
-                   + "</exception-strategy>" + SystemUtils.LINE_SEPARATOR + "</flow>"));
+                   + "<error-handler ref=\"On_Error_Continue\" doc:name=\"error handler doc name\">"
+                   + "</error-handler>" + SystemUtils.LINE_SEPARATOR + "</flow>"));
   }
 
   @Test
