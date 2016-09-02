@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.event.mutator.AddPropertyProcessor;
+import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.tck.size.SmallTest;
 
 import static org.hamcrest.collection.IsEmptyCollection.empty;

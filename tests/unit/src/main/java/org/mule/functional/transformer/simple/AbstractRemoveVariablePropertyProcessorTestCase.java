@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.event.mutator.AbstractRemoveVariablePropertyProcessor;
+import org.mule.runtime.core.processor.simple.AbstractRemoveVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

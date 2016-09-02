@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Ignore;
 
-import org.mule.compatibility.core.event.mutator.AddSessionVariableProcessor;
+import org.mule.compatibility.core.processor.simple.AddSessionVariableProcessor;
 import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;

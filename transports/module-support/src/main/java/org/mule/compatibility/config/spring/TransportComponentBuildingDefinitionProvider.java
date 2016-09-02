@@ -22,9 +22,9 @@ import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBea
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.core.event.mutator.AddAttachmentProcessor;
-import org.mule.compatibility.core.event.mutator.CopyAttachmentsProcessor;
-import org.mule.compatibility.core.event.mutator.RemoveAttachmentProcessor;
+import org.mule.compatibility.core.processor.simple.AddAttachmentProcessor;
+import org.mule.compatibility.core.processor.simple.CopyAttachmentsProcessor;
+import org.mule.compatibility.core.processor.simple.RemoveAttachmentProcessor;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;

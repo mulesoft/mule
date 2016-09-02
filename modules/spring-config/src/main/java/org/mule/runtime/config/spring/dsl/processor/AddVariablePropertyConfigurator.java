@@ -11,7 +11,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.config.spring.dsl.spring.ObjectFactoryCommonConfigurator;
-import org.mule.runtime.core.event.mutator.AbstractAddVariablePropertyProcessor;
+import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 
 import java.util.Map;
 

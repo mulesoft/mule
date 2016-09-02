@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.core.event.mutator;
+package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -20,7 +20,7 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 /**
  * Modifies the payload of a {@link MuleMessage} according to the provided value.
  */
-public class SetPayloadMessageProcessor extends AbstractEventMutatorProcessor {
+public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   private DataType dataType;
   private AttributeEvaluator valueEvaluator = new AttributeEvaluator(null);

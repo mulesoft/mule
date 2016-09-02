@@ -14,7 +14,7 @@ import java.util.HashSet;
 
 import org.junit.Ignore;
 
-import org.mule.compatibility.core.event.mutator.RemoveSessionVariableProcessor;
+import org.mule.compatibility.core.processor.simple.RemoveSessionVariableProcessor;
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleSession;

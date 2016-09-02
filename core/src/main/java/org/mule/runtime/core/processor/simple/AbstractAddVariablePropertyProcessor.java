@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.event.mutator;
+package org.mule.runtime.core.processor.simple;
 
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
@@ -23,7 +23,7 @@ import java.text.MessageFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractAddVariablePropertyProcessor<T> extends AbstractEventMutatorProcessor {
+public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMessageProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAddVariablePropertyProcessor.class);
 

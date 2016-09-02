@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.event.mutator;
+package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractRemoveVariablePropertyProcessor extends AbstractEventMutatorProcessor {
+public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMessageProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractRemoveVariablePropertyProcessor.class);
 

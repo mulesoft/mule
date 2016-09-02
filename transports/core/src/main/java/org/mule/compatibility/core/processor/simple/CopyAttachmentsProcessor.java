@@ -4,19 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.core.event.mutator;
+package org.mule.compatibility.core.processor.simple;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.event.mutator.AbstractEventMutatorProcessor;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
-public class CopyAttachmentsProcessor extends AbstractEventMutatorProcessor {
+public class CopyAttachmentsProcessor extends SimpleMessageProcessor {
 
   private AttributeEvaluator attachmentNameEvaluator;
   private WildcardAttributeEvaluator wildcardAttachmentNameEvaluator;

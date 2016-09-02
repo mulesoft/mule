@@ -14,20 +14,20 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.runtime.core.event.mutator.AbstractEventMutatorProcessor;
+import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
 
 /**
- * Provides a way to declare {@link AbstractEventMutatorProcessor} instances as transformers inside an {@link InboundEndpoint} or
+ * Provides a way to declare {@link SimpleMessageProcessor} instances as transformers inside an {@link InboundEndpoint} or
  * {@link OutboundEndpoint}.
  *
  * @since 4.0
  */
-public class MutatorTransformerWrapper extends AbstractMessageTransformer implements MuleContextAware {
+public class MessageProcessorTransformerAdaptor extends AbstractMessageTransformer implements MuleContextAware {
 
-  private AbstractEventMutatorProcessor messageProcessor;
+  private SimpleMessageProcessor messageProcessor;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -58,11 +58,11 @@ public class MutatorTransformerWrapper extends AbstractMessageTransformer implem
   }
 
 
-  public void setMessageProcessor(AbstractEventMutatorProcessor messageProcessor) {
+  public void setMessageProcessor(SimpleMessageProcessor messageProcessor) {
     this.messageProcessor = messageProcessor;
   }
 
-  public AbstractEventMutatorProcessor getMessageProcessor() {
+  public SimpleMessageProcessor getMessageProcessor() {
     return messageProcessor;
   }
 }

@@ -32,8 +32,8 @@ import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.event.mutator.AbstractAddVariablePropertyProcessor;
 import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

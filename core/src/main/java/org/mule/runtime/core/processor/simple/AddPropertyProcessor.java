@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.event.mutator;
+package org.mule.runtime.core.processor.simple;
 
 
 import org.mule.runtime.api.metadata.DataType;

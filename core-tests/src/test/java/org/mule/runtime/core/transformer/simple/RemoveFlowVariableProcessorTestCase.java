@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.event.mutator.RemoveFlowVariableProcessor;
+import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashSet;
