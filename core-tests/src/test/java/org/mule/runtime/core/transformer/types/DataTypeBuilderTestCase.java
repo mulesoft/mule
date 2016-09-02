@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
@@ -24,6 +23,7 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -132,6 +132,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-10452: re-enable once the cache is restored or remove it if not needed anymore")
   public void cachedInstances() {
     final DataTypeParamsBuilder builder1 = DataType.builder().type(String.class);
     final DataTypeParamsBuilder builder2 = DataType.builder().type(String.class);
