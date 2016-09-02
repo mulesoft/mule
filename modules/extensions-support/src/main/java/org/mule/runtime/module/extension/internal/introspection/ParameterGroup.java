@@ -17,6 +17,7 @@ import org.mule.runtime.module.extension.internal.model.property.ParameterGroupM
 
 import com.google.common.collect.ImmutableSet;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  *
  * @since 3.7.0
  */
-public class ParameterGroup<T> implements EnrichableModel {
+public class ParameterGroup<T extends AnnotatedElement> implements EnrichableModel {
 
   /**
    * The type of the pojo which implements the group
@@ -69,6 +70,7 @@ public class ParameterGroup<T> implements EnrichableModel {
 
     this.type = type;
     this.container = container;
+
   }
 
   /**

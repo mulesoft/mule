@@ -26,7 +26,7 @@ import org.mule.test.metadata.extension.resolver.TestContentResolverWithKeyResol
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputAttributesResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestOutputNullTypeResolver;
+import org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
@@ -42,7 +42,7 @@ import java.util.List;
 public class MetadataOperations extends MetadataOperationsParent {
 
   @MetadataScope(keysResolver = TestContentResolverWithKeyResolver.class,
-      contentResolver = TestContentResolverWithKeyResolver.class, outputResolver = TestOutputNullTypeResolver.class)
+      contentResolver = TestContentResolverWithKeyResolver.class, outputResolver = TestOutputAnyTypeResolver.class)
   public Object contentMetadataWithKeyId(@UseConfig Object object, @Connection MetadataConnection connection,
                                          @MetadataKeyId String type,
                                          @Optional @Content Object content) {
@@ -77,7 +77,7 @@ public class MetadataOperations extends MetadataOperationsParent {
                                        @Optional @Content Object content) {}
 
   @MetadataScope(contentResolver = TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam.class,
-      outputResolver = TestOutputNullTypeResolver.class)
+      outputResolver = TestOutputAnyTypeResolver.class)
   public Object contentMetadataWithoutKeyId(@Connection MetadataConnection connection, @Optional @Content Object content) {
     return null;
   }
@@ -114,7 +114,7 @@ public class MetadataOperations extends MetadataOperationsParent {
     return null;
   }
 
-  @MetadataScope(contentResolver = TestResolverWithCache.class, outputResolver = TestOutputNullTypeResolver.class)
+  @MetadataScope(contentResolver = TestResolverWithCache.class, outputResolver = TestOutputAnyTypeResolver.class)
   public Object contentOnlyCacheResolver(@Connection MetadataConnection connection, @MetadataKeyId String type,
                                          @Optional @Content Object content) {
     return null;
@@ -132,7 +132,7 @@ public class MetadataOperations extends MetadataOperationsParent {
     return locationKey;
   }
 
-  @MetadataScope(outputResolver = TestOutputNullTypeResolver.class)
+  @MetadataScope(outputResolver = TestOutputAnyTypeResolver.class)
   public OperationResult messageAttributesNullTypeMetadata() {
     return null;
   }

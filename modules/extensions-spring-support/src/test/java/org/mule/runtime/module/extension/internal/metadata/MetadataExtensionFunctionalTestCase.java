@@ -9,8 +9,10 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -95,6 +97,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected MuleEvent event;
   protected MetadataManager metadataManager;
   protected ClassTypeLoader typeLoader;
+  protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {

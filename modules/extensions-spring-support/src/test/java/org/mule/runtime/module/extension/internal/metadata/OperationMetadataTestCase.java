@@ -313,7 +313,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
 
 
-    assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, void.class);
+    assertExpectedOutput(metadataDescriptor.getOutputMetadata(), typeBuilder.anyType().build(), void.class);
 
     assertThat(metadataDescriptor.getParametersMetadata().size(), is(1));
     assertExpectedType(metadataDescriptor.getParametersMetadata().get(0), "type", String.class);
@@ -344,7 +344,7 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
 
     final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata(nullMetadataKey);
 
-    assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, void.class);
+    assertExpectedOutput(metadataDescriptor.getOutputMetadata(), typeBuilder.anyType().build(), void.class);
 
     assertThat(metadataDescriptor.getContentMetadata().isPresent(), is(true));
     assertExpectedType(metadataDescriptor.getContentMetadata().get(), "content", personType);

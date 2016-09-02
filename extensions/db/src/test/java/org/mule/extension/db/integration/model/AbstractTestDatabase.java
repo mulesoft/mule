@@ -9,7 +9,9 @@ package org.mule.extension.db.integration.model;
 
 import static org.mule.extension.db.integration.model.RegionManager.NORTHWEST_MANAGER;
 import static org.mule.extension.db.integration.model.RegionManager.SOUTHWEST_MANAGER;
-import org.mule.common.metadata.datatype.DataType;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
+import org.mule.metadata.api.model.MetadataType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -34,6 +36,7 @@ public abstract class AbstractTestDatabase {
   public static final String NO_RESULSET_FROM_FUNCTION_SUPPORT_ERROR =
       "Database does not support returning a resultset from a function";
   public static final String NO_UDT_SUPPORT_ERROR = "Database does not support User Defined Data Types";
+  public final BaseTypeBuilder<?> typeBuilder = BaseTypeBuilder.create(MetadataFormat.JAVA);
 
   public void deletePlanetTable(Connection connection) throws SQLException {
     executeUpdate(connection, "DELETE FROM PLANET");
@@ -343,16 +346,16 @@ public abstract class AbstractTestDatabase {
     throw new UnsupportedOperationException(NO_UDT_SUPPORT_ERROR);
   }
 
-  public DataType getIdFieldInputMetaDataType() {
-    return DataType.INTEGER;
+  public MetadataType getIdFieldMetaDataType() {
+    return typeBuilder.numberType().build();
   }
 
-  public DataType getIdFieldOutputMetaDataType() {
-    return DataType.INTEGER;
+  public MetadataType getPositionFielMetaDataType() {
+    return typeBuilder.numberType().build();
   }
 
-  public DataType getPositionFieldOutputMetaDataType() {
-    return DataType.INTEGER;
+  public MetadataType getNameFielMetaDataType() {
+    return typeBuilder.stringType().build();
   }
 
   public Class getIdFieldJavaClass() {

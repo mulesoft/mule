@@ -7,7 +7,9 @@
 
 package org.mule.extension.db.integration.model;
 
-import org.mule.common.metadata.datatype.DataType;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
+import org.mule.metadata.api.model.MetadataType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -117,7 +119,7 @@ public class MySqlTestDatabase extends AbstractTestDatabase {
   }
 
   @Override
-  public DataType getIdFieldInputMetaDataType() {
-    return DataType.STRING;
+  public MetadataType getIdFieldMetaDataType() {
+    return BaseTypeBuilder.create(MetadataFormat.JAVA).stringType().build();
   }
 }

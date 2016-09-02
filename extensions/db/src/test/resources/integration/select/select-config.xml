@@ -20,7 +20,7 @@
     <flow name="expressionAndFixedParamMixed">
         <set-variable variableName="position" value="3"/>
         <dbn:select>
-            <dbn:sql>SELECT * FROM PLANET WHERE POSITION = #[position] AND NAME = 'Earth'</dbn:sql>
+            <dbn:sql>SELECT * FROM PLANET WHERE POSITION = '#[position]' AND NAME = 'Earth'</dbn:sql>
         </dbn:select>
     </flow>
 

@@ -7,8 +7,6 @@
 
 package org.mule.extension.db.integration.model;
 
-import static org.mule.common.metadata.datatype.DataType.DECIMAL;
-import org.mule.common.metadata.datatype.DataType;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.math.BigDecimal;
@@ -140,21 +138,6 @@ public class OracleTestDatabase extends AbstractTestDatabase {
     } catch (ClassNotFoundException e) {
       throw new IllegalStateException("Unable to load ROWDID class");
     }
-  }
-
-  @Override
-  public DataType getIdFieldInputMetaDataType() {
-    return DECIMAL;
-  }
-
-  @Override
-  public DataType getIdFieldOutputMetaDataType() {
-    return DECIMAL;
-  }
-
-  @Override
-  public DataType getPositionFieldOutputMetaDataType() {
-    return DECIMAL;
   }
 
   @Override

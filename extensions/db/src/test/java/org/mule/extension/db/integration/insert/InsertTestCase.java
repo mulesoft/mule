@@ -46,7 +46,7 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void insertDynamic() throws Exception {
-    final String planet = "Mercury";
+    final String planet = "'Mercury'";
     MuleMessage response = flowRunner("insertDynamic").withPayload(planet).run().getMessage();
     assertInsert(response.getPayload(), planet);
   }

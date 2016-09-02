@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -25,6 +26,7 @@ public class DefaultMetadataContext implements MetadataContext {
   private final Optional<ConfigurationInstance> configInstance;
   private final ConnectionManager connectionManager;
   private final MetadataCache cache;
+  private final ClassTypeLoader typeLoader;
 
   /**
    * Retrieves the configuration for the related component
@@ -33,13 +35,15 @@ public class DefaultMetadataContext implements MetadataContext {
    * @param connectionManager {@link ConnectionManager} which is able to find a connection for the component using the
    *        {@param configInstance}
    * @param cache instance of the {@link MetadataCache} for this context
+   * @param typeLoader instance of a {@link TypeLoader} in the context of this extension
    */
   public DefaultMetadataContext(Optional<ConfigurationInstance> configInstance,
                                 ConnectionManager connectionManager,
-                                MetadataCache cache) {
+                                MetadataCache cache, ClassTypeLoader typeLoader) {
     this.configInstance = configInstance;
     this.connectionManager = connectionManager;
     this.cache = cache;
+    this.typeLoader = typeLoader;
   }
 
   /**
@@ -73,4 +77,10 @@ public class DefaultMetadataContext implements MetadataContext {
   public MetadataCache getCache() {
     return cache;
   }
+
+  @Override
+  public ClassTypeLoader getTypeLoader() {
+    return typeLoader;
+  }
+
 }

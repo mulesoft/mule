@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataEnrichableModel;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
@@ -88,6 +90,9 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
     MuleEvent fakeEvent = getInitialiserEvent(muleContext);
     return new DefaultMetadataContext(Optional.of(get(fakeEvent)),
                                       connectionManager,
-                                      metadataManager.getMetadataCache(getName()));
+                                      metadataManager.getMetadataCache(getName()),
+                                      ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(
+                                                                                                getClassLoader(getModel()
+                                                                                                    .getExtensionModel())));
   }
 }

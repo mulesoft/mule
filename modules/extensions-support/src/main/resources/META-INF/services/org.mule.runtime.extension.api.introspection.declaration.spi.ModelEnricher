@@ -9,5 +9,5 @@ org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnrich
 org.mule.runtime.module.extension.internal.introspection.enricher.ImportedTypesModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.SubTypesModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.DisplayModelEnricher
-org.mule.runtime.module.extension.internal.introspection.enricher.DynamicMetadataModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ParameterGroupModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.DynamicMetadataModelEnricher
