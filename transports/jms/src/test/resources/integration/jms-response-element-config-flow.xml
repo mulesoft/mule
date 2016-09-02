@@ -22,7 +22,7 @@
         <vm:inbound-endpoint name="vm.in" path="vminbound" exchange-pattern="request-response"/>
         <transports:outbound-endpoint ref="in" exchange-pattern="request-response">
             <transports:response>
-                <transports:mutator><set-property propertyName="test" value="test"/></transports:mutator>
+                <transports:mutator-transformer><set-property propertyName="test" value="test"/></transports:mutator-transformer>
                 <append-string-transformer message=" jms flow content" />
             </transports:response>
         </transports:outbound-endpoint>

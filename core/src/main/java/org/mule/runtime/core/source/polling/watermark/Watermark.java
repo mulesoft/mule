@@ -85,7 +85,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
    * Retrieves the watermark value from the underlying peristent store and enriches the event.If there is no value stored, a
    * default expression will be used to create a new one.
    */
-  public void putInto(MuleEvent event) throws ObjectStoreException {
+  public MuleEvent putInto(MuleEvent event) throws ObjectStoreException {
     String resolvedVariable = resolveVariable(event);
     Serializable watermarkValue = null;
 
@@ -100,9 +100,10 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
       }
     }
     if (watermarkValue != null) {
-      event.setFlowVariable(resolvedVariable, watermarkValue);
+      return MuleEvent.builder(event).addFlowVariable(resolvedVariable, watermarkValue).build();
     } else {
       logger.warn(CoreMessages.nullWatermark().getMessage());
+      return event;
     }
   }
 
@@ -112,7 +113,6 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
     }
 
     String variableName = this.resolveVariable(event);
-
     synchronized (objectStore) {
       if (objectStore.contains(variableName)) {
         objectStore.remove(variableName);

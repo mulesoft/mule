@@ -14,7 +14,6 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -36,6 +35,7 @@ import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.StringUtils;
 
 import org.slf4j.Logger;
@@ -222,8 +222,7 @@ public class PollingMessageSource
                 .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
                                                                    flowConstruct, MESSAGE_RECEIVED));
             event = interceptor.prepareRouting(sourceEvent, sourceEvent);
-            listener.process(event);
-            interceptor.postProcessRouting(event);
+            interceptor.postProcessRouting(listener.process(event));
           } else {
             logger.info(pollSourceReturnedNull(flowConstruct.getName()).getMessage());
           }

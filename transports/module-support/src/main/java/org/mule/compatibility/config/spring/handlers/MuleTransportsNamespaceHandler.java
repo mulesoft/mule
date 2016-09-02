@@ -26,11 +26,11 @@ import org.mule.compatibility.core.event.mutator.AddSessionVariableProcessor;
 import org.mule.compatibility.core.event.mutator.CopyAttachmentsProcessor;
 import org.mule.compatibility.core.event.mutator.RemoveAttachmentProcessor;
 import org.mule.compatibility.core.event.mutator.RemoveSessionVariableProcessor;
+import org.mule.compatibility.core.event.mutator.SetCorrelationIdTransformer;
 import org.mule.compatibility.core.routing.EndpointDlqUntilSuccessful;
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.core.routing.requestreply.SimpleAsyncEndpointRequestReplyRequester;
 import org.mule.compatibility.core.transformer.simple.MutatorTransformerWrapper;
-import org.mule.compatibility.core.transformer.simple.SetCorrelationIdTransformer;
 import org.mule.compatibility.module.cxf.builder.WebServiceMessageProcessorWithInboundEndpointBuilder;
 import org.mule.compatibility.module.cxf.component.WebServiceWrapperComponent;
 import org.mule.compatibility.module.cxf.config.JaxWsClientWithDecoupledEndpointFactoryBean;
@@ -69,7 +69,7 @@ public class MuleTransportsNamespaceHandler extends AbstractMuleNamespaceHandler
     registerBeanDefinitionParser("default-exception-strategy",
                                  new ExceptionStrategyDefinitionParser(DefaultMessagingExceptionStrategy.class));
 
-    registerBeanDefinitionParser("mutator", new MessageProcessorDefinitionParser(MutatorTransformerWrapper.class));
+    registerBeanDefinitionParser("mutator-transformer", new MessageProcessorDefinitionParser(MutatorTransformerWrapper.class));
 
     registerMuleBeanDefinitionParser("set-session-variable",
                                      new MessageProcessorWithDataTypeDefinitionParser(AddSessionVariableProcessor.class))

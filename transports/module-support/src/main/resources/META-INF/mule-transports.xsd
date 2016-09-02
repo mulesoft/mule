@@ -123,14 +123,14 @@
         </xsd:attribute>
     </xsd:complexType>
     
-    <xsd:element name="mutator" type="mutatorType" substitutionGroup="mule:abstract-transformer">
+    <xsd:element name="mutator-transformer" type="mutatorTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 A transformer that wraps a mutator of event or message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="mutatorType">
+    <xsd:complexType name="mutatorTransformerType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractTransformerType">
                 <xsd:choice>
@@ -144,6 +144,7 @@
                     <xsd:element ref="set-attachment"/>
                     <xsd:element ref="remove-attachment"/>
                     <xsd:element ref="copy-attachments"/>
+                    <xsd:element ref="set-correlation-id"/>
                 </xsd:choice>
             </xsd:extension>
         </xsd:complexContent>

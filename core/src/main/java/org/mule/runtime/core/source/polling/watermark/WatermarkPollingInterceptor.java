@@ -33,8 +33,7 @@ public class WatermarkPollingInterceptor extends MessageProcessorPollingIntercep
    */
   @Override
   public MuleEvent prepareSourceEvent(MuleEvent event) throws MuleException {
-    this.watermark.putInto(event);
-    return event;
+    return this.watermark.putInto(event);
   }
 
   /**

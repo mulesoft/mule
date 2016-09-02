@@ -8,7 +8,7 @@
 package org.mule.test.integration.watermark;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -23,6 +23,7 @@ import org.mule.runtime.core.util.store.ObjectStorePartition;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class WatermarkPollingTestCase extends AbstractIntegrationTestCase {
 
   private final Prober prober = new PollingProber(3000, 500);
 
-  private static final List<String> foo = new ArrayList<String>();
+  private static final List<String> foo = new ArrayList<>();
 
   @Override
   protected String getConfigFile() {
@@ -155,7 +156,7 @@ public class WatermarkPollingTestCase extends AbstractIntegrationTestCase {
 
       @Override
       public String describeFailure() {
-        return "The object store does not contain the key " + OS_KEY3;
+        return "The object store does not contain the key '" + OS_KEY3 + "'";
       }
     });
   }

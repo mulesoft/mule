@@ -46,10 +46,10 @@
             <expression-transformer
                 expression="payload[0]" />
 
-            <transports:mutator>
+            <transports:mutator-transformer>
                 <set-property propertyName="sleepTime"
                         value="3000" />
-            </transports:mutator>
+            </transports:mutator-transformer>
 
         </file:outbound-endpoint>
 
@@ -59,10 +59,10 @@
             <expression-transformer
                 expression="payload[1]" />
 
-            <transports:mutator>
+            <transports:mutator-transformer>
                 <set-property propertyName="sleepTime"
                         value="1000" />
-            </transports:mutator>
+            </transports:mutator-transformer>
 
         </file:outbound-endpoint>
 

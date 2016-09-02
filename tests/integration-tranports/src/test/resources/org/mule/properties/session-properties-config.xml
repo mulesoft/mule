@@ -8,9 +8,9 @@
        http://www.mulesoft.org/schema/mule/transports http://www.mulesoft.org/schema/mule/transports/current/mule-transports.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <transports:mutator name="addP1">
+    <transports:mutator-transformer name="addP1">
         <transports:set-session-variable variableName="P1" value="P1_VALUE"/>
-    </transports:mutator>
+    </transports:mutator-transformer>
 
     <flow name="A" processingStrategy="synchronous">
         <expression-transformer expression="sessionVars.key" />
