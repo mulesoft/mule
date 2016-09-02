@@ -24,10 +24,12 @@ public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilte
   private boolean authenticate;
   private CredentialsAccessor credentialsAccessor;
 
+  @Override
   public CredentialsAccessor getCredentialsAccessor() {
     return credentialsAccessor;
   }
 
+  @Override
   public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
     this.credentialsAccessor = credentialsAccessor;
   }
@@ -41,12 +43,13 @@ public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilte
   }
 
   @Override
-  public void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  public MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
-    authenticate(event);
+    return authenticate(event);
   }
 
-  public abstract void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+  @Override
+  public abstract MuleEvent authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
 }

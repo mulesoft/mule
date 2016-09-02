@@ -15,7 +15,6 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
@@ -95,7 +94,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
   }
 
-  protected void setUnauthenticated(MuleEvent event) {
+  protected MuleEvent setUnauthenticated(MuleEvent event) {
     String realmHeader = "Basic realm=";
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
@@ -107,6 +106,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     }
     headers.put(WWW_AUTHENTICATE, realmHeader);
     event.setFlowVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
+    return event;
   }
 
   /**
@@ -117,7 +117,8 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
    * @throws SecurityException if authentication fails
    */
   @Override
-  public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  public MuleEvent authenticate(MuleEvent event)
+      throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes,
                   "Message attributes must be HttpRequestAttributes.");
@@ -149,7 +150,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
         if (logger.isDebugEnabled()) {
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
-        setUnauthenticated(event);
+        event = setUnauthenticated(event);
         throw new UnauthorisedException(CoreMessages.authFailedForUser(username), event, e);
       }
 
@@ -160,6 +161,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       SecurityContext context = getSecurityManager().createSecurityContext(authResult);
       context.setAuthentication(authResult);
       event.getSession().setSecurityContext(context);
+      return event;
     } else if (header == null) {
       setUnauthenticated(event);
       throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);

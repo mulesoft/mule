@@ -80,10 +80,9 @@ public class SecurityFilterTestCase extends FunctionalTestCase {
     protected void doInitialise() throws InitialisationException {}
 
     @Override
-    public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+    public MuleEvent authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
         CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
-      // TODO Auto-generated method stub
-
+      return event;
     }
   }
 

@@ -111,7 +111,7 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
   }
 
   protected MuleMessage applyInboundTransformers(MuleMessage message) throws MuleException {
-    MuleMessage transformed = getTransformationService().applyTransformers(message, null, null, defaultInboundTransformers);
+    MuleMessage transformed = getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
     if (transformed instanceof MuleMessage) {
       return transformed;
     } else {

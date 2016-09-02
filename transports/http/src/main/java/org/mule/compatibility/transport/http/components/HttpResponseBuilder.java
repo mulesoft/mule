@@ -106,7 +106,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
   protected void setBody(HttpResponse response, MuleMessage message, MuleEvent event) throws MuleException {
     if (bodyTransformer != null) {
-      message = muleContext.getTransformationService().applyTransformers(event.getMessage(), event, null, bodyTransformer);
+      message = muleContext.getTransformationService().applyTransformers(event.getMessage(), event, bodyTransformer);
     }
 
     try {

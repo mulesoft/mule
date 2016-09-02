@@ -111,7 +111,7 @@ public class FutureMessageResult extends FutureTask {
 
         synchronized (this) {
           if (transformers != null) {
-            result = right(muleContext.getTransformationService().applyTransformers(result.getRight(), null, null, transformers));
+            result = right(muleContext.getTransformationService().applyTransformers(result.getRight(), null, transformers));
           }
         }
       }

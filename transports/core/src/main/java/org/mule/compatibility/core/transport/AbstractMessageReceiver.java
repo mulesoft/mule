@@ -212,14 +212,14 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
   protected MuleEvent applyInboundTransformers(MuleEvent event) throws MuleException {
     return MuleEvent.builder(event)
-        .message(getTransformationService().applyTransformers(event.getMessage(), event, null, defaultInboundTransformers))
+        .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultInboundTransformers))
         .build();
 
   }
 
   protected MuleEvent applyResponseTransformers(MuleEvent event) throws MuleException {
     return MuleEvent.builder(event)
-        .message(getTransformationService().applyTransformers(event.getMessage(), event, null, defaultResponseTransformers))
+        .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers))
         .build();
   }
 

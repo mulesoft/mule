@@ -253,7 +253,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
     // TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
     // class
-    return (HttpResponse) getMuleContext().getTransformationService().applyTransformers(message, null, null, getMessageReceiver()
+    return (HttpResponse) getMuleContext().getTransformationService().applyTransformers(message, null, getMessageReceiver()
         .getResponseTransportTransformers())
         .getPayload();
   }

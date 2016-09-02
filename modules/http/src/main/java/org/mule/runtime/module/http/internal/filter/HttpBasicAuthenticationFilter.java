@@ -9,9 +9,11 @@ package org.mule.runtime.module.http.internal.filter;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -24,7 +26,6 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
@@ -100,7 +101,8 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
    * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
    */
   @Override
-  public void authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  public MuleEvent authenticate(MuleEvent event)
+      throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     String header = event.getMessage().getInboundProperty(AUTHORIZATION);
 
@@ -132,7 +134,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
         setUnauthenticated(event);
-        throw new UnauthorisedException(CoreMessages.authFailedForUser(username), event, e);
+        throw new UnauthorisedException(authFailedForUser(username), event, e);
       }
 
       // Authentication success
@@ -143,6 +145,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       SecurityContext context = getSecurityManager().createSecurityContext(authResult);
       context.setAuthentication(authResult);
       event.getSession().setSecurityContext(context);
+      return event;
     } else if (header == null) {
       setUnauthenticated(event);
       throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);

@@ -72,7 +72,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload(new A()).build();
 
     try {
-      transformationService.applyTransformers(message, null, null, converter1);
+      transformationService.applyTransformers(message, null, converter1);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -89,7 +89,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
 
-    message = transformationService.applyTransformers(message, null, null, converter1);
+    message = transformationService.applyTransformers(message, null, converter1);
 
     assertTrue(message.getPayload() instanceof D);
     verifyTransformerExecuted(converter1);
@@ -102,7 +102,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).build();
 
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
-    message = transformationService.applyTransformers(message, null, null, converter1);
+    message = transformationService.applyTransformers(message, null, converter1);
 
     assertTrue(message.getPayload() instanceof C);
     verifyTransformerExecuted(converter1);
@@ -114,7 +114,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter1 = new MockConverterBuilder().from(dataTypeB).to(dataTypeC).build();
 
     MuleMessage message = MuleMessage.builder().payload(new C()).build();
-    message = transformationService.applyTransformers(message, null, null, converter1);
+    message = transformationService.applyTransformers(message, null, converter1);
 
     assertTrue(message.getPayload() instanceof C);
     verifyTransformerNotExecuted(converter1);
@@ -128,7 +128,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new A()).build();
     try {
-      transformationService.applyTransformers(message, null, null, converter1, converter2);
+      transformationService.applyTransformers(message, null, converter1, converter2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -143,7 +143,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
 
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
-    message = transformationService.applyTransformers(message, null, null, converter1, converter2);
+    message = transformationService.applyTransformers(message, null, converter1, converter2);
 
     assertTrue(message.getPayload() instanceof D);
     verifyTransformerExecuted(converter1);
@@ -157,7 +157,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
 
     MuleMessage message = MuleMessage.builder().payload(new C()).build();
-    message = transformationService.applyTransformers(message, null, null, converter1, converter2);
+    message = transformationService.applyTransformers(message, null, converter1, converter2);
 
     assertTrue(message.getPayload() instanceof D);
     verifyTransformerNotExecuted(converter1);
@@ -172,7 +172,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
     MuleMessage message = MuleMessage.builder().payload(new D()).build();
-    message = transformationService.applyTransformers(message, null, null, converter1, converter2);
+    message = transformationService.applyTransformers(message, null, converter1, converter2);
 
     assertTrue(message.getPayload() instanceof D);
     verifyTransformerNotExecuted(converter1);
@@ -187,7 +187,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new A()).build();
     try {
-      transformationService.applyTransformers(message, null, null, transformer1, converter2);
+      transformationService.applyTransformers(message, null, transformer1, converter2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -203,7 +203,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer converter2 = new MockConverterBuilder().from(dataTypeC).to(dataTypeD).build();
 
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
-    message = transformationService.applyTransformers(message, null, null, transformer1, converter2);
+    message = transformationService.applyTransformers(message, null, transformer1, converter2);
 
     assertTrue(message.getPayload() instanceof D);
     verifyTransformerExecuted(transformer1);
@@ -218,7 +218,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new C()).build();
     try {
-      transformationService.applyTransformers(message, null, null, transformer1, converter2);
+      transformationService.applyTransformers(message, null, transformer1, converter2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -234,7 +234,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new D()).build();
     try {
-      transformationService.applyTransformers(message, null, null, transformer1, converter2);
+      transformationService.applyTransformers(message, null, transformer1, converter2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -251,7 +251,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload(new A()).build();
 
     try {
-      transformationService.applyTransformers(message, null, null, converter1, transformer2);
+      transformationService.applyTransformers(message, null, converter1, transformer2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -267,7 +267,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
     try {
-      transformationService.applyTransformers(message, null, null, converter1, transformer2);
+      transformationService.applyTransformers(message, null, converter1, transformer2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -282,7 +282,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer transformer2 = new MockTransformerBuilder().from(dataTypeC).to(dataTypeD).returning(new D()).build();
 
     MuleMessage message = MuleMessage.builder().payload(new C()).build();
-    message = transformationService.applyTransformers(message, null, null, converter1, transformer2);
+    message = transformationService.applyTransformers(message, null, converter1, transformer2);
 
     assertTrue(message.getPayload() instanceof D);
     verifyTransformerNotExecuted(converter1);
@@ -297,7 +297,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new D()).build();
     try {
-      transformationService.applyTransformers(message, null, null, converter1, transformer2);
+      transformationService.applyTransformers(message, null, converter1, transformer2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -314,7 +314,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload(new A()).build();
 
     try {
-      transformationService.applyTransformers(message, null, null, transformer1, transformer2);
+      transformationService.applyTransformers(message, null, transformer1, transformer2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -331,7 +331,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
 
     try {
-      transformationService.applyTransformers(message, null, null, transformer1, transformer2);
+      transformationService.applyTransformers(message, null, transformer1, transformer2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -348,7 +348,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload(new C()).build();
 
     try {
-      transformationService.applyTransformers(message, null, null, transformer1, transformer2);
+      transformationService.applyTransformers(message, null, transformer1, transformer2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -365,7 +365,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload(new D()).build();
 
     try {
-      transformationService.applyTransformers(message, null, null, transformer1, transformer2);
+      transformationService.applyTransformers(message, null, transformer1, transformer2);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -381,7 +381,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload(new A()).build();
 
     try {
-      transformationService.applyTransformers(message, null, null, transformer1);
+      transformationService.applyTransformers(message, null, transformer1);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -394,7 +394,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     Transformer transformer1 = new MockTransformerBuilder().from(dataTypeB).to(dataTypeC).returning(new C()).build();
 
     MuleMessage message = MuleMessage.builder().payload(new B()).build();
-    message = transformationService.applyTransformers(message, null, null, transformer1);
+    message = transformationService.applyTransformers(message, null, transformer1);
 
     assertTrue(message.getPayload() instanceof C);
     verifyTransformerExecuted(transformer1);
@@ -407,7 +407,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload(new C()).build();
     try {
-      transformationService.applyTransformers(message, null, null, transformer1);
+      transformationService.applyTransformers(message, null, transformer1);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -423,7 +423,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     MuleMessage message = MuleMessage.builder().payload("TEST").build();
 
     try {
-      transformationService.applyTransformers(message, null, null, transformer);
+      transformationService.applyTransformers(message, null, transformer);
       fail("Transformation is supposed to fail");
     } catch (IllegalArgumentException expected) {
     }
@@ -440,7 +440,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     MuleMessage message = MuleMessage.builder().payload("TEST").build();
 
-    message = transformationService.applyTransformers(message, null, null, transformer);
+    message = transformationService.applyTransformers(message, null, transformer);
 
     assertEquals("bar", message.getPayload());
     verifyTransformerExecuted(transformer);

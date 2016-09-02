@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,6 @@ public class TransformationContentTypeTestCase extends AbstractIntegrationTestCa
     Transformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
     assertNotNull(trans);
     String inputMessage = "ABCDEF";
-    byte[] array = (byte[]) trans.transform(inputMessage);
 
     MuleMessage message = MuleMessage.builder().payload(inputMessage).build();
     List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});

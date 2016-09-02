@@ -45,7 +45,7 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
     when(transformer2.getReturnDataType()).thenReturn(DataType.OBJECT);
 
     MuleMessage message = MuleMessage.builder().payload("").build();
-    message = transformationService.applyTransformers(message, null, null, transformer1, transformer2);
+    message = transformationService.applyTransformers(message, null, transformer1, transformer2);
 
     assertEquals("foo", message.getPayload());
     verify(transformer1, never()).transform(null);

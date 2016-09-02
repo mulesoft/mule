@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.config.i18n.CoreMessages.failedToInvoke;
+import static org.mule.runtime.core.config.i18n.CoreMessages.initialisationFailure;
+import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithNumParamsNotFoundOnObject;
+import static org.mule.runtime.core.config.i18n.CoreMessages.methodWithParamsNotFoundOnObject;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -83,9 +88,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     if (argumentTypes != null) {
       method = ClassUtils.getMethod(object.getClass(), methodName, argumentTypes);
       if (method == null) {
-        throw new InitialisationException(CoreMessages.methodWithParamsNotFoundOnObject(methodName, argumentTypes,
-                                                                                        object.getClass()),
-                                          this);
+        throw new InitialisationException(methodWithParamsNotFoundOnObject(methodName, argumentTypes, object.getClass()), this);
       }
     } else {
       List<Method> matchingMethods = new ArrayList<>();
@@ -98,8 +101,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
         method = matchingMethods.get(0);
         argumentTypes = method.getParameterTypes();
       } else {
-        throw new InitialisationException(CoreMessages.methodWithNumParamsNotFoundOnObject(methodName, arguments.size(), object),
-                                          this);
+        throw new InitialisationException(methodWithNumParamsNotFoundOnObject(methodName, arguments.size(), object), this);
       }
     }
 
@@ -117,14 +119,13 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     try {
       object = muleContext.getRegistry().lookupObject(objectType);
     } catch (RegistrationException e) {
-      throw new InitialisationException(CoreMessages.initialisationFailure(String.format(
-                                                                                         "Muliple instances of '%s' were found in the registry so you need to configure a specific instance",
-                                                                                         objectType)),
+      throw new InitialisationException(initialisationFailure(format("Muliple instances of '%s' were found in the registry so you need to configure a specific instance",
+                                                                     objectType)),
                                         this);
     }
     if (object == null) {
       throw new InitialisationException(CoreMessages
-          .initialisationFailure(String.format("No instance of '%s' was found in the registry", objectType)), this);
+          .initialisationFailure(format("No instance of '%s' was found in the registry", objectType)), this);
 
     }
   }
@@ -135,7 +136,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     Object[] args = evaluateArguments(event, arguments);
 
     if (logger.isDebugEnabled()) {
-      logger.debug(String.format("Invoking  '%s' of '%s' with arguments: '%s'", method.getName(), object, args));
+      logger.debug(format("Invoking  '%s' of '%s' with arguments: '%s'", method.getName(), object, args));
     }
 
     try {
@@ -144,7 +145,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
         resultEvent = createResultEvent(event, result);
       }
     } catch (Exception e) {
-      throw new MessagingException(CoreMessages.failedToInvoke(object.toString()), event, e, this);
+      throw new MessagingException(failedToInvoke(object.toString()), event, e, this);
     }
     return resultEvent;
   }
@@ -244,8 +245,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     } else if (result != null) {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
-      eventBuilder.message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, eventBuilder,
-                                                                                    singletonList(template)));
+      eventBuilder
+          .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
     } else {
       eventBuilder.message(MuleMessage.builder().nullPayload().build());
     }

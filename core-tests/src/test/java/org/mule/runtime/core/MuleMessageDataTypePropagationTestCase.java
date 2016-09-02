@@ -132,7 +132,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
     assertDataType(result, Integer.class, APPLICATION_XML, DEFAULT_ENCODING);
   }
@@ -149,7 +149,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
     assertDataType(result, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
   }
@@ -166,7 +166,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
     assertDataType(result, Integer.class, APPLICATION_XML, CUSTOM_ENCODING);
   }
@@ -183,7 +183,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     MuleEvent muleEvent = mock(MuleEvent.class);
 
-    MuleMessage result = transformationService.applyTransformers(message, muleEvent, null, singletonList(transformer));
+    MuleMessage result = transformationService.applyTransformers(message, muleEvent, singletonList(transformer));
 
     assertDataType(result, String.class, ANY, DEFAULT_ENCODING);
   }

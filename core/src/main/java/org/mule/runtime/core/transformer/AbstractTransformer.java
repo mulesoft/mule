@@ -83,7 +83,7 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     if (event != null && event.getMessage() != null) {
       try {
         return MuleEvent.builder(event)
-            .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, null, this)).build();
+            .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (Exception e) {
         throw new TransformerMessagingException(event, this, e);
       }

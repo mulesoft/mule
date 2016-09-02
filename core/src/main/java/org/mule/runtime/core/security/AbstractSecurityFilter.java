@@ -98,13 +98,13 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
   }
 
   @Override
-  public abstract void doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+  public abstract MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
-  protected void updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException {
+  protected MuleEvent updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException {
     TransformerTemplate trans = new TransformerTemplate(message1 -> payload);
 
-    event.setMessage(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, MuleEvent.builder(event),
-                                                                              trans));
+    return MuleEvent.builder(event)
+        .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans)).build();
   }
 }

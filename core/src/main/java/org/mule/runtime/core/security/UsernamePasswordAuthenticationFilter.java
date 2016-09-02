@@ -39,7 +39,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
    * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
    */
   @Override
-  public void authenticate(MuleEvent event)
+  public MuleEvent authenticate(MuleEvent event)
       throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
     Authentication authentication = getAuthenticationToken(event);
     Authentication authResult;
@@ -62,6 +62,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     context.setAuthentication(authResult);
     event.getSession().setSecurityContext(context);
 
+    return event;
   }
 
   protected Authentication getAuthenticationToken(MuleEvent event) throws UnauthorisedException {

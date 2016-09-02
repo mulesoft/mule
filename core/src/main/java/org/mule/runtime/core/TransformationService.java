@@ -15,7 +15,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Converter;
@@ -51,35 +50,34 @@ public class TransformationService {
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
-   *
+   * 
    * @param event the event being processed
-   * @param eventBuilder the builder holding the result of the transformation
    * @param transformers the transformers to apply to the message payload
+   *
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, MuleEvent.Builder eventBuilder,
+  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event,
                                        final List<? extends Transformer> transformers)
       throws MuleException {
-    return applyAllTransformers(message, event, eventBuilder, transformers);
+    return applyAllTransformers(message, event, transformers);
   }
 
   /**
    * Applies a list of transformers returning the result of the transformation as a new message instance. If the list of
    * transformers is empty or transformation would be redundant then the same message instances will be returned.
-   *
+   * 
    * @param event the event being processed
-   * @param eventBuilder the builder holding the result of the transformation
    * @param transformers the transformers to apply to the message payload
+   *
    * @return the result of transformation
    * @throws TransformerException if a transformation error occurs or one or more of the transformers passed in a are incompatible
    *         with the message payload
    */
-  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, MuleEvent.Builder eventBuilder,
-                                       final Transformer... transformers)
+  public MuleMessage applyTransformers(final MuleMessage message, final MuleEvent event, final Transformer... transformers)
       throws MuleException {
-    return applyAllTransformers(message, event, eventBuilder, asList(transformers));
+    return applyAllTransformers(message, event, asList(transformers));
   }
 
   /**
@@ -141,7 +139,7 @@ public class TransformationService {
   }
 
   private MuleMessage applyAllTransformers(final MuleMessage message, final MuleEvent event,
-                                           Builder eventBuilder, final List<? extends Transformer> transformers)
+                                           final List<? extends Transformer> transformers)
       throws MuleException {
     MuleMessage result = message;
     if (!transformers.isEmpty()) {
@@ -180,9 +178,6 @@ public class TransformationService {
           }
         }
       }
-    }
-    if (eventBuilder != null) {
-      eventBuilder.message(message);
     }
     return result;
   }

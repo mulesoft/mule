@@ -65,8 +65,8 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase {
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.applyTransformers(any(MuleMessage.class), any(MuleEvent.class), any(MuleEvent.Builder.class),
-                                                 anyList())).thenAnswer(answer -> answer.getArguments()[0]);
+    when(transformationService.applyTransformers(any(MuleMessage.class), any(MuleEvent.class), anyList()))
+        .thenAnswer(answer -> answer.getArguments()[0]);
   }
 
   @Test

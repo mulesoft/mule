@@ -139,7 +139,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent {
         return result;
       } else {
         return muleContext.getTransformationService()
-            .applyTransformers(event.getMessage(), event, MuleEvent.builder(event),
+            .applyTransformers(event.getMessage(), event,
                                singletonList(new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result))));
       }
     } else {

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.jaas.filters;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
@@ -15,14 +17,12 @@ import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityException;
-import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.jaas.JaasAuthentication;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.core.security.MuleHeaderCredentialsAccessor;
+import org.mule.runtime.module.jaas.JaasAuthentication;
 
 public class JaasSecurityFilter extends AbstractOperationSecurityFilter {
 
@@ -31,7 +31,7 @@ public class JaasSecurityFilter extends AbstractOperationSecurityFilter {
   }
 
   @Override
-  protected final void authenticateInbound(MuleEvent event)
+  protected final MuleEvent authenticateInbound(MuleEvent event)
       throws SecurityException, CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     String userHeader = (String) getCredentialsAccessor().getCredentials(event);
     if (userHeader == null) {
@@ -56,7 +56,7 @@ public class JaasSecurityFilter extends AbstractOperationSecurityFilter {
       if (logger.isDebugEnabled()) {
         logger.debug("Authentication request for user: " + user.getUsername() + " failed: " + e.toString());
       }
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(user.getUsername()), event, e);
+      throw new UnauthorisedException(authFailedForUser(user.getUsername()), event, e);
     }
 
     // Authentication success
@@ -67,6 +67,7 @@ public class JaasSecurityFilter extends AbstractOperationSecurityFilter {
     SecurityContext context = getSecurityManager().createSecurityContext(authResult);
     context.setAuthentication(authResult);
     event.getSession().setSecurityContext(context);
+    return event;
   }
 
   @Override
