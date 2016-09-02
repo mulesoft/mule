@@ -183,8 +183,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
           response = MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
         }
 
-        if (response.getError() == null) {
-          event = MuleEvent.builder(event).error(response.getError()).build();
+        if (!response.getError().isPresent()) {
+          event = MuleEvent.builder(event).error(response.getError().orElse(null)).build();
         }
       } else {
         if (logger.isDebugEnabled()) {

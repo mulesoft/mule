@@ -115,7 +115,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
   public void testClientWithSOAPFaultCatchException() throws Exception {
     MuleEvent event = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run();
     assertNotNull(event);
-    assertThat(event.getError(), is(nullValue()));
+    assertThat(event.getError().isPresent(), is(false));
   }
 
   @Test
@@ -124,7 +124,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     assertNotNull(event);
     assertNotNull(event.getMessage());
     assertThat(getPayloadAsString(event.getMessage()), containsString("TEST"));
-    assertThat(event.getError(), is(nullValue()));
+    assertThat(event.getError().isPresent(), is(false));
   }
 
   @Test
@@ -162,7 +162,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      throw new Fault(event.getError().getException().getCause());
+      throw new Fault(event.getError().get().getException().getCause());
     }
   }
 

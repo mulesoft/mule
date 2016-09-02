@@ -7,6 +7,7 @@
 
 package org.mule.compatibility.core.processor.chain;
 
+import static java.util.Optional.empty;
 import static org.apache.commons.lang.RandomStringUtils.randomNumeric;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -40,6 +41,7 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -127,6 +129,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getError()).thenReturn(empty());
     Pipeline mockFlow = mock(Flow.class);
     when(mockFlow.getProcessingStrategy())
         .thenReturn(nonBlocking ? new NonBlockingProcessingStrategy() : new DefaultFlowProcessingStrategy());

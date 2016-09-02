@@ -19,6 +19,7 @@ import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.FileNotFoundException;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTestCase {
@@ -34,7 +35,7 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
     MuleMessage message = event.getMessage();
 
     assertNotNull(message);
-    assertNull(event.getError());
+    assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(message), is("Foo Bar Car Jar"));
   }
 
@@ -43,7 +44,7 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
     MuleEvent event = flowRunner("testService2").withPayload("foo").run();
     MuleMessage message = event.getMessage();
     assertNotNull(message);
-    assertNull(event.getError());
+    assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(message), is(loadResourceAsString("org/mule/test/integration/tck/test-data.txt")));
   }
 
@@ -52,7 +53,7 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
     MuleEvent event = flowRunner("testService3").withPayload("foo").run();
     MuleMessage message = event.getMessage();
     assertNotNull(message);
-    assertNull(event.getError());
+    assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(message), is("foo received"));
   }
 

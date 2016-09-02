@@ -6,9 +6,11 @@
  */
 package org.mule.test.integration.resolvers;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.MuleEvent;
@@ -21,6 +23,7 @@ import org.mule.runtime.core.util.Base64;
 import java.util.List;
 import java.util.Random;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class DefaultEntryPointResolverSetMultithreadingTestCase extends AbstractIntegrationTestCase {
@@ -80,7 +83,7 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Abstract
         try {
           MuleEvent event = flowRunner("flowTestSync").withPayload(payload).run();
           final MuleMessage outbound = event.getMessage();
-          assertNull(event.getError());
+          assertThat(event.getError().isPresent(), is(false));
           assertNotNull(outbound.getPayload());
           byte[] bytes = null;
           if (outbound.getPayload() instanceof byte[]) {

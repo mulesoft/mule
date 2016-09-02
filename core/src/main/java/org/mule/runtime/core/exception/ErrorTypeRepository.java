@@ -32,9 +32,9 @@ public class ErrorTypeRepository {
   public static final String CORE_NAMESPACE_NAME = "mule";
 
   private static final ErrorType ANY_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).stringRepresentation(ANY_IDENTIFIER).build();
+      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build();
   private static final ErrorType UNKNOWN_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).stringRepresentation(UNKNOWN_ERROR_IDENTIFIER)
+      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(UNKNOWN_ERROR_IDENTIFIER)
           .parentErrorType(ANY_ERROR_TYPE).build();
 
   private Map<ComponentIdentifier, ErrorType> errorTypes = new HashMap<>();
@@ -56,7 +56,7 @@ public class ErrorTypeRepository {
   public void addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
     ErrorTypeBuilder errorTypeBuilder =
         ErrorTypeBuilder.builder().namespace(errorTypeIdentifier.getNamespace())
-            .stringRepresentation(errorTypeIdentifier.getName())
+            .identifier(errorTypeIdentifier.getName())
             .parentErrorType(parentErrorType);
     if (this.errorTypes.put(errorTypeIdentifier, errorTypeBuilder.build()) != null) {
       throw new IllegalStateException(format("An error type with identifier %s already exists", errorTypeIdentifier));

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -170,6 +171,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
     when(mockMuleEvent.getReplyToHandler()).thenReturn(mockReplyToHandler);
     when(mockMuleEvent.getId()).thenReturn(muleEventIdToProcess);
+    when(mockMuleEvent.getError()).thenReturn(empty());
 
     when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);
     doAnswer(invocationOnMock -> {

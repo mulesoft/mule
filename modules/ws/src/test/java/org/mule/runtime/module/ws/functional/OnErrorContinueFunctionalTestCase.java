@@ -40,9 +40,9 @@ public class OnErrorContinueFunctionalTestCase extends AbstractWSConsumerFunctio
   public void soapFaultThrowsException() throws Exception {
     MessagingException e = flowRunner("soapFaultWithoutCatchExceptionStrategy").withPayload(FAIL_REQUEST).runExpectingException();
 
-    assertNotNull(e.getEvent().getError());
+    assertThat(e.getEvent().getError().isPresent(), is(true));
 
-    SoapFaultException soapFault = (SoapFaultException) e.getEvent().getError().getException();
+    SoapFaultException soapFault = (SoapFaultException) e.getEvent().getError().get().getException();
     assertThat(soapFault.getMessage(), startsWith("Hello"));
     assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
   }
@@ -57,7 +57,7 @@ public class OnErrorContinueFunctionalTestCase extends AbstractWSConsumerFunctio
 
     assertXMLEqual(EXPECTED_SOAP_FAULT_DETAIL, getPayloadAsString(event.getMessage()));
 
-    assertNull(event.getError());
+    assertThat(event.getError().isPresent(), is(false));
 
     SoapFaultException soapFault = ((MuleMessage) event.getMessage()).getOutboundProperty("soapFaultException");
     assertThat(soapFault.getMessage(), startsWith("Hello"));

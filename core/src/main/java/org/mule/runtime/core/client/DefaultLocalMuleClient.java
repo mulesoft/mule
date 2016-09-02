@@ -104,10 +104,10 @@ public class DefaultLocalMuleClient implements MuleClient {
       return left(builder(new MuleRuntimeException(createStaticMessage(MESSAGE_FILTERED_ERROR_MESSAGE))).errorType(anyErrorType)
           .build());
     }
-    if (muleEvent.getError() == null) {
+    if (!muleEvent.getError().isPresent()) {
       return right(muleEvent.getMessage());
     }
-    return left(muleEvent.getError());
+    return left(muleEvent.getError().get());
   }
 
   @Override
@@ -191,8 +191,8 @@ public class DefaultLocalMuleClient implements MuleClient {
       if (event == null || event instanceof VoidMuleEvent) {
         return right(empty());
       }
-      if (event.getError() != null) {
-        return left(event.getError());
+      if (event.getError().isPresent()) {
+        return left(event.getError().get());
       }
       return right(ofNullable(event.getMessage()));
     } else {

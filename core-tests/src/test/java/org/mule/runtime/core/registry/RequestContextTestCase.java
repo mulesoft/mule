@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.registry;
 
+import static java.time.OffsetTime.now;
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -13,6 +15,20 @@ import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import org.mule.runtime.core.DefaultMessageContext;
+import java.nio.charset.Charset;
+import java.time.OffsetTime;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;

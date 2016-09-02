@@ -237,8 +237,8 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     bindings.put(BINDING_SESSION_VARS, new SessionVariableMapContext(event.getSession()));
 
     // Only add exception is present
-    if (event.getError() != null) {
-      bindings.put(BINDING_EXCEPTION, event.getError().getException());
+    if (event.getError().isPresent()) {
+      bindings.put(BINDING_EXCEPTION, event.getError().get().getException());
     } else {
       bindings.put(BINDING_EXCEPTION, null);
     }

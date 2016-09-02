@@ -34,7 +34,7 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
 
     MuleEvent event = flowRunner("test").withPayload(list).run();
 
-    assertNull(event.getError());
+    assertThat(event.getError().isPresent(), is(false));
     assertThat(event.getMessage().getPayload(), is(notNullValue()));
     assertThat(event.getSession().getProperty("ErrorCount"), is(list.size()));
   }

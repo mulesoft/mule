@@ -6,8 +6,10 @@
  */
 package org.mule.test.integration.xml;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
@@ -49,7 +51,7 @@ public class XSLTWikiDocsTestCase extends AbstractIntegrationTestCase {
     final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
     MuleMessage message = muleEvent.getMessage();
     assertNotNull(message);
-    assertNull(muleEvent.getError());
+    assertThat(muleEvent.getError().isPresent(), is(false));
     // Compare results
 
     String result = getPayloadAsString(message);

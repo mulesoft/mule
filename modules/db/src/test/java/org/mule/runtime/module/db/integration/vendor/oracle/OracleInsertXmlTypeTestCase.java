@@ -95,7 +95,7 @@ public class OracleInsertXmlTypeTestCase extends AbstractOracleXmlTypeTestCase {
   }
 
   private void assertNoAliens(MuleEvent event) throws SQLException {
-    assertThat(event.getError(), is(notNullValue()));
+    assertThat(event.getError().isPresent(), is(true));
 
     List<Map<String, String>> result = selectData("SELECT name FROM Alien", getDefaultDataSource());
     assertRecords(result);

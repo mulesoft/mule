@@ -42,6 +42,8 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.routing.requestreply.AsyncReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.work.SerialWorkManager;
 
+import java.util.Optional;
+
 /**
  * This implementation of {@link AbstractPipeline} adds the following functionality:
  * <ul>
@@ -144,10 +146,11 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
 
   private MuleEvent createReturnEventForParentFlowConstruct(MuleEvent result, MuleEvent original) {
     if (result != null && !(result instanceof VoidMuleEvent)) {
-      Error error = result.getError();
+      Optional<Error> errorOptional = result.getError();
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous
       result = MuleEvent.builder(result).flow(original.getFlowConstruct()).replyToHandler(original.getReplyToHandler())
-          .replyToDestination(original.getReplyToDestination()).synchronous(original.isSynchronous()).error(error).build();
+          .replyToDestination(original.getReplyToDestination()).synchronous(original.isSynchronous())
+          .error(errorOptional.orElse(null)).build();
     }
     resetRequestContextEvent(result);
     return result;

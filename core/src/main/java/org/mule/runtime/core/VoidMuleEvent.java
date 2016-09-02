@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.Correlation;
 
 import java.nio.charset.Charset;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -53,7 +54,7 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public Error getError() {
+  public Optional<Error> getError() {
     throw new UnsupportedOperationException();
   }
 

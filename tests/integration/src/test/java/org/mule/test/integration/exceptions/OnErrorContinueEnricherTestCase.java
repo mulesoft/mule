@@ -8,6 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEvent;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
+import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class OnErrorContinueEnricherTestCase extends AbstractIntegrationTestCase {
@@ -25,7 +27,7 @@ public class OnErrorContinueEnricherTestCase extends AbstractIntegrationTestCase
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      handled = event.getError().getException();
+      handled = event.getError().get().getException();
       return event;
     }
   }
@@ -40,6 +42,6 @@ public class OnErrorContinueEnricherTestCase extends AbstractIntegrationTestCase
     MuleEvent event = flowRunner("enricherExceptionFlow").withPayload(getTestMuleMessage()).run();
     MuleMessage response = event.getMessage();
     assertThat(ErrorProcessor.handled, not(nullValue()));
-    assertThat(event.getError(), nullValue());
+    assertThat(event.getError().isPresent(), is(false));
   }
 }

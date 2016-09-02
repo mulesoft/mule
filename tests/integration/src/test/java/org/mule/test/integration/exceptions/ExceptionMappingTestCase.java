@@ -35,13 +35,13 @@ public class ExceptionMappingTestCase extends FunctionalTestCase {
             throw new IOException();
           }
         }).runExpectingException();
-    assertThat(messagingException.getEvent().getError().getErrorType().getStringRepresentation(), is("TRANSFORMATION"));
+    assertThat(messagingException.getEvent().getError().get().getErrorType().getIdentifier(), is("TRANSFORMATION"));
   }
 
   @Test
   public void expressionError() throws Exception {
     MessagingException messagingException = new FlowRunner(muleContext, "expressionErrorFlow").runExpectingException();
-    assertThat(messagingException.getEvent().getError().getErrorType().getStringRepresentation(), is("EXPRESSION"));
+    assertThat(messagingException.getEvent().getError().get().getErrorType().getIdentifier(), is("EXPRESSION"));
   }
 
 }

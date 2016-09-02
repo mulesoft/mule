@@ -6,6 +6,7 @@
  */
 package org.mule.test.tck;
 
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 
@@ -66,6 +67,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
   public void responseProcessNonBlocking() throws Exception {
     when(mockEvent.isAllowNonBlocking()).thenReturn(true);
     when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);
+    when(mockEvent.getError()).thenReturn(empty());
 
     ResponseAssertionMessageProcessor asp = createAssertionMessageProcessor();
     asp.setListener(testNonBlockingProcessor);

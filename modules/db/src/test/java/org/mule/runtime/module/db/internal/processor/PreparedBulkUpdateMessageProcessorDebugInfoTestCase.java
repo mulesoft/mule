@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.db.internal.processor;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
@@ -52,6 +53,7 @@ import org.mule.tck.size.SmallTest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -80,6 +82,7 @@ public class PreparedBulkUpdateMessageProcessorDebugInfoTestCase extends Abstrac
   public void before() {
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
+    when(event.getError()).thenReturn(empty());
   }
 
   @Test

@@ -8,6 +8,7 @@
 package org.mule.runtime.module.db.internal.processor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -47,6 +48,7 @@ import org.mule.tck.size.SmallTest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.hamcrest.Matcher;
 import org.junit.Before;
@@ -75,6 +77,7 @@ public class DynamicBulkUpdateMessageProcessorTestCase extends AbstractMuleTestC
   public void before() {
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getExchangePattern()).thenReturn(REQUEST_RESPONSE);
+    when(event.getError()).thenReturn(Optional.empty());
   }
 
   @Test
