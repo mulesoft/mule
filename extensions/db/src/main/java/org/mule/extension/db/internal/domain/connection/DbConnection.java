@@ -30,15 +30,41 @@ public interface DbConnection extends TransactionalConnection {
    */
   StatementResultIteratorFactory getStatementResultIteratorFactory(ResultSetHandler resultSetHandler);
 
+  /**
+   * @return A list of customer defined {@link DbType}s
+   */
+  List<DbType> getCustomDataTypes();
+
+  /**
+   * @return A list of {@link DbType}s which are specific to the Database vendor
+   */
   List<DbType> getVendorDataTypes();
 
+  /**
+   * @return The underlying JDBC connection
+   */
   Connection getJdbcConnection();
 
+  /**
+   * Closes the underlying JDBC connection, provided that {@link #isStreaming()} is
+   * {@code false}
+   */
   void release();
 
+  /**
+   * Starts streaming. Invoke this method when a streaming resultset generated with {@code this}
+   * connection is about to be iterated
+   */
   void beginStreaming();
 
+  /**
+   * @return whether {@link #beginStreaming()} has been invoked on {@code this} instance
+   * but {@link #endStreaming()} has not
+   */
   boolean isStreaming();
 
+  /**
+   * Marks that the streaming is over
+   */
   void endStreaming();
 }

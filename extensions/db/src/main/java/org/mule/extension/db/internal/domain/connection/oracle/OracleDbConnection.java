@@ -20,8 +20,8 @@ public class OracleDbConnection extends DefaultDbConnection {
   private static final int CURSOR_TYPE_ID = -10;
   private static final String CURSOR_TYPE_NAME = "CURSOR";
 
-  public OracleDbConnection(Connection jdbcConnection) {
-    super(jdbcConnection);
+  public OracleDbConnection(Connection jdbcConnection, List<DbType> customDataTypes) {
+    super(jdbcConnection, customDataTypes);
   }
 
   /**
