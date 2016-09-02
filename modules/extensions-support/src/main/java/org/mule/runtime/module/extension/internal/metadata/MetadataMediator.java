@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -21,6 +22,7 @@ import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetad
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContentParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isNullType;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.subTypesUnion;
 import org.mule.metadata.api.model.MetadataType;
@@ -139,7 +141,8 @@ public class MetadataMediator {
    */
   public MetadataResult<ComponentMetadataDescriptor> getMetadata() {
     ComponentMetadataDescriptorBuilder componentDescriptorBuilder = componentDescriptor(componentModel.getName())
-        .withParametersDescriptor(getParametersMetadataDescriptors()).withOutputDescriptor(getOutputMetadataDescriptor());
+        .withParametersDescriptor(getParametersMetadataDescriptors())
+        .withOutputDescriptor(getOutputMetadataDescriptor());
 
     Optional<MetadataResult<ParameterMetadataDescriptor>> contentDescriptor = getContentMetadataDescriptor();
     if (contentDescriptor.isPresent()) {
@@ -171,7 +174,8 @@ public class MetadataMediator {
     Optional<MetadataResult<ParameterMetadataDescriptor>> contentDescriptor = getContentMetadataDescriptor(context, key);
 
     ComponentMetadataDescriptorBuilder componentDescriptorBuilder = componentDescriptor(componentModel.getName())
-        .withParametersDescriptor(getParametersMetadataDescriptors()).withOutputDescriptor(outputResult);
+        .withParametersDescriptor(getParametersMetadataDescriptors())
+        .withOutputDescriptor(outputResult);
 
     if (!contentDescriptor.isPresent()) {
       return outputResult.isSuccess() ? success(componentDescriptorBuilder.build())
@@ -316,8 +320,11 @@ public class MetadataMediator {
       return failure(null, "No @Content parameter found", NO_DYNAMIC_TYPE_AVAILABLE, "");
     }
 
-    return resolveMetadataType(subTypesUnion(contentParameter.get().getType(), subTypesMappingContainer),
-                               () -> resolverFactory.getContentResolver().getContentMetadata(context, getKeyId(key)));
+    boolean allowsNullType = !contentParameter.get().isRequired() && (contentParameter.get().getDefaultValue() == null);
+    return resolveMetadataType(allowsNullType,
+                               subTypesUnion(contentParameter.get().getType(), subTypesMappingContainer),
+                               () -> resolverFactory.getContentResolver().getContentMetadata(context, getKeyId(key)),
+                               contentParameter.get().getName());
   }
 
   /**
@@ -334,8 +341,9 @@ public class MetadataMediator {
       return success(subTypesUnion(output.getType(), subTypesMappingContainer));
     }
 
-    return resolveMetadataType(subTypesUnion(output.getType(), subTypesMappingContainer),
-                               () -> resolverFactory.getOutputResolver().getOutputMetadata(context, getKeyId(key)));
+    return resolveMetadataType(false, subTypesUnion(output.getType(), subTypesMappingContainer),
+                               () -> resolverFactory.getOutputResolver().getOutputMetadata(context, getKeyId(key)),
+                               "Output");
   }
 
   /**
@@ -352,8 +360,9 @@ public class MetadataMediator {
       return success(subTypesUnion(attributes.getType(), subTypesMappingContainer));
     }
 
-    return resolveMetadataType(subTypesUnion(attributes.getType(), subTypesMappingContainer),
-                               () -> resolverFactory.getOutputAttributesResolver().getAttributesMetadata(context, getKeyId(key)));
+    return resolveMetadataType(false, subTypesUnion(attributes.getType(), subTypesMappingContainer),
+                               () -> resolverFactory.getOutputAttributesResolver().getAttributesMetadata(context, getKeyId(key)),
+                               "OutputAttributes");
   }
 
   /**
@@ -366,10 +375,22 @@ public class MetadataMediator {
    * @return a {@link MetadataResult} with the {@link MetadataType} resolved by the delegate invocation. Success if the type has
    *         been successfully fetched, Failure otherwise.
    */
-  private MetadataResult<MetadataType> resolveMetadataType(MetadataType staticType, MetadataDelegate delegate) {
+  private MetadataResult<MetadataType> resolveMetadataType(boolean allowsNullType, MetadataType staticType,
+                                                           MetadataDelegate delegate, String elementName) {
     try {
       MetadataType dynamicType = delegate.resolve();
-      return success((dynamicType == null || isVoid(dynamicType)) ? staticType : dynamicType);
+      // TODO review this once MULE-10438 and MDM-21 are done
+      if (isNullType(staticType) || dynamicType == null) {
+        return success(staticType);
+      }
+
+      if (isNullType(dynamicType) && !allowsNullType) {
+        return failure(staticType, format("An error occurred while resolving the MetadataType of the [%s]", elementName),
+                       NO_DYNAMIC_TYPE_AVAILABLE,
+                       "The resulting MetadataType was of NullType, but it is not a valid type for this element");
+      }
+
+      return success(dynamicType);
     } catch (Exception e) {
       return failure(staticType, e);
     }
@@ -386,6 +407,7 @@ public class MetadataMediator {
     return keyIdObjectResolver.resolve(componentModel, key);
   }
 
+  @FunctionalInterface
   private interface MetadataDelegate {
 
     MetadataType resolve() throws MetadataResolvingException, ConnectionException;
@@ -438,7 +460,8 @@ public class MetadataMediator {
     List<MetadataResult<?>> failedResults = Stream.of(results).filter(result -> !result.isSuccess()).collect(toList());
     String messages = failedResults.stream().map(f -> f.getFailure().get().getMessage()).collect(joining(" and "));
     String stackTrace = failedResults.size() == 1 ? failedResults.get(0).getFailure().get().getReason() : "";
-    FailureCode failureCode = failedResults.size() == 1 ? results[0].getFailure().get().getFailureCode() : FailureCode.MULTIPLE;
+    FailureCode failureCode =
+        failedResults.size() == 1 ? failedResults.get(0).getFailure().get().getFailureCode() : FailureCode.MULTIPLE;
     return failure(descriptor, messages, failureCode, stackTrace);
   }
 }

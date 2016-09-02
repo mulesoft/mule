@@ -17,6 +17,7 @@ import org.mule.extension.db.api.param.BulkScript;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.BulkUpdateExecutor;
+import org.mule.extension.db.internal.domain.metadata.BaseDbMetadataResolver;
 import org.mule.extension.db.internal.domain.query.BulkQuery;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
@@ -29,6 +30,7 @@ import org.mule.extension.db.internal.resolver.query.DefaultBulkQueryFactory;
 import org.mule.extension.db.internal.resolver.query.FileBulkQueryFactory;
 import org.mule.extension.db.internal.util.DefaultFileReader;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 
@@ -42,6 +44,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
+@MetadataScope(contentResolver = BaseDbMetadataResolver.class)
 public class BulkOperations extends BaseDbOperations {
 
   private BulkQueryResolver bulkQueryResolver = new BulkQueryResolver();

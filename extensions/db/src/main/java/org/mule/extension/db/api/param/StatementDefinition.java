@@ -13,6 +13,7 @@ import org.mule.extension.db.internal.operation.QuerySettings;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -36,6 +37,7 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
   @Optional
   @Text
   @DisplayName("SQL Query Text")
+  @MetadataKeyId
   protected String sql;
 
 

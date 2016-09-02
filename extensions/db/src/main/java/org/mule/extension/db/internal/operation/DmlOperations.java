@@ -23,7 +23,9 @@ import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.SelectExecutor;
 import org.mule.extension.db.internal.domain.executor.StoredProcedureExecutor;
-import org.mule.extension.db.internal.domain.metadata.SelectOutputResolver;
+import org.mule.extension.db.internal.domain.metadata.BaseDbMetadataResolver;
+import org.mule.extension.db.internal.domain.metadata.SelectMetadataResolver;
+import org.mule.extension.db.internal.domain.metadata.StoredProcedureMetadataResolver;
 import org.mule.extension.db.internal.domain.query.Query;
 import org.mule.extension.db.internal.domain.query.QueryType;
 import org.mule.extension.db.internal.domain.statement.QueryStatementFactory;
@@ -56,6 +58,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
+@MetadataScope(contentResolver = BaseDbMetadataResolver.class)
 public class DmlOperations extends BaseDbOperations {
 
   @Inject
@@ -75,7 +78,7 @@ public class DmlOperations extends BaseDbOperations {
    * @return depending on the value of {@code streaming}, it can be a {@link List} or {@link Iterator} of maps
    * @throws SQLException if an error is produced
    */
-  @MetadataScope(outputResolver = SelectOutputResolver.class)
+  @MetadataScope(outputResolver = SelectMetadataResolver.class, contentResolver = SelectMetadataResolver.class)
   public InterceptingCallback<Object> select(@ParameterGroup QueryDefinition query,
                                              @Optional(defaultValue = "false") @Expression(NOT_SUPPORTED) boolean streaming,
                                              @ParameterGroup StatementAttributes statementAttributes,
@@ -145,9 +148,7 @@ public class DmlOperations extends BaseDbOperations {
    * @return the number of affected rows
    * @throws SQLException if an error is produced
    */
-  public int delete(@ParameterGroup QueryDefinition query,
-                    @UseConfig DbConnector connector,
-                    @Connection DbConnection connection)
+  public int delete(@ParameterGroup QueryDefinition query, @UseConfig DbConnector connector, @Connection DbConnection connection)
       throws SQLException {
 
     final Query resolvedQuery = resolveQuery(query, connector, connection, DELETE);
@@ -167,7 +168,7 @@ public class DmlOperations extends BaseDbOperations {
    * @return A {@link Map} with the procedure's output
    * @throws SQLException if an error is produced
    */
-  @MetadataScope(outputResolver = SelectOutputResolver.class)
+  @MetadataScope(outputResolver = StoredProcedureMetadataResolver.class)
   public InterceptingCallback<Map<String, Object>> storedProcedure(@ParameterGroup StoredProcedureCall call,
                                                                    @Optional(
                                                                        defaultValue = "false") @Expression(NOT_SUPPORTED) boolean streaming,

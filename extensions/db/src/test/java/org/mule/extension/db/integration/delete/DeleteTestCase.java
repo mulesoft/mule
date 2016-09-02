@@ -37,17 +37,17 @@ public class DeleteTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void deleteDynamic() throws Exception {
-    doDelete("deleteDynamic");
+    doDelete("deleteDynamic", VENUS.getName());
   }
 
   @Test
   public void deleteParemeterized() throws Exception {
-    doDelete("deleteParameterized");
+    doDelete("deleteParameterized", VENUS.getName());
   }
 
-  private void doDelete(String flowName) throws Exception {
-    MuleMessage response = flowRunner(flowName).withPayload(VENUS.getName()).run().getMessage();
+  private void doDelete(String flowName, String payload) throws Exception {
+    MuleMessage response = flowRunner(flowName).withPayload(payload).run().getMessage();
     assertThat(response.getPayload(), is(1));
-    assertDeletedPlanetRecords(VENUS.getName());
+    assertDeletedPlanetRecords(payload);
   }
 }

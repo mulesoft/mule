@@ -124,7 +124,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   public void fetchMissingElementFromCache() throws Exception {
     componentId = new ProcessorId(CONTENT_ONLY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, nullMetadataKey);
-    assertFailure(metadata, "", FailureCode.UNKNOWN, "");
+    assertFailure(metadata, "", FailureCode.RESOURCE_UNAVAILABLE, "");
   }
 
   @Test
@@ -142,6 +142,6 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     final MetadataKey metadataKey = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
 
     final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, metadataKey);
-    assertFailure(metadataResult, "", FailureCode.UNKNOWN, "");
+    assertFailure(metadataResult, "", FailureCode.INVALID_METADATA_KEY, "");
   }
 }

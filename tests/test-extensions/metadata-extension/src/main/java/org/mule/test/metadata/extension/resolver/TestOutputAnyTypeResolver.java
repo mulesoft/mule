@@ -4,29 +4,21 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.db.internal.domain.metadata;
+package org.mule.test.metadata.extension.resolver;
 
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.builder.DictionaryTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 
-public class SelectOutputResolver implements MetadataOutputResolver {
-
-  private BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
+public class TestOutputAnyTypeResolver implements MetadataOutputResolver<String> {
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, Object key)
+  public MetadataType getOutputMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
-
-    DictionaryTypeBuilder dictionaryTypeBuilder = typeBuilder.dictionaryType();
-    dictionaryTypeBuilder.ofKey().stringType();
-    dictionaryTypeBuilder.ofValue().anyType();
-
-    return typeBuilder.arrayType().of(dictionaryTypeBuilder.build()).build();
+    return BaseTypeBuilder.create(JAVA).anyType().build();
   }
 }

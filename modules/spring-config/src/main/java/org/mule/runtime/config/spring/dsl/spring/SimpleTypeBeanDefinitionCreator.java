@@ -40,7 +40,7 @@ public class SimpleTypeBeanDefinitionCreator extends BeanDefinitionCreator {
       Map<String, String> parameters = componentModel.getParameters();
       checkState(parameters.size() < 2,
                  "Component model has more than one parameter when it's supposed to have at most one parameter");
-      checkState(!(componentModel.getTextContent() != null && !componentModel.getParameters().isEmpty()),
+      checkState(componentModel.getTextContent() != null || !componentModel.getParameters().isEmpty(),
                  "Component model has both a parameter and an inner content");
       final String value =
           componentModel.getTextContent() != null ? componentModel.getTextContent() : parameters.values().iterator().next();

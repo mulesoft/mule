@@ -10,6 +10,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
@@ -40,8 +41,8 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
   @Parameter
   @Optional
   @DisplayName("Input Parameters")
+  @Content
   protected LinkedHashMap<String, Object> inputParameters = new LinkedHashMap<>();
-
 
   /**
    * Returns a {@link Map} which keys are the names of the input

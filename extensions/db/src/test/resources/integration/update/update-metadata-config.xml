@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/db/current/mule-dbn.xsd">
+
+    <flow name="updateMetadata">
+        <dbn:update>
+            <dbn:sql>update PLANET set NAME='Mercury' where POSITION=4</dbn:sql>
+        </dbn:update>
+    </flow>
+
+    <flow name="bulkUpdateMetadata">
+        <dbn:bulk-update parameterValues="#[payload]">
+            <dbn:sql>update PLANET set NAME='Mercury' where NAME= :name</dbn:sql>
+        </dbn:bulk-update>
+    </flow>
+
+</mule>

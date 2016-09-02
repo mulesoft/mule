@@ -6,11 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.enricher;
 
-import static java.util.Arrays.stream;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseMetadataAnnotations;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotation;
-
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
@@ -20,6 +19,7 @@ import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
@@ -35,6 +35,7 @@ import org.mule.runtime.module.extension.internal.model.property.DeclaringMember
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalker;
 
 import java.lang.reflect.AnnotatedElement;
@@ -100,7 +101,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
 
       if (metadataScope.isCustomScope()) {
         declareOutput(sourceDeclaration.getOutput(), sourceDeclaration.getOutputAttributes(), metadataScope);
-        declareComponentMetadataKeyId(operationMethod, sourceDeclaration);
+        declareComponentMetadataKeyId(sourceDeclaration, sourceDeclaration);
       }
     }
   }
@@ -117,7 +118,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
       if (metadataScope.isCustomScope()) {
         declareOutput(operationDeclaration.getOutput(), operationDeclaration.getOutputAttributes(), metadataScope);
         declareContent(operationDeclaration, operationMethod);
-        declareComponentMetadataKeyId(operationMethod, operationDeclaration);
+        declareComponentMetadataKeyId(operationDeclaration, operationDeclaration);
       }
     }
   }
@@ -174,14 +175,24 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
     component.setType(component.getType(), true);
   }
 
-  private void declareComponentMetadataKeyId(Method method, BaseDeclaration operation) {
-    stream(method.getParameters()).filter(p -> p.isAnnotationPresent(MetadataKeyId.class)).findFirst()
-        .ifPresent(p -> operation.addModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(p.getType()))));
-  }
+  private void declareComponentMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component,
+                                             BaseDeclaration operation) {
 
-  private void declareComponentMetadataKeyId(Class<?> clazz, BaseDeclaration operation) {
-    stream(clazz.getDeclaredFields()).filter(p -> p.isAnnotationPresent(MetadataKeyId.class)).findFirst()
-        .ifPresent(p -> operation.addModelProperty(new MetadataKeyIdModelProperty(typeLoader.load(p.getType()))));
+    Optional<MetadataType> keyId = component.getParameters().stream()
+        .filter(p -> getAnnotatedElement(p).map(element -> element.isAnnotationPresent(MetadataKeyId.class)).orElse(false))
+        .map(ParameterDeclaration::getType)
+        .findFirst();
+
+    if (!keyId.isPresent() && component.getModelProperty(ParameterGroupModelProperty.class).isPresent()) {
+      keyId = component.getModelProperty(ParameterGroupModelProperty.class).get().getGroups().stream()
+          .filter(g -> g.getContainer().isAnnotationPresent(MetadataKeyId.class))
+          .map(g -> typeLoader.load(g.getType()))
+          .findFirst();
+    }
+
+    if (keyId.isPresent()) {
+      operation.addModelProperty(new MetadataKeyIdModelProperty(keyId.get()));
+    }
   }
 
   private Optional<AnnotatedElement> getAnnotatedElement(ParameterDeclaration declaration) {
@@ -193,9 +204,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
 
     if (declaringMemberProperty.isPresent()) {
       annotatedElement = declaringMemberProperty.get().getDeclaringField();
-    }
-
-    if (implementingParameterProperty.isPresent()) {
+    } else if (implementingParameterProperty.isPresent()) {
       annotatedElement = implementingParameterProperty.get().getParameter();
     }
 

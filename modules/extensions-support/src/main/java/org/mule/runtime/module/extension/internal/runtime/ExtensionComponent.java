@@ -16,7 +16,7 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresCo
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.runtime.api.message.MuleEvent;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyProvider;
@@ -28,6 +28,7 @@ import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -42,6 +43,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -75,11 +77,15 @@ public abstract class ExtensionComponent
   private final RuntimeExtensionModel extensionModel;
   private final ComponentModel componentModel;
   private final String configurationProviderName;
+  private final ClassTypeLoader typeLoader;
+  private MetadataMediator metadataMediator;
+
   protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
+
   @Inject
   protected ConnectionManagerAdapter connectionManager;
-  private MetadataMediator metadataMediator;
+
   @Inject
   private MuleMetadataManager metadataManager;
 
@@ -90,6 +96,7 @@ public abstract class ExtensionComponent
     this.configurationProviderName = configurationProviderName;
     this.extensionManager = extensionManager;
     this.metadataMediator = new MetadataMediator(extensionModel, componentModel);
+    this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getExtensionClassLoader());
   }
 
   /**
@@ -249,7 +256,7 @@ public abstract class ExtensionComponent
     String cacheId = configuration.map(ConfigurationInstance::getName)
         .orElseGet(() -> extensionModel.getName() + "|" + componentModel.getName());
 
-    return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId));
+    return new DefaultMetadataContext(configuration, connectionManager, metadataManager.getMetadataCache(cacheId), typeLoader);
   }
 
   /**

@@ -6,7 +6,7 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
-import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
