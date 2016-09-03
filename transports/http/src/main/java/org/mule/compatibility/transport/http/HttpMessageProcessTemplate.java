@@ -425,10 +425,10 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     httpStatus = message.getOutboundProperty(HTTP_STATUS_PROPERTY) != null
         ? Integer.valueOf(response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
 
-    response.setMessage(MuleMessage.builder(response.getMessage())
+    message = MuleMessage.builder(response.getMessage())
         .payload(exception.getMessage())
-        .addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus).build());
-    HttpResponse httpResponse = transformResponse(response.getMessage());
+        .addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus).build();
+    HttpResponse httpResponse = transformResponse(message);
     httpServerConnection.writeResponse(httpResponse, getThrottlingHeaders());
   }
 

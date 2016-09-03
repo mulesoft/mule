@@ -142,7 +142,8 @@ public class RestServiceWrapper extends AbstractComponent {
   public Object doInvoke(MuleEvent event) throws Exception {
     Object requestBody;
 
-    Object request = event.getMessage().getPayload();
+    MuleMessage message = event.getMessage();
+    Object request = message.getPayload();
     String tempUrl = serviceUrl;
     if (muleContext.getExpressionManager().isExpression(serviceUrl)) {
       muleContext.getExpressionManager().validateExpression(serviceUrl);
@@ -159,8 +160,8 @@ public class RestServiceWrapper extends AbstractComponent {
     }
     // if post
     else {
-      if (MediaType.ANY.matches(event.getMessage().getDataType().getMediaType())) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build());
+      if (MediaType.ANY.matches(message.getDataType().getMediaType())) {
+        message = MuleMessage.builder(message).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build();
       }
 
       StringBuilder requestBodyBuffer = new StringBuilder();
@@ -172,14 +173,14 @@ public class RestServiceWrapper extends AbstractComponent {
     tempUrl = urlBuffer.toString();
     logger.info("Invoking REST service: " + tempUrl);
 
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod).build());
+    message = MuleMessage.builder(message).addOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod).build();
 
     EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
     endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
     OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
     Either<Error, MuleMessage> clientResponse = muleContext.getClient().send(outboundEndpoint.getEndpointURI().toString(),
-                                                                             MuleMessage.builder(event.getMessage())
+                                                                             MuleMessage.builder(message)
                                                                                  .payload(requestBody).build());
 
     if (clientResponse.isLeft()) {

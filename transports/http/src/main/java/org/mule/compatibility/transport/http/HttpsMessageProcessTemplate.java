@@ -42,7 +42,7 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate {
     if (getHttpServerConnection().getLocalCertificateChain() != null) {
       messageBuilder.addOutboundProperty(LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
     }
-    muleEvent.setMessage(messageBuilder.build());
+    muleEvent = MuleEvent.builder(muleEvent).message(messageBuilder.build()).build();
 
     super.beforeRouteEvent(muleEvent);
     return muleEvent;
