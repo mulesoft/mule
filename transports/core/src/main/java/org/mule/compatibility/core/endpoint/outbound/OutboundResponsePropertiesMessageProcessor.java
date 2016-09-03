@@ -47,7 +47,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestR
 
       ((DefaultMuleEvent) response).setCorrelation(request.getCorrelation());
 
-      response.setMessage(builder.build());
+      response = MuleEvent.builder(response).message(builder.build()).build();
     }
     return response;
   }

@@ -21,9 +21,8 @@ public class OutboundRootMessageIdPropertyMessageProcessor implements MessagePro
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    event.setMessage(MuleMessage.builder(event.getMessage())
-        .addOutboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY, event.getContext().getCorrelationId()).build());
-    return event;
+    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+        .addOutboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY, event.getContext().getCorrelationId()).build()).build();
   }
 
   @Override

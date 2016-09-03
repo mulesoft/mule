@@ -42,7 +42,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
       if (event.getMessage().getExceptionPayload() != null) {
-        setExceptionDetails(event, connector, event.getMessage().getExceptionPayload().getException());
+        event = setExceptionDetails(event, connector, event.getMessage().getExceptionPayload().getException());
       }
     }
     return event;
@@ -55,7 +55,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
    * @param event
    * @param exception
    */
-  protected void setExceptionDetails(MuleEvent event, Connector connector, Throwable exception) {
+  protected MuleEvent setExceptionDetails(MuleEvent event, Connector connector, Throwable exception) {
     String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol(), muleContext);
     // If we dont find a error code property we can assume there are not
     // error code mappings for this connector
@@ -64,8 +64,10 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
       if (logger.isDebugEnabled()) {
         logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
       }
-      event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propName, code).build());
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty(propName, code).build())
+          .build();
     }
+    return event;
   }
 
   @Override

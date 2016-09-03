@@ -32,7 +32,9 @@ public class TestMessageProcessor implements MessageProcessor, NameableObject {
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     if (event != null && event.getMessage() != null) {
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(event.getMessage().getPayload() + ":" + label).build());
+      return MuleEvent.builder(event)
+          .message(MuleMessage.builder(event.getMessage()).payload(event.getMessage().getPayload() + ":" + label).build())
+          .build();
     }
     return event;
   }

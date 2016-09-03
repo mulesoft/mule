@@ -163,10 +163,6 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
       boolean hasResponse = endpoint.getExchangePattern().hasResponse();
       remoteSync = hasResponse || doSend;
     }
-    if (!remoteSync) {
-      event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(MULE_REMOTE_SYNC_PROPERTY).build());
-      event.removeFlowVariable(MULE_REMOTE_SYNC_PROPERTY);
-    }
     return remoteSync;
   }
 

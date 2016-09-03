@@ -55,7 +55,7 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
         }
       }
     }
-    event.setMessage(messageBuilder.build());
+    event = MuleEvent.builder(event).message(messageBuilder.build()).build();
     setCurrentEvent(event);
     return event;
   }
