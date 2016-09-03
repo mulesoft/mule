@@ -365,8 +365,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   protected MuleEvent assertMessageSentSame(boolean sync) throws MuleException {
     assertMessageSent(sync);
     MuleEvent event = inboundListener.sensedEvent;
-    assertEquals(TEST_MESSAGE, event.getMessageAsString(muleContext));
-    assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
+    assertThat(requestEvent.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
+    assertThat(event.getMessageAsString(muleContext), equalTo(TEST_MESSAGE));
+    assertThat(event.getMessage().getOutboundProperty("prop1"), equalTo("value1"));
     return event;
   }
 
