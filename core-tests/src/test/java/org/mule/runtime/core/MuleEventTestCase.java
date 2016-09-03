@@ -161,20 +161,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertEquals("bar2", copy.getFlowVariable("foo"));
   }
 
-  @Test
-  public void testFlowVarsShared() throws Exception {
-    MuleEvent event = getTestEvent("whatever");
-    event.setFlowVariable("foo", "bar");
-
-    MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event, false);
-
-    copy.setFlowVariable("foo", "bar2");
-
-    assertEquals("bar2", event.getFlowVariable("foo"));
-
-    assertEquals("bar2", copy.getFlowVariable("foo"));
-  }
-
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarNonexistent() throws Exception {
     MuleEvent event = getTestEvent("whatever");
