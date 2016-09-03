@@ -8,7 +8,6 @@ package org.mule.runtime.core.exception;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -132,7 +131,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
    */
   @Test
   public void testMessageToStringNotCalledOnFailure() throws Exception {
-    muleEvent.setMessage(spy(muleMessage));
+    muleEvent = MuleEvent.builder(muleEvent).message(spy(muleMessage)).build();
     muleEvent = spy(muleEvent);
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
 

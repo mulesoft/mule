@@ -52,7 +52,9 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         if (!event.getError().isPresent() || !(event.getError().get().equals(exception)
             || messagingException.causedExactlyBy(event.getError().get().getException().getClass()))) {
           ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, exception);
-          event = MuleEvent.builder(event).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
+          // TODO these break some tests and rely on the event mutability, check with PLG
+          // event = MuleEvent.builder(event).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
+          event.setError(ErrorBuilder.builder(exception).errorType(errorType).build());
         }
       }
 

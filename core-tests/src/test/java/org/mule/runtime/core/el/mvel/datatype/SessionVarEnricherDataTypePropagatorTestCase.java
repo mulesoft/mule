@@ -26,7 +26,8 @@ public class SessionVarEnricherDataTypePropagatorTestCase extends AbstractScoped
   }
 
   @Override
-  protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType) {
+  protected MuleEvent setVariable(MuleEvent event, Object propertyValue, DataType dataType) {
     event.getSession().setProperty(PROPERTY_NAME, (Serializable) propertyValue, dataType);
+    return event;
   }
 }

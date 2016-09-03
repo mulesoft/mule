@@ -40,7 +40,7 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
     MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-    testEvent.setFlowVariable("foo", "bar");
+    testEvent = MuleEvent.builder(testEvent).addFlowVariable("foo", "bar").build();
 
     dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 

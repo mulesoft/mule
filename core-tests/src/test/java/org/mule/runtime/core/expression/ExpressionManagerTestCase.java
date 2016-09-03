@@ -62,9 +62,9 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testParsing() throws Exception {
     MuleEvent event = getTestEvent("test");
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty("user", "vasya")
+    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty("user", "vasya")
         .addOutboundProperty("password", "pupkin").addOutboundProperty("host", "example.com").addOutboundProperty("port", "12345")
-        .build());
+        .build()).build();
 
     String result = muleContext.getExpressionManager().parse(
                                                              "http://#[message.outboundProperties.user]:#[message.outboundProperties.password]@#[message.outboundProperties.host]:#[message.outboundProperties.port]/foo/bar",
@@ -76,9 +76,9 @@ public class ExpressionManagerTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testBooleanEvaluation() throws Exception {
     MuleEvent event = getTestEvent("test");
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty("user", "vasya")
+    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty("user", "vasya")
         .addOutboundProperty("password", "pupkin").addOutboundProperty("host", "example.com").addOutboundProperty("port", "12345")
-        .build());
+        .build()).build();
 
     // Non-boolean string value
     assertFalse(muleContext.getExpressionManager().evaluateBoolean("message.outboundProperties.user", event, getTestFlow()));

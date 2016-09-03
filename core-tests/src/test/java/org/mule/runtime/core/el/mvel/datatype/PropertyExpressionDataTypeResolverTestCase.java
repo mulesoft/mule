@@ -40,7 +40,7 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
     MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-    testEvent.setFlowVariable("foo", EXPRESSION_VALUE, expectedDataType);
+    testEvent = MuleEvent.builder(testEvent).addFlowVariable("foo", EXPRESSION_VALUE, expectedDataType).build();
 
     assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }

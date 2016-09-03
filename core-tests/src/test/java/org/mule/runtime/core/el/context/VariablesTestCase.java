@@ -33,7 +33,7 @@ public class VariablesTestCase extends AbstractELTestCase {
 
   @Test
   public void flowVariablesMap() throws Exception {
-    event.setFlowVariable("foo", "bar");
+    event = MuleEvent.builder(event).addFlowVariable("foo", "bar").build();
     assertTrue(evaluate("flowVars", event) instanceof Map);
   }
 

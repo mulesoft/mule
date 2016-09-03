@@ -136,13 +136,13 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test(expected = UnsupportedOperationException.class)
   public void testFlowVarNamesAddImmutable() throws Exception {
     MuleEvent event = getTestEvent("whatever");
-    event.setFlowVariable("test", "val");
+    event = MuleEvent.builder(event).addFlowVariable("test", "val").build();
     event.getFlowVariableNames().add("other");
   }
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
     MuleEvent event = getTestEvent("whatever");
-    event.setFlowVariable("test", "val");
+    event = MuleEvent.builder(event).addFlowVariable("test", "val").build();
     event.getFlowVariableNames().remove("test");
     assertNull(event.getFlowVariable("test"));
   }
@@ -150,11 +150,11 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFlowVarsNotShared() throws Exception {
     MuleEvent event = getTestEvent("whatever");
-    event.setFlowVariable("foo", "bar");
+    event = MuleEvent.builder(event).addFlowVariable("foo", "bar").build();
 
     MuleEvent copy = MuleEvent.builder(event).build();
 
-    copy.setFlowVariable("foo", "bar2");
+    copy = MuleEvent.builder(copy).addFlowVariable("foo", "bar2").build();
 
     assertEquals("bar", event.getFlowVariable("foo"));
 

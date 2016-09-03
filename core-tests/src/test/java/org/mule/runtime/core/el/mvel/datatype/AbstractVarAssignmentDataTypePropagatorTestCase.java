@@ -66,7 +66,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
     MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
     final Map<String, String> propertyValue = new HashMap<>();
     propertyValue.put(INNER_PROPERTY_NAME, TEST_MESSAGE);
-    setVariable(testEvent, propertyValue, expectedDataType);
+    testEvent = setVariable(testEvent, propertyValue, expectedDataType);
 
     CompiledExpression compiledExpression = compileMelExpression(expression, testEvent);
 
@@ -78,7 +78,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
   protected abstract DataType getVariableDataType(MuleEvent event);
 
-  protected abstract void setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
+  protected abstract MuleEvent setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
 
   private CompiledExpression compileMelExpression(String expression, MuleEvent testEvent) {
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);

@@ -68,7 +68,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
     MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-    setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);
+    testEvent = setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);
 
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
     final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(testEvent, parserConfiguration);
@@ -98,5 +98,5 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     return context;
   }
 
-  protected abstract void setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
+  protected abstract MuleEvent setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
 }

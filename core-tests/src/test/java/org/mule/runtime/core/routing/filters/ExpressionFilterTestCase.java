@@ -40,7 +40,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     filter.setMuleContext(muleContext);
     MuleEvent event = getTestEvent("blah");
     assertTrue(!filter.accept(event));
-    event.setFlowVariable("foo", "bar");
+    event = MuleEvent.builder(event).addFlowVariable("foo", "bar").build();
     assertTrue(filter.accept(event));
   }
 
@@ -66,9 +66,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     MuleEvent event = getTestEvent("blah");
 
     assertTrue(filter.accept(event));
-    event.setFlowVariable("foo", "bar");
+    event = MuleEvent.builder(event).addFlowVariable("foo", "bar").build();
     assertTrue(!filter.accept(event));
-    event.setFlowVariable("foo", "car");
+    event = MuleEvent.builder(event).addFlowVariable("foo", "car").build();
     assertTrue(filter.accept(event));
   }
 
@@ -98,9 +98,9 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     MuleEvent event = getTestEvent("blah");
 
     assertTrue(!filter.accept(event));
-    event.setMessage(removeProperty(event.getMessage()));
+    event = MuleEvent.builder(event).message(removeProperty(event.getMessage())).build();
     assertTrue(!filter.accept(event));
-    event.setFlowVariable("foo", "car");
+    event = MuleEvent.builder(event).addFlowVariable("foo", "car").build();
     assertTrue(filter.accept(event));
   }
 

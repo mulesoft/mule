@@ -146,8 +146,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     @Override
     public MuleEvent after(MuleEvent event) {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(getPayloadAsString(event.getMessage()) + name + AFTER)
-            .build());
+        event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+            .payload(getPayloadAsString(event.getMessage()) + name + AFTER).build()).build();
       } catch (Exception e) {
         fail(e.getMessage());
       }
@@ -157,8 +157,8 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     @Override
     public MuleEvent before(MuleEvent event) {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(getPayloadAsString(event.getMessage()) + name + BEFORE)
-            .build());
+        event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+            .payload(getPayloadAsString(event.getMessage()) + name + BEFORE).build()).build();
       } catch (Exception e) {
         fail(e.getMessage());
       }

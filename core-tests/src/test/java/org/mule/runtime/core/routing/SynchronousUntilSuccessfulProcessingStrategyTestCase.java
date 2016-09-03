@@ -127,8 +127,8 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     when(mockRoute.process(any(MuleEvent.class))).then(invocation -> {
       MuleEvent argEvent = (MuleEvent) invocation.getArguments()[0];
       assertThat(argEvent.getMessageAsString(muleContext), is(TEST_DATA));
-      argEvent.setMessage(MuleMessage.builder(argEvent.getMessage()).payload(PROCESSED_DATA).build());
-      return argEvent;
+      return MuleEvent.builder(argEvent).message(MuleMessage.builder(argEvent.getMessage()).payload(PROCESSED_DATA).build())
+          .build();
     });
     try {
       processingStrategy.route(event, getTestFlow());

@@ -10,16 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
-import org.mockito.Mockito;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMessageContext;
@@ -33,8 +26,12 @@ import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Test;
 
 public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
@@ -64,8 +61,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFailureExpression() throws Exception {
     MessageProcessor intSetter = event -> {
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(Integer.valueOf(1)).build());
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(Integer.valueOf(1)).build())
+          .build();
     };
 
     FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));

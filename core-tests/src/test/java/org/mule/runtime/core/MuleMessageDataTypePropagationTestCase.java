@@ -254,7 +254,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   @Test
   public void setsDefaultFlowVariableDataType() throws Exception {
     MuleEvent muleEvent = getTestEvent(TEST, muleContext);
-    muleEvent.setFlowVariable(TEST_PROPERTY, TEST);
+    muleEvent = MuleEvent.builder(muleEvent).addFlowVariable(TEST_PROPERTY, TEST).build();
 
     assertVariableDataType(muleEvent, STRING);
   }
@@ -264,7 +264,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     MuleEvent muleEvent = getTestEvent(TEST, muleContext);
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    muleEvent.setFlowVariable(TEST_PROPERTY, TEST, dataType);
+    muleEvent = MuleEvent.builder(muleEvent).addFlowVariable(TEST_PROPERTY, TEST, dataType).build();
 
     assertVariableDataType(muleEvent, dataType);
   }

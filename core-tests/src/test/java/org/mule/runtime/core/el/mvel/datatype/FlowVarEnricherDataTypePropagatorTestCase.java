@@ -24,7 +24,7 @@ public class FlowVarEnricherDataTypePropagatorTestCase extends AbstractScopedVar
   }
 
   @Override
-  protected void setVariable(MuleEvent event, Object propertyValue, DataType dataType) {
-    event.setFlowVariable(PROPERTY_NAME, propertyValue, dataType);
+  protected MuleEvent setVariable(MuleEvent event, Object propertyValue, DataType dataType) {
+    return MuleEvent.builder(event).addFlowVariable(PROPERTY_NAME, propertyValue, dataType).build();
   }
 }

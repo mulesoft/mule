@@ -182,8 +182,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
   public void matchesValueFromFlowVar() throws Exception {
     regExWithValue.setValue("#[flowVars.value]");
     regExWithValue.initialise();
-    MuleEvent event = getTestEvent("");
-    event.setFlowVariable("value", "code with the mules");
+    MuleEvent event = MuleEvent.builder(getTestEvent("")).addFlowVariable("value", "code with the mules").build();
     assertThat(regExWithValue.accept(event), is(true));
   }
 
