@@ -154,7 +154,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                                                                           Exception lastException) {
     try {
       final MuleEvent event = getUntilSuccessfulConfiguration().getObjectStore().remove(eventStoreKey);
-      final MuleEvent mutableEvent = event;
+      MuleEvent mutableEvent = event;
 
       final Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, mutableEvent);
       final Integer deliveryAttemptCount =
@@ -163,7 +163,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       if (deliveryAttemptCount <= getUntilSuccessfulConfiguration().getMaxRetries()) {
         // we store the incremented version unless the max attempt count has
         // been reached
-        mutableEvent.setFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
+        mutableEvent = MuleEvent.builder(mutableEvent)
+            .addFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1).build();
         getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, mutableEvent);
         this.scheduleForProcessing(eventStoreKey, false);
       } else {
@@ -181,9 +182,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     return storeEvent(event, flow, deliveryAttemptCount);
   }
 
-  private Serializable storeEvent(final MuleEvent event, FlowConstruct flow, final int deliveryAttemptCount)
+  private Serializable storeEvent(MuleEvent event, FlowConstruct flow, final int deliveryAttemptCount)
       throws ObjectStoreException {
-    event.setFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
+    event = MuleEvent.builder(event).addFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount).build();
     final Serializable eventStoreKey = buildQueueKey(event, flow, muleContext);
     getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, event);
     return eventStoreKey;
