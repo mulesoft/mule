@@ -9,7 +9,7 @@ package org.mule.runtime.module.xml.filters;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -93,12 +93,12 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
   }
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     Object payload = event.getMessage().getPayload();
     if (payload == null) {
       if (logger.isWarnEnabled()) {
@@ -137,7 +137,7 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
       return false;
     }
 
-    event.setMessage(MuleMessage.builder(event.getMessage()).payload(node).build());
+    builder.message(MuleMessage.builder(event.getMessage()).payload(node).build());
 
     return accept(node);
   }

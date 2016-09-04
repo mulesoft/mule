@@ -52,12 +52,12 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter {
   private String schemaLocations;
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     JsonNode data;
     Object input = event.getMessage().getPayload();
     Object output = input;
@@ -83,7 +83,7 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter {
         return false;
       }
 
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(output).build());
+      builder.message(MuleMessage.builder(event.getMessage()).payload(output).build());
       ProcessingReport report = jsonSchema.validate(data);
 
       if (LOGGER.isDebugEnabled()) {

@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.PropertyScope.INBOUND;
 import static org.mule.runtime.core.PropertyScope.OUTBOUND;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
+
 import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.StringUtils;
@@ -55,7 +58,8 @@ public class MessagePropertyFilter implements Filter {
     setPattern(expression);
   }
 
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     if (message == null) {
       return false;
     }
@@ -73,7 +77,7 @@ public class MessagePropertyFilter implements Filter {
       match = compare(value.toString(), propertyValue);
     }
     if (!match && logger.isDebugEnabled()) {
-      logger.debug(String.format("Property: '%s' not found in scope '%s'. Message %n%s", propertyName, scope, message));
+      logger.debug(format("Property: '%s' not found in scope '%s'. Message %n%s", propertyName, scope, message));
     }
     return match;
   }
@@ -155,6 +159,7 @@ public class MessagePropertyFilter implements Filter {
     this.scope = ps;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;
@@ -168,6 +173,7 @@ public class MessagePropertyFilter implements Filter {
         && caseSensitive == other.caseSensitive;
   }
 
+  @Override
   public int hashCode() {
     return hash(new Object[] {this.getClass(), propertyName, propertyValue, scope, caseSensitive});
   }

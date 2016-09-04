@@ -20,7 +20,7 @@ public class ExceptionThrowingInboundRouter extends MessageFilter {
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     throw new RuntimeException();
   }
 }

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
@@ -25,10 +26,12 @@ public class EqualsFilter implements Filter, ObjectFilter {
     this.pattern = compareTo;
   }
 
-  public boolean accept(MuleMessage message) {
-    return accept((Object) message.getPayload());
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+    return accept(message.getPayload());
   }
 
+  @Override
   public boolean accept(Object object) {
     if (object == null && pattern == null) {
       return true;

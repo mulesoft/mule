@@ -9,7 +9,6 @@ package org.mule.runtime.core.construct;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
 import org.mule.runtime.core.api.GlobalNameableObject;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -17,7 +16,6 @@ import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
@@ -37,8 +35,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
-import org.mule.runtime.core.exception.ErrorHandler;
-import org.mule.runtime.core.exception.OnErrorPropagateHandler;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -366,7 +363,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public class ProcessIfPipelineStartedMessageProcessor extends AbstractFilteringMessageProcessor {
 
     @Override
-    protected boolean accept(MuleEvent event) {
+    protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
       return canProcessMessage;
     }
 

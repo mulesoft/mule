@@ -6,10 +6,11 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ public class ExceptionStrategyFilterMule5342TestCase extends AbstractIntegration
   public static class FalseFilter implements Filter {
 
     @Override
-    public boolean accept(MuleMessage message) {
+    public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
       return false;
     }
   }

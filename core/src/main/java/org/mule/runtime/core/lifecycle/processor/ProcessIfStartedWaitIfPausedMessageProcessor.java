@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.lifecycle.processor;
 
-import org.mule.runtime.core.exception.MessagingException;
+import static org.mule.runtime.core.config.i18n.CoreMessages.interruptedWaitingForPaused;
+
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.service.Pausable;
 
 public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStartedMessageProcessor {
@@ -22,28 +24,29 @@ public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStart
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    if (accept(event)) {
+    Builder builder = MuleEvent.builder(event);
+    if (accept(event, builder)) {
       if (isPaused()) {
         try {
           if (logger.isDebugEnabled()) {
             logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
-                + " is paused. Blocking call until resumd");
+                + " is paused. Blocking call until resumed");
           }
           while (isPaused()) {
             Thread.sleep(500);
           }
         } catch (InterruptedException e) {
-          throw new MessagingException(CoreMessages.interruptedWaitingForPaused(getStartableName(startable)), event, e, this);
+          throw new MessagingException(interruptedWaitingForPaused(getStartableName(startable)), event, e, this);
         }
       }
-      return processNext(event);
+      return processNext(builder.build());
     } else {
-      return handleUnaccepted(event);
+      return handleUnaccepted(builder.build());
     }
   }
 
   @Override
-  protected boolean accept(MuleEvent event) {
+  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     return lifecycleState.isStarted() || isPaused();
   }
 

@@ -40,12 +40,12 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
   protected JsonToXml jToX;
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     String jsonString = null;
     MuleMessage msg = event.getMessage();
 
@@ -62,15 +62,16 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
         }
         jsonString = jsonWriter.toString();
         msg = MuleMessage.builder(msg).payload(jsonString).build();
-        event.setMessage(msg);
+        builder.message(msg);
       }
       String xmlString = (String) jToX
           .transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
       MuleMessage xmlMessage = MuleMessage.builder().payload(xmlString).build();
-      boolean accepted = super.accept(MuleEvent.builder(event.getContext()).message(xmlMessage).flow(flowConstruct).build());
+      boolean accepted =
+          super.accept(MuleEvent.builder(event.getContext()).message(xmlMessage).flow(flowConstruct).build(), builder);
       if (jsonString != null) {
         msg = MuleMessage.builder(msg).payload(jsonString).build();
-        event.setMessage(msg);
+        builder.message(msg);
       }
       return accepted;
     } catch (Exception ex) {

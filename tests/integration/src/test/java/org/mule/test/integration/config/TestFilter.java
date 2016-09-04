@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.config;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
@@ -33,7 +34,8 @@ public class TestFilter implements Filter {
     this.foo = foo;
   }
 
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     return true;
   }
 }

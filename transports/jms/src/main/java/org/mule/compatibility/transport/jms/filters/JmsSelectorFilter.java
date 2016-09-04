@@ -9,6 +9,7 @@ package org.mule.compatibility.transport.jms.filters;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
@@ -21,7 +22,7 @@ public class JmsSelectorFilter implements Filter {
   private String expression = null;
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     // If we have received the message the selector has been honoured
     return true;
   }

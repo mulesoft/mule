@@ -85,11 +85,11 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
   private class WireTapFilter extends AbstractFilteringMessageProcessor {
 
     @Override
-    protected boolean accept(MuleEvent event) {
+    protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
       if (filter == null) {
         return true;
       } else {
-        return filter.accept(event);
+        return filter.accept(event, builder);
       }
     }
 

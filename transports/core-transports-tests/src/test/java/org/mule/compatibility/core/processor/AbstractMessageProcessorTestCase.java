@@ -223,7 +223,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     }
 
     @Override
-    public boolean accept(MuleMessage message) {
+    public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
       return accept;
     }
   }

@@ -7,12 +7,13 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
 import java.util.List;
@@ -60,7 +61,9 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
         } else if (returnEvent.getMessage() == null) {
           failed = true;
         } else {
-          failed = returnEvent == null || failureExpressionFilter.accept(returnEvent);
+          Builder builder = MuleEvent.builder(returnEvent);
+          failed = returnEvent == null || failureExpressionFilter.accept(returnEvent, builder);
+          returnEvent = builder.build();
         }
       } catch (Exception ex) {
         failed = true;

@@ -24,7 +24,6 @@ import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -41,6 +40,7 @@ import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
@@ -420,10 +420,10 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
       if (exceptionExpected) {
         return expectedAction == notification.getAction() && exception != null && notification.getSource() != null
-            && (this.event == null || this.event == notification.getSource());
+            && (this.event == null || this.event.getMessage().equals(((MuleEvent) notification.getSource()).getMessage()));
       } else {
         return expectedAction == notification.getAction() && exception == null && notification.getSource() != null
-            && (this.event == null || this.event == notification.getSource());
+            && (this.event == null || this.event.getMessage().equals(((MuleEvent) notification.getSource()).getMessage()));
       }
 
     }

@@ -78,15 +78,16 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
   }
 
   @Override
-  public boolean isMatch(MuleEvent event) throws MuleException {
+  public boolean isMatch(MuleEvent event, MuleEvent.Builder builder) throws MuleException {
     if (getFilter() == null) {
       return true;
     }
 
-    event = MuleEvent.builder(event)
-        .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers)).build();
+    MuleMessage message = muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers);
+    event = MuleEvent.builder(event).message(message).build();
+    builder.message(message);
 
-    return getFilter().accept(event);
+    return getFilter().accept(event, builder);
   }
 
   public List<Transformer> getTransformers() {

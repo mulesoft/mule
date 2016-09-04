@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
@@ -19,6 +18,7 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
@@ -171,7 +171,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   }
 
   @Override
-  public boolean isMatch(final MuleEvent event) throws MuleException {
+  public boolean isMatch(final MuleEvent event, MuleEvent.Builder builder) throws MuleException {
     return true;
   }
 

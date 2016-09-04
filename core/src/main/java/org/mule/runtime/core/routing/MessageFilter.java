@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -27,6 +26,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 import org.slf4j.Logger;
@@ -74,13 +74,13 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
   }
 
   @Override
-  protected boolean accept(MuleEvent event) {
+  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     if (filter == null) {
       return true;
     }
 
     if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
-      return filter.accept(event);
+      return filter.accept(event, builder);
     } else {
       return false;
     }

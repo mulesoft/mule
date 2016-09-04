@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a
@@ -38,19 +39,20 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     boolean accepted;
+    Builder builder = MuleEvent.builder(event);
     try {
-      accepted = accept(event);
+      accepted = accept(event, builder);
     } catch (Exception ex) {
-      throw filterFailureException(event, ex);
+      throw filterFailureException(builder.build(), ex);
     }
     if (accepted) {
-      return processNext(event);
+      return processNext(builder.build());
     } else {
-      return handleUnaccepted(event);
+      return handleUnaccepted(builder.build());
     }
   }
 
-  protected abstract boolean accept(MuleEvent event);
+  protected abstract boolean accept(MuleEvent event, MuleEvent.Builder builder);
 
   protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException {
     if (unacceptedMessageProcessor != null) {

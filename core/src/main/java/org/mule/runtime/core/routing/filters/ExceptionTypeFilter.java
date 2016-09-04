@@ -40,14 +40,14 @@ public class ExceptionTypeFilter extends PayloadTypeFilter {
    * @return <code>true</code> if the event matches the filter
    */
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     Optional<Error> errorOptional = event.getError();
     if (getExpectedType() == null) {
       return errorOptional.isPresent();
     } else if (errorOptional.isPresent()) {
       return getExpectedType().isAssignableFrom(errorOptional.get().getException().getClass());
     } else {
-      return accept(event.getMessage());
+      return accept(event.getMessage(), builder);
     }
   }
 
@@ -57,7 +57,8 @@ public class ExceptionTypeFilter extends PayloadTypeFilter {
    * @param message a non null message to filter.
    * @return <code>true</code> if the message matches the filter
    */
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     ExceptionPayload epl = message.getExceptionPayload();
 
     if (getExpectedType() == null) {

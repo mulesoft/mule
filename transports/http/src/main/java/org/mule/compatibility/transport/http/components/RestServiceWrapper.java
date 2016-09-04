@@ -18,6 +18,7 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -188,12 +189,12 @@ public class RestServiceWrapper extends AbstractComponent {
     }
 
     MuleEvent result = MuleEvent.builder(event.getContext()).message(clientResponse.getRight()).flow(flowConstruct).build();
-
-    if (isErrorPayload(result)) {
+    Builder builder = MuleEvent.builder(result);
+    if (isErrorPayload(result, builder)) {
       handleException(new RestServiceException(failedToInvokeRestService(tempUrl), event, this));
     }
 
-    return result.getMessage();
+    return builder.build().getMessage();
   }
 
   private String getSeparator(String url) {
@@ -285,8 +286,8 @@ public class RestServiceWrapper extends AbstractComponent {
     }
   }
 
-  protected boolean isErrorPayload(MuleEvent event) {
-    return errorFilter != null && errorFilter.accept(event);
+  protected boolean isErrorPayload(MuleEvent event, MuleEvent.Builder builder) {
+    return errorFilter != null && errorFilter.accept(event, builder);
   }
 
   protected void handleException(RestServiceException e) throws Exception {

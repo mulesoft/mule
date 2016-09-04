@@ -6,6 +6,7 @@
  */
 package org.mule.test.filters;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
@@ -18,7 +19,8 @@ public class FilterCounter implements Filter {
   /**
    * Increments the counter if it passes the filter
    */
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     if ("true".equals(message.getInboundProperty("pass"))) {
       counter.incrementAndGet();
       return true;

@@ -33,8 +33,7 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     MuleEvent resultEvent = mp.process(inEvent);
 
     assertNotNull(listener.event);
-    assertSame(inEvent, listener.event);
-    assertEquals(inEvent, resultEvent);
+    assertEquals(inEvent.getMessage(), resultEvent.getMessage());
   }
 
   @Test
@@ -64,8 +63,7 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     MuleEvent resultEvent = mp.process(inEvent);
 
     assertNotNull(out.event);
-    assertSame(inEvent, out.event);
-    assertEquals(inEvent, resultEvent);
+    assertEquals(inEvent.getMessage(), resultEvent.getMessage());
     assertNull(unaccepted.event);
   }
 
@@ -83,6 +81,5 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     assertNull(out.event);
     assertSame(VoidMuleEvent.getInstance(), resultEvent);
     assertNotNull(unaccepted.event);
-    assertSame(inEvent, unaccepted.event);
   }
 }

@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing.filters;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.ClassUtils;
@@ -33,7 +34,8 @@ public class PayloadTypeFilter implements Filter {
     this.expectedType = expectedType;
   }
 
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     return (expectedType != null ? expectedType.isAssignableFrom(message.getDataType().getType()) : false);
   }
 
@@ -45,6 +47,7 @@ public class PayloadTypeFilter implements Filter {
     this.expectedType = expectedType;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
@@ -55,6 +58,7 @@ public class PayloadTypeFilter implements Filter {
     return equal(expectedType, other.expectedType);
   }
 
+  @Override
   public int hashCode() {
     return hash(new Object[] {this.getClass(), expectedType});
   }

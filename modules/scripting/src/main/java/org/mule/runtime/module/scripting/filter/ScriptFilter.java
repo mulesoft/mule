@@ -45,7 +45,7 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     Bindings bindings = script.getScriptEngine().createBindings();
 
     script.populateBindings(bindings, event);
@@ -55,12 +55,12 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
       // TODO MULE-9356 ScriptFilter should rethrow exceptions, or at least log, not ignore them
       return false;
     } finally {
-      event.setMessage((MuleMessage) bindings.get(BINDING_MESSAGE));
+      builder.message((MuleMessage) bindings.get(BINDING_MESSAGE));
     }
   }
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     Bindings bindings = script.getScriptEngine().createBindings();
 
     // TODO MULE-9341 Remove Filters.

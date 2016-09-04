@@ -62,7 +62,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     endpoints.add(mockendpoint2);
     router.setRoutes(endpoints);
 
-    assertTrue(router.isMatch(getTestEvent(TEST_MESSAGE)));
+    assertTrue(router.isMatch(getTestEvent(TEST_MESSAGE), mock(MuleEvent.Builder.class)));
 
     when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
     when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
@@ -93,7 +93,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    assertTrue(router.isMatch(getTestEvent(message)));
+    assertTrue(router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
 
     Flow flow = getTestFlow();
     final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
@@ -131,7 +131,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    assertTrue(router.isMatch(getTestEvent(message)));
+    assertTrue(router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
     Flow flow = getTestFlow();
     final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
     MuleEvent event = MuleEvent.builder(context).message(message).flow(flow).build();
@@ -171,7 +171,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     final MessageContext context = create(flow, TEST_CONNECTOR, "MyCustomCorrelationId");
     final MuleEvent testEvent = MuleEvent.builder(context).message(message).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
 
-    assertTrue(router.isMatch(testEvent));
+    assertTrue(router.isMatch(testEvent, mock(MuleEvent.Builder.class)));
 
     Answer<MuleEvent> answer = invocation -> {
       Object[] arguments = invocation.getArguments();

@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing.filters;
 
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -20,7 +21,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.util.AttributeEvaluator;
@@ -74,15 +74,15 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   }
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     // TODO MULE-9341 Remove Filters that are not needed
     Flow flowConstruct = new Flow("", muleContext);
     return accept(MuleEvent.builder(create(flowConstruct, "RegExFilter")).message(message).exchangePattern(ONE_WAY)
-        .flow(flowConstruct).build());
+        .flow(flowConstruct).build(), builder);
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     try {
       if (value != null && value.getRawValue() != null) {
         return accept(value.resolveValue(event));
@@ -92,9 +92,9 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
         // If the payload is a stream and we've consumed it, then we should set the payload on the
         // message. This is the only time this method will alter the payload on the message
         if (event.getMessage().getDataType().isStreamType()) {
-          event.setMessage(transformedMessage);
+          builder.message(transformedMessage);
         }
-        return accept((Object) transformedMessage.getPayload());
+        return accept(transformedMessage.getPayload());
       }
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
@@ -118,7 +118,7 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
       try {
         object = transformer.transform(object);
       } catch (TransformerException e) {
-        logger.warn(CoreMessages.transformFailedBeforeFilter().toString(), e);
+        logger.warn(transformFailedBeforeFilter().toString(), e);
         // revert transformation
         object = tempObject;
       }

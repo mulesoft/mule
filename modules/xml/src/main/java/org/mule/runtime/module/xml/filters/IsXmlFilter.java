@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.xml.filters;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.module.xml.util.XMLUtils;
@@ -29,8 +30,9 @@ public class IsXmlFilter implements Filter {
     super();
   }
 
-  public boolean accept(MuleMessage obj) {
-    return accept((Object) obj.getPayload());
+  @Override
+  public boolean accept(MuleMessage obj, MuleEvent.Builder builder) {
+    return accept(obj.getPayload());
   }
 
   private boolean accept(Object obj) {

@@ -241,6 +241,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     result = mpChain.process(requestEvent);
 
     assertMessageSentSame(true);
+    assertThat(result.getMessage().getPayload(), equalTo(responseEvent.getMessage().getPayload()));
     final int status = result.getMessage().getOutboundProperty("status", 0);
     assertEquals(500, status);
   }
@@ -365,9 +366,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   protected MuleEvent assertMessageSentSame(boolean sync) throws MuleException {
     assertMessageSent(sync);
     MuleEvent event = inboundListener.sensedEvent;
-    assertThat(requestEvent.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
-    assertThat(event.getMessageAsString(muleContext), equalTo(TEST_MESSAGE));
-    assertThat(event.getMessage().getOutboundProperty("prop1"), equalTo("value1"));
+    assertThat(event.getMessage().getPayload(), equalTo(requestEvent.getMessage().getPayload()));
+    assertEquals(TEST_MESSAGE, event.getMessageAsString(muleContext));
+    assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
     return event;
   }
 

@@ -48,13 +48,13 @@ public class JsonSchemaValidationFilter implements JsonSchemaFilter {
   private Map<String, Boolean> validatorFeatures;
 
   @Override
-  public boolean accept(MuleMessage msg) {
-    return delegate.accept(msg);
+  public boolean accept(MuleMessage msg, MuleEvent.Builder builder) {
+    return delegate.accept(msg, builder);
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
-    return delegate.accept(event);
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+    return delegate.accept(event, builder);
   }
 
   @Override

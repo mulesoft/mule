@@ -58,7 +58,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
   private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
@@ -69,7 +69,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
    * @return Whether the message passes schema validation.
    */
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     Source source;
     try {
       source = loadSource(event.getMessage());
@@ -113,7 +113,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
       return false;
     } finally {
       if (result != null && result.getNode() != null) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(result.getNode()).build());
+        builder.message(MuleMessage.builder(event.getMessage()).payload(result.getNode()).build());
       }
     }
 

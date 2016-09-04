@@ -14,7 +14,7 @@ import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 public class FailingRouter extends AbstractFilteringMessageProcessor {
 
   @Override
-  protected boolean accept(MuleEvent event) {
+  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     throw new MuleRuntimeException(MessageFactory.createStaticMessage("Failure"));
   }
 }

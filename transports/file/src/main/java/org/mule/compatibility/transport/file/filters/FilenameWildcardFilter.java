@@ -7,6 +7,7 @@
 package org.mule.compatibility.transport.file.filters;
 
 import org.mule.compatibility.transport.file.FileConnector;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
@@ -28,7 +29,7 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
 
   /**
    * Filter condition decider method.
-   * <p/>
+   * <p>
    * Returns <code>boolean</code> <code>TRUE</code> if the file conforms to an acceptable pattern or <code>FALSE</code> otherwise.
    * 
    * @param dir The directory to apply the filter to.
@@ -46,7 +47,7 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
   }
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     Object filename = message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
     return accept(filename);
   }

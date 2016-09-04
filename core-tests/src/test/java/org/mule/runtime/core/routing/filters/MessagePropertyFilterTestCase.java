@@ -9,8 +9,10 @@ package org.mule.runtime.core.routing.filters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -25,10 +27,10 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
   public void testMessagePropertyFilter() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
     MuleMessage message = MuleMessage.builder().payload("blah").build();
-    assertTrue(!filter.accept(message));
+    assertTrue(!filter.accept(message, mock(MuleEvent.Builder.class)));
 
     message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -37,9 +39,9 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=bar");
     assertEquals("inbound", filter.getScope());
 
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     message = MuleMessage.builder(message).addInboundProperty("foo", "bar").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -48,21 +50,21 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=http://foo.com");
     assertEquals("inbound", filter.getScope());
 
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
 
     Map inboundProps = new HashMap();
     inboundProps.put("foo", "http://foo.com");
     message = MuleMessage.builder().payload("blah").inboundProperties(inboundProps).build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
 
     // Checking here that a ':' in the value doesn't throw things off
     filter = new MessagePropertyFilter("bar=http://bar.com");
     // default scope
     assertEquals("outbound", filter.getScope());
 
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     message = MuleMessage.builder(message).addOutboundProperty("bar", "http://bar.com").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -70,11 +72,11 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
     MuleMessage message = MuleMessage.builder().payload("blah").build();
 
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
     message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -82,11 +84,11 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
     MuleMessage message = MuleMessage.builder().payload("blah").build();
 
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     message = removeProperty(message, "foo");
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -94,9 +96,9 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=Bar");
     MuleMessage message = MuleMessage.builder().payload("blah").build();
     message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     filter.setCaseSensitive(false);
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -104,34 +106,34 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=B*");
     MuleMessage message = MuleMessage.builder().payload("blah").build();
     message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     filter.setCaseSensitive(false);
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
     filter.setPattern("foo=*a*");
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
   public void testMessagePropertyFilterDodgyValues() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter();
-    assertFalse(filter.accept((MuleMessage) null));
+    assertFalse(filter.accept((MuleMessage) null, mock(MuleEvent.Builder.class)));
 
     filter = new MessagePropertyFilter("foo = bar");
     MuleMessage message = MuleMessage.builder().payload("blah").build();
     message = MuleMessage.builder(message).addOutboundProperty("foo", "bar").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
     filter.setCaseSensitive(false);
 
     filter = new MessagePropertyFilter("foo2 =null");
     message = removeProperty(message, "foo2");
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
 
     filter = new MessagePropertyFilter("foo2 =");
     message = MuleMessage.builder(message).addOutboundProperty("foo2", "").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
 
     message = removeProperty(message, "foo2");
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   private MuleMessage removeProperty(MuleMessage message, String property) {
@@ -143,17 +145,17 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
     MuleMessage message = MuleMessage.builder().payload("blah").build();
 
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     message = MuleMessage.builder(message).addOutboundProperty("foo", "car").build();
-    assertTrue("Filter didn't accept the message", filter.accept(message));
+    assertTrue("Filter didn't accept the message", filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 
   @Test
   public void testMessagePropertyWithEnum() throws Exception {
     MessagePropertyFilter filter = new MessagePropertyFilter("foo=ONE_WAY");
     MuleMessage message = MuleMessage.builder().payload("").build();
-    assertFalse(filter.accept(message));
+    assertFalse(filter.accept(message, mock(MuleEvent.Builder.class)));
     message = MuleMessage.builder(message).addOutboundProperty("foo", ONE_WAY).build();
-    assertTrue(filter.accept(message));
+    assertTrue(filter.accept(message, mock(MuleEvent.Builder.class)));
   }
 }

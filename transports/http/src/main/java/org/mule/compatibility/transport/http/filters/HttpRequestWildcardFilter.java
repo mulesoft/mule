@@ -7,6 +7,7 @@
 package org.mule.compatibility.transport.http.filters;
 
 import org.mule.compatibility.transport.http.HttpConnector;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
@@ -25,7 +26,7 @@ public class HttpRequestWildcardFilter extends WildcardFilter {
   }
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     Object requestProperty = message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
     return super.accept(requestProperty);
   }

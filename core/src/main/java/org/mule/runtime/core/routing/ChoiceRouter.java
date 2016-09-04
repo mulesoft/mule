@@ -25,9 +25,9 @@ import java.util.Collections;
 public class ChoiceRouter extends AbstractSelectiveRouter implements NonBlockingMessageProcessor {
 
   @Override
-  protected Collection<MessageProcessor> selectProcessors(MuleEvent event) {
+  protected Collection<MessageProcessor> selectProcessors(MuleEvent event, MuleEvent.Builder builder) {
     for (MessageProcessorFilterPair mpfp : getConditionalMessageProcessors()) {
-      if (mpfp.getFilter().accept(event)) {
+      if (mpfp.getFilter().accept(event, builder)) {
         return Collections.singleton(mpfp.getMessageProcessor());
       }
     }

@@ -17,22 +17,28 @@ public interface Filter {
 
   /**
    * Checks a given message against this filter.
+   * <p>
+   * TODO MULE-9142 See how this API can be improved to not need the builder.
    * 
    * @param message a non null message to filter.
+   * @param builder an event builder in case the filter needs to make changes to the event.
    * @return <code>true</code> if the message matches the filter TODO MULE-9341 Remove Filters that are not needed. This method
    *         will be removed when filters are cleaned up.
    */
   @Deprecated
-  boolean accept(MuleMessage message);
+  boolean accept(MuleMessage message, MuleEvent.Builder builder);
 
   /**
    * Checks a given event against this filter.
+   * <p>
+   * TODO MULE-9142 See how this API can be improved to not need the builder.
    *
    * @param event a non null event to filter.
+   * @param builder an event builder in case the filter needs to make changes to the event.
    * @return <code>true</code> if the event matches the filter
    */
-  default boolean accept(MuleEvent event) {
-    return accept(event.getMessage());
+  default boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+    return accept(event.getMessage(), builder);
   }
 
 }

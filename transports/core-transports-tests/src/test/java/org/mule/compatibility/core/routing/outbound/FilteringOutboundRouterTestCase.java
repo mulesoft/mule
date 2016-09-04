@@ -69,7 +69,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
 
     MuleMessage message = MuleMessage.builder().payload("test event").build();
 
-    assertTrue(router.isMatch(getTestEvent(message)));
+    assertTrue(router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
 
     when(mockEndpoint.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
     MuleSession session = mock(MuleSession.class);
@@ -80,7 +80,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     // Test with transform
     message = MuleMessage.builder().payload(new Exception("test event")).build();
 
-    assertTrue(!router.isMatch(getTestEvent(message)));
+    assertTrue(!router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
 
     router.setTransformers(Arrays.<Transformer>asList(new AbstractTransformer() {
 
@@ -90,7 +90,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
       }
     }));
 
-    assertTrue(router.isMatch(getTestEvent(message)));
+    assertTrue(router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -147,7 +147,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
     MuleEvent event = MuleEvent.builder(context).message(message).flow(flow).build();
 
-    assertTrue(router.isMatch(getTestEvent(message)));
+    assertTrue(router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
     OutboundEndpoint ep = (OutboundEndpoint) router.getRoute(0, event);
     // MULE-2690: assert that templated targets are not mutated
     assertNotSame(endpoint1, ep);
