@@ -8,6 +8,7 @@ package org.mule.runtime.module.json.filters;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -26,17 +27,20 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFilterFalse() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().payload("This is definitely not JSON.").build()));
+    assertFalse(filter
+        .accept(MuleMessage.builder().payload("This is definitely not JSON.").build().getPayload()));
   }
 
   @Test
   public void testFilterFalse2() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().payload("{name=\"This may be JSON\",bool:}").build()));
+    assertFalse(filter.accept(MuleMessage.builder()
+        .payload("{name=\"This may be JSON\",bool:}").build().getPayload()));
   }
 
   @Test
   public void testFilterFalse3() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().payload("[name=\"This may be JSON\",bool:]").build()));
+    assertFalse(filter.accept(MuleMessage.builder()
+        .payload("[name=\"This may be JSON\",bool:]").build().getPayload()));
   }
 
   @Test
@@ -45,17 +49,17 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
                              org.mule.runtime.core.api.MuleMessage.builder()
                                  .payload("{\n" + "        \"in_reply_to_user_id\":null,\n"
                                      + "        \"text\":\"test from Mule: " + "6ffca02b-9d52-475e-8b17-946acdb01492\"}")
-                                 .build()));
+                                 .build().getPayload()));
   }
 
   @Test
   public void testFilterNull() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().nullPayload()));
+    assertFalse(filter.accept(MuleMessage.builder().nullPayload().build().getPayload()));
   }
 
   @Test
   public void testFilterWithObject() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().payload(new Object())));
+    assertFalse(filter.accept(MuleMessage.builder().payload(new Object()).build().getPayload()));
   }
 
 }

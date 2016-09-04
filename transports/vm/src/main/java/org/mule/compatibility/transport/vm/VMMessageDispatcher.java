@@ -28,6 +28,7 @@ import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
       throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event, getEndpoint());
     }
     MuleEvent eventToDispatch =
-        MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
+        MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).flowVariables(emptyMap()).build();
     final MuleCompatibilityMessageBuilder builder =
         new MuleCompatibilityMessageBuilder(createInboundMessage(eventToDispatch.getMessage()));
     builder.correlationId(eventToDispatch.getCorrelationId());
@@ -61,8 +62,6 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     builder.correlationGroupSize(eventToDispatch.getCorrelation().getGroupSize().orElse(null));
     final MuleCompatibilityMessage message = builder.build();
 
-    eventToDispatch.clearFlowVariables();
-    eventToDispatch.setMessage(createInboundMessage(eventToDispatch.getMessage()));
     QueueSession session = getQueueSession();
     Queue queue = session.getQueue(endpointUri.getAddress());
     if (!queue.offer(message, connector.getQueueTimeout())) {

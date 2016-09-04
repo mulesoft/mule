@@ -175,7 +175,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     // here is ok even though it is not ideal.
     client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
 
-    setPropertyFromEndpoint(event, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
+    event = setPropertyFromEndpoint(event, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
     MuleMessage msg = event.getMessage();
 
     HttpMethod httpMethod;
@@ -197,14 +197,16 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     return httpMethod;
   }
 
-  protected void setPropertyFromEndpoint(MuleEvent event, String prop) {
+  protected MuleEvent setPropertyFromEndpoint(MuleEvent event, String prop) {
     Serializable o = event.getMessage().getOutboundProperty(prop);
     if (o == null) {
       o = endpoint.getProperty(prop);
       if (o != null) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(prop, o).build());
+        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty(prop, o).build())
+            .build();
       }
     }
+    return event;
   }
 
   protected HttpMethod createEntityMethod(MuleEvent event, Object body, EntityEnclosingMethod postMethod)

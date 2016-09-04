@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,7 +60,7 @@ public class RoundRobin extends AbstractOutboundRouter {
   }
 
   @Override
-  public boolean isMatch(MuleEvent message) throws MuleException {
+  public boolean isMatch(MuleEvent message, MuleEvent.Builder builder) throws MuleException {
     return true;
   }
 }

@@ -34,7 +34,8 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
       MuleMessage message = event.getMessage();
       final DataType dataType = message.getDataType();
       if (DataType.OBJECT.getMediaType().matches(dataType.getMediaType())) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).mediaType(endpointMimeType).build());
+        event =
+            MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).mediaType(endpointMimeType).build()).build();
       } else {
         if (!dataType.getMediaType().matches(endpointMimeType)) {
           throw new MessagingException(CoreMessages.unexpectedMIMEType(dataType.getMediaType().toRfcString(),

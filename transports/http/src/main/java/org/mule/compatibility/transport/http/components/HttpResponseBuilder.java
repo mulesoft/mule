@@ -91,8 +91,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     setDateHeader(httpResponse, new Date());
     setBody(httpResponse, message, event);
 
-    event.setMessage(MuleMessage.builder(event.getMessage()).payload(httpResponse).build());
-    return event;
+    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(httpResponse).build()).build();
   }
 
   protected void setDateHeader(HttpResponse httpResponse, Date date) {

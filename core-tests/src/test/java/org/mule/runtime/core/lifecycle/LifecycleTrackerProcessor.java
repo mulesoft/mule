@@ -52,9 +52,10 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    event.setMessage(MuleMessage.builder(event.getMessage())
-        .addOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString()).build());
-    event.setFlowVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct);
+    event = MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage())
+            .addOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString()).build())
+        .addFlowVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct).build();
     return event;
   }
 }

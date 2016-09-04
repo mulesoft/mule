@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -59,12 +60,13 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
               + event));
     }
 
-    final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(returnEvent);
+    Builder builder = MuleEvent.builder(returnEvent);
+    final boolean errorDetected = untilSuccessfulConfiguration.getFailureExpressionFilter().accept(returnEvent, builder);
     if (errorDetected) {
       throw new MuleRuntimeException(MessageFactory
           .createStaticMessage("Failure expression positive when processing event: " + event));
     }
-    return returnEvent;
+    return builder.build();
   }
 
   /**

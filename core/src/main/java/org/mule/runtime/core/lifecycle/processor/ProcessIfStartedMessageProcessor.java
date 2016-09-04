@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.lifecycle.processor;
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.api.meta.NameableObject;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -25,7 +25,7 @@ public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessagePr
   }
 
   @Override
-  protected boolean accept(MuleEvent event) {
+  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     return lifecycleState.isStarted();
   }
 

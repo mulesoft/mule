@@ -134,7 +134,8 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
 
     MuleEvent event = getCurrentEvent();
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
+    event = MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build()).build();
 
     resolverSet.invoke(new FruitBowl(), new DefaultMuleEventContext(getTestFlow(), event));
     // fail("Should have failed to find an entrypoint.");
@@ -152,8 +153,9 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
 
     // those are usually set on the endpoint and copied over to the message
     MuleEvent event = getCurrentEvent();
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(METHOD_PROPERTY_NAME, INVALID_METHOD_NAME)
-        .build());
+    event = MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(METHOD_PROPERTY_NAME, INVALID_METHOD_NAME).build())
+        .build();
 
     Apple apple = new Apple();
     apple.setAppleCleaner(new FruitCleaner() {
@@ -186,7 +188,8 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     final String methodName = "nosuchmethod";
     final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
     MuleEvent event = getCurrentEvent();
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
+    event = MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build()).build();
 
     try {
       resolverSet.invoke(new Kiwi(), new DefaultMuleEventContext(getTestFlow(), event));
@@ -245,7 +248,8 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
 
     final String methodName = "setFruit";
     final String propertyName = MuleProperties.MULE_METHOD_PROPERTY;
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build());
+    event = MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build()).build();
 
     FruitBowl bowl = new FruitBowl();
     assertFalse(bowl.hasApple());

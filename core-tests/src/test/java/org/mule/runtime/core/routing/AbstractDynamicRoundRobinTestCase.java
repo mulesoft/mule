@@ -9,12 +9,12 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -75,9 +75,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
   }
 
   protected MuleEvent getEventWithId(String id) throws Exception {
-    MuleEvent event = getEvent();
-    event.setFlowVariable(ID_PROPERTY_NAME, id);
-    return event;
+    return MuleEvent.builder(getEvent()).addFlowVariable(ID_PROPERTY_NAME, id).build();
   }
 
   public static class LetterMessageProcessor implements MessageProcessor {
@@ -91,8 +89,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
-        return event;
+        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(letter).build()).build();
       } catch (Exception e) {
         throw new DefaultMuleException(e);
       }

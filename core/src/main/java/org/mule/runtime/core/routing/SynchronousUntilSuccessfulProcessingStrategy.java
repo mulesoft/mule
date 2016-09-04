@@ -8,9 +8,9 @@ package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -46,11 +46,11 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
             // continue processing with the original event
             finalEvent = event;
           } else {
+            Builder builder = MuleEvent.builder(event).message(successEvent.getMessage());
             for (String flowVar : successEvent.getFlowVariableNames()) {
-              event.setFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
+              builder.addFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
             }
-            // TODO MULE-9342 org.mule.test.routing.ForeachUntilSuccessfulTestCase.flowVariablesSyncArePropagated()
-            finalEvent = new DefaultMuleEvent(successEvent.getMessage(), event);
+            finalEvent = builder.build();
           }
           setCurrentEvent(finalEvent);
           return finalEvent;

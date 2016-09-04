@@ -41,7 +41,6 @@ public class ExpressionFilter implements Filter, MuleContextAware {
   protected transient final Logger logger = LoggerFactory.getLogger(ExpressionFilter.class);
 
   private ExpressionConfig config;
-  private String fullExpression;
   private boolean nullReturnsTrue = false;
   private MuleContext muleContext;
 
@@ -72,10 +71,10 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    * @return <code>true</code> if the message matches the filter
    */
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     String expr = getFullExpression();
     if (delegateFilter != null) {
-      boolean result = delegateFilter.accept(message);
+      boolean result = delegateFilter.accept(message, builder);
       if (logger.isDebugEnabled()) {
         logger.debug(MessageFormat.format("Result of expression filter: {0} is: {1}", expr, result));
       }
@@ -85,7 +84,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
     Flow flowConstruct = new Flow("", muleContext);
     return accept(MuleEvent.builder(create(flowConstruct, "ExpressionFilter")).message(message).exchangePattern(ONE_WAY)
-        .flow(flowConstruct).build());
+        .flow(flowConstruct).build(), builder);
   }
 
   /**
@@ -95,7 +94,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    * @return <code>true</code> if the event matches the filter
    */
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> muleContext.getExpressionManager()
         .evaluateBoolean(getFullExpression(), event, null, nullReturnsTrue, !nullReturnsTrue));
   }
@@ -110,7 +109,6 @@ public class ExpressionFilter implements Filter, MuleContextAware {
 
   public void setExpression(String expression) {
     this.config.setExpression(expression);
-    fullExpression = null;
   }
 
   public boolean isNullReturnsTrue() {

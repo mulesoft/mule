@@ -40,10 +40,8 @@ public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
       // URI
       inboundEndpoint = endpoint.getEndpointURI().getUri().toString();
     }
-    String finalInboundEndpoint = inboundEndpoint;
-    event.setMessage(MuleMessage.builder(event.getMessage())
-        .addInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, finalInboundEndpoint).build());
-    return event;
+    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+        .addInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint).build()).build();
   }
 
   @Override

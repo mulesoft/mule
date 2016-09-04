@@ -48,18 +48,15 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher implements 
 
   @Override
   protected void doDispatch(MuleEvent event) throws Exception {
-    Object data = event.getMessage().getPayload();
-    // Wrap the transformed message before passing it to the filename parser
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage()).payload(data);
-
     FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
     try {
+      MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage());
       if (event.getMessage().getOutboundProperty(PROPERTY_FILENAME) == null) {
         messageBuilder.addOutboundProperty(PROPERTY_FILENAME, event.getMessage().getOutboundProperty(PROPERTY_FILENAME, EMPTY));
       }
-      event.setMessage(messageBuilder.build());
+      event = MuleEvent.builder(event).message(messageBuilder.build()).build();
 
-
+      Object data = event.getMessage().getPayload();
       if (data instanceof byte[]) {
         fos.write((byte[]) data);
       } else if (data instanceof String) {

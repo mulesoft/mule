@@ -40,8 +40,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
       builder.payload(value).mediaType(dataTypeBuilder.build().getMediaType());
     }
 
-    event.setMessage(builder.build());
-    return event;
+    return MuleEvent.builder(event).message(builder.build()).build();
   }
 
   private Object resolveValue(MuleEvent event) {

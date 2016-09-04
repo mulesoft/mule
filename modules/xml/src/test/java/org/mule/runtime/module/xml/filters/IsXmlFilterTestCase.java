@@ -9,6 +9,9 @@ package org.mule.runtime.module.xml.filters;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.util.XMLTestUtils;
@@ -31,29 +34,32 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testFilterFalse() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().payload("This is definitely not XML.").build()));
+    assertFalse(filter.accept(MuleMessage.builder().payload("This is definitely not XML.").build(),
+                              mock(MuleEvent.Builder.class)));
   }
 
   @Test
   public void testFilterFalse2() throws Exception {
     assertFalse(filter
-        .accept(MuleMessage.builder().payload("<line>This is almost XML</line><line>This is almost XML</line>").build()));
+        .accept(MuleMessage.builder().payload("<line>This is almost XML</line><line>This is almost XML</line>").build(),
+                mock(MuleEvent.Builder.class)));
   }
 
   @Test
   public void testFilterTrue() throws Exception {
-    assertTrue(filter.accept(MuleMessage.builder().payload("<msg attrib=\"att1\">This is some nice XML!</msg>").build()));
+    assertTrue(filter.accept(MuleMessage.builder().payload("<msg attrib=\"att1\">This is some nice XML!</msg>").build(),
+                             mock(MuleEvent.Builder.class)));
   }
 
   @Test
   public void testFilterBytes() throws Exception {
     byte[] bytes = "<msg attrib=\"att1\">This is some nice XML!</msg>".getBytes();
-    assertTrue(filter.accept(MuleMessage.builder().payload(bytes).build()));
+    assertTrue(filter.accept(MuleMessage.builder().payload(bytes).build(), mock(MuleEvent.Builder.class)));
   }
 
   @Test
   public void testFilterNull() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().nullPayload().build()));
+    assertFalse(filter.accept(MuleMessage.builder().nullPayload().build(), mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -61,7 +67,7 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase {
     InputStream is = IOUtils.getResourceAsStream("cdcatalog.xml", getClass());
     assertNotNull("Test resource not found.", is);
     final String xml = IOUtils.toString(is);
-    assertTrue(filter.accept(MuleMessage.builder().payload(xml).build()));
+    assertTrue(filter.accept(MuleMessage.builder().payload(xml).build(), mock(MuleEvent.Builder.class)));
   }
 
   @Test
@@ -69,14 +75,14 @@ public class IsXmlFilterTestCase extends AbstractMuleTestCase {
     InputStream is = IOUtils.getResourceAsStream("cdcatalog.html", getClass());
     assertNotNull("Test resource not found.", is);
     final String html = IOUtils.toString(is);
-    assertTrue(filter.accept(MuleMessage.builder().payload(html).build()));
+    assertTrue(filter.accept(MuleMessage.builder().payload(html).build(), mock(MuleEvent.Builder.class)));
   }
 
   @Test
   public void testFilterXmlMessageVariants() throws Exception {
     List<?> list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
     for (Object message : list) {
-      assertTrue(filter.accept(MuleMessage.builder().payload(message).build()));
+      assertTrue(filter.accept(MuleMessage.builder().payload(message).build(), mock(MuleEvent.Builder.class)));
     }
   }
 }

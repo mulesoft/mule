@@ -10,6 +10,7 @@ import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -113,7 +114,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
       MuleMessage msg = MuleMessage.builder().payload(e).build();
       try {
         // TODO: Filters should really be applied by the endpoint
-        if (endpoint.getFilter() != null && !endpoint.getFilter().accept(msg)) {
+        if (endpoint.getFilter() != null && !endpoint.getFilter().accept(msg, MuleEvent
+            .builder(DefaultMessageContext.create(endpoint.getFlowConstruct(), "EndpointNotificationLoggerAgent")))) {
           if (logger.isInfoEnabled()) {
             logger.info("Message not accepted with filter: " + endpoint.getFilter());
           }

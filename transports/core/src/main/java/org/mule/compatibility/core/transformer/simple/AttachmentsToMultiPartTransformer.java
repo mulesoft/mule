@@ -56,10 +56,9 @@ public class AttachmentsToMultiPartTransformer extends AbstractMessageTransforme
             .mediaType(MediaType.parse(attachment.getContentType())).attributes(new PartAttributes(attachmentName)).build());
       }
 
-      event.setMessage(builder.payload(new DefaultMultiPartPayload(parts)).build());
+      return builder.payload(new DefaultMultiPartPayload(parts)).build();
     } catch (Exception e) {
       throw new TransformerException(this, e);
     }
-    return event.getMessage();
   }
 }

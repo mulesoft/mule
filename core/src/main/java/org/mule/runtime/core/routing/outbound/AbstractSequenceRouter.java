@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing.outbound;
 import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -45,7 +46,11 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
       for (int i = 0; i < routes.size(); i++) {
         MessageProcessor mp = getRoute(i, event);
 
-        if (!(mp instanceof LegacyOutboundEndpoint) || ((LegacyOutboundEndpoint) mp).filterAccepts(message)) {
+        Builder builder = MuleEvent.builder(event);
+        boolean filterAccepted =
+            !(mp instanceof LegacyOutboundEndpoint) || ((LegacyOutboundEndpoint) mp).filterAccepts(message, builder);
+        event = builder.build();
+        if (filterAccepted) {
           AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
           MuleMessage clonedMessage = cloneMessage(event, message);
 
@@ -53,22 +58,10 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
           if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
             results.add(result);
           }
-          // AbstractRoutingStrategy.validateMessageIsNotConsumable(event,message);
-          // MuleMessage clonedMessage = cloneMessage(event, message);
 
           if (!continueRoutingMessageAfter(result)) {
             break;
           }
-          // MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
-          // if (result != null && !VoidMuleEvent.getInstance().equals(result))
-          // {
-          // results.add(result);
-          // }
-          //
-          // if (!continueRoutingMessageAfter(result))
-          // {
-          // break;
-          // }
         }
       }
     } catch (MuleException e) {

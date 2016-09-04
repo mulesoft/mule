@@ -61,18 +61,6 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
     // get the endpoint for this url
     OutboundEndpoint endpoint = getEndpoint(event, replyToEndpoint);
 
-    // carry over properties
-    final MuleMessage message = event.getMessage();
-    final Builder builder = MuleMessage.builder(message);
-
-    for (String propertyName : endpoint.getResponseProperties()) {
-      Serializable propertyValue = message.getInboundProperty(propertyName);
-      if (propertyValue != null) {
-        builder.addOutboundProperty(propertyName, propertyValue);
-      }
-    }
-    event.setMessage(builder.build());
-
     // dispatch the event
     try {
       if (logger.isInfoEnabled()) {

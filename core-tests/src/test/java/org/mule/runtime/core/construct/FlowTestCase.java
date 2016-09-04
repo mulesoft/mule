@@ -80,8 +80,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     processors.add(new StringAppendTransformer("c"));
     processors.add(dynamicProcessorContainer);
     processors.add(event -> {
-      event.setFlowVariable("thread", Thread.currentThread());
-      return event;
+      return MuleEvent.builder(event).addFlowVariable("thread", Thread.currentThread()).build();
     });
     processors.add(sensingMessageProcessor);
     flow.setMessageProcessors(processors);

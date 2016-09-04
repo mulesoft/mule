@@ -9,7 +9,6 @@ package org.mule.runtime.core.routing;
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -23,6 +22,7 @@ import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 
 import java.text.MessageFormat;
@@ -107,7 +107,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   }
 
   @Override
-  protected boolean accept(MuleEvent event) {
+  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);

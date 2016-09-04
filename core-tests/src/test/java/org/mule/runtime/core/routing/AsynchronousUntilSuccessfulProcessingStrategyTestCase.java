@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -46,7 +45,6 @@ import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -94,7 +92,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
 
   @Before
   public void setUp() throws Exception {
-    when(mockAlwaysTrueFailureExpressionFilter.accept(any(MuleEvent.class))).thenReturn(true);
+    when(mockAlwaysTrueFailureExpressionFilter.accept(any(MuleEvent.class), any(MuleEvent.Builder.class))).thenReturn(true);
     when(mockUntilSuccessfulConfiguration.getRoute()).thenReturn(mockRoute);
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
@@ -153,7 +151,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             && ((MessagingException) item).getCause() instanceof RetryPolicyExhaustedException
             && EXPECTED_FAILURE_MSG.equals(((MessagingException) item).getCauseException().getMessage());
       }
-    }), eq(event));
+    }), any(MuleEvent.class));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
   }
 
@@ -176,7 +174,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             && ((MessagingException) item).getCauseException().getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
-    }), eq(event));
+    }), any(MuleEvent.class));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
   }
 
@@ -199,7 +197,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
             && (((MessagingException) item).getCauseException()).getMessage()
                 .contains("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG);
       }
-    }), eq(event));
+    }), any(MuleEvent.class));
     verify(mockDLQ, never()).process(any(MuleEvent.class));
   }
 
@@ -285,8 +283,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
   public void successfulExecution() throws Exception {
     executeUntilSuccessful();
     waitUntilRouteIsExecuted();
-    verify(mockRoute, times(1)).process(event);
-    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));
+    verify(mockRoute, times(1)).process(any(MuleEvent.class));
+    verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), any(MuleEvent.class));
   }
 
   @Test
@@ -298,9 +296,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
         .thenReturn(expressionEvalutaionResult);
     final MuleEvent result = executeUntilSuccessful();
     waitUntilRouteIsExecuted();
-    verify(mockRoute, times(1)).process(event);
-    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1)).evaluate(ackExpression, event,
-                                                                                                        null);
+    verify(mockRoute, times(1)).process(any(MuleEvent.class));
+    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1))
+        .evaluate(eq(ackExpression), any(MuleEvent.class), eq(null));
 
     assertThat(result.getMessage().getPayload(), is(expressionEvalutaionResult));
     verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));

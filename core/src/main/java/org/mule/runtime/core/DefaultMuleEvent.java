@@ -10,16 +10,6 @@ import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.message.Correlation.NO_CORRELATION;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -45,6 +35,16 @@ import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,53 +93,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   protected boolean nonBlocking;
   private String legacyCorrelationId;
   private Error error;
-
-  // Constructors to copy MuleEvent
-
-  /**
-   * A helper constructor used to rewrite an event payload
-   *
-   * @param message The message to use as the current payload of the event
-   * @param rewriteEvent the previous event that will be used as a template for this event
-   */
-  public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent) {
-    this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), rewriteEvent.isSynchronous());
-  }
-
-  public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent, boolean synchronus) {
-    this(message, rewriteEvent, rewriteEvent.getFlowConstruct(), rewriteEvent.getSession(), synchronus);
-  }
-
-  protected DefaultMuleEvent(MuleMessage message,
-                             MuleEvent rewriteEvent,
-                             FlowConstruct flowConstruct,
-                             MuleSession session,
-                             boolean synchronous) {
-    this.context = rewriteEvent.getContext();
-    this.correlation = rewriteEvent.getCorrelation();
-    this.parent = rewriteEvent.getParent();
-    this.id = rewriteEvent.getId();
-    this.flowConstruct = flowConstruct;
-    this.session = session;
-
-    this.exchangePattern = rewriteEvent.getExchangePattern();
-    if (rewriteEvent instanceof DefaultMuleEvent) {
-      // TODO MULE-9342 always clone the flowvars
-      // this.flowVariables.putAll(((DefaultMuleEvent) rewriteEvent).flowVariables);
-      this.flowVariables = ((DefaultMuleEvent) rewriteEvent).flowVariables;
-      this.legacyCorrelationId = ((DefaultMuleEvent) rewriteEvent).getLegacyCorrelationId();
-    }
-    setMessage(message);
-    this.replyToHandler = rewriteEvent.getReplyToHandler();
-    this.replyToDestination = rewriteEvent.getReplyToDestination();
-    this.transacted = rewriteEvent.isTransacted();
-    this.notificationsEnabled = rewriteEvent.isNotificationsEnabled();
-    this.synchronous = synchronous;
-    this.nonBlocking = rewriteEvent.isAllowNonBlocking() || isFlowConstructNonBlockingProcessingStrategy();
-    this.flowCallStack =
-        rewriteEvent.getFlowCallStack() == null ? new DefaultFlowCallStack() : rewriteEvent.getFlowCallStack().clone();
-    this.error = rewriteEvent.getError().orElseGet(() -> null);
-  }
 
   // Use this constructor from the builder
   public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,

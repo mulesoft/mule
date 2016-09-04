@@ -46,8 +46,7 @@ public class WatermarkPollingInterceptor extends MessageProcessorPollingIntercep
     }
 
     String variableName = this.watermark.resolveVariable(event);
-    event.setFlowVariable(variableName, sourceEvent.getFlowVariable(variableName));
-    return event;
+    return MuleEvent.builder(event).addFlowVariable(variableName, sourceEvent.getFlowVariable(variableName)).build();
   }
 
   /**

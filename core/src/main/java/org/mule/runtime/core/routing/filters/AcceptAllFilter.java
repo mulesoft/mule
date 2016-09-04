@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing.filters;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
@@ -17,10 +18,12 @@ public class AcceptAllFilter implements Filter, ObjectFilter {
 
   public static final AcceptAllFilter INSTANCE = new AcceptAllFilter();
 
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     return true;
   }
 
+  @Override
   public boolean accept(Object object) {
     return true;
   }

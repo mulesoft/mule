@@ -8,6 +8,8 @@ package org.mule.compatibility.transport.jms.filters;
 
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
+
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.ClassUtils;
@@ -48,7 +50,7 @@ public class JmsPropertyFilter implements Filter {
   private Pattern pattern = null;
 
   @Override
-  public boolean accept(MuleMessage message) {
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     if (StringUtils.isBlank(propertyName)) {
       logger.warn("No property name was specified");
       return false;

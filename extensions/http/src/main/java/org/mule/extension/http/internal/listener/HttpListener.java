@@ -228,14 +228,15 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                       .setStatusCode(statusCodeFromException)
                       .setReasonPhrase(messagingException.getMessage());
                   addThrottlingHeaders(failureResponseBuilder);
-                  MuleEvent event = messagingException.getEvent();
-                  event.setMessage(org.mule.runtime.core.api.MuleMessage.builder(event.getMessage())
-                      .payload(messagingException.getMessage()).build());
+                  MuleEvent exceptionEvent = MuleEvent
+                      .builder(messagingException.getEvent()).message(org.mule.runtime.core.api.MuleMessage
+                          .builder(messagingException.getEvent().getMessage()).payload(messagingException.getMessage()).build())
+                      .build();
 
                   HttpResponse response;
                   try {
-                    response = muleEventToHttpResponse.create(messagingException.getEvent(), failureResponseBuilder,
-                                                              errorResponseBuilder, supportStreaming);
+                    response = muleEventToHttpResponse.create(exceptionEvent, failureResponseBuilder, errorResponseBuilder,
+                                                              supportStreaming);
                   } catch (MessagingException e) {
                     response = new DefaultHttpResponse(new ResponseStatus(500, "Server error"), new MultiValueMap(),
                                                        new EmptyHttpEntity());

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
-import org.mule.compatibility.transport.file.FileConnector;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
@@ -23,7 +23,7 @@ public class FileRecursiveFileFilterTestCase extends AbstractFileRecursiveFilter
   public static class TxtFileFilter implements Filter, FileFilter {
 
     @Override
-    public boolean accept(MuleMessage message) {
+    public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
       String filename = message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
       return acceptsFile(filename);
     }

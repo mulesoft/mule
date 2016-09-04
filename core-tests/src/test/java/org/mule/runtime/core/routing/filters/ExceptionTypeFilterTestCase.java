@@ -15,17 +15,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import org.junit.Test;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import java.io.IOException;
+
+import org.junit.Test;
 
 public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
 
@@ -34,15 +32,15 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
     ExceptionTypeFilter filter = new ExceptionTypeFilter();
     assertThat(filter.getExpectedType(), nullValue());
     MuleMessage m = MuleMessage.builder().payload("test").build();
-    assertThat(filter.accept(m), is(false));
+    assertThat(filter.accept(m, mock(MuleEvent.Builder.class)), is(false));
 
     m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
-    assertThat(filter.accept(m), is(true));
+    assertThat(filter.accept(m, mock(MuleEvent.Builder.class)), is(true));
 
     filter = new ExceptionTypeFilter(IOException.class);
-    assertThat(filter.accept(m), is(false));
+    assertThat(filter.accept(m, mock(MuleEvent.Builder.class)), is(false));
     m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
-    assertThat(filter.accept(m), is(true));
+    assertThat(filter.accept(m, mock(MuleEvent.Builder.class)), is(true));
   }
 
   @Test
@@ -51,22 +49,22 @@ public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase {
     ExceptionTypeFilter filter = new ExceptionTypeFilter();
     assertThat(filter.getExpectedType(), nullValue());
     MuleMessage m = MuleMessage.builder().payload("test").build();
-    assertThat(filter.accept(m), is(false));
+    assertThat(filter.accept(m, mock(MuleEvent.Builder.class)), is(false));
 
     Exception exception = new IllegalArgumentException("test");
     Error mockError = createErrorMock(exception);
     when(event.getError()).thenReturn(of(mockError));
     m = MuleMessage.builder(m).build();
-    assertThat(filter.accept(event), is(true));
+    assertThat(filter.accept(event, mock(MuleEvent.Builder.class)), is(true));
 
     when(event.getMessage()).thenReturn(m);
     when(event.getError()).thenReturn(empty());
     filter = new ExceptionTypeFilter(IOException.class);
-    assertThat(filter.accept(event), is(false));
+    assertThat(filter.accept(event, mock(MuleEvent.Builder.class)), is(false));
     exception = new IOException("test");
     mockError = createErrorMock(exception);
     when(event.getError()).thenReturn(of(mockError));
-    assertThat(filter.accept(event), is(true));
+    assertThat(filter.accept(event, mock(MuleEvent.Builder.class)), is(true));
   }
 
 }

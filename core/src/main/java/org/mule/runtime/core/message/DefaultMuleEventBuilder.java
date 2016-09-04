@@ -185,7 +185,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   protected boolean resolveEventSynchronicity() {
     return transacted
         || isFlowConstructSynchronous()
-        || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy();
+        || exchangePattern != null && exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy();
   }
 
   private boolean isFlowConstructSynchronous() {

@@ -98,15 +98,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher {
       logger.debug("Is socket closed? " + (socket != null && socket.isClosed()));
     }
     try {
-      Object payload = event.getMessage().getPayload();// getTransformedMessage();
-      // following line was added set the payload in the threadlocal
-      // so that a protocol class can use the thread local and pick the
-      // transformed
-      // message.
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
-      // OptimizedRequestContext.unsafeRewriteEvent(new DefaultMuleMessage(
-      // payload));
-      write(payload);
+      write(event.getMessage().getPayload());
       return;
     } catch (IOException ioEx) {
       closeSocket();

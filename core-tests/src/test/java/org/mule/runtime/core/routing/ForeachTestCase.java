@@ -49,11 +49,14 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     List<MessageProcessor> lmp = new ArrayList<>();
     lmp.add(event -> {
       String payload = event.getMessage().getPayload().toString();
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload + ":foo").build());
-      processedEvents.add(event);
+      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(payload + ":foo").build()).build();
       return event;
     });
     lmp.add(new TestMessageProcessor("zas"));
+    lmp.add(event -> {
+      processedEvents.add(event);
+      return event;
+    });
     return lmp;
   }
 

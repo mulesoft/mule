@@ -7,6 +7,7 @@
 package org.mule.test.integration.filter;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -29,28 +30,34 @@ public class LifecycleTrackerFilter implements Filter, Lifecycle, MuleContextAwa
     tracker.add("setProperty");
   }
 
+  @Override
   public void setMuleContext(final MuleContext context) {
     tracker.add("setMuleContext");
   }
 
 
+  @Override
   public void initialise() throws InitialisationException {
     tracker.add("initialise");
   }
 
+  @Override
   public void start() throws MuleException {
     tracker.add("start");
   }
 
+  @Override
   public void stop() throws MuleException {
     tracker.add("stop");
   }
 
+  @Override
   public void dispose() {
     tracker.add("dispose");
   }
 
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     // TODO Auto-generated method stub
     return false;
   }

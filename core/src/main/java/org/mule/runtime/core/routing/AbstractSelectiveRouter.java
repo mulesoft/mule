@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -161,14 +162,15 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    Collection<MessageProcessor> selectedProcessors = selectProcessors(event);
+    Builder builder = MuleEvent.builder(event);
+    Collection<MessageProcessor> selectedProcessors = selectProcessors(event, builder);
 
     if (!selectedProcessors.isEmpty()) {
-      return routeWithProcessors(selectedProcessors, event);
+      return routeWithProcessors(selectedProcessors, builder.build());
     }
 
     if (defaultProcessor != null) {
-      return routeWithProcessor(defaultProcessor, event);
+      return routeWithProcessor(defaultProcessor, builder.build());
     }
 
     if (getRouterStatistics() != null && getRouterStatistics().isEnabled()) {
@@ -183,7 +185,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   /**
    * @return the processors selected according to the specific router strategy or an empty collection (not null).
    */
-  protected abstract Collection<MessageProcessor> selectProcessors(MuleEvent event);
+  protected abstract Collection<MessageProcessor> selectProcessors(MuleEvent event, MuleEvent.Builder builder);
 
   private Collection<?> getLifecycleManagedObjects() {
     if (defaultProcessor == null) {

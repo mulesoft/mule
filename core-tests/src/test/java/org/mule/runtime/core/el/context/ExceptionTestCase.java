@@ -39,14 +39,14 @@ public class ExceptionTestCase extends AbstractELTestCase {
     MuleEvent event = createEvent();
     RuntimeException rte = new RuntimeException();
     when(mockError.getException()).thenReturn(rte);
-    event.setMessage(MuleMessage.builder(event.getMessage()).build());
+    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).build()).build();
     assertEquals(rte, evaluate("exception", event));
   }
 
   @Test
   public void assignException() throws Exception {
     MuleEvent event = createEvent();
-    event.setMessage(MuleMessage.builder(event.getMessage()).build());
+    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).build()).build();
     RuntimeException runtimeException = new RuntimeException();
     when(mockError.getException()).thenReturn(runtimeException);
     assertImmutableVariable("exception='other'", event);

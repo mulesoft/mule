@@ -8,7 +8,6 @@ package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.component.Component;
@@ -74,13 +73,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
     if (copyOnVoidEvent
         && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
             || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent()))) {
-      /*
-       * TODO MULE-9342 migrating this to the builder breaks the following tests:
-       * 
-       * org.mule.test.routing.ForeachUntilSuccessfulTestCase.flowVariablesAsyncArePropagated()
-       * org.mule.test.construct.FlowSyncAsyncProcessingStrategyTestCase
-       */
-      MuleEvent copy = new DefaultMuleEvent(event.getMessage(), event);
+      MuleEvent copy = MuleEvent.builder(event).build();
       MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
 
       if (isUseEventCopy(result)) {

@@ -6,6 +6,7 @@
  */
 package org.mule.compatibility.transport.http.components;
 
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -33,6 +34,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -45,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -92,6 +95,8 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
       return null;
     }).when(mockEvent).setMessage(any(MuleMessage.class));
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
+    when(mockEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(mockEvent.getError()).thenReturn(empty());
     final Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
     MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);

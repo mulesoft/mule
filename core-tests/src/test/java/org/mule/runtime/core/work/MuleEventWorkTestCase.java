@@ -12,7 +12,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -35,10 +35,10 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
     super.doSetUp();
     // Create a dummy event and give it some properties
     originalEvent = getTestEvent("test");
-    originalEvent.setMessage(MuleMessage.builder(originalEvent.getMessage())
+    originalEvent = MuleEvent.builder(originalEvent).message(MuleMessage.builder(originalEvent.getMessage())
         .addOutboundProperty("test", "val")
         .addOutboundProperty("test2", "val2")
-        .build());
+        .build()).build();
     setCurrentEvent(originalEvent);
   }
 

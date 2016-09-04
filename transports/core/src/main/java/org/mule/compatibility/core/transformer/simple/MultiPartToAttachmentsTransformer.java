@@ -52,10 +52,9 @@ public class MultiPartToAttachmentsTransformer extends AbstractMessageTransforme
                                                                           muleMessage.getDataType().getMediaType()));
       }
 
-      event.setMessage(builder.build());
+      return builder.build();
     } catch (Exception e) {
       throw new TransformerException(this, e);
     }
-    return event.getMessage();
   }
 }

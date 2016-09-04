@@ -6,12 +6,14 @@
  */
 package org.mule.test.integration.streaming;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 public class ExceptionThrowingFilter implements Filter {
 
-  public boolean accept(MuleMessage message) {
+  @Override
+  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
     throw new RuntimeException();
   }
 

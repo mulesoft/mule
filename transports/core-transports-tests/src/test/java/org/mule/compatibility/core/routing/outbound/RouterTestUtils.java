@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 
 import org.mockito.invocation.InvocationOnMock;
@@ -30,11 +31,11 @@ public class RouterTestUtils {
     when(endpoint.getExchangePattern()).thenReturn(toMock.getExchangePattern());
     when(endpoint.getProperties()).thenReturn(toMock.getProperties());
     when(endpoint.getFilter()).thenReturn(toMock.getFilter());
-    when(endpoint.filterAccepts(any(MuleMessage.class))).thenAnswer(new Answer<Boolean>() {
+    when(endpoint.filterAccepts(any(MuleMessage.class), any(MuleEvent.Builder.class))).thenAnswer(new Answer<Boolean>() {
 
       @Override
       public Boolean answer(InvocationOnMock invocation) throws Throwable {
-        return toMock.filterAccepts((MuleMessage) invocation.getArguments()[0]);
+        return toMock.filterAccepts((MuleMessage) invocation.getArguments()[0], mock(MuleEvent.Builder.class));
       }
     });
     when(endpoint.getName()).thenReturn(toMock.getName());

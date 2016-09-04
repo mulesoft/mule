@@ -36,37 +36,4 @@ public class HttpBasicAuthenticationFilter extends org.mule.runtime.module.http.
     this.setRealm(realm);
   }
 
-  /**
-   * Authenticates the current message if authenticate is set to true. This method will always populate the secure context in the
-   * session
-   *
-   * @param event the current event being dispatched
-   * @throws org.mule.api.security.SecurityException if authentication fails
-   */
-  public void authenticateOutbound(MuleEvent event) throws SecurityException, SecurityProviderNotFoundException {
-    SecurityContext securityContext = event.getSession().getSecurityContext();
-    if (securityContext == null) {
-      if (isAuthenticate()) {
-        throw new UnauthorisedException(event, securityContext, this);
-      } else {
-        return;
-      }
-    }
-
-    Authentication auth = securityContext.getAuthentication();
-    if (isAuthenticate()) {
-      auth = getSecurityManager().authenticate(auth);
-      if (logger.isDebugEnabled()) {
-        logger.debug("Authentication success: " + auth.toString());
-      }
-    }
-
-    StringBuilder header = new StringBuilder(128);
-    header.append("Basic ");
-    String token = auth.getCredentials().toString();
-    header.append(new String(Base64.encodeBase64(token.getBytes())));
-
-    event
-        .setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HEADER_AUTHORIZATION, header.toString()).build());
-  }
 }
