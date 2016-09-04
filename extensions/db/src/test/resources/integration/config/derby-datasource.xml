@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <dbn:config name="dbConfig">
-        <dbn:derby-connection url="jdbc:derby:muleEmbeddedDB;create=true">
-            <dbn:custom-data-types>
+    <db:config name="dbConfig">
+        <db:derby-connection url="jdbc:derby:muleEmbeddedDB;create=true">
+            <db:custom-data-types>
                 <!-- Derby uses JAVA_OBJECT for UDT-->
-                <dbn:custom-data-type typeName="CONTACT_DETAILS" id="2000"/>
-            </dbn:custom-data-types>
-        </dbn:derby-connection>
-    </dbn:config>
+                <db:custom-data-type typeName="CONTACT_DETAILS" id="2000"/>
+            </db:custom-data-types>
+        </db:derby-connection>
+    </db:config>
 </mule>

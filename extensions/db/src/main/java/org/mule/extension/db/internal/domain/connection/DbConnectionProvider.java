@@ -165,8 +165,7 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
       dataSource = createDataSource();
     }
 
-    dataSource = dataSourceFactory.decorateDataSource(dataSource, connectionParameters.getDataSourceConfig().getPoolingProfile(),
-                                                      muleContext);
+    dataSource = dataSourceFactory.decorateDataSource(dataSource, connectionParameters.getDataSourceConfig().getPoolingProfile());
 
     return dataSource;
   }

@@ -7,6 +7,7 @@
 package org.mule.extension.db.api.config;
 
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.runtime.api.config.DatabasePoolingProfile;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @since 4.0
  */
 @Alias("pooling-profile")
-public class DbPoolingProfile {
+public class DbPoolingProfile implements DatabasePoolingProfile {
 
   /**
    * Maximum number of connections a pool maintains at any given time
@@ -74,26 +75,32 @@ public class DbPoolingProfile {
   private TimeUnit maxWaitUnit;
 
 
+  @Override
   public int getMaxPoolSize() {
     return maxPoolSize;
   }
 
+  @Override
   public int getMinPoolSize() {
     return minPoolSize;
   }
 
+  @Override
   public int getAcquireIncrement() {
     return acquireIncrement;
   }
 
+  @Override
   public int getPreparedStatementCacheSize() {
     return preparedStatementCacheSize;
   }
 
+  @Override
   public int getMaxWait() {
     return maxWait;
   }
 
+  @Override
   public TimeUnit getMaxWaitUnit() {
     return maxWaitUnit;
   }

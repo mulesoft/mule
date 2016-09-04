@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="deleteDynamic">
-        <dbn:delete>
-            <dbn:sql>DELETE FROM PLANET WHERE name = '#[payload]'</dbn:sql>
-        </dbn:delete>
+        <db:delete>
+            <db:sql>DELETE FROM PLANET WHERE name = '#[payload]'</db:sql>
+        </db:delete>
     </flow>
 
     <flow name="deleteParameterized">
-        <dbn:delete>
-            <dbn:sql>DELETE FROM PLANET WHERE name = :name</dbn:sql>
-            <dbn:input-parameters>
-                <dbn:input-parameter key="name" value="#[payload]"/>
-            </dbn:input-parameters>
-        </dbn:delete>
+        <db:delete>
+            <db:sql>DELETE FROM PLANET WHERE name = :name</db:sql>
+            <db:input-parameters>
+                <db:input-parameter key="name" value="#[payload]"/>
+            </db:input-parameters>
+        </db:delete>
     </flow>
 </mule>

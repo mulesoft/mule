@@ -136,7 +136,6 @@
                 <include>org.mule.modules:mule-module-container</include>
                 <include>org.mule.modules:mule-module-builders</include>
                 <include>org.mule.modules:mule-module-cxf</include>
-                <include>org.mule.modules:mule-module-db</include>
                 <include>org.mule.modules:mule-module-extensions-support</include>
                 <include>org.mule.modules:mule-module-extensions-spring-support</include>
                 <include>org.mule.modules:mule-module-file-extension-common</include>
@@ -200,7 +199,6 @@
                 <exclude>org.mule.modules:mule-module-artifact</exclude>
                 <exclude>org.mule.modules:mule-module-builders</exclude>
                 <exclude>org.mule.modules:mule-module-cxf</exclude>
-                <exclude>org.mule.modules:mule-module-db</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-support</exclude>
                 <exclude>org.mule.modules:mule-module-extensions-spring-support</exclude>
                 <exclude>org.mule.modules:mule-module-file-extension-common</exclude>

@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="inOutParameter">
-        <dbn:stored-procedure>
-            <dbn:sql>{ call doubleMyInt(:myInt) }</dbn:sql>
-            <dbn:in-out-parameters>
-                <dbn:in-out-parameter key="myInt" value="3"/>
-            </dbn:in-out-parameters>
-        </dbn:stored-procedure>
+        <db:stored-procedure>
+            <db:sql>{ call doubleMyInt(:myInt) }</db:sql>
+            <db:in-out-parameters>
+                <db:in-out-parameter key="myInt" value="3"/>
+            </db:in-out-parameters>
+        </db:stored-procedure>
     </flow>
 
     <flow name="outParam">
-        <dbn:stored-procedure>
-            <dbn:sql>{ CALL countTestRecords(:count) }</dbn:sql>
-            <dbn:output-parameters>
-                <dbn:output-parameter key="count"/>
-            </dbn:output-parameters>
-        </dbn:stored-procedure>
+        <db:stored-procedure>
+            <db:sql>{ CALL countTestRecords(:count) }</db:sql>
+            <db:output-parameters>
+                <db:output-parameter key="count"/>
+            </db:output-parameters>
+        </db:stored-procedure>
     </flow>
 
     <flow name="multiplyInts">
-        <dbn:stored-procedure>
-            <dbn:sql>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</dbn:sql>
-            <dbn:input-parameters>
-                <dbn:input-parameter key="int1" value="3"/>
-                <dbn:input-parameter key="int2" value="4"/>
-                <dbn:input-parameter key="int3" value="5"/>
-            </dbn:input-parameters>
-            <dbn:output-parameters>
-                <dbn:output-parameter key="result1"/>
-                <dbn:output-parameter key="result2"/>
-            </dbn:output-parameters>
-        </dbn:stored-procedure>
+        <db:stored-procedure>
+            <db:sql>{ call multiplyInts(:int1, :int2, :result1, :int3, :result2) }</db:sql>
+            <db:input-parameters>
+                <db:input-parameter key="int1" value="3"/>
+                <db:input-parameter key="int2" value="4"/>
+                <db:input-parameter key="int3" value="5"/>
+            </db:input-parameters>
+            <db:output-parameters>
+                <db:output-parameter key="result1"/>
+                <db:output-parameter key="result2"/>
+            </db:output-parameters>
+        </db:stored-procedure>
     </flow>
 
     <flow name="concatenateStrings">
-        <dbn:stored-procedure config-ref="dbConfig">
-            <dbn:sql>{ call concatenateStrings(:s1, :s2, :result) }</dbn:sql>
-            <dbn:input-parameters>
-                <dbn:input-parameter key="s1" value="foo"/>
-                <dbn:input-parameter key="s2" value="bar"/>
-            </dbn:input-parameters>
-            <dbn:output-parameters>
-                <dbn:output-parameter key="result"/>
-            </dbn:output-parameters>
-        </dbn:stored-procedure>
+        <db:stored-procedure config-ref="dbConfig">
+            <db:sql>{ call concatenateStrings(:s1, :s2, :result) }</db:sql>
+            <db:input-parameters>
+                <db:input-parameter key="s1" value="foo"/>
+                <db:input-parameter key="s2" value="bar"/>
+            </db:input-parameters>
+            <db:output-parameters>
+                <db:output-parameter key="result"/>
+            </db:output-parameters>
+        </db:stored-procedure>
     </flow>
 
 </mule>

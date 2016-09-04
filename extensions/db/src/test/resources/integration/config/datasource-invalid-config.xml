@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
 
-    <dbn:config name="invalidDbConfig">
-        <dbn:connection dataSource="#[flowVars.jdbcDataSource]" user="This parameter violates the optional exclusiveness condition"/>
-    </dbn:config>
+    <db:config name="invalidDbConfig">
+        <db:connection dataSource="#[flowVars.jdbcDataSource]" user="This parameter violates the optional exclusiveness condition"/>
+    </db:config>
 
     <flow name="usesBeanDatasourceConfig">
-        <dbn:select config-ref="invalidDbConfig">
-            <dbn:sql>select * from PLANET order by ID</dbn:sql>
-        </dbn:select>
+        <db:select config-ref="invalidDbConfig">
+            <db:sql>select * from PLANET order by ID</db:sql>
+        </db:select>
     </flow>
 
 </mule>

@@ -6,8 +6,8 @@
  */
 package org.mule.extension.db.internal.domain.xa;
 
-import org.mule.extension.db.api.config.DbPoolingProfile;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.api.tx.DataSourceDecorator;
+import org.mule.runtime.api.config.DatabasePoolingProfile;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -26,18 +26,17 @@ public class CompositeDataSourceDecorator implements DataSourceDecorator {
   }
 
   @Override
-  public DataSource decorate(DataSource dataSource, String dataSourceName, DbPoolingProfile dbPoolingProfile,
-                             MuleContext muleContext) {
+  public DataSource decorate(DataSource dataSource, String dataSourceName, DatabasePoolingProfile dbPoolingProfile) {
     for (DataSourceDecorator decorator : decorators) {
-      if (decorator.appliesTo(dataSource, muleContext)) {
-        return decorator.decorate(dataSource, dataSourceName, dbPoolingProfile, muleContext);
+      if (decorator.appliesTo(dataSource)) {
+        return decorator.decorate(dataSource, dataSourceName, dbPoolingProfile);
       }
     }
     return dataSource;
   }
 
   @Override
-  public boolean appliesTo(DataSource dataSource, MuleContext muleContext) {
+  public boolean appliesTo(DataSource dataSource) {
     return true;
   }
 }
