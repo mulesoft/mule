@@ -63,8 +63,7 @@ public class StatefulOperationTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void assertRemainingMoney(String configName, String name, long expectedAmount) throws Exception {
-    MuleEvent event = getTestEvent("");
-    event.setFlowVariable("myName", name);
+    MuleEvent event = MuleEvent.builder(getTestEvent("")).addFlowVariable("myName", name).build();
 
     HeisenbergExtension heisenbergExtension = ExtensionsTestUtils.getConfigurationFromRegistry(configName, event, muleContext);
     assertThat(heisenbergExtension.getMoney(), equalTo(BigDecimal.valueOf(expectedAmount)));

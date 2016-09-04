@@ -19,11 +19,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.runners.Parameterized.Parameter;
-import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
@@ -43,6 +42,8 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestCase {
@@ -116,8 +117,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
   @Test
   public void configWithExpressionFunctionStillDynamic() throws Exception {
     MuleEvent event = getHeisenbergEvent();
-    MuleEvent anotherEvent = getHeisenbergEvent();
-    anotherEvent.setFlowVariable("age", 40);
+    MuleEvent anotherEvent = MuleEvent.builder(getHeisenbergEvent()).addFlowVariable("age", 40).build();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
     assertThat(config, is(not(sameInstance(anotherConfig))));

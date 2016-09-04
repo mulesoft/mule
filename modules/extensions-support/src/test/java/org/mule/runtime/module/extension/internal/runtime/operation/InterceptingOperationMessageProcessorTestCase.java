@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
@@ -61,10 +62,10 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
     org.mule.runtime.core.api.MuleEvent resultEvent = mock(org.mule.runtime.core.api.MuleEvent.class);
     MuleMessage resultMessage = mock(MuleMessage.class);
     when(resultEvent.getMessage()).thenReturn(resultMessage);
-    when(next.process(event)).thenReturn(resultEvent);
+    when(next.process(any())).thenReturn(resultEvent);
 
     assertThat(messageProcessor.process(event), is(sameInstance(resultEvent)));
-    verify(next).process(event);
+    verify(next).process(any());
     verify(interceptingCallback).onSuccess(resultMessage);
     verify(interceptingCallback, never()).onException(any());
     verify(interceptingCallback).onComplete();
@@ -75,7 +76,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
     when(interceptingCallback.shouldProcessNext()).thenReturn(false);
 
     messageProcessor.process(event);
-    verify(next, never()).process(event);
+    verify(next, never()).process(any());
     verify(interceptingCallback, never()).onSuccess(any());
     verify(interceptingCallback, never()).onException(any());
     verify(interceptingCallback).onComplete();
@@ -90,7 +91,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
       messageProcessor.process(event);
       fail("Should have failed");
     } catch (Exception e) {
-      verify(next).process(event);
+      verify(next).process(any());
       verify(interceptingCallback, never()).onSuccess(any());
       verify(interceptingCallback).onException(exception);
       verify(interceptingCallback).onComplete();
@@ -103,7 +104,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
 
     messageProcessor.process(event);
 
-    verify(next, never()).process(event);
+    verify(next, never()).process(any());
     verify(interceptingCallback).onSuccess(any());
     verify(interceptingCallback, never()).onException(any());
     verify(interceptingCallback).onComplete();

@@ -43,9 +43,8 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
    */
   @Override
   public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext) {
-    MuleEvent event = operationContext.getEvent();
-    event.setMessage((org.mule.runtime.core.api.MuleMessage) toMessage(value, operationContext));
-    return event;
+    return MuleEvent.builder(operationContext.getEvent())
+        .message((org.mule.runtime.core.api.MuleMessage) toMessage(value, operationContext)).build();
   }
 
 

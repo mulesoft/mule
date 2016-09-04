@@ -238,15 +238,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   SecurityContext getSecurityContext();
 
   /**
-   * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
-   * this context.
-   * TODO MULE-9281 Make MuleEvent immutable
-   *
-   * @param context the context for this session or null if the request is not secure.
-   */
-  void setSecurityContext(SecurityContext context);
-
-  /**
    * Sets an error related to this event.
    *
    * @param error the error associated with this event

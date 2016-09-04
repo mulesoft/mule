@@ -69,31 +69,31 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase {
   }
 
   protected MuleEvent getHeisenbergEvent() throws Exception {
-    MuleEvent event = getTestEvent("");
-    event.setFlowVariable("lidia", LIDIA);
-
-    event.setFlowVariable("myName", HeisenbergExtension.HEISENBERG);
-    event.setFlowVariable("age", HeisenbergExtension.AGE);
-    event.setFlowVariable("microgramsPerKilo", MICROGRAMS_PER_KILO);
-    event.setFlowVariable("steviaCoffeShop", STEVIA_COFFE_SHOP);
-    event.setFlowVariable("pollosHermanos", POLLOS_HERMANOS);
-    event.setFlowVariable("gustavoFring", GUSTAVO_FRING);
-    event.setFlowVariable("krazy8", KRAZY_8);
-    event.setFlowVariable("jesses", JESSE_S);
-    event.setFlowVariable("methylamine", METHYLAMINE_QUANTITY);
-    event.setFlowVariable("pseudoephedrine", PSEUDOEPHEDRINE_QUANTITY);
-    event.setFlowVariable("p2p", P2P_QUANTITY);
-    event.setFlowVariable("hank", HANK);
-    event.setFlowVariable("money", MONEY);
-    event.setFlowVariable("skyler", SKYLER);
-    event.setFlowVariable("saul", SAUL);
-    event.setFlowVariable("whiteAddress", WHITE_ADDRESS);
-    event.setFlowVariable("shoppingMall", SHOPPING_MALL);
-    event.setFlowVariable("initialHealth", INITIAL_HEALTH);
-    event.setFlowVariable("finalHealth", FINAL_HEALTH);
-    event.setFlowVariable("weaponType", FIRE_WEAPON);
     WEAPON.setMicrogramsPerKilo(10L);
-    event.setFlowVariable("weapon", WEAPON);
+    MuleEvent event = MuleEvent.builder(getTestEvent(""))
+        .addFlowVariable("lidia", LIDIA)
+        .addFlowVariable("myName", HeisenbergExtension.HEISENBERG)
+        .addFlowVariable("age", HeisenbergExtension.AGE)
+        .addFlowVariable("microgramsPerKilo", MICROGRAMS_PER_KILO)
+        .addFlowVariable("steviaCoffeShop", STEVIA_COFFE_SHOP)
+        .addFlowVariable("pollosHermanos", POLLOS_HERMANOS)
+        .addFlowVariable("gustavoFring", GUSTAVO_FRING)
+        .addFlowVariable("krazy8", KRAZY_8)
+        .addFlowVariable("jesses", JESSE_S)
+        .addFlowVariable("methylamine", METHYLAMINE_QUANTITY)
+        .addFlowVariable("pseudoephedrine", PSEUDOEPHEDRINE_QUANTITY)
+        .addFlowVariable("p2p", P2P_QUANTITY)
+        .addFlowVariable("hank", HANK)
+        .addFlowVariable("money", MONEY)
+        .addFlowVariable("skyler", SKYLER)
+        .addFlowVariable("saul", SAUL)
+        .addFlowVariable("whiteAddress", WHITE_ADDRESS)
+        .addFlowVariable("shoppingMall", SHOPPING_MALL)
+        .addFlowVariable("initialHealth", INITIAL_HEALTH)
+        .addFlowVariable("finalHealth", FINAL_HEALTH)
+        .addFlowVariable("weaponType", FIRE_WEAPON)
+        .addFlowVariable("weapon", WEAPON)
+        .build();
 
     return event;
   }

@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHOR
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -95,6 +96,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   }
 
   protected MuleEvent setUnauthenticated(MuleEvent event) {
+    Builder builder = MuleEvent.builder(event);
     String realmHeader = "Basic realm=";
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
@@ -102,11 +104,11 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     Map<String, String> headers = getFlowVariableOrNull(headersFlowVar, event);
     if (headers == null) {
       headers = new HashMap<>();
-      event.setFlowVariable(headersFlowVar, headers);
+      builder.addFlowVariable(headersFlowVar, headers);
     }
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    event.setFlowVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
-    return event;
+    builder.addFlowVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
+    return builder.build();
   }
 
   /**
