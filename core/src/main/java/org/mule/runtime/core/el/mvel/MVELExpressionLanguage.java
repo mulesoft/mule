@@ -80,6 +80,10 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   // default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
+  public MVELExpressionLanguage(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
   @Override
   public void initialise() throws InitialisationException {
     parserConfiguration = createParserConfiguration(imports);

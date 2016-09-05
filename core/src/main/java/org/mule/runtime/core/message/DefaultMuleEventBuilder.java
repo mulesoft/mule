@@ -197,7 +197,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
                                synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
                                nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
                                replyToDestination, replyToHandler, flowCallStack, correlation, error);
-      this.flowVariables.forEach((s, value) -> event.setFlowVariable(s, value.getValue(), value.getDataType()));
+      this.flowVariables.forEach((s, value) -> flowVariables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
       event.setLegacyCorrelationId(legacyCorrelationId);
       return event;
     }

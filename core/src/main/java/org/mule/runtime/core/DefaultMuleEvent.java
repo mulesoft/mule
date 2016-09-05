@@ -391,12 +391,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   @Override
   public void setFlowVariable(String key, Object value) {
-    setFlowVariable(key, value, value != null ? DataType.fromObject(value) : DataType.OBJECT);
-  }
-
-  @Override
-  public void setFlowVariable(String key, Object value, DataType dataType) {
-    flowVariables.put(key, new TypedValue(value, dataType));
+    flowVariables.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
   }
 
   @Override
