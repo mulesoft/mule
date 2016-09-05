@@ -7,9 +7,11 @@
 package org.mule.compatibility.transport.file;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
@@ -200,7 +202,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     return fileMessageReceiver;
   }
 
-  private void configureMocks() throws CreateException {
+  private void configureMocks() throws MuleException {
     when(mockInboundEndpoint.getConnector()).thenReturn(mockFileConnector);
     when(mockInboundEndpoint.getMuleContext()).thenReturn(mockMuleContext);
     when(mockInboundEndpoint.getFilter()).thenReturn(null);
@@ -213,10 +215,13 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockFlowConstruct.getExceptionListener()).thenReturn(mockMessagingExceptionHandler);
     when(mockHandledMessagingException.causedRollback()).thenReturn(false);
     when(mockUnhandledMessagingException.causedRollback()).thenReturn(true);
+    MuleEvent mockMessageProcessorResponseEvent = mock(MuleEvent.class);
+    when(mockMessageProcessorResponseEvent.getError()).thenReturn(empty());
+    when(mockMessageProcessor.process(any())).thenReturn(mockMessageProcessorResponseEvent);
     when(mockMessagingExceptionHandler.handleException(any(MessagingException.class), any(MuleEvent.class)))
         .thenAnswer(invocationOnMock -> {
           if (invocationOnMock.getArguments()[0] == mockHandledMessagingException) {
-            return mockMuleEvent;
+            return this.mockMuleEvent;
           } else {
             throw (Throwable) invocationOnMock.getArguments()[0];
           }
