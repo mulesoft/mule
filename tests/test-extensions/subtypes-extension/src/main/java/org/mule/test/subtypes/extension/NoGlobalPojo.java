@@ -7,9 +7,9 @@
 package org.mule.test.subtypes.extension;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.dsl.xml.NoGlobalDeclaration;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
-@NoGlobalDeclaration
+@XmlHints(allowTopLevelDefinition = false)
 public class NoGlobalPojo {
 
   @Parameter

@@ -11,13 +11,13 @@ import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.supportsTopLevelDeclaration;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isInstantiable;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.utils.JavaTypeUtils;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.annotation.NotGlobalTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
@@ -58,7 +58,8 @@ public final class SubtypesModelValidator implements ModelValidator {
   private void validateSubtypesSupportGlobalDeclaration(ExtensionModel model,
                                                         Map<MetadataType, List<MetadataType>> typesMapping) {
     List<MetadataType> nonGlobalTypes = typesMapping.values().stream().flatMap(Collection::stream)
-        .filter(s -> s.getAnnotation(NotGlobalTypeAnnotation.class).isPresent()).collect(toList());
+        .filter(type -> !supportsTopLevelDeclaration(type))
+        .collect(toList());
 
     if (!nonGlobalTypes.isEmpty()) {
       throw new IllegalModelDefinitionException(format("All the declared SubtypesMapping in extension %s must support to be declared"

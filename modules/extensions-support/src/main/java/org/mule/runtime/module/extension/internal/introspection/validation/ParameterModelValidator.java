@@ -13,6 +13,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;
 import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.supportsTopLevelDeclaration;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
@@ -27,7 +28,6 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.annotation.NotGlobalTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.XmlHintsAnnotation;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -177,7 +177,7 @@ public final class ParameterModelValidator implements ModelValidator {
   }
 
   private boolean supportsGlobalReferences(MetadataType type) {
-    return !type.getAnnotation(NotGlobalTypeAnnotation.class).isPresent() && MetadataTypeUtils.isInstantiable(type);
+    return supportsTopLevelDeclaration(type) && MetadataTypeUtils.isInstantiable(type);
   }
 
   private boolean supportsGlobalReferences(ObjectFieldType field) {
