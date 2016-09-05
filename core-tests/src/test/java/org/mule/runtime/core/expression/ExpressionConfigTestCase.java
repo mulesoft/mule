@@ -21,7 +21,7 @@ public class ExpressionConfigTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setup() throws InitialisationException {
-    expressionLanguage = new MVELExpressionLanguage();
+    expressionLanguage = new MVELExpressionLanguage(muleContext);
   }
 
   @Test
