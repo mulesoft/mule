@@ -193,11 +193,10 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
       return originalEvent;
     } else {
       DefaultMuleEvent event =
-          new DefaultMuleEvent(context, message, exchangePattern, flow, session, transacted,
+          new DefaultMuleEvent(context, message, flowVariables, exchangePattern, flow, session, transacted,
                                synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
                                nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
                                replyToDestination, replyToHandler, flowCallStack, correlation, error);
-      this.flowVariables.forEach((s, value) -> flowVariables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
       event.setLegacyCorrelationId(legacyCorrelationId);
       return event;
     }

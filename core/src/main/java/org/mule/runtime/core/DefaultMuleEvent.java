@@ -95,7 +95,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   private Error error;
 
   // Use this constructor from the builder
-  public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, Map<String, TypedValue<Object>> flowVariables,
+                          MessageExchangePattern exchangePattern,
                           FlowConstruct flowConstruct, MuleSession session, boolean transacted, boolean synchronous,
                           boolean nonBlocking, Object replyToDestination, ReplyToHandler replyToHandler,
                           FlowCallStack flowCallStack, Correlation correlation, Error error) {
@@ -105,7 +106,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.id = "" + System.identityHashCode(this);
     this.flowConstruct = flowConstruct;
     this.session = session;
-    setMessage(message);
+    this.message = message;
+    flowVariables.forEach((s, value) -> this.flowVariables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
 
     this.exchangePattern = exchangePattern;
     this.replyToHandler = replyToHandler;
