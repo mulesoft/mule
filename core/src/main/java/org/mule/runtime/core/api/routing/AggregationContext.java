@@ -7,6 +7,11 @@
 
 package org.mule.runtime.core.api.routing;
 
+import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.util.Preconditions;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.NavigableMap;
@@ -14,11 +19,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-
-import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.util.Preconditions;
 
 /**
  * Immutable object used to provide all the necessary information to perform an aggregation operation in one single parameter,

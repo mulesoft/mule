@@ -35,7 +35,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.Matcher;
