@@ -70,6 +70,7 @@ import org.mule.runtime.extension.api.introspection.property.SubTypesModelProper
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
@@ -522,13 +523,15 @@ public final class SchemaBuilder {
     final DslElementSyntax paramDsl = dslResolver.resolve(parameterModel);
     return getParameterDeclarationVisitor(extensionType, all, parameterModel.getName(), parameterModel.getDescription(),
                                           parameterModel.getExpressionSupport(), parameterModel.isRequired(),
-                                          parameterModel.getDefaultValue(), paramDsl);
+                                          parameterModel.getDefaultValue(), paramDsl,
+                                          parameterModel.getModelProperty(XmlHintsModelProperty.class));
   }
 
   private MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
                                                              final String name, final String description,
                                                              ExpressionSupport expressionSupport, boolean required,
-                                                             Object defaultValue, DslElementSyntax paramDsl) {
+                                                             Object defaultValue, DslElementSyntax paramDsl,
+                                                             Optional<XmlHintsModelProperty> paramXmlHints) {
     return new MetadataTypeVisitor() {
 
       private boolean forceOptional = paramDsl.supportsChildDeclaration() || !required;
@@ -564,7 +567,7 @@ public final class SchemaBuilder {
         }
 
         defaultVisit(objectType);
-        objectTypeDelegate.generatePojoElement(objectType, paramDsl, name, description, all);
+        objectTypeDelegate.generatePojoElement(objectType, paramDsl, paramXmlHints, description, all);
       }
 
       @Override

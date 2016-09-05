@@ -12,9 +12,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.config.dsl.ExtensionXmlNamespaceInfo.EXTENSION_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -28,6 +26,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
@@ -57,7 +56,6 @@ import org.mule.runtime.module.extension.internal.config.dsl.operation.Operation
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
-import org.mule.runtime.extension.api.IdempotentExtensionWalker;
 import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
 
 import java.util.LinkedList;
@@ -237,7 +235,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (isInstantiable(objectType)) {
+        if (elementDsl.supportsTopLevelDeclaration()) {
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
                                                   parsingContext, muleContext));
         }

@@ -18,6 +18,7 @@ import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
+import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.CollectionValueResolver;
@@ -25,7 +26,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResol
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
@@ -199,6 +199,6 @@ public abstract class AbstractExtensionObjectFactory<T> implements ObjectFactory
   }
 
   private Set<String> getOffendingParameterNames(Multimap<Class<?>, Field> parametersFromGroup) {
-    return parametersFromGroup.values().stream().map(IntrospectionUtils::getAliasName).collect(toSet());
+    return parametersFromGroup.values().stream().map(NameUtils::getAliasName).collect(toSet());
   }
 }

@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.metadata.api.annotation.EnumAnnotation;
+import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
-import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
@@ -18,6 +20,7 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.ExtensibleTypeAnnotation;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 import com.google.common.collect.ImmutableList;
@@ -50,8 +53,9 @@ public final class MetadataTypeUtils {
    * @param metadataType the {@link MetadataType} to inspect to retrieve its type Alias
    * @return the {@code Alias} name of the {@link MetadataType}
    */
-  public static String getAliasName(MetadataType metadataType) {
-    return IntrospectionUtils.getAliasName(getType(metadataType));
+  public static String getAlias(MetadataType metadataType) {
+    return metadataType.getAnnotation(TypeAliasAnnotation.class).map(TypeAliasAnnotation::getValue)
+        .orElse(metadataType.getMetadataFormat().equals(JAVA) ? getAliasName(getType(metadataType)) : "");
   }
 
   /**
@@ -59,9 +63,11 @@ public final class MetadataTypeUtils {
    * @param defaultName default name to use if {@code metadataType} alias is not defined
    * @return the {@code Alias} name of the {@link MetadataType} or the {@code defaultName} if alias was not specified
    */
-  public static String getAliasName(MetadataType metadataType, String defaultName) {
-    Class<?> type = getType(metadataType);
-    return IntrospectionUtils.getAliasName(defaultName, type.getAnnotation(Alias.class));
+  public static String getAlias(MetadataType metadataType, String defaultName) {
+    return metadataType.getAnnotation(TypeAliasAnnotation.class).map(TypeAliasAnnotation::getValue)
+        .orElse(metadataType.getMetadataFormat().equals(JAVA)
+            ? getAliasName(defaultName, getType(metadataType).getAnnotation(Alias.class))
+            : defaultName);
   }
 
   /**
@@ -106,8 +112,7 @@ public final class MetadataTypeUtils {
 
   public static boolean isInstantiable(MetadataType metadataType) {
     return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable)
-        .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA)
-            && IntrospectionUtils.isInstantiable(getType(metadataType)));
+        .orElse(metadataType.getMetadataFormat().equals(JAVA) && IntrospectionUtils.isInstantiable(getType(metadataType)));
   }
 
   public static boolean hasExposedFields(MetadataType metadataType) {
@@ -116,13 +121,12 @@ public final class MetadataTypeUtils {
 
   public static boolean isFinal(MetadataType metadataType) {
     return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isFinal)
-        .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA)
-            && Modifier.isFinal(getType(metadataType).getModifiers()));
+        .orElse(metadataType.getMetadataFormat().equals(JAVA) && Modifier.isFinal(getType(metadataType).getModifiers()));
   }
 
   public static String getId(MetadataType metadataType) {
     return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
-        .orElse(metadataType.getMetadataFormat().equals(MetadataFormat.JAVA) ? getType(metadataType).getName() : "");
+        .orElse(metadataType.getMetadataFormat().equals(JAVA) ? getType(metadataType).getName() : "");
   }
 
   public static boolean isExtensible(MetadataType metadataType) {
@@ -132,4 +136,5 @@ public final class MetadataTypeUtils {
   public static boolean isEnum(MetadataType metadataType) {
     return metadataType.getAnnotation(EnumAnnotation.class).isPresent();
   }
+
 }

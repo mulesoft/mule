@@ -10,7 +10,8 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import org.mule.metadata.api.model.ObjectType;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.hasExposedFields;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isInstantiable;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -132,7 +133,7 @@ public final class NameClashModelValidator implements ModelValidator {
     }
 
     private void validateTopLevelParameter(ParameterModel parameter, ParameterizedModel owner) {
-      if (!(parameter.getType() instanceof ObjectType)) {
+      if (!isInstantiable(parameter.getType()) || !hasExposedFields(parameter.getType())) {
         return;
       }
 
@@ -143,12 +144,9 @@ public final class NameClashModelValidator implements ModelValidator {
       Collection<TopLevelParameter> foundParameters = topLevelParameters.get(parameter.getName());
       if (CollectionUtils.isEmpty(foundParameters)) {
         Optional<XmlHintsModelProperty> hints = parameter.getModelProperty(XmlHintsModelProperty.class);
-        boolean allowsInlineDefinition = true;
-        if (hints.isPresent() && !hints.get().allowsInlineDefinition()) {
-          allowsInlineDefinition = false;
-        }
+        boolean allowsInline = hints.map(XmlHintsModelProperty::allowsInlineDefinition).orElse(true);
 
-        if (allowsInlineDefinition) {
+        if (allowsInline) {
           topLevelParameters.put(parameter.getName(), new TopLevelParameter(parameter, ownerName, ownerType));
         }
       } else {
@@ -157,7 +155,7 @@ public final class NameClashModelValidator implements ModelValidator {
 
         if (repeated.isPresent()) {
           TopLevelParameter tp = repeated.get();
-          throw new IllegalModelDefinitionException(format("Extension '%s' defines a %s of name '%s' which contains parameter '%s' of complex type '%s'. However, "
+          throw new IllegalModelDefinitionException(format("Extension '%s' defines an %s of name '%s' which contains parameter '%s' of complex type '%s'. However, "
               + "%s of name '%s' defines a parameter of the same name but type '%s'. Complex parameter of different types cannot have the same name.",
                                                            extensionModel.getName(),
                                                            ownerType, ownerName,

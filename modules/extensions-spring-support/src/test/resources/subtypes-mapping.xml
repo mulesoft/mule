@@ -122,6 +122,7 @@
             <subtypes:triangle>
                 <subtypes:triangle-alias height="4" area="2"/>
             </subtypes:triangle>
+            <subtypes:no-ref number="1" string="noRef"/>
         </subtypes:subtyped-and-concrete-parameters>
     </flow>
 
@@ -153,6 +154,11 @@
         </subtypes:subtypes-source>
         <set-payload value="100"/>
     </flow>
-    
+
+    <flow name="duplicatedOperationParameterAndTypeNames">
+        <subtypes:no-global-pojo noGlobalPojo="#[new org.mule.test.subtypes.extension.NoGlobalPojo()]"/>
+    </flow>
+
+
     <subtypes:revolver name="sledgeHammer's" bullets="1" />
 </mule>
