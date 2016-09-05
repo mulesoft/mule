@@ -16,11 +16,13 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -49,22 +51,12 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   }
 
   protected MVELExpressionLanguage expressionLanguage;
-  protected MuleContext muleContext;
 
   @SuppressWarnings("unchecked")
   @Before
   public void setup() throws Exception {
     expressionLanguage = new MVELExpressionLanguage(muleContext);
-    muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    MuleRegistry muleRegistry = mock(MuleRegistry.class);
-    when(muleContext.getConfiguration()).thenReturn(new DefaultMuleConfiguration());
-    when(muleContext.getRegistry()).thenReturn(muleRegistry);
-    ExpressionLanguage expressionLanguage = getExpressionLanguage();
-    if (expressionLanguage instanceof Initialisable) {
-      ((Initialisable) expressionLanguage).initialise();
-    }
-    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
-    when(muleRegistry.lookupObjectsForLifecycle(Mockito.any(Class.class))).thenReturn(Collections.<Object>emptyList());
+    muleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
   }
 
   @Test
