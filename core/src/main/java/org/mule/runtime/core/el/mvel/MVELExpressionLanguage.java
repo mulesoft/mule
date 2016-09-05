@@ -42,6 +42,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
@@ -233,17 +234,35 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
   @Override
   public void validate(String expression) throws InvalidExpressionException {
-    if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
-      if (!expression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
-        throw new InvalidExpressionException(expression, "Expression string is not an expression");
+    if (!muleContext.getConfiguration().isValidateExpressions()) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("Validate expressions is turned off, no checking done for: " + expression);
       }
-      expression = expression.substring(2, expression.length() - 1);
+      return;
+    }
+    try {
+      parser.validate(expression);
+    } catch (IllegalArgumentException e) {
+      throw new InvalidExpressionException(expression, e.getMessage());
     }
 
-    try {
-      expressionExecutor.validate(expression);
-    } catch (CompileException e) {
-      throw new InvalidExpressionException(expression, e.getMessage());
+    final AtomicBoolean valid = new AtomicBoolean(true);
+    final StringBuilder message = new StringBuilder();
+    parser.parse(token -> {
+      if (valid.get()) {
+        try {
+          expressionExecutor.validate(token);
+        } catch (InvalidExpressionException e) {
+          valid.compareAndSet(true, false);
+          message.append(token).append(" is invalid\n");
+          message.append(e.getMessage());
+        }
+      }
+      return null;
+    }, expression);
+
+    if (message.length() > 0) {
+      throw new InvalidExpressionException(expression, message.toString());
     }
   }
 
