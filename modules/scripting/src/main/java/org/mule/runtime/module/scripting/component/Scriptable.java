@@ -233,7 +233,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
   }
 
   private void populateHeadersVariablesAndException(Bindings bindings, MuleEvent event) {
-    bindings.put(BINDING_FLOW_VARS, new FlowVariableMapContext(event));
+    bindings.put(BINDING_FLOW_VARS, new FlowVariableMapContext(event, MuleEvent.builder(event)));
     bindings.put(BINDING_SESSION_VARS, new SessionVariableMapContext(event.getSession()));
 
     // Only add exception is present
