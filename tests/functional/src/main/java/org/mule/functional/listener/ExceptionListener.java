@@ -7,6 +7,8 @@
 package org.mule.functional.listener;
 
 import static java.lang.String.format;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Listener for exception thrown by a message source or flow.
@@ -28,6 +31,7 @@ public class ExceptionListener {
   private CountDownLatch exceptionThrownLatch = new Latch();
   private int timeout = 10000;
   private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
+  private AtomicInteger numberOfInvocations = new AtomicInteger();
 
   /**
    * Constructor for creating a listener for any exception thrown within a flow or message source.
@@ -95,5 +99,12 @@ public class ExceptionListener {
   public ExceptionListener setTimeoutInMillis(int timeout) {
     this.timeout = timeout;
     return this;
+  }
+
+  /**
+   * Asserts that the exception handler was not invoked.
+   */
+  public void assertNotInvoked() {
+    assertThat(this.numberOfInvocations.get(), is(0));
   }
 }

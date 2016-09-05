@@ -67,11 +67,11 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
       defaultConfig.setDefaultResponseTimeout(config.getDefaultResponseTimeout());
       defaultConfig.setDefaultTransactionTimeout(config.getDefaultTransactionTimeout());
       defaultConfig.setShutdownTimeout(config.getShutdownTimeout());
-      defaultConfig.setDefaultExceptionStrategyName(config.getDefaultExceptionStrategyName());
+      defaultConfig.setDefaultErrorHandlerName(config.getDefaultErrorHandlerName());
       defaultConfig.addExtensions(config.getExtensions());
       defaultConfig.setMaxQueueTransactionFilesSize(config.getMaxQueueTransactionFilesSizeInMegabytes());
       determineDefaultProcessingStrategy(defaultConfig);
-      validateDefaultExceptionStrategy();
+      validateDefaultErrorHandler();
       applyDefaultIfNoObjectSerializerSet(defaultConfig);
 
       return configuration;
@@ -93,13 +93,13 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     }
   }
 
-  private void validateDefaultExceptionStrategy() {
-    String defaultExceptionStrategyName = config.getDefaultExceptionStrategyName();
-    if (defaultExceptionStrategyName != null) {
-      MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(defaultExceptionStrategyName);
+  private void validateDefaultErrorHandler() {
+    String defaultErrorHandler = config.getDefaultErrorHandlerName();
+    if (defaultErrorHandler != null) {
+      MessagingExceptionHandler messagingExceptionHandler = muleContext.getRegistry().lookupObject(defaultErrorHandler);
       if (messagingExceptionHandler == null) {
         throw new MuleRuntimeException(CoreMessages.createStaticMessage(String
-            .format("No global exception strategy defined with name %s.", defaultExceptionStrategyName)));
+            .format("No global exception strategy defined with name %s.", defaultErrorHandler)));
       }
       if (messagingExceptionHandler instanceof MessagingExceptionHandlerAcceptor) {
         MessagingExceptionHandlerAcceptor messagingExceptionHandlerAcceptor =
@@ -150,8 +150,8 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     config.setShutdownTimeout(shutdownTimeout);
   }
 
-  public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName) {
-    config.setDefaultExceptionStrategyName(defaultExceptionStrategyName);
+  public void setDefaultErrorHandlerName(String defaultErrorHandlerName) {
+    config.setDefaultErrorHandlerName(defaultErrorHandlerName);
   }
 
   public void setDefaultObjectSerializer(ObjectSerializer objectSerializer) {

@@ -9,11 +9,6 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-    <!--TODO MULE-10323: Define handlers reutilisation (refs)-->
-    <!--<on-error-continue name="global-catch" when="#[exception.causedBy(java.lang.ArithmeticException)]">-->
-        <!--<append-string-transformer message=" global catch es"/>-->
-    <!--</on-error-continue>-->
-
     <flow name="matchesCorrectExceptionStrategyUsingExceptionType">
         <test:component/>
         <error-handler>
@@ -51,8 +46,6 @@
             <on-error-continue when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.runtime.core.api.registry.ResolverException)]">
                 <append-string-transformer message=" catch-9"/>
             </on-error-continue>
-            <!--TODO MULE-10323: Define handlers reutilisation (refs)-->
-            <!--<exception-strategy ref="global-catch"/>-->
         </error-handler>
     </flow>
 

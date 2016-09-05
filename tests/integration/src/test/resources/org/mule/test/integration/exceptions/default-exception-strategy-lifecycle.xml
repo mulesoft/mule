@@ -4,7 +4,7 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <configuration defaultExceptionStrategy-ref="defaultEs"/>
+    <configuration defaultErrorHandler-ref="defaultEh"/>
 
     <error-handler name="esA">
         <on-error-continue>
@@ -12,13 +12,7 @@
         </on-error-continue>
     </error-handler>
 
-    <error-handler name="esB">
-        <on-error-continue>
-            <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
-        </on-error-continue>
-    </error-handler>
-
-    <error-handler name="defaultEs">
+    <error-handler name="defaultEh">
         <on-error-continue>
             <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
         </on-error-continue>
@@ -26,12 +20,20 @@
 
     <flow name="flowA">
         <logger/>
-        <exception-strategy ref="esA"/>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="flowB">
         <logger/>
-        <exception-strategy ref="esB"/>
+        <error-handler>
+            <on-error-continue>
+                <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyLifecycleTestCase$LifecycleCheckerMessageProcessor"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
     <flow name="flowC">

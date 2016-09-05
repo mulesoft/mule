@@ -22,12 +22,11 @@
     <!-- This caused a StackOverflowException during app init before MULE-8913 -->
     <flow name="testExceptionHandlerWithTransformerInEndpointFlow">
         <test:component throwException="true"/>
-        <exception-strategy ref="exceptionHandler" />
+        <error-handler>
+            <on-error-continue>
+                <transformer ref="AtoBConverter" />
+            </on-error-continue>
+        </error-handler>
     </flow>
 
-    <error-handler name="exceptionHandler">
-        <on-error-continue>
-            <transformer ref="AtoBConverter" />
-        </on-error-continue>
-    </error-handler>
 </mule>

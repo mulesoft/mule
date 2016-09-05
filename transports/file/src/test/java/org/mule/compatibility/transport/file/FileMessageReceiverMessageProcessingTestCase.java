@@ -7,9 +7,11 @@
 package org.mule.compatibility.transport.file;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Optional.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
@@ -200,7 +202,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     return fileMessageReceiver;
   }
 
-  private void configureMocks() throws CreateException {
+  private void configureMocks() throws MuleException {
     when(mockInboundEndpoint.getConnector()).thenReturn(mockFileConnector);
     when(mockInboundEndpoint.getMuleContext()).thenReturn(mockMuleContext);
     when(mockInboundEndpoint.getFilter()).thenReturn(null);
@@ -224,6 +226,9 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockInboundEndpoint.getMuleContext().getRegistry().get(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER))
         .thenReturn(mockMessageManager);
     when(mockInboundEndpoint.getMuleContext().getRegistry().get(OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
+    MuleEvent mockMuleEvent = mock(MuleEvent.class);
+    when(mockMuleEvent.getError()).thenReturn(empty());
+    when(mockMessageProcessor.process(any())).thenReturn(mockMuleEvent);
   }
 
   private void configureWorkingDirectory(String workingDirectory) {
