@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
-import org.mule.runtime.extension.api.introspection.declaration.type.annotation.NoGlobalTypeAnnotation;
+import org.mule.runtime.extension.api.introspection.declaration.type.annotation.NotGlobalTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.XmlHintsAnnotation;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -177,7 +177,7 @@ public final class ParameterModelValidator implements ModelValidator {
   }
 
   private boolean supportsGlobalReferences(MetadataType type) {
-    return !type.getAnnotation(NoGlobalTypeAnnotation.class).isPresent() && MetadataTypeUtils.isInstantiable(type);
+    return !type.getAnnotation(NotGlobalTypeAnnotation.class).isPresent() && MetadataTypeUtils.isInstantiable(type);
   }
 
   private boolean supportsGlobalReferences(ObjectFieldType field) {

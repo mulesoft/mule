@@ -172,10 +172,6 @@ final class ObjectTypeSchemaDelegate {
    * @return the reference name of the complexType
    */
   private String registerPojoType(MetadataType type, MetadataType baseType, String description) {
-    //ComplexTypeHolder alreadyRegisteredType = registeredComplexTypesHolders.get(getId(type));
-    //if (alreadyRegisteredType != null) {
-    //  return alreadyRegisteredType.getComplexType().getName();
-    //}
     registerPojoComplexType((ObjectType) type, (ObjectType) baseType, description);
 
     DslElementSyntax typeDsl = builder.getDslResolver().resolve(type);
