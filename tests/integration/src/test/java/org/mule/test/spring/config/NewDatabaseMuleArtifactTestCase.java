@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+@Ignore("EE-5097")
 public class NewDatabaseMuleArtifactTestCase extends XmlConfigurationMuleArtifactFactoryTestCase {
 
   @Test(expected = MuleArtifactFactoryException.class)
