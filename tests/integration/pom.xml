@@ -73,17 +73,6 @@
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-db</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-db</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-        </dependency>
 
         <!-- Mule Extensions - The ones that are packages as zip (plugins) have to be explicitly added
             with compile scope in order to be used with the artifact test runner
