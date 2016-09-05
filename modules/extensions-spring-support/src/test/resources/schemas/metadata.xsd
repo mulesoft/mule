@@ -40,6 +40,7 @@
         <xs:complexContent>
             <xs:extension xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" base="metadata:org.mule.test.metadata.extension.model.shapes.Shape">
                 <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="diameter"></xs:attribute>
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionInt" use="optional" name="id"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -529,6 +530,21 @@
                 <xs:attribute type="mule:expressionString" use="required" name="continent"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="country"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="city"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoQueryType" substitutionGroup="mule:abstract-message-processor" name="do-query"></xs:element>
+    <xs:complexType name="DoQueryType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query"></xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

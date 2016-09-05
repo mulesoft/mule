@@ -62,6 +62,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -193,12 +194,14 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getModelProperty(MetadataKeyPartModelProperty.class))
         .thenReturn(of(new MetadataKeyPartModelProperty(0)));
     when(keyParamMock.getModelProperty(MetadataContentModelProperty.class)).thenReturn(empty());
+    when(keyParamMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
     when(contentMock.getType()).thenReturn(stringType);
     when(contentMock.getModelProperty(MetadataContentModelProperty.class))
         .thenReturn(of(new MetadataContentModelProperty()));
     when(contentMock.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(empty());
+    when(contentMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     when(operationModel.getParameterModels()).thenReturn(Arrays.asList(keyParamMock, contentMock));
 
@@ -293,7 +296,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   public void getMetadataKeys() throws Exception {
     MetadataResult<MetadataKeysContainer> metadataKeysResult = messageProcessor.getMetadataKeys();
 
-    verify(operationModel, times(2)).getMetadataResolverFactory();
+    verify(operationModel, times(3)).getMetadataResolverFactory();
     verify(metadataResolverFactory).getKeyResolver();
 
     assertThat(metadataKeysResult.isSuccess(), is(true));

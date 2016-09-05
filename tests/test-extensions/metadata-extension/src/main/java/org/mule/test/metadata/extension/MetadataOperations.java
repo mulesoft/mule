@@ -9,6 +9,7 @@ package org.mule.test.metadata.extension;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.Query;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -20,6 +21,9 @@ import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
+import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
+import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
+import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam;
 import org.mule.test.metadata.extension.resolver.TestContentResolverWithKeyResolver;
@@ -163,6 +167,13 @@ public class MetadataOperations extends MetadataOperationsParent {
   @MetadataScope()
   public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal) {
     return false;
+  }
+
+  @Query(translator = MetadataExtensionQueryTranslator.class,
+      entityResolver = MetadataExtensionEntityResolver.class,
+      nativeOutputResolver = NativeQueryOutputResolver.class)
+  public String doQuery(@MetadataKeyId String query) {
+    return query;
   }
 
   @MetadataScope()

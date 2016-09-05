@@ -13,6 +13,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+import org.mule.runtime.api.metadata.EntityMetadataProvider;
+import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -29,6 +37,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
 import org.mule.runtime.module.extension.internal.runtime.ExecutionMediator;
@@ -57,7 +66,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, Lifecycle {
+public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, EntityMetadataProvider, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
 
@@ -65,19 +74,24 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
   private final RuntimeOperationModel operationModel;
   private final ResolverSet resolverSet;
   private final String target;
+  private final EntityMetadataMediator entityMetadataMediator;
 
   private ExecutionMediator executionMediator;
   private OperationExecutor operationExecutor;
   protected ReturnDelegate returnDelegate;
 
-  public OperationMessageProcessor(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
-                                   String configurationProviderName, String target, ResolverSet resolverSet,
+  public OperationMessageProcessor(RuntimeExtensionModel extensionModel,
+                                   RuntimeOperationModel operationModel,
+                                   String configurationProviderName,
+                                   String target,
+                                   ResolverSet resolverSet,
                                    ExtensionManagerAdapter extensionManager) {
     super(extensionModel, operationModel, configurationProviderName, extensionManager);
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
     this.resolverSet = resolverSet;
     this.target = target;
+    this.entityMetadataMediator = new EntityMetadataMediator(operationModel);
   }
 
   @Override
@@ -149,6 +163,20 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
   @Override
   public void doDispose() {
     disposeIfNeeded(operationExecutor, LOGGER);
+  }
+
+  @Override
+  public MetadataResult<MetadataKeysContainer> getEntityKeys() throws MetadataResolvingException {
+    final MetadataContext metadataContext = getMetadataContext();
+    return withContextClassLoader(getClassLoader(this.extensionModel),
+                                  () -> entityMetadataMediator.getEntityKeys(metadataContext));
+  }
+
+  @Override
+  public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(MetadataKey key) throws MetadataResolvingException {
+    final MetadataContext metadataContext = getMetadataContext();
+    return withContextClassLoader(getClassLoader(this.extensionModel),
+                                  () -> entityMetadataMediator.getEntityMetadata(metadataContext, key));
   }
 
   protected ExecutionMediator createExecutionMediator() {

@@ -142,7 +142,7 @@ public final class AnnotationsBasedDescriber implements Describer {
   private final Map<Class<?>, SourceDeclarer> sourceDeclarers = new HashMap<>();
   private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
-  private List<ParameterDeclarerContributor> fielParameterContributor = ImmutableList.of(new InfrastructureFieldContributor());
+  private List<ParameterDeclarerContributor> fieldParameterContributor = ImmutableList.of(new InfrastructureFieldContributor());
 
   public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver) {
     checkArgument(extensionType != null, format("describer %s does not specify an extension type", getClass().getName()));
@@ -406,7 +406,7 @@ public final class AnnotationsBasedDescriber implements Describer {
 
   private List<ParameterDeclarer> declareFieldBasedParameters(ParameterizedDeclarer component,
                                                               List<ExtensionParameter> parameters) {
-    return declareParameters(component, parameters, this.fielParameterContributor, null);
+    return declareParameters(component, parameters, this.fieldParameterContributor, null);
   }
 
   private List<ParameterDeclarer> declareMethodBasedParameters(ParameterizedDeclarer component,

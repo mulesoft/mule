@@ -77,8 +77,8 @@ public abstract class ExtensionComponent
   private final RuntimeExtensionModel extensionModel;
   private final ComponentModel componentModel;
   private final String configurationProviderName;
+  private final MetadataMediator metadataMediator;
   private final ClassTypeLoader typeLoader;
-  private MetadataMediator metadataMediator;
 
   protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
@@ -89,8 +89,10 @@ public abstract class ExtensionComponent
   @Inject
   private MuleMetadataManager metadataManager;
 
-  protected ExtensionComponent(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel,
-                               String configurationProviderName, ExtensionManagerAdapter extensionManager) {
+  protected ExtensionComponent(RuntimeExtensionModel extensionModel,
+                               RuntimeComponentModel componentModel,
+                               String configurationProviderName,
+                               ExtensionManagerAdapter extensionManager) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.configurationProviderName = configurationProviderName;
@@ -237,7 +239,7 @@ public abstract class ExtensionComponent
     this.flowConstruct = flowConstruct;
   }
 
-  private MetadataContext getMetadataContext() throws MetadataResolvingException {
+  protected MetadataContext getMetadataContext() throws MetadataResolvingException {
     MuleEvent fakeEvent = getInitialiserEvent(muleContext);
 
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);

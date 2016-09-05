@@ -8,23 +8,16 @@ package org.mule.runtime.module.extension.internal.introspection.describer;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.OnException;
-import org.mule.runtime.extension.api.annotation.metadata.Content;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
-import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
@@ -185,28 +178,6 @@ public final class MuleExtensionAnnotationParser {
   private static boolean isDisplayAnnotationPresent(WithAnnotations annotatedElement) {
     List<Class> displayAnnotations = Arrays.asList(Password.class, Text.class, Placement.class);
     return displayAnnotations.stream().anyMatch(annotation -> annotatedElement.getAnnotation(annotation) != null);
-  }
-
-  /**
-   * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} or a {@link MetadataContentModelProperty}
-   * if the parsedParameter is annotated either as {@link MetadataKeyId}, {@link MetadataKeyPart} or {@link Content} respectibly.
-   *
-   * @param element the method annotated parameter parsed
-   * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
-   */
-  public static void parseMetadataAnnotations(AnnotatedElement element, BaseDeclaration baseDeclaration) {
-    if (element.isAnnotationPresent(Content.class)) {
-      baseDeclaration.addModelProperty(new MetadataContentModelProperty());
-    }
-
-    if (element.isAnnotationPresent(MetadataKeyId.class)) {
-      baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(1));
-    }
-
-    if (element.isAnnotationPresent(MetadataKeyPart.class)) {
-      MetadataKeyPart metadataKeyPart = element.getAnnotation(MetadataKeyPart.class);
-      baseDeclaration.addModelProperty(new MetadataKeyPartModelProperty(metadataKeyPart.order()));
-    }
   }
 
   static java.util.Optional<ExceptionEnricherFactory> getExceptionEnricherFactory(WithAnnotations element) {

@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 import org.mule.metadata.api.model.MetadataType;
@@ -25,16 +26,20 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
+import org.mule.runtime.extension.api.dsql.DsqlParser;
+import org.mule.runtime.extension.api.dsql.DsqlQuery;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Provides an instance of the annotated {@link MetadataKeyId} parameter type. The instance will be populated with all the
@@ -44,19 +49,22 @@ import java.util.Map;
  */
 final class MetadataKeyIdObjectResolver {
 
+  private static final DsqlParser dsqlParser = DsqlParser.getInstance();
+
+
   /**
    * Given a {@link ComponentModel} and a {@link Map} key, return the populated key in the Type that the {@link Component}
    * parameter requires.
    *
    * @param component the component model that contains the parameter annotated with {@link MetadataKeyId}
-   * @param key the {@link MetadataKey} associated to the {@link MetadataKeyId}
+   * @param key       the {@link MetadataKey} associated to the {@link MetadataKeyId}
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
    * @throws MetadataResolvingException if:
-   *         <ul>
-   *         <li>Parameter types is not instantiable</li>
-   *         <li>{@param key} does not provide the required levels</li>
-   *         <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
-   *         </ul>
+   *                                    <ul>
+   *                                    <li>Parameter types is not instantiable</li>
+   *                                    <li>{@param key} does not provide the required levels</li>
+   *                                    <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
+   *                                    </ul>
    */
   public Object resolve(ComponentModel component, MetadataKey key) throws MetadataResolvingException {
     final List<ParameterModel> metadataKeyParts = getMetadataKeyParts(component);
@@ -65,11 +73,11 @@ final class MetadataKeyIdObjectResolver {
 
   private Object resolveMetadataKeyWhenPresent(MetadataKey key, ComponentModel componentModel) throws MetadataResolvingException {
 
-    final MetadataType metadataType =
-        componentModel.getModelProperty(MetadataKeyIdModelProperty.class).map(MetadataKeyIdModelProperty::getType)
-            .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId parameter associated",
-                                                     componentModel.getName())));
+    final MetadataKeyIdModelProperty keyIdModelProperty = componentModel.getModelProperty(MetadataKeyIdModelProperty.class)
+        .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId "
+            + "parameter associated", componentModel.getName())));
 
+    final MetadataType metadataType = keyIdModelProperty.getType();
     final Class<?> metadataKeyType = getType(metadataType);
     final ValueHolder<Object> keyValueHolder = new ValueHolder<>();
     final ValueHolder<MetadataResolvingException> exceptionValueHolder = new ValueHolder<>();
@@ -78,14 +86,21 @@ final class MetadataKeyIdObjectResolver {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        exceptionValueHolder.set(buildException(String.format(
-                                                              "'%s' type is invalid for MetadataKeyId parameters, use String type instead. Affecting component: '%s'",
-                                                              metadataKeyType.getSimpleName(), componentModel.getName())));
+        exceptionValueHolder.set(buildException(format("'%s' type is invalid for MetadataKeyId parameters, "
+            + "use String type instead. Affecting component: '%s'",
+                                                       metadataKeyType.getSimpleName(), componentModel.getName())));
       }
 
       @Override
       public void visitString(StringType stringType) {
-        keyValueHolder.set(key.getId());
+        String id = key.getId();
+        Optional<QueryParameterModelProperty> query = getQueryModelProperty(componentModel);
+        if (query.isPresent() && isDsqlQuery(id)) {
+          DsqlQuery dsqlQuery = dsqlParser.parse(id);
+          keyValueHolder.set(dsqlQuery);
+        } else {
+          keyValueHolder.set(id);
+        }
       }
 
       @Override
@@ -105,12 +120,11 @@ final class MetadataKeyIdObjectResolver {
     return keyValueHolder.get();
   }
 
-
   /**
    * Resolves the KeyIdObject for a MultiLevel {@link MetadataKeyId}
    *
    * @param componentModel model property of the {@link MetadataKeyId} parameter
-   * @param key key containing the values of each level
+   * @param key            key containing the values of each level
    * @return the KeyIdObject for the {@link MetadataKeyId} parameter
    * @throws MetadataResolvingException
    */
@@ -122,8 +136,8 @@ final class MetadataKeyIdObjectResolver {
     try {
       metadataKeyId = ClassUtils.instanciateClass(metadataKeyType);
     } catch (Exception e) {
-      throw buildException(String.format("MetadataKey object of type '%s' from the component '%s' could not be instantiated",
-                                         metadataKeyType.getSimpleName(), componentModel.getName()),
+      throw buildException(format("MetadataKey object of type '%s' from the component '%s' could not be instantiated",
+                                  metadataKeyType.getSimpleName(), componentModel.getName()),
                            e);
     }
 
@@ -134,16 +148,18 @@ final class MetadataKeyIdObjectResolver {
 
 
   private Map<Field, String> toFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException {
-    final Map<String, Field> metadataKeyParts =
-        getAnnotatedFields(type, MetadataKeyPart.class).stream().collect(toMap(Field::getName, identity()));
+    final Map<String, Field> metadataKeyParts = getAnnotatedFields(type, MetadataKeyPart.class)
+        .stream()
+        .collect(toMap(Field::getName, identity()));
     final Map<String, String> currentParts = getCurrentParts(key);
-    final List<String> missingParts =
-        metadataKeyParts.keySet().stream().filter(partName -> !currentParts.containsKey(partName)).collect(toList());
+    final List<String> missingParts = metadataKeyParts.keySet()
+        .stream()
+        .filter(partName -> !currentParts.containsKey(partName))
+        .collect(toList());
 
     if (!missingParts.isEmpty()) {
-      throw new MetadataResolvingException(String
-          .format("The given MetadataKey does not provide all the required levels. Missing levels: %s", missingParts),
-                                           INVALID_METADATA_KEY);
+      throw new MetadataResolvingException(format("The given MetadataKey does not provide all the required levels. "
+          + "Missing levels: %s", missingParts), INVALID_METADATA_KEY);
     }
 
     return currentParts.entrySet().stream().filter(keyEntry -> metadataKeyParts.containsKey(keyEntry.getKey()))
@@ -165,9 +181,8 @@ final class MetadataKeyIdObjectResolver {
   private void checkOneChildPerLevel(MetadataKey key) throws MetadataResolvingException {
     if (key.getChilds().size() > 1) {
       final List<String> keyNames = key.getChilds().stream().map(MetadataKey::getId).collect(toList());
-      throw buildException(String.format(
-                                         "MetadataKey used for Metadata resolution must only have one child per level. Key '%s' has %s as children.",
-                                         key.getId(), keyNames));
+      throw buildException(format("MetadataKey used for Metadata resolution must only have one child per level. "
+          + "Key '%s' has %s as children.", key.getId(), keyNames));
     }
   }
 
@@ -184,4 +199,10 @@ final class MetadataKeyIdObjectResolver {
     return metadataKeyParts.isEmpty();
   }
 
+  private Optional<QueryParameterModelProperty> getQueryModelProperty(ComponentModel componentModel) {
+    return componentModel.getParameterModels().stream()
+        .filter(p -> p.getModelProperty(QueryParameterModelProperty.class).isPresent())
+        .map(p -> p.getModelProperty(QueryParameterModelProperty.class).get())
+        .findAny();
+  }
 }

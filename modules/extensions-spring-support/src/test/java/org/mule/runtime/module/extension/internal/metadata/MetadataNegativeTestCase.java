@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.RESOURCE_UNAVAILABLE;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
@@ -19,6 +21,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.InvalidComponentIdException;
@@ -29,11 +32,13 @@ import org.junit.Test;
 
 public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCase {
 
+  private static final String NOT_A_METADATA_PROVIDER = "is not a MetadataProvider or MetadataEntityProvider";
+  private static final String PROCESSOR_DOES_NOT_EXIST = "Processor doesn't exist in the given index";
+  private static final String SOURCE_DOES_NOT_EXIST = "Flow doesn't contain a message source";
   private static final String FAIL_WITH_RESOLVING_EXCEPTION = "failWithResolvingException";
   private static final String FAIL_WITH_RUNTIME_EXCEPTION = "failWithRuntimeException";
   private static final String NON_EXISTING_FLOW = "nonExistingFlow";
   private static final String LOGGER_FLOW = "loggerFlow";
-  private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
   private static final String FLOW_WITHOUT_SOURCE = "flowWithoutSource";
   private static final String CONFIGURATION_CANNOT_BE_DYNAMIC = "Configuration used for Metadata fetch cannot be dynamic";
 
@@ -45,7 +50,7 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void getOperationMetadataWithResolvingException() throws Exception {
     componentId = new ProcessorId(FAIL_WITH_RESOLVING_EXCEPTION, FIRST_PROCESSOR_INDEX);
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, PERSON_METADATA_KEY);
     assertFailure(metadata, "", FailureCode.MULTIPLE, "");
   }
 
@@ -54,13 +59,13 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     componentId = new ProcessorId(FAIL_WITH_RUNTIME_EXCEPTION, FIRST_PROCESSOR_INDEX);
     MetadataResult<MetadataKeysContainer> metadata = metadataManager.getMetadataKeys(componentId);
 
-    assertFailure(metadata, "", FailureCode.UNKNOWN, RuntimeException.class.getName());
+    assertFailure(metadata, "", UNKNOWN, RuntimeException.class.getName());
   }
 
   @Test
   public void getOperationMetadataWithRuntimeException() throws Exception {
     componentId = new ProcessorId(FAIL_WITH_RUNTIME_EXCEPTION, FIRST_PROCESSOR_INDEX);
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, PERSON_METADATA_KEY);
 
     assertFailure(metadata, "", FailureCode.MULTIPLE, "");
   }
@@ -68,17 +73,17 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void flowDoesNotExist() throws Exception {
     componentId = new ProcessorId(NON_EXISTING_FLOW, FIRST_PROCESSOR_INDEX);
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
-
-    assertFailure(metadata, "Processor doesn't exist ", FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
+    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, PERSON_METADATA_KEY);
+    assertFailure(metadata, format(PROCESSOR_DOES_NOT_EXIST, 0), UNKNOWN, InvalidComponentIdException.class.getName());
   }
 
   @Test
   public void processorDoesNotExist() throws Exception {
-    componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID, "10");
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
+    String notValidIndex = "10";
+    componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID, notValidIndex);
+    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, PERSON_METADATA_KEY);
 
-    assertFailure(metadata, "Processor doesn't exist", FailureCode.UNKNOWN, IndexOutOfBoundsException.class.getName());
+    assertFailure(metadata, format(PROCESSOR_DOES_NOT_EXIST, notValidIndex), UNKNOWN, IndexOutOfBoundsException.class.getName());
   }
 
   @Test
@@ -86,7 +91,14 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     final SourceId notExistingSource = new SourceId(FLOW_WITHOUT_SOURCE);
     final MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getMetadataKeys(notExistingSource);
 
-    assertFailure(metadataKeysResult, SOURCE_NOT_FOUND, FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
+    assertFailure(metadataKeysResult, SOURCE_DOES_NOT_EXIST, UNKNOWN, InvalidComponentIdException.class.getName());
+  }
+
+  @Test
+  public void processorIsNotEntityMetadataProvider() throws Exception {
+    componentId = new ProcessorId(LOGGER_FLOW, FIRST_PROCESSOR_INDEX);
+    MetadataResult<TypeMetadataDescriptor> metadata = metadataManager.getEntityMetadata(componentId, PERSON_METADATA_KEY);
+    assertFailure(metadata, NOT_A_METADATA_PROVIDER, UNKNOWN, InvalidComponentIdException.class.getName());
   }
 
   @Test
@@ -115,16 +127,15 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   @Test
   public void processorIsNotMetadataProvider() throws Exception {
     componentId = new ProcessorId(LOGGER_FLOW, FIRST_PROCESSOR_INDEX);
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, personKey);
-
-    assertFailure(metadata, "not a MetadataProvider", FailureCode.UNKNOWN, InvalidComponentIdException.class.getName());
+    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, PERSON_METADATA_KEY);
+    assertFailure(metadata, NOT_A_METADATA_PROVIDER, UNKNOWN, InvalidComponentIdException.class.getName());
   }
 
   @Test
   public void fetchMissingElementFromCache() throws Exception {
     componentId = new ProcessorId(CONTENT_ONLY_CACHE_RESOLVER, FIRST_PROCESSOR_INDEX);
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, nullMetadataKey);
-    assertFailure(metadata, "", FailureCode.RESOURCE_UNAVAILABLE, "");
+    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId, NULL_METADATA_KEY);
+    assertFailure(metadata, "", RESOURCE_UNAVAILABLE, "");
   }
 
   @Test

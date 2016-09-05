@@ -216,7 +216,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithInlineListParameter() throws Exception {
-    List<String> response = (List<String>) flowRunner("knockManyWithInlineList").withPayload("")
+    List<String> response = flowRunner("knockManyWithInlineList").withPayload("")
         .withFlowVariable("victim", "Saul").run().getMessage().getPayload();
     assertThat(response, Matchers.contains(knock("Inline Skyler"), knock("Saul")));
   }
@@ -225,7 +225,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   public void operationWithExpressionListParameter() throws Exception {
     List<KnockeableDoor> doors = Arrays.asList(new KnockeableDoor("Skyler"), new KnockeableDoor("Saul"));
 
-    List<String> response = (List<String>) flowRunner("knockManyByExpression").withPayload("").withFlowVariable("doors", doors)
+    List<String> response = flowRunner("knockManyByExpression").withPayload("").withFlowVariable("doors", doors)
         .run().getMessage().getPayload();
     assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
   }
@@ -290,7 +290,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     Ricin ricinWeapon2 = new Ricin();
     ricinWeapon2.setMicrogramsPerKilo(22L);
 
-    List<Ricin> ricins = (List<Ricin>) flowRunner("killWithRicinDefaultPayload")
+    List<Ricin> ricins = flowRunner("killWithRicinDefaultPayload")
         .withPayload(Arrays.asList(ricinWeapon1, ricinWeapon2)).run().getMessage().getPayload();
 
     assertThat(ricins, hasSize(2));
@@ -306,8 +306,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithListPojoAsChildElementsOverridesDefault() throws Exception {
-    List<Ricin> ricins =
-        (List<Ricin>) flowRunner("killWithRicinAsChildElement").withPayload(EMPTY).run().getMessage().getPayload();
+    List<Ricin> ricins = flowRunner("killWithRicinAsChildElement").withPayload(EMPTY).run().getMessage().getPayload();
 
     assertThat(ricins, hasSize(2));
     assertThat(ricins.get(0), instanceOf(Ricin.class));
