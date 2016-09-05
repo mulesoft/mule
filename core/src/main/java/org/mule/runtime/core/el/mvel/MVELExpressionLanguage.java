@@ -246,7 +246,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
       parser.validate(expression);
       final AtomicBoolean valid = new AtomicBoolean(true);
 
-      if(expression.contains(DEFAULT_EXPRESSION_PREFIX)) {
+      if (expression.contains(DEFAULT_EXPRESSION_PREFIX)) {
         parser.parse(token -> {
           if (valid.get()) {
             try {
@@ -259,8 +259,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
           }
           return null;
         }, expression);
-      }
-      else{
+      } else {
         expressionExecutor.validate(expression);
       }
     } catch (Exception e) {
