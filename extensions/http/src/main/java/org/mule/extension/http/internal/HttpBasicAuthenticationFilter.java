@@ -96,12 +96,12 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   }
 
   protected MuleEvent setUnauthenticated(MuleEvent event) {
-    Builder builder = MuleEvent.builder(event);
     String realmHeader = "Basic realm=";
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
     Map<String, String> headers = getFlowVariableOrNull(headersFlowVar, event);
+    Builder builder = MuleEvent.builder(event);
     if (headers == null) {
       headers = new HashMap<>();
       builder.addFlowVariable(headersFlowVar, headers);
@@ -165,10 +165,10 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       event.getSession().setSecurityContext(context);
       return event;
     } else if (header == null) {
-      setUnauthenticated(event);
+      event = setUnauthenticated(event);
       throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);
     } else {
-      setUnauthenticated(event);
+      event = setUnauthenticated(event);
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), event);
     }
