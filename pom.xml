@@ -181,7 +181,7 @@
         <jacksonVersion>1.9.11</jacksonVersion>
         <jackson2Version>2.4.3</jackson2Version>
         <javax.inject.version>1</javax.inject.version>
-        <javax.transaction.version>1.2-b03</javax.transaction.version>
+        <javax.transaction.version>1.2</javax.transaction.version>
         <jerseyVersion>2.11</jerseyVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.7.ga</javassistVersion>
@@ -572,6 +572,10 @@
                     <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
