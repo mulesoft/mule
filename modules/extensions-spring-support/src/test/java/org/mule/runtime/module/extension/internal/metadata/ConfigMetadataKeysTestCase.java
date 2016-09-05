@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAliasName;
+import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;

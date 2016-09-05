@@ -13,8 +13,6 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.deriveModelProperties;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
-import static org.mule.runtime.extension.api.util.NameUtils.getTopLevelTypeName;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
@@ -25,6 +23,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.parameter.ImmutableParameterModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -38,6 +37,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -49,6 +49,7 @@ import javax.xml.namespace.QName;
 final class ObjectTypeSchemaDelegate {
 
   private final Map<String, ComplexTypeHolder> registeredComplexTypesHolders = new LinkedHashMap<>();
+  private final Map<String, TopLevelElement> registeredGlobalElementTypes = new LinkedHashMap<>();
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final SchemaBuilder builder;
 
@@ -56,36 +57,53 @@ final class ObjectTypeSchemaDelegate {
     this.builder = builder;
   }
 
-  void generatePojoElement(ObjectType objectType, DslElementSyntax paramDsl, String name, String description, ExplicitGroup all) {
+  void generatePojoElement(ObjectType objectType, DslElementSyntax paramDsl, Optional<XmlHintsModelProperty> paramXmlHints,
+                           String description, ExplicitGroup all) {
 
-    if (!paramDsl.supportsChildDeclaration()) {
-      DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType);
-      if (typeDsl.supportsChildDeclaration()) {
-        // We need to register the type, just in case people want to use it as global elements
-        registerPojoType(objectType, description);
-      }
-    } else if (builder.getImportedTypes().get(objectType) != null) {
-      addImportedTypeElement(paramDsl, name, description, objectType, all);
-    } else {
-      if (paramDsl.isWrapped()) {
-        registerPojoSubtypes(objectType, builder.getSubTypesMapping().getSubTypes(objectType));
-        addAbstractTypeRef(paramDsl, description, objectType, all);
+    if (paramDsl.supportsChildDeclaration()) {
+      if (isImported(objectType)) {
+        addImportedTypeElement(paramDsl, description, objectType, all);
       } else {
-        String typeName = registerPojoType(objectType, description);
-        QName localQName = new QName(paramDsl.getNamespaceUri(), typeName, paramDsl.getNamespace());
-        addChildElementTypeExtension(localQName, description, name, all);
+        if (paramDsl.isWrapped()) {
+          declareRefToType(objectType, paramDsl, description, all);
+        } else {
+          declareTypeInline(objectType, paramDsl, description, all);
+        }
       }
+    }
+
+    DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType);
+    boolean allowsRef = paramXmlHints.map(XmlHintsModelProperty::allowsReferences).orElse(true);
+    if (allowsRef && typeDsl.supportsTopLevelDeclaration() && !isImported(objectType)) {
+      // We need to register the type, just in case people want to use it as global elements
+      registerPojoType(objectType, description);
     }
   }
 
+  private boolean isImported(ObjectType objectType) {
+    return builder.getImportedTypes().get(objectType) != null;
+  }
+
+  private void declareTypeInline(ObjectType objectType, DslElementSyntax paramDsl, String description, ExplicitGroup all) {
+    registerPojoComplexType(objectType, null, description);
+    String typeName = getBaseTypeName(objectType);
+    QName localQName = new QName(paramDsl.getNamespaceUri(), typeName, paramDsl.getNamespace());
+    addChildElementTypeExtension(localQName, description, paramDsl.getElementName(), all);
+  }
+
+  private void declareRefToType(ObjectType objectType, DslElementSyntax paramDsl, String description, ExplicitGroup all) {
+    registerPojoSubtypes(objectType, builder.getSubTypesMapping().getSubTypes(objectType));
+    addAbstractTypeRef(paramDsl, description, objectType, all);
+  }
+
   private void addChildElementTypeExtension(QName base, String description, String name, ExplicitGroup all) {
-    TopLevelElement objectElement = builder.createTopLevelElement(hyphenize(name), ZERO, "1");
+    TopLevelElement objectElement = builder.createTopLevelElement(name, ZERO, "1");
     objectElement.setAnnotation(builder.createDocAnnotation(description));
     objectElement.setComplexType(createTypeExtension(base));
     all.getParticle().add(objectFactory.createElement(objectElement));
   }
 
-  private void addImportedTypeElement(DslElementSyntax paramDsl, String name, String description, MetadataType metadataType,
+  private void addImportedTypeElement(DslElementSyntax paramDsl, String description, MetadataType metadataType,
                                       ExplicitGroup all) {
 
     DslElementSyntax typeDsl = builder.getDslResolver().resolve(metadataType);
@@ -105,7 +123,7 @@ final class ObjectTypeSchemaDelegate {
       all.getParticle().add(objectFactory.createElement(objectElement));
     } else {
       QName extensionBase = new QName(typeDsl.getNamespaceUri(), sanitizeName(getId(metadataType)), typeDsl.getNamespace());
-      addChildElementTypeExtension(extensionBase, description, name, all);
+      addChildElementTypeExtension(extensionBase, description, paramDsl.getElementName(), all);
     }
   }
 
@@ -148,26 +166,28 @@ final class ObjectTypeSchemaDelegate {
    * Registers a pojo type creating a base complex type and a substitutable top level type while assigning it a name. This method
    * will not register the same type twice even if requested to
    *
-   * @param metadataType a {@link MetadataType} describing a pojo type
+   * @param type a {@link MetadataType} describing a pojo type
    * @param baseType     a {@link MetadataType} describing a pojo's base type
    * @param description  the type's description
    * @return the reference name of the complexType
    */
-  private String registerPojoType(MetadataType metadataType, MetadataType baseType, String description) {
-    ComplexTypeHolder alreadyRegisteredType = registeredComplexTypesHolders.get(getId(metadataType));
-    if (alreadyRegisteredType != null) {
-      return alreadyRegisteredType.getComplexType().getName();
+  private String registerPojoType(MetadataType type, MetadataType baseType, String description) {
+    //ComplexTypeHolder alreadyRegisteredType = registeredComplexTypesHolders.get(getId(type));
+    //if (alreadyRegisteredType != null) {
+    //  return alreadyRegisteredType.getComplexType().getName();
+    //}
+    registerPojoComplexType((ObjectType) type, (ObjectType) baseType, description);
+
+    DslElementSyntax typeDsl = builder.getDslResolver().resolve(type);
+    if (typeDsl.supportsTopLevelDeclaration() || typeDsl.isWrapped()) {
+
+      registerPojoGlobalElements(typeDsl, (ObjectType) type, (ObjectType) baseType, description);
     }
-
-    DslElementSyntax typeDsl = builder.getDslResolver().resolve(metadataType);
-    registerPojoAsTypeWithBase((ObjectType) metadataType, (ObjectType) baseType, description);
-    registerPojoGlobalElement(typeDsl, (ObjectType) metadataType, (ObjectType) baseType, description);
-
-    return getBaseTypeName(metadataType);
+    return getBaseTypeName(type);
   }
 
-  private ComplexType registerPojoAsTypeWithBase(ObjectType metadataType, ObjectType baseType, String description) {
-    String typeId = getId(metadataType);
+  private ComplexType registerPojoComplexType(ObjectType type, ObjectType baseType, String description) {
+    String typeId = getId(type);
     if (registeredComplexTypesHolders.get(typeId) != null) {
       return registeredComplexTypesHolders.get(typeId).getComplexType();
     }
@@ -176,17 +196,16 @@ final class ObjectTypeSchemaDelegate {
     Collection<ObjectFieldType> fields;
     if (baseType == null) {
       base = MULE_ABSTRACT_EXTENSION_TYPE;
-      fields = metadataType.getFields();
+      fields = type.getFields();
     } else {
       DslElementSyntax baseDsl = builder.getDslResolver().resolve(baseType);
       base = new QName(baseDsl.getNamespaceUri(), getBaseTypeName(baseType), baseDsl.getNamespace());
-      fields = metadataType.getFields().stream()
-          .filter(field -> !baseType.getFields().stream()
-              .anyMatch(other -> other.getKey().getName().getLocalPart().equals(field.getKey().getName().getLocalPart())))
+      fields = type.getFields().stream().filter(field -> !baseType.getFields().stream()
+          .anyMatch(other -> other.getKey().getName().getLocalPart().equals(field.getKey().getName().getLocalPart())))
           .collect(toList());
     }
 
-    ComplexType complexType = declarePojoAsType(metadataType, base, description, fields);
+    ComplexType complexType = declarePojoAsType(type, base, description, fields);
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(complexType);
     return complexType;
   }
@@ -232,13 +251,35 @@ final class ObjectTypeSchemaDelegate {
     field.getValue().accept(builder.getParameterDeclarationVisitor(extension, all, asParameter(field)));
   }
 
-  private void registerPojoGlobalElement(DslElementSyntax typeDsl, ObjectType metadataType, ObjectType baseType,
-                                         String description) {
-    String abstractElementName = builder.getTopLevelAbstractName(typeDsl);
+  private void registerPojoGlobalElements(DslElementSyntax typeDsl, ObjectType metadataType, ObjectType baseType,
+                                          String description) {
+
+    if (registeredGlobalElementTypes.containsKey(globalTypeKey(typeDsl))) {
+      return;
+    }
+
+    registerPojoComplexType(metadataType, baseType, description);
+    TopLevelElement abstractElement = registerAbstractElement(typeDsl, baseType);
+    QName typeQName =
+        new QName(builder.getSchema().getTargetNamespace(), getBaseTypeName(metadataType), typeDsl.getNamespace());
+    if (!typeDsl.supportsTopLevelDeclaration()) {
+      abstractElement.setType(typeQName);
+    } else {
+      registerConcreteGlobalElement(typeDsl, description, abstractElement.getName(), typeQName);
+    }
+  }
+
+  private TopLevelElement registerAbstractElement(DslElementSyntax typeDsl, ObjectType baseType) {
+
+    String abstractName = builder.getTopLevelAbstractName(typeDsl);
+
+    TopLevelElement element = registeredGlobalElementTypes.get(typeDsl.getNamespace() + abstractName);
+    if (element != null) {
+      return element;
+    }
 
     TopLevelElement abstractElement = new TopLevelElement();
-    abstractElement.setName(abstractElementName);
-
+    abstractElement.setName(abstractName);
 
     QName substitutionGroup = MULE_ABSTRACT_EXTENSION;
     if (baseType != null) {
@@ -251,21 +292,32 @@ final class ObjectTypeSchemaDelegate {
 
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(abstractElement);
 
-    QName typeQName =
-        new QName(builder.getSchema().getTargetNamespace(), registerPojoType(metadataType, description), typeDsl.getNamespace());
-    if (!typeDsl.supportsTopLevelDeclaration()) {
-      abstractElement.setType(typeQName);
-    } else {
-      TopLevelElement objectElement = new TopLevelElement();
-      objectElement.setName(getTopLevelTypeName(metadataType));
-      objectElement.setSubstitutionGroup(new QName(typeDsl.getNamespaceUri(), abstractElementName, typeDsl.getNamespace()));
-      objectElement.setAnnotation(builder.createDocAnnotation(description));
+    registeredGlobalElementTypes.put(typeDsl.getNamespace() + abstractName, abstractElement);
+    return abstractElement;
+  }
 
-      objectElement.setComplexType(createTypeExtension(typeQName));
-      objectElement.getComplexType().getComplexContent().getExtension().getAttributeOrAttributeGroup()
-          .add(builder.createNameAttribute(false));
-      builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(objectElement);
+  private void registerConcreteGlobalElement(DslElementSyntax typeDsl, String description,
+                                             String abstractElementName, QName typeQName) {
+
+    if (registeredGlobalElementTypes.containsKey(globalTypeKey(typeDsl))) {
+      return;
     }
+
+    TopLevelElement objectElement = new TopLevelElement();
+    objectElement.setName(typeDsl.getElementName());
+    objectElement.setSubstitutionGroup(new QName(typeDsl.getNamespaceUri(), abstractElementName, typeDsl.getNamespace()));
+    objectElement.setAnnotation(builder.createDocAnnotation(description));
+
+    objectElement.setComplexType(createTypeExtension(typeQName));
+    objectElement.getComplexType().getComplexContent().getExtension().getAttributeOrAttributeGroup()
+        .add(builder.createNameAttribute(false));
+    builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(objectElement);
+
+    registeredGlobalElementTypes.put(globalTypeKey(typeDsl), objectElement);
+  }
+
+  private String globalTypeKey(DslElementSyntax typeDsl) {
+    return typeDsl.getNamespace() + typeDsl.getElementName();
   }
 
   private ImmutableParameterModel asParameter(ObjectFieldType field) {

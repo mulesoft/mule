@@ -20,6 +20,7 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
@@ -62,7 +63,9 @@ public class ParameterModelValidatorTestCase extends AbstractMuleTestCase {
     when(extensionModel.getModelProperty(SubTypesModelProperty.class)).thenReturn(Optional.empty());
     when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
     when(validParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(validParameterModel.getModelProperty(XmlHintsModelProperty.class)).thenReturn(Optional.empty());
     when(invalidParameterModel.getModelProperty(ParameterGroupModelProperty.class)).thenReturn(Optional.empty());
+    when(invalidParameterModel.getModelProperty(XmlHintsModelProperty.class)).thenReturn(Optional.empty());
     when(operationModel.getName()).thenReturn("dummyOperation");
     when(extensionModel.getName()).thenReturn("extensionModel");
   }

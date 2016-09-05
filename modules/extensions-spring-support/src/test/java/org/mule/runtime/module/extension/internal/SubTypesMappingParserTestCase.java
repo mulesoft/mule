@@ -21,6 +21,8 @@ import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.subtypes.extension.CarDoor;
 import org.mule.test.subtypes.extension.FinalPojo;
 import org.mule.test.subtypes.extension.HouseDoor;
+import org.mule.test.subtypes.extension.NoGlobalPojo;
+import org.mule.test.subtypes.extension.NoReferencePojo;
 import org.mule.test.subtypes.extension.ParentShape;
 import org.mule.test.subtypes.extension.PojoForList;
 import org.mule.test.subtypes.extension.Revolver;
@@ -113,7 +115,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
     assertThat(responseEvent.getMessage().getPayload(), instanceOf(SubTypesConnectorConnection.class));
 
-    SubTypesConnectorConnection payload = (SubTypesConnectorConnection) responseEvent.getMessage().getPayload();
+    SubTypesConnectorConnection payload = responseEvent.getMessage().getPayload();
     assertThat(payload.getDoor(), instanceOf(HouseDoor.class));
     assertThat(payload.getShape(), instanceOf(Triangle.class));
     assertThat(payload.getShape().getArea(), is(1));
@@ -126,7 +128,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(responseEvent.getMessage().getPayload(), notNullValue());
 
     List<Object> payload = responseEvent.getMessage().getPayload();
-    assertThat(payload, hasSize(6));
+    assertThat(payload, hasSize(7));
 
     assertThat(payload.get(0), instanceOf(ParentShape.class));
     assertThat(((ParentShape) payload.get(0)).getArea(), is(2));
@@ -147,6 +149,10 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(payload.get(5), instanceOf(Triangle.class));
     assertThat(((Triangle) payload.get(5)).getHeight(), is(4));
     assertThat(((Triangle) payload.get(5)).getArea(), is(2));
+
+    assertThat(payload.get(6), instanceOf(NoReferencePojo.class));
+    assertThat(((NoReferencePojo) payload.get(6)).getNumber(), is(1));
+    assertThat(((NoReferencePojo) payload.get(6)).getString(), is("noRef"));
   }
 
   @Test
@@ -156,7 +162,7 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     assertThat(responseEvent.getMessage().getPayload(), notNullValue());
 
     List<Object> payload = responseEvent.getMessage().getPayload();
-    assertThat(payload, hasSize(6));
+    assertThat(payload, hasSize(7));
 
     assertThat(payload.get(0), instanceOf(ParentShape.class));
     assertThat(((ParentShape) payload.get(0)).getArea(), is(9));
@@ -205,6 +211,14 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     } catch (Exception e) {
       fail(e.getMessage());
     }
+  }
+
+  @Test
+  public void duplicatedOperationParameterAndTypeNames() throws Exception {
+    MuleEvent responseEvent = flowRunner("duplicatedOperationParameterAndTypeNames").run();
+
+    assertThat(responseEvent.getMessage().getPayload(), notNullValue());
+    assertThat(responseEvent.getMessage().getPayload(), instanceOf(NoGlobalPojo.class));
   }
 
   @Test

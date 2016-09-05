@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Extension(name = "SubtypesConnector", description = "Test connector for pojo subtype mapping")
-@Operations(TestOperationsWithSubTypeMapping.class)
+@Operations(SubTypesTestOperations.class)
 @Sources(SubtypesSource.class)
 @ConnectionProviders(SubTypesConnectionProvider.class)
 @Import(type = Ricin.class, from = "Heisenberg")

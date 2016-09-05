@@ -81,7 +81,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.core.ResolvableType;
 
 /**
@@ -434,18 +433,18 @@ public final class IntrospectionUtils {
     return expressionAnnotation != null ? expressionAnnotation.value() : SUPPORTED;
   }
 
-  public static String getAliasName(Class<?> type) {
-    return getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
-  }
-
-  public static String getAliasName(Field field) {
-    return getAliasName(field.getName(), field.getAnnotation(Alias.class));
-  }
-
-  public static String getAliasName(String defaultName, Alias aliasAnnotation) {
-    String alias = aliasAnnotation != null ? aliasAnnotation.value() : null;
-    return StringUtils.isEmpty(alias) ? defaultName : alias;
-  }
+  //public static String getAliasName(Class<?> type) {
+  //  return getAliasName(type.getSimpleName(), type.getAnnotation(Alias.class));
+  //}
+  //
+  //public static String getAliasName(Field field) {
+  //  return getAliasName(field.getName(), field.getAnnotation(Alias.class));
+  //}
+  //
+  //public static String getAliasName(String defaultName, Alias aliasAnnotation) {
+  //  String alias = aliasAnnotation != null ? aliasAnnotation.value() : null;
+  //  return isEmpty(alias) ? defaultName : alias;
+  //}
 
   public static String getSourceName(Class<? extends Source> sourceType) {
     Alias alias = sourceType.getAnnotation(Alias.class);
