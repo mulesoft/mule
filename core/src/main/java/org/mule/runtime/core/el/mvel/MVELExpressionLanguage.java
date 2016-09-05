@@ -240,26 +240,32 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
       }
       return;
     }
+
+    final StringBuilder message = new StringBuilder();
     try {
       parser.validate(expression);
-    } catch (IllegalArgumentException e) {
+      final AtomicBoolean valid = new AtomicBoolean(true);
+
+      if(expression.contains(DEFAULT_EXPRESSION_PREFIX)) {
+        parser.parse(token -> {
+          if (valid.get()) {
+            try {
+              expressionExecutor.validate(token);
+            } catch (InvalidExpressionException e) {
+              valid.compareAndSet(true, false);
+              message.append(token).append(" is invalid\n");
+              message.append(e.getMessage());
+            }
+          }
+          return null;
+        }, expression);
+      }
+      else{
+        expressionExecutor.validate(expression);
+      }
+    } catch (Exception e) {
       throw new InvalidExpressionException(expression, e.getMessage());
     }
-
-    final AtomicBoolean valid = new AtomicBoolean(true);
-    final StringBuilder message = new StringBuilder();
-    parser.parse(token -> {
-      if (valid.get()) {
-        try {
-          expressionExecutor.validate(token);
-        } catch (InvalidExpressionException e) {
-          valid.compareAndSet(true, false);
-          message.append(token).append(" is invalid\n");
-          message.append(e.getMessage());
-        }
-      }
-      return null;
-    }, expression);
 
     if (message.length() > 0) {
       throw new InvalidExpressionException(expression, message.toString());
