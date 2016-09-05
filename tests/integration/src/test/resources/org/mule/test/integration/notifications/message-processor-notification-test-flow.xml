@@ -297,18 +297,6 @@
         </error-handler>
     </flow>
 
-    <error-handler name="Global_Exception_Strategy">
-        <on-error-continue>
-            <logger level="INFO"/>
-            <logger level="INFO"/>
-        </on-error-continue>
-    </error-handler>
-
-    <flow name="global-es">
-        <test:component throwException="true"/>
-        <exception-strategy ref="Global_Exception_Strategy"/>
-    </flow>
-
     <flow name="composite-source">
         <composite-source>
             <custom-source class="org.mule.test.core.context.notification.processors.MessageProcessorNotificationTestCase$TestMessageSource"/>

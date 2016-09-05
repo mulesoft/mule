@@ -552,8 +552,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build()).build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("configuration")
         .withTypeDefinition(fromType(MuleConfiguration.class)).withObjectFactoryType(MuleConfigurationConfigurator.class)
-        .withSetterParameterDefinition("defaultExceptionStrategyName",
-                                       fromSimpleParameter("defaultExceptionStrategy-ref").build())
+        .withSetterParameterDefinition("defaultErrorHandlerName",
+                                       fromSimpleParameter("defaultErrorHandler-ref").build())
         .withSetterParameterDefinition("defaultProcessingStrategy",
                                        fromSimpleReferenceParameter("defaultProcessingStrategy").build())
         .withSetterParameterDefinition("defaultResponseTimeout", fromSimpleParameter("defaultResponseTimeout").build())

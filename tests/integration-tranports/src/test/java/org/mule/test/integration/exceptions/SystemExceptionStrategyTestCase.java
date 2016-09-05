@@ -36,18 +36,16 @@ public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTe
     } catch (LifecycleException e) {
       // expected
     }
-    latch.await(1000, TimeUnit.MILLISECONDS);
-    assertEquals(0, serviceExceptionCounter.get());
-    assertEquals(1, systemExceptionCounter.get());
+    systemExceptionListener.waitUntilAllNotificationsAreReceived();
+    exceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testConnectorPolling() throws Exception {
     ((Flow) muleContext.getRegistry().lookupFlowConstruct("Polling")).start();
     Thread.sleep(3000);
-    latch.await(1000, TimeUnit.MILLISECONDS);
-    assertEquals(0, serviceExceptionCounter.get());
-    assertEquals(1, systemExceptionCounter.get());
+    systemExceptionListener.waitUntilAllNotificationsAreReceived();
+    exceptionListener.assertNotInvoked();
   }
 }
 

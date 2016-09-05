@@ -23,7 +23,6 @@
     <flow name="Polling" initialState="stopped">
         <file:inbound-endpoint path="/a/b/c" pollingFrequency="1000"/>
         <log-component/>
-        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
     </flow>
 
 </mule>

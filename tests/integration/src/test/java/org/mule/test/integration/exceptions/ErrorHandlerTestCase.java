@@ -102,12 +102,6 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
     callAndThrowException(new ResolverException(CoreMessages.createStaticMessage("")), null);
   }
 
-  @Test
-  @Ignore("MULE-10323: Define handlers reutilisation (refs)")
-  public void testNoMatchThenCallDefaultExceptionStrategy() throws Exception {
-    callAndThrowException(new ArithmeticException(), "0 global catch es");
-  }
-
   private void callAndThrowException(final Exception exceptionToThrow, final String expectedMessage) throws Exception {
     callAndThrowException("0", exceptionToThrow, expectedMessage);
   }

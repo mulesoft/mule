@@ -307,7 +307,7 @@ public interface MuleContext extends Lifecycle {
    * @return default exception strategy. If no default exception strategy was configured it returns
    *         {@link org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy}
    */
-  MessagingExceptionHandler getDefaultExceptionStrategy();
+  MessagingExceptionHandler getDefaultErrorHandler();
 
   /**
    * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource

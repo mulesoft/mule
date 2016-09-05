@@ -6,10 +6,6 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Test;
 
 public class AsynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase {
@@ -22,25 +18,22 @@ public class AsynchronousMessagingExceptionStrategyTestCase extends AbstractExce
   @Test
   public void testTransformerException() throws Exception {
     flowRunner("TransformerException").withPayload(getTestMuleMessage()).asynchronously().run();
-    latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-    assertEquals(1, serviceExceptionCounter.get());
-    assertEquals(0, systemExceptionCounter.get());
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    systemExceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testScriptComponentException() throws Exception {
     flowRunner("ScriptComponentException").withPayload(getTestMuleMessage()).asynchronously().run();
-    latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-    assertEquals(1, serviceExceptionCounter.get());
-    assertEquals(0, systemExceptionCounter.get());
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    systemExceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testCustomProcessorException() throws Exception {
     flowRunner("CustomProcessorException").withPayload(getTestMuleMessage()).asynchronously().run();
-    latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-    assertEquals(1, serviceExceptionCounter.get());
-    assertEquals(0, systemExceptionCounter.get());
+    exceptionListener.waitUntilAllNotificationsAreReceived();
+    systemExceptionListener.assertNotInvoked();
   }
 }
 

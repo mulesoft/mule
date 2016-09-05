@@ -69,7 +69,7 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
     if (exceptionListener != null) {
       flowConstruct.setExceptionListener(exceptionListener);
     } else {
-      flowConstruct.setExceptionListener(flowConstruct.getMuleContext().getDefaultExceptionStrategy());
+      flowConstruct.setExceptionListener(flowConstruct.getMuleContext().getDefaultErrorHandler());
     }
   }
 }

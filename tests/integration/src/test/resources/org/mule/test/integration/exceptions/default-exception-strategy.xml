@@ -4,10 +4,11 @@
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <configuration defaultExceptionStrategy-ref="defaultExceptionStrategy"/>
+    <configuration defaultErrorHandler-ref="defaultErrorHandler"/>
 
-    <custom-exception-strategy name="defaultExceptionStrategy"
-                               class="org.mule.test.integration.exceptions.DefaultExceptionStrategyTestCase$CustomExceptionStrategy"/>
+    <error-handler name="defaultErrorHandler">
+        <on-error-continue/>
+    </error-handler>
 
     <flow name="flowNoExceptionStrategy">
         <logger/>

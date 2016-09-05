@@ -17,12 +17,11 @@
 
     <flow name="WithRefExceptionStrategy" doc:name="With Referenced Exception Strategy">
         <echo-component doc:name="echo_ex"/>
-        <exception-strategy ref="On_Error_Continue" doc:name="Reference Exception Strategy"/>
+        <error-handler doc:name="error handler doc name">
+            <on-error-continue doc:name="On Error Continue">
+                <logger message="Exception! " level="ERROR" doc:name="Logger"/>
+            </on-error-continue>
+        </error-handler>
     </flow>
 
-    <error-handler name="On_Error_Continue">
-        <on-error-continue doc:name="On Error Continue">
-            <logger message="Exception! " level="ERROR" doc:name="Logger"/>
-        </on-error-continue>
-    </error-handler>
 </mule>

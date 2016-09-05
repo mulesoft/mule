@@ -69,7 +69,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
   @Override
   public void initialise() throws InitialisationException {
     if (exceptionListener == null) {
-      exceptionListener = muleContext.getDefaultExceptionStrategy();
+      exceptionListener = muleContext.getDefaultErrorHandler();
     }
     if (exceptionListener instanceof FlowConstructAware) {
       ((FlowConstructAware) exceptionListener).setFlowConstruct(flowConstruct);

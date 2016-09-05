@@ -600,11 +600,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   }
 
   @Override
-  public String getDefaultExceptionStrategyName() {
+  public String getDefaultErrorHandlerName() {
     return defaultExceptionStrategyName;
   }
 
-  public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName) {
+  public void setDefaultErrorHandlerName(String defaultExceptionStrategyName) {
     this.defaultExceptionStrategyName = defaultExceptionStrategyName;
   }
 

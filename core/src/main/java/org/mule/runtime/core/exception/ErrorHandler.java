@@ -80,7 +80,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     if (!exceptionListeners.get(exceptionListeners.size() - 1).acceptsAll()) {
       MessagingExceptionHandler defaultExceptionStrategy;
       try {
-        defaultExceptionStrategy = getMuleContext().getDefaultExceptionStrategy();
+        defaultExceptionStrategy = getMuleContext().getDefaultErrorHandler();
       } catch (Exception e) {
         throw new InitialisationException(CoreMessages.createStaticMessage("Failure initializing "
             + "error-handler. If error-handler is defined as default one "
