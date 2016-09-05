@@ -7,8 +7,11 @@
 
 package org.mule.runtime.module.launcher.plugin;
 
-import static java.lang.String.format;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +37,7 @@ public class NamePluginDependenciesResolver implements PluginDependenciesResolve
 
       for (ArtifactPluginDescriptor unresolvedPlugin : unresolvedPlugins) {
         if (isResolvedPlugin(unresolvedPlugin, resolvedPlugins)) {
+          sanitizeExportedPackages(unresolvedPlugin, resolvedPlugins);
           resolvedPlugins.add(unresolvedPlugin);
         } else {
           pendingUnresolvedPlugins.add(unresolvedPlugin);
@@ -47,14 +51,55 @@ public class NamePluginDependenciesResolver implements PluginDependenciesResolve
     }
 
     if (unresolvedPlugins.size() != 0) {
-      throw new PluginResolutionError(createResolutionErrorMessage(unresolvedPlugins));
+      throw new PluginResolutionError(createResolutionErrorMessage(unresolvedPlugins, resolvedPlugins));
     }
 
     return resolvedPlugins;
   }
 
-  protected static String createResolutionErrorMessage(List<ArtifactPluginDescriptor> unresolvedPlugins) {
-    return format("Unable to resolve plugin dependencies: %s", unresolvedPlugins);
+  private void sanitizeExportedPackages(ArtifactPluginDescriptor pluginDescriptor,
+                                        List<ArtifactPluginDescriptor> resolvedPlugins) {
+
+    final Set<String> packagesExportedByDependencies =
+        findDependencyPackageClosure(pluginDescriptor.getPluginDependencies(), resolvedPlugins);
+
+    final ArtifactClassLoaderFilter originalClassLoaderFilter = pluginDescriptor.getClassLoaderFilter();
+    final Set<String> exportedClassPackages = new HashSet<>(originalClassLoaderFilter.getExportedClassPackages());
+    exportedClassPackages.removeAll(packagesExportedByDependencies);
+    pluginDescriptor.setClassLoaderFilter(new DefaultArtifactClassLoaderFilter(exportedClassPackages,
+                                                                               originalClassLoaderFilter.getExportedResources()));
+
+  }
+
+  private Set<String> findDependencyPackageClosure(Set<String> pluginDependencies,
+                                                   List<ArtifactPluginDescriptor> resolvedPlugins) {
+    Set<String> exportedPackages = new HashSet<>();
+    for (String pluginDependency : pluginDependencies) {
+      ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(pluginDependency, resolvedPlugins);
+      exportedPackages.addAll(dependencyDescriptor.getClassLoaderFilter().getExportedClassPackages());
+      exportedPackages.addAll(findDependencyPackageClosure(dependencyDescriptor.getPluginDependencies(), resolvedPlugins));
+    }
+
+    return exportedPackages;
+  }
+
+  protected static String createResolutionErrorMessage(List<ArtifactPluginDescriptor> unresolvedPlugins,
+                                                       List<ArtifactPluginDescriptor> resolvedPlugins) {
+    StringBuilder builder = new StringBuilder("Unable to resolve plugin dependencies:");
+    for (ArtifactPluginDescriptor unresolvedPlugin : unresolvedPlugins) {
+      builder.append("\nPlugin: ").append(unresolvedPlugin.getName()).append(" missing dependencies:");
+      List<String> missingDependencies = new ArrayList<>();
+      for (String dependency : unresolvedPlugin.getPluginDependencies()) {
+        final ArtifactPluginDescriptor dependencyDescriptor = findArtifactPluginDescriptor(dependency, resolvedPlugins);
+        if (dependencyDescriptor == null) {
+          missingDependencies.add(dependency);
+        }
+      }
+
+      builder.append(missingDependencies);
+    }
+
+    return builder.toString();
   }
 
   private boolean isResolvedPlugin(ArtifactPluginDescriptor descriptor, List<ArtifactPluginDescriptor> resolvedPlugins) {
@@ -67,19 +112,26 @@ public class NamePluginDependenciesResolver implements PluginDependenciesResolve
     return isResolved;
   }
 
+  private static ArtifactPluginDescriptor findArtifactPluginDescriptor(String name,
+                                                                       List<ArtifactPluginDescriptor> resolvedPlugins) {
+    ArtifactPluginDescriptor result = null;
+
+    for (ArtifactPluginDescriptor resolvedPlugin : resolvedPlugins) {
+      if (resolvedPlugin.getName().equals(name)) {
+        result = resolvedPlugin;
+        break;
+      }
+    }
+
+    return result;
+  }
+
   private boolean hasDependenciesResolved(Set<String> pluginDependencies, List<ArtifactPluginDescriptor> resolvedPlugins) {
     boolean resolvedDependency = true;
 
     for (String dependency : pluginDependencies) {
-      resolvedDependency = false;
-      for (ArtifactPluginDescriptor resolvedPlugin : resolvedPlugins) {
-
-        if (resolvedPlugin.getName().equals(dependency)) {
-          resolvedDependency = true;
-        }
-      }
-
-      if (!resolvedDependency) {
+      if (findArtifactPluginDescriptor(dependency, resolvedPlugins) == null) {
+        resolvedDependency = false;
         break;
       }
     }
