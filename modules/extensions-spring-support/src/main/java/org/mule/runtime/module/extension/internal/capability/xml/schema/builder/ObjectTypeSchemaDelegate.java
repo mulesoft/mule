@@ -196,8 +196,9 @@ final class ObjectTypeSchemaDelegate {
     } else {
       DslElementSyntax baseDsl = builder.getDslResolver().resolve(baseType);
       base = new QName(baseDsl.getNamespaceUri(), getBaseTypeName(baseType), baseDsl.getNamespace());
-      fields = type.getFields().stream().filter(field -> !baseType.getFields().stream()
-          .anyMatch(other -> other.getKey().getName().getLocalPart().equals(field.getKey().getName().getLocalPart())))
+      fields = type.getFields().stream()
+          .filter(field -> !baseType.getFields().stream()
+              .anyMatch(other -> other.getKey().getName().getLocalPart().equals(field.getKey().getName().getLocalPart())))
           .collect(toList());
     }
 
@@ -266,7 +267,6 @@ final class ObjectTypeSchemaDelegate {
   }
 
   private TopLevelElement registerAbstractElement(DslElementSyntax typeDsl, ObjectType baseType) {
-
     String abstractName = builder.getTopLevelAbstractName(typeDsl);
 
     TopLevelElement element = registeredGlobalElementTypes.get(typeDsl.getNamespace() + abstractName);

@@ -133,7 +133,6 @@ public final class NameClashModelValidator implements ModelValidator {
     }
 
     private void validateTopLevelParameter(ParameterModel parameter, ParameterizedModel owner) {
-
       if (!isInstantiable(parameter.getType()) || !hasExposedFields(parameter.getType())) {
         return;
       }

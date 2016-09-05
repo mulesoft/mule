@@ -53,7 +53,7 @@
             <subtypes:revolver bullets="0"/>
         </subtypes:weapon-list>
         <subtypes:weapon-maps>
-            <subtypes:weapon-map key="ricinChild" >
+            <subtypes:weapon-map key="ricinChild">
                 <heisenberg:ricin microgramsPerKilo="20">
                     <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
                 </heisenberg:ricin>
