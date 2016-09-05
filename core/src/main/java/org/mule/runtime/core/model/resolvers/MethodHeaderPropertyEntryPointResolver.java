@@ -51,7 +51,6 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
     Object[] payload = getPayloadFromMessage(context);
 
     Object methodProp = getFlowVariableOrNull(getMethodProperty(), context.getEvent());
-    context.getEvent().removeFlowVariable(getMethodProperty());
     if (methodProp == null) {
       methodProp = context.getMessage().getInboundProperty(getMethodProperty());
     }

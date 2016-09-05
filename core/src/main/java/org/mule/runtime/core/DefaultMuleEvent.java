@@ -400,11 +400,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  public void removeFlowVariable(String key) {
-    flowVariables.remove(key);
-  }
-
-  @Override
   public boolean isNotificationsEnabled() {
     return notificationsEnabled;
   }

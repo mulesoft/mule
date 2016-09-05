@@ -182,7 +182,6 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
     } catch (NoSuchElementException nsse) {
       // Ignore
     }
-    event.removeFlowVariable(MULE_SESSION_PROPERTY);
     return outbound.get() != null ? outbound.get() : (Serializable) invocation;
   }
 

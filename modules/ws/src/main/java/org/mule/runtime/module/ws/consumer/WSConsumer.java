@@ -218,7 +218,7 @@ public class WSConsumer
       @Override
       protected MuleEvent processRequest(MuleEvent event) throws MuleException {
         propertyValue = getFlowVariableOrNull(propertyName, event);
-        event.removeFlowVariable(propertyName);
+        event = MuleEvent.builder(event).removeFlowVariable(propertyName).build();
         return super.processRequest(event);
       }
 
