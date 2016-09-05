@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el;
 
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -26,6 +27,7 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -33,6 +35,7 @@ import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -134,8 +137,9 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
     MuleEvent event = getTestEvent("");
 
-    mvel.evaluate("p='bar'", event, flowConstruct);
-    assertThat(event.getMessage().getPayload(), is("bar"));
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    mvel.evaluate("p='bar'", event, eventBuilder, flowConstruct);
+    assertThat(eventBuilder.build().getMessage().getPayload(), is("bar"));
   }
 
   @Test
@@ -171,6 +175,8 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
     mvel.initialise();
 
     MuleEvent event = mock(MuleEvent.class);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getError()).thenReturn(empty());
     MuleMessage message = mock(MuleMessage.class);
     when(event.getMessage()).thenReturn(message);
 

@@ -94,14 +94,16 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   public void assignValueToOutboundProperty() throws Exception {
     event = MuleEvent.builder(event)
         .message(MuleMessage.builder(event.getMessage()).addOutboundProperty("foo", "bar_old").build()).build();
-    evaluate("message.outboundProperties['foo']='bar'", event);
-    assertEquals("bar", event.getMessage().getOutboundProperty("foo"));
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    evaluate("message.outboundProperties['foo']='bar'", event, eventBuilder);
+    assertEquals("bar", eventBuilder.build().getMessage().getOutboundProperty("foo"));
   }
 
   @Test
   public void assignValueToNewOutboundProperty() throws Exception {
-    evaluate("message.outboundProperties['foo']='bar'", event);
-    assertEquals("bar", event.getMessage().getOutboundProperty("foo"));
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    evaluate("message.outboundProperties['foo']='bar'", event, eventBuilder);
+    assertEquals("bar", eventBuilder.build().getMessage().getOutboundProperty("foo"));
   }
 
   @Test
@@ -192,8 +194,9 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
   public void outboundClear() throws Exception {
     event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc")
         .addOutboundProperty("bar", "xyz").build()).build();
-    evaluate("message.outboundProperties.clear()", event);
-    assertEquals(0, event.getMessage().getOutboundPropertyNames().size());
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    evaluate("message.outboundProperties.clear()", event, eventBuilder);
+    assertEquals(0, eventBuilder.build().getMessage().getOutboundPropertyNames().size());
   }
 
   @Test
@@ -260,18 +263,20 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void outboundPutAll() throws Exception {
-    evaluate("message.outboundProperties.putAll(['foo': 'abc','bar': 'xyz'])", event);
-    assertEquals("abc", evaluate("message.outboundProperties['foo']", event));
-    assertEquals("xyz", evaluate("message.outboundProperties['bar']", event));
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    evaluate("message.outboundProperties.putAll(['foo': 'abc','bar': 'xyz'])", event, eventBuilder);
+    assertEquals("abc", evaluate("message.outboundProperties['foo']", eventBuilder.build()));
+    assertEquals("xyz", evaluate("message.outboundProperties['bar']", eventBuilder.build()));
   }
 
   @Test
   public void outboundInboundRemove() throws Exception {
     event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty("foo", "abc").build())
         .build();
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
     assertFalse((Boolean) evaluate("message.outboundProperties.isEmpty()", event));
-    evaluate("message.outboundProperties.remove('foo')", event);
-    assertTrue((Boolean) evaluate("message.outboundProperties.isEmpty()", event));
+    evaluate("message.outboundProperties.remove('foo')", event, eventBuilder);
+    assertTrue((Boolean) evaluate("message.outboundProperties.isEmpty()", eventBuilder.build()));
   }
 
 }

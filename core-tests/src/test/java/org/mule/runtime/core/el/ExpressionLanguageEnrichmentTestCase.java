@@ -12,21 +12,13 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -35,13 +27,10 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 
-import java.util.Collections;
-
 import javax.activation.DataHandler;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
@@ -81,9 +70,8 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
       }
     };
     MuleEvent event = getTestEvent(apple);
-    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
-    expressionLanguage.enrich("message.payload.appleCleaner", event, eventBuilder, flowConstruct, fruitCleaner);
-    assertThat(eventBuilder.build().getMessage().getPayload(), is(apple.getAppleCleaner()));
+    expressionLanguage.enrich("message.payload.appleCleaner", event, flowConstruct, fruitCleaner);
+    assertThat(apple.getAppleCleaner(), is(fruitCleaner));
   }
 
   @Test

@@ -155,7 +155,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     }
     MVELExpressionLanguageContext context = createExpressionLanguageContext();
     final DelegateVariableResolverFactory innerDelegate =
-        new DelegateVariableResolverFactory(globalContext, createVariableVariableResolverFactory(event));
+        new DelegateVariableResolverFactory(globalContext, createVariableVariableResolverFactory(event, eventBuilder));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new EventVariableResolverFactory(parserConfiguration, muleContext,
                                                                                             event, eventBuilder, flowConstruct,
@@ -169,6 +169,11 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
+  public void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct, Object object) {
+    enrich(expression, event, MuleEvent.builder(event), flowConstruct, object);
+  }
+
+  @Override
   public void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
                      Object object) {
     expression = removeExpressionMarker(expression);
@@ -179,9 +184,9 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   @Override
   public void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
                      TypedValue typedValue) {
-    evaluate(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
-
     expression = removeExpressionMarker(expression);
+    expression = createEnrichmentExpression(expression);
+    evaluate(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
 
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
 
@@ -316,9 +321,9 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     this.globalFunctionsFile = globalFunctionsFile;
   }
 
-  protected VariableResolverFactory createVariableVariableResolverFactory(MuleEvent event) {
+  protected VariableResolverFactory createVariableVariableResolverFactory(MuleEvent event, MuleEvent.Builder eventBuilder) {
     if (autoResolveVariables) {
-      return new VariableVariableResolverFactory(parserConfiguration, muleContext, event);
+      return new VariableVariableResolverFactory(parserConfiguration, muleContext, event, eventBuilder);
     } else {
       return new NullVariableResolverFactory();
     }

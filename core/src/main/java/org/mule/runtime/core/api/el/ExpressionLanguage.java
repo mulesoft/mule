@@ -135,6 +135,18 @@ public interface ExpressionLanguage {
    */
   void validate(String expression) throws InvalidExpressionException;
 
+  /**
+   *
+   * @param expression
+   * @param event
+   * @param flowConstruct
+   * @param object
+   *
+   * @Deprecated  When using of this method MEL expression will only be able to enirch existing mutable payloads or properties.
+   */
+  void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct,
+              Object object);
+
   void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
               Object object);
 

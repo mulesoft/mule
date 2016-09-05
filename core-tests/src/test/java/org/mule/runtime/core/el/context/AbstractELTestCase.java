@@ -70,6 +70,11 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
     return expressionLanguage.evaluate(expression, event, flowConstruct);
   }
 
+  @SuppressWarnings("deprecation")
+  protected Object evaluate(String expression, MuleEvent event, MuleEvent.Builder eventBuilder) {
+    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct);
+  }
+
   public static enum Variant {
     EXPRESSION_MANAGER, EVALUATOR_LANGUAGE
   }

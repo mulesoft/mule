@@ -16,9 +16,12 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
   private static final long serialVersionUID = -4433478558175131280L;
 
   private MuleEvent event;
+  private MuleEvent.Builder eventBuilder;
 
-  public VariableVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event) {
+  public VariableVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
+                                         MuleEvent.Builder eventBuilder) {
     this.event = event;
+    this.eventBuilder = eventBuilder;
   }
 
   @SuppressWarnings("deprecation")
@@ -80,7 +83,8 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
 
     @Override
     public void setValue(Object value) {
-      event.setFlowVariable(name, value);
+      eventBuilder.addFlowVariable(name, value);
+      event = eventBuilder.build();
     }
   }
 

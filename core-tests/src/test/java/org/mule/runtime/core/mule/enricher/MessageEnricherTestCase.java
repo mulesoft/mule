@@ -150,10 +150,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     MuleEvent in = getTestEvent("");
     in = MuleEvent.builder(in).message(MuleMessage.builder(in.getMessage()).addOutboundProperty("foo", "bar").build()).build();
     MuleEvent out = enricher.process(in);
-    assertThat(out, is(in));
-    assertThat(out.getMessage(), is(in.getMessage()));
     assertThat(out.getCorrelationId(), equalTo(in.getCorrelationId()));
-    assertThat(out.getMessage().getOutboundPropertyNames(), equalTo(in.getMessage().getOutboundPropertyNames()));
     assertThat(out.getMessage().getOutboundProperty("foo"), equalTo("bar"));
     assertThat(out.getMessage().getPayload(), equalTo(in.getMessage().getPayload()));
   }
@@ -276,61 +273,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
   @Test
   public void enrichesFlowVarWithDataTypeUsingExpressionEvaluator() throws Exception {
     doEnrichDataTypePropagationTest(new EnrichExpressionPair(FOO_FLOW_VAR_EXPRESSION));
-  }
-
-  @Test
-  public void enricherConservesSameEventInstance() throws Exception {
-    MessageEnricher enricher = new MessageEnricher();
-    enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
-    SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
-    enricher.setEnrichmentMessageProcessor(sensingNullMessageProcessor);
-
-    Flow flow = mock(Flow.class);
-    when(flow.getMuleContext()).thenReturn(muleContext);
-    MuleEvent in = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(TEST_MESSAGE).build()).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
-    MuleEvent out = enricher.process(in);
-
-    assertThat(out, is(sameInstance(in)));
-    assertThat(sensingNullMessageProcessor.event, not(sameInstance(in)));
-  }
-
-  @Test
-  public void enricherConservesSameEventInstanceNonBlockingTargetNonBlocking() throws Exception {
-    SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor();
-    MessageEnricher enricher = createNonBlockingEnricher(sensingNullMessageProcessor);
-    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    final MuleEvent in = createNonBlockingEvent(nullReplyToHandler);
-
-    MuleEvent out = processEnricherInChain(enricher, in);
-
-    nullReplyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-    assertThat(sensingNullMessageProcessor.event.getMessage(), sameInstance(in.getMessage()));
-
-    assertThat(out, is(instanceOf(NonBlockingVoidMuleEvent.class)));
-    assertThat(nullReplyToHandler.event.getMessage(), is(sameInstance(in.getMessage())));
-  }
-
-  @Test
-  public void enricherConservesSameEventInstanceNonBlockingTargetBlocking() throws Exception {
-    SensingNullMessageProcessor sensingNullMessageProcessor = new SensingNullMessageProcessor() {
-
-      @Override
-      public boolean isNonBlocking(MuleEvent event) {
-        return false;
-      }
-    };
-    MessageEnricher enricher = createNonBlockingEnricher(sensingNullMessageProcessor);
-
-    SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    final MuleEvent in = createNonBlockingEvent(nullReplyToHandler);
-
-    MuleEvent out = processEnricherInChain(enricher, in);
-
-    assertThat(sensingNullMessageProcessor.event.getMessage(), sameInstance(in.getMessage()));
-    assertThat(out.getMessage(), is(sameInstance(in.getMessage())));
   }
 
   @Test

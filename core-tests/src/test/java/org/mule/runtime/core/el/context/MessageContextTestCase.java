@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -44,6 +45,8 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Before
   public void setup() {
     event = mock(MuleEvent.class);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getError()).thenReturn(empty());
     message = spy(MuleMessage.builder().nullPayload().build());
     when(event.getCorrelation()).thenReturn(mock(Correlation.class));
     doAnswer(invocation -> {
@@ -51,8 +54,6 @@ public class MessageContextTestCase extends AbstractELTestCase {
       return null;
     }).when(event).setMessage(any(MuleMessage.class));
     when(event.getMessage()).thenAnswer(invocation -> message);
-    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
-    when(event.getError()).thenReturn(empty());
   }
 
   @Test
@@ -108,8 +109,9 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void assignPayload() throws Exception {
     message = MuleMessage.builder().payload("").build();
-    evaluate("message.payload = 'foo'", event);
-    assertEquals("foo", event.getMessage().getPayload());
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    evaluate("message.payload = 'foo'", event, eventBuilder);
+    assertThat(eventBuilder.build().getMessage().getPayload(), equalTo("foo"));
   }
 
   @Test

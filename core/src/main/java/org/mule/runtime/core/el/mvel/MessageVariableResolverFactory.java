@@ -66,10 +66,11 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
         return new MuleImmutableVariableResolver<>(MESSAGE, new MessageContext(event, eventBuilder, muleContext), null);
       } else if (PAYLOAD.equals(name)) {
         return new MuleVariableResolver<>(PAYLOAD, new MessageContext(event, eventBuilder, muleContext).getPayload(), null,
-                                          (name1, value, newValue) -> event
-                                              .setMessage(MuleMessage.builder(event.getMessage()).payload(newValue).build()));
+                                          (name1, value, newValue) -> eventBuilder
+                                              .message(MuleMessage.builder(event.getMessage()).payload(newValue).build()));
       } else if (FLOW_VARS.equals(name)) {
-        return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS, new FlowVariableMapContext(event), null);
+        return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS, new FlowVariableMapContext(event, eventBuilder),
+                                                                      null);
       } else if (EXCEPTION.equals(name)) {
         if (event.getError().isPresent()) {
           return new MuleImmutableVariableResolver<>(EXCEPTION, event.getError().get().getException(), null);

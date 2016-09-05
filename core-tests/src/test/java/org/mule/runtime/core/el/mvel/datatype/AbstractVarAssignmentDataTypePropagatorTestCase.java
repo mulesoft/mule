@@ -102,7 +102,8 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     final DelegateVariableResolverFactory innerDelegate =
         new DelegateVariableResolverFactory(globalContext,
-                                            new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent));
+                                            new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent,
+                                                                                MuleEvent.builder(testEvent)));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext,
                                             new MessageVariableResolverFactory(parserConfiguration, muleContext, testEvent,

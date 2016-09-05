@@ -12,13 +12,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.*;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
@@ -73,7 +67,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Deprecated
   private String id;
   private MessageContext context;
-  private MuleMessage message;
+  MuleMessage message;
   private final MuleSession session;
   private transient FlowConstruct flowConstruct;
 
@@ -87,7 +81,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   private boolean notificationsEnabled = true;
 
-  private CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
+  CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
 
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   protected boolean nonBlocking;
@@ -433,8 +427,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    * @deprecated This should be used only by the compatibility module.
    * @param encoding
    * @param exchangePattern
-   * @param name
-   * @param uri
    * @param transacted
    */
   @Deprecated
@@ -525,4 +517,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public void setError(Error error) {
     this.error = error;
   }
+
+
 }
