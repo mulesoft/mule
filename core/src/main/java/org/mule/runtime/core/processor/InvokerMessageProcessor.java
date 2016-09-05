@@ -196,7 +196,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       // If string contains is a single expression then evaluate otherwise
       // parse. We can't use parse() always because that will convert
       // everything to a string
-      if (expression.startsWith(patternInfo.getPrefix()) && expression.endsWith(patternInfo.getSuffix())) {
+      if (expression.startsWith(patternInfo.getPrefix()) && expression.endsWith(patternInfo.getSuffix())
+          && expression.lastIndexOf(patternInfo.getPrefix()) == 0) {
         arg = expressionLanguage.evaluate(expression, event, flowConstruct);
       } else {
         arg = expressionLanguage.parse(expression, event, flowConstruct);

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.el.function;
 
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionExecutor;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
@@ -30,6 +32,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
@@ -199,7 +202,9 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
 
   protected void addMessageToContextWithPayload(String payload) throws TransformerException {
     event = mock(MuleEvent.class);
-    eventBuilder = mock(MuleEvent.Builder.class);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getError()).thenReturn(empty());
+    eventBuilder = MuleEvent.builder(event);
     message = mock(MuleMessage.class);
     doAnswer(invocation -> {
       message = (MuleMessage) invocation.getArguments()[0];
