@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
@@ -24,6 +27,8 @@ import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 import java.util.Enumeration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.CompoundEnumeration;
 import sun.net.www.protocol.jar.Handler;
 
@@ -40,12 +45,20 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     registerAsParallelCapable();
   }
 
+  protected Logger logger = LoggerFactory.getLogger(getClass());
+
   private final ClassLoaderLookupPolicy lookupPolicy;
+  private final boolean verboseLogging;
 
   public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
     super(urls, parent, new NonCachingURLStreamHandlerFactory());
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
+    verboseLogging = logger.isDebugEnabled() || isVerboseLoggingEnabled();
+  }
+
+  private boolean isVerboseLoggingEnabled() {
+    return logger.isInfoEnabled() && valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
   }
 
   @Override
@@ -59,6 +72,10 @@ public class FineGrainedControlClassLoader extends URLClassLoader
     final ClassLoaderLookupStrategy lookupStrategy = lookupPolicy.getLookupStrategy(name);
     if (lookupStrategy == null) {
       throw new NullPointerException(format("Unable to find a lookup strategy for '%s' from %s", name, this));
+    }
+
+    if (verboseLogging) {
+      logLoadingClass(name, lookupStrategy, "Loading class '%s' with '%s' on '%s'", this);
     }
 
     // Gather information about the exceptions in each of the searched classloaders to provide
@@ -90,11 +107,36 @@ public class FineGrainedControlClassLoader extends URLClassLoader
                                                 firstException != null ? asList(firstException, e) : asList(e));
     }
 
+    if (verboseLogging) {
+      logLoadedClass(name, result);
+    }
+
     if (resolve) {
       resolveClass(result);
     }
 
     return result;
+  }
+
+  private void logLoadingClass(String name, ClassLoaderLookupStrategy lookupStrategy, String format,
+                               FineGrainedControlClassLoader fineGrainedControlClassLoader) {
+    final String message = format(format, name, lookupStrategy, fineGrainedControlClassLoader);
+    doVerboseLogging(message);
+  }
+
+  private void logLoadedClass(String name, Class<?> result) {
+    final boolean loadedFromChild = result.getClassLoader() == this;
+    final String message = format("Class '%s' loaded from %s: %s", name, (loadedFromChild ? "child" : "parent"),
+                                  (loadedFromChild ? this : getParent()));
+    doVerboseLogging(message);
+  }
+
+  private void doVerboseLogging(String message) {
+    if (logger.isDebugEnabled()) {
+      logger.debug(message);
+    } else {
+      logger.info(message);
+    }
   }
 
   protected Class<?> findParentClass(String name) throws ClassNotFoundException {

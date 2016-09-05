@@ -19,7 +19,6 @@ import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStra
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_ONLY;
 import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
-
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.artifact.classloader.TestClassLoader.TestClassNotFoundException;
 import org.mule.runtime.module.artifact.classloader.exception.CompositeClassNotFoundException;
