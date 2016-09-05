@@ -20,8 +20,8 @@ import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
-import org.mule.runtime.extension.api.dsql.DsqlQueryTranslator;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
+import org.mule.runtime.extension.api.introspection.dsql.QueryTranslator;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
@@ -118,7 +118,7 @@ public class MetadataKeyIdObjectResolverTestCase {
   public void resolveDsql() throws MetadataResolvingException {
     ParameterModel queryParam = mock(ParameterModel.class);
     when(queryParam.getModelProperty(QueryParameterModelProperty.class))
-        .thenReturn(Optional.of(new QueryParameterModelProperty(DsqlQueryTranslator.class)));
+        .thenReturn(Optional.of(new QueryParameterModelProperty(QueryTranslator.class)));
     mockMetadataKeyModelProp(queryParam, 1);
     setParameters(queryParam);
     setMetadataKeyIdModelProperty(String.class);
