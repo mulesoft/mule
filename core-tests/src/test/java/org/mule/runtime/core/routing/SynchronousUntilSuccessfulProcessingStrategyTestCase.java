@@ -156,7 +156,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     assertThat(response.getMessage().getPayload(), equalTo(expressionEvalutaionResult));
     verify(mockRoute).process(any(MuleEvent.class));
     verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage()).evaluate(eq(ackExpression),
-                                                                                              any(MuleEvent.class), eq(null));
+                                                                                               any(MuleEvent.class), eq(null));
   }
 
   @Test
