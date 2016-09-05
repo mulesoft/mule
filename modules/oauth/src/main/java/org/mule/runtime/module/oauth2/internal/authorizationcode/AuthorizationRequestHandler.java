@@ -77,7 +77,7 @@ public class AuthorizationRequestHandler implements MuleContextAware {
 
   public void init() throws MuleException {
     try {
-      stateEvaluator = new AttributeEvaluator(state).initialize(muleContext.getExpressionManager());
+      stateEvaluator = new AttributeEvaluator(state).initialize(muleContext.getExpressionLanguage());
       final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(muleContext);
       final String flowName = "authorization-request-handler-" + localAuthorizationUrl;
       final Flow flow = DynamicFlowFactory.createDynamicFlow(muleContext, flowName, createLocalAuthorizationUrlListener());

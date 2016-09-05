@@ -9,7 +9,6 @@ package org.mule.compatibility.transport.http;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -530,7 +529,7 @@ enum CookieStorageType {
 
         final String value;
         if (event != null) {
-          value = muleContext.getExpressionManager().parse(cookieValue, event, null);
+          value = muleContext.getExpressionLanguage().parse(cookieValue, event, null);
         } else {
           value = cookieValue;
         }

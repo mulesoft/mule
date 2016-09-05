@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
@@ -80,7 +79,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
       initOrderedObjects.add(new NotificationLifecycleObject(ObjectStoreManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguageExtension.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ExpressionLanguage.class));
-      initOrderedObjects.add(new NotificationLifecycleObject(ExpressionManager.class));
       initOrderedObjects.add(new NotificationLifecycleObject(ConfigurationProvider.class));
       initOrderedObjects.add(new NotificationLifecycleObject(Config.class));
       initOrderedObjects.add(new NotificationLifecycleObject(QueueManager.class));

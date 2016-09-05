@@ -40,8 +40,8 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
   private static final String ROOT_FOO_BAR = "<root foo=\"bar\"/>";
   private static final String BAR = "bar";
 
-  public XPath3FunctionTestCase(AbstractELTestCase.Variant variant, String optimizer) {
-    super(variant, optimizer);
+  public XPath3FunctionTestCase(String optimizer) {
+    super(optimizer);
   }
 
   @Test

@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
 
 import org.junit.Test;
 
@@ -25,14 +24,11 @@ public class ExpressionLanguageExtensionTestCase extends AbstractIntegrationTest
 
   @Test
   public void doesNotOverrideExpressionLanguageInExpressionManagerOnCreation() throws Exception {
-    ExpressionLanguage originalExpressionLanguage =
-        ((DefaultExpressionManager) muleContext.getExpressionManager()).getExpressionLanguage();
+    ExpressionLanguage originalExpressionLanguage = muleContext.getExpressionLanguage();
 
-    MuleClient client = muleContext.getClient();
     flowRunner("createsExpressionLanguage").withPayload(TEST_MESSAGE).run();
 
-    ExpressionLanguage newExpressionLanguage =
-        ((DefaultExpressionManager) muleContext.getExpressionManager()).getExpressionLanguage();
+    ExpressionLanguage newExpressionLanguage = muleContext.getExpressionLanguage();
 
     assertSame(originalExpressionLanguage, newExpressionLanguage);
   }

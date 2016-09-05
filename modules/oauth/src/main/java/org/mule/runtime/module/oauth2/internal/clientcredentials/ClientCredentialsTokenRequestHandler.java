@@ -90,7 +90,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
       final MuleEvent response;
       response = invokeTokenUrl(accessTokenEvent);
       final TokenResponseProcessor tokenResponseProcessor = TokenResponseProcessor
-          .createClientCredentialsProcessor(tokenResponseConfiguration, getMuleContext().getExpressionManager());
+          .createClientCredentialsProcessor(tokenResponseConfiguration, getMuleContext().getExpressionLanguage());
       tokenResponseProcessor.process(response);
 
       if (logger.isDebugEnabled()) {

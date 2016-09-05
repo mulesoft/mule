@@ -9,7 +9,7 @@ package org.mule.runtime.core.util;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.TypedValue;
 
@@ -28,14 +28,14 @@ public class AttributeEvaluator {
   }
 
   private final String attributeValue;
-  private ExpressionManager expressionManager;
+  private ExpressionLanguage expressionManager;
   private AttributeType attributeType;
 
   public AttributeEvaluator(String attributeValue) {
     this.attributeValue = attributeValue;
   }
 
-  public AttributeEvaluator initialize(final ExpressionManager expressionManager) {
+  public AttributeEvaluator initialize(final ExpressionLanguage expressionManager) {
     this.expressionManager = expressionManager;
     resolveAttributeType();
     return this;

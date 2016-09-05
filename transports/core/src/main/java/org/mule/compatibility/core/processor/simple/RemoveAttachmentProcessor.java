@@ -28,7 +28,7 @@ public class RemoveAttachmentProcessor extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    nameEvaluator.initialize(muleContext.getExpressionManager());
+    nameEvaluator.initialize(muleContext.getExpressionLanguage());
   }
 
   @Override

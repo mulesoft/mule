@@ -35,8 +35,8 @@ public class MessageContextTestCase extends AbstractELTestCase {
   private MuleEvent event;
   private MuleMessage message;
 
-  public MessageContextTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
+  public MessageContextTestCase(String mvelOptimizer) {
+    super(mvelOptimizer);
   }
 
   @Before

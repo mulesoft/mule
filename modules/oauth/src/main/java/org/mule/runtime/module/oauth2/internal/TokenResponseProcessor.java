@@ -7,7 +7,7 @@
 package org.mule.runtime.module.oauth2.internal;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class TokenResponseProcessor {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private final TokenResponseConfiguration tokenResponseConfiguration;
-  private final ExpressionManager expressionManager;
+  private final ExpressionLanguage expressionLanguage;
   private final boolean retrieveRefreshToken;
   private String accessToken;
   private String refreshToken;
@@ -31,38 +31,38 @@ public class TokenResponseProcessor {
   private Map<String, Object> customResponseParameters;
 
   public static TokenResponseProcessor createAuthorizationCodeProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                                                        final ExpressionManager expressionManager) {
-    return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, true);
+                                                                        final ExpressionLanguage expressionLanguage) {
+    return new TokenResponseProcessor(tokenResponseConfiguration, expressionLanguage, true);
   }
 
   public static TokenResponseProcessor createClientCredentialsProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                                                        final ExpressionManager expressionManager) {
-    return new TokenResponseProcessor(tokenResponseConfiguration, expressionManager, false);
+                                                                        final ExpressionLanguage expressionLanguage) {
+    return new TokenResponseProcessor(tokenResponseConfiguration, expressionLanguage, false);
   }
 
   private TokenResponseProcessor(final TokenResponseConfiguration tokenResponseConfiguration,
-                                 final ExpressionManager expressionManager, boolean retrieveRefreshToken) {
+                                 final ExpressionLanguage expressionLanguage, boolean retrieveRefreshToken) {
     this.tokenResponseConfiguration = tokenResponseConfiguration;
-    this.expressionManager = expressionManager;
+    this.expressionLanguage = expressionLanguage;
     this.retrieveRefreshToken = retrieveRefreshToken;
   }
 
   public void process(final MuleEvent muleEvent) {
-    accessToken = expressionManager.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, null);
+    accessToken = expressionLanguage.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, null);
     accessToken = isEmpty(accessToken) ? null : accessToken;
     if (accessToken == null) {
       logger.error("Could not extract access token from token URL. Expressions used to retrieve access token was "
           + tokenResponseConfiguration.getAccessToken());
     }
     if (retrieveRefreshToken) {
-      refreshToken = expressionManager.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, null);
+      refreshToken = expressionLanguage.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, null);
       refreshToken = isEmpty(refreshToken) ? null : refreshToken;
     }
-    expiresIn = expressionManager.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, null);
+    expiresIn = expressionLanguage.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, null);
     customResponseParameters = new HashMap<>();
     for (ParameterExtractor parameterExtractor : tokenResponseConfiguration.getParameterExtractors()) {
       customResponseParameters.put(parameterExtractor.getParamName(),
-                                   expressionManager.evaluate(parameterExtractor.getValue(), muleEvent, null));
+                                   expressionLanguage.evaluate(parameterExtractor.getValue(), muleEvent, null));
     }
   }
 

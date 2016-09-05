@@ -56,7 +56,6 @@ import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
@@ -110,7 +109,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     muleContext.setworkListener(getWorkListener());
     muleContext.setNotificationManager(injectMuleContextIfRequired(getNotificationManager(), muleContext));
     muleContext.setLifecycleManager(injectMuleContextIfRequired(getLifecycleManager(), muleContext));
-    muleContext.setExpressionManager(injectMuleContextIfRequired(new DefaultExpressionManager(), muleContext));
 
     DefaultRegistryBroker registryBroker = new DefaultRegistryBroker(muleContext);
     muleContext.setRegistryBroker(registryBroker);

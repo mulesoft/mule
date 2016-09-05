@@ -93,7 +93,9 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
                                             new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(parserConfiguration, muleContext,
-                                                                                              testEvent, innerDelegate));
+                                                                                              testEvent,
+                                                                                              MuleEvent.builder(testEvent),
+                                                                                              innerDelegate));
     context.setNextFactory(new CachedMapVariableResolverFactory(Collections.EMPTY_MAP, delegate));
     return context;
   }

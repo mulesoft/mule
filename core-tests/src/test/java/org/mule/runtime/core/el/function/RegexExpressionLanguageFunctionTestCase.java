@@ -43,6 +43,7 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
   protected RegexExpressionLanguageFuntion regexFuntion;
   protected MuleContext muleContext;
   private MuleEvent event;
+  private MuleEvent.Builder eventBuilder;
   private MuleMessage message;
 
   @Before
@@ -198,6 +199,7 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
 
   protected void addMessageToContextWithPayload(String payload) throws TransformerException {
     event = mock(MuleEvent.class);
+    eventBuilder = mock(MuleEvent.Builder.class);
     message = mock(MuleMessage.class);
     doAnswer(invocation -> {
       message = (MuleMessage) invocation.getArguments()[0];
@@ -209,7 +211,7 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
     TransformationService transformationService = mock(TransformationService.class);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
     when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
-    context.addFinalVariable("message", new MessageContext(event, muleContext));
+    context.addFinalVariable("message", new MessageContext(event, eventBuilder, muleContext));
   }
 
 }

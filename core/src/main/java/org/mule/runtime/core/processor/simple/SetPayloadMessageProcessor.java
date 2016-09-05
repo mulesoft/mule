@@ -83,6 +83,6 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    valueEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator.initialize(muleContext.getExpressionLanguage());
   }
 }

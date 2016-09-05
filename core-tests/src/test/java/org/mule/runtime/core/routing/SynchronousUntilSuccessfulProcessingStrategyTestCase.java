@@ -148,14 +148,14 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     String ackExpression = "some-expression";
     String expressionEvalutaionResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager()
+    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage()
         .evaluate(eq(ackExpression), any(MuleEvent.class), eq(null))).thenReturn(expressionEvalutaionResult);
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(MuleEvent.class))).thenAnswer(invocation -> (MuleEvent) invocation.getArguments()[0]);
     MuleEvent response = processingStrategy.route(event, getTestFlow());
     assertThat(response.getMessage().getPayload(), equalTo(expressionEvalutaionResult));
     verify(mockRoute).process(any(MuleEvent.class));
-    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager()).evaluate(eq(ackExpression),
+    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage()).evaluate(eq(ackExpression),
                                                                                               any(MuleEvent.class), eq(null));
   }
 

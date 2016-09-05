@@ -49,7 +49,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
 
     this.expectedType = expectedType;
     evaluator = new AttributeEvaluator(expression);
-    evaluator.initialize(muleContext.getExpressionManager());
+    evaluator.initialize(muleContext.getExpressionLanguage());
 
     this.muleContext = muleContext;
   }

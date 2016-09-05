@@ -37,10 +37,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLI
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_IN_MEMORY_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAULT_PERSISTENT_NAME;
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DynamicDataTypeConversionResolver;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -49,7 +47,7 @@ import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.bootstrap.SimpleRegistryBootstrap;
 import org.mule.runtime.core.connector.MuleConnectorOperationLocator;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
@@ -125,7 +123,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, new NoRetryPolicyTemplate(), muleContext);
     registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(muleContext), muleContext);
 
-    registerObject(OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguageWrapper(muleContext), muleContext);
+    registerObject(OBJECT_EXPRESSION_LANGUAGE, new MVELExpressionLanguage(muleContext), muleContext);
     registerObject(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR, new MuleConnectorOperationLocator(), muleContext);
     registerObject(OBJECT_TIME_SUPPLIER, new TimeSupplier(), muleContext);
     registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);

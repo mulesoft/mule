@@ -7,8 +7,8 @@
 package org.mule.runtime.core.el.mvel;
 
 import static java.util.Collections.singletonMap;
-import static org.mule.runtime.core.expression.DefaultExpressionManager.OBJECT_FOR_ENRICHMENT;
-import static org.mule.runtime.core.expression.DefaultExpressionManager.removeExpressionMarker;
+import static org.apache.commons.lang.StringUtils.replace;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
@@ -21,9 +21,9 @@ import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -33,6 +33,8 @@ import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.util.TemplateParser;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -46,10 +48,16 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.MimeType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
  */
 public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable {
+
+  public static final String OBJECT_FOR_ENRICHMENT = "__object_for_enrichment";
+  private static final Logger logger = getLogger(MVELExpressionLanguage.class);
 
   protected ParserConfiguration parserConfiguration;
   protected MuleContext muleContext;
@@ -67,6 +75,9 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   protected boolean autoResolveVariables = true;
   protected MvelDataTypeResolver dataTypeResolver = new MvelDataTypeResolver();
   protected MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator();
+
+  // default style parser
+  private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
   public MVELExpressionLanguage(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -124,11 +135,21 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   @Override
   @SuppressWarnings("unchecked")
   public <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct) {
-    return (T) evaluate(expression, event, flowConstruct, null);
+    return (T) evaluate(expression, event, MuleEvent.builder(event), flowConstruct);
+  }
+
+  public <T> T evaluate(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct) {
+    return (T) evaluate(expression, event, eventBuilder, flowConstruct, null);
   }
 
   @Override
   public <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct, Map<String, Object> vars) {
+    return evaluate(expression, event, MuleEvent.builder(event), flowConstruct, vars);
+  }
+
+  @Override
+  public <T> T evaluate(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
+                        Map<String, Object> vars) {
     if (event == null) {
       return evaluate(expression, vars);
     }
@@ -137,7 +158,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
         new DelegateVariableResolverFactory(globalContext, createVariableVariableResolverFactory(event));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new EventVariableResolverFactory(parserConfiguration, muleContext,
-                                                                                            event, flowConstruct, innerDelegate));
+                                                                                            event, eventBuilder, flowConstruct,
+                                                                                            innerDelegate));
     if (vars != null) {
       context.setNextFactory(new CachedMapVariableResolverFactory(vars, delegate));
     } else {
@@ -147,8 +169,17 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct, TypedValue typedValue) {
-    evaluate(expression, event, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
+  public void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
+                     Object object) {
+    expression = removeExpressionMarker(expression);
+    expression = createEnrichmentExpression(expression);
+    evaluate(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, object));
+  }
+
+  @Override
+  public void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
+                     TypedValue typedValue) {
+    evaluate(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
 
     expression = removeExpressionMarker(expression);
 
@@ -159,9 +190,15 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
   @Override
   public TypedValue evaluateTyped(String expression, MuleEvent event, FlowConstruct flowConstruct) {
+    return evaluateTyped(expression, event, MuleEvent.builder(event), flowConstruct);
+  }
+
+  @Override
+  public TypedValue evaluateTyped(String expression, MuleEvent event, MuleEvent.Builder eventBuilder,
+                                  FlowConstruct flowConstruct) {
     expression = removeExpressionMarker(expression);
 
-    final Object value = evaluate(expression, event, flowConstruct);
+    final Object value = evaluate(expression, event, eventBuilder, flowConstruct);
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
     final DataType dataType = dataTypeResolver.resolve(value, event, compiledExpression);
 
@@ -193,8 +230,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
   @Override
   public void validate(String expression) throws InvalidExpressionException {
-    if (expression.startsWith(ExpressionManager.DEFAULT_EXPRESSION_PREFIX)) {
-      if (!expression.endsWith(ExpressionManager.DEFAULT_EXPRESSION_POSTFIX)) {
+    if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
+      if (!expression.endsWith(DEFAULT_EXPRESSION_POSTFIX)) {
         throw new InvalidExpressionException(expression, "Expression string is not an expression");
       }
       expression = expression.substring(2, expression.length() - 1);
@@ -299,6 +336,72 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     return parserConfiguration;
   }
 
+  @Override
+  public String parse(String expression, final MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
+    return parser.parse((TemplateParser.TemplateCallback) token -> {
+      Object result = evaluate(token, event, flowConstruct);
+      if (result instanceof MuleMessage) {
+        return ((MuleMessage) result).getPayload();
+      } else {
+        return result;
+      }
+    }, expression);
+  }
 
+  public static String removeExpressionMarker(String expression) {
+    if (expression == null) {
+      throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
+    }
+    if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX)) {
+      expression = expression.substring(2, expression.length() - 1);
+    }
+    return expression;
+  }
+
+  @Override
+  public boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct)
+      throws ExpressionRuntimeException {
+    return evaluateBoolean(expression, event, flowConstruct, false, false);
+  }
+
+  @Override
+  public boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
+                                 boolean nonBooleanReturnsTrue)
+      throws ExpressionRuntimeException {
+    return resolveBoolean(evaluate(expression, event, flowConstruct), nullReturnsTrue, nonBooleanReturnsTrue, expression);
+  }
+
+  protected boolean resolveBoolean(Object result, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue, String expression) {
+    if (result == null) {
+      return nullReturnsTrue;
+    } else if (result instanceof Boolean) {
+      return (Boolean) result;
+    } else if (result instanceof String) {
+      if (result.toString().toLowerCase().equalsIgnoreCase("false")) {
+        return false;
+      } else if (result.toString().toLowerCase().equalsIgnoreCase("true")) {
+        return true;
+      } else {
+        return nonBooleanReturnsTrue;
+      }
+    } else {
+      logger.warn("Expression: " + expression + ", returned an non-boolean result. Returning: " + nonBooleanReturnsTrue);
+      return nonBooleanReturnsTrue;
+    }
+  }
+
+  @Override
+  public boolean isExpression(String expression) {
+    return (expression.contains(DEFAULT_EXPRESSION_PREFIX));
+  }
+
+  protected String createEnrichmentExpression(String expression) {
+    if (expression.contains("$")) {
+      expression = replace(expression, "$", OBJECT_FOR_ENRICHMENT);
+    } else {
+      expression = expression + "=" + OBJECT_FOR_ENRICHMENT;
+    }
+    return expression;
+  }
 
 }

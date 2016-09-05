@@ -16,8 +16,8 @@ import org.junit.Test;
 
 public class FlowTestCase extends AbstractELTestCase {
 
-  public FlowTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
+  public FlowTestCase(String mvelOptimizer) {
+    super(mvelOptimizer);
   }
 
   @Override

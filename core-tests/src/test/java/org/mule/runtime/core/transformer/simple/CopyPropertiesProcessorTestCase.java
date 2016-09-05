@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -56,12 +56,12 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   private MuleMessage muleMessage;
 
   @Mock
-  private ExpressionManager mockExpressionManager;
+  private ExpressionLanguage mockExpressionLanguage;
 
   @Before
   public void setUp() throws Exception {
-    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(mockMuleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
+    when(mockExpressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
     muleMessage = MuleMessage.builder().payload("").mediaType(PROPERTY_DATA_TYPE.getMediaType()).build();

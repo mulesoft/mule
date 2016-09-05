@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.IOUtils;
@@ -36,7 +36,7 @@ public class ParseTemplateTransformerTestCase {
   private MuleEvent mockMuleEvent = mock(MuleEvent.class);
   private MuleMessage mockMuleMessage = mock(MuleMessage.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
-  private ExpressionManager mockExpressionManager = mock(ExpressionManager.class);
+  private ExpressionLanguage mockExpressionLanguage = mock(ExpressionLanguage.class);
 
   @Before
   public void setUp() {
@@ -44,7 +44,7 @@ public class ParseTemplateTransformerTestCase {
     parseTemplateTransformer.setMuleContext(mockMuleContext);
 
     when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
-    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
+    when(mockMuleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -74,7 +74,7 @@ public class ParseTemplateTransformerTestCase {
     when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
     String expectedExpression = IOUtils.getResourceAsString(LOCATION, this.getClass());
 
-    when(mockExpressionManager.parse(expectedExpression, mockMuleEvent, null)).thenReturn("Parsed");
+    when(mockExpressionLanguage.parse(expectedExpression, mockMuleEvent, null)).thenReturn("Parsed");
 
     Object response = parseTemplateTransformer.transformMessage(mockMuleEvent, UTF_8);
     assertNotNull(response);

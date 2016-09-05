@@ -136,7 +136,7 @@ public class MuleEventToHttpRequest {
     HttpEntity entity;
 
     if (!StringUtils.isEmpty(requester.getSource()) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getSource()))) {
-      Object newPayload = muleContext.getExpressionManager().evaluate(requester.getSource(), muleEvent, null);
+      Object newPayload = muleContext.getExpressionLanguage().evaluate(requester.getSource(), muleEvent, null);
       oldPayload = muleEvent.getMessage().getPayload();
       muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(newPayload).build());
       customSource = true;

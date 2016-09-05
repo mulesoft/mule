@@ -22,8 +22,8 @@ public class VariablesTestCase extends AbstractELTestCase {
 
   private MuleEvent event;
 
-  public VariablesTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
+  public VariablesTestCase(String mvelOptimizer) {
+    super(mvelOptimizer);
   }
 
   @Before

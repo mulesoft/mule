@@ -29,12 +29,14 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
 
-  private MuleEvent event;
-  private MuleContext muleContext;
+  protected MuleEvent event;
+  protected MuleEvent.Builder eventBuilder;
+  protected MuleContext muleContext;
 
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final MuleEvent event) {
+                                        final MuleEvent event, final MuleEvent.Builder eventBuilder) {
     this.event = event;
+    this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;
   }
 
@@ -45,8 +47,9 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
    * @param next
    */
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final MuleEvent event, final VariableResolverFactory next) {
-    this(parserConfiguration, muleContext, event);
+                                        final MuleEvent event, final MuleEvent.Builder eventBuilder,
+                                        final VariableResolverFactory next) {
+    this(parserConfiguration, muleContext, event, eventBuilder);
     setNextFactory(next);
   }
 
@@ -60,9 +63,9 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public VariableResolver getVariableResolver(String name) {
     if (event != null) {
       if (MESSAGE.equals(name)) {
-        return new MuleImmutableVariableResolver<>(MESSAGE, new MessageContext(event, muleContext), null);
+        return new MuleImmutableVariableResolver<>(MESSAGE, new MessageContext(event, eventBuilder, muleContext), null);
       } else if (PAYLOAD.equals(name)) {
-        return new MuleVariableResolver<>(PAYLOAD, new MessageContext(event, muleContext).getPayload(), null,
+        return new MuleVariableResolver<>(PAYLOAD, new MessageContext(event, eventBuilder, muleContext).getPayload(), null,
                                           (name1, value, newValue) -> event
                                               .setMessage(MuleMessage.builder(event.getMessage()).payload(newValue).build()));
       } else if (FLOW_VARS.equals(name)) {

@@ -196,7 +196,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
   protected void setCacheControl(HttpResponse response, MuleEvent event) {
     if (cacheControl != null) {
-      cacheControl.parse(event, muleContext.getExpressionManager());
+      cacheControl.parse(event, muleContext.getExpressionLanguage());
       String cacheControlValue = cacheControl.toString();
       if (!"".equals(cacheControlValue)) {
         if (headers.get(HttpConstants.HEADER_CACHE_CONTROL) != null) {
@@ -214,7 +214,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     if (!cookies.isEmpty()) {
       for (CookieWrapper cookie : cookies) {
         try {
-          cookie.parse(event, muleContext.getExpressionManager());
+          cookie.parse(event, muleContext.getExpressionLanguage());
           response.addHeader(new Header(HttpConstants.HEADER_COOKIE_SET,
                                         CookieHelper.formatCookieForASetCookieHeader(cookie.createCookie())));
 
@@ -267,7 +267,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
   private String parse(String value, MuleEvent event) {
     if (value != null) {
-      return muleContext.getExpressionManager().parse(value, event, flowConstruct);
+      return muleContext.getExpressionLanguage().parse(value, event, flowConstruct);
     }
     return value;
   }
@@ -275,8 +275,8 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
   private String evaluateDate(String value, MuleEvent event) {
     Object realValue = value;
 
-    if (value != null && muleContext.getExpressionManager().isExpression(value)) {
-      realValue = muleContext.getExpressionManager().evaluate(value, event, flowConstruct);
+    if (value != null && muleContext.getExpressionLanguage().isExpression(value)) {
+      realValue = muleContext.getExpressionLanguage().evaluate(value, event, flowConstruct);
     }
 
     if (realValue instanceof Date) {

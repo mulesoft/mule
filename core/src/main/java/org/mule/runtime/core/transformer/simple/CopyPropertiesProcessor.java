@@ -33,7 +33,7 @@ public class CopyPropertiesProcessor implements MessageProcessor, MuleContextAwa
 
   @Override
   public void initialise() throws InitialisationException {
-    this.propertyNameEvaluator.initialize(muleContext.getExpressionManager());
+    this.propertyNameEvaluator.initialize(muleContext.getExpressionLanguage());
   }
 
   @Override

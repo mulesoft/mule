@@ -434,8 +434,8 @@ public class XsltTransformer extends AbstractXmlTransformer {
   protected Object evaluateTransformParameter(String key, Object value, MuleEvent event) throws TransformerException {
     if (value instanceof String) {
       String stringValue = (String) value;
-      if (muleContext.getExpressionManager().isExpression(stringValue)) {
-        return muleContext.getExpressionManager().evaluate(stringValue, event, null);
+      if (muleContext.getExpressionLanguage().isExpression(stringValue)) {
+        return muleContext.getExpressionLanguage().evaluate(stringValue, event, null);
       }
     }
 

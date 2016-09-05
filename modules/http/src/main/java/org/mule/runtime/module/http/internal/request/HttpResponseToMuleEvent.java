@@ -145,7 +145,8 @@ public class HttpResponseToMuleEvent {
       muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(payload)
           .mediaType(muleEvent.getMessage().getDataType().getMediaType()).build());
     } else {
-      muleContext.getExpressionManager().enrich(requester.getTarget(), muleEvent, null, payload);
+      // TODO MVEL-IMMUTABLE-EVENT
+      muleContext.getExpressionLanguage().enrich(requester.getTarget(), muleEvent, MuleEvent.builder(muleEvent), null, payload);
     }
   }
 

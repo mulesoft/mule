@@ -84,10 +84,8 @@ import org.mule.runtime.core.context.notification.RegistryNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
@@ -155,7 +153,7 @@ class SpringMuleContextServiceConfigurator {
   private final ImmutableMap<String, BeanDefinition> defaultContextServices = ImmutableMap.<String, BeanDefinition>builder()
       .put(OBJECT_TRANSACTION_MANAGER, getBeanDefinition(TransactionManagerFactoryBean.class))
       .put(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, getBeanDefinition(NoRetryPolicyTemplate.class))
-      .put(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguageWrapper.class))
+      .put(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguage.class))
       .put(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class))
       .put(OBJECT_TIME_SUPPLIER, getBeanDefinition(TimeSupplier.class))
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DefaultConnectionManager.class))
@@ -261,7 +259,6 @@ class SpringMuleContextServiceConfigurator {
       // TODO MULE-9638 - DB parsers use the expression language before initialisation phase. Remove once it gets migrated to SDK.
       MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
       expressionLanguage.initialise();
-      ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(expressionLanguage);
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);
     }

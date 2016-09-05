@@ -20,13 +20,11 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
   private static final long serialVersionUID = -6819292692339684915L;
 
   private final String FLOW = "flow";
-  private MuleEvent event;
   private FlowConstruct flowConstruct;
 
   public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
-                                      FlowConstruct flowConstruct) {
-    super(parserConfiguration, muleContext, event);
-    this.event = event;
+                                      MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct) {
+    super(parserConfiguration, muleContext, event, eventBuilder);
     this.flowConstruct = flowConstruct;
   }
 
@@ -34,12 +32,11 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
    * Convenience constructor to allow for more concise creation of VariableResolverFactory chains without and performance overhead
    * incurred by using a builder.
    * 
-   * @param delegate
    * @param next
    */
   public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
-                                      FlowConstruct flowConstruct, VariableResolverFactory next) {
-    this(parserConfiguration, muleContext, event, flowConstruct);
+                                      MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct, VariableResolverFactory next) {
+    this(parserConfiguration, muleContext, event, eventBuilder, flowConstruct);
     setNextFactory(next);
   }
 

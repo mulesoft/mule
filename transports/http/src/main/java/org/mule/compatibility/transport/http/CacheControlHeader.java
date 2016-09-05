@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 
 import java.util.Arrays;
 
@@ -35,15 +35,15 @@ public class CacheControlHeader {
    * Evaluates all the properties in case there are expressions
    *
    * @param event MuleEvent
-   * @param expressionManager
+   * @param expressionLanguage
    */
-  public void parse(MuleEvent event, ExpressionManager expressionManager) {
-    directive = parse(directive, event, expressionManager);
+  public void parse(MuleEvent event, ExpressionLanguage expressionLanguage) {
+    directive = parse(directive, event, expressionLanguage);
     checkDirective(directive);
-    noCache = parse(noCache, event, expressionManager);
-    noStore = parse(noStore, event, expressionManager);
-    mustRevalidate = parse(mustRevalidate, event, expressionManager);
-    maxAge = parse(maxAge, event, expressionManager);
+    noCache = parse(noCache, event, expressionLanguage);
+    noStore = parse(noStore, event, expressionLanguage);
+    mustRevalidate = parse(mustRevalidate, event, expressionLanguage);
+    maxAge = parse(maxAge, event, expressionLanguage);
   }
 
   private void checkDirective(String directive) {
@@ -78,9 +78,9 @@ public class CacheControlHeader {
     return value;
   }
 
-  private String parse(String value, MuleEvent event, ExpressionManager expressionManager) {
+  private String parse(String value, MuleEvent event, ExpressionLanguage expressionLanguage) {
     if (value != null) {
-      return expressionManager.parse(value, event, null);
+      return expressionLanguage.parse(value, event, null);
     }
     return value;
   }

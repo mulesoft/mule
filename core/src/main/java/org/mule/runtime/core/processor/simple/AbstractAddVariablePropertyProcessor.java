@@ -33,8 +33,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
 
   @Override
   public void initialise() throws InitialisationException {
-    identifierEvaluator.initialize(muleContext.getExpressionManager());
-    valueEvaluator.initialize(muleContext.getExpressionManager());
+    identifierEvaluator.initialize(muleContext.getExpressionLanguage());
+    valueEvaluator.initialize(muleContext.getExpressionLanguage());
   }
 
   @Override

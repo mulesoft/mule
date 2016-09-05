@@ -7,12 +7,15 @@
 package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.*;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -45,11 +48,11 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   protected volatile ObjectStore<String> store;
   protected String storePrefix;
 
-  protected String idExpression = MessageFormat.format("{0}message:id{1}", ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                                                       ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+  protected String idExpression = MessageFormat.format("{0}message:id{1}", DEFAULT_EXPRESSION_PREFIX,
+                                                       DEFAULT_EXPRESSION_POSTFIX);
 
-  protected String valueExpression = MessageFormat.format("{0}message:id{1}", ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                                                          ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+  protected String valueExpression = MessageFormat.format("{0}message:id{1}", DEFAULT_EXPRESSION_PREFIX,
+                                                          DEFAULT_EXPRESSION_POSTFIX);
 
   public IdempotentMessageFilter() {
     super();
@@ -83,11 +86,11 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   }
 
   protected String getValueForEvent(MuleEvent event) throws MessagingException {
-    return flowConstruct.getMuleContext().getExpressionManager().parse(valueExpression, event, flowConstruct, true);
+    return flowConstruct.getMuleContext().getExpressionLanguage().parse(valueExpression, event, flowConstruct);
   }
 
   protected String getIdForEvent(MuleEvent event) throws MessagingException {
-    return flowConstruct.getMuleContext().getExpressionManager().parse(idExpression, event, flowConstruct, true);
+    return flowConstruct.getMuleContext().getExpressionLanguage().parse(idExpression, event, flowConstruct);
   }
 
   public String getIdExpression() {

@@ -37,10 +37,13 @@ import org.mule.runtime.core.message.Correlation;
 public class MessageContext {
 
   private MuleEvent event;
+  private MuleEvent.Builder eventBuilder;
   private MuleContext muleContext;
 
-  public MessageContext(MuleEvent event, MuleContext muleContext) {
+
+  public MessageContext(MuleEvent event, MuleEvent.Builder eventBuilder, MuleContext muleContext) {
     this.event = event;
+    this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;
   }
 
@@ -72,7 +75,8 @@ public class MessageContext {
    * @throws TransformerException
    */
   public <T> T payloadAs(Class<T> type) throws TransformerException {
-    event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), DataType.fromType(type)));
+    eventBuilder.message(muleContext.getTransformationService().transform(event.getMessage(), DataType.fromType(type)));
+    event = eventBuilder.build();
     return (T) event.getMessage().getPayload();
   }
 
@@ -84,12 +88,15 @@ public class MessageContext {
    * @throws TransformerException if there is an error during transformation
    */
   public Object payloadAs(DataType dataType) throws TransformerException {
-    event.setMessage(muleContext.getTransformationService().transform(event.getMessage(), dataType));
+    eventBuilder.message(muleContext.getTransformationService().transform(event.getMessage(), dataType));
+    event = eventBuilder.build();
     return event.getMessage().getPayload();
   }
 
   public void setPayload(Object payload) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
+    eventBuilder.message(MuleMessage.builder(event.getMessage()).payload(payload).build());
+    event = eventBuilder.build();
+
   }
 
   public Map<String, Serializable> getInboundProperties() {
@@ -97,7 +104,7 @@ public class MessageContext {
   }
 
   public Map<String, Serializable> getOutboundProperties() {
-    return new OutboundPropertiesMapContext(event);
+    return new OutboundPropertiesMapContext(event, eventBuilder);
   }
 
   public Map<String, DataHandler> getInboundAttachments() {
@@ -105,7 +112,7 @@ public class MessageContext {
   }
 
   public Map<String, DataHandler> getOutboundAttachments() {
-    return new OutboundAttachmentMapContext(event);
+    return new OutboundAttachmentMapContext(event, eventBuilder);
   }
 
   public Attributes getAttributes() {

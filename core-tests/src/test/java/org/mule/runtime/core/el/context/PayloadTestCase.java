@@ -25,8 +25,8 @@ public class PayloadTestCase extends AbstractELTestCase {
   private MuleEvent event;
   private MuleMessage message;
 
-  public PayloadTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
+  public PayloadTestCase(String mvelOptimizer) {
+    super(mvelOptimizer);
   }
 
   @Before

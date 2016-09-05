@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -65,7 +64,6 @@ import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
@@ -156,8 +154,6 @@ public class DefaultMuleContext implements MuleContext {
    */
   private long startDate;
 
-  private ExpressionManager expressionManager;
-
   private volatile StreamCloserService streamCloserService;
   private Object streamCloserServiceLock = new Object();
 
@@ -226,9 +222,6 @@ public class DefaultMuleContext implements MuleContext {
     this.lifecycleManager = lifecycleManager;
     this.notificationManager = notificationManager;
     this.notificationManager.setMuleContext(this);
-    // there is no point having this object configurable
-    this.expressionManager = new DefaultExpressionManager();
-    ((MuleContextAware) this.expressionManager).setMuleContext(this);
     registryBroker = createRegistryBroker();
     muleRegistryHelper = createRegistryHelper(registryBroker);
     localMuleClient = new DefaultLocalMuleClient(this);
@@ -281,10 +274,6 @@ public class DefaultMuleContext implements MuleContext {
       getNotificationManager().start(workManager, workListener);
       fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
-
-      if (expressionManager instanceof Initialisable) {
-        ((Initialisable) expressionManager).initialise();
-      }
 
       fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
     } catch (InitialisationException e) {
@@ -364,10 +353,6 @@ public class DefaultMuleContext implements MuleContext {
 
     notificationManager.dispose();
     workManager.dispose();
-
-    if (expressionManager != null && expressionManager instanceof Disposable) {
-      ((Disposable) expressionManager).dispose();
-    }
 
     if ((getStartDate() > 0) && logger.isInfoEnabled()) {
       SplashScreen shutdownScreen = buildShutdownSplash();
@@ -722,17 +707,6 @@ public class DefaultMuleContext implements MuleContext {
     return startDate;
   }
 
-  /**
-   * Returns the Expression Manager configured for this instance of Mule
-   *
-   * @return the Expression Manager configured for this instance of Mule
-   * @see org.mule.runtime.core.api.expression.ExpressionManager
-   */
-  @Override
-  public ExpressionManager getExpressionManager() {
-    return expressionManager;
-  }
-
   @Override
   public void setExecutionClassLoader(ClassLoader cl) {
     this.executionClassLoader = cl;
@@ -943,10 +917,6 @@ public class DefaultMuleContext implements MuleContext {
 
   public void setLifecycleManager(MuleContextLifecycleManager lifecyleManager) {
     this.lifecycleManager = lifecyleManager;
-  }
-
-  public void setExpressionManager(DefaultExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
   }
 
   public void setRegistryBroker(DefaultRegistryBroker registryBroker) {

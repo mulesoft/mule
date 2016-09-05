@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -40,13 +40,13 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
   private CountDownLatch latch;
 
   protected FlowConstruct flowConstruct;
-  protected ExpressionManager expressionManager;
+  protected ExpressionLanguage expressionLanguage;
   private boolean result = true;
 
   @Override
   public void start() throws InitialisationException {
-    this.expressionManager = flowConstruct.getMuleContext().getExpressionManager();
-    this.expressionManager.validateExpression(expression);
+    this.expressionLanguage = flowConstruct.getMuleContext().getExpressionLanguage();
+    this.expressionLanguage.validate(expression);
     latch = new CountDownLatch(count);
     FlowAssert.addAssertion(flowConstruct.getName(), this);
   }
@@ -57,7 +57,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
       return null;
     }
     this.event = event;
-    result = result && expressionManager.evaluateBoolean(expression, event, flowConstruct, false, true);
+    result = result && expressionLanguage.evaluateBoolean(expression, event, flowConstruct, false, true);
     increaseCount();
     latch.countDown();
     return event;

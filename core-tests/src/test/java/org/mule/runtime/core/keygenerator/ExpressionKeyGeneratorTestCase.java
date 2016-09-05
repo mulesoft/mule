@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.NotSerializableException;
@@ -33,9 +33,9 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
-    expressionManager = mock(ExpressionManager.class);
+    expressionLanguage = mock(ExpressionLanguage.class);
     MuleContext context = mock(MuleContext.class);
-    when(context.getExpressionManager()).thenReturn(expressionManager);
+    when(context.getExpressionLanguage()).thenReturn(expressionLanguage);
 
     message = mock(MuleMessage.class);
 
@@ -47,11 +47,11 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
     keyGenerator.setMuleContext(context);
   }
 
-  private ExpressionManager expressionManager;
+  private ExpressionLanguage expressionLanguage;
 
   @Test
   public void testGeneratesSerializableKey() throws Exception {
-    when(expressionManager.evaluate(EXPRESSION, event, null)).thenReturn(KEY);
+    when(expressionLanguage.evaluate(EXPRESSION, event, null)).thenReturn(KEY);
     Serializable key = keyGenerator.generateKey(event);
 
     assertEquals(KEY, key);
@@ -59,7 +59,7 @@ public class ExpressionKeyGeneratorTestCase extends AbstractMuleTestCase {
 
   @Test(expected = NotSerializableException.class)
   public void testThrowsExceptionOnNonSerializableKey() throws Exception {
-    when(expressionManager.evaluate(EXPRESSION, event, null)).thenReturn(null);
+    when(expressionLanguage.evaluate(EXPRESSION, event, null)).thenReturn(null);
     keyGenerator.generateKey(event);
   }
 }
