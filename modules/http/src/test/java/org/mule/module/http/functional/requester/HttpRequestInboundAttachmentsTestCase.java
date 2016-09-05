@@ -14,6 +14,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
+import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.transport.NullPayload;
 
 import java.io.IOException;
@@ -49,7 +50,8 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
         assertAttachment(event.getMessage(), "partName1", "Test part 1", "text/plain");
         assertAttachment(event.getMessage(), "partName2", "Test part 2", "text/html");
 
-
+        HttpPartDataSource part2Source = (HttpPartDataSource) event.getMessage().getInboundAttachment("partName2").getDataSource();
+        assertThat(part2Source.getHeader("Custom-Header"), equalTo("custom"));
     }
 
     private void assertAttachment(MuleMessage message, String attachmentName, String attachmentContents, String contentType) throws IOException
@@ -60,10 +62,7 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
         assertThat(handler.getContentType(), equalTo(contentType));
 
         assertThat(IOUtils.toString(handler.getInputStream()), equalTo(attachmentContents));
-
     }
-
-
 
     protected void handleRequest(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException
     {
@@ -76,7 +75,10 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
         multiPartWriter.write("Test part 1");
         multiPartWriter.endPart();
 
-        multiPartWriter.startPart("text/html", new String[] { "Content-Disposition: form-data; name=\"partName2\"" });
+        multiPartWriter.startPart("text/html", new String[] {
+            "Content-Disposition: form-data; name=\"partName2\"",
+            "Custom-Header: custom"
+        });
         multiPartWriter.write("Test part 2");
         multiPartWriter.endPart();
 

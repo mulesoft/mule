@@ -107,6 +107,10 @@ public abstract class HttpHeaders
          */
         public static final String CONTENT_DISPOSITION = "Content-Disposition";
         /**
+         * {@value "Content-Id"}
+         */
+        public static final String CONTENT_ID = "Content-Id";
+        /**
          * {@value "Content-Language"}
          */
         public static final String CONTENT_LANGUAGE = "Content-Language";
