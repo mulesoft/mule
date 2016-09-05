@@ -60,7 +60,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
 
   public MetadataResult<MetadataKeysContainer> getMetadataKeys() throws MetadataResolvingException {
 
-    MetadataKeysContainerBuilder keysBuilder = new MetadataKeysContainerBuilder();
+    MetadataKeysContainerBuilder keysBuilder = MetadataKeysContainerBuilder.getInstance();
     MetadataContext metadataContext = getMetadataContext();
     try {
       addComponentKeys(getModel().getOperationModels(), metadataContext, keysBuilder);

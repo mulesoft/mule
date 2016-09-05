@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.metadata;
+package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.getClassName;
@@ -16,35 +16,31 @@ import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.extension.api.annotation.Query;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
+import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 
 
 /**
- * Default implementation of the {@link MetadataResolverFactory}, it provides initialized instances of
- * {@link MetadataKeysResolver}, {@link MetadataKeysResolver} and {@link MetadataOutputResolver} of the classes passed in the
- * constructor.
+ * A {@link MetadataResolverFactory} implementation for {@link Query} operations, it provides initialized instances of
+ * {@link MetadataOutputResolver} and {@link QueryEntityResolver}.
+ *
+ * {@link MetadataAttributesResolver}, {@link MetadataContentResolver} and {@link MetadataKeysResolver} returned instances are
+ * always instances of {@link NullMetadataResolver}.
  *
  * @since 4.0
  */
-public final class DefaultMetadataResolverFactory implements MetadataResolverFactory {
+public final class QueryMetadataResolverFactory implements MetadataResolverFactory {
 
   private final MetadataOutputResolver metadataOutputResolver;
-  private final MetadataAttributesResolver metadataAttributesResolver;
-  private final MetadataContentResolver metadataContentResolver;
-  private final MetadataKeysResolver metadataKeysResolver;
+  private final QueryEntityResolver queryMetadataEntityResolver;
 
-  public DefaultMetadataResolverFactory(Class<? extends MetadataKeysResolver> keyResolver,
-                                        Class<? extends MetadataContentResolver> contentResolver,
-                                        Class<? extends MetadataOutputResolver> outputResolver,
-                                        Class<? extends MetadataAttributesResolver> attributesResolver) {
-    checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
-    checkArgument(contentResolver != null, "MetadataContentResolver type cannot be null");
+  public QueryMetadataResolverFactory(Class<? extends MetadataOutputResolver> outputResolver,
+                                      Class<? extends QueryEntityResolver> queryEntityResolver) {
     checkArgument(outputResolver != null, "MetadataOutputResolver type cannot be null");
-
-    metadataKeysResolver = instantiateResolver(keyResolver);
-    metadataContentResolver = instantiateResolver(contentResolver);
+    checkArgument(queryEntityResolver != null, "QueryEntityResolver type cannot be null");
     metadataOutputResolver = instantiateResolver(outputResolver);
-    metadataAttributesResolver = instantiateResolver(attributesResolver);
+    queryMetadataEntityResolver = instantiateResolver(queryEntityResolver);
   }
 
   /**
@@ -52,7 +48,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
    */
   @Override
   public MetadataKeysResolver getKeyResolver() {
-    return metadataKeysResolver;
+    return new NullMetadataResolver();
   }
 
   /**
@@ -60,15 +56,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
    */
   @Override
   public <T> MetadataContentResolver<T> getContentResolver() {
-    return metadataContentResolver;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <T> MetadataOutputResolver<T> getOutputResolver() {
-    return metadataOutputResolver;
+    return (MetadataContentResolver<T>) new NullMetadataResolver();
   }
 
   /**
@@ -76,7 +64,15 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
    */
   @Override
   public <T> MetadataAttributesResolver<T> getOutputAttributesResolver() {
-    return metadataAttributesResolver;
+    return (MetadataAttributesResolver<T>) new NullMetadataResolver();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> MetadataOutputResolver<T> getOutputResolver() {
+    return new DsqlQueryMetadataResolver(queryMetadataEntityResolver, metadataOutputResolver);
   }
 
   /**
@@ -84,7 +80,7 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
    */
   @Override
   public QueryEntityResolver getQueryEntityResolver() {
-    return new NullQueryEntityMetadataResolver();
+    return queryMetadataEntityResolver;
   }
 
   private <T> T instantiateResolver(Class<?> factoryType) {

@@ -10,6 +10,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 
@@ -51,9 +52,20 @@ public class NullMetadataResolverFactory implements MetadataResolverFactory {
     return (MetadataOutputResolver<T>) metadataResolver;
   }
 
+  /**
+   * @return a {@link NullMetadataResolver} instance implementation of {@link MetadataAttributesResolver}
+   */
   @Override
   public <T> MetadataAttributesResolver<T> getOutputAttributesResolver() {
     return (MetadataAttributesResolver<T>) metadataResolver;
+  }
+
+  /**
+   * @return a {@link NullQueryEntityMetadataResolver} instance.
+   */
+  @Override
+  public QueryEntityResolver getQueryEntityResolver() {
+    return new NullQueryEntityMetadataResolver();
   }
 
 }

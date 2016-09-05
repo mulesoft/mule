@@ -10,13 +10,15 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getMetadata;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -30,9 +32,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
-import org.mule.test.metadata.extension.MetadataConnection;
 import org.mule.test.metadata.extension.MetadataExtension;
-import org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -48,6 +48,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String FIRST_PROCESSOR_INDEX = "0";
 
   protected static final String METADATA_TEST = "metadata-tests.xml";
+  protected static final String DSQL_QUERY = "dsql:SELECT id FROM Circle WHERE (diameter < 18)";
 
   protected static final String METADATA_TEST_STATIC_NO_REF_CONFIGURATION = "metadata-tests-static-no-ref-configuration.xml";
   protected static final String METADATA_TEST_DYNAMIC_NO_REF_CONFIGURATION = "metadata-tests-dynamic-no-ref-configuration.xml";
@@ -67,6 +68,9 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER = "contentAndOutputWithCacheResolver";
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG =
       "contentAndOutputWithCacheResolverWithSpecificConfig";
+  protected static final String QUERY_FLOW = "queryOperation";
+  protected static final String NATIVE_QUERY_FLOW = "nativeQueryOperation";
+
   protected static final String CONTENT_ONLY_CACHE_RESOLVER = "contentOnlyCacheResolver";
   protected static final String OUTPUT_AND_METADATA_KEY_CACHE_RESOLVER = "outputAndMetadataKeyCacheResolver";
   protected static final String SOURCE_METADATA = "sourceMetadata";
@@ -89,10 +93,11 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String COUNTRY = "country";
   protected static final String CITY = "city";
 
-  protected final NullMetadataKey nullMetadataKey = new NullMetadataKey();
-  protected MetadataType personType;
+  protected final static MetadataKey PERSON_METADATA_KEY = newKey(PERSON).build();
+  protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
+  protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
-  protected MetadataKey personKey;
+  protected MetadataType personType;
   protected ComponentId componentId;
   protected MuleEvent event;
   protected MetadataManager metadataManager;
@@ -105,20 +110,14 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   }
 
   @Before
-  public void setContext() throws Exception {
+  public void setup() throws Exception {
     event = getTestEvent("");
     metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
-  }
-
-  @Before
-  public void setMetadata() throws Exception {
-    typeLoader = ExtensionsTestUtils.TYPE_LOADER;
-    personKey = MetadataKeyBuilder.newKey(MetadataConnection.PERSON).build();
-    personType = TestMetadataResolverUtils.getMetadata(personKey.getId());
+    personType = getMetadata(PERSON_METADATA_KEY.getId());
   }
 
   protected ComponentMetadataDescriptor getComponentDynamicMetadata() {
-    return getComponentDynamicMetadata(personKey);
+    return getComponentDynamicMetadata(PERSON_METADATA_KEY);
   }
 
   protected ComponentMetadataDescriptor getComponentDynamicMetadata(MetadataKey key) {
@@ -173,12 +172,12 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   }
 
   protected void assertExpectedType(MetadataResult<TypeMetadataDescriptor> descriptor, Type type) throws IOException {
-    assertThat(descriptor.get().getType(), is(typeLoader.load(type)));
+    assertThat(descriptor.get().getType(), is(TYPE_LOADER.load(type)));
   }
 
   protected void assertExpectedType(MetadataResult<ParameterMetadataDescriptor> descriptor, String name, Type type)
       throws IOException {
-    assertThat(descriptor.get().getType(), is(typeLoader.load(type)));
+    assertThat(descriptor.get().getType(), is(TYPE_LOADER.load(type)));
     if (!StringUtils.isBlank(name)) {
       assertThat(descriptor.get().getName(), is(name));
     }

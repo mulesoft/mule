@@ -159,7 +159,20 @@
     </flow>
 
     <flow name="pagedOperationMetadata">
-        <metadata:paged-operation-metadata config-ref="dynamic-config" animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
+        <metadata:paged-operation-metadata config-ref="dynamic-config"
+                                           animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
+    </flow>
+
+    <flow name="queryOperation">
+        <metadata:do-query>
+            <metadata:query><![CDATA[dsql:SELECT id FROM Circle WHERE diameter < 18]]></metadata:query>
+        </metadata:do-query>
+    </flow>
+
+    <flow name="nativeQueryOperation">
+        <metadata:do-query>
+            <metadata:query><![CDATA[SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18]]></metadata:query>
+        </metadata:do-query>
     </flow>
 
 </mule>

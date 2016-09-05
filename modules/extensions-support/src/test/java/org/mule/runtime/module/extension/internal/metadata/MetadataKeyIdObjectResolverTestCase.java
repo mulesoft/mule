@@ -6,19 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.extension.api.dsql.DsqlQuery;
+import org.mule.runtime.extension.api.dsql.DsqlQueryTranslator;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.test.metadata.extension.LocationKey;
 
 import java.util.Arrays;
@@ -42,8 +49,8 @@ public class MetadataKeyIdObjectResolverTestCase {
   private static final String USA = "USA";
   private static final String CONTINENT = "continent";
   private static final String AMERICA = "AMERICA";
-  private static final MetadataKey MULTILEVEL_KEY =
-      newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY).withChild(newKey(SFO, CITY))).build();
+  private static final MetadataKey MULTILEVEL_KEY = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)
+      .withChild(newKey(SFO, CITY))).build();
   private static final MetadataKey INCOMPLETE_MULTILEVEL_KEY = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
   private static final String OPERATION_NAME = "SomeOperation";
   private final MetadataKeyIdObjectResolver keyIdObjectResolver = new MetadataKeyIdObjectResolver();
@@ -65,13 +72,23 @@ public class MetadataKeyIdObjectResolverTestCase {
 
   @Before
   public void setUp() {
-    when(continentParam.getModelProperty(MetadataKeyPartModelProperty.class))
-        .thenReturn(Optional.of(new MetadataKeyPartModelProperty(1)));
-    when(countryParam.getModelProperty(MetadataKeyPartModelProperty.class))
-        .thenReturn(Optional.of(new MetadataKeyPartModelProperty(2)));
-    when(cityParam.getModelProperty(MetadataKeyPartModelProperty.class))
-        .thenReturn(Optional.of(new MetadataKeyPartModelProperty(3)));
+    mockMetadataKeyModelProp(continentParam, 1);
+    mockMetadataKeyModelProp(countryParam, 2);
+    mockMetadataKeyModelProp(cityParam, 3);
+
+    mockQueryModelProp(continentParam);
+    mockQueryModelProp(countryParam);
+    mockQueryModelProp(cityParam);
+
     when(componentModel.getName()).thenReturn(OPERATION_NAME);
+  }
+
+  private void mockMetadataKeyModelProp(ParameterModel param, int pos) {
+    when(param.getModelProperty(MetadataKeyPartModelProperty.class)).thenReturn(of(new MetadataKeyPartModelProperty(pos)));
+  }
+
+  private void mockQueryModelProp(ParameterModel param) {
+    when(param.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
   }
 
   @Test
@@ -98,10 +115,27 @@ public class MetadataKeyIdObjectResolverTestCase {
   }
 
   @Test
+  public void resolveDsql() throws MetadataResolvingException {
+    ParameterModel queryParam = mock(ParameterModel.class);
+    when(queryParam.getModelProperty(QueryParameterModelProperty.class))
+        .thenReturn(Optional.of(new QueryParameterModelProperty(DsqlQueryTranslator.class)));
+    mockMetadataKeyModelProp(queryParam, 1);
+    setParameters(queryParam);
+    setMetadataKeyIdModelProperty(String.class);
+
+    MetadataKey dsqlKey = newKey("dsql:SELECT id FROM Circle WHERE (diameter < 18)").build();
+    final Object resolvedKey = keyIdObjectResolver.resolve(componentModel, dsqlKey);
+    assertThat(resolvedKey, is(instanceOf(DsqlQuery.class)));
+    DsqlQuery query = (DsqlQuery) resolvedKey;
+    assertThat(query.getFields(), hasSize(1));
+    assertThat(query.getType().getName(), is("Circle"));
+  }
+
+  @Test
   public void failToResolveWithNotInstantiableKey() throws MetadataResolvingException {
     exception.expect(MetadataResolvingException.class);
-    exception
-        .expectMessage(is("MetadataKey object of type 'NotInstantiableClass' from the component 'SomeOperation' could not be instantiated"));
+    exception.expectMessage(
+                            is("MetadataKey object of type 'NotInstantiableClass' from the component 'SomeOperation' could not be instantiated"));
     exception.expectCause(is(instanceOf(NoSuchMethodException.class)));
 
     setParameters(continentParam, countryParam, cityParam);
@@ -127,7 +161,7 @@ public class MetadataKeyIdObjectResolverTestCase {
     exception.expectMessage(is("Component 'SomeOperation' doesn't have a MetadataKeyId parameter associated"));
 
     setParameters(continentParam, countryParam, cityParam);
-    when(componentModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(Optional.empty());
+    when(componentModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(empty());
 
     keyIdObjectResolver.resolve(componentModel, MULTILEVEL_KEY);
   }
@@ -136,7 +170,8 @@ public class MetadataKeyIdObjectResolverTestCase {
   public void failToResolveWithMultipleChildren() throws MetadataResolvingException {
     exception.expect(MetadataResolvingException.class);
     exception
-        .expectMessage(is("MetadataKey used for Metadata resolution must only have one child per level. Key 'USA' has [SFO, NY] as children."));
+        .expectMessage(
+                       is("MetadataKey used for Metadata resolution must only have one child per level. Key 'USA' has [SFO, NY] as children."));
 
     final MetadataKey invalidMetadataKey = newKey(AMERICA, CONTINENT)
         .withChild(newKey(USA, COUNTRY).withChild(newKey(SFO, CITY)).withChild(newKey(NY, CITY))).build();
@@ -150,7 +185,8 @@ public class MetadataKeyIdObjectResolverTestCase {
   public void failToResolveWithInvalidKeyIdParam() throws MetadataResolvingException {
     exception.expect(MetadataResolvingException.class);
     exception
-        .expectMessage(is("'Boolean' type is invalid for MetadataKeyId parameters, use String type instead. Affecting component: 'SomeOperation'"));
+        .expectMessage(is(
+                          "'Boolean' type is invalid for MetadataKeyId parameters, use String type instead. Affecting component: 'SomeOperation'"));
 
     setParameters(continentParam);
     setMetadataKeyIdModelProperty(Boolean.class);
@@ -164,7 +200,7 @@ public class MetadataKeyIdObjectResolverTestCase {
 
   private void setMetadataKeyIdModelProperty(Class<?> type) {
     when(componentModel.getModelProperty(MetadataKeyIdModelProperty.class))
-        .thenReturn(Optional.of(new MetadataKeyIdModelProperty(new JavaTypeLoader(this.getClass().getClassLoader()).load(type))));
+        .thenReturn(of(new MetadataKeyIdModelProperty(new JavaTypeLoader(this.getClass().getClassLoader()).load(type))));
   }
 
   private class NotInstantiableClass {

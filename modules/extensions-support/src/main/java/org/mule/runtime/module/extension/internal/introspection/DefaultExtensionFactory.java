@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.EMPTY;
@@ -102,7 +103,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
    * Creates a new instance and uses the given {@code serviceRegistry} to locate instances of {@link ModelEnricher}
    *
    * @param serviceRegistry a {@link ServiceRegistry}
-   * @param classLoader the {@link ClassLoader} on which the {@code serviceRegistry} will search into
+   * @param classLoader     the {@link ClassLoader} on which the {@code serviceRegistry} will search into
    */
   public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader) {
     modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
@@ -136,8 +137,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
     try {
       new MuleVersion(extensionDeclaration.getVersion());
     } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException(String.format("Invalid version '%s' for extension '%s'",
-                                                       extensionDeclaration.getVersion(), extensionDeclaration.getName()));
+      throw new IllegalArgumentException(format("Invalid version '%s' for extension '%s'",
+                                                extensionDeclaration.getVersion(), extensionDeclaration.getName()));
     }
   }
 
@@ -250,10 +251,14 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
         OperationExecutorFactory executorFactory =
             new OperationExecutorFactoryWrapper(declaration.getExecutorFactory(), interceptors);
 
-        return new ImmutableRuntimeOperationModel(declaration.getName(), declaration.getDescription(), executorFactory,
-                                                  parameterModels, toOutputModel(declaration.getOutput()),
+        return new ImmutableRuntimeOperationModel(declaration.getName(),
+                                                  declaration.getDescription(),
+                                                  executorFactory,
+                                                  parameterModels,
+                                                  toOutputModel(declaration.getOutput()),
                                                   toOutputModel(declaration.getOutputAttributes()),
-                                                  declaration.getModelProperties(), declaration.getInterceptorFactories(),
+                                                  declaration.getModelProperties(),
+                                                  declaration.getInterceptorFactories(),
                                                   declaration.getExceptionEnricherFactory(),
                                                   declaration.getMetadataResolverFactory());
       });
@@ -296,19 +301,25 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
       Object defaultValue = parameter.getDefaultValue();
       if (defaultValue instanceof String) {
         if (parameter.getExpressionSupport() == NOT_SUPPORTED && isExpression((String) defaultValue)) {
-          throw new IllegalParameterModelDefinitionException(String.format(
-                                                                           "Parameter '%s' is marked as not supporting expressions yet it contains one as a default value. Please fix this",
-                                                                           parameter.getName()));
+          throw new IllegalParameterModelDefinitionException(
+                                                             format("Parameter '%s' is marked as not supporting expressions yet it"
+                                                                 + " contains one as a default value. Please fix this",
+                                                                    parameter.getName()));
         } else if (parameter.getExpressionSupport() == REQUIRED && !isExpression((String) defaultValue)) {
-          throw new IllegalParameterModelDefinitionException(String.format(
-                                                                           "Parameter '%s' requires expressions yet it contains a constant as a default value. Please fix this",
-                                                                           parameter.getName()));
+          throw new IllegalParameterModelDefinitionException(format("Parameter '%s' requires expressions yet it "
+              + "contains a constant as a default value. Please fix this",
+                                                                    parameter.getName()));
         }
       }
-      return new ImmutableParameterModel(parameter.getName(), parameter.getDescription(), parameter.getType(),
-                                         parameter.hasDynamicType(), parameter.isRequired(), parameter.getExpressionSupport(),
-                                         parameter.getDefaultValue(), parameter.getModelProperties());
 
+      return new ImmutableParameterModel(parameter.getName(),
+                                         parameter.getDescription(),
+                                         parameter.getType(),
+                                         parameter.hasDynamicType(),
+                                         parameter.isRequired(),
+                                         parameter.getExpressionSupport(),
+                                         parameter.getDefaultValue(),
+                                         parameter.getModelProperties());
     }
   }
 }
