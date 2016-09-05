@@ -14,7 +14,7 @@
 
     <flow name="commitLocalTx">
         <tx:verify-no-transaction/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun/>
         </block>
         <tx:verify-transaction-commited/>
@@ -22,7 +22,7 @@
 
     <flow name="rollbackLocalTx">
         <tx:verify-no-transaction/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun/>
             <tx:fail/>
         </block>
@@ -35,7 +35,7 @@
 
     <flow name="executeTransactionless">
         <tx:verify-no-transaction/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <tx:get-connection transactionalAction="NOT_SUPPORTED"/>
         </block>
     </flow>

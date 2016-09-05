@@ -8,7 +8,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="jdbcRollback">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:update config-ref="dbConfig">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>
@@ -17,7 +17,7 @@
     </flow>
 
     <flow name="jdbcCommit">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:update config-ref="dbConfig">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>
@@ -27,7 +27,7 @@
     </flow>
 
     <flow name="rollbackWithNonTransactionalMP">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>
@@ -36,7 +36,7 @@
     </flow>
 
     <flow name="commitWithNonTransactionalMP">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>

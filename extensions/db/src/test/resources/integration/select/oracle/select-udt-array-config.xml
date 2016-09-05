@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="returnsDefaultArray">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select * from regions</db:sql>
             </db:select>
@@ -22,7 +22,7 @@
     </flow>
 
     <flow name="returnsCustomArray">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select * from contacts</db:sql>
             </db:select>

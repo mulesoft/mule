@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="returnsDefaultArrayValue">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:stored-procedure>
                 <db:sql>{ CALL getZipCodes('Southwest', :out) }</db:sql>
                 <db:output-parameters>
@@ -20,7 +20,7 @@
     </flow>
 
     <flow name="returnsCustomArrayValue">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:stored-procedure>
                 <db:sql>{ CALL getContactDetails('Contact1', :out) }</db:sql>
                 <db:output-parameters>

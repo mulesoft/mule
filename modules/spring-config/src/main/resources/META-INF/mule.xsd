@@ -911,7 +911,7 @@
                     <xsd:group ref="messageProcessorOrMixedContentMessageProcessor" maxOccurs="unbounded"/>
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
-                <xsd:attribute name="transactionalAction" type="transactionalActionType" default="ALWAYS_BEGIN"/>
+                <xsd:attribute name="transactionalAction" type="transactionalActionType" default="INDIFFERENT"/>
                 <xsd:attribute name="transactionType" type="transactionType" default="LOCAL"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -919,6 +919,7 @@
 
     <xsd:simpleType name="transactionalActionType">
         <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="INDIFFERENT"/>
             <xsd:enumeration value="ALWAYS_BEGIN"/>
             <xsd:enumeration value="BEGIN_OR_JOIN"/>
         </xsd:restriction>
