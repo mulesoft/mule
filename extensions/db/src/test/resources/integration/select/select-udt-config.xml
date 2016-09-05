@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="returnsUDT">
-        <dbn:select>
-            <dbn:sql>select * from REGION_MANAGERS</dbn:sql>
-        </dbn:select>
+        <db:select>
+            <db:sql>select * from REGION_MANAGERS</db:sql>
+        </db:select>
     </flow>
 </mule>

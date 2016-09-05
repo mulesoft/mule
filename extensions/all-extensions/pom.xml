@@ -116,7 +116,7 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-dbn</artifactId>
+            <artifactId>mule-module-db</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
             <exclusions>

@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:dbn="http://www.mulesoft.org/schema/mule/dbn"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-            http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <dbn:query name="namedParamsQueryTemplate">
-        <dbn:sql>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</dbn:sql>
-        <dbn:input-parameters>
-            <dbn:input-parameter key="position" value="4"/>
-            <dbn:input-parameter key="name" value="Venus"/>
-        </dbn:input-parameters>
-    </dbn:query>
+    <db:query name="namedParamsQueryTemplate">
+        <db:sql>SELECT * FROM PLANET WHERE POSITION = :position and NAME = :name</db:sql>
+        <db:input-parameters>
+            <db:input-parameter key="position" value="4"/>
+            <db:input-parameter key="name" value="Venus"/>
+        </db:input-parameters>
+    </db:query>
 
-    <dbn:query name="overridenQueryParamByName" template="namedParamsQueryTemplate">
-        <dbn:input-parameters>
-            <dbn:input-parameter key="name" value="Mars"/>
-        </dbn:input-parameters>
-    </dbn:query>
+    <db:query name="overridenQueryParamByName" template="namedParamsQueryTemplate">
+        <db:input-parameters>
+            <db:input-parameter key="name" value="Mars"/>
+        </db:input-parameters>
+    </db:query>
 
     <flow name="overriddenParamsByName">
-        <dbn:select template="overridenQueryParamByName"/>
+        <db:select template="overridenQueryParamByName"/>
     </flow>
 
     <flow name="inlineOverriddenParamsByName">
-        <dbn:select template="namedParamsQueryTemplate">
-            <dbn:input-parameters>
+        <db:select template="namedParamsQueryTemplate">
+            <db:input-parameters>
                 <!-- Note that parameters are in different order-->
-                <dbn:input-parameter key="name" value="Venus"/>
-                <dbn:input-parameter key="position" value="2"/>
-            </dbn:input-parameters>
-        </dbn:select>
+                <db:input-parameter key="name" value="Venus"/>
+                <db:input-parameter key="position" value="2"/>
+            </db:input-parameters>
+        </db:select>
     </flow>
 </mule>

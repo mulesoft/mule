@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mule.modules</groupId>
-    <artifactId>mule-module-dbn</artifactId>
+    <artifactId>mule-module-db</artifactId>
     <packaging>mule-extension</packaging>
 
     <name>Mule DB Connector</name>

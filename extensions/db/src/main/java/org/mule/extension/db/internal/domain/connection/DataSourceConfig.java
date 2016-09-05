@@ -14,6 +14,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.param.TransactionIsolation;
+import org.mule.runtime.api.config.DatabasePoolingProfile;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -145,7 +146,7 @@ public class DataSourceConfig {
     return useXaTransactions;
   }
 
-  public DbPoolingProfile getPoolingProfile() {
+  public DatabasePoolingProfile getPoolingProfile() {
     return poolingProfile;
   }
 
@@ -175,9 +176,5 @@ public class DataSourceConfig {
 
   public void setUseXaTransactions(boolean useXaTransactions) {
     this.useXaTransactions = useXaTransactions;
-  }
-
-  public void setPoolingProfile(DbPoolingProfile poolingProfile) {
-    this.poolingProfile = poolingProfile;
   }
 }

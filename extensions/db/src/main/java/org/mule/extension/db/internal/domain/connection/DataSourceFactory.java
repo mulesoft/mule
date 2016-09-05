@@ -7,9 +7,9 @@
 
 package org.mule.extension.db.internal.domain.connection;
 
-import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.internal.domain.xa.CompositeDataSourceDecorator;
-import org.mule.extension.db.internal.domain.xa.DataSourceDecorator;
+import org.mule.runtime.api.tx.DataSourceDecorator;
+import org.mule.runtime.api.config.DatabasePoolingProfile;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.util.concurrent.ConcurrentHashSet;
@@ -36,14 +36,12 @@ public class DataSourceFactory implements Disposable {
   private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceFactory.class);
 
   private final String name;
-  private final MuleContext muleContext;
   private final Set<DataSource> pooledDataSources = new ConcurrentHashSet();
   private final Set<Disposable> disposableDataSources = new ConcurrentHashSet();
   private final CompositeDataSourceDecorator dataSourceDecorator;
 
   public DataSourceFactory(String name, MuleContext muleContext) {
     this.name = name;
-    this.muleContext = muleContext;
     dataSourceDecorator = new CompositeDataSourceDecorator(muleContext.getRegistry().lookupObjects(DataSourceDecorator.class));
   }
 
@@ -64,7 +62,7 @@ public class DataSourceFactory implements Disposable {
     }
 
     if (dataSourceConfig.isUseXaTransactions()) {
-      dataSource = decorateDataSource(dataSource, dataSourceConfig.getPoolingProfile(), muleContext);
+      dataSource = decorateDataSource(dataSource, dataSourceConfig.getPoolingProfile());
     }
 
     if (!(dataSourceConfig.getPoolingProfile() == null || dataSourceConfig.isUseXaTransactions())) {
@@ -76,8 +74,8 @@ public class DataSourceFactory implements Disposable {
     return dataSource;
   }
 
-  public DataSource decorateDataSource(DataSource dataSource, DbPoolingProfile poolingProfile, MuleContext muleContext) {
-    return dataSourceDecorator.decorate(dataSource, name, poolingProfile, muleContext);
+  public DataSource decorateDataSource(DataSource dataSource, DatabasePoolingProfile poolingProfile) {
+    return dataSourceDecorator.decorate(dataSource, name, poolingProfile);
   }
 
   protected DataSource createSingleDataSource(DataSourceConfig dataSourceConfig) throws SQLException {
@@ -104,7 +102,7 @@ public class DataSourceFactory implements Disposable {
     }
   }
 
-  protected DataSource createPooledStandardDataSource(DataSource dataSource, DbPoolingProfile poolingProfile)
+  protected DataSource createPooledStandardDataSource(DataSource dataSource, DatabasePoolingProfile poolingProfile)
       throws SQLException {
     Map<String, Object> config = new HashMap<>();
     config.put("maxPoolSize", poolingProfile.getMaxPoolSize());

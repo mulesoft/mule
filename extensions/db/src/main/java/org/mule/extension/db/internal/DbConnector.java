@@ -40,7 +40,7 @@ import java.util.List;
 @Extension(name = "Database", description = "Connector for connecting to relation Databases through the JDBC API")
 @Operations({DmlOperations.class, DdlOperations.class, BulkOperations.class})
 @ConnectionProviders({DbConnectionProvider.class, DerbyConnectionProvider.class, MySqlConnectionProvider.class})
-@Xml(namespace = "dbn")
+@Xml(namespace = "db")
 @Export(classes = {StatementStreamingResultSetCloser.class, QueryDefinition.class, StoredProcedureCall.class,
     BulkQueryDefinition.class},
     resources = {"/META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties"})
