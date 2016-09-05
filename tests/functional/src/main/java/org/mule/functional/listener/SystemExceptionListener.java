@@ -6,6 +6,8 @@
  */
 package org.mule.functional.listener;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Listener for exceptions managed by the {@link org.mule.runtime.core.api.exception.SystemExceptionHandler}.
@@ -29,6 +32,7 @@ public class SystemExceptionListener {
   private CountDownLatch exceptionThrownLatch = new Latch();
   private int timeout = 10000;
   private List<ExceptionNotification> exceptionNotifications = new ArrayList<>();
+  private AtomicInteger numberOfInvocations = new AtomicInteger();
 
   public SystemExceptionListener(MuleContext muleContext) {
     try {
@@ -38,6 +42,7 @@ public class SystemExceptionListener {
         @Override
         public void handleException(Exception exception, RollbackSourceCallback rollbackMethod) {
           try {
+            numberOfInvocations.incrementAndGet();
             exceptionListener.handleException(exception, rollbackMethod);
           } finally {
             exceptionThrownLatch.countDown();
@@ -47,6 +52,7 @@ public class SystemExceptionListener {
         @Override
         public void handleException(Exception exception) {
           try {
+            numberOfInvocations.incrementAndGet();
             exceptionListener.handleException(exception);
           } finally {
             exceptionThrownLatch.countDown();
@@ -92,5 +98,12 @@ public class SystemExceptionListener {
   public SystemExceptionListener setTimeoutInMillis(int timeout) {
     this.timeout = timeout;
     return this;
+  }
+
+  /**
+   * Asserts that the system exception handler was not invoked.
+   */
+  public void assertNotInvoked() {
+    assertThat(this.numberOfInvocations.get(), is(0));
   }
 }

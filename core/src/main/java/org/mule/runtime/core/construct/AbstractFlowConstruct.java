@@ -83,7 +83,7 @@ public abstract class AbstractFlowConstruct extends AbstractAnnotatedObject impl
   public final void initialise() throws InitialisationException {
     try {
       if (exceptionListener == null) {
-        this.exceptionListener = muleContext.getDefaultExceptionStrategy();
+        this.exceptionListener = muleContext.getDefaultErrorHandler();
       }
       lifecycleManager.fireInitialisePhase((phaseName, object) -> {
         injectFlowConstructMuleContext(exceptionListener);

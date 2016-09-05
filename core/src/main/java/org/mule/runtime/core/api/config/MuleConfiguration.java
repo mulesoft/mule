@@ -83,9 +83,9 @@ public interface MuleConfiguration {
   boolean isStandalone();
 
   /**
-   * @return default exception strategy to be used on flows and services if there's no exception strategy configured explicitly.
+   * @return default error handler to be used on flows and services if there's no error handler configured explicitly.
    */
-  String getDefaultExceptionStrategyName();
+  String getDefaultErrorHandlerName();
 
   boolean isDisableTimeouts();
 

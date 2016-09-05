@@ -6,9 +6,11 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <configuration defaultExceptionStrategy-ref="testES"/>
+    <configuration defaultErrorHandler-ref="testES"/>
 
-    <custom-exception-strategy name="testES" class="org.mule.tck.testmodels.mule.TestExceptionStrategy"/>
+    <error-handler name="testES">
+        <on-error-propagate/>
+    </error-handler>
 
     <script:transformer name="exceptionTransformer">
         <script:script engine="groovy">

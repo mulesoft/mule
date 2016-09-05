@@ -64,12 +64,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     loadConfiguration("org/mule/test/integration/exceptions/named-flow-exception-strategy.xml");
   }
 
-  // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly definedWatermarkInvalidExpressionTestCase
-  @Test(expected = InitialisationException.class)
-  public void testReferenceExceptionStrategyAsGlobalExceptionStrategy() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/reference-global-exception-strategy.xml");
-  }
-
   @Test(expected = ConfigurationException.class)
   public void testErrorHandlerCantHaveMiddleExceptionStrategyWithoutExpression() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/exception-strategy-in-choice-without-expression.xml");
@@ -89,12 +83,6 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
   @Test(expected = InitialisationException.class)
   public void testDefaultExceptionStrategyReferencesNonExistentExceptionStrategy() throws Exception {
     loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-non-existent-es.xml");
-  }
-
-  // TODO MULE-10061 - Review once the MuleContext lifecycle is clearly defined
-  @Test(expected = InitialisationException.class)
-  public void testDefaultExceptionStrategyReferencesExceptionStrategyWithExpression() throws Exception {
-    loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");
   }
 
   @Test(expected = InitialisationException.class)

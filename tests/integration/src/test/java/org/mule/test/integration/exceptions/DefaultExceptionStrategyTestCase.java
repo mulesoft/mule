@@ -61,7 +61,6 @@ public class DefaultExceptionStrategyTestCase extends AbstractIntegrationTestCas
 
     FlowConstruct flowNoExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("flowNoExceptionStrategy");
     MessagingExceptionHandler flowNoExceptionStrategyExceptionListener = flowNoExceptionStrategy.getExceptionListener();
-    assertThat(flowNoExceptionStrategyExceptionListener, instanceOf(CustomExceptionStrategy.class));
     assertThat(usedExceptionStrategies.add(flowNoExceptionStrategyExceptionListener), is(true));
 
     FlowConstruct flowExceptionStrategy = muleContext.getRegistry().lookupFlowConstruct("flowExceptionStrategy");

@@ -6,22 +6,15 @@
  */
 package org.mule.test.integration.exceptions;
 
+import org.mule.functional.listener.ExceptionListener;
+import org.mule.functional.listener.SystemExceptionListener;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractExceptionStrategyTestCase extends AbstractIntegrationTestCase {
 
-  public static final int LATCH_AWAIT_TIMEOUT = 3000;
-
-  protected final AtomicInteger systemExceptionCounter = new AtomicInteger();
-  protected final AtomicInteger serviceExceptionCounter = new AtomicInteger();
-  protected Latch latch;
+  protected ExceptionListener exceptionListener;
+  protected SystemExceptionListener systemExceptionListener;
   protected MuleClient client;
 
   @Override
@@ -30,38 +23,11 @@ public abstract class AbstractExceptionStrategyTestCase extends AbstractIntegrat
     if (client == null) {
       client = muleContext.getClient();
     }
-    latch = new Latch();
-    systemExceptionCounter.set(0);
-    serviceExceptionCounter.set(0);
 
-    TestExceptionStrategy systemExceptionListener = new TestExceptionStrategy();
-    systemExceptionListener.setExceptionCallback(new ExceptionCallback() {
-
-      @Override
-      public void onException(Throwable t) {
-        systemExceptionCounter.incrementAndGet();
-        latch.countDown();
-      }
-    });
-    muleContext.setExceptionListener(systemExceptionListener);
-
-    for (FlowConstruct flow : muleContext.getRegistry().lookupFlowConstructs()) {
-      ((TestExceptionStrategy) flow.getExceptionListener()).setExceptionCallback(new ExceptionCallback() {
-
-        @Override
-        public void onException(Throwable t) {
-          serviceExceptionCounter.incrementAndGet();
-          latch.countDown();
-        }
-      });
-    }
+    exceptionListener = new ExceptionListener(muleContext);
+    systemExceptionListener = new SystemExceptionListener(muleContext);
   }
 
-  @Override
-  protected void doTearDown() throws Exception {
-    super.doTearDown();
-    latch = null;
-  }
 }
 
 

@@ -26,12 +26,12 @@ import org.w3c.dom.Element;
  */
 public class ConfigurationDefinitionParser extends NamedDefinitionParser {
 
-  public static final String DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE = "defaultExceptionStrategy-ref";
+  public static final String DEFAULT_ERROR_HANDLER_ATTRIBUTE = "defaultErrorHandler-ref";
   private static final String DEFAULT_OBJECT_SERIALIZER_ATTRIBUTE = "defaultObjectSerializer-ref";
 
   public ConfigurationDefinitionParser() {
     super(MuleProperties.OBJECT_MULE_CONFIGURATION);
-    addIgnored(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE);
+    addIgnored(DEFAULT_ERROR_HANDLER_ATTRIBUTE);
     singleton = true;
   }
 
@@ -49,8 +49,8 @@ public class ConfigurationDefinitionParser extends NamedDefinitionParser {
   }
 
   private void parseExceptionStrategy(Element element, BeanDefinitionBuilder builder) {
-    if (element.hasAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE)) {
-      builder.addPropertyValue("defaultExceptionStrategyName", element.getAttribute(DEFAULT_EXCEPTION_STRATEGY_ATTRIBUTE));
+    if (element.hasAttribute(DEFAULT_ERROR_HANDLER_ATTRIBUTE)) {
+      builder.addPropertyValue("defaultErrorHandlerName", element.getAttribute(DEFAULT_ERROR_HANDLER_ATTRIBUTE));
     }
   }
 

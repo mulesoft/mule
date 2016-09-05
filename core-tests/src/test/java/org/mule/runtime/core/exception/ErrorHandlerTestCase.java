@@ -58,7 +58,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void testNonMatchThenCallDefault() throws Exception {
     ErrorHandler errorHandler = new ErrorHandler();
-    when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
+    when(mockMuleContext.getDefaultErrorHandler()).thenReturn(mockDefaultTestExceptionStrategy2);
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
@@ -81,7 +81,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
-    when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
+    when(mockMuleContext.getDefaultErrorHandler()).thenReturn(mockDefaultTestExceptionStrategy2);
     errorHandler.initialise();
     when(mockTestExceptionStrategy1.accept(any(MuleEvent.class))).thenReturn(false);
     when(mockTestExceptionStrategy2.accept(any(MuleEvent.class))).thenReturn(true);
@@ -100,7 +100,7 @@ public class ErrorHandlerTestCase extends AbstractMuleTestCase {
     errorHandler.setMuleContext(mockMuleContext);
     errorHandler.setExceptionListeners(new ArrayList<>(Arrays
         .<MessagingExceptionHandlerAcceptor>asList(mockTestExceptionStrategy1, mockTestExceptionStrategy2)));
-    when(mockMuleContext.getDefaultExceptionStrategy()).thenReturn(mockDefaultTestExceptionStrategy2);
+    when(mockMuleContext.getDefaultErrorHandler()).thenReturn(mockDefaultTestExceptionStrategy2);
     when(mockTestExceptionStrategy1.acceptsAll()).thenReturn(true);
     when(mockTestExceptionStrategy2.acceptsAll()).thenReturn(false);
     when(mockDefaultTestExceptionStrategy2.acceptsAll()).thenReturn(true);
