@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/dbn http://www.mulesoft.org/schema/mule/dbn/current/mule-dbn.xsd">
 
     <flow name="updatesStringArray">
-        <transactional>
+        <block>
             <dbn:select>
                 <dbn:sql>select ZIPS from REGIONS where REGION_NAME='Northwest'</dbn:sql>
             </dbn:select>
@@ -24,11 +24,11 @@
 
             <!--Obtains the java array from the array field-->
             <set-payload value="#[payload.get(0)['ZIPS'].getArray()]"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="updatesStructArray">
-        <transactional>
+        <block>
             <dbn:select>
                 <dbn:sql>select DETAILS from CONTACTS where CONTACT_NAME='Contact2'</dbn:sql>
             </dbn:select>
@@ -46,6 +46,6 @@
 
             <!--Obtains the java array from the array field-->
             <set-payload value="#[payload.get(0)['DETAILS'].getArray()]"/>
-        </transactional>
+        </block>
     </flow>
 </mule>

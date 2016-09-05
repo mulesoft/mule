@@ -18,7 +18,7 @@ import org.mule.runtime.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SimpleMemoryQueueStoreFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
+import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.collection.ChildListEntryDefinitionParser;
@@ -404,7 +404,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler {
 
     registerBeanDefinitionParser("async", new AsyncMessageProcessorsDefinitionParser());
     registerBeanDefinitionParser("transactional",
-                                 new ChildDefinitionParser("messageProcessor", TransactionalMessageProcessorsFactoryBean.class));
+                                 new ChildDefinitionParser("messageProcessor", BlockMessageProcessorFactoryBean.class));
     registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor", LoggerMessageProcessor.class));
     registerMuleBeanDefinitionParser("expression-component",
                                      new ExpressionComponentDefintionParser("messageProcessor",

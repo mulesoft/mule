@@ -8,39 +8,39 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="jdbcRollback">
-        <transactional>
+        <block>
             <db:update config-ref="dbConfig">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>
             <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="jdbcCommit">
-        <transactional>
+        <block>
             <db:update config-ref="dbConfig">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>
-        </transactional>
+        </block>
 
         <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
     </flow>
 
     <flow name="rollbackWithNonTransactionalMP">
-        <transactional>
+        <block>
             <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>
             <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="commitWithNonTransactionalMP">
-        <transactional>
+        <block>
             <db:update config-ref="dbConfig" transactionalAction="NOT_SUPPORTED">
                 <db:parameterized-query>update PLANET set NAME='Mercury' where POSITION=4</db:parameterized-query>
             </db:update>
-        </transactional>
+        </block>
 
         <test:component throwException="true" exceptionToThrow="java.lang.NullPointerException"/>
     </flow>

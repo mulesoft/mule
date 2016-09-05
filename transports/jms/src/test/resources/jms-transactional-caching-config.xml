@@ -27,13 +27,13 @@
     <flow name="main">
         <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
 
-        <transactional>
+        <block>
             <jms:outbound-endpoint queue="testQueue" connector-ref="JMS"/>
 
             <component>
                 <singleton-object class="org.mule.compatibility.transport.jms.JmsTransactionalCachingTestCase$AbortMessageOnEventCount"/>
             </component>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="dataVerification">

@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="returnsDefaultArray">
-        <transactional>
+        <block>
             <db:select>
                 <db:parameterized-query>select * from regions</db:parameterized-query>
             </db:select>
@@ -17,12 +17,12 @@
                     payload.put("ZIPS", payload.get("ZIPS").getArray())
                 </expression-component>
             </foreach>
-        </transactional>
+        </block>
 
     </flow>
 
     <flow name="returnsCustomArray">
-        <transactional>
+        <block>
             <db:select>
                 <db:parameterized-query>select * from contacts</db:parameterized-query>
             </db:select>
@@ -33,6 +33,6 @@
                     payload.put("DETAILS", payload.get("DETAILS").getArray())
                 </expression-component>
             </foreach>
-        </transactional>
+        </block>
     </flow>
 </mule>

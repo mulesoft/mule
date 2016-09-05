@@ -52,7 +52,7 @@
     </flow>
 
     <flow name="customProcessorInTransactionalScope">
-        <transactional>
+        <block>
             <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
             <test:component throwException="true"/>
             <error-handler>
@@ -61,11 +61,11 @@
                     <test:queue name="outTransactional1"/>
                 </on-error-continue>
             </error-handler>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="asyncInTransactionalScope">
-        <transactional>
+        <block>
             <async>
                 <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
                 <test:component throwException="true"/>
@@ -75,11 +75,11 @@
                     <test:queue name="outTransactional4"/>
                 </on-error-continue>
             </error-handler>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="untilSuccessfulInTransactionalScope">
-        <transactional>
+        <block>
             <until-successful objectStore-ref="objectStore" maxRetries="1" millisBetweenRetries="1000">
                 <custom-processor class="org.mule.test.integration.exceptions.ExceptionHandlingTestCase$ExceptionHandlerVerifierProcessor" />
             </until-successful>
@@ -91,7 +91,7 @@
                     <test:queue name="outTransactional5"/>
                 </on-error-continue>
             </error-handler>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="customProcessorInExceptionStrategy">

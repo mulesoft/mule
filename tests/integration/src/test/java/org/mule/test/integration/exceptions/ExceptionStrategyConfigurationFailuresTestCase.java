@@ -97,6 +97,11 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     loadConfiguration("org/mule/test/integration/exceptions/default-exception-strategy-reference-has-expression.xml");
   }
 
+  @Test(expected = InitialisationException.class)
+  public void xaTransactionalBlockNotAllowed() throws Exception {
+    loadConfiguration("org/mule/test/integration/transaction/xa-transactional-block-config.xml");
+  }
+
   private void loadConfiguration(String configuration) throws MuleException, InterruptedException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();

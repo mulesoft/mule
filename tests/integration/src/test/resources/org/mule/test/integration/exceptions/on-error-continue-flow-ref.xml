@@ -25,12 +25,12 @@
     </flow>
 
     <flow name="transactionNotResolvedAfterException">
-        <transactional action="ALWAYS_BEGIN">
+        <block transactionalAction="ALWAYS_BEGIN">
             <flow-ref name="blockWithOwnExceptionStrategy"/>
             <custom-processor
                     class="org.mule.test.integration.exceptions.OnErrorContinueFlowRefTestCase$VerifyTransactionNotResolvedProcessor"/>
             <json:object-to-json-transformer/>
-        </transactional>
+        </block>
     </flow>
 
 </mule>

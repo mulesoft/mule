@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updatesStringArray">
-        <transactional>
+        <block>
             <db:select>
                 <db:parameterized-query>
                     select ZIPS from REGIONS where REGION_NAME='Northwest'
@@ -28,11 +28,11 @@
 
             <!--Obtains the java array from the array field-->
             <set-payload value="#[payload.get(0)['ZIPS'].getArray()]"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="updatesStructArray">
-        <transactional>
+        <block>
             <db:select>
                 <db:parameterized-query>
                     select DETAILS from CONTACTS where CONTACT_NAME='Contact2'
@@ -54,6 +54,6 @@
 
             <!--Obtains the java array from the array field-->
             <set-payload value="#[payload.get(0)['DETAILS'].getArray()]"/>
-        </transactional>
+        </block>
     </flow>
 </mule>

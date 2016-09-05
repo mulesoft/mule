@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.core.processor;
 
+import static org.mule.runtime.core.transaction.TransactionType.LOCAL;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
+import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
+import org.mule.runtime.core.transaction.TransactionType;
 
 /**
  * Transaction factory for DelegateTransaction. Used for transactional element since transaction type is not known until the first
  * transactional message processor is executed.
  */
-public class DelegateTransactionFactory implements TransactionFactory {
+public class DelegateTransactionFactory implements TypedTransactionFactory {
 
   @Override
   public Transaction beginTransaction(MuleContext muleContext) throws TransactionException {
@@ -27,6 +29,11 @@ public class DelegateTransactionFactory implements TransactionFactory {
   @Override
   public boolean isTransacted() {
     return true;
+  }
+
+  @Override
+  public TransactionType getType() {
+    return LOCAL;
   }
 
 }

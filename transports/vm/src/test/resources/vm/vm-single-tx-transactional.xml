@@ -20,158 +20,158 @@
 
     <flow name="transactional">
         <append-string-transformer message=" a"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailInTheMiddle">
         <append-string-transformer message=" b"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <vm:outbound-endpoint ref="out2"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailAtEnd">
         <append-string-transformer message=" c"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailAfterEnd">
         <append-string-transformer message=" d"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
-        </transactional>
+        </block>
         <test:component throwException="true"/>
     </flow>
 
     <flow name="transactionalFailInTheMiddleWithCatchExceptionStrategy">
         <append-string-transformer message=" e"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <vm:outbound-endpoint ref="out2"/>
             <error-handler>
                 <on-error-continue/>
             </error-handler>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalFailAtEndWithCatchExceptionStrategy">
         <append-string-transformer message=" f"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
             <error-handler>
                 <on-error-continue/>
             </error-handler>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalWorksWithAnotherResourceType">
         <append-string-transformer message=" g"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <vm:outbound-endpoint ref="out3"/>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalDoesntFailWithAnotherResourceType">
         <append-string-transformer message=" h"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <vm:outbound-endpoint ref="out3">
                 <vm:transaction action="NOT_SUPPORTED"/>
             </vm:outbound-endpoint>
-        </transactional>
+        </block>
     </flow>
 
     <flow name="transactionalWithAnotherResourceTypeAndExceptionAtEnd">
         <append-string-transformer message=" i"/>
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out3">
                 <vm:transaction action="NOT_SUPPORTED"/>
             </vm:outbound-endpoint>
             <vm:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
-        </transactional>
+        </block>
     </flow>
 
 
     <flow name="nestedTransactional">
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
-            <transactional>
+            <block>
                 <vm:outbound-endpoint ref="out2"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalFail">
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
-            <transactional>
+            <block>
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalFailWithCatch">
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
-            <transactional>
+            <block>
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <error-handler>
                     <on-error-continue/>
                 </error-handler>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoin">
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
-            <transactional action="BEGIN_OR_JOIN">
+            <block transactionalAction="BEGIN_OR_JOIN">
                 <vm:outbound-endpoint ref="out2"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFail">
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
-            <transactional action="BEGIN_OR_JOIN">
+            <block transactionalAction="BEGIN_OR_JOIN">
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFailWithCatch">
-        <transactional>
+        <block>
             <vm:outbound-endpoint ref="out1"/>
-            <transactional action="BEGIN_OR_JOIN">
+            <block transactionalAction="BEGIN_OR_JOIN">
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <error-handler>
                     <on-error-continue/>
                 </error-handler>
-            </transactional>
-        </transactional>
+            </block>
+        </block>
     </flow>
 
 </mule>
