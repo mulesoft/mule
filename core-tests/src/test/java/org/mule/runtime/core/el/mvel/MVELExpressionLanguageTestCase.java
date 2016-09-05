@@ -63,7 +63,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -102,7 +101,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Before
   public void setupMVEL() throws InitialisationException {
-    mvel = new MVELExpressionLanguage(muleContext);
+    mvel = new MVELExpressionLanguage();
+    mvel.setMuleContext(muleContext);
     mvel.initialise();
 
     flowConstruct = mock(FlowConstruct.class);

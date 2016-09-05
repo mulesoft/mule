@@ -50,6 +50,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAUL
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
@@ -257,7 +258,8 @@ class SpringMuleContextServiceConfigurator {
   private void initialiseExpressionManager() {
     try {
       // TODO MULE-9638 - DB parsers use the expression language before initialisation phase. Remove once it gets migrated to SDK.
-      MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
+      MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage();
+      expressionLanguage.setMuleContext(muleContext);
       expressionLanguage.initialise();
     } catch (InitialisationException e) {
       throw new MuleRuntimeException(e);

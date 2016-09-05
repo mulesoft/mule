@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
 import javax.activation.MimeType;
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -58,6 +59,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   private static final Logger logger = getLogger(MVELExpressionLanguage.class);
 
   protected ParserConfiguration parserConfiguration;
+  @Inject
   protected MuleContext muleContext;
   protected MVELExpressionExecutor expressionExecutor;
 
@@ -76,10 +78,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
   // default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
-
-  public MVELExpressionLanguage(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
 
   @Override
   public void initialise() throws InitialisationException {
@@ -409,4 +407,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     return expression;
   }
 
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
 }

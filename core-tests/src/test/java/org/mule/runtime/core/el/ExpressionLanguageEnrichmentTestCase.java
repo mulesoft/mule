@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 
@@ -44,7 +43,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @SuppressWarnings("unchecked")
   @Before
   public void setup() throws Exception {
-    expressionLanguage = new MVELExpressionLanguage(muleContext);
+    expressionLanguage = new MVELExpressionLanguage();
     muleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
   }
 

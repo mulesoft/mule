@@ -84,8 +84,10 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
     return Arrays.asList(new Object[][] {{OptimizerFactory.DYNAMIC}, {OptimizerFactory.SAFE_REFLECTIVE}});
   }
 
-  protected ExpressionLanguage getExpressionLanguage() throws Exception {
-    return new MVELExpressionLanguage(muleContext);
+  protected ExpressionLanguage getExpressionLanguage() {
+    final MVELExpressionLanguage el = new MVELExpressionLanguage();
+    el.setMuleContext(muleContext);
+    return el;
   }
 
   protected void assertUnsupportedOperation(String expression) {

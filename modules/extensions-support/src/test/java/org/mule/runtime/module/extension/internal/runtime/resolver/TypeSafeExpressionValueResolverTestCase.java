@@ -16,13 +16,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
+import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -37,10 +34,10 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   @Override
   protected void doSetUp() throws Exception {
+    muleContext = spy(muleContext);
     expressionLanguage = spy((MVELExpressionLanguage) muleContext.getExpressionLanguage());
 
-    DefaultMuleContext defaultMuleContext = (DefaultMuleContext) muleContext;
-    defaultMuleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
+    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
   }
 
   @Test
