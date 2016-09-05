@@ -49,12 +49,15 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   private Boolean synchronous;
   private boolean nonBlocking;
   private MuleSession session = new DefaultMuleSession();
+  private MuleEvent originalEvent;
+  private boolean modified;
 
   public DefaultMuleEventBuilder(MessageContext messageContext) {
     this.context = messageContext;
   }
 
   public DefaultMuleEventBuilder(MuleEvent event) {
+    this.originalEvent = event;
     this.context = event.getContext();
     this.message = event.getMessage();
     this.flow = event.getFlowConstruct();
@@ -88,18 +91,21 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   @Override
   public MuleEvent.Builder message(MuleMessage message) {
     this.message = message;
+    this.modified = true;
     return this;
   }
 
   @Override
   public MuleEvent.Builder flowVariables(Map<String, Object> flowVariables) {
     flowVariables.forEach((s, o) -> this.flowVariables.put(s, new TypedValue<>(o, DataType.fromObject(o))));
+    this.modified = true;
     return this;
   }
 
   @Override
   public MuleEvent.Builder addFlowVariable(String key, Object value) {
     flowVariables.put(key, new TypedValue<>(value, DataType.fromObject(value)));
+    this.modified = true;
     return this;
 
   }
@@ -107,79 +113,95 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   @Override
   public MuleEvent.Builder addFlowVariable(String key, Object value, DataType dataType) {
     flowVariables.put(key, new TypedValue<>(value, dataType));
+    this.modified = true;
     return this;
   }
 
   @Override
   public MuleEvent.Builder removeFlowVariable(String key) {
     flowVariables.remove(key);
+    this.modified = true;
     return this;
   }
 
   @Override
   public Builder correlation(Correlation correlation) {
     this.correlation = correlation;
+    this.modified = true;
     return this;
   }
 
   @Override
   public Builder error(Error error) {
     this.error = error;
+    this.modified = true;
     return this;
   }
 
   @Override
   public Builder synchronous(boolean synchronous) {
     this.synchronous = synchronous;
+    this.modified = true;
     return this;
   }
 
   @Override
   public MuleEvent.Builder exchangePattern(MessageExchangePattern exchangePattern) {
     this.exchangePattern = exchangePattern;
+    this.modified = true;
     return this;
   }
 
   @Override
   public MuleEvent.Builder flow(FlowConstruct flow) {
     this.flow = flow;
+    this.modified = true;
     return this;
   }
 
   @Override
   public MuleEvent.Builder replyToHandler(ReplyToHandler replyToHandler) {
     this.replyToHandler = replyToHandler;
+    this.modified = true;
     return this;
   }
 
   @Override
   public Builder replyToDestination(Object replyToDestination) {
     this.replyToDestination = replyToDestination;
+    this.modified = true;
     return this;
   }
 
   @Override
   public Builder transacted(boolean transacted) {
     this.transacted = transacted;
+    this.modified = true;
     return this;
   }
 
   @Override
   public Builder session(MuleSession session) {
     this.session = session;
+    this.modified = true;
     return this;
   }
 
   @Override
   public MuleEvent build() {
-    DefaultMuleEvent event =
-        new DefaultMuleEvent(context, message, exchangePattern, flow, session, transacted,
-                             synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
-                             nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
-                             replyToDestination, replyToHandler, flowCallStack, correlation, error);
-    this.flowVariables.forEach((s, value) -> event.setFlowVariable(s, value.getValue(), value.getDataType()));
-    event.setLegacyCorrelationId(legacyCorrelationId);
-    return event;
+    if (originalEvent != null && !modified) {
+      return originalEvent;
+    }
+    else{
+      DefaultMuleEvent event =
+          new DefaultMuleEvent(context, message, exchangePattern, flow, session, transacted,
+                               synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
+                               nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
+                               replyToDestination, replyToHandler, flowCallStack, correlation, error);
+      this.flowVariables.forEach((s, value) -> event.setFlowVariable(s, value.getValue(), value.getDataType()));
+      event.setLegacyCorrelationId(legacyCorrelationId);
+      return event;
+    }
   }
 
   protected boolean resolveEventSynchronicity() {
