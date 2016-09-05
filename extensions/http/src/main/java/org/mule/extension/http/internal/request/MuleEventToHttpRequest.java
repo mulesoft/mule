@@ -15,16 +15,6 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import javax.activation.DataHandler;
-
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
@@ -32,11 +22,11 @@ import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.ParameterMap;
@@ -47,6 +37,17 @@ import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.activation.DataHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,26 +144,18 @@ public class MuleEventToHttpRequest {
   private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod,
                                          Map<String, DataHandler> parts, MuleContext muleContext)
       throws MessagingException {
-    boolean customSource = false;
-    Object oldPayload = null;
     HttpEntity entity;
 
     if (!StringUtils.isEmpty(this.source) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(this.source))) {
       Object newPayload = this.source;
-      oldPayload = muleEvent.getMessage().getPayload();
-      muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(newPayload).build());
-      customSource = true;
+      muleEvent =
+          MuleEvent.builder(muleEvent).message(MuleMessage.builder(muleEvent.getMessage()).payload(newPayload).build()).build();
     }
 
     if (isEmptyBody(muleEvent, resolvedMethod, parts)) {
       entity = new EmptyHttpEntity();
     } else {
       entity = createRequestEntityFromPayload(requestBuilder, muleEvent, parts, muleContext);
-    }
-
-    if (customSource) {
-      final Object finalOldPayload = oldPayload;
-      muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(finalOldPayload).build());
     }
 
     return entity;

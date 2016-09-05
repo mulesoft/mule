@@ -16,6 +16,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHOR
 
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -100,13 +101,14 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       realmHeader += "\"" + realm + "\"";
     }
     Map<String, String> headers = getFlowVariableOrNull(headersFlowVar, event);
+    Builder builder = MuleEvent.builder(event);
     if (headers == null) {
       headers = new HashMap<>();
-      event.setFlowVariable(headersFlowVar, headers);
+      builder.addFlowVariable(headersFlowVar, headers);
     }
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    event.setFlowVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
-    return event;
+    builder.addFlowVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
+    return builder.build();
   }
 
   /**
@@ -163,10 +165,10 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       event.getSession().setSecurityContext(context);
       return event;
     } else if (header == null) {
-      setUnauthenticated(event);
+      event = setUnauthenticated(event);
       throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);
     } else {
-      setUnauthenticated(event);
+      event = setUnauthenticated(event);
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), event);
     }

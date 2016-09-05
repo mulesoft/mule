@@ -14,9 +14,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -95,7 +92,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     MuleEvent responseEvent = runner.run();
 
     assertThat(responseEvent.getMessage().getPayload(), is(""));
-    verify(event, never()).setMessage(any(MuleMessage.class));
 
     MuleMessage responseMessage = responseEvent.getFlowVariable("myFace");
     assertThat(responseMessage.getPayload(), is(HEISENBERG));

@@ -16,11 +16,14 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -42,7 +45,6 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   @Mock
   protected OperationContextAdapter operationContext;
 
-  @Mock
   protected MuleEvent event;
 
   @Mock
@@ -52,18 +54,20 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
   @Before
   public void before() {
+    FlowConstruct flow = mock(FlowConstruct.class);
+    when(flow.getMuleContext()).thenReturn(muleContext);
+    event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(attributes).build()).build();
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
-    when(event.getMessage())
-        .thenReturn(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(attributes).build());
   }
 
   @Test
   public void returnsSingleValue() {
     byte[] value = new byte[] {};
-    delegate.asReturnValue(value, operationContext);
+    org.mule.runtime.api.message.MuleEvent result = delegate.asReturnValue(value, operationContext);
 
-    MuleMessage message = getOutputMessage();
+    MuleMessage message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(value)));
     assertThat(message.getDataType().getType().equals(byte[].class), is(true));
@@ -74,9 +78,10 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Object payload = new Object();
     MediaType mediaType = ANY.withCharset(getDefaultEncoding(muleContext));
 
-    delegate.asReturnValue(OperationResult.builder().output(payload).mediaType(mediaType).build(), operationContext);
+    org.mule.runtime.api.message.MuleEvent result =
+        delegate.asReturnValue(OperationResult.builder().output(payload).mediaType(mediaType).build(), operationContext);
 
-    MuleMessage message = getOutputMessage();
+    MuleMessage message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
@@ -87,9 +92,10 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   public void operationReturnsOperationResultThatOnlySpecifiesPayload() throws Exception {
     Object payload = "hello world!";
 
-    delegate.asReturnValue(OperationResult.builder().output(payload).build(), operationContext);
+    org.mule.runtime.api.message.MuleEvent result =
+        delegate.asReturnValue(OperationResult.builder().output(payload).build(), operationContext);
 
-    MuleMessage message = getOutputMessage();
+    MuleMessage message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
@@ -101,9 +107,10 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     Object payload = "hello world!";
     Attributes newAttributes = mock(Attributes.class);
 
-    delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
+    org.mule.runtime.api.message.MuleEvent result =
+        delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
 
-    MuleMessage message = getOutputMessage();
+    MuleMessage message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(newAttributes)));
@@ -112,5 +119,5 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
   protected abstract ReturnDelegate createReturnDelegate();
 
-  protected abstract MuleMessage getOutputMessage();
+  protected abstract MuleMessage getOutputMessage(org.mule.runtime.api.message.MuleEvent result);
 }

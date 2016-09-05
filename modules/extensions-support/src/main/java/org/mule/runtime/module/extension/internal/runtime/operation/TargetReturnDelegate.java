@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
@@ -38,9 +38,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   @Override
   public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext) {
-    MuleEvent event = operationContext.getEvent();
-    // TODO MULE-9281 Make MuleEvent immutable
-    ((org.mule.runtime.core.api.MuleEvent) event).setFlowVariable(target, toMessage(value, operationContext));
-    return event;
+    return org.mule.runtime.core.api.MuleEvent.builder(operationContext.getEvent())
+        .addFlowVariable(target, toMessage(value, operationContext)).build();
   }
 }

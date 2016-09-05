@@ -28,6 +28,7 @@ import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtil
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
 import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
+
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -36,6 +37,7 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -115,10 +117,9 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock
   protected ResolverSetResult parameters;
 
-  @Mock(answer = RETURNS_DEEP_STUBS)
   protected MuleEvent event;
 
-  @Mock
+  @Mock(answer = RETURNS_DEEP_STUBS)
   protected MuleMessage message;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
@@ -163,7 +164,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
   @Before
   public void before() throws Exception {
-    configureMockEvent(event);
+    event = configureEvent();
 
     when(operationModel.getName()).thenReturn(getClass().getName());
     when(operationModel.getOutput())
@@ -235,11 +236,11 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     messageProcessor = setUpOperationMessageProcessor();
   }
 
-  protected MuleEvent configureMockEvent(MuleEvent mockEvent) {
-    when(mockEvent.getMessage().getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
-    when(mockEvent.getMessage()).thenReturn(message);
+  protected MuleEvent configureEvent() throws Exception {
+    when(message.getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
     when(message.getPayload()).thenReturn(TEST_PAYLOAD);
-    return mockEvent;
+    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
+    return event;
   }
 
   protected OperationMessageProcessor setUpOperationMessageProcessor() throws Exception {

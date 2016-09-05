@@ -456,11 +456,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return session.getSecurityContext();
   }
 
-  @Override
-  public void setSecurityContext(SecurityContext context) {
-    session.setSecurityContext(context);
-  }
-
   private MuleEvent parent;
   private Correlation correlation;
 

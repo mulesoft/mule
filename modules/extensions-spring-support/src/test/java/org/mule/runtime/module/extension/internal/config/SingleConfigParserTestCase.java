@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -36,8 +37,7 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
   @Test
   public void configWithExpressionFunctionStillDynamic() throws Exception {
     MuleEvent event = getHeisenbergEvent();
-    MuleEvent anotherEvent = getHeisenbergEvent();
-    anotherEvent.setFlowVariable("age", 40);
+    MuleEvent anotherEvent = MuleEvent.builder(getHeisenbergEvent()).addFlowVariable("age", 40).build();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
     assertThat(config, is(not(sameInstance(anotherConfig))));
