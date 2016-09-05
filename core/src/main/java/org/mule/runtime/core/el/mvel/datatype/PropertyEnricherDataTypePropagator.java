@@ -7,10 +7,10 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.metadata.TypedValue;
 
 /**
  * Propagates data type for inlined flow and session vars used for enrichment target
@@ -18,12 +18,12 @@ import org.mule.mvel2.ast.AssignmentNode;
 public class PropertyEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator {
 
   @Override
-  protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node) {
+  protected boolean doPropagate(MuleEvent event, MuleEvent.Builder builder, TypedValue typedValue, ASTNode node) {
     if (node instanceof AssignmentNode) {
       String assignmentVar = ((AssignmentNode) node).getAssignmentVar();
 
       if (event.getFlowVariableNames().contains(assignmentVar)) {
-        event.setFlowVariable(assignmentVar, typedValue.getValue(), typedValue.getDataType());
+        builder.addFlowVariable(assignmentVar, typedValue.getValue(), typedValue.getDataType());
         return true;
       } else if (event.getSession().getPropertyNamesAsSet().contains(assignmentVar)) {
         event.getSession().setProperty(assignmentVar, typedValue.getValue(), typedValue.getDataType());

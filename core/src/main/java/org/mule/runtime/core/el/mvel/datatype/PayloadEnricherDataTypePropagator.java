@@ -22,12 +22,12 @@ import org.mule.runtime.core.metadata.TypedValue;
 public class PayloadEnricherDataTypePropagator extends AbstractEnricherDataTypePropagator {
 
   @Override
-  protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node) {
+  protected boolean doPropagate(MuleEvent event, MuleEvent.Builder builder, TypedValue typedValue, ASTNode node) {
     if (node instanceof Assignment) {
       String assignmentVar = ((Assignment) node).getAssignmentVar();
 
       if (PAYLOAD.equals(assignmentVar) || MESSAGE_PAYLOAD.equals(assignmentVar)) {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(typedValue.getValue())
+        builder.message(MuleMessage.builder(event.getMessage()).payload(typedValue.getValue())
             .mediaType(typedValue.getDataType().getMediaType()).build());
         return true;
       }

@@ -33,7 +33,6 @@ import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.TemplateParser;
 
 import java.io.IOException;
@@ -49,7 +48,6 @@ import javax.activation.DataHandler;
 import javax.activation.MimeType;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Expression language that uses MVEL (http://mvel.codehaus.org/).
@@ -138,6 +136,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     return (T) evaluate(expression, event, MuleEvent.builder(event), flowConstruct);
   }
 
+  @Override
   public <T> T evaluate(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct) {
     return (T) evaluate(expression, event, eventBuilder, flowConstruct, null);
   }
@@ -190,7 +189,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
 
-    dataTypePropagator.propagate(typedValue, event, compiledExpression);
+    event = eventBuilder.build();
+    dataTypePropagator.propagate(typedValue, event, eventBuilder, compiledExpression);
   }
 
   @Override

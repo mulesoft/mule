@@ -21,7 +21,7 @@ public class SessionVarEnricherDataTypePropagator extends AbstractVariableEnrich
   }
 
   @Override
-  protected void addVariable(MuleEvent event, TypedValue typedValue, String propertyName) {
+  protected void addVariable(MuleEvent event, MuleEvent.Builder builder, TypedValue typedValue, String propertyName) {
     event.getSession().setProperty(propertyName, typedValue.getValue(), typedValue.getDataType());
   }
 

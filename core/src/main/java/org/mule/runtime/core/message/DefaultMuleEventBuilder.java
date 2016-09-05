@@ -191,8 +191,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   public MuleEvent build() {
     if (originalEvent != null && !modified) {
       return originalEvent;
-    }
-    else{
+    } else {
       DefaultMuleEvent event =
           new DefaultMuleEvent(context, message, exchangePattern, flow, session, transacted,
                                synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,

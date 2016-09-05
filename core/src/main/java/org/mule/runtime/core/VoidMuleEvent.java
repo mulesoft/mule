@@ -169,11 +169,6 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public void clearFlowVariables() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public boolean isNotificationsEnabled() {
     throw new UnsupportedOperationException();
   }

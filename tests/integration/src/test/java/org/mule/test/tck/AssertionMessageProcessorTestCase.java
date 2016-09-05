@@ -53,11 +53,11 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
     expressionLanguage = mock(ExpressionLanguage.class);
     when(expressionLanguage.isValid(anyString())).thenReturn(true);
     when(expressionLanguage.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
-                                           anyBoolean()))
-                                               .thenReturn(true);
+                                            anyBoolean()))
+                                                .thenReturn(true);
     when(expressionLanguage.evaluateBoolean(eq(FALSE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
-                                           anyBoolean()))
-                                               .thenReturn(false);
+                                            anyBoolean()))
+                                                .thenReturn(false);
 
     when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
 

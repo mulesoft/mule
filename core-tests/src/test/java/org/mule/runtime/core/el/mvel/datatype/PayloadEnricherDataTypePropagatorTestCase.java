@@ -19,6 +19,7 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -52,7 +53,9 @@ public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleConte
 
     MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
-    dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    final Builder builder = MuleEvent.builder(testEvent);
+    dataTypePropagator.propagate(testEvent, builder, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    testEvent = builder.build();
 
     assertThat(testEvent.getMessage().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
   }

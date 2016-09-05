@@ -7,9 +7,9 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
+import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.metadata.TypedValue;
-import org.mule.mvel2.compiler.CompiledExpression;
 
 /**
  * Propagates {@link org.mule.runtime.api.metadata.DataType} from the right to the left side of an assignment expression if
@@ -25,5 +25,5 @@ public interface EnricherDataTypePropagator {
    * @param compiledExpression assignment expression used for enrichment
    * @return true if propagation was done, false otherwise
    */
-  boolean propagate(MuleEvent event, TypedValue typedValue, CompiledExpression compiledExpression);
+  boolean propagate(MuleEvent event, MuleEvent.Builder builder, TypedValue typedValue, CompiledExpression compiledExpression);
 }
