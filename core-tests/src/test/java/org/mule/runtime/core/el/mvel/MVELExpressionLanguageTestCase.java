@@ -101,8 +101,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Before
   public void setupMVEL() throws InitialisationException {
-    mvel = new MVELExpressionLanguage();
-    mvel.setMuleContext(muleContext);
+    mvel = new MVELExpressionLanguage(muleContext);
     mvel.initialise();
 
     flowConstruct = mock(FlowConstruct.class);

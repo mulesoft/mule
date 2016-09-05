@@ -85,8 +85,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
   }
 
   protected ExpressionLanguage getExpressionLanguage() {
-    final MVELExpressionLanguage el = new MVELExpressionLanguage();
-    el.setMuleContext(muleContext);
+    final MVELExpressionLanguage el = new MVELExpressionLanguage(muleContext);
     return el;
   }
 

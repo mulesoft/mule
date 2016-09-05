@@ -43,7 +43,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @SuppressWarnings("unchecked")
   @Before
   public void setup() throws Exception {
-    expressionLanguage = new MVELExpressionLanguage();
+    expressionLanguage = new MVELExpressionLanguage(muleContext);
     muleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
   }
 

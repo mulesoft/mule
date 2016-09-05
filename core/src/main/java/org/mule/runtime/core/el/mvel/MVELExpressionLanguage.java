@@ -10,7 +10,6 @@ import static java.util.Collections.singletonMap;
 import static org.apache.commons.lang.StringUtils.replace;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.mvel2.CompileException;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.ast.Function;
 import org.mule.mvel2.compiler.ExpressionCompiler;
@@ -60,7 +59,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   private static final Logger logger = getLogger(MVELExpressionLanguage.class);
 
   protected ParserConfiguration parserConfiguration;
-  @Inject
   protected MuleContext muleContext;
   protected MVELExpressionExecutor expressionExecutor;
 
@@ -80,6 +78,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   // default style parser
   private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
+  @Inject
   public MVELExpressionLanguage(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
@@ -433,9 +432,5 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
       expression = expression + "=" + OBJECT_FOR_ENRICHMENT;
     }
     return expression;
-  }
-
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 }
