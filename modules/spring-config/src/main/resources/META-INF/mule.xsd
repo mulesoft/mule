@@ -912,7 +912,7 @@
                     <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="transactionalAction" type="transactionalActionType" default="ALWAYS_BEGIN"/>
-                <xsd:attribute name="transactionType" type="transactionType" default="STANDARD"/>
+                <xsd:attribute name="transactionType" type="transactionType" default="LOCAL"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -931,7 +931,7 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:NMTOKEN">
-            <xsd:enumeration value="STANDARD"/>
+            <xsd:enumeration value="LOCAL"/>
             <xsd:enumeration value="MULTI"/>
             <xsd:enumeration value="XA"/>
         </xsd:restriction>

@@ -10,5 +10,5 @@ package org.mule.runtime.core.transaction;
  * Represents the different kind of transaction available.
  */
 public enum TransactionType {
-  STANDARD, MULTI, XA
+  LOCAL, MULTI, XA
 }

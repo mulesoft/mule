@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.transaction.TransactionType.STANDARD;
+import static org.mule.runtime.core.transaction.TransactionType.LOCAL;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
@@ -33,7 +33,7 @@ public class DelegateTransactionFactory implements TypedTransactionFactory {
 
   @Override
   public TransactionType getType() {
-    return STANDARD;
+    return LOCAL;
   }
 
 }
