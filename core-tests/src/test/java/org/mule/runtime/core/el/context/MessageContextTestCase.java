@@ -49,10 +49,6 @@ public class MessageContextTestCase extends AbstractELTestCase {
     when(event.getError()).thenReturn(empty());
     message = spy(MuleMessage.builder().nullPayload().build());
     when(event.getCorrelation()).thenReturn(mock(Correlation.class));
-    doAnswer(invocation -> {
-      message = (MuleMessage) invocation.getArguments()[0];
-      return null;
-    }).when(event).setMessage(any(MuleMessage.class));
     when(event.getMessage()).thenAnswer(invocation -> message);
   }
 

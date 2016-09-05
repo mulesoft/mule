@@ -216,10 +216,6 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
     when(event.getError()).thenReturn(empty());
     eventBuilder = MuleEvent.builder(event);
     message = mock(MuleMessage.class);
-    doAnswer(invocation -> {
-      message = (MuleMessage) invocation.getArguments()[0];
-      return null;
-    }).when(event).setMessage(any(MuleMessage.class));
     when(event.getMessage()).thenAnswer(invocation -> message);
     MuleMessage transformedMessage = mock(MuleMessage.class);
     when(transformedMessage.getPayload()).thenReturn(payload);
