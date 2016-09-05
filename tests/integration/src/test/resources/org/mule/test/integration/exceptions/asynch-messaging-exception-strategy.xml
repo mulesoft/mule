@@ -8,7 +8,9 @@
 
     <configuration defaultErrorHandler-ref="testES"/>
 
-    <error-handler name="testES"/>
+    <error-handler name="testES">
+        <on-error-propagate/>
+    </error-handler>
 
     <script:transformer name="exceptionTransformer">
         <script:script engine="groovy">

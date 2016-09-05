@@ -150,8 +150,8 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
     config.setShutdownTimeout(shutdownTimeout);
   }
 
-  public void setDefaultExceptionStrategyName(String defaultExceptionStrategyName) {
-    config.setDefaultErrorHandlerName(defaultExceptionStrategyName);
+  public void setDefaultErrorHandlerName(String defaultErrorHandlerName) {
+    config.setDefaultErrorHandlerName(defaultErrorHandlerName);
   }
 
   public void setDefaultObjectSerializer(ObjectSerializer objectSerializer) {

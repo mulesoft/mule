@@ -17,7 +17,7 @@
 
     <flow name="WithRefExceptionStrategy" doc:name="With Referenced Exception Strategy">
         <echo-component doc:name="echo_ex"/>
-        <error-handler name="On_Error_Continue" doc:name="error handler doc name">
+        <error-handler doc:name="error handler doc name">
             <on-error-continue doc:name="On Error Continue">
                 <logger message="Exception! " level="ERROR" doc:name="Logger"/>
             </on-error-continue>
