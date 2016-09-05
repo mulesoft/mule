@@ -43,7 +43,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.concurrent.Latch;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;

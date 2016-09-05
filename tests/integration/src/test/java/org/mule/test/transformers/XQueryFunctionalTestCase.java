@@ -10,6 +10,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -18,11 +22,6 @@ import java.util.Map;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.AbstractIntegrationTestCase;
 
 @Ignore("MULE-10083:  The XMLUnit assertion at the end of this tests requires to instantiate a javax.xml.transform.TransformerFactory "
     + "class, that class is found using SPI and results in org.apache.xalan.processor.TransformerFactoryImpl from Xalan."

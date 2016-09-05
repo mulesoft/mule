@@ -22,7 +22,6 @@ import org.mule.tck.size.SmallTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
