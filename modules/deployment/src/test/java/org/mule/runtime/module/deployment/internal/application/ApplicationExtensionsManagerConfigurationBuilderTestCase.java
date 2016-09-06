@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
@@ -77,7 +78,7 @@ public class ApplicationExtensionsManagerConfigurationBuilderTestCase extends Ab
   @Test
   public void register() throws Exception {
     builder.doConfigure(muleContext);
-    ArgumentCaptor<ExtensionManifest> manifestCaptor = ArgumentCaptor.forClass(ExtensionManifest.class);
+    ArgumentCaptor<ExtensionManifest> manifestCaptor = forClass(ExtensionManifest.class);
 
     verify(extensionManager).registerExtension(manifestCaptor.capture(), same(pluginClassLoader));
     ExtensionManifest manifest = manifestCaptor.getValue();

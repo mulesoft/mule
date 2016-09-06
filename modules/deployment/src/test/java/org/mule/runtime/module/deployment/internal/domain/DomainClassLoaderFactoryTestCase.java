@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.internal.domain;
 
 import static java.util.Collections.emptyList;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -24,7 +25,6 @@ import org.mule.runtime.module.deployment.internal.MuleSharedDomainClassLoader;
 import java.io.File;
 import java.io.IOException;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 
@@ -52,7 +52,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
 
     assertThat(new DomainClassLoaderFactory(getClass().getClassLoader())
         .create(containerClassLoader, descriptor, emptyList())
-        .getArtifactName(), CoreMatchers.is(DEFAULT_DOMAIN_NAME));
+        .getArtifactName(), is(DEFAULT_DOMAIN_NAME));
   }
 
   @Test

@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.module.deployment.api;
 
+import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.module.deployment.api.domain.Domain;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.mule.runtime.module.deployment.api.application.Application;
-import org.mule.runtime.module.deployment.api.domain.Domain;
 
 /**
  * Manages deploy of mule applications
@@ -34,7 +34,7 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
    */
   List<Application> getApplications();
 
-  /**
+  /**.
    * @param domainName name of the domain
    * @return the domain with the name domainName, null if there is no domain with domainName
    */

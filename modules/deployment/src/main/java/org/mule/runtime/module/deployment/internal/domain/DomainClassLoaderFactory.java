@@ -11,6 +11,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
@@ -123,7 +124,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     try {
       List<URL> urls = new LinkedList<>();
       urls.add(MuleFoldersUtil.getDomainFolder(domain).toURI().toURL());
-      File domainLibraryFolder = MuleFoldersUtil.getDomainLibFolder(domain);
+      File domainLibraryFolder = getDomainLibFolder(domain);
 
       if (domainLibraryFolder.exists()) {
         Collection<File> jars = listFiles(domainLibraryFolder, new String[] {"jar"}, false);

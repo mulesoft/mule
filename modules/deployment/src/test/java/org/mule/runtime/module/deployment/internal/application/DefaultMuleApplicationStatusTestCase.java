@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_INITIALISED;
 
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.module.deployment.api.application.ApplicationStatus;
@@ -56,9 +57,7 @@ public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTes
   public void initialised() {
     // the context was initialised before we gave it to the application, so we need
     // to fire the notification again since the listener wasn't there
-    muleContext
-        .fireNotification(new MuleContextNotification(muleContext,
-                                                      MuleContextNotification.CONTEXT_INITIALISED));
+    muleContext.fireNotification(new MuleContextNotification(muleContext, CONTEXT_INITIALISED));
     assertStatus(ApplicationStatus.INITIALISED);
   }
 

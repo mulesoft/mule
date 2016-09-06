@@ -29,7 +29,7 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   @BeforeClass
   public static void setUpPatches() {
-    File libFolder = newFile(AbstractSplashScreenTestCase.workingDirectory.getRoot(), "lib/user");
+    File libFolder = newFile(workingDirectory.getRoot(), "lib/user");
     libFolder.mkdirs();
     newFile(libFolder, FIRST_PATCH).mkdir();
     newFile(libFolder, "library.jar").mkdir();

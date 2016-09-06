@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,6 +48,7 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.deployment.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.module.deployment.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.module.deployment.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.deployment.internal.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
@@ -55,6 +57,7 @@ import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassL
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -116,7 +119,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.hamcrest.core.IsNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -830,7 +832,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // change shared http config name to use a wrong name
     File domainConfigFile =
-        new File(domainsDir + "/" + sharedHttpBundleDomainFileBuilder.getDeployedPath(), Domain.DOMAIN_CONFIG_FILE_LOCATION);
+        new File(domainsDir + "/" + sharedHttpBundleDomainFileBuilder.getDeployedPath(), DOMAIN_CONFIG_FILE_LOCATION);
     String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
     String wrongDomainFileContext = correctDomainConfigContent.replace("http-listener-config", "http-listener-config-wrong");
     FileUtils.copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
@@ -2313,7 +2315,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // Ensure resources are registered at domain's registry
     Domain domain = findADomain(sharedHttpDomainFileBuilder.getId());
-    assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(IsNull.nullValue())));
+    assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(nullValue())));
 
     ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
 
@@ -2815,8 +2817,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
       @Override
       public boolean test() {
-        verify(listener, times(1)).onMuleContextInitialised(eq(appName),
-                                                            any(MuleContext.class));
+        verify(listener, times(1)).onMuleContextInitialised(eq(appName), any(MuleContext.class));
         return true;
       }
 
@@ -3204,7 +3205,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
     MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, AbstractMuleTestCase.TEST_CONNECTOR))
+    mainFlow.process(MuleEvent.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR))
         .message(muleMessage)
         .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
   }

@@ -36,7 +36,7 @@ public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader impleme
   public URL findResource(String name) {
     URL resource = super.findResource(name);
     if (resource == null) {
-      File file = new File(MuleFoldersUtil.getDomainFolder(getArtifactName()) + File.separator + name);
+      File file = new File(getDomainFolder(getArtifactName()) + File.separator + name);
       if (file.exists()) {
         try {
           resource = file.toURI().toURL();
@@ -50,7 +50,7 @@ public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader impleme
 
   @Override
   protected String[] getLocalResourceLocations() {
-    return new String[] {MuleFoldersUtil.getDomainFolder(getArtifactName()).getAbsolutePath(),
+    return new String[] {getDomainFolder(getArtifactName()).getAbsolutePath(),
         MuleContainerBootstrapUtils.getMuleConfDir().getAbsolutePath()};
   }
 }

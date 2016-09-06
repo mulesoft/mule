@@ -8,7 +8,9 @@ package org.mule.runtime.module.deployment.internal.domain;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
 
 import org.mule.runtime.container.api.MuleFoldersUtil;
@@ -67,11 +69,11 @@ public class DefaultDomainFactory implements DomainFactory {
   }
 
   private DomainDescriptor findDomain(String domainName) throws IOException {
-    if (Domain.DEFAULT_DOMAIN_NAME.equals(domainName)) {
-      return new EmptyDomainDescriptor(Domain.DEFAULT_DOMAIN_NAME);
+    if (DEFAULT_DOMAIN_NAME.equals(domainName)) {
+      return new EmptyDomainDescriptor(DEFAULT_DOMAIN_NAME);
     }
 
-    final File deploymentFile = getDeploymentFile(MuleFoldersUtil.getDomainFolder(domainName));
+    final File deploymentFile = getDeploymentFile(getDomainFolder(domainName));
 
     DomainDescriptor descriptor;
 

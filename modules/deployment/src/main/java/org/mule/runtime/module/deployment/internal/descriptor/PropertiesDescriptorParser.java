@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal.descriptor;
 
+import static org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppDir;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -15,9 +17,6 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.lang.BooleanUtils;
-
-import static org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppDir;
 
 public class PropertiesDescriptorParser implements DescriptorParser<ApplicationDescriptor> {
 

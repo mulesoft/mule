@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.internal.domain;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 
@@ -20,7 +21,6 @@ import java.io.IOException;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.mockito.Mockito;
 
 public class DomainStartedSplashScreenTestCase extends AbstractSplashScreenTestCase<DomainStartedSplashScreen> {
 
@@ -28,7 +28,7 @@ public class DomainStartedSplashScreenTestCase extends AbstractSplashScreenTestC
   private static final String DOMAIN_LIB_PATH = format("domains/%s/lib", DOMAIN_NAME);
   private static final String SOME_JAR = "some.jar";
   private static final String MY_ZIP = "myZip.zip";
-  private DomainDescriptor descriptor = Mockito.mock(DomainDescriptor.class);
+  private DomainDescriptor descriptor = mock(DomainDescriptor.class);
 
   @BeforeClass
   public static void setUpLibrary() throws IOException {

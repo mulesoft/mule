@@ -11,11 +11,13 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.mule.runtime.container.api.MuleFoldersUtil.PLUGINS_FOLDER;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppSharedPluginLibsFolder;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE;
 
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.internal.descriptor.EmptyApplicationDescriptor;
@@ -103,18 +105,18 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
   }
 
   private URL[] findLibraries(String appName) throws MalformedURLException {
-    return findJars(MuleFoldersUtil.getAppLibFolder(appName)).toArray(new URL[0]);
+    return findJars(getAppLibFolder(appName)).toArray(new URL[0]);
   }
 
   private URL[] findSharedLibraries(String appName) throws MalformedURLException {
-    return findJars(MuleFoldersUtil.getAppSharedPluginLibsFolder(appName)).toArray(new URL[0]);
+    return findJars(getAppSharedPluginLibsFolder(appName)).toArray(new URL[0]);
   }
 
   private ArtifactClassLoaderFilter createApplicationClassLoaderFilter(ApplicationDescriptor descriptor) {
     final JarInfo librariesInfo = findExportedResources(descriptor.getSharedRuntimeLibs());
     final JarInfo classesInfo;
     try {
-      final File appClassesFolder = MuleFoldersUtil.getAppClassesFolder(descriptor.getName());
+      final File appClassesFolder = getAppClassesFolder(descriptor.getName());
       if (appClassesFolder.exists()) {
         classesInfo = findExportedResources(appClassesFolder.toURI().toURL());
       } else {

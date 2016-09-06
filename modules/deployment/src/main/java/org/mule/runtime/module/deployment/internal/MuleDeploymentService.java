@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import static java.lang.System.getProperties;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.util.Preconditions;
@@ -77,7 +78,7 @@ public class MuleDeploymentService implements DeploymentService {
     ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>();
 
     this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
-                                                            ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
+                                                            NOP_ARTIFACT_DEPLOYMENT_TEMPLATE);
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
     this.domainDeployer = new DomainArchiveDeployer(
                                                     new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
