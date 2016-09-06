@@ -68,7 +68,8 @@ public class HttpResponseToMuleEvent {
     this.parseResponse = parseResponse;
   }
 
-  public void convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException {
+  public MuleEvent convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException {
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(muleEvent);
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
     DataType dataType = muleEvent.getMessage().getDataType();
     if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType())) {
@@ -102,14 +103,15 @@ public class HttpResponseToMuleEvent {
       builder.mediaType(MediaType.parse(responseContentType));
     }
 
-    MuleMessage message = builder.build();
 
-    muleEvent.setMessage(message);
-    setResponsePayload(payload, muleEvent);
+    eventBuilder.message(builder.build());
+
+    setResponsePayload(payload, eventBuilder.build(), eventBuilder);
 
     if (requester.getConfig().isEnableCookies()) {
       processCookies(response, uri);
     }
+    return eventBuilder.build();
   }
 
   private Map<String, Serializable> getInboundProperties(HttpResponse response) {
@@ -140,13 +142,12 @@ public class HttpResponseToMuleEvent {
    * Stores the response payload (body of the HTTP response) in the Mule message according to the "target" property. If empty, it
    * will be stored in the payload. If not, it will use the target expression to enrich the message with the body of the response.
    */
-  private void setResponsePayload(Object payload, MuleEvent muleEvent) {
+  private void setResponsePayload(Object payload, MuleEvent muleEvent, MuleEvent.Builder eventBuilder) {
     if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget())) {
-      muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(payload)
+      eventBuilder.message(MuleMessage.builder(muleEvent.getMessage()).payload(payload)
           .mediaType(muleEvent.getMessage().getDataType().getMediaType()).build());
     } else {
-      // TODO MVEL-IMMUTABLE-EVENT
-      muleContext.getExpressionLanguage().enrich(requester.getTarget(), muleEvent, MuleEvent.builder(muleEvent), null, payload);
+      muleContext.getExpressionLanguage().enrich(requester.getTarget(), muleEvent, eventBuilder, null, payload);
     }
   }
 

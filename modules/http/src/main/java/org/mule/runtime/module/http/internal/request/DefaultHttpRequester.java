@@ -229,18 +229,19 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                            protected void doOnCompletion(HttpResponse httpResponse) {
                              try {
 
-                               httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
+                               MuleEvent resultEvent =
+                                   httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
                                notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(),
                                                                    flowConstruct, MESSAGE_REQUEST_END);
-                               resetMuleEventForNewThread(muleEvent);
+                               resetMuleEventForNewThread(resultEvent);
 
 
-                               if (resendRequest(muleEvent, checkRetry, authentication)) {
-                                 consumePayload(muleEvent);
-                                 innerProcessNonBlocking(muleEvent, completionHandler, false);
+                               if (resendRequest(resultEvent, checkRetry, authentication)) {
+                                 consumePayload(resultEvent);
+                                 innerProcessNonBlocking(resultEvent, completionHandler, false);
                                } else {
-                                 validateResponse(muleEvent);
-                                 completionHandler.onCompletion(muleEvent, createCompletionExceptionCallback(muleEvent));
+                                 validateResponse(resultEvent);
+                                 completionHandler.onCompletion(resultEvent, createCompletionExceptionCallback(resultEvent));
                                }
                              } catch (MessagingException messagingException) {
                                completionHandler.onFailure(messagingException);
