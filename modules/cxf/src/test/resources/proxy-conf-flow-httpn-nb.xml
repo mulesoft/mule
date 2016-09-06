@@ -38,7 +38,9 @@
         <cxf:proxy-service />
         <cxf:proxy-client />
         <processor ref="sensingRequestResponseProcessorGreeter" />
+        <logger message="1 - #[message.payloadAs(String)]" level="ERROR"/>
         <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+        <logger message="3 - #[message.payloadAs(String)]" level="ERROR"/>
     </flow>
     <flow name="greeter-service">
         <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" />
@@ -46,6 +48,7 @@
         <component>
             <prototype-object class="org.apache.hello_world_soap_http.GreeterImpl" />
         </component>
+        <logger message="2 - #[payload]" level="ERROR"/>
     </flow>
 
 
