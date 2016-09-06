@@ -182,7 +182,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   class TestComponent extends AbstractComponent {
 
     @Override
-    protected Object doInvoke(MuleEvent event) throws Exception {
+    protected Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
       return event.getMessageAsString(muleContext) + COMPONENT;
     }
   }

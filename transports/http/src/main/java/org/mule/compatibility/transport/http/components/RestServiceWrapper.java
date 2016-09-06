@@ -138,7 +138,7 @@ public class RestServiceWrapper extends AbstractComponent {
   }
 
   @Override
-  public Object doInvoke(MuleEvent event) throws Exception {
+  public Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
     Object requestBody;
 
     MuleMessage message = event.getMessage();

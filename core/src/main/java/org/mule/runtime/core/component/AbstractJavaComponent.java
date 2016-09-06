@@ -53,7 +53,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
   }
 
   @Override
-  protected Object doInvoke(MuleEvent event) throws Exception {
+  protected Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
     return invokeComponentInstance(event);
   }
 
