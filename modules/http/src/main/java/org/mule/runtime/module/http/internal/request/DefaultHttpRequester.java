@@ -231,7 +231,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
 
                                MuleEvent resultEvent =
                                    httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
-                               notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(),
+                               notificationHelper.fireNotification(this, resultEvent, httpRequest.getUri(),
                                                                    flowConstruct, MESSAGE_REQUEST_END);
                                resetMuleEventForNewThread(resultEvent);
 
