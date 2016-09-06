@@ -40,8 +40,7 @@ public class CustomRouteResolver implements DynamicRouteResolver {
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
-        return event;
+        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(letter).build()).build();
       } catch (Exception e) {
         throw new DefaultMuleException(e);
       }
@@ -69,10 +68,13 @@ public class CustomRouteResolver implements DynamicRouteResolver {
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage())
-            .payload(muleContext.getTransformationService().transform(event.getMessage(), DataType.STRING).getPayload()
-                + letter)
-            .build());
+        event = MuleEvent
+            .builder(event).message(
+                                    MuleMessage.builder(event.getMessage())
+                                        .payload(muleContext.getTransformationService()
+                                            .transform(event.getMessage(), DataType.STRING).getPayload() + letter)
+                                        .build())
+            .build();
       } catch (Exception e) {
       }
       throw new DefaultMuleException(CoreMessages.createStaticMessage(""));

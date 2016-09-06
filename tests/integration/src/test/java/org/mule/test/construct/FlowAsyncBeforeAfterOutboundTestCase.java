@@ -11,12 +11,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -68,9 +69,8 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      event.setMessage(MuleMessage.builder(event.getMessage())
-          .addOutboundProperty(event.getFlowVariable("property-name"), currentThread().getName()).build());
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+          .addOutboundProperty(event.getFlowVariable("property-name"), currentThread().getName()).build()).build();
     }
   }
 }

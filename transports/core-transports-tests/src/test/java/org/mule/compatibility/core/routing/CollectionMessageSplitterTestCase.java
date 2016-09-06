@@ -20,6 +20,7 @@ import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populate
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -165,12 +166,13 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     splitter.setMuleContext(muleContext);
     Grabber grabber = new Grabber();
     splitter.setListener(grabber);
-    MuleEvent event =
-        MuleEvent.builder(DefaultMessageContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session).build();
-    populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
+    final Builder builder =
+        MuleEvent.builder(DefaultMessageContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session);
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
-      event.setFlowVariable(entry.getKey(), entry.getValue());
+      builder.addFlowVariable(entry.getKey(), entry.getValue());
     }
+    MuleEvent event = builder.build();
+    populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     splitter.process(event);
     List<MuleEvent> splits = grabber.getEvents();
     assertEquals(count, splits.size());
