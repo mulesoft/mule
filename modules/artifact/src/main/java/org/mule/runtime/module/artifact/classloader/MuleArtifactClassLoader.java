@@ -36,8 +36,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
       "/org/mule/runtime/module/artifact/classloader/DefaultResourceReleaser.class";
   private final String name;
 
-  protected Logger logger = LoggerFactory.getLogger(getClass());
-
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
   private LocalResourceLocator localResourceLocator;
