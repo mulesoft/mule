@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
@@ -38,6 +39,7 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -60,6 +62,7 @@ import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
@@ -178,6 +181,7 @@ public class DefaultMuleContext implements MuleContext {
   private LockFactory lockFactory;
 
   private ExpressionLanguage expressionLanguage;
+  private ExpressionLanguage defaultExpressionLanguage;
 
   private ProcessingTimeWatcher processingTimeWatcher;
 
@@ -227,10 +231,12 @@ public class DefaultMuleContext implements MuleContext {
     localMuleClient = new DefaultLocalMuleClient(this);
     exceptionListener = new DefaultSystemExceptionStrategy();
     transformationService = new TransformationService(this);
+    defaultExpressionLanguage = new MVELExpressionLanguage(this);
   }
 
   public DefaultMuleContext() {
     transformationService = new TransformationService(this);
+    defaultExpressionLanguage = new MVELExpressionLanguage(this);
   }
 
   protected DefaultRegistryBroker createRegistryBroker() {
@@ -244,6 +250,8 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public synchronized void initialise() throws InitialisationException {
     lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
+
+    initialiseIfNeeded(defaultExpressionLanguage);
 
     if (getNotificationManager() == null) {
       throw new MuleRuntimeException(CoreMessages.objectIsNull(MuleProperties.OBJECT_NOTIFICATION_MANAGER));
@@ -856,11 +864,16 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public ExpressionLanguage getExpressionLanguage() {
-    if (this.expressionLanguage == null) {
-      this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-    }
-
-    return this.expressionLanguage;
+      if (this.expressionLanguage == null) {
+        this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+      }
+      if(this.expressionLanguage == null || !lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME)){
+        // This is required because there are some uses of expression language before MuleContext is initialized.
+        return defaultExpressionLanguage;
+      }
+      else{
+        return this.expressionLanguage;
+      }
   }
 
   @Override

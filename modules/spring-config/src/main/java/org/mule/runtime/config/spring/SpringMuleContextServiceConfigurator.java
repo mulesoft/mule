@@ -228,7 +228,6 @@ class SpringMuleContextServiceConfigurator {
   }
 
   void createArtifactServices() {
-    initialiseExpressionManager();
     defaultContextServices.entrySet().stream()
         .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)).forEach(service -> {
           registerBeanDefinition(service.getKey(), service.getValue());
@@ -252,16 +251,6 @@ class SpringMuleContextServiceConfigurator {
       final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService);
 
       registerBeanDefinition(serviceName, beanDefinition);
-    }
-  }
-
-  private void initialiseExpressionManager() {
-    try {
-      // TODO MULE-9638 - DB parsers use the expression language before initialisation phase. Remove once it gets migrated to SDK.
-      MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
-      expressionLanguage.initialise();
-    } catch (InitialisationException e) {
-      throw new MuleRuntimeException(e);
     }
   }
 
