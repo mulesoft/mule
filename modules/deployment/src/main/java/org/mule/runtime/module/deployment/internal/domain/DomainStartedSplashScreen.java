@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal.domain;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 
-import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactStartedSplashScreen;
 import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
 
-import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 
 /**
  * Splash screen specific for {@link Domain} startup.
@@ -22,7 +21,7 @@ public class DomainStartedSplashScreen extends ArtifactStartedSplashScreen<Domai
   @Override
   protected void createMessage(DomainDescriptor descriptor) {
     doBody(String.format("Started domain '%s'", descriptor.getName()));
-    if (SplashScreen.RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
+    if (RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
       listLibraries(descriptor);
     }
   }
