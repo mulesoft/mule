@@ -106,7 +106,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
   @Test
   public void returnsDebugInfoWithSecurity() throws Exception {
     configureSecurityExpressions();
-    addConfigSecurityProperties(event);
+    event = addConfigSecurityProperties(event);
 
     doDebugInfoTest(message, event, getSecurityFieldsMatchers());
   }
@@ -119,7 +119,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
   private void doDebugInfoTest(MuleMessage message, MuleEvent event, List<Matcher<FieldDebugInfo<?>>> securityFieldMatchers)
       throws InitialisationException {
     configureRequesterExpressions();
-    addRequesterProperties(message);
+    event = addRequesterProperties(event);
 
     final List<FieldDebugInfo<?>> debugInfo = requester.getDebugInfo(event);
 
@@ -154,26 +154,28 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     return securityFields;
   }
 
-  private void addConfigSecurityProperties(MuleEvent event) {
-    event.setFlowVariable(DOMAIN_PROPERTY, DOMAIN);
-    event.setFlowVariable(PASSWORD_PROPERTY, PASSWORD);
-    event.setFlowVariable(PREEMPTIVE_PROPERTY, Boolean.FALSE.toString());
-    event.setFlowVariable(USERNAME_PROPERTY, USERNAME);
-    event.setFlowVariable(WORKSTATION_PROPERTY, WORKSTATION);
+  private MuleEvent addConfigSecurityProperties(MuleEvent event) {
+    return MuleEvent.builder(event)
+        .addFlowVariable(DOMAIN_PROPERTY, DOMAIN)
+        .addFlowVariable(PASSWORD_PROPERTY, PASSWORD)
+        .addFlowVariable(PREEMPTIVE_PROPERTY, Boolean.FALSE.toString())
+        .addFlowVariable(USERNAME_PROPERTY, USERNAME)
+        .addFlowVariable(WORKSTATION_PROPERTY, WORKSTATION).build();
   }
 
-  private void addRequesterProperties(MuleMessage message) {
-    event.setFlowVariable(HOST_PROPERTY, HOST);
-    event.setFlowVariable(PORT_PROPERTY, PORT);
-    event.setFlowVariable(METHOD_PROPERTY, METHOD);
-    event.setFlowVariable(STREAMING_MODE_PROPERTY, TRUE.toString());
-    event.setFlowVariable(SEND_BODY_PROPERTY, ALWAYS.toString());
-    event.setFlowVariable(FOLLOW_REDIRECTS_PROPERTY, TRUE.toString());
-    event.setFlowVariable(PARSE_RESPONSE_PROPERTY, TRUE.toString());
-    event.setFlowVariable(RESPONSE_TIMEOUT_PROPERTY, RESPONSE_TIMEOUT);
-    event.setFlowVariable(PARAM_NAME1, PARAM_VALUE1);
-    event.setFlowVariable(PARAM2_FIRST_VALUE_PROPERTY, PARAM_VALUE1);
-    event.setFlowVariable(PARAM2_SECOND_VALUE_PROPERTY, PARAM_VALUE2);
+  private MuleEvent addRequesterProperties(MuleEvent event) {
+    return MuleEvent.builder(event)
+        .addFlowVariable(HOST_PROPERTY, HOST)
+        .addFlowVariable(PORT_PROPERTY, PORT)
+        .addFlowVariable(METHOD_PROPERTY, METHOD)
+        .addFlowVariable(STREAMING_MODE_PROPERTY, TRUE.toString())
+        .addFlowVariable(SEND_BODY_PROPERTY, ALWAYS.toString())
+        .addFlowVariable(FOLLOW_REDIRECTS_PROPERTY, TRUE.toString())
+        .addFlowVariable(PARSE_RESPONSE_PROPERTY, TRUE.toString())
+        .addFlowVariable(RESPONSE_TIMEOUT_PROPERTY, RESPONSE_TIMEOUT)
+        .addFlowVariable(PARAM_NAME1, PARAM_VALUE1)
+        .addFlowVariable(PARAM2_FIRST_VALUE_PROPERTY, PARAM_VALUE1)
+        .addFlowVariable(PARAM2_SECOND_VALUE_PROPERTY, PARAM_VALUE2).build();
   }
 
   private void configureSecurityExpressions() throws InitialisationException {
