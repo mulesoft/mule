@@ -8,7 +8,10 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestEventContext;
 
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
@@ -26,28 +29,24 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    InvocationResult ctx = resolver
-        .invoke(new FruitBowl(),
-                MuleTestUtils.getTestEventContext(new Fruit[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext(new Fruit[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext);
+    InvocationResult ctx = resolver.invoke(new FruitBowl(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(ctx.getState(), InvocationResult.State.SUCCESSFUL);
-
   }
 
   @Test
   public void testArrayMatchGenericFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    InvocationResult ctx = resolver
-        .invoke(new FruitBowl(),
-                MuleTestUtils.getTestEventContext(new Object[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext(new Object[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext);
+    InvocationResult ctx = resolver.invoke(new FruitBowl(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(ctx.getState(), InvocationResult.State.FAILED);
   }
-
 
   @Test
   public void testArrayMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    InvocationResult ctx =
-        resolver.invoke(new Apple(), MuleTestUtils.getTestEventContext(new Object[] {"blah"}, REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext(new Object[] {"blah"}, REQUEST_RESPONSE, muleContext);
+    InvocationResult ctx = resolver.invoke(new Apple(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(ctx.getState(), InvocationResult.State.FAILED);
   }
 }

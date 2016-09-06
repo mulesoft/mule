@@ -66,7 +66,6 @@ public class MuleInvoker implements Invoker {
     } else {
       try {
         Object payload = extractPayload(exchange.getInMessage());
-        Class payloadClass = payload != null ? payload.getClass() : Object.class;
         event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).mediaType(cxfMmessageProcessor.getMimeType())
             .build());
         BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.model;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 
 /**
@@ -28,7 +29,7 @@ public interface EntryPointResolverSet {
    * @return the result of the invocation
    * @throws Exception if the invocation itself or an {@link EntryPointResolver} fails
    */
-  Object invoke(Object component, MuleEventContext context) throws Exception;
+  Object invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception;
 
   /**
    * Will add a resolver to the list of resolvers to invoke on a compoent. Implementations must maintain an ordered list of
