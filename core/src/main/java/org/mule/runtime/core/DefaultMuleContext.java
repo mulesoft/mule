@@ -864,16 +864,15 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public ExpressionLanguage getExpressionLanguage() {
-      if (this.expressionLanguage == null) {
-        this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-      }
-      if(this.expressionLanguage == null || !lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME)){
-        // This is required because there are some uses of expression language before MuleContext is initialized.
-        return defaultExpressionLanguage;
-      }
-      else{
-        return this.expressionLanguage;
-      }
+    if (this.expressionLanguage == null) {
+      this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    }
+    if (this.expressionLanguage == null || !lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME)) {
+      // This is required because there are some uses of expression language before MuleContext is initialized.
+      return defaultExpressionLanguage;
+    } else {
+      return this.expressionLanguage;
+    }
   }
 
   @Override
