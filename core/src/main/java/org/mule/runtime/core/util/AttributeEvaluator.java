@@ -68,9 +68,9 @@ public class AttributeEvaluator {
     return attributeType.equals(AttributeType.PARSE_EXPRESSION);
   }
 
-  public TypedValue resolveTypedValue(MuleEvent event) {
+  public TypedValue resolveTypedValue(MuleEvent event, MuleEvent.Builder eventBuilder) {
     if (isExpression()) {
-      return expressionManager.evaluateTyped(attributeValue, event, null);
+      return expressionManager.evaluateTyped(attributeValue, event, eventBuilder, null);
     } else if (isParseExpression()) {
       final String value = expressionManager.parse(attributeValue, event, null);
       return new TypedValue(value, DataType.builder().type(String.class).build());

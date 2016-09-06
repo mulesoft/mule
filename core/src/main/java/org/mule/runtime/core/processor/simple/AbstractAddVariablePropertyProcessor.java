@@ -10,6 +10,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -45,7 +46,9 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       logger.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
     } else {
-      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event);
+      final Builder builder = MuleEvent.builder(event);
+      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event, builder);
+      event = builder.build();
       if (typedValue.getValue() == null) {
         if (logger.isDebugEnabled()) {
           logger.debug(MessageFormat.format(
