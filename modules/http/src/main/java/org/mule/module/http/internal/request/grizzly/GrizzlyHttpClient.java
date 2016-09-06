@@ -8,6 +8,10 @@ package org.mule.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
 import static org.mule.module.http.api.HttpHeaders.Names.CONNECTION;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
@@ -38,7 +42,6 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.ning.http.client.generators.InputStreamBodyGenerator;
-import com.ning.http.client.multipart.ByteArrayPart;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProviderConfig;
 
@@ -46,6 +49,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -60,6 +65,13 @@ public class GrizzlyHttpClient implements HttpClient
     private static final int MAX_CONNECTION_LIFETIME = 30 * 60 * 1000;
 
     private Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
+
+    private static final List<String> SPECIAL_CUSTOM_HEADERS = Arrays.asList(
+            CONTENT_DISPOSITION.toLowerCase(),
+            CONTENT_TRANSFER_ENCODING.toLowerCase(),
+            CONTENT_TYPE.toLowerCase(),
+            CONTENT_ID.toLowerCase()
+    );
 
     private final TlsContextFactory tlsContextFactory;
     private final ProxyConfig proxyConfig;
@@ -264,7 +276,6 @@ public class GrizzlyHttpClient implements HttpClient
             }
 
             builder.setRealm(realmBuilder.build());
-
         }
 
         if (request.getEntity() != null)
@@ -283,15 +294,42 @@ public class GrizzlyHttpClient implements HttpClient
 
                 for (HttpPart part : multipartHttpEntity.getParts())
                 {
-                    if (part.getFileName() != null)
+                    ByteArrayPart byteArrayPart;
+                    String encoding = null;
+                    String contentId = null;
+
+                    for (String headerName : part.getHeaderNames())
                     {
-                        builder.addBodyPart(new ByteArrayPart(part.getName(), IOUtils.toByteArray(part.getInputStream()), part.getContentType(), null, part.getFileName()));
+                        if (headerName.toLowerCase().equals(CONTENT_TRANSFER_ENCODING.toLowerCase()))
+                        {
+                            encoding = part.getHeader(headerName);
+                        }
+                        else if (headerName.toLowerCase().equals(CONTENT_ID.toLowerCase()))
+                        {
+                            contentId = part.getHeader(headerName);
+                        }
                     }
-                    else
+
+                    byte[] content = IOUtils.toByteArray(part.getInputStream());
+                    byteArrayPart = new ByteArrayPart(part.getName(), content, part.getContentType(), null, part.getFileName(), contentId, encoding);
+
+                    for (String headerName : part.getHeaderNames())
                     {
-                        byte[] content = IOUtils.toByteArray(part.getInputStream());
-                        builder.addBodyPart(new ByteArrayPart(part.getName(), content, part.getContentType(), null));
+                        if (!SPECIAL_CUSTOM_HEADERS.contains(headerName.toLowerCase()))
+                        {
+                            byteArrayPart.addCustomHeader(headerName + ": ", part.getHeader(headerName));
+                        }
+                        else if (headerName.toLowerCase().equals(CONTENT_DISPOSITION.toLowerCase()))
+                        {
+                            byteArrayPart.setCustomContentDisposition(part.getHeader(headerName));
+                        }
+                        else if (headerName.toLowerCase().equals(CONTENT_TYPE.toLowerCase()))
+                        {
+                            byteArrayPart.setCustomContentType(part.getHeader(headerName));
+                        }
                     }
+
+                    builder.addBodyPart(byteArrayPart);
                 }
             }
         }

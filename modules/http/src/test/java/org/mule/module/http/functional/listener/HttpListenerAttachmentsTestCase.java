@@ -9,10 +9,13 @@ package org.mule.module.http.functional.listener;
 import static java.lang.String.format;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang.StringUtils.countMatches;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Values.CHUNKED;
@@ -26,14 +29,23 @@ import org.mule.module.http.api.HttpHeaders;
 import org.mule.module.http.internal.HttpParser;
 import org.mule.module.http.internal.multipart.HttpPart;
 import org.mule.module.http.internal.multipart.HttpPartDataSource;
+import org.mule.module.http.internal.request.grizzly.ByteArrayPart;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,6 +124,47 @@ public class HttpListenerAttachmentsTestCase extends FunctionalTestCase
     public void receiveOnlyAttachmentsAndReturnOnlyAttachmentsWithMultipartFormDataAndTransferEncodingChunked() throws Exception
     {
         processAttachmentRequestAndResponse(formDataPath.getValue(), MULTIPART_FORM_DATA, USE_CHUNKED_MODE);
+    }
+
+    @Test
+    public void receiveAttachmentWithCustomHeaders() throws Exception
+    {
+
+        RequestBuilder requestBuilder = new RequestBuilder();
+        AsyncHttpClientConfig asyncHttpClientConfig = new AsyncHttpClientConfig.Builder().build();
+        GrizzlyAsyncHttpProvider grizzlyAsyncHttpProvider = new GrizzlyAsyncHttpProvider(asyncHttpClientConfig);
+
+        requestBuilder.setMethod("POST");
+        requestBuilder.setUrl(getUrl(formDataPath.getValue()));
+        ByteArrayPart byteArrayPart = new ByteArrayPart("partName", "blahblah".getBytes(), "application/pdf", null, null, null, "base64");
+        byteArrayPart.setCustomContentDisposition("file; name=\"partName\"; documentId=1");
+        byteArrayPart.addCustomHeader("Custom-Header: ", "custom");
+        requestBuilder.addBodyPart(byteArrayPart);
+
+        try (AsyncHttpClient asyncHttpClient = new AsyncHttpClient(grizzlyAsyncHttpProvider, asyncHttpClientConfig))
+        {
+
+            ListenableFuture<Response> responseFuture = asyncHttpClient.executeRequest(requestBuilder.build());
+            com.ning.http.client.Response response = responseFuture.get();
+
+            // check that the Mule message is created correctly from the HTTP request
+            final MuleMessage receivedMessage = muleContext.getClient().request(VM_MESSAGE_ENDPOINT, 1000);
+            assertThat(receivedMessage.getInboundAttachmentNames().size(), is(1));
+            HttpPartDataSource muleAttachment = (HttpPartDataSource) receivedMessage.getInboundAttachment("partName").getDataSource();
+            assertThat(muleAttachment.getHeader("Custom-Header"), equalTo("custom"));
+            assertThat(muleAttachment.getContentType(), equalTo("application/pdf"));
+            assertThat(muleAttachment.getHeader(CONTENT_TRANSFER_ENCODING), equalTo("base64"));
+            assertThat(muleAttachment.getHeader(CONTENT_DISPOSITION), equalTo("file; name=\"partName\"; documentId=1"));
+
+            // check that the HTTP response includes the same headers as the HTTP request (when echoing)
+            final Collection<HttpPart> parts = HttpParser.parseMultipartContent(response.getResponseBodyAsStream(), response.getContentType());
+            assertThat(parts.size(), Is.is(1));
+            HttpPart receivedPart = new ArrayList<>(parts).get(0);
+            assertThat(receivedPart.getHeader("Custom-Header"), equalTo("custom"));
+            assertThat(receivedPart.getContentType(), equalTo("application/pdf"));
+            assertThat(receivedPart.getHeader(CONTENT_TRANSFER_ENCODING), equalTo("base64"));
+            assertThat(receivedPart.getHeader(CONTENT_DISPOSITION), equalTo("file; name=\"partName\"; documentId=1"));
+        }
     }
 
     @Test
