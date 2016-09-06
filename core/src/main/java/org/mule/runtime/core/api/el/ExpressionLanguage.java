@@ -11,7 +11,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.metadata.TypedValue;
-import org.mule.runtime.core.util.TemplateParser;
 
 import java.util.Map;
 
@@ -184,15 +183,40 @@ public interface ExpressionLanguage {
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
    * evaluate a single expression they can use {@link #evaluate(String, MuleEvent, FlowConstruct, Map)}.
    *
+   * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link MuleEvent} or
+   * {@link org.mule.runtime.core.api.MuleMessage} mutation performed within the expression will impact within the context of
+   * expression evaluation but will not mutated the {@code event} parameter.
+   *
    * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[xpath://foo] other value is
    *        #[header:foo]."
    * @param event The current event being processed
    * @param flowConstruct the flow where the event is being processed
    * @return the result of the evaluation
    * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
-   * to true.
+   *         to true.
    */
   String parse(String expression, MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException;
+
+  /**
+   * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
+   * evaluate a single expression they can use {@link #evaluate(String, MuleEvent, FlowConstruct, Map)}.
+   *
+   * This version of {@code parse} allows {@link MuleEvent} or {@link org.mule.runtime.core.api.MuleMessage} mutation performed
+   * within the expression to be maintained post-evaluation via the use of a result
+   * {@link org.mule.runtime.core.api.MuleEvent.Builder} which should be created from the original event before being passed and
+   * then used to construct the post-evaluation event.
+   * 
+   * @param expression one or more expressions embedded in a literal string i.e. "Value is #[xpath://foo] other value is
+   *        #[header:foo]."
+   * @param event The current event being processed
+   * @param eventBuilder event builder instance used to mutate the current message or event.
+   * @param flowConstruct the flow where the event is being processed
+   * @return the result of the evaluation
+   * @throws ExpressionRuntimeException if the expression is invalid, or a null is found for the expression and 'failIfNull is set
+   *         to true.
+   */
+  String parse(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct)
+      throws ExpressionRuntimeException;
 
   /**
    * Determines if the string is an expression.

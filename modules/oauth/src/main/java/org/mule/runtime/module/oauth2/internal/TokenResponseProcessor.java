@@ -7,6 +7,7 @@
 package org.mule.runtime.module.oauth2.internal;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 
@@ -47,22 +48,30 @@ public class TokenResponseProcessor {
     this.retrieveRefreshToken = retrieveRefreshToken;
   }
 
-  public void process(final MuleEvent muleEvent) {
-    accessToken = expressionLanguage.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, null);
+  public void process(MuleEvent muleEvent) {
+    Builder builder = MuleEvent.builder(muleEvent);
+    accessToken = expressionLanguage.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, builder, null);
+    muleEvent = builder.build();
     accessToken = isEmpty(accessToken) ? null : accessToken;
     if (accessToken == null) {
       logger.error("Could not extract access token from token URL. Expressions used to retrieve access token was "
           + tokenResponseConfiguration.getAccessToken());
     }
     if (retrieveRefreshToken) {
-      refreshToken = expressionLanguage.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, null);
+      builder = MuleEvent.builder(muleEvent);
+      refreshToken = expressionLanguage.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, builder, null);
+      muleEvent = builder.build();
       refreshToken = isEmpty(refreshToken) ? null : refreshToken;
     }
-    expiresIn = expressionLanguage.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, null);
+    builder = MuleEvent.builder(muleEvent);
+    expiresIn = expressionLanguage.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, builder, null);
+    muleEvent = builder.build();
     customResponseParameters = new HashMap<>();
     for (ParameterExtractor parameterExtractor : tokenResponseConfiguration.getParameterExtractors()) {
+      builder = MuleEvent.builder(muleEvent);
       customResponseParameters.put(parameterExtractor.getParamName(),
-                                   expressionLanguage.evaluate(parameterExtractor.getValue(), muleEvent, null));
+                                   expressionLanguage.evaluate(parameterExtractor.getValue(), muleEvent, builder, null));
+      muleEvent = builder.build();
     }
   }
 
