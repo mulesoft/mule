@@ -9,22 +9,28 @@ package org.mule.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_DISPOSITION;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_ID;
+import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TRANSFER_ENCODING;
 import static org.mule.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.transformer.types.MimeTypes.HTML;
 import static org.mule.transformer.types.MimeTypes.TEXT;
-
 import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
+import org.mule.api.MuleMessage;
 import org.mule.message.ds.ByteArrayDataSource;
+import org.mule.module.http.internal.multipart.HttpPart;
+import org.mule.module.http.internal.multipart.HttpPartDataSource;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.activation.DataHandler;
@@ -34,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.commons.codec.binary.Base64;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.MultiPartInputStreamParser;
 import org.junit.Rule;
@@ -65,13 +72,11 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void payloadIsIgnoredWhenSendingOutboundAttachments() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
         MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         event.getMessage().addOutboundAttachment("attachment1", "Contents 1", TEXT);
         event.getMessage().addOutboundAttachment("attachment2", "Contents 2", HTML);
 
-        flow.process(event);
+        runFlow("requestFlow", event);
 
         assertThat(requestContentType, startsWith("multipart/form-data; boundary="));
         assertThat(parts.size(), equalTo(2));
@@ -83,13 +88,12 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
     @Test
     public void outboundAttachmentsCustomContentType() throws Exception
     {
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
         MuleEvent event = getTestEvent(TEST_MESSAGE);
-
         event.getMessage().addOutboundAttachment("attachment1", "Contents 1", TEXT);
         event.getMessage().addOutboundAttachment("attachment2", "Contents 2", HTML);
         event.getMessage().setOutboundProperty("Content-Type", "multipart/form-data2");
-        flow.process(event);
+
+        runFlow("requestFlow", event);
 
         assertThat(requestContentType, startsWith("multipart/form-data2; boundary="));
         assertThat(parts.size(), equalTo(2));
@@ -106,8 +110,7 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
         DataHandler dataHandler = new DataHandler(new FileDataSource(file));
         event.getMessage().addOutboundAttachment(TEST_PART_NAME, dataHandler);
 
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        flow.process(event);
+        runFlow("requestFlow", event);
 
         Part part = getPart(TEST_PART_NAME);
         assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME.substring(5));
@@ -120,8 +123,7 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
         DataHandler dataHandler = new DataHandler(new ByteArrayDataSource(TEST_MESSAGE.getBytes(), TEXT, TEST_FILE_NAME));
         event.getMessage().addOutboundAttachment(TEST_PART_NAME, dataHandler);
 
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        flow.process(event);
+        runFlow("requestFlow", event);
 
         Part part = getPart(TEST_PART_NAME);
         assertFormDataContentDisposition(part, TEST_PART_NAME, TEST_FILE_NAME);
@@ -133,8 +135,7 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
         MuleEvent event = getTestEvent(TEST_MESSAGE);
         event.getMessage().addOutboundAttachment(TEST_PART_NAME, TEST_MESSAGE, TEXT);
 
-        Flow flow = (Flow) getFlowConstruct("requestFlow");
-        flow.process(event);
+        runFlow("requestFlow", event);
 
         Part part = getPart(TEST_PART_NAME);
         assertFormDataContentDisposition(part, TEST_PART_NAME, null);
@@ -151,10 +152,54 @@ public class HttpRequestOutboundAttachmentsTestCase extends AbstractHttpRequestT
         // Set an attachment bigger than the queue size.
         event.getMessage().addOutboundAttachment(TEST_PART_NAME, new byte[maxAsyncWriteQueueSize * 2], TEXT);
 
-        Flow flow = (Flow) getFlowConstruct("requestFlowTls");
-        MuleEvent response = flow.process(event);
+        MuleEvent response = runFlow("requestFlowTls", event);
         
         assertThat((Integer) response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(OK.getStatusCode()));
+    }
+
+    @Test
+    public void canSetAttachmentHeaders() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE);
+        MuleMessage message = event.getMessage();
+        String attachmentName = addAttachmentWithHeaders(message);
+
+        runFlow("requestFlow", event);
+        Part resultPart = getPart(attachmentName);
+
+        assertThat(resultPart.getHeader("a-custom-header"), equalTo("custom"));
+
+        assertThat(resultPart.getHeaders(CONTENT_TRANSFER_ENCODING.toLowerCase()).size(), is(1));
+        assertThat(resultPart.getHeader(CONTENT_TRANSFER_ENCODING.toLowerCase()), equalTo("base64"));
+
+        assertThat(resultPart.getHeaders(CONTENT_DISPOSITION.toLowerCase()).size(), is(1));
+        assertThat(resultPart.getHeader(CONTENT_DISPOSITION.toLowerCase()), equalTo("form-data; name=\"attachment1\"; documentId=1"));
+
+        assertThat(resultPart.getHeaders(CONTENT_ID.toLowerCase()).size(), is(1));
+        assertThat(resultPart.getHeader(CONTENT_ID.toLowerCase()), equalTo("my-id"));
+
+        assertThat(resultPart.getHeaders(CONTENT_TYPE.toLowerCase()).size(), is(1));
+        assertThat(resultPart.getHeader(CONTENT_TYPE.toLowerCase()), equalTo("application/pdf; test-param"));
+    }
+
+    private String addAttachmentWithHeaders(MuleMessage message) throws Exception
+    {
+        String attachmentName = "attachment1";
+        String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<test><message>Hi</message></test>";
+        byte[] data = Base64.encodeBase64String(xml.getBytes()).getBytes();
+
+        HttpPart part = new HttpPart(attachmentName, data, "application/pdf", data.length);
+        part.addHeader(CONTENT_TRANSFER_ENCODING, "base64");
+        part.addHeader(CONTENT_DISPOSITION, "form-data; name=\"attachment1\"; documentId=1");
+        part.addHeader("a-custom-header", "custom");
+        part.addHeader(CONTENT_ID, "my-id");
+        part.addHeader(CONTENT_TYPE, "application/pdf; test-param");
+
+        Collection<HttpPart> parts = new ArrayList<>(Arrays.asList(part));
+        HttpPartDataSource attachment = new ArrayList<>(HttpPartDataSource.createFrom(parts)).get(0);
+        DataHandler dh = new DataHandler(attachment);
+        message.addOutboundAttachment(attachmentName, dh);
+        return attachmentName;
     }
 
     private void assertPart(String name, String expectedContentType, String expectedBody) throws Exception
