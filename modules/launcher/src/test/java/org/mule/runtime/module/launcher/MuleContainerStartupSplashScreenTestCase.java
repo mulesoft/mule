@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.launcher;
 
+import org.mule.runtime.module.deployment.internal.AbstractSplashScreenTestCase;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.core.util.FileUtils.newFile;

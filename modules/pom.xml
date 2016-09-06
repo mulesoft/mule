@@ -19,6 +19,7 @@
         <module>builders</module>
         <module>cxf</module>
         <module>container</module>
+        <module>deployment</module>
         <module>extensions-support</module>
         <module>file-extension-common</module>
         <module>launcher</module>
