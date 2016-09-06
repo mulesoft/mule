@@ -373,6 +373,19 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     }, expression);
   }
 
+  @Override
+  public String parse(String expression, final MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct)
+      throws ExpressionRuntimeException {
+    return parser.parse((TemplateParser.TemplateCallback) token -> {
+      Object result = evaluate(token, event, eventBuilder, flowConstruct);
+      if (result instanceof MuleMessage) {
+        return ((MuleMessage) result).getPayload();
+      } else {
+        return result;
+      }
+    }, expression);
+  }
+
   public static String removeExpressionMarker(String expression) {
     if (expression == null) {
       throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
