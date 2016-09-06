@@ -74,9 +74,15 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
         .thenAnswer(invocation -> invocation.getArguments()[0]);
     when(mockExpressionLanguage.evaluate(eq(EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenReturn(EXPRESSION_VALUE);
+    when(mockExpressionLanguage.evaluate(eq(EXPRESSION), any(MuleEvent.class), any(MuleEvent.Builder.class),
+                                         any(FlowConstruct.class)))
+                                             .thenReturn(EXPRESSION_VALUE);
     TypedValue typedValue = new TypedValue(EXPRESSION_VALUE, DataType.STRING);
     when(mockExpressionLanguage.evaluateTyped(eq(EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenReturn(typedValue);
+    when(mockExpressionLanguage.evaluateTyped(eq(EXPRESSION), any(MuleEvent.class), any(MuleEvent.Builder.class),
+                                              any(FlowConstruct.class)))
+                                                  .thenReturn(typedValue);
     addVariableProcessor.setMuleContext(mockMuleContext);
 
     message = MuleMessage.builder().payload("").build();
@@ -177,6 +183,8 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     addVariableProcessor.setIdentifier(PLAIN_STRING_KEY);
     TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
     when(mockExpressionLanguage.evaluateTyped(NULL_EXPRESSION, event, null)).thenReturn(typedValue);
+    when(mockExpressionLanguage.evaluateTyped(eq(NULL_EXPRESSION), eq(event), any(MuleEvent.Builder.class), eq(null)))
+        .thenReturn(typedValue);
     addVariableProcessor.setValue(NULL_EXPRESSION);
     addVariableProcessor.initialise();
     event = addVariableProcessor.process(event);
@@ -189,6 +197,8 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     addVariableProcessor.setValue(EXPRESSION);
     TypedValue typedValue = new TypedValue(null, DataType.OBJECT);
     when(mockExpressionLanguage.evaluateTyped(EXPRESSION, event, null)).thenReturn(typedValue);
+    when(mockExpressionLanguage.evaluateTyped(eq(EXPRESSION), eq(event), any(MuleEvent.Builder.class), eq(null)))
+        .thenReturn(typedValue);
     addVariableProcessor.initialise();
 
     event = addVariableProcessor.process(event);

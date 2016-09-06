@@ -12,6 +12,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
@@ -95,6 +96,8 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.initialise();
     TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
     when(expressionLanguage.evaluateTyped(EXPRESSION, muleEvent, null)).thenReturn(typedValue);
+    when(expressionLanguage.evaluateTyped(eq(EXPRESSION), eq(muleEvent), any(MuleEvent.Builder.class), eq(null)))
+        .thenReturn(typedValue);
 
     MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
 
