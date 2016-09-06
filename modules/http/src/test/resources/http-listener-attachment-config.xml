@@ -38,5 +38,4 @@
         <custom-processor class="org.mule.module.http.functional.listener.HttpListenerAttachmentsTestCase$CustomAttachmentMessageProcessor"/>
         <set-attachment attachmentName="field1" value="yes" contentType="text/plain"/>
     </flow>
-
 </mule>
