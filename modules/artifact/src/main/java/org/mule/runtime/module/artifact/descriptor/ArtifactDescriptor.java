@@ -7,6 +7,7 @@
 
 package org.mule.runtime.module.artifact.descriptor;
 
+import static java.lang.String.format;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 
@@ -44,5 +45,10 @@ public class ArtifactDescriptor {
 
   public void setClassLoaderFilter(ArtifactClassLoaderFilter classLoaderFilter) {
     this.classLoaderFilter = classLoaderFilter;
+  }
+
+  @Override
+  public String toString() {
+    return format("%s[%s]", getClass().getSimpleName(), getName());
   }
 }
