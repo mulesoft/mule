@@ -39,11 +39,11 @@ public class ScriptComponent extends AbstractComponent {
   }
 
   @Override
-  protected Object doInvoke(MuleEvent event) throws Exception {
+  protected Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
     // Set up initial script variables.
     Bindings bindings = script.getScriptEngine().createBindings();
     putBindings(bindings);
-    script.populateBindings(bindings, event);
+    script.populateBindings(bindings, event, eventBuilder);
     try {
       return script.runScript(bindings);
     } catch (Exception e) {

@@ -29,9 +29,10 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     final Builder builder = MuleMessage.builder(event.getMessage());
+    final org.mule.runtime.core.api.MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
 
     if (dataType == null) {
-      final TypedValue typedValue = resolveTypedValue(event);
+      final TypedValue typedValue = resolveTypedValue(event, eventBuilder);
       builder.payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
     } else {
       Object value = resolveValue(event);
@@ -40,7 +41,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
       builder.payload(value).mediaType(dataTypeBuilder.build().getMediaType());
     }
 
-    return MuleEvent.builder(event).message(builder.build()).build();
+    return eventBuilder.message(builder.build()).build();
   }
 
   private Object resolveValue(MuleEvent event) {
@@ -53,11 +54,11 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     return value;
   }
 
-  private TypedValue resolveTypedValue(MuleEvent event) {
+  private TypedValue resolveTypedValue(MuleEvent event, MuleEvent.Builder eventBuilder) {
     if (valueEvaluator.getRawValue() == null) {
       return new TypedValue(null, DataType.OBJECT);
     } else {
-      return valueEvaluator.resolveTypedValue(event);
+      return valueEvaluator.resolveTypedValue(event, eventBuilder);
     }
   }
 
@@ -83,6 +84,6 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    valueEvaluator.initialize(muleContext.getExpressionManager());
+    valueEvaluator.initialize(muleContext.getExpressionLanguage());
   }
 }

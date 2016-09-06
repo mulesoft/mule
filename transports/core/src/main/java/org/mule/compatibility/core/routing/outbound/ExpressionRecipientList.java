@@ -30,11 +30,11 @@ public class ExpressionRecipientList extends AbstractRecipientList {
   @Override
   protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
     String expr = getFullExpression();
-    if (!muleContext.getExpressionManager().isValidExpression(expr)) {
+    if (!muleContext.getExpressionLanguage().isValid(expr)) {
       throw new CouldNotRouteOutboundMessageException(CoreMessages.expressionInvalidForProperty("expression", expr), event, null);
     }
 
-    Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event, flowConstruct);
+    Object msgRecipients = muleContext.getExpressionLanguage().evaluate(expr, event, flowConstruct);
     if (msgRecipients == null) {
       throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), event, null);
     } else if (msgRecipients instanceof String) {
@@ -51,7 +51,7 @@ public class ExpressionRecipientList extends AbstractRecipientList {
   }
 
   public String getFullExpression() {
-    return expressionConfig.getFullExpression(muleContext.getExpressionManager());
+    return expressionConfig.getFullExpression(muleContext.getExpressionLanguage());
   }
 
   public String getExpression() {

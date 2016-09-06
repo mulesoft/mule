@@ -75,11 +75,11 @@ public class ExpressionArgument implements MuleContextAware {
   }
 
   protected String getFullExpression() {
-    return expressionConfig.getFullExpression(muleContext.getExpressionManager());
+    return expressionConfig.getFullExpression(muleContext.getExpressionLanguage());
   }
 
   protected void validate() {
-    expressionConfig.validate(muleContext.getExpressionManager());
+    expressionConfig.validate(muleContext.getExpressionLanguage());
   }
 
   /**
@@ -100,7 +100,7 @@ public class ExpressionArgument implements MuleContextAware {
     // certain ExpressionEvaluators further in.
     Object result =
         withContextClassLoader(expressionEvaluationClassLoader,
-                               () -> muleContext.getExpressionManager().evaluate(getExpression(), event, null, !isOptional()));
+                               () -> muleContext.getExpressionLanguage().evaluate(getExpression(), event, null));
 
     if (getReturnClass() != null && result != null) {
       if (!getReturnClass().isInstance(result)) {

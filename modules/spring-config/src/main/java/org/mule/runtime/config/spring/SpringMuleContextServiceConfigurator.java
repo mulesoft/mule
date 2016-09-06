@@ -50,6 +50,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.QUEUE_STORE_DEFAUL
 import static org.mule.runtime.core.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.util.ClassUtils.loadClass;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
+
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.config.spring.factories.ExtensionManagerFactoryBean;
 import org.mule.runtime.config.spring.factories.TransactionManagerFactoryBean;
@@ -84,10 +85,8 @@ import org.mule.runtime.core.context.notification.RegistryNotification;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.el.mvel.MVELExpressionLanguageWrapper;
 import org.mule.runtime.core.exception.MessagingExceptionLocationProvider;
 import org.mule.runtime.core.execution.MuleMessageProcessingManager;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.management.stats.DefaultProcessingTimeWatcher;
@@ -155,7 +154,7 @@ class SpringMuleContextServiceConfigurator {
   private final ImmutableMap<String, BeanDefinition> defaultContextServices = ImmutableMap.<String, BeanDefinition>builder()
       .put(OBJECT_TRANSACTION_MANAGER, getBeanDefinition(TransactionManagerFactoryBean.class))
       .put(OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE, getBeanDefinition(NoRetryPolicyTemplate.class))
-      .put(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguageWrapper.class))
+      .put(OBJECT_EXPRESSION_LANGUAGE, getBeanDefinition(MVELExpressionLanguage.class))
       .put(OBJECT_EXTENSION_MANAGER, getBeanDefinition(ExtensionManagerFactoryBean.class))
       .put(OBJECT_TIME_SUPPLIER, getBeanDefinition(TimeSupplier.class))
       .put(OBJECT_CONNECTION_MANAGER, getBeanDefinition(DefaultConnectionManager.class))
@@ -229,7 +228,6 @@ class SpringMuleContextServiceConfigurator {
   }
 
   void createArtifactServices() {
-    initialiseExpressionManager();
     defaultContextServices.entrySet().stream()
         .filter(service -> !APPLICATION_ONLY_SERVICES.contains(service.getKey()) || artifactType.equals(APP)).forEach(service -> {
           registerBeanDefinition(service.getKey(), service.getValue());
@@ -253,17 +251,6 @@ class SpringMuleContextServiceConfigurator {
       final BeanDefinition beanDefinition = getCustomServiceBeanDefinition(customService);
 
       registerBeanDefinition(serviceName, beanDefinition);
-    }
-  }
-
-  private void initialiseExpressionManager() {
-    try {
-      // TODO MULE-9638 - DB parsers use the expression language before initialisation phase. Remove once it gets migrated to SDK.
-      MVELExpressionLanguage expressionLanguage = new MVELExpressionLanguage(muleContext);
-      expressionLanguage.initialise();
-      ((DefaultExpressionManager) muleContext.getExpressionManager()).setExpressionLanguage(expressionLanguage);
-    } catch (InitialisationException e) {
-      throw new MuleRuntimeException(e);
     }
   }
 

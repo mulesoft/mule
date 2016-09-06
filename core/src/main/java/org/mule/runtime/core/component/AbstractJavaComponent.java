@@ -53,15 +53,15 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
   }
 
   @Override
-  protected Object doInvoke(MuleEvent event) throws Exception {
-    return invokeComponentInstance(event);
+  protected Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+    return invokeComponentInstance(event, eventBuilder);
   }
 
-  protected Object invokeComponentInstance(MuleEvent event) throws Exception {
+  protected Object invokeComponentInstance(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
     LifecycleAdapter componentLifecycleAdapter = null;
     try {
       componentLifecycleAdapter = borrowComponentLifecycleAdaptor();
-      return componentLifecycleAdapter.invoke(event);
+      return componentLifecycleAdapter.invoke(event, eventBuilder);
     } finally {
       if (componentLifecycleAdapter != null) {
         returnComponentLifecycleAdaptor(componentLifecycleAdapter);

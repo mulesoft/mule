@@ -12,6 +12,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
@@ -25,7 +26,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
@@ -47,18 +48,18 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
   private MuleContext muleContext;
   private MuleMessage muleMessage;
   private MuleEvent muleEvent;
-  private ExpressionManager expressionManager;
+  private ExpressionLanguage expressionLanguage;
 
   @Before
   public void setUp() throws Exception {
     setPayloadMessageProcessor = new SetPayloadMessageProcessor();
     muleContext = mock(MuleContext.class);
     setPayloadMessageProcessor.setMuleContext(muleContext);
-    expressionManager = mock(ExpressionManager.class);
+    expressionLanguage = mock(ExpressionLanguage.class);
 
-    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    when(expressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(expressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
     muleMessage = MuleMessage.builder().payload("").build();
@@ -81,7 +82,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(PLAIN_TEXT);
     setPayloadMessageProcessor.initialise();
 
-    when(expressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
+    when(expressionLanguage.isExpression(PLAIN_TEXT)).thenReturn(false);
 
     MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
 
@@ -91,10 +92,12 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
   @Test
   public void setsExpressionPayload() throws MuleException {
     setPayloadMessageProcessor.setValue(EXPRESSION);
-    when(expressionManager.isExpression(EXPRESSION)).thenReturn(true);
+    when(expressionLanguage.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadMessageProcessor.initialise();
     TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
-    when(expressionManager.evaluateTyped(EXPRESSION, muleEvent, null)).thenReturn(typedValue);
+    when(expressionLanguage.evaluateTyped(EXPRESSION, muleEvent, null)).thenReturn(typedValue);
+    when(expressionLanguage.evaluateTyped(eq(EXPRESSION), eq(muleEvent), any(MuleEvent.Builder.class), eq(null)))
+        .thenReturn(typedValue);
 
     MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
 

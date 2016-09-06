@@ -20,8 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.expression.ExpressionManager;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -35,7 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
 
   protected FlowConstruct flowConstruct;
-  protected ExpressionManager expressionManager;
+  protected ExpressionLanguage expressionLanguage;
   protected final String TRUE_EXPRESSION = "trueExpression";
   protected final String FALSE_EXPRESSION = "falseExpression";
 
@@ -51,16 +50,16 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
   @Before
   public void initialise() {
     when(mockEvent.getMessage()).thenReturn(muleMessage);
-    expressionManager = mock(DefaultExpressionManager.class);
-    when(expressionManager.isValidExpression(anyString())).thenReturn(true);
-    when(expressionManager.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
-                                           anyBoolean()))
-                                               .thenReturn(true);
-    when(expressionManager.evaluateBoolean(eq(FALSE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
-                                           anyBoolean()))
-                                               .thenReturn(false);
+    expressionLanguage = mock(ExpressionLanguage.class);
+    when(expressionLanguage.isValid(anyString())).thenReturn(true);
+    when(expressionLanguage.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
+                                            anyBoolean()))
+                                                .thenReturn(true);
+    when(expressionLanguage.evaluateBoolean(eq(FALSE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
+                                            anyBoolean()))
+                                                .thenReturn(false);
 
-    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
+    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
 
     flowConstruct = mock(FlowConstruct.class);
     when(flowConstruct.getMuleContext()).thenReturn(muleContext);

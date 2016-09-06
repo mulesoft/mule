@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.spring.security.filters.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.apache.http.HttpHeaders.WWW_AUTHENTICATE;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.security.SecurityManager;
@@ -40,14 +41,13 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
     SecurityManager manager = mock(SecurityManager.class);
     filter.setSecurityManager(manager);
 
-    doThrow(new UnauthorisedException(null, (MuleEvent) event)).when(manager).authenticate(anyObject());
+    doThrow(new UnauthorisedException(null, event)).when(manager).authenticate(anyObject());
 
     try {
       filter.authenticate(event);
       fail("An UnauthorisedException should be thrown");
     } catch (UnauthorisedException e) {
-      assertNotNull(event.getMessage().getOutboundProperty("WWW-Authenticate"));
-      assertEquals("Basic realm=", event.getMessage().getOutboundProperty("WWW-Authenticate"));
+      assertThat(e.getEvent().getMessage().getOutboundProperty(WWW_AUTHENTICATE), is("Basic realm="));
       verify(manager);
     }
     setCurrentEvent(oldEvent);

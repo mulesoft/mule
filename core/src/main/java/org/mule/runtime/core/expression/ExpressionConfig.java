@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.core.expression;
 
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * A simple configuration object for holding the common Expression evaluator configuration. The
- * {@link #getFullExpression(ExpressionManager)} will return the evaluator and expression information in a format that can be
- * passed into the {@link DefaultExpressionManager}
+ * A simple configuration object for holding the common Expression configuration.
  */
 public class ExpressionConfig {
 
@@ -21,8 +19,8 @@ public class ExpressionConfig {
 
   private String fullExpression;
 
-  private String expressionPrefix = ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
-  private String expressionPostfix = ExpressionManager.DEFAULT_EXPRESSION_POSTFIX;
+  private String expressionPrefix = ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
+  private String expressionPostfix = ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
   private volatile boolean parsed = false;
 
   public ExpressionConfig() {
@@ -30,7 +28,7 @@ public class ExpressionConfig {
   }
 
   public ExpressionConfig(String expression) {
-    this(expression, ExpressionManager.DEFAULT_EXPRESSION_PREFIX, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+    this(expression, ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX, ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX);
 
   }
 
@@ -64,7 +62,7 @@ public class ExpressionConfig {
     this.expression = expressionString;
   }
 
-  public void validate(ExpressionManager manager) {
+  public void validate(ExpressionLanguage expressionLanguage) {
     if (expression == null) {
       parse(unParsedExpression);
     }
@@ -73,12 +71,12 @@ public class ExpressionConfig {
     }
   }
 
-  public String getFullExpression(ExpressionManager manager) {
+  public String getFullExpression(ExpressionLanguage expressionLanguage) {
     if (fullExpression == null) {
       if (expression == null) {
         parse(unParsedExpression);
       }
-      validate(manager);
+      validate(expressionLanguage);
       fullExpression = expressionPrefix + expression + expressionPostfix;
     }
     return fullExpression;

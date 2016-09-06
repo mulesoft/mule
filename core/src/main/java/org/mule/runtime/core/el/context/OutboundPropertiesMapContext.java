@@ -18,9 +18,12 @@ import java.util.Set;
 class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   private MuleEvent event;
+  private MuleEvent.Builder eventBuilder;
 
-  public OutboundPropertiesMapContext(MuleEvent event) {
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
+  public OutboundPropertiesMapContext(MuleEvent event, MuleEvent.Builder eventBuilder) {
     this.event = event;
+    this.eventBuilder = eventBuilder;
   }
 
   @Override
@@ -30,12 +33,14 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public void doPut(String key, Serializable value) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(key, value).build());
+    eventBuilder.message(MuleMessage.builder(event.getMessage()).addOutboundProperty(key, value).build());
+    event = eventBuilder.build();
   }
 
   @Override
   public void doRemove(String key) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundProperty(key).build());
+    eventBuilder.message(MuleMessage.builder(event.getMessage()).removeOutboundProperty(key).build());
+    event = eventBuilder.build();
   }
 
   @Override
@@ -45,7 +50,8 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public void clear() {
-    event.setMessage(MuleMessage.builder(event.getMessage()).outboundProperties(emptyMap()).build());
+    eventBuilder.message(MuleMessage.builder(event.getMessage()).outboundProperties(emptyMap()).build());
+    event = eventBuilder.build();
   }
 
   @Override

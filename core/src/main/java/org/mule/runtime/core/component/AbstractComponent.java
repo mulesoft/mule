@@ -105,13 +105,14 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
         startTime = System.currentTimeMillis();
       }
 
-      Object result = doInvoke(event);
+      MuleEvent.Builder resultEventBuilder = MuleEvent.builder(event);
+      Object result = doInvoke(event, resultEventBuilder);
 
       if (statistics.isEnabled()) {
         statistics.addExecutionTime(System.currentTimeMillis() - startTime);
       }
 
-      MuleEvent resultEvent = createResultEvent(event, result);
+      MuleEvent resultEvent = createResultEvent(event, resultEventBuilder, result);
       fireComponentNotification(resultEvent.getMessage(),
                                 ComponentMessageNotification.COMPONENT_POST_INVOKE);
 
@@ -132,20 +133,21 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     }
   }
 
-  protected MuleEvent createResultEvent(MuleEvent event, Object result) throws MuleException {
+  protected MuleEvent createResultEvent(MuleEvent event, MuleEvent.Builder resultEventBuilder, Object result)
+      throws MuleException {
     if (result instanceof MuleMessage) {
-      return MuleEvent.builder(event).message((MuleMessage) result).build();
+      return resultEventBuilder.message((MuleMessage) result).build();
     } else if (result instanceof VoidResult) {
       return event;
     } else {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
-      return MuleEvent.builder(event).message(muleContext.getTransformationService()
+      return resultEventBuilder.message(muleContext.getTransformationService()
           .applyTransformers(event.getMessage(), event, singletonList(template))).build();
     }
   }
 
-  protected abstract Object doInvoke(MuleEvent event) throws Exception;
+  protected abstract Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception;
 
   @Override
   public String toString() {

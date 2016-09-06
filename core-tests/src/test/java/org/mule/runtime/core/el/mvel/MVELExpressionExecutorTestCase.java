@@ -37,8 +37,8 @@ public class MVELExpressionExecutorTestCase extends AbstractELTestCase {
   protected MVELExpressionExecutor mvel;
   protected MVELExpressionLanguageContext context;
 
-  public MVELExpressionExecutorTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
+  public MVELExpressionExecutorTestCase(String mvelOptimizer) {
+    super(mvelOptimizer);
   }
 
   @Before

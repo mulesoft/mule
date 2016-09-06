@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Callable;
@@ -34,7 +35,7 @@ public class CallableEntryPointResolver implements EntryPointResolver {
     }
   }
 
-  public InvocationResult invoke(Object component, MuleEventContext context) throws Exception {
+  public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
     if (component instanceof Callable) {
       Object result = ((Callable) component).onCall(context);
       return new InvocationResult(this, result, callableMethod);

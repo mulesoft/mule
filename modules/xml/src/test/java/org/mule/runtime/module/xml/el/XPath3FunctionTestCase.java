@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
@@ -40,8 +41,8 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
   private static final String ROOT_FOO_BAR = "<root foo=\"bar\"/>";
   private static final String BAR = "bar";
 
-  public XPath3FunctionTestCase(AbstractELTestCase.Variant variant, String optimizer) {
-    super(variant, optimizer);
+  public XPath3FunctionTestCase(String optimizer) {
+    super(optimizer);
   }
 
   @Test
@@ -65,8 +66,9 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
   @Test
   public void messagePayloadChangedWhenPayloadConsumed() throws Exception {
     MuleEvent event = getTestEvent(new ByteArrayInputStream(ROOT_FOO_BAR.getBytes()));
-    assertThat((String) doEvaluate("xpath3('/root/@foo')", event), equalTo(BAR));
-    assertThat(event.getMessage().getPayload(), instanceOf(Node.class));
+    final Builder builder = MuleEvent.builder(event);
+    assertThat((String) doEvaluate("xpath3('/root/@foo')", event, builder), equalTo(BAR));
+    assertThat(builder.build().getMessage().getPayload(), instanceOf(Node.class));
   }
 
   @Test
@@ -81,28 +83,32 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
     MuleEvent event = getTestEvent(ROOT_FOO_BAR);
     for (Map.Entry<XPathReturnType, Class<?>> entry : types.entrySet()) {
       String expression = String.format("xpath3('/root/@foo', payload, '%s')", entry.getKey().name());
-      assertThat(doEvaluate(expression, event), instanceOf(entry.getValue()));
+      assertThat(doEvaluate(expression, event, MuleEvent.builder(event)), instanceOf(entry.getValue()));
     }
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void noArgs() throws Exception {
-    doEvaluate("xpath3()", getTestEvent(ROOT_FOO_BAR));
+    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3()", event, MuleEvent.builder(event));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void tooManyArgs() throws Exception {
-    doEvaluate("xpath3('/root/@foo', payload, 'STRING_DATA_TYPE', 'one too many')", getTestEvent(ROOT_FOO_BAR));
+    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3('/root/@foo', payload, 'STRING_DATA_TYPE', 'one too many')", event, MuleEvent.builder(event));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void blankExpression() throws Exception {
-    doEvaluate("xpath3('')", getTestEvent(ROOT_FOO_BAR));
+    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3('')", event, MuleEvent.builder(event));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void notAStringExpression() throws Exception {
-    doEvaluate("xpath3(System.out)", getTestEvent(ROOT_FOO_BAR));
+    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3(System.out)", event, MuleEvent.builder(event));
   }
 
   @Test
@@ -126,7 +132,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
   public void parametrized() throws Exception {
     MuleEvent event = getTestEvent(ROOT_FOO_BAR);
     event.setFlowVariable("foo", "bar");
-    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event);
+    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
     assertThat(result, instanceOf(Node.class));
     assertThat((((Node) result)).getAttributes().getNamedItem("foo").getNodeValue(), equalTo("bar"));
   }
@@ -135,7 +141,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
   public void emptyParametrizedResult() throws Exception {
     MuleEvent event = getTestEvent(ROOT_FOO_BAR);
     event.setFlowVariable("foo", "not a bar");
-    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event);
+    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
     assertThat(result, is(nullValue()));
   }
 
@@ -143,7 +149,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
   public void autoConvertNumericType() throws Exception {
     MuleEvent event = getTestEvent("<root foo=\"33\"/>");
     event.setFlowVariable("foo", 33);
-    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event);
+    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
     assertThat(result, instanceOf(Node.class));
     assertThat((((Node) result)).getAttributes().getNamedItem("foo").getNodeValue(), equalTo("33"));
   }
@@ -152,20 +158,20 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
     MuleMessage message = MuleMessage.builder().payload(payload).build();
     MuleEvent event = MuleEvent.builder(getTestEvent("")).message(message).build();
 
-    assertThat((String) doEvaluate("xpath3('/root/@foo')", event), equalTo(BAR));
+    assertThat((String) doEvaluate("xpath3('/root/@foo')", event, MuleEvent.builder(event)), equalTo(BAR));
   }
 
   private void evaluateFooFromFlowVar(Object payload) throws Exception {
     MuleEvent event = getTestEvent("");
     event.setFlowVariable("input", payload);
-    assertThat((String) doEvaluate("xpath3('/root/@foo', flowVars['input'])", event), equalTo(BAR));
+    assertThat((String) doEvaluate("xpath3('/root/@foo', flowVars['input'])", event, MuleEvent.builder(event)), equalTo(BAR));
   }
 
-  private Object doEvaluate(String expression, MuleEvent event) throws Exception {
+  private Object doEvaluate(String expression, MuleEvent event, Builder builder) throws Exception {
 
     setCurrentEvent(event);
     try {
-      return evaluate(expression, event);
+      return evaluate(expression, event, builder);
     } finally {
       setCurrentEvent(null);
     }

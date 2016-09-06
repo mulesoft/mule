@@ -85,8 +85,8 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
       String epUri;
       if (ep instanceof DynamicOutboundEndpoint) {
         Flow flow = getTestFlow();
-        epUri = muleContext.getExpressionManager().parse(ep.getAddress(), MuleEvent
-            .builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build(), flow, true);
+        epUri = muleContext.getExpressionLanguage().parse(ep.getAddress(), MuleEvent
+            .builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build(), flow);
       } else {
         epUri = ep.getAddress();
       }

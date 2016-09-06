@@ -95,7 +95,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   private Error error;
 
   // Use this constructor from the builder
-  public DefaultMuleEvent(MessageContext context, MuleMessage message, MessageExchangePattern exchangePattern,
+  public DefaultMuleEvent(MessageContext context, MuleMessage message, Map<String, TypedValue<Object>> flowVariables,
+                          MessageExchangePattern exchangePattern,
                           FlowConstruct flowConstruct, MuleSession session, boolean transacted, boolean synchronous,
                           boolean nonBlocking, Object replyToDestination, ReplyToHandler replyToHandler,
                           FlowCallStack flowCallStack, Correlation correlation, Error error) {
@@ -105,7 +106,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.id = "" + System.identityHashCode(this);
     this.flowConstruct = flowConstruct;
     this.session = session;
-    setMessage(message);
+    this.message = message;
+    flowVariables.forEach((s, value) -> this.flowVariables.put(s, new TypedValue<>(value.getValue(), value.getDataType())));
 
     this.exchangePattern = exchangePattern;
     this.replyToHandler = replyToHandler;
@@ -368,11 +370,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  public void clearFlowVariables() {
-    flowVariables.clear();
-  }
-
-  @Override
   public <T> T getFlowVariable(String key) {
     TypedValue typedValue = flowVariables.get(key);
 
@@ -396,17 +393,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   @Override
   public void setFlowVariable(String key, Object value) {
-    setFlowVariable(key, value, value != null ? DataType.fromObject(value) : DataType.OBJECT);
-  }
-
-  @Override
-  public void setFlowVariable(String key, Object value, DataType dataType) {
-    flowVariables.put(key, new TypedValue(value, dataType));
-  }
-
-  @Override
-  public void removeFlowVariable(String key) {
-    flowVariables.remove(key);
+    flowVariables.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
   }
 
   @Override
@@ -433,8 +420,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    * @deprecated This should be used only by the compatibility module.
    * @param encoding
    * @param exchangePattern
-   * @param name
-   * @param uri
    * @param transacted
    */
   @Deprecated
@@ -525,4 +510,5 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public void setError(Error error) {
     this.error = error;
   }
+
 }

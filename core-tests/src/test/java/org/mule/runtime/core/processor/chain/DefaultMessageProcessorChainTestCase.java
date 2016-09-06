@@ -25,21 +25,6 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
-
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -77,6 +62,21 @@ import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.mockito.Mockito;
 
 @RunWith(Parameterized.class)
 @SmallTest
@@ -177,7 +177,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   }
 
   /*
-   * Any MP returns null: - Processing doesn't proceed - Result of chain is Nnll
+   * Any MP returns null: - Processing doesn't proceed - Result of chain is Null
    */
   @Test
   public void testMPChainWithVoidReturn() throws MuleException, Exception {
@@ -204,7 +204,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     assertEquals(mp2.resultEvent.getMessage(), voidmp.event.getMessage());
 
     // mp3
-    assertNotSame(mp3.event, mp2.resultEvent);
     assertThat(mp3.event.getMessage().getPayload(), equalTo(mp2.resultEvent.getMessage().getPayload()));
     assertEquals(mp3.event.getMessage().getPayload(), "012");
 

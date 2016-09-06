@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
@@ -246,14 +245,6 @@ public interface MuleContext extends Lifecycle {
    * @return the date when the server was started.
    */
   long getStartDate();
-
-  /**
-   * Returns the Expression Manager configured for this instance of Mule
-   * 
-   * @return the Expression Manager configured for this instance of Mule
-   * @see org.mule.runtime.core.api.expression.ExpressionManager
-   */
-  ExpressionManager getExpressionManager();
 
   void setExecutionClassLoader(ClassLoader cl);
 

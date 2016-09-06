@@ -137,11 +137,11 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
       if (localAuthorizationUrlResourceOwnerIdEvaluator == null) {
         localAuthorizationUrlResourceOwnerIdEvaluator = new AttributeEvaluator(null);
       }
-      localAuthorizationUrlResourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
+      localAuthorizationUrlResourceOwnerIdEvaluator.initialize(muleContext.getExpressionLanguage());
       if (resourceOwnerIdEvaluator == null) {
         resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
       }
-      resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
+      resourceOwnerIdEvaluator.initialize(muleContext.getExpressionLanguage());
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }
@@ -167,7 +167,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   @Override
   public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) throws MuleException {
     if (!StringUtils.isBlank(getRefreshTokenWhen())) {
-      final Object value = muleContext.getExpressionManager().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
+      final Object value = muleContext.getExpressionLanguage().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
       if (!(value instanceof Boolean)) {
         throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s",
                                                            getRefreshTokenWhen(), value));

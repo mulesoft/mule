@@ -36,7 +36,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver {
 
   // @GuardedBy(itself)
   private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>> methodCache =
-      new ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>>(4);
+      new ConcurrentHashMap<>(4);
 
   public boolean isAcceptVoidMethods() {
     return acceptVoidMethods;
@@ -77,8 +77,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver {
 
   protected String getCacheKeyForPayload(Object component, Object[] payload) {
     StringBuilder key = new StringBuilder(48);
-    for (int i = 0; i < payload.length; i++) {
-      Object o = payload[i];
+    for (Object o : payload) {
       if (o != null) {
         key.append(o.getClass().getName());
       } else {

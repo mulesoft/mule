@@ -83,14 +83,16 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
   }
 
-  protected void setUnauthenticated(MuleEvent event) {
+  protected MuleEvent setUnauthenticated(MuleEvent event) {
     String realmHeader = "Basic realm=";
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
     String finalRealmHeader = realmHeader;
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(WWW_AUTHENTICATE, finalRealmHeader)
-        .addOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode()).build());
+    return MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(WWW_AUTHENTICATE, finalRealmHeader)
+            .addOutboundProperty(HTTP_STATUS_PROPERTY, UNAUTHORIZED.getStatusCode()).build())
+        .build();
   }
 
   /**
@@ -133,7 +135,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
         if (logger.isDebugEnabled()) {
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
-        setUnauthenticated(event);
+        event = setUnauthenticated(event);
         throw new UnauthorisedException(authFailedForUser(username), event, e);
       }
 
@@ -147,10 +149,10 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       event.getSession().setSecurityContext(context);
       return event;
     } else if (header == null) {
-      setUnauthenticated(event);
+      event = setUnauthenticated(event);
       throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);
     } else {
-      setUnauthenticated(event);
+      event = setUnauthenticated(event);
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), event);
     }

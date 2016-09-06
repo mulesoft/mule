@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -78,7 +77,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     processors.add(processor1);
     processors.add(processor2);
     processors.add(processor3);
-    assertBlockingExecution(processors, not(sameInstance(event)));
+    assertBlockingExecution(processors);
 
     // When NonBlockingProcessorExecutor falls-back to blocking the existing ReplyToHandler should be cleared
     assertThat(processor1.event.getReplyToHandler(), is(nullValue()));
@@ -90,7 +89,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
     processors.add(new TestContainerMessageProcessor());
     processors.add(processor2);
     processors.add(processor3);
-    assertBlockingExecution(processors, not(sameInstance(event)));
+    assertBlockingExecution(processors);
 
     // When NonBlockingProcessorExecutor falls-back to blocking the existing ReplyToHandler should be cleared
     assertThat(processor1.event.getReplyToHandler(), is(nullValue()));

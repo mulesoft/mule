@@ -9,7 +9,9 @@ package org.mule.runtime.core.mule.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestEventContext;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.ExplicitMethodEntryPointResolver;
@@ -26,8 +28,9 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodSetPass() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(),
-                                              MuleTestUtils.getTestEventContext("blah", REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+    InvocationResult result =
+        resolver.invoke(new MultiplePayloadsTestObject(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -36,8 +39,9 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
     resolver.addMethod("someSetter");
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(),
-                                              MuleTestUtils.getTestEventContext("blah", REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+    InvocationResult result =
+        resolver.invoke(new MultiplePayloadsTestObject(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -46,8 +50,9 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("noMethod");
     resolver.addMethod("noMethod2");
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(),
-                                              MuleTestUtils.getTestEventContext("blah", REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+    InvocationResult result =
+        resolver.invoke(new MultiplePayloadsTestObject(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.FAILED);
   }
 
@@ -55,7 +60,9 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testNoMethodSet() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     try {
-      resolver.invoke(new MultiplePayloadsTestObject(), MuleTestUtils.getTestEventContext("blah", REQUEST_RESPONSE, muleContext));
+      MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+      InvocationResult result =
+          resolver.invoke(new MultiplePayloadsTestObject(), eventContext, MuleEvent.builder(eventContext.getEvent()));
       fail("method property is not set, this should cause an error");
     } catch (IllegalStateException e) {
       // Expected
@@ -72,8 +79,8 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterAssignableFromPayload() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("wash");
-    MuleEventContext ctx = MuleTestUtils.getTestEventContext(new Apple(), REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx);
+    MuleEventContext ctx = getTestEventContext(new Apple(), REQUEST_RESPONSE, muleContext);
+    InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -87,9 +94,9 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterNull() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someOtherBusinessMethod");
+    MuleEventContext eventContext = getTestEventContext(new Object[] {null, "blah"}, REQUEST_RESPONSE, muleContext);
     InvocationResult result =
-        resolver.invoke(new MultiplePayloadsTestObject(),
-                        MuleTestUtils.getTestEventContext(new Object[] {null, "blah"}, REQUEST_RESPONSE, muleContext));
+        resolver.invoke(new MultiplePayloadsTestObject(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 

@@ -61,7 +61,7 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     muleEventLogger = new MuleEventLogger(logger, muleContext);
   }
 
-  private void setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException {
+  private MuleEvent setMapPayloadWithTokenRequestParameters(final MuleEvent event) throws MuleException {
     final HashMap<String, String> formData = new HashMap<>();
     formData.put(OAuthConstants.GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_CLIENT_CREDENTIALS);
     String clientId = applicationCredentials.getClientId();
@@ -78,19 +78,19 @@ public class ClientCredentialsTokenRequestHandler extends AbstractTokenRequestHa
     if (scopes != null) {
       formData.put(OAuthConstants.SCOPE_PARAMETER, scopes);
     }
-    event.setMessage(builder.payload(formData).build());
+    return MuleEvent.builder(event).message(builder.payload(formData).build()).build();
   }
 
   public void refreshAccessToken() throws MuleException {
     try {
       Flow flow = new Flow("test", getMuleContext());
-      final MuleEvent accessTokenEvent = MuleEvent.builder(create(flow, "ClientCredentialsTokenRequestHandler"))
+      MuleEvent accessTokenEvent = MuleEvent.builder(create(flow, "ClientCredentialsTokenRequestHandler"))
           .message(MuleMessage.builder().nullPayload().build()).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
-      setMapPayloadWithTokenRequestParameters(accessTokenEvent);
+      accessTokenEvent = setMapPayloadWithTokenRequestParameters(accessTokenEvent);
       final MuleEvent response;
       response = invokeTokenUrl(accessTokenEvent);
       final TokenResponseProcessor tokenResponseProcessor = TokenResponseProcessor
-          .createClientCredentialsProcessor(tokenResponseConfiguration, getMuleContext().getExpressionManager());
+          .createClientCredentialsProcessor(tokenResponseConfiguration, getMuleContext().getExpressionLanguage());
       tokenResponseProcessor.process(response);
 
       if (logger.isDebugEnabled()) {

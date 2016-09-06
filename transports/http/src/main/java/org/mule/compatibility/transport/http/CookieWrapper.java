@@ -8,7 +8,8 @@ package org.mule.compatibility.transport.http;
 
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.extension.api.annotation.Expression;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,30 +29,30 @@ public class CookieWrapper extends NameValuePair {
   private String secure;
   private String version;
 
-  public void parse(MuleEvent event, ExpressionManager expressionManager) {
-    setName(parse(getName(), event, expressionManager));
-    setValue(parse(getValue(), event, expressionManager));
-    this.domain = parse(domain, event, expressionManager);
-    this.path = parse(path, event, expressionManager);
+  public void parse(MuleEvent event, ExpressionLanguage expressionLanguage) {
+    setName(parse(getName(), event, expressionLanguage));
+    setValue(parse(getValue(), event, expressionLanguage));
+    this.domain = parse(domain, event, expressionLanguage);
+    this.path = parse(path, event, expressionLanguage);
     if (expiryDate != null) {
-      this.expiryDate = evaluateDate(expiryDate, event, expressionManager);
+      this.expiryDate = evaluateDate(expiryDate, event, expressionLanguage);
     }
-    this.maxAge = parse(maxAge, event, expressionManager);
-    this.secure = parse(secure, event, expressionManager);
-    this.version = parse(version, event, expressionManager);
+    this.maxAge = parse(maxAge, event, expressionLanguage);
+    this.secure = parse(secure, event, expressionLanguage);
+    this.version = parse(version, event, expressionLanguage);
   }
 
-  private String parse(String value, MuleEvent event, ExpressionManager expressionManager) {
+  private String parse(String value, MuleEvent event, ExpressionLanguage expressionLanguage) {
     if (value != null) {
-      return expressionManager.parse(value, event, null);
+      return expressionLanguage.parse(value, event, null);
     }
     return value;
   }
 
-  private Object evaluateDate(Object date, MuleEvent event, ExpressionManager expressionManager) {
+  private Object evaluateDate(Object date, MuleEvent event, ExpressionLanguage expressionLanguage) {
 
-    if (date != null && date instanceof String && expressionManager.isExpression(date.toString())) {
-      return expressionManager.evaluate(date.toString(), event, null);
+    if (date != null && date instanceof String && expressionLanguage.isExpression(date.toString())) {
+      return expressionLanguage.evaluate(date.toString(), event, null);
     }
     return date;
   }

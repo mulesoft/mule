@@ -17,9 +17,12 @@ import javax.activation.DataHandler;
 public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler> {
 
   private MuleEvent event;
+  private MuleEvent.Builder eventBuilder;
 
-  public OutboundAttachmentMapContext(MuleEvent event) {
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
+  public OutboundAttachmentMapContext(MuleEvent event, MuleEvent.Builder eventBuilder) {
     this.event = event;
+    this.eventBuilder = eventBuilder;
   }
 
   @Override
@@ -29,12 +32,14 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
 
   @Override
   public void doPut(String key, DataHandler value) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, value).build());
+    eventBuilder.message(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, value).build());
+    event = eventBuilder.build();
   }
 
   @Override
   public void doRemove(String key) {
-    event.setMessage(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(key).build());
+    eventBuilder.message(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(key).build());
+    event = eventBuilder.build();
   }
 
   @Override
@@ -44,7 +49,8 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
 
   @Override
   public void clear() {
-    event.setMessage(MuleMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
+    eventBuilder.message(MuleMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
+    event = eventBuilder.build();
   }
 
 }

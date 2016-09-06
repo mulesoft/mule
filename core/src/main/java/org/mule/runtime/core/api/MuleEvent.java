@@ -185,15 +185,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   // TODO MULE-9281 Make MuleEvent immutable
   void setFlowVariable(String key, Object value);
 
-  // TODO MULE-9281 Make MuleEvent immutable
-  void setFlowVariable(String key, Object value, DataType dataType);
-
-  // TODO MULE-9281 Make MuleEvent immutable
-  void removeFlowVariable(String key);
-
-  // TODO MULE-9281 Make MuleEvent immutable
-  void clearFlowVariables();
-
   /**
    * Indicates if notifications should be fired when processing this message.
    *

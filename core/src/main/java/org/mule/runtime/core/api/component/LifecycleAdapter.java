@@ -19,6 +19,6 @@ public interface LifecycleAdapter extends Lifecycle {
 
   boolean isDisposed();
 
-  Object invoke(MuleEvent message) throws MuleException;
+  Object invoke(MuleEvent message, MuleEvent.Builder eventBuilder) throws MuleException;
 
 }

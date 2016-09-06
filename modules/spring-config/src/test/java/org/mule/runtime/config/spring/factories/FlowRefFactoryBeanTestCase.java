@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -58,12 +58,12 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   private MessageProcessor targetSubFlow = mock(SubFlowMessageProcessor.class, INITIALIZABLE_MESSAGE_PROCESSOR);
   private ApplicationContext applicationContext = mock(ApplicationContext.class);
   private MuleContext muleContext = mock(MuleContext.class);
-  private ExpressionManager expressionManager = mock(ExpressionManager.class);
+  private ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
 
   @Before
   public void setup() throws MuleException {
-    when(muleContext.getExpressionManager()).thenReturn(expressionManager);
-    when(expressionManager.isExpression(anyString())).thenReturn(true);
+    when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
+    when(expressionLanguage.isExpression(anyString())).thenReturn(true);
     when(((MessageProcessor) targetFlow).process(any(MuleEvent.class))).thenReturn(result);
     when(targetSubFlow.process(any(MuleEvent.class))).thenReturn(result);
   }
@@ -165,15 +165,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Test(expected = MuleRuntimeException.class)
   public void staticFlowRefDoesNotExist() throws Exception {
-    when(expressionManager.isExpression(anyString())).thenReturn(false);
+    when(expressionLanguage.isExpression(anyString())).thenReturn(false);
 
     createFlowRefFactoryBean(NON_EXISTANT).getObject();
   }
 
   @Test(expected = MuleRuntimeException.class)
   public void dynamicFlowRefDoesNotExist() throws Exception {
-    when(expressionManager.isExpression(anyString())).thenReturn(true);
-    when(expressionManager.parse(eq(DYNAMIC_NON_EXISTANT), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn("other");
+    when(expressionLanguage.isExpression(anyString())).thenReturn(true);
+    when(expressionLanguage.parse(eq(DYNAMIC_NON_EXISTANT), any(MuleEvent.class), any(FlowConstruct.class))).thenReturn("other");
 
     createFlowRefFactoryBean(DYNAMIC_NON_EXISTANT).getObject().process(mock(MuleEvent.class));
   }
@@ -188,15 +188,15 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
   }
 
   private FlowRefFactoryBean createStaticFlowRefFactoryBean(MessageProcessor target) throws InitialisationException {
-    when(expressionManager.isExpression(anyString())).thenReturn(false);
+    when(expressionLanguage.isExpression(anyString())).thenReturn(false);
     when(applicationContext.getBean(eq(STATIC_REFERENCED_FLOW))).thenReturn(target);
 
     return createFlowRefFactoryBean(STATIC_REFERENCED_FLOW);
   }
 
   private FlowRefFactoryBean createDynamicFlowRefFactoryBean(MessageProcessor target) throws InitialisationException {
-    when(expressionManager.isExpression(anyString())).thenReturn(true);
-    when(expressionManager.parse(eq(DYNAMIC_REFERENCED_FLOW), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(expressionLanguage.isExpression(anyString())).thenReturn(true);
+    when(expressionLanguage.parse(eq(DYNAMIC_REFERENCED_FLOW), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenReturn(PARSED_DYNAMIC_REFERENCED_FLOW);
     when(applicationContext.getBean(eq(PARSED_DYNAMIC_REFERENCED_FLOW))).thenReturn(target);
 

@@ -25,8 +25,8 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   private Error mockError = mock(Error.class);
 
-  public ExceptionTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
+  public ExceptionTestCase(String mvelOptimizer) {
+    super(mvelOptimizer);
   }
 
   @Override

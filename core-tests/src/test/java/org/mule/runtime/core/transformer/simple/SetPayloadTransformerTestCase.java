@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -39,20 +39,20 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
   private MuleContext mockMuleContext;
   private MuleEvent mockMuleEvent;
   private MuleMessage mockMuleMessage;
-  private ExpressionManager mockExpressionManager;
+  private ExpressionLanguage mockExpressionLanguage;
 
   @Before
   public void setUp() {
     setPayloadTransformer = new SetPayloadTransformer();
     mockMuleContext = mock(MuleContext.class);
     setPayloadTransformer.setMuleContext(mockMuleContext);
-    mockExpressionManager = mock(ExpressionManager.class);
+    mockExpressionLanguage = mock(ExpressionLanguage.class);
     mockMuleEvent = mock(MuleEvent.class);
     mockMuleMessage = mock(MuleMessage.class);
 
     when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
-    when(mockMuleContext.getExpressionManager()).thenReturn(mockExpressionManager);
-    when(mockExpressionManager.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(mockMuleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
+    when(mockExpressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
   }
 
@@ -70,7 +70,7 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     setPayloadTransformer.setValue(PLAIN_TEXT);
     setPayloadTransformer.initialise();
 
-    when(mockExpressionManager.isExpression(PLAIN_TEXT)).thenReturn(false);
+    when(mockExpressionLanguage.isExpression(PLAIN_TEXT)).thenReturn(false);
 
     Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
     assertEquals(PLAIN_TEXT, response);
@@ -79,9 +79,9 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
   @Test
   public void testSetPayloadTransformerExpression() throws InitialisationException, TransformerException {
     setPayloadTransformer.setValue(EXPRESSION);
-    when(mockExpressionManager.isExpression(EXPRESSION)).thenReturn(true);
+    when(mockExpressionLanguage.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadTransformer.initialise();
-    when(mockExpressionManager.evaluate(EXPRESSION, mockMuleEvent, null)).thenReturn(PLAIN_TEXT);
+    when(mockExpressionLanguage.evaluate(EXPRESSION, mockMuleEvent, null)).thenReturn(PLAIN_TEXT);
 
     Object response = setPayloadTransformer.transformMessage(mockMuleEvent, UTF_8);
     assertEquals(PLAIN_TEXT, response);

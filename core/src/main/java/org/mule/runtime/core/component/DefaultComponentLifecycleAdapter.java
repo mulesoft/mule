@@ -265,7 +265,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter {
   }
 
   @Override
-  public Object invoke(MuleEvent event) throws MuleException {
+  public Object invoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws MuleException {
     // Invoke method
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     Object result;
@@ -275,9 +275,9 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter {
       }
       // Use the overriding entrypoint resolver if one is set
       if (component.getEntryPointResolverSet() != null) {
-        result = component.getEntryPointResolverSet().invoke(componentObject, eventContext);
+        result = component.getEntryPointResolverSet().invoke(componentObject, eventContext, eventBuilder);
       } else {
-        result = entryPointResolver.invoke(componentObject, eventContext);
+        result = entryPointResolver.invoke(componentObject, eventContext, eventBuilder);
       }
     } catch (Exception e) {
       throw new ComponentException(createStaticMessage("%s: %s", e.getClass().getName(), e.getMessage()), event, component, e);

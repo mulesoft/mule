@@ -6,10 +6,12 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.core.util.TemplateParser.TemplateCallback;
 
@@ -48,9 +50,8 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
   private static final AtomicLong count = new AtomicLong(0);
 
   public static final String DEFAULT_DATE_FORMAT = "dd-MM-yy_HH-mm-ss.SSS";
-  public static final String DEFAULT_EXPRESSION =
-      MessageFormat.format("{0}org.mule.runtime.core.util.UUID.getUUID(){1}.dat", ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                           ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+  public static final String DEFAULT_EXPRESSION = MessageFormat.format("{0}org.mule.runtime.core.util.UUID.getUUID(){1}.dat",
+                                                                       DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
 
   private final TemplateParser wigglyMuleParser = TemplateParser.createMuleStyleParser();
   private final TemplateParser squareParser = TemplateParser.createSquareBracesStyleParser();
@@ -68,7 +69,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
       expression = DEFAULT_EXPRESSION;
     }
 
-    if (expression.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX) > -1) {
+    if (expression.indexOf(DEFAULT_EXPRESSION_PREFIX) > -1) {
       return getFilename(event, expression, wigglyMuleParser);
     } else {
       return getFilename(event, expression, squareParser);
@@ -76,7 +77,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
   }
 
   protected String getFilename(final MuleEvent event, String expression, TemplateParser parser) {
-    return parser.parse((TemplateCallback) token -> muleContext.getExpressionManager().evaluate(token, event, null), expression);
+    return parser.parse((TemplateCallback) token -> muleContext.getExpressionLanguage().evaluate(token, event, null), expression);
   }
 
   public static Long count() {

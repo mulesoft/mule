@@ -7,6 +7,8 @@
 package org.mule.runtime.core.model.resolvers;
 
 import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
+import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Callable;
@@ -35,7 +37,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
     this.methodProperty = methodProperty;
   }
 
-  public InvocationResult invoke(Object component, MuleEventContext context) throws Exception {
+  public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
     // Transports such as SOAP need to ignore the method property
     boolean ignoreMethod =
         BooleanUtils.toBoolean(context.getMessage().<Boolean>getInboundProperty(MuleProperties.MULE_IGNORE_METHOD_PROPERTY));
@@ -51,7 +53,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
     Object[] payload = getPayloadFromMessage(context);
 
     Object methodProp = getFlowVariableOrNull(getMethodProperty(), context.getEvent());
-    context.getEvent().removeFlowVariable(getMethodProperty());
+    eventBuilder.removeFlowVariable(getMethodProperty());
     if (methodProp == null) {
       methodProp = context.getMessage().getInboundProperty(getMethodProperty());
     }

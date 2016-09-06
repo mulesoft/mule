@@ -154,22 +154,7 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public void setFlowVariable(String key, Object value, DataType dataType) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void removeFlowVariable(String key) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public Set<String> getFlowVariableNames() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void clearFlowVariables() {
     throw new UnsupportedOperationException();
   }
 

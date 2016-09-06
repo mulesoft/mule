@@ -7,10 +7,10 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
+import org.mule.mvel2.compiler.CompiledExpression;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.metadata.TypedValue;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.mvel2.compiler.CompiledExpression;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -42,12 +42,12 @@ public class MvelEnricherDataTypePropagator {
     return propagators;
   }
 
-  public void propagate(TypedValue typedValue, MuleEvent event, Serializable serializedExpression) {
+  public void propagate(TypedValue typedValue, MuleEvent event, MuleEvent.Builder builder, Serializable serializedExpression) {
     if (serializedExpression instanceof CompiledExpression) {
       CompiledExpression compiledExpression = (CompiledExpression) serializedExpression;
 
       for (EnricherDataTypePropagator propagator : propagators) {
-        if (propagator.propagate(event, typedValue, compiledExpression)) {
+        if (propagator.propagate(event, builder, typedValue, compiledExpression)) {
           return;
         }
       }

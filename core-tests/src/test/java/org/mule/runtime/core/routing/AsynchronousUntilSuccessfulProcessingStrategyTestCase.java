@@ -292,12 +292,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     String ackExpression = "some-expression";
     String expressionEvalutaionResult = "new payload";
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(ackExpression);
-    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager().evaluate(ackExpression, event, null))
+    when(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage().evaluate(ackExpression, event, null))
         .thenReturn(expressionEvalutaionResult);
     final MuleEvent result = executeUntilSuccessful();
     waitUntilRouteIsExecuted();
     verify(mockRoute, times(1)).process(any(MuleEvent.class));
-    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionManager(), times(1))
+    verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage(), times(1))
         .evaluate(eq(ackExpression), any(MuleEvent.class), eq(null));
 
     assertThat(result.getMessage().getPayload(), is(expressionEvalutaionResult));

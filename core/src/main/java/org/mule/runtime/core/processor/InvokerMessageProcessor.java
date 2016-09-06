@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -69,7 +69,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
 
   protected Method method;
-  protected ExpressionManager expressionManager;
+  protected ExpressionLanguage expressionLanguage;
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
 
@@ -81,7 +81,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
 
     resolveMethodToInvoke();
 
-    expressionManager = muleContext.getExpressionManager();
+    expressionLanguage = muleContext.getExpressionLanguage();
   }
 
   protected void resolveMethodToInvoke() throws InitialisationException {
@@ -196,10 +196,11 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
       // If string contains is a single expression then evaluate otherwise
       // parse. We can't use parse() always because that will convert
       // everything to a string
-      if (expression.startsWith(patternInfo.getPrefix()) && expression.endsWith(patternInfo.getSuffix())) {
-        arg = expressionManager.evaluate(expression, event, flowConstruct);
+      if (expression.startsWith(patternInfo.getPrefix()) && expression.endsWith(patternInfo.getSuffix())
+          && expression.lastIndexOf(patternInfo.getPrefix()) == 0) {
+        arg = expressionLanguage.evaluate(expression, event, flowConstruct);
       } else {
-        arg = expressionManager.parse(expression, event, flowConstruct);
+        arg = expressionLanguage.parse(expression, event, flowConstruct);
       }
 
       // If expression evaluates to a MuleMessage then use it's payload

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.mvel2.MVEL.compileExpression;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
@@ -20,6 +21,7 @@ import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.GlobalVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -53,9 +55,12 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
 
-    CompiledExpression compiledExpression = compileMelExpression(expression, testEvent);
+    final Builder builder = MuleEvent.builder(testEvent);
+    CompiledExpression compiledExpression = compileMelExpression(expression, testEvent, builder);
+    testEvent = builder.build();
 
-    dataTypePropagator.propagate(testEvent, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    dataTypePropagator.propagate(testEvent, builder, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    testEvent = builder.build();
 
     assertThat(getVariableDataType(testEvent), like(String.class, JSON, CUSTOM_ENCODING));
   }
@@ -68,10 +73,13 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
     propertyValue.put(INNER_PROPERTY_NAME, TEST_MESSAGE);
     testEvent = setVariable(testEvent, propertyValue, expectedDataType);
 
-    CompiledExpression compiledExpression = compileMelExpression(expression, testEvent);
+    final Builder builder = MuleEvent.builder(testEvent);
+    CompiledExpression compiledExpression = compileMelExpression(expression, testEvent, builder);
+    testEvent = builder.build();
 
     // Attempts to propagate a different dataType, which should be ignored
-    dataTypePropagator.propagate(testEvent, new TypedValue(propertyValue, DataType.STRING), compiledExpression);
+    dataTypePropagator.propagate(testEvent, builder, new TypedValue(propertyValue, DataType.STRING), compiledExpression);
+    testEvent = builder.build();
 
     assertThat(getVariableDataType(testEvent), like(Map.class, UNKNOWN, CUSTOM_ENCODING));
   }
@@ -80,9 +88,9 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
   protected abstract MuleEvent setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
 
-  private CompiledExpression compileMelExpression(String expression, MuleEvent testEvent) {
+  private CompiledExpression compileMelExpression(String expression, MuleEvent testEvent, MuleEvent.Builder builder) {
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
-    final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(testEvent, parserConfiguration);
+    final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(testEvent, builder, parserConfiguration);
 
     CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(parserConfiguration));
@@ -93,20 +101,22 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
     return compiledExpression;
   }
 
-  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(MuleEvent testEvent,
+  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(MuleEvent testEvent, MuleEvent.Builder builder,
                                                                               ParserConfiguration parserConfiguration) {
     final MVELExpressionLanguageContext context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
     final StaticVariableResolverFactory staticContext = new StaticVariableResolverFactory(parserConfiguration, muleContext);
     final GlobalVariableResolverFactory globalContext =
-        new GlobalVariableResolverFactory(Collections.EMPTY_MAP, Collections.EMPTY_MAP, parserConfiguration, muleContext);
+        new GlobalVariableResolverFactory(emptyMap(), emptyMap(), parserConfiguration, muleContext);
 
     final DelegateVariableResolverFactory innerDelegate =
         new DelegateVariableResolverFactory(globalContext,
-                                            new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent));
+                                            new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent,
+                                                                                builder));
     final DelegateVariableResolverFactory delegate =
-        new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(parserConfiguration, muleContext,
-                                                                                              testEvent, innerDelegate));
-    context.setNextFactory(new CachedMapVariableResolverFactory(Collections.EMPTY_MAP, delegate));
+        new DelegateVariableResolverFactory(staticContext,
+                                            new MessageVariableResolverFactory(parserConfiguration, muleContext, testEvent,
+                                                                               builder, innerDelegate));
+    context.setNextFactory(new CachedMapVariableResolverFactory(emptyMap(), delegate));
     return context;
   }
 }

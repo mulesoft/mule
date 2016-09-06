@@ -15,7 +15,6 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -33,6 +32,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpAuthentication;
@@ -188,7 +188,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   private void initializeAttributeEvaluators(AttributeEvaluator... attributeEvaluators) {
     for (AttributeEvaluator attributeEvaluator : attributeEvaluators) {
       if (attributeEvaluator != null) {
-        attributeEvaluator.initialize(muleContext.getExpressionManager());
+        attributeEvaluator.initialize(muleContext.getExpressionLanguage());
       }
     }
   }
@@ -229,18 +229,19 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                            protected void doOnCompletion(HttpResponse httpResponse) {
                              try {
 
-                               httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
-                               notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(),
+                               MuleEvent resultEvent =
+                                   httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
+                               notificationHelper.fireNotification(this, resultEvent, httpRequest.getUri(),
                                                                    flowConstruct, MESSAGE_REQUEST_END);
-                               resetMuleEventForNewThread(muleEvent);
+                               resetMuleEventForNewThread(resultEvent);
 
 
-                               if (resendRequest(muleEvent, checkRetry, authentication)) {
-                                 consumePayload(muleEvent);
+                               if (resendRequest(resultEvent, checkRetry, authentication)) {
+                                 consumePayload(resultEvent);
                                  innerProcessNonBlocking(muleEvent, completionHandler, false);
                                } else {
-                                 validateResponse(muleEvent);
-                                 completionHandler.onCompletion(muleEvent, createCompletionExceptionCallback(muleEvent));
+                                 validateResponse(resultEvent);
+                                 completionHandler.onCompletion(resultEvent, createCompletionExceptionCallback(resultEvent));
                                }
                              } catch (MessagingException messagingException) {
                                completionHandler.onFailure(messagingException);
@@ -289,7 +290,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
       throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e, this);
     }
 
-    httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
+    muleEvent = httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
     notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
 
     if (resendRequest(muleEvent, checkRetry, authentication)) {

@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.mvel;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
@@ -37,6 +38,7 @@ import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.MuleManifest;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.AppContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.function.RegexExpressionLanguageFuntion;
@@ -476,6 +478,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
     when(message.getPayload()).thenReturn(payload);
     when(event.getMessage()).thenReturn(message);
     when(message.getDataType()).thenReturn(dataType);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getError()).thenReturn(empty());
     return event;
   }
 

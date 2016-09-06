@@ -12,12 +12,12 @@ import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing should
@@ -67,11 +67,9 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
 
   class NonBlockingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException, Void> {
 
-    final private MuleEvent event;
     final private ReplyToHandler replyToHandler;
 
     NonBlockingCompletionHandler(MuleEvent event) {
-      this.event = event;
       this.replyToHandler = event.getReplyToHandler();
     }
 
@@ -83,7 +81,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
     @Override
     public void onCompletion(MuleEvent result, ExceptionCallback<Void, Exception> exceptionCallback) {
       try {
-        replyToHandler.processReplyTo(event, null, null);
+        replyToHandler.processReplyTo(result, null, null);
       } catch (Exception e) {
         exceptionCallback.onException(e);
       }

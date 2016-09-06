@@ -8,6 +8,7 @@ package org.mule.runtime.core.model.resolvers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -48,7 +49,7 @@ public class EntryPointResolverMethodCacheTestCase extends AbstractMuleTestCase 
 
   private static class MockEntryPointResolver extends AbstractEntryPointResolver {
 
-    public InvocationResult invoke(Object component, MuleEventContext context) throws Exception {
+    public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
       throw new AssertionFailedError("do not invoke this method");
     }
   }

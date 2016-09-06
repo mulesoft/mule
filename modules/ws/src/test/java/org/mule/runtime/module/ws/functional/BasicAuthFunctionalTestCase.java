@@ -20,6 +20,7 @@ import org.mule.runtime.module.ws.consumer.SoapFaultException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -44,6 +45,7 @@ public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTes
   }
 
   @Test
+  @Ignore("MULE-9281")
   public void requestWithInvalidCredentialsThrowsException() throws Exception {
     // The unauthorized response contains an error message in the payload (which is not a SOAP Fault), then WSConsumer
     // should fail to parse the response and throw a SoapFaultException because of this.

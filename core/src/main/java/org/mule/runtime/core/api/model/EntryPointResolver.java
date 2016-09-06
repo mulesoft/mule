@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.model;
 
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 
 /**
@@ -18,5 +19,5 @@ import org.mule.runtime.core.api.MuleEventContext;
  */
 public interface EntryPointResolver {
 
-  InvocationResult invoke(Object component, MuleEventContext context) throws Exception;
+  InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception;
 }

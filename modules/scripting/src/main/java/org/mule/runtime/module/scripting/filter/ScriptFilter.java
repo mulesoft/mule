@@ -48,7 +48,7 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
   public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
     Bindings bindings = script.getScriptEngine().createBindings();
 
-    script.populateBindings(bindings, event);
+    script.populateBindings(bindings, event, builder);
     try {
       return (Boolean) script.runScript(bindings);
     } catch (Throwable e) {
@@ -67,7 +67,7 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
     Flow flow = new Flow("", muleContext);
     MuleEvent event =
         MuleEvent.builder(create(flow, "ScriptFilter")).message(message).exchangePattern(ONE_WAY).flow(flow).build();
-    script.populateBindings(bindings, event);
+    script.populateBindings(bindings, event, builder);
     try {
       return (Boolean) script.runScript(bindings);
     } catch (Throwable e) {

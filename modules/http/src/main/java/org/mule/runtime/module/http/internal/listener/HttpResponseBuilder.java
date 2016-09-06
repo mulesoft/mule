@@ -83,8 +83,8 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
   }
 
   void init() throws InitialisationException {
-    statusCodeEvaluator = new AttributeEvaluator(statusCode).initialize(muleContext.getExpressionManager());
-    reasonPhraseEvaluator = new AttributeEvaluator(reasonPhrase).initialize(muleContext.getExpressionManager());
+    statusCodeEvaluator = new AttributeEvaluator(statusCode).initialize(muleContext.getExpressionLanguage());
+    reasonPhraseEvaluator = new AttributeEvaluator(reasonPhrase).initialize(muleContext.getExpressionLanguage());
   }
 
   public HttpResponse build(org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder,

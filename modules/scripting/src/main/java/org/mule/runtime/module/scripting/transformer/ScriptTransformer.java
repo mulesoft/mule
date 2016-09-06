@@ -47,7 +47,8 @@ public class ScriptTransformer extends AbstractMessageTransformer {
   @Override
   public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
     Bindings bindings = script.getScriptEngine().createBindings();
-    script.populateBindings(bindings, event);
+    // TODO MVEL EVENT IMMUTABILTIY
+    script.populateBindings(bindings, event, MuleEvent.builder(event));
     try {
       return script.runScript(bindings);
     } catch (ScriptException e) {

@@ -19,7 +19,7 @@ public class SetCorrelationIdTransformer extends SimpleMessageProcessor {
 
   @Override
   public void initialise() throws InitialisationException {
-    correlationIdEvaluator.initialize(muleContext.getExpressionManager());
+    correlationIdEvaluator.initialize(muleContext.getExpressionLanguage());
   }
 
   @Override

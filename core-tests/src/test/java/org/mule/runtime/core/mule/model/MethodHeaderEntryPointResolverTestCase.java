@@ -10,6 +10,7 @@ import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.DefaultMuleEventContext;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
@@ -37,7 +38,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
   public void testMethodSetPass() throws Exception {
     MuleEventContext ctx = createMuleEventContext("blah", singletonMap("method", "someBusinessMethod"));
 
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertInvocationWasSuccessful(result);
   }
 
@@ -45,7 +46,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
   public void testMethodSetWithNoArgsPass() throws Exception {
     MuleEventContext ctx = createMuleEventContext(null, singletonMap("method", "wash"));
 
-    InvocationResult result = resolver.invoke(new Apple(), ctx);
+    InvocationResult result = resolver.invoke(new Apple(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertInvocationWasSuccessful(result);
     assertEquals("wash", result.getMethodCalled());
   }
@@ -56,7 +57,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
 
     MuleEventContext ctx = createMuleEventContext("blah", singletonMap("serviceMethod", "someBusinessMethod"));
 
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertInvocationWasSuccessful(result);
   }
 
@@ -66,7 +67,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
 
     MuleEventContext ctx = createMuleEventContext("blah", singletonMap("serviceMethod", "noMethod"));
 
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertInvocationFailed(result);
   }
 
@@ -76,7 +77,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
 
     MuleEventContext ctx = createMuleEventContext("blah", singletonMap("myMethod", "someBusinessMethod"));
 
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertInvocationFailed(result);
   }
 
@@ -84,7 +85,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
   public void testMethodPropertyMismatch() throws Exception {
     MuleEventContext ctx = createMuleEventContext("blah", singletonMap("method", "noMethod"));
 
-    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx);
+    InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertInvocationFailed(result);
   }
 
@@ -96,7 +97,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
   public void testMethodPropertyParameterAssignableFromPayload() throws Exception {
     MuleEventContext ctx = createMuleEventContext(new Apple(), singletonMap("method", "wash"));
 
-    InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx);
+    InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx, MuleEvent.builder(ctx.getEvent()));
     assertInvocationWasSuccessful(result);
   }
 

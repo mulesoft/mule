@@ -34,13 +34,11 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
-  protected Variant variant;
   protected ExpressionLanguage expressionLanguage;
   protected Flow flowConstruct;
   protected MessageContext context;
 
-  public AbstractELTestCase(Variant variant, String mvelOptimizer) {
-    this.variant = variant;
+  public AbstractELTestCase(String mvelOptimizer) {
     OptimizerFactory.setDefaultOptimizer(mvelOptimizer);
   }
 
@@ -64,24 +62,17 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @SuppressWarnings("deprecation")
   protected Object evaluate(String expression) {
-    switch (variant) {
-      case EVALUATOR_LANGUAGE:
-        return expressionLanguage.evaluate(expression);
-      case EXPRESSION_MANAGER:
-        return muleContext.getExpressionManager().evaluate(expression, null, flowConstruct);
-    }
-    return null;
+    return expressionLanguage.evaluate(expression);
   }
 
   @SuppressWarnings("deprecation")
   protected Object evaluate(String expression, MuleEvent event) {
-    switch (variant) {
-      case EVALUATOR_LANGUAGE:
-        return expressionLanguage.evaluate(expression, event, flowConstruct);
-      case EXPRESSION_MANAGER:
-        return muleContext.getExpressionManager().evaluate(expression, event, flowConstruct);
-    }
-    return null;
+    return expressionLanguage.evaluate(expression, event, flowConstruct);
+  }
+
+  @SuppressWarnings("deprecation")
+  protected Object evaluate(String expression, MuleEvent event, MuleEvent.Builder eventBuilder) {
+    return expressionLanguage.evaluate(expression, event, eventBuilder, flowConstruct);
   }
 
   public static enum Variant {
@@ -90,13 +81,12 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @Parameters
   public static List<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{Variant.EVALUATOR_LANGUAGE, OptimizerFactory.DYNAMIC},
-        {Variant.EVALUATOR_LANGUAGE, OptimizerFactory.SAFE_REFLECTIVE}, {Variant.EXPRESSION_MANAGER, OptimizerFactory.DYNAMIC},
-        {Variant.EXPRESSION_MANAGER, OptimizerFactory.SAFE_REFLECTIVE}});
+    return Arrays.asList(new Object[][] {{OptimizerFactory.DYNAMIC}, {OptimizerFactory.SAFE_REFLECTIVE}});
   }
 
-  protected ExpressionLanguage getExpressionLanguage() throws Exception {
-    return new MVELExpressionLanguage(muleContext);
+  protected ExpressionLanguage getExpressionLanguage() {
+    final MVELExpressionLanguage el = new MVELExpressionLanguage(muleContext);
+    return el;
   }
 
   protected void assertUnsupportedOperation(String expression) {

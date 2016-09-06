@@ -9,11 +9,12 @@ package org.mule.compatibility.transport.http.components;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
+import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 
-import org.mule.compatibility.transport.http.components.RestServiceWrapper;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
@@ -26,8 +27,7 @@ public class RestServiceComponentFlowTestCase extends FunctionalTestCase {
 
   public static final String FLOW_NAME = "WORMS";
   public static final String FLOW_URL =
-      MessageFormat.format("{0}header:serviceUrl{1}", ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                           ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+      MessageFormat.format("{0}header:serviceUrl{1}", DEFAULT_EXPRESSION_PREFIX, DEFAULT_EXPRESSION_POSTFIX);
 
   @Override
   protected String getConfigFile() {

@@ -129,7 +129,7 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent {
   }
 
   @Override
-  protected Object invokeComponentInstance(MuleEvent event) throws Exception {
+  protected Object invokeComponentInstance(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
     Object result = ((Callable) objectFactory.getInstance(muleContext)).onCall(new DefaultMuleEventContext(flowConstruct, event));
     if (result instanceof VoidResult) {
       // This will rewire the current message

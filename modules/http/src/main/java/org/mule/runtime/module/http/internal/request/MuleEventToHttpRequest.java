@@ -23,10 +23,10 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
@@ -131,26 +131,17 @@ public class MuleEventToHttpRequest {
 
   private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod)
       throws MessagingException {
-    boolean customSource = false;
-    Object oldPayload = null;
     HttpEntity entity;
 
     if (!StringUtils.isEmpty(requester.getSource()) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getSource()))) {
-      Object newPayload = muleContext.getExpressionManager().evaluate(requester.getSource(), muleEvent, null);
-      oldPayload = muleEvent.getMessage().getPayload();
-      muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(newPayload).build());
-      customSource = true;
+      muleEvent = MuleEvent.builder(muleEvent).message(MuleMessage.builder(muleEvent.getMessage())
+          .payload(muleContext.getExpressionLanguage().evaluate(requester.getSource(), muleEvent, null)).build()).build();
     }
 
     if (isEmptyBody(muleEvent, resolvedMethod)) {
       entity = new EmptyHttpEntity();
     } else {
       entity = createRequestEntityFromPayload(requestBuilder, muleEvent);
-    }
-
-    if (customSource) {
-      Object finalOldPayload = oldPayload;
-      muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).payload(finalOldPayload).build());
     }
 
     return entity;

@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static java.util.Collections.emptyMap;
 import org.mule.runtime.core.api.MuleEvent;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,9 +20,12 @@ import java.util.Set;
 public class FlowVariableMapContext extends AbstractMapContext<Object> {
 
   private MuleEvent event;
+  private MuleEvent.Builder eventBuider;
 
-  public FlowVariableMapContext(MuleEvent event) {
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
+  public FlowVariableMapContext(MuleEvent event, MuleEvent.Builder eventBuider) {
     this.event = event;
+    this.eventBuider = eventBuider;
   }
 
   @Override
@@ -30,12 +35,14 @@ public class FlowVariableMapContext extends AbstractMapContext<Object> {
 
   @Override
   public void doPut(String key, Object value) {
-    event.setFlowVariable(key, value);
+    eventBuider.addFlowVariable(key, value);
+    event = eventBuider.build();
   }
 
   @Override
   public void doRemove(String key) {
-    event.removeFlowVariable(key);
+    eventBuider.removeFlowVariable(key);
+    event = eventBuider.build();
   }
 
   @Override
@@ -45,7 +52,8 @@ public class FlowVariableMapContext extends AbstractMapContext<Object> {
 
   @Override
   public void clear() {
-    event.clearFlowVariables();
+    eventBuider.flowVariables(emptyMap());
+    event = eventBuider.build();
   }
 
   @Override

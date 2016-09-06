@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.StringUtils;
@@ -39,12 +39,12 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
 
   protected MuleContext muleContext;
   protected FlowConstruct flowConstruct;
-  protected ExpressionManager expressionManager;
+  protected ExpressionLanguage expressionLanguage;
 
   @Override
   public void initialise() throws InitialisationException {
     initLogger();
-    expressionManager = muleContext.getExpressionManager();
+    expressionLanguage = muleContext.getExpressionLanguage();
   }
 
   protected void initLogger() {
@@ -70,7 +70,7 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
       } else {
         LogLevel logLevel = LogLevel.valueOf(level);
         if (LogLevel.valueOf(level).isEnabled(logger)) {
-          logLevel.log(logger, expressionManager.parse(message, event, flowConstruct));
+          logLevel.log(logger, expressionLanguage.parse(message, event, flowConstruct));
         }
       }
     }

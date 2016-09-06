@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing.outbound;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
@@ -30,7 +30,7 @@ import java.util.List;
 
 public class FilteringOutboundRouter extends AbstractOutboundRouter implements TransformingMatchable {
 
-  protected ExpressionManager expressionManager;
+  protected ExpressionLanguage expressionLanguage;
 
   private List<Transformer> transformers = new LinkedList<>();
 
@@ -44,7 +44,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
   @Override
   public void initialise() throws InitialisationException {
     super.initialise();
-    expressionManager = muleContext.getExpressionManager();
+    expressionLanguage = muleContext.getExpressionLanguage();
   }
 
   @Override

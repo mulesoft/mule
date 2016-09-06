@@ -10,13 +10,13 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -43,24 +43,34 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T> {
   private final AttributeEvaluator evaluator;
   private final MuleContext muleContext;
 
+  private boolean evaluatorInitted = false;
+
   public TypeSafeExpressionValueResolver(String expression, Class<?> expectedType, MuleContext muleContext) {
     checkArgument(!StringUtils.isBlank(expression), "Expression cannot be blank or null");
     checkArgument(expectedType != null, "expected type cannot be null");
 
     this.expectedType = expectedType;
     evaluator = new AttributeEvaluator(expression);
-    evaluator.initialize(muleContext.getExpressionManager());
 
     this.muleContext = muleContext;
   }
 
+  protected void initEvaluator(MuleContext muleContext) {
+    if (!evaluatorInitted) {
+      evaluatorInitted = true;
+      evaluator.initialize(muleContext.getExpressionLanguage());
+    }
+  }
+
   @Override
   public T resolve(MuleEvent event) throws MuleException {
+    initEvaluator(muleContext);
     T evaluated = (T) evaluator.resolveValue(event);
     return evaluated != null ? transform(evaluated, event) : null;
   }
 
   private T transform(T object, MuleEvent event) throws MuleException {
+    initEvaluator(muleContext);
     if (ClassUtils.isInstance(expectedType, object)) {
       return object;
     }

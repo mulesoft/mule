@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLLING_CONTROLLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSACTION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 
@@ -34,11 +35,11 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.expression.ExpressionManager;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -61,11 +62,11 @@ import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeRepository;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.management.stats.AllStatistics;
 import org.mule.runtime.core.management.stats.ProcessingTimeWatcher;
@@ -156,8 +157,6 @@ public class DefaultMuleContext implements MuleContext {
    */
   private long startDate;
 
-  private ExpressionManager expressionManager;
-
   private volatile StreamCloserService streamCloserService;
   private Object streamCloserServiceLock = new Object();
 
@@ -226,9 +225,6 @@ public class DefaultMuleContext implements MuleContext {
     this.lifecycleManager = lifecycleManager;
     this.notificationManager = notificationManager;
     this.notificationManager.setMuleContext(this);
-    // there is no point having this object configurable
-    this.expressionManager = new DefaultExpressionManager();
-    ((MuleContextAware) this.expressionManager).setMuleContext(this);
     registryBroker = createRegistryBroker();
     muleRegistryHelper = createRegistryHelper(registryBroker);
     localMuleClient = new DefaultLocalMuleClient(this);
@@ -281,11 +277,6 @@ public class DefaultMuleContext implements MuleContext {
       getNotificationManager().start(workManager, workListener);
       fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
-
-      if (expressionManager instanceof Initialisable) {
-        ((Initialisable) expressionManager).initialise();
-      }
-
       fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
     } catch (InitialisationException e) {
       throw e;
@@ -364,10 +355,6 @@ public class DefaultMuleContext implements MuleContext {
 
     notificationManager.dispose();
     workManager.dispose();
-
-    if (expressionManager != null && expressionManager instanceof Disposable) {
-      ((Disposable) expressionManager).dispose();
-    }
 
     if ((getStartDate() > 0) && logger.isInfoEnabled()) {
       SplashScreen shutdownScreen = buildShutdownSplash();
@@ -722,17 +709,6 @@ public class DefaultMuleContext implements MuleContext {
     return startDate;
   }
 
-  /**
-   * Returns the Expression Manager configured for this instance of Mule
-   *
-   * @return the Expression Manager configured for this instance of Mule
-   * @see org.mule.runtime.core.api.expression.ExpressionManager
-   */
-  @Override
-  public ExpressionManager getExpressionManager() {
-    return expressionManager;
-  }
-
   @Override
   public void setExecutionClassLoader(ClassLoader cl) {
     this.executionClassLoader = cl;
@@ -882,10 +858,22 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public ExpressionLanguage getExpressionLanguage() {
-    if (this.expressionLanguage == null) {
-      this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    if (expressionLanguage == null) {
+      if (Initialisable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase())) {
+        // Transports need expression language during object construction so we need to ensure it's initilized as lifecyce
+        // ordering doesn't help in this case.  The first time the expression language is initialized it won't have been
+        // initialized with any extensions, but spring will eventually re-initialize the same instance and expression language
+        // extensions will be applied at this point.
+        this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+        try {
+          initialiseIfNeeded(expressionLanguage);
+        } catch (InitialisationException e) {
+          throw new MuleRuntimeException(e);
+        }
+      } else {
+        this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+      }
     }
-
     return this.expressionLanguage;
   }
 
@@ -943,10 +931,6 @@ public class DefaultMuleContext implements MuleContext {
 
   public void setLifecycleManager(MuleContextLifecycleManager lifecyleManager) {
     this.lifecycleManager = lifecyleManager;
-  }
-
-  public void setExpressionManager(DefaultExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
   }
 
   public void setRegistryBroker(DefaultRegistryBroker registryBroker) {

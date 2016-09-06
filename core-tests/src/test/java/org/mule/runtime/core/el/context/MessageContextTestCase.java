@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.el.context;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -25,6 +27,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.message.Correlation;
 
 import org.junit.Before;
@@ -35,19 +38,17 @@ public class MessageContextTestCase extends AbstractELTestCase {
   private MuleEvent event;
   private MuleMessage message;
 
-  public MessageContextTestCase(Variant variant, String mvelOptimizer) {
-    super(variant, mvelOptimizer);
+  public MessageContextTestCase(String mvelOptimizer) {
+    super(mvelOptimizer);
   }
 
   @Before
   public void setup() {
     event = mock(MuleEvent.class);
+    when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
+    when(event.getError()).thenReturn(empty());
     message = spy(MuleMessage.builder().nullPayload().build());
     when(event.getCorrelation()).thenReturn(mock(Correlation.class));
-    doAnswer(invocation -> {
-      message = (MuleMessage) invocation.getArguments()[0];
-      return null;
-    }).when(event).setMessage(any(MuleMessage.class));
     when(event.getMessage()).thenAnswer(invocation -> message);
   }
 
@@ -94,7 +95,6 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void payload() throws Exception {
-    MuleEvent event = mock(MuleEvent.class);
     MuleMessage message = mock(MuleMessage.class);
     when(event.getMessage()).thenReturn(message);
     Object payload = new Object();
@@ -105,8 +105,9 @@ public class MessageContextTestCase extends AbstractELTestCase {
   @Test
   public void assignPayload() throws Exception {
     message = MuleMessage.builder().payload("").build();
-    evaluate("message.payload = 'foo'", event);
-    assertEquals("foo", event.getMessage().getPayload());
+    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    evaluate("message.payload = 'foo'", event, eventBuilder);
+    assertThat(eventBuilder.build().getMessage().getPayload(), equalTo("foo"));
   }
 
   @Test

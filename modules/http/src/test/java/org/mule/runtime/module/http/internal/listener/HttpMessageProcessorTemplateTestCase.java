@@ -20,21 +20,24 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -124,12 +127,14 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
     assertThat(httpResponseCaptor.getValue().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
   }
 
-  private MuleEvent createMockEvent() throws MuleException {
+  private MuleEvent createMockEvent() throws Exception {
     MuleMessage testMessage = MuleMessage.builder().payload("").build();
 
-    MuleEvent testEvent = mock(MuleEvent.class);
-    when(testEvent.getMessage()).thenReturn(testMessage);
-    when(testEvent.getMessageAsBytes(muleContext)).thenReturn("".getBytes(UTF_8));
+    MuleEvent testEvent =
+        spy(MuleEvent.builder(DefaultMessageContext.create(MuleTestUtils.getTestFlow(muleContext), TEST_CONNECTOR))
+            .message(testMessage).build());
+    when(muleContext.getTransformationService().transform(any(MuleMessage.class), any(DataType.class)))
+        .thenReturn(MuleMessage.builder().payload("".getBytes(UTF_8)).build());
     return testEvent;
   }
 

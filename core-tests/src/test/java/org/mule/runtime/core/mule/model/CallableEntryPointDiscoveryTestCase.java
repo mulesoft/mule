@@ -8,7 +8,10 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestEventContext;
 
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.CallableEntryPointResolver;
 import org.mule.tck.MuleTestUtils;
@@ -23,8 +26,8 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
   @Test
   public void testBadMatch() throws Exception {
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
-    InvocationResult result = resolver
-        .invoke(new WaterMelon(), MuleTestUtils.getTestEventContext(new StringBuilder("foo"), REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext(new StringBuilder("foo"), REQUEST_RESPONSE, muleContext);
+    InvocationResult result = resolver.invoke(new WaterMelon(), eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals("Service doesn't implement Callable", result.getState(), InvocationResult.State.NOT_SUPPORTED);
   }
 
@@ -33,7 +36,8 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
     final Apple apple = new Apple();
     apple.setMuleContext(muleContext);
-    InvocationResult result = resolver.invoke(apple, MuleTestUtils.getTestEventContext("blah", REQUEST_RESPONSE, muleContext));
+    MuleEventContext eventContext = getTestEventContext(new StringBuilder("blah"), REQUEST_RESPONSE, muleContext);
+    InvocationResult result = resolver.invoke(apple, eventContext, MuleEvent.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 }

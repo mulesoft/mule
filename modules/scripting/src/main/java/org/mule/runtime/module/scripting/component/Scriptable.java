@@ -188,8 +188,8 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     if (properties != null) {
       for (Entry entry : properties.entrySet()) {
         String value = (String) entry.getValue();
-        if (muleContext.getExpressionManager().isExpression(value)) {
-          bindings.put((String) entry.getKey(), muleContext.getExpressionManager().parse(value, event, flow));
+        if (muleContext.getExpressionLanguage().isExpression(value)) {
+          bindings.put((String) entry.getKey(), muleContext.getExpressionLanguage().parse(value, event, flow));
         } else {
           bindings.put((String) entry.getKey(), value);
         }
@@ -206,17 +206,17 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     bindings.put(BINDING_REGISTRY, muleContext.getRegistry());
   }
 
-  public void populateBindings(Bindings bindings, MuleEvent event) {
+  public void populateBindings(Bindings bindings, MuleEvent event, MuleEvent.Builder eventBuilder) {
     populatePropertyBindings(bindings, event);
     populateDefaultBindings(bindings);
-    populateMessageBindings(bindings, event);
+    populateMessageBindings(bindings, event, eventBuilder);
 
     bindings.put(BINDING_EVENT_CONTEXT, new DefaultMuleEventContext(flow, event));
     bindings.put(BINDING_ID, event.getId());
     bindings.put(BINDING_FLOW_CONSTRUCT, flow);
   }
 
-  protected void populateMessageBindings(Bindings bindings, MuleEvent event) {
+  protected void populateMessageBindings(Bindings bindings, MuleEvent event, MuleEvent.Builder eventBuilder) {
     MuleMessage message = event.getMessage();
 
     populateVariablesInOrder(bindings, event);
@@ -229,11 +229,11 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     // For backward compatability
     bindings.put(BINDING_SRC, message.getPayload());
 
-    populateHeadersVariablesAndException(bindings, event);
+    populateHeadersVariablesAndException(bindings, event, eventBuilder);
   }
 
-  private void populateHeadersVariablesAndException(Bindings bindings, MuleEvent event) {
-    bindings.put(BINDING_FLOW_VARS, new FlowVariableMapContext(event));
+  private void populateHeadersVariablesAndException(Bindings bindings, MuleEvent event, MuleEvent.Builder eventBuilder) {
+    bindings.put(BINDING_FLOW_VARS, new FlowVariableMapContext(event, eventBuilder));
     bindings.put(BINDING_SESSION_VARS, new SessionVariableMapContext(event.getSession()));
 
     // Only add exception is present

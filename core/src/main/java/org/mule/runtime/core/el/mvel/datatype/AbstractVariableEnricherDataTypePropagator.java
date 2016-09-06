@@ -7,8 +7,6 @@
 
 package org.mule.runtime.core.el.mvel.datatype;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.metadata.TypedValue;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.AssignmentNode;
 import org.mule.mvel2.ast.DeepAssignmentNode;
@@ -18,6 +16,8 @@ import org.mule.mvel2.compiler.ExecutableLiteral;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessor;
 import org.mule.mvel2.optimizers.impl.refl.nodes.MapAccessorNest;
 import org.mule.mvel2.optimizers.impl.refl.nodes.VariableAccessor;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.metadata.TypedValue;
 
 import java.lang.reflect.Field;
 
@@ -45,7 +45,7 @@ public abstract class AbstractVariableEnricherDataTypePropagator extends Abstrac
   }
 
   @Override
-  protected boolean doPropagate(MuleEvent event, TypedValue typedValue, ASTNode node) {
+  protected boolean doPropagate(MuleEvent event, MuleEvent.Builder builder, TypedValue typedValue, ASTNode node) {
     if (isAssignmentNode(node)) {
       CompiledAccExpression compiledAccExpression = getCompiledAccExpression(node);
 
@@ -67,7 +67,7 @@ public abstract class AbstractVariableEnricherDataTypePropagator extends Abstrac
 
             if (propertyName != null && containsVariable(event, propertyName)) {
               propertyName = getUnescapedPropertyName(propertyName);
-              addVariable(event, typedValue, propertyName);
+              addVariable(event, builder, typedValue, propertyName);
               return true;
             }
           }
@@ -78,7 +78,7 @@ public abstract class AbstractVariableEnricherDataTypePropagator extends Abstrac
     return false;
   }
 
-  protected abstract void addVariable(MuleEvent event, TypedValue typedValue, String propertyName);
+  protected abstract void addVariable(MuleEvent event, MuleEvent.Builder builder, TypedValue typedValue, String propertyName);
 
   protected abstract boolean containsVariable(MuleEvent event, String propertyName);
 

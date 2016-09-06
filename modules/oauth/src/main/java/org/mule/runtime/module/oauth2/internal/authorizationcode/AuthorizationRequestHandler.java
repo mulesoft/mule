@@ -7,9 +7,11 @@
 package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -45,7 +47,7 @@ public class AuthorizationRequestHandler implements MuleContextAware {
   private String state;
   private String localAuthorizationUrl;
   private String authorizationUrl;
-  private Map<String, String> customParameters = new HashMap<String, String>();
+  private Map<String, String> customParameters = new HashMap<>();
   private HttpListener listener;
   private MuleContext muleContext;
   private AuthorizationCodeGrantType oauthConfig;
@@ -77,7 +79,7 @@ public class AuthorizationRequestHandler implements MuleContextAware {
 
   public void init() throws MuleException {
     try {
-      stateEvaluator = new AttributeEvaluator(state).initialize(muleContext.getExpressionManager());
+      stateEvaluator = new AttributeEvaluator(state).initialize(muleContext.getExpressionLanguage());
       final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(muleContext);
       final String flowName = "authorization-request-handler-" + localAuthorizationUrl;
       final Flow flow = DynamicFlowFactory.createDynamicFlow(muleContext, flowName, createLocalAuthorizationUrlListener());
@@ -95,32 +97,30 @@ public class AuthorizationRequestHandler implements MuleContextAware {
   }
 
   private List<MessageProcessor> createLocalAuthorizationUrlListener() {
-    final MessageProcessor listenerMessageProcessor = new MessageProcessor() {
+    final MessageProcessor listenerMessageProcessor = muleEvent -> {
+      final Builder builder = MuleEvent.builder(muleEvent);
 
-      @Override
-      public MuleEvent process(MuleEvent muleEvent) throws MuleException {
-        final String onCompleteRedirectToValue =
-            ((Map<String, String>) muleEvent.getMessage().getInboundProperty("http.query.params")).get("onCompleteRedirectTo");
-        final String resourceOwnerId =
-            getOauthConfig().getLocalAuthorizationUrlResourceOwnerIdEvaluator().resolveStringValue(muleEvent);
-        muleEvent.setFlowVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId);
-        final String stateValue = stateEvaluator.resolveStringValue(muleEvent);
-        final StateEncoder stateEncoder = new StateEncoder(stateValue);
-        if (resourceOwnerId != null) {
-          stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
-        }
-        if (onCompleteRedirectToValue != null) {
-          stateEncoder.encodeOnCompleteRedirectToInState(onCompleteRedirectToValue);
-        }
-        final String authorizationUrlWithParams = new AuthorizationRequestUrlBuilder().setAuthorizationUrl(authorizationUrl)
-            .setClientId(oauthConfig.getClientId()).setClientSecret(oauthConfig.getClientSecret())
-            .setCustomParameters(customParameters).setRedirectUrl(oauthConfig.getRedirectionUrl())
-            .setState(stateEncoder.getEncodedState()).setScope(scopes).buildUrl();
-
-        muleEvent.setMessage(MuleMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION, authorizationUrlWithParams)
-            .build());
-        return muleEvent;
+      final String onCompleteRedirectToValue =
+          ((Map<String, String>) muleEvent.getMessage().getInboundProperty("http.query.params")).get("onCompleteRedirectTo");
+      final String resourceOwnerId =
+          getOauthConfig().getLocalAuthorizationUrlResourceOwnerIdEvaluator().resolveStringValue(muleEvent);
+      muleEvent = builder.addFlowVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();
+      final String stateValue = stateEvaluator.resolveStringValue(muleEvent);
+      final StateEncoder stateEncoder = new StateEncoder(stateValue);
+      if (resourceOwnerId != null) {
+        stateEncoder.encodeResourceOwnerIdInState(resourceOwnerId);
       }
+      if (onCompleteRedirectToValue != null) {
+        stateEncoder.encodeOnCompleteRedirectToInState(onCompleteRedirectToValue);
+      }
+      final String authorizationUrlWithParams = new AuthorizationRequestUrlBuilder().setAuthorizationUrl(authorizationUrl)
+          .setClientId(oauthConfig.getClientId()).setClientSecret(oauthConfig.getClientSecret())
+          .setCustomParameters(customParameters).setRedirectUrl(oauthConfig.getRedirectionUrl())
+          .setState(stateEncoder.getEncodedState()).setScope(scopes).buildUrl();
+
+      return builder
+          .message(MuleMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION, authorizationUrlWithParams).build())
+          .build();
     };
     return Arrays.asList(listenerMessageProcessor);
   }

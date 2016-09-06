@@ -12,13 +12,15 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.spy;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.expression.DefaultExpressionManager;
+import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.function.Function;
@@ -32,16 +34,15 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
       new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class), muleContext);
 
   private MuleEvent event;
-  private DefaultExpressionManager expressionManager;
+  private MVELExpressionLanguage expressionLanguage;
 
   @Override
   protected void doSetUp() throws Exception {
     event = getTestEvent("test");
-    expressionManager = spy((DefaultExpressionManager) muleContext.getExpressionManager());
+    expressionLanguage = spy((MVELExpressionLanguage) muleContext.getExpressionLanguage());
     DefaultMuleContext defaultMuleContext = (DefaultMuleContext) muleContext;
-    defaultMuleContext.setExpressionManager(expressionManager);
+    defaultMuleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
   }
-
 
   @Test
   public void testEqualExpressionFunctions() {

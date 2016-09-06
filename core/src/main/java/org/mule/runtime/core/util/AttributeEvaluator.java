@@ -9,7 +9,7 @@ package org.mule.runtime.core.util;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.expression.ExpressionManager;
+import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.TypedValue;
 
@@ -28,15 +28,15 @@ public class AttributeEvaluator {
   }
 
   private final String attributeValue;
-  private ExpressionManager expressionManager;
+  private ExpressionLanguage expressionLanguage;
   private AttributeType attributeType;
 
   public AttributeEvaluator(String attributeValue) {
     this.attributeValue = attributeValue;
   }
 
-  public AttributeEvaluator initialize(final ExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
+  public AttributeEvaluator initialize(final ExpressionLanguage expressionLanguage) {
+    this.expressionLanguage = expressionLanguage;
     resolveAttributeType();
     return this;
   }
@@ -68,11 +68,11 @@ public class AttributeEvaluator {
     return attributeType.equals(AttributeType.PARSE_EXPRESSION);
   }
 
-  public TypedValue resolveTypedValue(MuleEvent event) {
+  public TypedValue resolveTypedValue(MuleEvent event, MuleEvent.Builder eventBuilder) {
     if (isExpression()) {
-      return expressionManager.evaluateTyped(attributeValue, event, null);
+      return expressionLanguage.evaluateTyped(attributeValue, event, eventBuilder, null);
     } else if (isParseExpression()) {
-      final String value = expressionManager.parse(attributeValue, event, null);
+      final String value = expressionLanguage.parse(attributeValue, event, null);
       return new TypedValue(value, DataType.builder().type(String.class).build());
     } else {
       Class<?> type = attributeValue == null ? Object.class : String.class;
@@ -82,9 +82,9 @@ public class AttributeEvaluator {
 
   public Object resolveValue(MuleEvent event) {
     if (isExpression()) {
-      return expressionManager.evaluate(attributeValue, event, null);
+      return expressionLanguage.evaluate(attributeValue, event, null);
     } else if (isParseExpression()) {
-      return expressionManager.parse(attributeValue, event, null);
+      return expressionLanguage.parse(attributeValue, event, null);
     } else {
       return attributeValue;
     }
