@@ -10,19 +10,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
@@ -35,8 +35,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContextTestCase {
 
@@ -68,12 +66,12 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
   @Test
   public void nonMultiPartPayloadToAttachment() throws Exception {
-    expected.expect(TransformerMessagingException.class);
+    expected.expect(MessageTransformerException.class);
     mp2a.transform("", MuleEvent.builder(context).message(getTestMuleMessage()).flow(flow).build());
   }
 
   @Test
-  public void multiPartWithBody() throws TransformerMessagingException, Exception {
+  public void multiPartWithBody() throws MessageTransformerException {
     final MuleMessage attachmentPart = MuleMessage.builder().payload("this is the attachment").mediaType(MediaType.TEXT)
         .attributes(new PartAttributes("attachment")).build();
 
@@ -91,7 +89,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   }
 
   @Test
-  public void multiPartWithoutBody() throws TransformerMessagingException, Exception {
+  public void multiPartWithoutBody() throws MessageTransformerException {
     final MuleMessage attachment1Part = MuleMessage.builder().payload("this is the attachment1").mediaType(MediaType.TEXT)
         .attributes(new PartAttributes("attachment1")).build();
     final MuleMessage attachment2Part = MuleMessage.builder().payload("this is the attachment2").mediaType(MediaType.TEXT)
@@ -109,7 +107,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   }
 
   @Test
-  public void attachmentsWithPayload() throws TransformerMessagingException, Exception {
+  public void attachmentsWithPayload() throws MessageTransformerException {
     final DataHandler attDH = mock(DataHandler.class);
     when(attDH.getContentType()).thenReturn(MediaType.TEXT.toRfcString());
     final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addInboundAttachment("attachment", attDH).build();
@@ -124,7 +122,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   }
 
   @Test
-  public void attachmentsWithoutPayload() throws TransformerMessagingException, Exception {
+  public void attachmentsWithoutPayload() throws MessageTransformerException {
     final DataHandler attDH = mock(DataHandler.class);
     when(attDH.getContentType()).thenReturn(MediaType.TEXT.toRfcString());
     final MuleMessage message = MuleMessage.builder().nullPayload().addInboundAttachment("attachment", attDH).build();

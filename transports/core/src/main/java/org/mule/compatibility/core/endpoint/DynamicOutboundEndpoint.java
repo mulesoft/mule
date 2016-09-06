@@ -117,7 +117,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint {
     try {
       return dynamicURIBuilder.build(event);
     } catch (Exception e) {
-      throw new DispatchException(event, this, e);
+      throw new DispatchException(this, e);
     }
   }
 

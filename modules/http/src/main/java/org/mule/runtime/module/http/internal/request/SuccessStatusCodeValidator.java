@@ -28,7 +28,7 @@ public class SuccessStatusCodeValidator extends RangeStatusCodeValidator {
     int status = responseEvent.getMessage().getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
 
     if (!belongs(status)) {
-      throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status), responseEvent);
+      throw new ResponseValidatorException(String.format("Response code %d mapped as failure", status));
     }
   }
 

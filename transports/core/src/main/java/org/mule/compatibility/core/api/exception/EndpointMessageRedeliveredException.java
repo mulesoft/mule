@@ -61,3 +61,4 @@ public class EndpointMessageRedeliveredException extends MessageRedeliveredExcep
     return endpoint;
   }
 }
+

@@ -142,7 +142,7 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
 
       return event;
     } catch (Exception e) {
-      throw new DispatchException(JmsMessages.failedToCreateAndDispatchResponse(replyToDestination), event, null, e);
+      throw new DispatchException(JmsMessages.failedToCreateAndDispatchResponse(replyToDestination), null, e);
     } finally {
       jmsConnector.closeQuietly(replyToProducer);
       jmsConnector.closeSessionIfNoTransactionActive(session);

@@ -2194,7 +2194,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
       } catch (DispatchException dex) {
         throw dex;
       } catch (MuleException ex) {
-        throw new DispatchException(event, endpoint, ex);
+        throw new DispatchException(endpoint, ex);
       } finally {
         returnDispatcher(endpoint, dispatcher);
       }

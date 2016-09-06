@@ -462,7 +462,7 @@ public class FileConnector extends AbstractConnector {
 
       return new FileOutputStream(file, isOutputAppend());
     } catch (IOException e) {
-      throw new DispatchException(CoreMessages.streamingFailedNoStream(), event, endpoint, e);
+      throw new DispatchException(CoreMessages.streamingFailedNoStream(), endpoint, e);
     }
   }
 

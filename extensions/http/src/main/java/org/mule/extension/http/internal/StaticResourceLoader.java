@@ -98,7 +98,7 @@ public class StaticResourceLoader {
       return result;
     } catch (IOException e) {
       throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBasePath + path)),
-                                          event, e);
+                                          e);
     } finally {
       IOUtils.closeQuietly(in);
     }

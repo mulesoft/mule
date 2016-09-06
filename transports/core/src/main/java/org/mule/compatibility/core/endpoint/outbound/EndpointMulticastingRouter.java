@@ -69,16 +69,16 @@ public final class EndpointMulticastingRouter extends MulticastingRouter {
         EndpointURI endpointURI = ep.getEndpointURI();
         if (endpointURI != null && !newUri.getScheme().equalsIgnoreCase(endpointURI.getScheme())) {
           throw new CouldNotRouteOutboundMessageException(CoreMessages
-              .schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(), newUri.getScheme()), event, ep);
+              .schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(), newUri.getScheme()), ep);
         }
         newUri.initialise();
 
         return new DynamicURIOutboundEndpoint(ep, newUri);
       } catch (EndpointException e) {
-        throw new CouldNotRouteOutboundMessageException(CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), event,
+        throw new CouldNotRouteOutboundMessageException(CoreMessages.templateCausedMalformedEndpoint(uri, newUriString),
                                                         ep, e);
       } catch (InitialisationException e) {
-        throw new CouldNotRouteOutboundMessageException(CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), event,
+        throw new CouldNotRouteOutboundMessageException(CoreMessages.templateCausedMalformedEndpoint(uri, newUriString),
                                                         ep, e);
       }
     }

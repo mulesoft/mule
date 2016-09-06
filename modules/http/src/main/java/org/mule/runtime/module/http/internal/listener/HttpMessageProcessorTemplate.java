@@ -10,11 +10,11 @@ import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapp
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
@@ -144,8 +144,9 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
                                           ResponseCompletionCallback responseCompletationCallback)
       throws MuleException {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
+    Throwable cause = messagingException instanceof SecurityException ? messagingException : messagingException.getCause();
     String exceptionStatusCode =
-        getTransportErrorMapping(HTTP.getScheme(), messagingException.getClass(), responseBuilder.getMuleContext());
+        getTransportErrorMapping(HTTP.getScheme(), cause.getClass(), responseBuilder.getMuleContext());
     Integer statusCodeFromException =
         exceptionStatusCode != null ? Integer.valueOf(exceptionStatusCode) : INTERNAL_SERVER_ERROR_STATUS_CODE;
     final org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder failureResponseBuilder =

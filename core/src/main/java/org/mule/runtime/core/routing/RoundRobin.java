@@ -11,7 +11,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,17 +28,17 @@ public class RoundRobin extends AbstractOutboundRouter {
    * Process the event using the next target route in sequence
    */
   @Override
-  public MuleEvent route(MuleEvent event) throws MessagingException {
+  public MuleEvent route(MuleEvent event) throws MuleException {
     int modulo = getAndIncrementModuloN(routes.size());
     if (modulo < 0) {
-      throw new CouldNotRouteOutboundMessageException(event, this);
+      throw new CouldNotRouteOutboundMessageException(this);
     }
 
     MessageProcessor mp = routes.get(modulo);
     try {
       return doProcessRoute(mp, event);
     } catch (MuleException ex) {
-      throw new RoutingException(event, this, ex);
+      throw new RoutingException(this, ex);
     }
   }
 

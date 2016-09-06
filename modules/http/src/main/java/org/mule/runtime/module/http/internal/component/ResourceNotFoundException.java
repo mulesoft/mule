@@ -6,23 +6,21 @@
  */
 package org.mule.runtime.module.http.internal.component;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * Thrown when a static file is requested but not found
  */
-public class ResourceNotFoundException extends MessagingException {
+public class ResourceNotFoundException extends MuleException {
 
   private static final long serialVersionUID = -6693780652453067693L;
 
-  public ResourceNotFoundException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
-    super(message, event, failingMessageProcessor);
+  public ResourceNotFoundException(Message message) {
+    super(message);
   }
 
-  public ResourceNotFoundException(Message message, MuleEvent event, Throwable cause) {
-    super(message, event, cause);
+  public ResourceNotFoundException(Message message, Throwable cause) {
+    super(message, cause);
   }
 }

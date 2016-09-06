@@ -6,37 +6,35 @@
  */
 package org.mule.runtime.core.api.routing.filter;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
 
-public class FilterUnacceptedException extends MessagingException {
+public class FilterUnacceptedException extends MuleException {
 
   private static final long serialVersionUID = -1828111078295716525L;
 
   private transient Filter filter;
 
-  public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, MessageProcessor failingMessageProcessor) {
-    super(message, event, failingMessageProcessor);
+  public FilterUnacceptedException(Message message, Filter filter) {
+    super(message);
     this.filter = filter;
     addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
   }
 
-  public FilterUnacceptedException(Message message, MuleEvent event, Filter filter, Throwable cause) {
-    super(message, event, cause);
+  public FilterUnacceptedException(Message message, Filter filter, Throwable cause) {
+    super(message, cause);
     this.filter = filter;
     addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
   }
 
-  public FilterUnacceptedException(Message message, MuleEvent event, Throwable cause) {
-    super(message, event, cause);
+  public FilterUnacceptedException(Message message, Throwable cause) {
+    super(message, cause);
   }
 
-  public FilterUnacceptedException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
-    super(message, event, failingMessageProcessor);
+  public FilterUnacceptedException(Message message) {
+    super(message);
   }
 
   public Filter getFilter() {

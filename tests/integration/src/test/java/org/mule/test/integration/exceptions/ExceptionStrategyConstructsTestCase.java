@@ -6,18 +6,21 @@
  */
 package org.mule.test.integration.exceptions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.either;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.ExceptionMessage;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -43,12 +46,12 @@ public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTest
   }
 
   private void assertExceptionMessage(MuleMessage out) {
-    assertNotNull(out);
-    assertTrue(out.getPayload() instanceof ExceptionMessage);
+    assertThat(out, notNullValue());
+    assertThat(out.getPayload(), instanceOf(ExceptionMessage.class));
     ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
-    assertTrue(exceptionMessage.getException().getClass() == FunctionalTestException.class
-        || exceptionMessage.getException().getCause().getClass() == FunctionalTestException.class);
-    assertEquals("test", exceptionMessage.getPayload());
+    Class clazz = FunctionalTestException.class;
+    assertThat(exceptionMessage.getException(), either(hasCause(instanceOf(clazz))).or(hasCause(hasCause(instanceOf(clazz)))));
+    assertThat(exceptionMessage.getPayload(), is("test"));
   }
 
   public static class ExceptionThrowingProcessor implements MessageProcessor {

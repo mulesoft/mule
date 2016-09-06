@@ -9,7 +9,7 @@ package org.mule.runtime.core.exception;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.config.ComponentIdentifier;
 

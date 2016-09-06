@@ -7,6 +7,9 @@
 package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
+import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
@@ -23,14 +26,8 @@ import java.util.Map;
  */
 public class ErrorTypeRepository {
 
-  public static final String TRANSFORMATION_ERROR_IDENTIFIER = "TRANSFORMATION";
-  public static final String EXPRESSION_ERROR_IDENTIFIER = "EXPRESSION";
-  public static final String REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER = "REDELIVERY_EXHAUSTED";
-  public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
-  public static final String ANY_IDENTIFIER = "ANY";
-  public static final String CORE_NAMESPACE_NAME = "mule";
-
   protected static final ErrorType ANY_ERROR_TYPE =
+
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build();
   private static final ErrorType UNKNOWN_ERROR_TYPE =
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(UNKNOWN_ERROR_IDENTIFIER)

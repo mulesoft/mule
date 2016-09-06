@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate;
 
 import java.lang.reflect.Method;
@@ -107,8 +108,11 @@ public class MuleInvoker implements Invoker {
           if (cause instanceof ScriptException && cause.getCause() != null) {
             cause = cause.getCause();
           }
-        } else if (e instanceof ComponentException) {
+        } else if (e instanceof MessagingException && e.getCause() != null) {
           cause = e.getCause();
+          if (cause instanceof ComponentException) {
+            cause = cause.getCause();
+          }
         }
 
         throw new Fault(cause);

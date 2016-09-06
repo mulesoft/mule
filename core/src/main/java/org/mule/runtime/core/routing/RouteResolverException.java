@@ -6,28 +6,25 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.routing.RoutingFailedMessagingException;
 
 import java.lang.Throwable;
 
 /**
  * Exception thrown when a route for an event can not be found
  */
-public class RouteResolverException extends RoutingFailedMessagingException {
+public class RouteResolverException extends RoutingFailedException {
 
-  public RouteResolverException(MuleEvent event, Throwable cause) {
-    super(event, cause);
+  public RouteResolverException(Throwable cause) {
+    super(cause);
   }
 
-  public RouteResolverException(Message message, MuleEvent event, Throwable cause) {
-    super(message, event, cause);
+  public RouteResolverException(Message message, Throwable cause) {
+    super(message, cause);
   }
 
-  public RouteResolverException(Message message, MuleEvent event) {
-    super(message, event);
+  public RouteResolverException(Message message) {
+    super(message);
   }
 
 }

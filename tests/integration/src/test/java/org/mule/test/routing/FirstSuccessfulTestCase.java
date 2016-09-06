@@ -37,9 +37,9 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
     assertThat(getPayloadAsString(response), is("42 is a number"));
 
     try {
-      response = flowRunner("test-router").withPayload(Boolean.TRUE).run().getMessage();
+      flowRunner("test-router").withPayload(Boolean.TRUE).run().getMessage();
     } catch (MessagingException e) {
-      assertThat(e, instanceOf(CouldNotRouteOutboundMessageException.class));
+      assertThat(e.getCause(), instanceOf(CouldNotRouteOutboundMessageException.class));
     }
   }
 
@@ -52,7 +52,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testFirstSuccessfulWithExpressionAllFail() throws Exception {
     MessagingException e = flowRunner("test-router3").withPayload("XYZ").runExpectingException();
-    assertThat(e, instanceOf(CouldNotRouteOutboundMessageException.class));
+    assertThat(e.getCause(), instanceOf(CouldNotRouteOutboundMessageException.class));
   }
 
   @Test

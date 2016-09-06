@@ -31,6 +31,6 @@ public class ValidateSchemaWithValidationExtensionTestCase extends ExtensionFunc
   @Test
   public void validateInGroup() throws Exception {
     MessagingException e = flowRunner("validate").runExpectingException();
-    assertThat(e, is(instanceOf(ValidationException.class)));
+    assertThat(e.getCause(), is(instanceOf(ValidationException.class)));
   }
 }

@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -77,7 +77,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
     assertEquals(new Integer(3), transformedMessage);
   }
 
-  @Test(expected = TransformerMessagingException.class)
+  @Test(expected = MessageTransformerException.class)
   public void testIgnoreBadInputBreaksWithTransformationOrderInvalidValidWhenEnforcedOn() throws Exception {
     AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
     assertNotNull(invalidTransformer);

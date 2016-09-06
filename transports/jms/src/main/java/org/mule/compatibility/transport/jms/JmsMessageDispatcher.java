@@ -295,7 +295,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   private Message getJmsMessagePayload(MuleEvent event) throws DispatchException {
     Object message = event.getMessage().getPayload();
     if (!(message instanceof Message)) {
-      throw new DispatchException(JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()), event,
+      throw new DispatchException(JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()),
                                   getEndpoint());
     }
     return (Message) message;

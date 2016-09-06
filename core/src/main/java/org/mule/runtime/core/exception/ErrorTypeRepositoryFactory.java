@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.EXPRESSION_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.TRANSFORMATION_ERROR_IDENTIFIER;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
+import org.mule.runtime.api.message.ErrorType;
 
 /**
  * Factory for {@link ErrorTypeRepository}.
@@ -28,16 +31,13 @@ public class ErrorTypeRepositoryFactory {
    */
   public static ErrorTypeRepository createDefaultErrorTypeRepository() {
     ErrorTypeRepository errorTypeRepository = new ErrorTypeRepository();
-    errorTypeRepository.addErrorType(
-                                     new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME)
-                                         .withName(TRANSFORMATION_ERROR_IDENTIFIER).build(),
-                                     errorTypeRepository.getAnyErrorType());
-    errorTypeRepository.addErrorType(new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME)
-        .withName(EXPRESSION_ERROR_IDENTIFIER).build(), errorTypeRepository.getAnyErrorType());
-    errorTypeRepository.addErrorType(
-                                     new ComponentIdentifier.Builder().withNamespace(CORE_NAMESPACE_NAME)
-                                         .withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build(),
-                                     errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(TRANSFORMATION, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(EXPRESSION, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(REDELIVERY_EXHAUSTED, errorTypeRepository.getAnyErrorType());
+    ErrorType connectivityErrorType = errorTypeRepository.addErrorType(CONNECTIVITY, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(RETRY_EXHAUSTED, connectivityErrorType);
+    errorTypeRepository.addErrorType(ROUTING, errorTypeRepository.getAnyErrorType());
+    errorTypeRepository.addErrorType(SECURITY, errorTypeRepository.getAnyErrorType());
     return errorTypeRepository;
   }
 

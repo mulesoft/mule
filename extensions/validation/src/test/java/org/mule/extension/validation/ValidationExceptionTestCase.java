@@ -6,12 +6,14 @@
  */
 package org.mule.extension.validation;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,8 +59,9 @@ public class ValidationExceptionTestCase extends ValidationTestCase {
   }
 
   private void assertCustomExceptionFactory(String flowName) throws Exception {
-    expectedException.expect(instanceOf(ValidationException.class));
-    expectedException.expectMessage(MESSAGE_FAILED);
+    expectedException.expect(instanceOf(MessagingException.class));
+    expectedException.expectCause(instanceOf(ValidationException.class));
+    expectedException.expectMessage(containsString(MESSAGE_FAILED));
     flowRunner(flowName).run();
   }
 
@@ -66,12 +69,12 @@ public class ValidationExceptionTestCase extends ValidationTestCase {
 
     @Override
     public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, MuleEvent event) {
-      return (T) new ValidationException(error(MESSAGE_FAILED), event);
+      return (T) new ValidationException(error(MESSAGE_FAILED));
     }
 
     @Override
     public Exception createException(ValidationResult result, String exceptionClassName, MuleEvent event) {
-      return new ValidationException(error(MESSAGE_FAILED), event);
+      return new ValidationException(error(MESSAGE_FAILED));
     }
   }
 }

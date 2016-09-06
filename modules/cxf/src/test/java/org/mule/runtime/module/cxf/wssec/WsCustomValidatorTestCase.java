@@ -9,6 +9,7 @@ package org.mule.runtime.module.cxf.wssec;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
@@ -45,7 +46,7 @@ public class WsCustomValidatorTestCase extends FunctionalTestCase {
   @Test
   public void testFailAuthentication() throws Exception {
     ClientPasswordCallback.setPassword("wrongPassword");
-    expectedException.expectCause(instanceOf(SOAPFaultException.class));
+    expectedException.expectCause(hasCause(instanceOf(SOAPFaultException.class)));
     expectedException.expectMessage("The security token could not be authenticated");
     flowRunner("cxfClient").withPayload("hello").run();
   }

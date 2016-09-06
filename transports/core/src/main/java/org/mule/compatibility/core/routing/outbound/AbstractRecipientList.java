@@ -66,7 +66,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
           sendRequest(event, createEventToRoute(event, request), endpoint, false);
         }
       } catch (MuleException e) {
-        throw new CouldNotRouteOutboundMessageException(event, endpoint, e);
+        throw new CouldNotRouteOutboundMessageException(endpoint, e);
       }
     }
 

@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
@@ -21,11 +20,11 @@ public class ResponseTimeoutException extends RoutingException {
    */
   private static final long serialVersionUID = 6882278747922113240L;
 
-  public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target) {
-    super(message, event, target);
+  public ResponseTimeoutException(Message message, MessageProcessor target) {
+    super(message, target);
   }
 
-  public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target, Throwable cause) {
-    super(message, event, target, cause);
+  public ResponseTimeoutException(Message message, MessageProcessor target, Throwable cause) {
+    super(message, target, cause);
   }
 }

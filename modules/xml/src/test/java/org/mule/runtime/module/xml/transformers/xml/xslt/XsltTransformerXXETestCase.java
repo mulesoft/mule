@@ -7,14 +7,18 @@
 package org.mule.runtime.module.xml.transformers.xml.xslt;
 
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.Matchers.instanceOf;
 
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * This test case validates that by default the XSLT transformer is not vulnerable to External Entity Processing attack unless
@@ -25,26 +29,35 @@ import org.junit.Test;
  */
 public class XsltTransformerXXETestCase extends FunctionalTestCase {
 
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
   @Override
   protected String getConfigFile() {
     return "xslt-xxe-config.xml";
   }
 
-  @Test(expected = TransformerMessagingException.class)
+  @Test
   public void xxeAsStream() throws Exception {
     String input = this.makeInput();
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(MessageTransformerException.class));
     this.flowRunner("safeXxe").withPayload(new ByteArrayInputStream(input.getBytes())).run().getMessage().getPayload();
   }
 
-  @Test(expected = TransformerMessagingException.class)
+  @Test
   public void xxeAsString() throws Exception {
     String input = this.makeInput();
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(MessageTransformerException.class));
     this.flowRunner("safeXxe").withPayload(input).run().getMessage().getPayload();
   }
 
-  @Test(expected = TransformerMessagingException.class)
+  @Test
   public void xxeAsByteArray() throws Exception {
     String input = this.makeInput();
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(MessageTransformerException.class));
     this.flowRunner("safeXxe").withPayload(input.getBytes()).run().getMessage().getPayload();
   }
 

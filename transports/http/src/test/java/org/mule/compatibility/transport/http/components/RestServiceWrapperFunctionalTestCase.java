@@ -6,10 +6,13 @@
  */
 package org.mule.compatibility.transport.http.components;
 
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleMessage;
@@ -47,9 +50,9 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
   public void testErrorExpressionOnRegexFilterFail() throws Exception {
     MuleMessage result =
         muleContext.getClient().send("restServiceEndpoint", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
-    assertNotNull(result);
-    assertNotNull(result.getExceptionPayload());
-    assertEquals(RestServiceException.class, result.getExceptionPayload().getException().getClass());
+    assertThat(result, notNullValue());
+    assertThat(result.getExceptionPayload(), notNullValue());
+    assertThat(result.getExceptionPayload().getException(), hasCause(instanceOf(RestServiceException.class)));
   }
 
   @Test
@@ -83,9 +86,9 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
   public void testRequiredParametersMissing() throws Exception {
     MuleMessage result =
         muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().nullPayload().build()).getRight();
-    assertNotNull(result);
-    assertNotNull(result.getExceptionPayload());
-    assertEquals(ComponentException.class, result.getExceptionPayload().getException().getClass());
+    assertThat(result, notNullValue());
+    assertThat(result.getExceptionPayload(), notNullValue());
+    assertThat(result.getExceptionPayload().getException(), hasCause(instanceOf(ComponentException.class)));
   }
 
   @Test

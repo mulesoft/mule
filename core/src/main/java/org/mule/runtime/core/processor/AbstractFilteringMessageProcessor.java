@@ -69,7 +69,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
   }
 
   protected MuleException filterUnacceptedException(MuleEvent event) {
-    return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, this);
+    return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter());
   }
 
   public MessageProcessor getUnacceptedMessageProcessor() {

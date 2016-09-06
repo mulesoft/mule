@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
-public class ResponseValidatorException extends MessagingException {
+public class ResponseValidatorException extends MuleException {
 
-  public ResponseValidatorException(String message, MuleEvent event) {
-    super(CoreMessages.createStaticMessage(message), event);
+  public ResponseValidatorException(String message) {
+    super(CoreMessages.createStaticMessage(message));
   }
 }

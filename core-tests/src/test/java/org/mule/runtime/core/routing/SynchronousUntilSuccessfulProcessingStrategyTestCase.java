@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,7 +28,6 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -89,10 +87,8 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     try {
       processingStrategy.route(event, getTestFlow());
       fail("processing should throw exception");
-    } catch (MessagingException e) {
-      assertThat(e, instanceOf(RoutingException.class));
+    } catch (RoutingException e) {
       verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(any(MuleEvent.class));
-      assertThat(getCurrentEvent(), sameInstance(e.getEvent()));
     }
   }
 
@@ -104,8 +100,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     try {
       processingStrategy.route(event, getTestFlow());
       fail("processing should throw exception");
-    } catch (MessagingException e) {
-      assertThat(e, instanceOf(RoutingException.class));
+    } catch (RoutingException e) {
       verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(any(MuleEvent.class));
       verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(MuleEvent.class),
                                                                                        any(MuleEvent.Builder.class));
@@ -135,7 +130,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     try {
       processingStrategy.route(event, getTestFlow());
       fail("processing should throw exception");
-    } catch (MessagingException e) {
+    } catch (RoutingException e) {
       assertThat(e, instanceOf(RoutingException.class));
       verify(mockRoute, times(DEFAULT_RETRIES + 1)).process(any(MuleEvent.class));
       verify(mockAlwaysTrueFailureExpressionFilter, times(DEFAULT_RETRIES + 1)).accept(any(MuleEvent.class),

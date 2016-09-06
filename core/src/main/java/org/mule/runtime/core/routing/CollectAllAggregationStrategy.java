@@ -37,7 +37,7 @@ public class CollectAllAggregationStrategy implements AggregationStrategy {
   }
 
   protected MuleEvent aggregateWithFailedRoutes(AggregationContext context) throws MuleException {
-    throw new CompositeRoutingException(context.getOriginalEvent(), context.collectRouteExceptions());
+    throw new CompositeRoutingException(context.collectRouteExceptions());
   }
 
 }

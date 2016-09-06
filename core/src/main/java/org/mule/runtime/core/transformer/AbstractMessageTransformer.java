@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
@@ -63,7 +63,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   public final Object transform(Object src, Charset enc) throws TransformerException {
     try {
       return transform(src, enc, null);
-    } catch (TransformerMessagingException e) {
+    } catch (MessageTransformerException e) {
       // Try to avoid double-wrapping
       Throwable cause = e.getCause();
       if (cause instanceof TransformerException) {
@@ -77,12 +77,12 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   }
 
   @Override
-  public Object transform(Object src, MuleEvent event) throws TransformerMessagingException {
+  public Object transform(Object src, MuleEvent event) throws MessageTransformerException {
     return transform(src, resolveEncoding(src), event);
   }
 
   @Override
-  public final Object transform(Object src, Charset enc, MuleEvent event) throws TransformerMessagingException {
+  public final Object transform(Object src, Charset enc, MuleEvent event) throws MessageTransformerException {
     DataType sourceType = DataType.fromType(src.getClass());
     if (!isSourceDataTypeSupported(sourceType)) {
       if (isIgnoreBadInput()) {
@@ -92,7 +92,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       } else {
         Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(), src.getClass());
         /// FIXME
-        throw new TransformerMessagingException(msg, event, this);
+        throw new MessageTransformerException(msg, this);
       }
     }
     if (logger.isDebugEnabled()) {
@@ -112,7 +112,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       message = MuleMessage.builder().payload(src).build();
     } else {
       if (event == null) {
-        throw new TransformerMessagingException(CoreMessages.noCurrentEventForTransformer(), event, this);
+        throw new MessageTransformerException(CoreMessages.noCurrentEventForTransformer(), this);
       }
       message = event.getMessage();
     }
@@ -128,7 +128,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     try {
       result = transformMessage(event, enc);
     } catch (TransformerException e) {
-      throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+      throw new MessageTransformerException(e.getI18nMessage(), this, e);
     }
 
     if (logger.isDebugEnabled()) {
@@ -142,7 +142,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Check if the return class is supported by this transformer
    */
-  protected Object checkReturnClass(Object object, MuleEvent event) throws TransformerMessagingException {
+  protected Object checkReturnClass(Object object, MuleEvent event) throws MessageTransformerException {
 
     // Null is a valid return type
     if (object == null && isAllowNullReturn()) {
@@ -152,7 +152,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     if (getReturnDataType() != null) {
       DataType dt = DataType.fromObject(object);
       if (!getReturnDataType().isCompatibleWith(dt)) {
-        throw new TransformerMessagingException(CoreMessages.transformUnexpectedType(dt, getReturnDataType()), event, this);
+        throw new MessageTransformerException(CoreMessages.transformUnexpectedType(dt, getReturnDataType()), this);
       }
     }
 

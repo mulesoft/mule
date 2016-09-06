@@ -95,12 +95,12 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
   }
 
   @Override
-  public MuleEvent route(MuleEvent event, FlowConstruct flow) throws MessagingException {
+  public MuleEvent route(MuleEvent event, FlowConstruct flow) throws MuleException {
     prepareAndValidateEvent(event);
     return doRoute(event, flow);
   }
 
-  protected abstract MuleEvent doRoute(final MuleEvent event, FlowConstruct flow) throws MessagingException;
+  protected abstract MuleEvent doRoute(final MuleEvent event, FlowConstruct flow) throws MuleException;
 
   private void prepareAndValidateEvent(final MuleEvent event) throws MessagingException {
     try {

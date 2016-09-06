@@ -7,7 +7,7 @@
 package org.mule.runtime.module.json.transformers;
 
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -70,7 +70,7 @@ public class JsonXsltTestCase extends AbstractMuleContextTestCase {
     JSONAssert.assertEquals(EXPECTED_JSON, jsonResponse, false);
   }
 
-  @Test(expected = TransformerMessagingException.class)
+  @Test(expected = MessageTransformerException.class)
   public void invalidInputShouldThrow() throws Exception {
     transformer.transform(new Object(), getTestEvent(MuleMessage.builder().nullPayload().build()));
   }

@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
-import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -37,7 +36,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
 
   @Override
   protected MuleEvent authenticateInbound(MuleEvent event)
-      throws SecurityException, UnauthorisedException, UnknownAuthenticationTypeException {
+      throws UnauthorisedException, UnknownAuthenticationTypeException {
     MuleMessage message = event.getMessage();
 
     String userId = (String) getCredentialsAccessor().getCredentials(event);
@@ -47,14 +46,14 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
       creds = event.getMessageAsBytes(muleContext);
       creds = strategy.decrypt(creds, null);
     } catch (Exception e1) {
-      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
+      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), e1);
     }
 
     Authentication authentication;
     try {
       authentication = new PGPAuthentication(userId, decodeMsgRaw(creds), event);
     } catch (Exception e1) {
-      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), event, e1);
+      throw new UnauthorisedException(CoreMessages.failedToReadPayload(), e1);
     }
 
     final Authentication authResult;
@@ -66,7 +65,7 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
         logger.debug("Authentication request for user: " + userId + " failed: " + e.toString());
       }
 
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(userId), event, e);
+      throw new UnauthorisedException(CoreMessages.authFailedForUser(userId), e);
     }
 
     // Authentication success

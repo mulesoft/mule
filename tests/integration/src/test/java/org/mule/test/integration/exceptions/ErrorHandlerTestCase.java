@@ -9,16 +9,31 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.registry.ResolverException;
+import org.mule.runtime.core.api.routing.ResponseTimeoutException;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.security.UnauthorisedException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.exception.MessageRedeliveredException;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.sql.SQLDataException;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,6 +42,9 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  private Message mockMessage = mock(Message.class);
+  private MessageProcessor mockMP = mock(MessageProcessor.class);
 
   @Override
   protected String getConfigFile() {
@@ -97,9 +115,61 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testMatchesCorrectExceptionUsingNoCause() throws Exception {
-    expectedException.expect(ComponentException.class);
-    expectedException.expectCause(instanceOf(ResolverException.class));
+    expectedException.expectCause(is(instanceOf(ComponentException.class)));
+    expectedException.expectCause(hasCause(instanceOf(ResolverException.class)));
     callAndThrowException(new ResolverException(CoreMessages.createStaticMessage("")), null);
+  }
+
+  @Test
+  public void transformation() throws Exception {
+    String expectedMessage = "0 transformation";
+    Transformer mockTransformer = mock(Transformer.class);
+    callTypeAndThrowException(new MessageTransformerException(mockMessage, mockTransformer), expectedMessage);
+    callTypeAndThrowException(new TransformerException(mockMessage, mockTransformer), expectedMessage);
+  }
+
+  @Test
+  public void expression() throws Exception {
+    callTypeAndThrowException(new ExpressionRuntimeException(mockMessage, new Exception()), "0 expression");
+  }
+
+  @Test
+  public void connectivity() throws Exception {
+    callTypeAndThrowException(new RetryPolicyExhaustedException(mockMessage, new Object()), "0 connectivity");
+  }
+
+  @Test
+  public void security() throws Exception {
+    callTypeAndThrowException(new UnauthorisedException(mockMessage, getTestEvent("0")), "0 security");
+  }
+
+  @Test
+  public void routing() throws Exception {
+    String expectedMessage = "0 routing";
+    callTypeAndThrowException(new RoutingException(mockMP), expectedMessage);
+    callTypeAndThrowException(new ResponseTimeoutException(mockMessage, mockMP), expectedMessage);
+  }
+
+  @Test
+  public void redelivery() throws Exception {
+    MessageRedeliveredException exception = new MessageRedeliveredException("3", 1, 1, getTestEvent("0"), mockMP);
+    callTypeAndThrowException(exception, "0 redelivery");
+  }
+
+  @Test
+  public void any() throws Exception {
+    String expectedMessage = "0 any";
+    callTypeAndThrowException(new RuntimeException(), expectedMessage);
+    callTypeAndThrowException(new DefaultMuleException(mockMessage), expectedMessage);
+  }
+
+  private void callTypeAndThrowException(Exception exception, String expectedMessage) throws Exception {
+    MuleMessage response = flowRunner("matchesHandlerUsingType")
+        .withPayload("0")
+        .withFlowVariable("exception", exception)
+        .run()
+        .getMessage();
+    assertThat(getPayloadAsString(response), is(expectedMessage));
   }
 
   private void callAndThrowException(final Exception exceptionToThrow, final String expectedMessage) throws Exception {
@@ -108,12 +178,12 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   private void callAndThrowException(Object payload, final Exception exceptionToThrow, final String expectedMessage)
       throws Exception {
-    FunctionalTestComponent ftc = getFunctionalTestComponent("matchesCorrectExceptionStrategyUsingExceptionType");
+    FunctionalTestComponent ftc = getFunctionalTestComponent("matchesHandlerUsingWhen");
     ftc.setEventCallback((context, component, muleContext) -> {
       throw exceptionToThrow;
     });
     MuleMessage response =
-        flowRunner("matchesCorrectExceptionStrategyUsingExceptionType").withPayload(payload).run().getMessage();
+        flowRunner("matchesHandlerUsingWhen").withPayload(payload).run().getMessage();
     assertThat(getPayloadAsString(response), is(expectedMessage));
   }
 
@@ -139,5 +209,20 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
   }
 
   public static class AnotherTotallyDifferentKindOfException extends Exception {
+  }
+
+  public static class ThrowExceptionProcessor implements MessageProcessor {
+
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      Throwable exception = event.getFlowVariable("exception");
+      if (exception instanceof MuleException) {
+        throw (MuleException) exception;
+      } else if (exception instanceof RuntimeException) {
+        throw (RuntimeException) exception;
+      }
+      return event;
+    }
+
   }
 }

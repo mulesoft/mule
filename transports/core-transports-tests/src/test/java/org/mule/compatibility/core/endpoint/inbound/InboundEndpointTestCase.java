@@ -8,6 +8,8 @@ package org.mule.compatibility.core.endpoint.inbound;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -45,6 +47,7 @@ import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.SecurityNotification;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
@@ -147,8 +150,8 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     try {
       result = mpChain.process(requestEvent);
       fail("Filter should have thrown a FilterException");
-    } catch (FilterUnacceptedException e) {
-      // expected
+    } catch (MessagingException e) {
+      assertThat(e.getCause(), is(instanceOf(FilterUnacceptedException.class)));
     }
 
     assertMessageNotSent();
@@ -189,7 +192,8 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     try {
       result = mpChain.process(requestEvent);
       fail("Exception expected");
-    } catch (TestSecurityFilter.StaticMessageUnauthorisedException e) {
+    } catch (MessagingException e) {
+      assertThat(e, is(instanceOf(TestSecurityFilter.StaticMessageUnauthorisedException.class)));
       endpoint.getFlowConstruct().getExceptionListener().handleException(e, requestEvent);
     }
 
@@ -217,8 +221,8 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     try {
       result = mpChain.process(requestEvent);
       fail("Filter should have thrown a FilterException");
-    } catch (FilterUnacceptedException e) {
-      // expected
+    } catch (MessagingException e) {
+      assertThat(e.getCause(), is(instanceOf(FilterUnacceptedException.class)));
     }
 
     assertFalse(securityFilter.wasCalled());
@@ -266,8 +270,8 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     try {
       result = mpChain.process(requestEvent);
       fail("Exception expected");
-    } catch (TestSecurityFilter.StaticMessageUnauthorisedException e) {
-      // expected
+    } catch (MessagingException e) {
+      assertThat(e, is(instanceOf(TestSecurityFilter.StaticMessageUnauthorisedException.class)));
     }
 
     assertMessageNotSent();

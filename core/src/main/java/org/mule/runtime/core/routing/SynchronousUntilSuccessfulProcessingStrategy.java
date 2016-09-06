@@ -7,17 +7,16 @@
 package org.mule.runtime.core.routing;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
-
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
 import java.io.NotSerializableException;
@@ -34,7 +33,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MessagingException {
+  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MuleException {
     Exception lastExecutionException = null;
     MuleEvent retryEvent = copyEventForRetry(event);
     try {
@@ -66,11 +65,9 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
           }
         }
       }
-      throw new RoutingException(retryEvent, getUntilSuccessfulConfiguration().getRouter(), lastExecutionException);
-    } catch (MessagingException e) {
-      throw e;
+      throw new RoutingException(getUntilSuccessfulConfiguration().getRouter(), lastExecutionException);
     } catch (Exception e) {
-      throw new RoutingException(retryEvent, getUntilSuccessfulConfiguration().getRouter(), e);
+      throw new RoutingException(getUntilSuccessfulConfiguration().getRouter(), e);
     }
   }
 

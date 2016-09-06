@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
@@ -104,7 +105,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientWithFaultDefaultException() throws Exception {
-    expectedException.expectCause(instanceOf(Fault.class));
+    expectedException.expectCause(hasCause(instanceOf(Fault.class)));
     expectedException.expectMessage("Failed to route event");
     flowRunner("FlowWithClientWithFaultDefaultException").withPayload("hello").run();
   }

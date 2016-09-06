@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.security.filters;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -54,7 +55,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
       if (logger.isDebugEnabled()) {
         logger.debug("Authentication request for user: " + user.getUsername() + " failed: " + e.toString());
       }
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(user.getUsername()), event, e);
+      throw new UnauthorisedException(authFailedForUser(user.getUsername()), e);
     }
 
     // Authentication success

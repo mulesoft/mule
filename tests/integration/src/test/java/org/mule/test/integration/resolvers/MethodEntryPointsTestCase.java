@@ -29,8 +29,8 @@ public class MethodEntryPointsTestCase extends AbstractIntegrationTestCase {
     try {
       flowRunner("Service").withPayload("hello").run().getMessage();
     } catch (Exception e) {
-      assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
-      assertThat(e.getMessage(), containsString("Found too many possible methods on object"));
+      assertThat(e.getCause().getCause(), instanceOf(EntryPointNotFoundException.class));
+      assertThat(e.getCause().getMessage(), containsString("Found too many possible methods on object"));
     }
   }
 
@@ -39,7 +39,7 @@ public class MethodEntryPointsTestCase extends AbstractIntegrationTestCase {
     try {
       flowRunner("Service").withPayload("hello").withInboundProperty("method", "foo").run().getMessage();
     } catch (Exception e) {
-      assertThat(e.getCause(), instanceOf(EntryPointNotFoundException.class));
+      assertThat(e.getCause().getCause(), instanceOf(EntryPointNotFoundException.class));
     }
   }
 

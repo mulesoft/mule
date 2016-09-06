@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.core.message;
 
-import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-
 import org.mule.runtime.api.message.ErrorType;
 
 /**

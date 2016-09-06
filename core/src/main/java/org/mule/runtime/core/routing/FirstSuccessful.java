@@ -10,7 +10,6 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 
@@ -35,11 +34,11 @@ public class FirstSuccessful extends AbstractOutboundRouter {
    * Route the given event to one of our targets
    */
   @Override
-  public MuleEvent route(MuleEvent event) throws MessagingException {
+  public MuleEvent route(MuleEvent event) throws MuleException {
     try {
       return routingStrategy.route(event, getRoutes());
-    } catch (RoutingFailedMessagingException exception) {
-      throw new CouldNotRouteOutboundMessageException(event, this);
+    } catch (RoutingFailedException exception) {
+      throw new CouldNotRouteOutboundMessageException(this);
     }
   }
 

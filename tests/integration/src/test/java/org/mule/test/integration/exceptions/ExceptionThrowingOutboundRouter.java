@@ -15,7 +15,7 @@ import org.mule.runtime.core.routing.outbound.FilteringOutboundRouter;
 public class ExceptionThrowingOutboundRouter extends FilteringOutboundRouter {
 
   public MuleEvent process(MuleEvent event) throws MuleException {
-    throw new RoutingException(MessageFactory.createStaticMessage("dummyException"), event, null);
+    throw new RoutingException(MessageFactory.createStaticMessage("dummyException"), null);
   }
 }
 

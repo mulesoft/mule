@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.createStaticMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
 import java.util.List;
@@ -46,14 +45,14 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
   }
 
   @Override
-  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException {
+  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MuleException {
     MuleEvent returnEvent = null;
 
     boolean failed = true;
     Exception failExceptionCause = null;
     for (MessageProcessor mp : messageProcessors) {
       try {
-        MuleEvent toProcess = cloneEventForRoutinng(event, mp);
+        MuleEvent toProcess = cloneEventForRouting(event, mp);
         returnEvent = processor.processRoute(mp, toProcess);
 
         if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent)) {
@@ -76,24 +75,22 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
     if (failed) {
       if (failExceptionCause != null) {
-        throw new RoutingFailedMessagingException(CoreMessages
-            .createStaticMessage("all message processor failed during first successful routing strategy"), event,
-                                                  failExceptionCause);
+        throw new RoutingFailedException(createStaticMessage("all message processor failed during first successful routing strategy"),
+                                         failExceptionCause);
       } else {
-        throw new RoutingFailedMessagingException(CoreMessages
-            .createStaticMessage("all message processor failed during first successful routing strategy"), event);
+        throw new RoutingFailedException(createStaticMessage("all message processor failed during first successful routing strategy"));
       }
     }
 
     return returnEvent;
   }
 
-  private MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp) throws MessagingException {
-    return createEventToRoute(event, cloneMessage(event, event.getMessage()), mp);
+  private MuleEvent cloneEventForRouting(MuleEvent event, MessageProcessor mp) throws MuleException {
+    return createEventToRoute(event, cloneMessage(event.getMessage()), mp);
   }
 
   interface RouteProcessor {
 
-    MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MessagingException, MuleException;
+    MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MuleException;
   }
 }

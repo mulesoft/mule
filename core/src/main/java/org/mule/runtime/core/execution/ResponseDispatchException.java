@@ -6,25 +6,24 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * Exception thrown when there's a failure writing the response using the transport infrastructure.
  */
-public class ResponseDispatchException extends MessagingException {
+public class ResponseDispatchException extends MuleException {
 
-  public ResponseDispatchException(Message message, MuleEvent event) {
-    super(message, event);
+  public ResponseDispatchException(Message message) {
+    super(message);
   }
 
-  public ResponseDispatchException(Message message, MuleEvent event, Throwable cause) {
-    super(message, event, cause);
+  public ResponseDispatchException(Message message, Throwable cause) {
+    super(message, cause);
   }
 
-  public ResponseDispatchException(MuleEvent event, Throwable cause) {
-    super(event, cause);
+  public ResponseDispatchException(Throwable cause) {
+    super(cause);
   }
 
 }

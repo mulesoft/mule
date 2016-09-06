@@ -148,13 +148,13 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testUntilSuccessfulInExceptionStrategy() throws Exception {
     testExceptionStrategy("untilSuccessfulInExceptionStrategy", emptyMap());
-    assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(MessagingExceptionHandlerToSystemAdapter.class)));
   }
 
   @Test
   public void testUntilSuccessfulInExceptionStrategyRollback() throws Exception {
     testExceptionStrategy("untilSuccessfulInExceptionStrategyRollback", emptyMap());
-    assertTrue(injectedMessagingExceptionHandler instanceof MessagingExceptionHandlerToSystemAdapter);
+    assertThat(injectedMessagingExceptionHandler, is(instanceOf(MessagingExceptionHandlerToSystemAdapter.class)));
   }
 
   private Map<String, Serializable> getMessageProperties() {

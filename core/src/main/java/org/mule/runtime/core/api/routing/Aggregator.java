@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.MuleException;
 
 public interface Aggregator {
 
@@ -14,6 +14,6 @@ public interface Aggregator {
 
   void setFailOnTimeout(boolean failOnTimeout);
 
-  void expireAggregation(String groupId) throws MessagingException;
+  void expireAggregation(String groupId) throws MuleException;
 
 }

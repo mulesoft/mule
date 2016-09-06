@@ -10,11 +10,11 @@ package org.mule.compatibility.transport.http.functional;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
-
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -75,8 +75,8 @@ public class HttpsMultipleConnectorsTestCase extends FunctionalTestCase {
     try {
       client.process(getTestEvent(TEST_MESSAGE));
       fail();
-    } catch (DispatchException e) {
-      assertThat(e.getCause(), instanceOf(SSLHandshakeException.class));
+    } catch (MessagingException e) {
+      assertThat(e.getCause(), hasCause(instanceOf(SSLHandshakeException.class)));
     }
   }
 }

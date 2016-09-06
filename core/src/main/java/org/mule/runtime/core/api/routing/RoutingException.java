@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
@@ -17,7 +16,7 @@ import org.mule.runtime.core.config.i18n.Message;
  * DefaultInboundRouterCollection and DefaultOutboundRouterCollection and deriving types. Mule itself does not throw routing
  * exceptions when routing internal events.
  */
-public class RoutingException extends MessagingException {
+public class RoutingException extends MuleException {
 
   /**
    * Serial version
@@ -26,23 +25,23 @@ public class RoutingException extends MessagingException {
 
   protected final transient MessageProcessor route;
 
-  public RoutingException(MuleEvent event, MessageProcessor route) {
-    super(generateMessage(null, route), event, route);
+  public RoutingException(MessageProcessor route) {
+    super(generateMessage(null, route));
     this.route = route;
   }
 
-  public RoutingException(MuleEvent event, MessageProcessor route, Throwable cause) {
-    super(generateMessage(null, route), event, cause, route);
+  public RoutingException(MessageProcessor route, Throwable cause) {
+    super(generateMessage(null, route), cause);
     this.route = route;
   }
 
-  public RoutingException(Message message, MuleEvent event, MessageProcessor route) {
-    super(generateMessage(message, route), event, route);
+  public RoutingException(Message message, MessageProcessor route) {
+    super(generateMessage(message, route));
     this.route = route;
   }
 
-  public RoutingException(Message message, MuleEvent event, MessageProcessor route, Throwable cause) {
-    super(generateMessage(message, route), event, cause, route);
+  public RoutingException(Message message, MessageProcessor route, Throwable cause) {
+    super(generateMessage(message, route), cause);
     this.route = route;
   }
 

@@ -11,6 +11,7 @@ import static org.mule.runtime.core.context.notification.RoutingNotification.MIS
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
 
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -106,7 +107,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
     this.processedGroups = processedGroups;
   }
 
-  public void forceGroupExpiry(String groupId) throws MessagingException {
+  public void forceGroupExpiry(String groupId) throws MuleException {
     try {
       if (correlatorStore.retrieve(groupId, getEventGroupsPartitionKey()) != null) {
         handleGroupExpiry(getEventGroup(groupId));
@@ -149,7 +150,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
           return null;
         }
       } catch (ObjectStoreException e) {
-        throw new RoutingException(event, timeoutMessageProcessor, e);
+        throw new RoutingException(timeoutMessageProcessor, e);
       }
 
       // check for an existing group first
@@ -157,7 +158,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
       try {
         group = this.getEventGroup(groupId);
       } catch (ObjectStoreException e) {
-        throw new RoutingException(event, timeoutMessageProcessor, e);
+        throw new RoutingException(timeoutMessageProcessor, e);
       }
 
       // does the group exist?
@@ -168,7 +169,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
           eventGroup.initEventsStore(correlatorStore);
           group = this.addEventGroup(eventGroup);
         } catch (ObjectStoreException e) {
-          throw new RoutingException(event, timeoutMessageProcessor, e);
+          throw new RoutingException(timeoutMessageProcessor, e);
         }
       }
 
@@ -182,7 +183,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         try {
           group.addEvent(event);
         } catch (ObjectStoreException e) {
-          throw new RoutingException(event, timeoutMessageProcessor, e);
+          throw new RoutingException(timeoutMessageProcessor, e);
         }
 
         // check to see if the event group is ready to be aggregated
@@ -196,7 +197,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
             this.removeEventGroup(group);
             group.clear();
           } catch (ObjectStoreException e) {
-            throw new RoutingException(event, timeoutMessageProcessor, e);
+            throw new RoutingException(timeoutMessageProcessor, e);
           }
 
           return returnEvent;
@@ -271,11 +272,11 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
     this.timeout = timeout;
   }
 
-  protected void handleGroupExpiry(EventGroup group) throws MessagingException {
+  protected void handleGroupExpiry(EventGroup group) throws MuleException {
     try {
       removeEventGroup(group);
     } catch (ObjectStoreException e) {
-      throw new MessagingException(group.getMessageCollectionEvent(), e);
+      throw new DefaultMuleException(e);
     }
 
     if (isFailOnTimeout()) {
@@ -287,7 +288,7 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
         logger.warn("Failed to clear group with id " + group.getGroupId() + " since underlying ObjectStore threw Exception:"
             + e.getMessage());
       }
-      throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()), messageCollectionEvent);
+      throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()));
     } else {
       if (logger.isDebugEnabled()) {
         logger.debug(MessageFormat.format(

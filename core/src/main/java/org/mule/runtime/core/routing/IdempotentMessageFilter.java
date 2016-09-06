@@ -7,15 +7,12 @@
 package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.el.ExpressionLanguage.*;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -89,7 +86,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     return flowConstruct.getMuleContext().getExpressionLanguage().parse(valueExpression, event, flowConstruct);
   }
 
-  protected String getIdForEvent(MuleEvent event) throws MessagingException {
+  protected String getIdForEvent(MuleEvent event) throws MuleException {
     return flowConstruct.getMuleContext().getExpressionLanguage().parse(idExpression, event, flowConstruct);
   }
 
@@ -127,7 +124,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
           logger.warn("ObjectStore exception: " + e.getMessage());
           return false;
         }
-      } catch (MessagingException e) {
+      } catch (MuleException e) {
         logger.warn("Could not retrieve Id or Value for event: " + e.getMessage());
         return false;
       }

@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.core.component;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.Message;
@@ -16,7 +15,7 @@ import org.mule.runtime.core.config.i18n.Message;
  * <code>ComponentException</code> should be thrown when some action on a component fails, such as starting or stopping
  */
 // @ThreadSafe
-public class ComponentException extends MessagingException {
+public class ComponentException extends MuleException {
 
   /**
    * Serial version
@@ -25,23 +24,28 @@ public class ComponentException extends MessagingException {
 
   private final transient Component component;
 
-  public ComponentException(Message message, MuleEvent muleMessage, Component component) {
-    super(generateMessage(message, component), muleMessage, component);
+  public ComponentException(Message message, Component component) {
+    super(generateMessage(message, component));
     this.component = component;
   }
 
-  public ComponentException(Message message, MuleEvent event, Component component, Throwable cause) {
-    super(generateMessage(message, component), event, cause, component);
+  public ComponentException(Message message, Component component, Throwable cause) {
+    super(generateMessage(message, component), cause);
     this.component = component;
   }
 
-  public ComponentException(MuleEvent message, Component component, Throwable cause) {
-    super(generateMessage(null, component), message, cause, component);
+  public ComponentException(Component component, Throwable cause) {
+    super(generateMessage(null, component), cause);
     this.component = component;
   }
 
   public Component getComponent() {
     return component;
+  }
+
+  @Override
+  protected void setMessage(Message message) {
+    super.setMessage(message.getMessage());
   }
 
   private static Message generateMessage(Message previousMessage, Component component) {

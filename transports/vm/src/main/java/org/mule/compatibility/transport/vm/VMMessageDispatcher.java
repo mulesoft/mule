@@ -28,7 +28,6 @@ import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +50,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     EndpointURI endpointUri = endpoint.getEndpointURI();
 
     if (endpointUri == null) {
-      throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event, getEndpoint());
+      throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), getEndpoint());
     }
     MuleEvent eventToDispatch =
         MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).flowVariables(emptyMap()).build();
@@ -66,7 +65,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     Queue queue = session.getQueue(endpointUri.getAddress());
     if (!queue.offer(message, connector.getQueueTimeout())) {
       // queue is full
-      throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()), eventToDispatch, getEndpoint());
+      throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()), getEndpoint());
     }
     if (logger.isDebugEnabled()) {
       logger.debug("dispatched MuleEvent on endpointUri: " + endpointUri);

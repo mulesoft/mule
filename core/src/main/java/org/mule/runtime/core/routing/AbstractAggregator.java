@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -156,7 +155,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   }
 
   @Override
-  public void expireAggregation(String groupId) throws MessagingException {
+  public void expireAggregation(String groupId) throws MuleException {
     eventCorrelator.forceGroupExpiry(groupId);
   }
 

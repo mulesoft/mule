@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -85,7 +85,7 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
     MessagingException e = flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST)
         .withOutboundProperty(SOAP_HEADER_IN, "invalid xml").runExpectingException();
 
-    assertThat("Expected as header can't be converted to XML", e, instanceOf(TransformerMessagingException.class));
+    assertThat("Expected as header can't be converted to XML", e.getCause(), instanceOf(MessageTransformerException.class));
     assertThat(e.getMessage(), containsString(SOAP_HEADER_IN));
   }
 
@@ -94,7 +94,7 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
     MessagingException e = flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST)
         .withOutboundProperty(SOAP_HEADER_IN, new String()).runExpectingException();
 
-    assertThat("Expected as header can't be converted to XML", e, instanceOf(TransformerMessagingException.class));
+    assertThat("Expected as header can't be converted to XML", e.getCause(), instanceOf(MessageTransformerException.class));
   }
 
 }

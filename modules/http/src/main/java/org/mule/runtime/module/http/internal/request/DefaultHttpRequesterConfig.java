@@ -79,7 +79,6 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
   @Inject
   @DefaultTlsContextFactoryBuilder
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
-
   private MuleContext muleContext;
 
   @Override

@@ -8,15 +8,12 @@
 package org.mule.runtime.core.routing;
 
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.Message;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Collections;
 import java.util.Map;
@@ -28,7 +25,7 @@ import java.util.Map.Entry;
  * 
  * @since 3.5.0
  */
-public class CompositeRoutingException extends MessagingException {
+public class CompositeRoutingException extends MuleException {
 
   private static final String MESSAGE_TITLE = "Exception(s) were found for route(s): ";
 
@@ -38,24 +35,17 @@ public class CompositeRoutingException extends MessagingException {
 
   /**
    * Constructs a new {@link CompositeRoutingException}
-   * 
-   * @param message message describing the failure
-   * @param event the current {@link MuleEvent}
+   *  @param message message describing the failure
    * @param exceptions a {@link Map} in which the key is an {@link Integer} describing the index of the route that generated the
    *        error and the value is the {@link Throwable} itself
    */
-  public CompositeRoutingException(Message message, MuleEvent event, Map<Integer, Throwable> exceptions) {
-    super(message, event);
+  public CompositeRoutingException(Message message, Map<Integer, Throwable> exceptions) {
+    super(message);
     this.exceptions = Collections.unmodifiableMap(exceptions);
   }
 
-  public CompositeRoutingException(MuleEvent event, Map<Integer, Throwable> exceptions) {
-    this(buildExceptionMessage(exceptions), event, exceptions);
-  }
-
-  @Override
-  protected String generateMessage(Message message, MuleContext context) {
-    return message.getMessage();
+  public CompositeRoutingException(Map<Integer, Throwable> exceptions) {
+    this(buildExceptionMessage(exceptions), exceptions);
   }
 
   /**

@@ -7,11 +7,10 @@
 package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.exceptions.FunctionalTestException;
@@ -134,9 +133,9 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
   }
 
   private void assertExceptionMessage(MuleMessage out) {
-    assertTrue(out.getPayload() instanceof ExceptionMessage);
+    assertThat(out.getPayload(), is(instanceOf(ExceptionMessage.class)));
     ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
-    assertEquals(FunctionalTestException.class, exceptionMessage.getException().getCause().getClass());
-    assertEquals("test", exceptionMessage.getPayload());
+    assertThat(exceptionMessage.getException().getCause().getCause(), is(instanceOf(FunctionalTestException.class)));
+    assertThat(exceptionMessage.getPayload(), is("test"));
   }
 }

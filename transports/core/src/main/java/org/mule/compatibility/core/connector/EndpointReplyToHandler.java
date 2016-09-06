@@ -18,7 +18,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
@@ -26,8 +25,6 @@ import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-
-import java.io.Serializable;
 
 public class EndpointReplyToHandler extends DefaultReplyToHandler {
 
@@ -68,7 +65,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
       }
       return endpoint.process(replyToEvent);
     } catch (Exception e) {
-      throw new DispatchException(TransportCoreMessages.failedToDispatchToReplyto(endpoint), replyToEvent, endpoint, e);
+      throw new DispatchException(TransportCoreMessages.failedToDispatchToReplyto(endpoint), endpoint, e);
     }
   }
 

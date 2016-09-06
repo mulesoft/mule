@@ -81,7 +81,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
       } catch (RoutingException e1) {
         throw e1;
       } catch (Exception e2) {
-        throw new RoutingException(event, AbstractOutboundRouter.this, e2);
+        throw new RoutingException(AbstractOutboundRouter.this, e2);
       }
     };
     try {
@@ -93,7 +93,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
   }
 
-  protected abstract MuleEvent route(MuleEvent event) throws MessagingException;
+  protected abstract MuleEvent route(MuleEvent event) throws MuleException;
 
   protected final MuleEvent sendRequest(final MuleEvent originalEvent, final MuleEvent eventToRoute, final MessageProcessor route,
                                         boolean awaitResponse)
@@ -104,7 +104,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     } catch (MessagingException me) {
       throw me;
     } catch (Exception e) {
-      throw new RoutingException(originalEvent, null, e);
+      throw new RoutingException(null, e);
     }
 
     if (getRouterStatistics() != null) {
@@ -216,7 +216,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
                                        boolean awaitResponse)
       throws MuleException {
     if (route == null) {
-      throw new DispatchException(CoreMessages.objectIsNull("connector operation"), originalEvent, null);
+      throw new DispatchException(CoreMessages.objectIsNull("connector operation"), null);
     }
     return doProcessRoute(route, eventToRoute);
   }
@@ -243,8 +243,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
    * @return The fresh copy of the {@link MuleMessage}.
    * @throws MessagingException If the message can't be cloned because it carries a consumable payload.
    */
-  protected MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException {
-    return AbstractRoutingStrategy.cloneMessage(event, message);
+  protected MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MuleException {
+    return AbstractRoutingStrategy.cloneMessage(message);
   }
 
   @Override

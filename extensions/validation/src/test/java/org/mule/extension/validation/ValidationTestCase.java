@@ -10,7 +10,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.internal.ValidationMessages;
@@ -18,6 +17,7 @@ import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.exception.MessagingException;
 
 @ArtifactClassLoaderRunnerConfig(exportClasses = {ValidationMessages.class})
 abstract class ValidationTestCase extends MuleArtifactFunctionalTestCase {
@@ -43,8 +43,9 @@ abstract class ValidationTestCase extends MuleArtifactFunctionalTestCase {
 
   protected void assertInvalid(FlowRunner runner, Message expectedMessage) throws Exception {
     Exception e = runner.runExpectingException();
-    assertThat(e, is(instanceOf(ValidationException.class)));
-    assertThat(e.getMessage(), is(expectedMessage.getMessage()));
+    assertThat(e, is(instanceOf(MessagingException.class)));
+    assertThat(e.getCause(), is(instanceOf(ValidationException.class)));
+    assertThat(e.getCause().getMessage(), is(expectedMessage.getMessage()));
     // assert that all placeholders were replaced in message
     assertThat(e.getMessage(), not(containsString("${")));
     runner.reset();

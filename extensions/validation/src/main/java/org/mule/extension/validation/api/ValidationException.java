@@ -7,12 +7,7 @@
 package org.mule.extension.validation.api;
 
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
 
 /**
  * The exception to be thrown by default when a validation fails. It's a pretty simple {@link MuleException} with the added
@@ -22,18 +17,17 @@ import org.mule.runtime.core.config.i18n.Message;
  *
  * @since 3.7.0
  */
-public class ValidationException extends MessagingException {
+public class ValidationException extends MuleException {
 
   private final ValidationResult validationResult;
 
   /**
    * Creates a new instance for the given {@code validationResult}
+   *  @param validationResult a failing {@link ValidationResult}
    *
-   * @param validationResult a failing {@link ValidationResult}
-   * @param event {@link MuleEvent} on which validation failed
    */
-  public ValidationException(ValidationResult validationResult, MuleEvent event) {
-    super(createStaticMessage(validationResult.getMessage()), event);
+  public ValidationException(ValidationResult validationResult) {
+    super(createStaticMessage(validationResult.getMessage()));
     this.validationResult = validationResult;
   }
 
@@ -44,8 +38,4 @@ public class ValidationException extends MessagingException {
     return validationResult;
   }
 
-  @Override
-  protected String generateMessage(Message message, MuleContext context) {
-    return message.getMessage();
-  }
 }

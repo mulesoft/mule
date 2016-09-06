@@ -10,10 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.functional.FlowAssert.verify;
-
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.core.component.ComponentException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -102,8 +101,8 @@ public class NonBlockingNotSupportedFunctionalTestCase extends AbstractIntegrati
     try {
       flowRunner("rollbackRollbackExceptionStrategy").withPayload(TEST_MESSAGE).nonBlocking().run();
       fail("Exception Expected");
-    } catch (ComponentException componentException) {
-      assertThat(componentException.getCause(), instanceOf(FunctionalTestException.class));
+    } catch (MessagingException me) {
+      assertThat(me.getCause().getCause(), instanceOf(FunctionalTestException.class));
     } finally {
       verify("rollbackRollbackExceptionStrategy");
       verify("rollbackExceptionStrategyChild");

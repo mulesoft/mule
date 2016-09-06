@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.Message;
 
@@ -21,19 +20,19 @@ public class CouldNotRouteOutboundMessageException extends RoutingException {
    */
   private static final long serialVersionUID = 4609966704030524483L;
 
-  public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target) {
-    super(event, target);
+  public CouldNotRouteOutboundMessageException(MessageProcessor target) {
+    super(target);
   }
 
-  public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target, Throwable cause) {
-    super(event, target, cause);
+  public CouldNotRouteOutboundMessageException(MessageProcessor target, Throwable cause) {
+    super(target, cause);
   }
 
-  public CouldNotRouteOutboundMessageException(Message message, MuleEvent event, MessageProcessor target) {
-    super(message, event, target);
+  public CouldNotRouteOutboundMessageException(Message message, MessageProcessor target) {
+    super(message, target);
   }
 
-  public CouldNotRouteOutboundMessageException(Message message, MuleEvent event, MessageProcessor target, Throwable cause) {
-    super(message, event, target, cause);
+  public CouldNotRouteOutboundMessageException(Message message, MessageProcessor target, Throwable cause) {
+    super(message, target, cause);
   }
 }

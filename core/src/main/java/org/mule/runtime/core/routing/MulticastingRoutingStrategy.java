@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -44,11 +43,11 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy {
   }
 
   @Override
-  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException {
+  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MuleException {
     MuleMessage message = event.getMessage();
 
     if (messageProcessors == null || messageProcessors.size() == 0) {
-      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
+      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
     }
 
     List<MuleEvent> results = new ArrayList<>(messageProcessors.size());
@@ -64,7 +63,7 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy {
         }
       }
     } catch (MuleException e) {
-      throw new CouldNotRouteOutboundMessageException(event, messageProcessors.get(0), e);
+      throw new CouldNotRouteOutboundMessageException(messageProcessors.get(0), e);
     }
     return resultsHandler.aggregateResults(results, event);
   }

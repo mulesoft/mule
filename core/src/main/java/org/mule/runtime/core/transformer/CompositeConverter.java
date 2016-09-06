@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 
 import java.nio.charset.Charset;
 import java.util.LinkedList;
@@ -134,7 +134,7 @@ public class CompositeConverter implements Converter, MuleContextAware {
         event = MuleEvent.builder(event)
             .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (Exception e) {
-        throw new TransformerMessagingException(event, this, e);
+        throw new MessageTransformerException(this, e);
       }
     }
 

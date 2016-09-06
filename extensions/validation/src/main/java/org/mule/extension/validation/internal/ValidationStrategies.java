@@ -61,7 +61,7 @@ public final class ValidationStrategies {
     MultipleValidationResult result = ImmutableMultipleValidationResult.of(results);
 
     if (result.isError()) {
-      throw new MultipleValidationException(result, muleEvent);
+      throw new MultipleValidationException(result);
     }
   }
 }

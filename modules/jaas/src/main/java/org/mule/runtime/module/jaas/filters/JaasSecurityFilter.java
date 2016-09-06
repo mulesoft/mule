@@ -56,7 +56,7 @@ public class JaasSecurityFilter extends AbstractOperationSecurityFilter {
       if (logger.isDebugEnabled()) {
         logger.debug("Authentication request for user: " + user.getUsername() + " failed: " + e.toString());
       }
-      throw new UnauthorisedException(authFailedForUser(user.getUsername()), event, e);
+      throw new UnauthorisedException(authFailedForUser(user.getUsername()), e);
     }
 
     // Authentication success

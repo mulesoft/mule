@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -34,7 +34,7 @@ public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter {
   private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
   @Override
-  protected String getIdForEvent(MuleEvent event) throws MessagingException {
+  protected String getIdForEvent(MuleEvent event) throws MuleException {
     try {
       Object payload = event.getMessage().getPayload();
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
@@ -42,9 +42,9 @@ public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter {
       byte[] digestedBytes = md.digest(bytes);
       return (String) byteArrayToHexString.transform(digestedBytes);
     } catch (NoSuchAlgorithmException nsa) {
-      throw new RoutingException(event, this, nsa);
+      throw new RoutingException(this, nsa);
     } catch (TransformerException te) {
-      throw new RoutingException(event, this, te);
+      throw new RoutingException(this, te);
     }
   }
 

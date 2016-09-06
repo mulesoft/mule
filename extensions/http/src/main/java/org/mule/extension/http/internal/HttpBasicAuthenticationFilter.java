@@ -10,10 +10,10 @@ import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
+import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEvent.Builder;
@@ -27,7 +27,6 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
@@ -153,7 +152,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
         event = setUnauthenticated(event);
-        throw new UnauthorisedException(CoreMessages.authFailedForUser(username), event, e);
+        throw new UnauthorisedException(authFailedForUser(username), event, e);
       }
 
       if (logger.isDebugEnabled()) {

@@ -6,21 +6,21 @@
  */
 package org.mule.compatibility.transport.jms.integration.transactions.local;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import org.mule.compatibility.transport.jms.integration.AbstractJmsFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 
 import javax.jms.JMSException;
 
-import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -115,7 +115,8 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
     try {
       flow.process(event);
       fail("DispatchException should be thrown");
-    } catch (DispatchException e) {
+    } catch (MessagingException e) {
+      assertThat(e, hasCause(instanceOf(DispatchException.class)));
     }
     assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
     assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));

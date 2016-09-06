@@ -112,8 +112,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
           .addOutboundProperty(CONTENT_LENGTH, buffer.length).build();
       resultEvent = MuleEvent.builder(event).message(message).build();
     } catch (IOException e) {
-      throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBase + path)), event,
-                                          this);
+      throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBase + path)));
     } finally {
       IOUtils.closeQuietly(in);
     }
