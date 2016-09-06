@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updatesStringArray">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select ZIPS from REGIONS where REGION_NAME='Northwest'</db:sql>
             </db:select>
@@ -28,7 +28,7 @@
     </flow>
 
     <flow name="updatesStructArray">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select DETAILS from CONTACTS where CONTACT_NAME='Contact2'</db:sql>
             </db:select>

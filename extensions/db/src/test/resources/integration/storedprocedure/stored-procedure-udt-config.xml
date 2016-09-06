@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="returnsObject">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:stored-procedure>
                 <db:sql>{ CALL getManagerDetails('Southwest', :out) }</db:sql>
                 <db:output-parameters>

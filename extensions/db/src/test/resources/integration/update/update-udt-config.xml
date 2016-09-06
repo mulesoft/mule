@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <flow name="updatesObject">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:select>
                 <db:sql>select DETAILS from REGION_MANAGERS where REGION_NAME='Southwest'</db:sql>
             </db:select>

@@ -8,7 +8,7 @@
             http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="dataSourcePooling" processingStrategy="asynchronous">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:delete config-ref="pooledJdbcConfig">
                 <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
             </db:delete>

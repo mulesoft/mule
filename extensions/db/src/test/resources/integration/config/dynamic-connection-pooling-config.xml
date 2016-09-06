@@ -10,7 +10,7 @@
     <flow name="dataSourcePooling">
         <set-variable variableName="dataSourceUrl" value="jdbc:derby:muleEmbeddedDB;create=true"/>
 
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <db:delete config-ref="pooledJdbcConfig">
                 <db:parameterized-query>delete from PLANET where id = #[payload.id]</db:parameterized-query>
             </db:delete>

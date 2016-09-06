@@ -27,7 +27,7 @@
     <flow name="main">
         <vm:inbound-endpoint path="testInput" exchange-pattern="request-response"/>
 
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <jms:outbound-endpoint queue="testQueue" connector-ref="JMS"/>
 
             <component>

@@ -20,7 +20,7 @@
 
     <flow name="transactional">
         <append-string-transformer message=" a"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
         </block>
@@ -28,7 +28,7 @@
 
     <flow name="transactionalFailInTheMiddle">
         <append-string-transformer message=" b"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <vm:outbound-endpoint ref="out2"/>
@@ -37,7 +37,7 @@
 
     <flow name="transactionalFailAtEnd">
         <append-string-transformer message=" c"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
@@ -46,7 +46,7 @@
 
     <flow name="transactionalFailAfterEnd">
         <append-string-transformer message=" d"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
         </block>
@@ -55,7 +55,7 @@
 
     <flow name="transactionalFailInTheMiddleWithCatchExceptionStrategy">
         <append-string-transformer message=" e"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <test:component throwException="true"/>
             <vm:outbound-endpoint ref="out2"/>
@@ -67,7 +67,7 @@
 
     <flow name="transactionalFailAtEndWithCatchExceptionStrategy">
         <append-string-transformer message=" f"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <test:component throwException="true"/>
@@ -79,7 +79,7 @@
 
     <flow name="transactionalWorksWithAnotherResourceType">
         <append-string-transformer message=" g"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <vm:outbound-endpoint ref="out3"/>
@@ -88,7 +88,7 @@
 
     <flow name="transactionalDoesntFailWithAnotherResourceType">
         <append-string-transformer message=" h"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out2"/>
             <vm:outbound-endpoint ref="out3">
@@ -99,7 +99,7 @@
 
     <flow name="transactionalWithAnotherResourceTypeAndExceptionAtEnd">
         <append-string-transformer message=" i"/>
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <vm:outbound-endpoint ref="out3">
                 <vm:transaction action="NOT_SUPPORTED"/>
@@ -111,18 +111,18 @@
 
 
     <flow name="nestedTransactional">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
-            <block>
+            <block transactionalAction="ALWAYS_BEGIN">
                 <vm:outbound-endpoint ref="out2"/>
             </block>
         </block>
     </flow>
 
     <flow name="nestedTransactionalFail">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
-            <block>
+            <block transactionalAction="ALWAYS_BEGIN">
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
             </block>
@@ -130,9 +130,9 @@
     </flow>
 
     <flow name="nestedTransactionalFailWithCatch">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
-            <block>
+            <block transactionalAction="ALWAYS_BEGIN">
                 <vm:outbound-endpoint ref="out2"/>
                 <test:component throwException="true"/>
                 <error-handler>
@@ -143,7 +143,7 @@
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoin">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <block transactionalAction="BEGIN_OR_JOIN">
                 <vm:outbound-endpoint ref="out2"/>
@@ -152,7 +152,7 @@
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFail">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <block transactionalAction="BEGIN_OR_JOIN">
                 <vm:outbound-endpoint ref="out2"/>
@@ -162,7 +162,7 @@
     </flow>
 
     <flow name="nestedTransactionalWithBeginOrJoinFailWithCatch">
-        <block>
+        <block transactionalAction="ALWAYS_BEGIN">
             <vm:outbound-endpoint ref="out1"/>
             <block transactionalAction="BEGIN_OR_JOIN">
                 <vm:outbound-endpoint ref="out2"/>
