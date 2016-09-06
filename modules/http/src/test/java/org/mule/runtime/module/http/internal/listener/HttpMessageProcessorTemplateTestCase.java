@@ -133,9 +133,6 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
     MuleEvent testEvent =
         spy(MuleEvent.builder(DefaultMessageContext.create(MuleTestUtils.getTestFlow(muleContext), TEST_CONNECTOR))
             .message(testMessage).build());
-    // when(testEvent.getMessage()).thenReturn(testMessage);
-    // when(testEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
-    // when(testEvent.getMessageAsBytes(muleContext)).thenReturn("".getBytes(UTF_8));
     when(muleContext.getTransformationService().transform(any(MuleMessage.class), any(DataType.class)))
         .thenReturn(MuleMessage.builder().payload("".getBytes(UTF_8)).build());
     return testEvent;

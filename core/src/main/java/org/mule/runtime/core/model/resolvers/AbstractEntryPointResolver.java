@@ -112,7 +112,6 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver {
 
     Object result;
 
-    System.out.println(component.toString());
     if (isSynchronizeCall()) {
       synchronized (component) {
         result = method.invoke(component, arguments);

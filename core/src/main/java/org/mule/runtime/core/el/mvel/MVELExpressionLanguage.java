@@ -363,14 +363,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
   @Override
   public String parse(String expression, final MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
-    return parser.parse((TemplateParser.TemplateCallback) token -> {
-      Object result = evaluate(token, event, flowConstruct);
-      if (result instanceof MuleMessage) {
-        return ((MuleMessage) result).getPayload();
-      } else {
-        return result;
-      }
-    }, expression);
+    return parse(expression, event, MuleEvent.builder(event), flowConstruct);
   }
 
   @Override
