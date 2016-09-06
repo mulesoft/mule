@@ -20,6 +20,7 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
   private MuleEvent event;
   private MuleEvent.Builder eventBuilder;
 
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public OutboundPropertiesMapContext(MuleEvent event, MuleEvent.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;

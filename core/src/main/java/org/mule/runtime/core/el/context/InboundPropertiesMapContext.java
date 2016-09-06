@@ -18,6 +18,7 @@ class InboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   private MuleEvent event;
 
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public InboundPropertiesMapContext(MuleEvent event) {
     this.event = event;
   }

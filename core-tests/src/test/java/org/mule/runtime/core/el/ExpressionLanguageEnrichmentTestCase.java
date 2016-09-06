@@ -69,7 +69,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
       }
     };
     MuleEvent event = getTestEvent(apple);
-    expressionLanguage.enrich("message.payload.appleCleaner", event, flowConstruct, fruitCleaner);
+    expressionLanguage.enrich("message.payload.appleCleaner", event, MuleEvent.builder(event), flowConstruct, fruitCleaner);
     assertThat(apple.getAppleCleaner(), is(fruitCleaner));
   }
 

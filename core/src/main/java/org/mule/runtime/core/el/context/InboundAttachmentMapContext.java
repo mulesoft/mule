@@ -17,6 +17,7 @@ public class InboundAttachmentMapContext extends AbstractMapContext<DataHandler>
 
   private MuleEvent event;
 
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public InboundAttachmentMapContext(MuleEvent event) {
     this.event = event;
   }

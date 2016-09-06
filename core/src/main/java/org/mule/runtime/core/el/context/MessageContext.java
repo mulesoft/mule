@@ -40,7 +40,6 @@ public class MessageContext {
   private MuleEvent.Builder eventBuilder;
   private MuleContext muleContext;
 
-
   public MessageContext(MuleEvent event, MuleEvent.Builder eventBuilder, MuleContext muleContext) {
     this.event = event;
     this.eventBuilder = eventBuilder;

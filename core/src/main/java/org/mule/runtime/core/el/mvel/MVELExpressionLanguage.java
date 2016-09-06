@@ -170,11 +170,6 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public void enrich(String expression, MuleEvent event, FlowConstruct flowConstruct, Object object) {
-    enrich(expression, event, MuleEvent.builder(event), flowConstruct, object);
-  }
-
-  @Override
   public void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
                      Object object) {
     expression = removeExpressionMarker(expression);

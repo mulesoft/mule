@@ -22,7 +22,7 @@ public class FlowVariableMapContext extends AbstractMapContext<Object> {
   private MuleEvent event;
   private MuleEvent.Builder eventBuider;
 
-
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public FlowVariableMapContext(MuleEvent event, MuleEvent.Builder eventBuider) {
     this.event = event;
     this.eventBuider = eventBuider;

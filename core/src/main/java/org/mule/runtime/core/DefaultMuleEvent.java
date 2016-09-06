@@ -73,7 +73,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Deprecated
   private String id;
   private MessageContext context;
-  MuleMessage message;
+  private MuleMessage message;
   private final MuleSession session;
   private transient FlowConstruct flowConstruct;
 
@@ -87,7 +87,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   private boolean notificationsEnabled = true;
 
-  CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
+  private CopyOnWriteCaseInsensitiveMap<String, TypedValue> flowVariables = new CopyOnWriteCaseInsensitiveMap<>();
 
   private FlowCallStack flowCallStack = new DefaultFlowCallStack();
   protected boolean nonBlocking;
@@ -510,6 +510,5 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   public void setError(Error error) {
     this.error = error;
   }
-
 
 }

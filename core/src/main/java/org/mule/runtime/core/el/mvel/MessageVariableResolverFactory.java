@@ -33,6 +33,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   protected MuleEvent.Builder eventBuilder;
   protected MuleContext muleContext;
 
+  // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
                                         final MuleEvent event, final MuleEvent.Builder eventBuilder) {
     this.event = event;
