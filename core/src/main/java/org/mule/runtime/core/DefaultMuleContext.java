@@ -181,7 +181,6 @@ public class DefaultMuleContext implements MuleContext {
   private LockFactory lockFactory;
 
   private ExpressionLanguage expressionLanguage;
-  private ExpressionLanguage defaultExpressionLanguage;
 
   private ProcessingTimeWatcher processingTimeWatcher;
 
@@ -231,12 +230,10 @@ public class DefaultMuleContext implements MuleContext {
     localMuleClient = new DefaultLocalMuleClient(this);
     exceptionListener = new DefaultSystemExceptionStrategy();
     transformationService = new TransformationService(this);
-    defaultExpressionLanguage = new MVELExpressionLanguage(this);
   }
 
   public DefaultMuleContext() {
     transformationService = new TransformationService(this);
-    defaultExpressionLanguage = new MVELExpressionLanguage(this);
   }
 
   protected DefaultRegistryBroker createRegistryBroker() {
@@ -250,8 +247,6 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public synchronized void initialise() throws InitialisationException {
     lifecycleManager.checkPhase(Initialisable.PHASE_NAME);
-
-    initialiseIfNeeded(defaultExpressionLanguage);
 
     if (getNotificationManager() == null) {
       throw new MuleRuntimeException(CoreMessages.objectIsNull(MuleProperties.OBJECT_NOTIFICATION_MANAGER));
@@ -282,7 +277,6 @@ public class DefaultMuleContext implements MuleContext {
       getNotificationManager().start(workManager, workListener);
       fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISING));
       getLifecycleManager().fireLifecycle(Initialisable.PHASE_NAME);
-
       fireNotification(new MuleContextNotification(this, MuleContextNotification.CONTEXT_INITIALISED));
     } catch (InitialisationException e) {
       throw e;
@@ -864,15 +858,24 @@ public class DefaultMuleContext implements MuleContext {
 
   @Override
   public ExpressionLanguage getExpressionLanguage() {
-    if (this.expressionLanguage == null) {
-      this.expressionLanguage = this.registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+    if(expressionLanguage == null) {
+      if(Initialisable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase())){
+        // Transports need expression language during object construction so we need to ensure it's initilized as lifecyce
+        // ordering doesn't help in this case.  The first time the expression language is initialized it won't have been
+        // initialized with any extensions, but spring will eventually re-initialize the same instance and expression language
+        // extensions will be applied at this point.
+        this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+        try {
+          initialiseIfNeeded(expressionLanguage);
+        } catch (InitialisationException e) {
+          throw new MuleRuntimeException(e);
+        }
+      }
+      else{
+        this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
+      }
     }
-    if (this.expressionLanguage == null || !lifecycleManager.isPhaseComplete(Initialisable.PHASE_NAME)) {
-      // This is required because there are some uses of expression language before MuleContext is initialized.
-      return defaultExpressionLanguage;
-    } else {
-      return this.expressionLanguage;
-    }
+    return this.expressionLanguage;
   }
 
   @Override

@@ -28,15 +28,15 @@ public class AttributeEvaluator {
   }
 
   private final String attributeValue;
-  private ExpressionLanguage expressionManager;
+  private ExpressionLanguage expressionLanguage;
   private AttributeType attributeType;
 
   public AttributeEvaluator(String attributeValue) {
     this.attributeValue = attributeValue;
   }
 
-  public AttributeEvaluator initialize(final ExpressionLanguage expressionManager) {
-    this.expressionManager = expressionManager;
+  public AttributeEvaluator initialize(final ExpressionLanguage expressionLanguage) {
+    this.expressionLanguage = expressionLanguage;
     resolveAttributeType();
     return this;
   }
@@ -70,9 +70,9 @@ public class AttributeEvaluator {
 
   public TypedValue resolveTypedValue(MuleEvent event, MuleEvent.Builder eventBuilder) {
     if (isExpression()) {
-      return expressionManager.evaluateTyped(attributeValue, event, eventBuilder, null);
+      return expressionLanguage.evaluateTyped(attributeValue, event, eventBuilder, null);
     } else if (isParseExpression()) {
-      final String value = expressionManager.parse(attributeValue, event, null);
+      final String value = expressionLanguage.parse(attributeValue, event, null);
       return new TypedValue(value, DataType.builder().type(String.class).build());
     } else {
       Class<?> type = attributeValue == null ? Object.class : String.class;
@@ -82,9 +82,9 @@ public class AttributeEvaluator {
 
   public Object resolveValue(MuleEvent event) {
     if (isExpression()) {
-      return expressionManager.evaluate(attributeValue, event, null);
+      return expressionLanguage.evaluate(attributeValue, event, null);
     } else if (isParseExpression()) {
-      return expressionManager.parse(attributeValue, event, null);
+      return expressionLanguage.parse(attributeValue, event, null);
     } else {
       return attributeValue;
     }
