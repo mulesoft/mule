@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;

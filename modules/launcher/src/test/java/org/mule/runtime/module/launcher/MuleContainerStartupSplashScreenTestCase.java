@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.launcher;
 
+import org.mule.runtime.module.deployment.internal.AbstractSplashScreenTestCase;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mule.runtime.core.util.FileUtils.newFile;
@@ -27,7 +29,7 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   @BeforeClass
   public static void setUpPatches() {
-    File libFolder = newFile(workingDirectory.getRoot(), "lib/user");
+    File libFolder = newFile(AbstractSplashScreenTestCase.workingDirectory.getRoot(), "lib/user");
     libFolder.mkdirs();
     newFile(libFolder, FIRST_PATCH).mkdir();
     newFile(libFolder, "library.jar").mkdir();

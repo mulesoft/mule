@@ -16,7 +16,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
-import org.mule.runtime.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;

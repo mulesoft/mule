@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.module.launcher.application.Application;
+import org.mule.runtime.module.deployment.api.application.Application;
 import org.mule.test.infrastructure.deployment.AbstractFakeMuleServerTestCase;
 
 import java.util.LinkedList;

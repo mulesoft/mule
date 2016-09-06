@@ -10,8 +10,8 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withName;
 
 import org.mule.runtime.core.logging.LogConfigChangeSubject;
+import org.mule.runtime.module.deployment.internal.application.ApplicationClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.launcher.application.ApplicationClassLoader;
 
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
