@@ -38,12 +38,13 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   @Test
   public void email() throws Exception {
     final String expression = "#[validator.validateEmail(email)]";
-    MuleEvent event = getTestEvent("");
-    event.setFlowVariable("email", VALID_EMAIL);
+    MuleEvent event = MuleEvent.builder(getTestEvent(""))
+        .addFlowVariable("email", VALID_EMAIL)
+        .build();
 
     assertValid(expression, event);
 
-    event.setFlowVariable("email", INVALID_EMAIL);
+    event = MuleEvent.builder(event).addFlowVariable("email", INVALID_EMAIL).build();
     assertInvalid(expression, event);
   }
 
@@ -52,19 +53,20 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
     final String regex = "[tT]rue";
     final String expression = "#[validator.matchesRegex(payload, regexp, caseSensitive)]";
 
-    MuleEvent event = getTestEvent("true");
-    event.setFlowVariable("regexp", regex);
-    event.setFlowVariable("caseSensitive", false);
+    MuleEvent event = MuleEvent.builder(getTestEvent("true"))
+    .addFlowVariable("regexp", regex)
+    .addFlowVariable("caseSensitive", false)
+        .build();
 
     assertValid(expression, event);
 
-    event.setMessage(MuleMessage.builder(event.getMessage()).payload("TRUE").build());
+    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("TRUE").build()).build();
     assertValid(expression, event);
 
-    event.setFlowVariable("caseSensitive", true);
+    event = MuleEvent.builder(event).addFlowVariable("caseSensitive", true).build();
     assertInvalid(expression, event);
 
-    event.setMessage(MuleMessage.builder(event.getMessage()).payload("tTrue").build());
+    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("tTrue").build()).build();
     assertInvalid(expression, event);
   }
 
@@ -72,9 +74,10 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   public void isTime() throws Exception {
     final String time = "12:08 PM";
 
-    MuleEvent event = getTestEvent(time);
-    event.setFlowVariable("validPattern", "h:mm a");
-    event.setFlowVariable("invalidPattern", "yyMMddHHmmssZ");
+    MuleEvent event = MuleEvent.builder(getTestEvent(time))
+        .addFlowVariable("validPattern", "h:mm a")
+        .addFlowVariable("invalidPattern", "yyMMddHHmmssZ")
+        .build();
 
     assertValid("#[validator.isTime(payload, validPattern)]", event);
     assertValid("#[validator.isTime(payload, validPattern, 'US')]", event);
@@ -186,10 +189,11 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   private MuleEvent getNumberValidationEvent(Object value, NumberType numberType, Object minValue, Object maxValue)
       throws Exception {
-    MuleEvent event = getTestEvent(value);
-    event.setFlowVariable("numberType", numberType);
-    event.setFlowVariable("minValue", minValue);
-    event.setFlowVariable("maxValue", maxValue);
+    MuleEvent event = MuleEvent.builder(getTestEvent(value))
+        .addFlowVariable("numberType", numberType)
+        .addFlowVariable("minValue", minValue)
+        .addFlowVariable("maxValue", maxValue)
+        .build();
 
     return event;
   }

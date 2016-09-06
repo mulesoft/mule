@@ -39,8 +39,7 @@ public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Ini
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    validator.validate(event, muleContext);
-    return event;
+    return validator.validate(event, muleContext);
   }
 
   public void setSchemaLocation(String schemaLocation) {
