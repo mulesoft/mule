@@ -238,7 +238,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
 
                                if (resendRequest(resultEvent, checkRetry, authentication)) {
                                  consumePayload(resultEvent);
-                                 innerProcessNonBlocking(resultEvent, completionHandler, false);
+                                 innerProcessNonBlocking(muleEvent, completionHandler, false);
                                } else {
                                  validateResponse(resultEvent);
                                  completionHandler.onCompletion(resultEvent, createCompletionExceptionCallback(resultEvent));
