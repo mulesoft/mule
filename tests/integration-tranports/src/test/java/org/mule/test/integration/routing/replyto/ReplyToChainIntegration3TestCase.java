@@ -43,9 +43,7 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
-      return MuleEvent.builder(event).message(message).build();
+      return MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
     }
   }
 }
