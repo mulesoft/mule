@@ -99,7 +99,7 @@ public class AuthorizationRequestHandler implements MuleContextAware {
   private List<MessageProcessor> createLocalAuthorizationUrlListener() {
     final MessageProcessor listenerMessageProcessor = muleEvent -> {
       final Builder builder = MuleEvent.builder(muleEvent);
-      
+
       final String onCompleteRedirectToValue =
           ((Map<String, String>) muleEvent.getMessage().getInboundProperty("http.query.params")).get("onCompleteRedirectTo");
       final String resourceOwnerId =
@@ -118,7 +118,9 @@ public class AuthorizationRequestHandler implements MuleContextAware {
           .setCustomParameters(customParameters).setRedirectUrl(oauthConfig.getRedirectionUrl())
           .setState(stateEncoder.getEncodedState()).setScope(scopes).buildUrl();
 
-      return builder.message(MuleMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION, authorizationUrlWithParams)            .build()).build();
+      return builder
+          .message(MuleMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION, authorizationUrlWithParams).build())
+          .build();
     };
     return Arrays.asList(listenerMessageProcessor);
   }
