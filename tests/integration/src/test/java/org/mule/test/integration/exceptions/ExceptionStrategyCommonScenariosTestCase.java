@@ -9,14 +9,14 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.test.AbstractIntegrationTestCase;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,10 +71,8 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractIntegratio
 
     @Override
     public MuleEvent handleException(MessagingException e, MuleEvent event) {
-      Object payloadBeforeException = event.getMessage().getPayload();
-      MuleEvent resultEvent = super.handleException(e, event);
-      resultEvent.setMessage(MuleMessage.builder(event.getMessage()).payload(payloadBeforeException).build());
-      return resultEvent;
+      return MuleEvent.builder(super.handleException(e, event))
+          .message(MuleMessage.builder(event.getMessage()).payload(event.getMessage().getPayload()).build()).build();
     }
   }
 }

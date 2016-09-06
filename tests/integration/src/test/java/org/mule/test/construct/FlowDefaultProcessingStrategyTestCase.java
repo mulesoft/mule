@@ -10,7 +10,7 @@ import static java.lang.Thread.currentThread;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleEvent;
@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -77,9 +78,10 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(PROCESSOR_THREAD, currentThread().getName())
-          .build());
-      return event;
+      return MuleEvent.builder(event)
+          .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(PROCESSOR_THREAD, currentThread().getName())
+              .build())
+          .build();
     }
   }
 

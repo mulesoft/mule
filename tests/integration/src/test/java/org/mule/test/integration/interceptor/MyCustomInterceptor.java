@@ -16,9 +16,9 @@ public class MyCustomInterceptor extends AbstractInterceptingMessageProcessor im
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    String payload = (String) event.getMessage().getPayload();
-    event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload + "!").build());
-    return processNext(event);
+    return processNext(MuleEvent.builder(event)
+        .message(MuleMessage.builder(event.getMessage()).payload((String) event.getMessage().getPayload() + "!").build())
+        .build());
   }
 
 }

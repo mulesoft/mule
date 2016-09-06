@@ -30,7 +30,6 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -207,9 +206,8 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
       if (expectedHandler) {
         expectedHandler = messagingExceptionHandler.equals(flowConstruct.getExceptionListener());
       }
-      event.setFlowVariable("expectedHandler", expectedHandler);
       injectedMessagingExceptionHandler = messagingExceptionHandler;
-      return event;
+      return MuleEvent.builder(event).addFlowVariable("expectedHandler", expectedHandler).build();
     }
 
     @Override

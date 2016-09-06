@@ -7,13 +7,13 @@
 package org.mule.test.routing;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.IdentifiableDynamicRouteResolver;
 
 import java.util.ArrayList;
@@ -48,8 +48,7 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(letter).build());
-        return event;
+        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(letter).build()).build();
       } catch (Exception e) {
         throw new DefaultMuleException(e);
       }

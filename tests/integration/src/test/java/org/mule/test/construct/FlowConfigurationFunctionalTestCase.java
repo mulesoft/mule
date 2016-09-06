@@ -16,12 +16,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_NONE;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -31,6 +29,7 @@ import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.source.StartableCompositeMessageSource;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -602,8 +601,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(currentThread()).build());
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(currentThread()).build()).build();
     }
   }
 

@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -138,8 +139,7 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
       NewsResponse newsResponse = new NewsResponse();
       newsResponse.setUserId(newsRequest.getUserId());
       newsResponse.setTitle("News title");
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(newsResponse).build());
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(newsResponse).build()).build();
     }
   }
 

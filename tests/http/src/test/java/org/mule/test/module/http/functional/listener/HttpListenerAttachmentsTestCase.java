@@ -262,8 +262,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
     public MuleEvent process(MuleEvent event) throws MuleException {
       org.mule.extension.http.api.HttpPart part =
           new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, TEXT_PLAIN_LATIN, null);
-      event.setFlowVariable("parts", asList(part));
-      return event;
+      return MuleEvent.builder(event).addFlowVariable("parts", asList(part)).build();
     }
   }
 
@@ -276,8 +275,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
       org.mule.extension.http.api.HttpPart part2 =
           new org.mule.extension.http.api.HttpPart(FILE_BODY_FIELD_NAME, FILE_BODY_FIELD_VALUE.getBytes(), BINARY,
                                                    FILE_BODY_FIELD_FILENAME);
-      event.setFlowVariable("parts", asList(part1, part2));
-      return event;
+      return MuleEvent.builder(event).addFlowVariable("parts", asList(part1, part2)).build();
     }
   }
 
@@ -295,8 +293,7 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
         parts.add(new org.mule.extension.http.api.HttpPart(attributes.getName(), m.getPayload(), m.getDataType().getMediaType(),
                                                            filename));
       });
-      event.setFlowVariable("parts", parts);
-      return event;
+      return MuleEvent.builder(event).addFlowVariable("parts", parts).build();
     }
   }
 }

@@ -254,9 +254,9 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     endpoint.setFlowConstruct(getTestFlow());
     requestEvent = createTestRequestEvent(endpoint);
     responseEvent = createTestResponseEvent(endpoint);
-    responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage())
+    responseEvent = MuleEvent.builder(createTestResponseEvent(endpoint)).message(MuleMessage.builder(responseEvent.getMessage())
         .exceptionPayload(new DefaultExceptionPayload(new RuntimeException()))
-        .build());
+        .build()).build();
 
     MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(endpoint.getFlowConstruct());
 

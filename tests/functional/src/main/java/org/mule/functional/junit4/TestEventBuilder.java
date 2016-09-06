@@ -299,18 +299,14 @@ public class TestEventBuilder {
     final MuleMessage muleMessage = messageBuilder.build();
 
     MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
-        .message((MuleMessage) spyTransformer.transform(muleMessage)).exchangePattern(exchangePattern).flow(flow)
-        .replyToHandler(replyToHandler).transacted(transacted).build();
+        .message((MuleMessage) spyTransformer.transform(muleMessage)).flowVariables(flowVariables)
+        .exchangePattern(exchangePattern).flow(flow).replyToHandler(replyToHandler).transacted(transacted).build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
-      outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
+      event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
     }
     for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet()) {
       event.getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
-    }
-
-    for (Entry<String, Object> flowVarEntry : flowVariables.entrySet()) {
-      event.setFlowVariable(flowVarEntry.getKey(), flowVarEntry.getValue());
     }
 
     return (MuleEvent) spyTransformer.transform(event);
@@ -318,7 +314,7 @@ public class TestEventBuilder {
 
   private interface Attachment {
 
-    void addOutboundTo(MuleEvent event, String key);
+    MuleEvent addOutboundTo(MuleEvent event, String key);
   }
 
   private class DataHandlerAttachment implements Attachment {
@@ -330,8 +326,9 @@ public class TestEventBuilder {
     }
 
     @Override
-    public void addOutboundTo(MuleEvent event, String key) {
-      event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, dataHandler).build());
+    public MuleEvent addOutboundTo(MuleEvent event, String key) {
+      return MuleEvent.builder(event)
+          .message(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, dataHandler).build()).build();
     }
   }
 
@@ -346,10 +343,10 @@ public class TestEventBuilder {
     }
 
     @Override
-    public void addOutboundTo(MuleEvent event, String key) {
+    public MuleEvent addOutboundTo(MuleEvent event, String key) {
       try {
-        event.setMessage(MuleMessage.builder(event.getMessage())
-            .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType)).build());
+        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+            .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType)).build()).build();
       } catch (Exception e) {
         throw new MuleRuntimeException(e);
       }

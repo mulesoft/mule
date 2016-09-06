@@ -19,9 +19,8 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy {
 
   @Override
   public MuleEvent handleException(MessagingException exception, MuleEvent event) {
-    MuleEvent result = super.handleException(exception, event);
-    result.setMessage(MuleMessage.builder(result.getMessage()).payload("Ka-boom!").build());
-    return result;
+    return MuleEvent.builder(event)
+        .message(MuleMessage.builder(super.handleException(exception, event).getMessage()).payload("Ka-boom!").build()).build();
   }
 
   public boolean isRedeliver() {
