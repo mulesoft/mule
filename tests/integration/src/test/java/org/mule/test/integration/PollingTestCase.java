@@ -32,7 +32,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
   private static List<String> foo;
   private static List<String> bar;
   private static List<MuleEvent> events;
-  private static List<Integer> eventIds;
+  private static List<String> eventIds;
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
@@ -73,7 +73,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
 
       for (int i = 0; i < events.size(); i++) {
         assertNotNull(events.get(i));
-        assertThat(eventIds.get(i), equalTo(events.get(i).hashCode()));
+        assertThat(eventIds.get(i), equalTo(events.get(i).getContext().getId()));
       }
     }
   }
@@ -111,7 +111,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
     public MuleEvent process(MuleEvent event) throws MuleException {
       synchronized (events) {
         events.add(getCurrentEvent());
-        eventIds.add(event.hashCode());
+        eventIds.add(event.getContext().getId());
       }
       return event;
     }
