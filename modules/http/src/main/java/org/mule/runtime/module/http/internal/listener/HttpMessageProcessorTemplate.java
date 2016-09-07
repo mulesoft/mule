@@ -157,8 +157,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
     event = MuleEvent.builder(event)
         .message(MuleMessage.builder(event.getMessage()).payload(messagingException.getMessage()).build()).build();
     final HttpResponse response = errorResponseBuilder.build(failureResponseBuilder, event);
-    responseReadyCallback.responseReady(response,
-                                        getResponseFailureCallback(responseCompletationCallback, messagingException.getEvent()));
+    responseReadyCallback.responseReady(response, getResponseFailureCallback(responseCompletationCallback, event));
   }
 
   @Override

@@ -14,6 +14,39 @@ import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBU
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Disposable;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
+import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
+import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.util.Base64;
+import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.cxf.CxfConstants;
+import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.runtime.module.cxf.builder.ProxyClientMessageProcessorBuilder;
+import org.mule.runtime.module.ws.security.SecurityStrategy;
+import org.mule.runtime.module.ws.security.WSSecurity;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -45,38 +78,6 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
-import org.mule.runtime.core.api.connector.DispatchException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.message.PartAttributes;
-import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.util.Base64;
-import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.cxf.CxfConstants;
-import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
-import org.mule.runtime.module.cxf.builder.ProxyClientMessageProcessorBuilder;
-import org.mule.runtime.module.ws.security.SecurityStrategy;
-import org.mule.runtime.module.ws.security.WSSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -164,18 +165,20 @@ public class WSConsumer
 
       @Override
       protected MuleEvent processRequest(MuleEvent event) throws MuleException {
+        MuleMessage message = event.getMessage();
+        final MuleEvent.Builder builder = MuleEvent.builder(event);
         /*
          * If the requestBody variable is set, it will be used as the payload to send instead of the payload of the message. This
          * will happen when an operation required no input parameters.
          */
         if (requestBody != null) {
-          event.setMessage(MuleMessage.builder(event.getMessage()).payload(requestBody).build());
-
+          message = MuleMessage.builder(event.getMessage()).payload(requestBody).build();
+          builder.message(message);
         }
 
-        copyAttachmentsRequest(event);
+        copyAttachmentsRequest(builder, message);
 
-        return super.processRequest(event);
+        return super.processRequest(builder.build());
       }
 
       @Override
@@ -191,8 +194,8 @@ public class WSConsumer
           if (e.getCause() instanceof SoapFault) {
             SoapFault soapFault = (SoapFault) e.getCause();
 
-            event.setMessage(MuleMessage.builder(event.getMessage())
-                .payload(soapFault.getDetail() != null ? soapFault.getDetail() : null).build());
+            event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+                .payload(soapFault.getDetail() != null ? soapFault.getDetail() : null).build()).build();
 
             throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(), soapFault.getMessage(),
                                          soapFault.getDetail(), this);
@@ -204,8 +207,7 @@ public class WSConsumer
 
       @Override
       protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
-        copyAttachmentsResponse(response);
-        return super.processResponse(response, request);
+        return super.processResponse(copyAttachmentsResponse(response), request);
       }
     };
   }
@@ -225,7 +227,7 @@ public class WSConsumer
       @Override
       protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
         if (propertyValue != null) {
-          response.setFlowVariable(propertyName, propertyValue);
+          response = MuleEvent.builder(response).addFlowVariable(propertyName, propertyValue).build();
         }
         return super.processResponse(response, request);
       }
@@ -248,9 +250,8 @@ public class WSConsumer
             builder.removeOutboundProperty(outboundProperty);
           }
         }
-        event.setMessage(builder.build());
 
-        return super.processRequest(event);
+        return super.processRequest(MuleEvent.builder(event).message(builder.build()).build());
       }
 
       @Override
@@ -258,8 +259,8 @@ public class WSConsumer
         // Ensure that the http.status code inbound property (if present) is a String.
         Object statusCode = response.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY, null);
         if (statusCode != null && !(statusCode instanceof String)) {
-          response.setMessage(MuleMessage.builder(response.getMessage())
-              .addInboundProperty(HTTP_STATUS_PROPERTY, statusCode.toString()).build());
+          response = MuleEvent.builder(request).message(MuleMessage.builder(response.getMessage())
+              .addInboundProperty(HTTP_STATUS_PROPERTY, statusCode.toString()).build()).build();
         }
         return super.processResponse(response, request);
       }
@@ -396,20 +397,18 @@ public class WSConsumer
    * Reads outbound attachments from the MuleMessage and sets the CxfConstants.ATTACHMENTS invocation properties with a set of CXF
    * Attachment objects.
    */
-  private void copyAttachmentsRequest(MuleEvent event) throws MessagingException {
-    MuleMessage message = event.getMessage();
-
-    final Builder builder = MuleMessage.builder(event.getMessage());
+  private void copyAttachmentsRequest(MuleEvent.Builder eventBuilder, MuleMessage message) throws MessagingException {
+    final Builder builder = MuleMessage.builder(message);
 
     List<Attachment> attachments = new ArrayList<>();
-    for (String outboundAttachmentName : event.getMessage().getOutboundAttachmentNames()) {
+    for (String outboundAttachmentName : message.getOutboundAttachmentNames()) {
       attachments
-          .add(new AttachmentImpl(outboundAttachmentName, event.getMessage().getOutboundAttachment(outboundAttachmentName)));
+          .add(new AttachmentImpl(outboundAttachmentName, message.getOutboundAttachment(outboundAttachmentName)));
     }
 
     try {
-      if (event.getMessage().getPayload() instanceof MultiPartPayload) {
-        for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) event.getMessage().getPayload()).getParts()) {
+      if (message.getPayload() instanceof MultiPartPayload) {
+        for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) message.getPayload()).getParts()) {
           final String partName = ((PartAttributes) part.getAttributes()).getName();
           attachments
               .add(new AttachmentImpl(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType())));
@@ -417,19 +416,20 @@ public class WSConsumer
         builder.nullPayload();
       }
     } catch (IOException e) {
-      throw new MessagingException(CoreMessages.createStaticMessage("Exception processing attachments."), event, e, this);
+      throw new MessagingException(CoreMessages.createStaticMessage("Exception processing attachments."), eventBuilder.build(), e,
+                                   this);
     }
 
-    event.setFlowVariable(CxfConstants.ATTACHMENTS, attachments);
-
-    event.setMessage(builder.outboundAttachments(emptyMap()).build());
+    eventBuilder.addFlowVariable(CxfConstants.ATTACHMENTS, attachments).message(builder.outboundAttachments(emptyMap()).build());
   }
 
   /**
    * Takes the set of CXF attachments from the CxfConstants.ATTACHMENTS invocation properties and sets them as inbound attachments
    * in the Mule Message.
+   * 
+   * @return
    */
-  private void copyAttachmentsResponse(MuleEvent event) throws MessagingException {
+  private MuleEvent copyAttachmentsResponse(MuleEvent event) throws MessagingException {
     MuleMessage message = event.getMessage();
 
     if (event.getFlowVariable(CxfConstants.ATTACHMENTS) != null) {
@@ -461,7 +461,9 @@ public class WSConsumer
 
         builder.payload(new DefaultMultiPartPayload(parts));
       }
-      event.setMessage(builder.build());
+      return MuleEvent.builder(event).message(builder.build()).build();
+    } else {
+      return event;
     }
 
   }

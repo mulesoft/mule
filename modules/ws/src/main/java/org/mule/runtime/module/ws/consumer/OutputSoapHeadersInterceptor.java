@@ -55,7 +55,8 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
           String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
           String value = (String) transformer.transform(header.getObject());
 
-          event.setMessage(MuleMessage.builder(event.getMessage()).addInboundProperty(key, value).build());
+          message.getExchange().put(CxfConstants.MULE_EVENT, MuleEvent.builder(event)
+              .message(MuleMessage.builder(event.getMessage()).addInboundProperty(key, value).build()).build());
         } catch (TransformerException e) {
           throw new Fault(new TransformerMessagingException(CoreMessages
               .createStaticMessage("Cannot parse content of SOAP header %s in the response", header.getName().getLocalPart()),
