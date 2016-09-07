@@ -272,6 +272,9 @@ do
         '9000/800')
             DIST_ARCH="parisc"
             break;;
+        's390x')
+            DIST_ARCH="s390x"
+            break;;
         *)
             echo "Your machine's hardware type (uname $UNAME_PROC_OPTION) was not recognized by the Service Wrapper as a supported platform."
             echo "Please report this message along with your machine's processor/architecture."
