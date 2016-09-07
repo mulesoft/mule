@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -16,6 +18,12 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
    * @return the artifact unique identifier
    */
   String getArtifactName();
+
+  /**
+   * @param <T> the generic type of the artifact descriptor.
+   * @return the artifact descriptor corresponding to this classloader instance. Non null.
+   */
+  <T extends ArtifactDescriptor> T getArtifactDescriptor();
 
   /**
    * @param resource name of the resource to find.

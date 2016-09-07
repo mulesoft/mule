@@ -8,10 +8,10 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
@@ -28,8 +28,9 @@ public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader impleme
     registerAsParallelCapable();
   }
 
-  public MuleSharedDomainClassLoader(String domain, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy, List<URL> urls) {
-    super(domain, urls.toArray(new URL[0]), parent, lookupPolicy);
+  public MuleSharedDomainClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent,
+                                     ClassLoaderLookupPolicy lookupPolicy, List<URL> urls) {
+    super(artifactDescriptor, urls.toArray(new URL[0]), parent, lookupPolicy);
   }
 
   @Override

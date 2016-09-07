@@ -7,6 +7,8 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -15,6 +17,11 @@ public class TestArtifactClassLoader extends TestClassLoader implements Artifact
 
   @Override
   public String getArtifactName() {
+    return null;
+  }
+
+  @Override
+  public <T extends ArtifactDescriptor> T getArtifactDescriptor() {
     return null;
   }
 

@@ -23,21 +23,22 @@ import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.util.ExceptionUtils;
-import org.mule.runtime.module.deployment.api.application.ApplicationStatus;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentInitException;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentStartException;
 import org.mule.runtime.module.deployment.api.DeploymentStopException;
 import org.mule.runtime.module.deployment.api.InstallException;
 import org.mule.runtime.module.deployment.api.application.Application;
-import org.mule.runtime.module.deployment.internal.MuleApplicationClassLoader;
+import org.mule.runtime.module.deployment.api.application.ApplicationStatus;
+import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.DisposableClassLoader;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactMuleContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.service.ServiceRepository;
@@ -65,7 +66,7 @@ public class DefaultMuleApplication implements Application {
   protected DeploymentListener deploymentListener;
   private ServerNotificationListener<MuleContextNotification> statusListener;
 
-  public DefaultMuleApplication(ApplicationDescriptor descriptor, MuleApplicationClassLoader deploymentClassLoader,
+  public DefaultMuleApplication(ApplicationDescriptor descriptor, MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
                                 ServiceRepository serviceRepository) {
     this.descriptor = descriptor;
@@ -114,10 +115,6 @@ public class DefaultMuleApplication implements Application {
   @Override
   public Domain getDomain() {
     return domainRepository.getDomain(descriptor.getDomain());
-  }
-
-  public void setAppName(String appName) {
-    this.descriptor.setName(appName);
   }
 
   @Override
@@ -245,8 +242,9 @@ public class DefaultMuleApplication implements Application {
       doDispose();
 
       if (appCl != null) {
-        // close classloader to release jar connections in lieu of Java 7's ClassLoader.close()
-        if (appCl instanceof DisposableClassLoader) {
+        if (isRegionClassLoaderMember(appCl)) {
+          ((DisposableClassLoader) appCl.getParent()).dispose();
+        } else if (appCl instanceof DisposableClassLoader) {
           ((DisposableClassLoader) appCl).dispose();
         }
       }
@@ -255,6 +253,10 @@ public class DefaultMuleApplication implements Application {
       Thread.currentThread().setContextClassLoader(null);
       deploymentClassLoader = null;
     }
+  }
+
+  private static boolean isRegionClassLoaderMember(ClassLoader loggerClassLoader) {
+    return !(loggerClassLoader instanceof RegionClassLoader) && loggerClassLoader.getParent() instanceof RegionClassLoader;
   }
 
   @Override

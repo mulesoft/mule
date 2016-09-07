@@ -17,7 +17,7 @@ import java.io.File;
 public class EmptyApplicationDescriptor extends ApplicationDescriptor {
 
   public EmptyApplicationDescriptor(String appName) {
-    setName(appName);
+    super(appName);
     setConfigResources(new String[] {MuleServer.DEFAULT_CONFIGURATION});
     File configPathFile = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(appName);
     String configPath = String.format(configPathFile.getAbsolutePath());

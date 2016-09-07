@@ -44,7 +44,7 @@ public class ServiceClassLoaderFactory implements ArtifactClassLoaderFactory<Ser
     addDirectoryToClassLoader(urls, new File(rootFolder, CLASSES_DIR));
     loadJarsFromFolder(urls, new File(rootFolder, LIB_DIR));
 
-    return new MuleArtifactClassLoader(descriptor.getName(), urls.toArray(new URL[0]), parent.getClassLoader(),
+    return new MuleArtifactClassLoader(descriptor, urls.toArray(new URL[0]), parent.getClassLoader(),
                                        parent.getClassLoaderLookupPolicy());
   }
 

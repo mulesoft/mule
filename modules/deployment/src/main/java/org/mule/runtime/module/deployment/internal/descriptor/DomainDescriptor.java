@@ -10,4 +10,13 @@ package org.mule.runtime.module.deployment.internal.descriptor;
  * Represents the description of a domain.
  */
 public class DomainDescriptor extends DeployableArtifactDescriptor {
+
+  /**
+   * Creates a new domain descriptor
+   *
+   * @param name domain name. Non empty.
+   */
+  public DomainDescriptor(String name) {
+    super(name);
+  }
 }

@@ -29,33 +29,33 @@ public class PropertiesDescriptorParser implements DescriptorParser<ApplicationD
 
   @Override
   public ApplicationDescriptor parse(File descriptor, String artifactName) throws IOException {
-    final Properties p = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
+    final Properties properties = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
 
-    ApplicationDescriptor d = new ApplicationDescriptor();
-    d.setName(artifactName);
-    d.setEncoding(p.getProperty(PROPERTY_ENCODING));
-    d.setDomain(p.getProperty(PROPERTY_DOMAIN));
+    ApplicationDescriptor appDescriptor = new ApplicationDescriptor(artifactName);
+    appDescriptor.setEncoding(properties.getProperty(PROPERTY_ENCODING));
+    appDescriptor.setDomain(properties.getProperty(PROPERTY_DOMAIN));
 
-    final String resProps = p.getProperty(PROPERTY_CONFIG_RESOURCES);
+    final String resProps = properties.getProperty(PROPERTY_CONFIG_RESOURCES);
     String[] urls;
     if (StringUtils.isBlank(resProps)) {
       urls = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     } else {
       urls = resProps.split(",");
     }
-    d.setConfigResources(urls);
+    appDescriptor.setConfigResources(urls);
 
     String[] absoluteResourcePaths = convertConfigResourcesToAbsolutePatch(urls, artifactName);
-    d.setAbsoluteResourcePaths(absoluteResourcePaths);
-    d.setConfigResourcesFile(convertConfigResourcesToFile(absoluteResourcePaths));
+    appDescriptor.setAbsoluteResourcePaths(absoluteResourcePaths);
+    appDescriptor.setConfigResourcesFile(convertConfigResourcesToFile(absoluteResourcePaths));
 
     // supports true (case insensitive), yes, on as positive values
-    d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
+    appDescriptor.setRedeploymentEnabled(BooleanUtils
+        .toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
 
-    if (p.containsKey(PROPERTY_LOG_CONFIG_FILE)) {
-      d.setLogConfigFile(new File(p.getProperty(PROPERTY_LOG_CONFIG_FILE)));
+    if (properties.containsKey(PROPERTY_LOG_CONFIG_FILE)) {
+      appDescriptor.setLogConfigFile(new File(properties.getProperty(PROPERTY_LOG_CONFIG_FILE)));
     }
-    return d;
+    return appDescriptor;
   }
 
   private File[] convertConfigResourcesToFile(String[] absoluteResourcePaths) {

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal.descriptor;
 
+import static java.lang.Boolean.TRUE;
+import static org.apache.commons.lang.BooleanUtils.toBoolean;
 import static org.mule.runtime.core.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.module.deployment.internal.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
 
@@ -13,8 +15,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.apache.commons.lang.BooleanUtils;
 
 /**
  * Descriptor parser exclusive for domains.
@@ -24,10 +24,9 @@ public class DomainDescriptorParser implements DescriptorParser<DomainDescriptor
   @Override
   public DomainDescriptor parse(File descriptor, String artifactName) throws IOException {
     final Properties properties = loadProperties(new FileInputStream(descriptor));
-    DomainDescriptor domainDescriptor = new DomainDescriptor();
-    domainDescriptor.setName(artifactName);
-    domainDescriptor.setRedeploymentEnabled(BooleanUtils
-        .toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
+    final DomainDescriptor domainDescriptor = new DomainDescriptor(artifactName);
+    domainDescriptor.setRedeploymentEnabled(toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, TRUE.toString())));
+
     return domainDescriptor;
   }
 }

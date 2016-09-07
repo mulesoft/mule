@@ -8,6 +8,7 @@ package org.mule.runtime.module.launcher.log4j2;
 
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 
 import java.net.URI;
@@ -91,8 +92,14 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
     ClassLoader loggerClassLoader = classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
     if (!(loggerClassLoader instanceof ArtifactClassLoader)) {
       loggerClassLoader = loggerClassLoader.getSystemClassLoader();
+    } else if (isRegionClassLoaderMember(loggerClassLoader)) {
+      loggerClassLoader = loggerClassLoader.getParent();
     }
     return loggerClassLoader;
+  }
+
+  private static boolean isRegionClassLoaderMember(ClassLoader loggerClassLoader) {
+    return !(loggerClassLoader instanceof RegionClassLoader) && loggerClassLoader.getParent() instanceof RegionClassLoader;
   }
 
   @Override

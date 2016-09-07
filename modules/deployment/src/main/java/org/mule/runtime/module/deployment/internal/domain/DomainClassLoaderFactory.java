@@ -16,19 +16,19 @@ import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessa
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
-
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.util.Preconditions;
-import org.mule.runtime.module.deployment.api.DeploymentException;
-import org.mule.runtime.module.deployment.internal.MuleSharedDomainClassLoader;
-import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
-import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarExplorer;
+import org.mule.runtime.module.deployment.api.DeploymentException;
+import org.mule.runtime.module.deployment.internal.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
           if (domain.equals(DEFAULT_DOMAIN_NAME)) {
             domainClassLoader = getDefaultDomainClassLoader(parent.getClassLoaderLookupPolicy());
           } else {
-            domainClassLoader = getCustomDomainClassLoader(parent.getClassLoaderLookupPolicy(), domain);
+            domainClassLoader = getCustomDomainClassLoader(parent.getClassLoaderLookupPolicy(), descriptor);
           }
 
           domainArtifactClassLoaders.put(domain, domainClassLoader);
@@ -96,9 +96,9 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
     return domainClassLoader;
   }
 
-  private ArtifactClassLoader getCustomDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy, String domain) {
-    validateDomain(domain);
-    final List<URL> urls = getDomainUrls(domain);
+  private ArtifactClassLoader getCustomDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy, DomainDescriptor domain) {
+    validateDomain(domain.getName());
+    final List<URL> urls = getDomainUrls(domain.getName());
     final Map<String, ClassLoaderLookupStrategy> domainLookStrategies = getLookStrategiesFrom(urls);
     final ClassLoaderLookupPolicy domainLookupPolicy = containerLookupPolicy.extend(domainLookStrategies);
 
@@ -155,9 +155,8 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
   }
 
   private ArtifactClassLoader getDefaultDomainClassLoader(ClassLoaderLookupPolicy containerLookupPolicy) {
-    return new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, parentClassLoader,
-                                           containerLookupPolicy.extend(emptyMap()),
-                                           emptyList());
+    return new MuleSharedDomainClassLoader(new DomainDescriptor(DEFAULT_DOMAIN_NAME), parentClassLoader,
+                                           containerLookupPolicy.extend(emptyMap()), emptyList());
   }
 
   private void validateDomain(String domain) {
@@ -173,6 +172,11 @@ public class DomainClassLoaderFactory implements DeployableArtifactClassLoaderFa
       @Override
       public String getArtifactName() {
         return classLoader.getArtifactName();
+      }
+
+      @Override
+      public <T extends ArtifactDescriptor> T getArtifactDescriptor() {
+        return classLoader.getArtifactDescriptor();
       }
 
       @Override
