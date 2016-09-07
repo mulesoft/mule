@@ -7,7 +7,6 @@
 package org.mule.runtime.module.scripting.transformer;
 
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -41,13 +40,6 @@ public class ScriptTransformer extends AbstractMessageTransformer {
   public void dispose() {
     super.dispose();
     LifecycleUtils.disposeIfNeeded(script, LOGGER);
-  }
-
-  @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    // TODO Auto-generated method stub
-    final MuleEvent ret = super.process(event);
-    return ret;
   }
 
   @Override
