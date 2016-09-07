@@ -214,13 +214,10 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
    */
   public void addEvent(MuleEvent event) throws ObjectStoreException {
     synchronized (this) {
+      event = MuleEvent.builder(event).addFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter).build();
       // Using both event ID and CorrelationSequence since in certain instances
       // when an event is split up, the same event IDs are used.
       Serializable key = getEventKey(event);
-      // TODO MULE-9342 migrating this breaks
-      // org.mule.test.core.routing.outbound.AggregationTimeoutTestCase.timeoutsAggregationWithPersistentStore()
-      // event = MuleEvent.builder(event).addFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter).build();
-      event.setFlowVariable(MULE_ARRIVAL_ORDER_PROPERTY, ++arrivalOrderCounter);
       lastStoredEventKey = key;
       eventsObjectStore.store(key, event, eventsPartitionKey);
     }

@@ -43,18 +43,18 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         } else {
           messagingException = new MessagingException(event, exception, messageProcessor);
         }
-        // TODO these break some tests and rely on the event mutability, check with PLG
-        // event = MuleEvent.builder(event).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
-        event.setError(ErrorBuilder.builder(exception).errorType(errorType).build());
+        MuleEvent exceptionEvent = messagingException.getEvent();
+        event = MuleEvent.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
+        messagingException.setProcessedEvent(event);
       } else {
         messagingException = (MessagingException) exception;
+        MuleEvent exceptionEvent = messagingException.getEvent();
         //TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the messagingException.causedExactlyBy(..) condition.
-        if (!event.getError().isPresent() || !(event.getError().get().equals(exception)
-            || messagingException.causedExactlyBy(event.getError().get().getException().getClass()))) {
+        if (!exceptionEvent.getError().isPresent() || !(exceptionEvent.getError().get().equals(exception)
+            || messagingException.causedExactlyBy(exceptionEvent.getError().get().getException().getClass()))) {
           ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, exception);
-          // TODO MULE-9342 these break some tests and rely on the event mutability, check with PLG
-          // event = MuleEvent.builder(event).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
-          event.setError(ErrorBuilder.builder(exception).errorType(errorType).build());
+          event = MuleEvent.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
+          messagingException.setProcessedEvent(event);
         }
       }
 

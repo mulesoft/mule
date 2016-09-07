@@ -184,11 +184,6 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public void setError(Error error) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public Correlation getCorrelation() {
     throw new UnsupportedOperationException();
   }

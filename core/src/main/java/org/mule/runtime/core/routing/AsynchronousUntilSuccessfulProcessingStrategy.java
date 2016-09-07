@@ -154,21 +154,20 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
                                                                           Exception lastException) {
     try {
       final MuleEvent event = getUntilSuccessfulConfiguration().getObjectStore().remove(eventStoreKey);
-      MuleEvent mutableEvent = event;
 
-      final Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, mutableEvent);
+      final Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, event);
       final Integer deliveryAttemptCount =
           configuredAttempts != null ? configuredAttempts : DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 
+      MuleEvent incrementedEvent = event;
       if (deliveryAttemptCount <= getUntilSuccessfulConfiguration().getMaxRetries()) {
-        // we store the incremented version unless the max attempt count has
-        // been reached
-        mutableEvent = MuleEvent.builder(mutableEvent)
+        // we store the incremented version unless the max attempt count has been reached
+        incrementedEvent = MuleEvent.builder(incrementedEvent)
             .addFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1).build();
-        getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, mutableEvent);
+        getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, incrementedEvent);
         this.scheduleForProcessing(eventStoreKey, false);
       } else {
-        abandonRetries(event, mutableEvent, lastException);
+        abandonRetries(event, incrementedEvent, lastException);
       }
     } catch (final ObjectStoreException ose) {
       logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey, ose);
