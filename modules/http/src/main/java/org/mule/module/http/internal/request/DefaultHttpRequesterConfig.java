@@ -72,6 +72,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     private MuleContext muleContext;
 
     private boolean initialised = false;
+    private boolean started = false;
 
     @Override
     public void initialise() throws InitialisationException
@@ -151,6 +152,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
         {
             ((Stoppable) this.authentication).stop();
         }
+        started = false;
     }
 
     public String getScheme()
@@ -330,11 +332,16 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject implemen
     @Override
     public void start() throws MuleException
     {
+        if (started)
+        {
+            return;
+        }
         httpClient.start();
         if (this.authentication instanceof Startable)
         {
             ((Startable) this.authentication).start();
         }
+        started = true;
     }
 
     public void setMaxConnections(int maxConnections)
