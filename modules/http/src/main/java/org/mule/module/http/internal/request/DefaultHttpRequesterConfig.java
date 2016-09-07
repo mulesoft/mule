@@ -66,6 +66,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     private MuleContext muleContext;
 
     private boolean initialised = false;
+    private boolean started = false;
 
     @Override
     public void initialise() throws InitialisationException
@@ -131,6 +132,7 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
         {
             ((Stoppable) this.authentication).stop();
         }
+        started = false;
     }
 
     public String getScheme()
@@ -302,11 +304,16 @@ public class DefaultHttpRequesterConfig implements HttpRequesterConfig, Initiali
     @Override
     public void start() throws MuleException
     {
+        if (started)
+        {
+            return;
+        }
         httpClient.start();
         if (this.authentication instanceof Startable)
         {
             ((Startable) this.authentication).start();
         }
+        started = true;
     }
 
     public void setMaxConnections(int maxConnections)
