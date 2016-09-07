@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.component.simple.EchoService;
@@ -14,8 +17,6 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.module.cxf.builder.SimpleClientMessageProcessorBuilder;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.hamcrest.core.Is;
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.Test;
 
 public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTestCase {
@@ -49,20 +50,19 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
       } catch (Exception e) {
         e.printStackTrace();
       }
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(msg).build());
       gotEvent = true;
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(msg).build()).build();
     };
     processor.setListener(messageProcessor);
 
     MuleEvent event = getTestEvent("hello");
     MuleEvent response = processor.process(event);
-    assertThat(processor.getClient().getRequestContext().isEmpty(), Is.is(true));
-    assertThat(processor.getClient().getResponseContext().isEmpty(), Is.is(true));
+    assertThat(processor.getClient().getRequestContext().isEmpty(), is(true));
+    assertThat(processor.getClient().getResponseContext().isEmpty(), is(true));
     Object payload = response.getMessage().getPayload();
-    assertThat(payload, IsInstanceOf.instanceOf(String.class));
-    assertThat((String) payload, Is.is("hello"));
-    assertThat(gotEvent, Is.is(true));
+    assertThat(payload, instanceOf(String.class));
+    assertThat((String) payload, is("hello"));
+    assertThat(gotEvent, is(true));
   }
 
 }

@@ -10,13 +10,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -25,6 +18,13 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.json.DefaultJsonParser;
+
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.load.Dereferencing;
@@ -233,7 +233,8 @@ public class JsonSchemaValidator {
    * @param event the current {@link MuleEvent}
    * @param muleContext the Mule node.
    */
-  public void validate(MuleEvent event, MuleContext muleContext) throws MuleException {
+  public MuleEvent validate(MuleEvent event, MuleContext muleContext) throws MuleException {
+    final org.mule.runtime.core.api.MuleEvent.Builder builder = MuleEvent.builder(event);
     Object input = event.getMessage().getPayload();
     ProcessingReport report;
     JsonNode jsonNode = null;
@@ -242,7 +243,7 @@ public class JsonSchemaValidator {
       jsonNode = new DefaultJsonParser(muleContext).asJsonNode(input);
 
       if ((input instanceof Reader) || (input instanceof InputStream)) {
-        event.setMessage(MuleMessage.builder().payload(jsonNode.toString()).build());
+        builder.message(MuleMessage.builder().payload(jsonNode.toString()).build());
       }
 
       report = schema.validate(jsonNode);
@@ -255,5 +256,6 @@ public class JsonSchemaValidator {
       throw new JsonSchemaValidationException("Json content is not compliant with schema\n" + report.toString(),
                                               jsonNode.toString());
     }
+    return builder.build();
   }
 }

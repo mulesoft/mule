@@ -17,7 +17,6 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -28,6 +27,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.i18n.CxfMessages;
@@ -132,8 +132,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         res = doSendWithProxy(event);
       }
       return res;
-    } catch (Exception e) {
-      throw wrapException(event, e, false);
     } finally {
       cleanup();
     }
@@ -168,44 +166,53 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     return super.processNext(event);
   }
 
-  protected MuleEvent doSendWithProxy(MuleEvent event) throws Exception {
-    Method method = getMethod(event);
-
-    Map<String, Object> props = getInovcationProperties(event);
-
-    Holder<MuleEvent> responseHolder = new Holder<>();
-    props.put("holder", responseHolder);
-
-    // Set custom soap action if set on the event or endpoint
-    String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
-    if (soapAction != null) {
-      props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
-    }
-
-    clientProxy.getRequestContext().putAll(props);
-
-    Object response;
-    Object[] args = getArgs(event);
+  protected MuleEvent doSendWithProxy(MuleEvent event) throws MuleException {
     try {
-      response = method.invoke(clientProxy, args);
-    } catch (InvocationTargetException e) {
-      Throwable ex = e.getTargetException();
+      Method method = getMethod(event);
 
-      if (ex != null && ex.getMessage().contains("Security")) {
-        throw new WebServiceSecurityException(event, e, this, muleContext.getSecurityManager());
-      } else {
-        throw e;
+      Map<String, Object> props = getInovcationProperties(event);
+
+      Holder<MuleEvent> responseHolder = new Holder<>();
+      props.put("holder", responseHolder);
+
+      // Set custom soap action if set on the event or endpoint
+      String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+      if (soapAction != null) {
+        props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
       }
+
+      clientProxy.getRequestContext().putAll(props);
+
+      Object response;
+      Object[] args = getArgs(event);
+      try {
+        response = method.invoke(clientProxy, args);
+      } catch (InvocationTargetException e) {
+        Throwable ex = e.getTargetException();
+
+        if (ex != null && ex.getMessage().contains("Security")) {
+          throw new WebServiceSecurityException(event, e, this, muleContext.getSecurityManager());
+        } else {
+          throw e;
+        }
+      }
+
+      Object[] objResponse = addHoldersToResponse(response, args);
+      MuleEvent muleRes = responseHolder.value;
+
+      return buildResponseMessage(event, muleRes, objResponse);
+    } catch (Exception e) {
+      throw wrapException(event, e, false);
     }
-
-    Object[] objResponse = addHoldersToResponse(response, args);
-    MuleEvent muleRes = responseHolder.value;
-
-    return buildResponseMessage(event, muleRes, objResponse);
   }
 
-  protected MuleEvent doSendWithClient(final MuleEvent event) throws Exception {
-    BindingOperationInfo bop = getOperation(event);
+  protected MuleEvent doSendWithClient(final MuleEvent event) throws MuleException {
+    BindingOperationInfo bop;
+    try {
+      bop = getOperation(event);
+    } catch (Exception e) {
+      throw wrapException(event, e, false);
+    }
 
     Map<String, Object> props = getInovcationProperties(event);
 
@@ -232,27 +239,31 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     // mule will close the stream so don't let cxf, otherwise cxf will close it too early
     exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
 
-    if (event.isAllowNonBlocking() && event.getReplyToHandler() != null) {
-      client.invoke(new ClientCallback() {
+    try {
+      if (event.isAllowNonBlocking() && event.getReplyToHandler() != null) {
+        client.invoke(new ClientCallback() {
 
-        @Override
-        public void handleResponse(Map<String, Object> ctx, Object[] res) {
-          try {
-            event.getReplyToHandler().processReplyTo(buildResponseMessage(event, responseHolder.value, res), null, null);
-          } catch (MuleException ex) {
-            handleException(ctx, ex);
+          @Override
+          public void handleResponse(Map<String, Object> ctx, Object[] res) {
+            try {
+              event.getReplyToHandler().processReplyTo(buildResponseMessage(event, responseHolder.value, res), null, null);
+            } catch (MuleException ex) {
+              handleException(ctx, ex);
+            }
           }
-        }
 
-        @Override
-        public void handleException(Map<String, Object> ctx, Throwable ex) {
-          event.getReplyToHandler().processExceptionReplyTo(wrapException(responseHolder.value, ex), null);
-        }
-      }, bop, getArgs(event), ctx, exchange);
-      return NonBlockingVoidMuleEvent.getInstance();
-    } else {
-      Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
-      return buildResponseMessage(event, responseHolder.value, response);
+          @Override
+          public void handleException(Map<String, Object> ctx, Throwable ex) {
+            event.getReplyToHandler().processExceptionReplyTo(wrapException(responseHolder.value, ex), null);
+          }
+        }, bop, getArgs(event), ctx, exchange);
+        return NonBlockingVoidMuleEvent.getInstance();
+      } else {
+        Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
+        return buildResponseMessage(event, (MuleEvent) exchange.get(CxfConstants.MULE_EVENT), response);
+      }
+    } catch (Exception e) {
+      throw wrapException((MuleEvent) exchange.get(CxfConstants.MULE_EVENT), e, false);
     }
   }
 
@@ -397,11 +408,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       builder.addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
     }
 
-    Class payloadClass = payload != null ? payload.getClass() : Object.class;
     builder.payload(payload).mediaType(getMimeType());
 
-    transportResponse.setMessage(builder.build());
-    return transportResponse;
+    return MuleEvent.builder(transportResponse).message(builder.build()).build();
   }
 
   protected Object[] addHoldersToResponse(Object response, Object[] args) {

@@ -130,8 +130,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
   @Test
   public void parametrized() throws Exception {
-    MuleEvent event = getTestEvent(ROOT_FOO_BAR);
-    event.setFlowVariable("foo", "bar");
+    MuleEvent event = MuleEvent.builder(getTestEvent(ROOT_FOO_BAR)).addFlowVariable("foo", "bar").build();
     Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
     assertThat(result, instanceOf(Node.class));
     assertThat((((Node) result)).getAttributes().getNamedItem("foo").getNodeValue(), equalTo("bar"));
@@ -139,16 +138,14 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
   @Test
   public void emptyParametrizedResult() throws Exception {
-    MuleEvent event = getTestEvent(ROOT_FOO_BAR);
-    event.setFlowVariable("foo", "not a bar");
+    MuleEvent event = MuleEvent.builder(getTestEvent(ROOT_FOO_BAR)).addFlowVariable("foo", "not a bar").build();
     Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void autoConvertNumericType() throws Exception {
-    MuleEvent event = getTestEvent("<root foo=\"33\"/>");
-    event.setFlowVariable("foo", 33);
+    MuleEvent event = MuleEvent.builder(getTestEvent("<root foo=\"33\"/>")).addFlowVariable("foo", 33).build();
     Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
     assertThat(result, instanceOf(Node.class));
     assertThat((((Node) result)).getAttributes().getNamedItem("foo").getNodeValue(), equalTo("33"));
@@ -162,8 +159,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
   }
 
   private void evaluateFooFromFlowVar(Object payload) throws Exception {
-    MuleEvent event = getTestEvent("");
-    event.setFlowVariable("input", payload);
+    MuleEvent event = MuleEvent.builder(getTestEvent("")).addFlowVariable("input", payload).build();
     assertThat((String) doEvaluate("xpath3('/root/@foo', flowVars['input'])", event, MuleEvent.builder(event)), equalTo(BAR));
   }
 

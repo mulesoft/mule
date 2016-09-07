@@ -37,9 +37,8 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     MessageProcessor messageProcessor = event -> {
       payload = event.getMessage().getPayload();
       assertEquals("echo", payload);
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload("echo").build());
       gotEvent = true;
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("echo").build()).build();
     };
     processor.setListener(messageProcessor);
 
@@ -61,7 +60,6 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     MessageProcessor messageProcessor = event -> {
       payload = event.getMessage().getPayload();
       assertEquals("echo", payload);
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload("echo").build());
       gotEvent = true;
       return null;
     };

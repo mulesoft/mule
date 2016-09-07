@@ -10,10 +10,10 @@ import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.module.cxf.CxfConstants.UNWRAP_MULE_EXCEPTIONS;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -58,16 +58,18 @@ public class MuleInvoker implements Invoker {
   @Override
   public Object invoke(Exchange exchange, Object o) {
     // this is the original request. Keep it to copy all the message properties from it
-    final MuleEvent event = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+    MuleEvent event = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
     MuleEvent responseEvent = null;
 
     if (PropertyUtils.isTrue(exchange.remove(CxfConstants.NON_BLOCKING_RESPONSE))) {
       responseEvent = event;
     } else {
+      final Builder responseBuilder = MuleEvent.builder(event);
       try {
         Object payload = extractPayload(exchange.getInMessage());
-        event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).mediaType(cxfMmessageProcessor.getMimeType())
-            .build());
+
+        responseBuilder.message(MuleMessage.builder(event.getMessage()).payload(payload)
+            .mediaType(cxfMmessageProcessor.getMimeType()).build());
         BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
         Service svc = exchange.get(Service.class);
         if (!cxfMmessageProcessor.isProxy()) {
@@ -77,19 +79,21 @@ public class MuleInvoker implements Invoker {
             m = matchMethod(m, targetClass);
           }
 
-          event.setFlowVariable(MuleProperties.MULE_METHOD_PROPERTY, m);
+          responseBuilder.addFlowVariable(MuleProperties.MULE_METHOD_PROPERTY, m);
         }
 
         if (bop != null) {
-          event.setFlowVariable(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName());
-          event.setFlowVariable(CxfConstants.INBOUND_SERVICE, svc.getName());
+          responseBuilder.addFlowVariable(CxfConstants.INBOUND_OPERATION, bop.getOperationInfo().getName())
+              .addFlowVariable(CxfConstants.INBOUND_SERVICE, svc.getName());
         }
 
         ErrorHandlingExecutionTemplate errorHandlingExecutionTemplate =
             createErrorHandlingExecutionTemplate(flowConstruct.getMuleContext(), flowConstruct,
                                                  flowConstruct.getExceptionListener());
-        responseEvent = errorHandlingExecutionTemplate.execute(() -> cxfMmessageProcessor.processNext(event));
+        MuleEvent finalEvent = event = responseBuilder.build();
+        responseEvent = errorHandlingExecutionTemplate.execute(() -> cxfMmessageProcessor.processNext(finalEvent));
       } catch (MuleException e) {
+        event = responseBuilder.build();
         exchange.put(CxfConstants.MULE_EVENT, event);
 
         Throwable cause = e;
@@ -109,7 +113,7 @@ public class MuleInvoker implements Invoker {
 
         throw new Fault(cause);
       } catch (Exception e) {
-        exchange.put(CxfConstants.MULE_EVENT, event);
+        exchange.put(CxfConstants.MULE_EVENT, responseBuilder.build());
         throw new Fault(e);
       }
 
