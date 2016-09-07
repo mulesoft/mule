@@ -225,23 +225,11 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
 
   private String getEventKey(MuleEvent event) {
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(event.getContext().getId());
-    stringBuilder.append(DASH);
+    event.getCorrelation().getSequence().ifPresent(v -> stringBuilder.append(v + DASH));
     stringBuilder.append(event.hashCode());
-    event.getCorrelation().getSequence().ifPresent(v -> stringBuilder.append(DASH + v));
+    stringBuilder.append(DASH);
+    stringBuilder.append(event.getContext().getId());
     return stringBuilder.toString();
-  }
-
-  /**
-   * Remove the given event from the group.
-   *
-   * @param event the evnt to remove
-   * @throws ObjectStoreException
-   */
-  public void removeEvent(MuleEvent event) throws ObjectStoreException {
-    synchronized (this) {
-      eventsObjectStore.remove(event.hashCode(), eventsPartitionKey);
-    }
   }
 
   /**

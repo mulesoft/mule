@@ -440,6 +440,13 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     currentEvent.set(event);
   }
 
+  /**
+   * Obtain the correlationId set during flow execution if any. This is only used to support transports and should not be used
+   * otherwise. Customization of the correlationId, if needed, should instead be done as part of the source connector
+   * configuration.
+   *
+   * @return legacy correlationId if set, otherwise {@code null}.
+   */
   @Deprecated
   public String getLegacyCorrelationId() {
     return this.legacyCorrelationId;

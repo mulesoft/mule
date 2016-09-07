@@ -289,6 +289,14 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      */
     Builder removeFlowVariable(String key);
 
+    /**
+     * Set correlationId overriding the correlationId from {@link MessageContext#getCorrelationId()} that came from the source
+     * system or that was configured in the connector source. This is only used to support transports and should not be used
+     * otherwise.
+     *
+     * @param correlationId to override existing correlationId
+     * @return the builder instance
+     */
     @Deprecated
     Builder correlationId(String correlationId);
 

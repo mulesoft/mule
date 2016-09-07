@@ -195,12 +195,12 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     // object store it also adds a random trailer to support events which have been split and thus have the same id. Random number
     // was chosen over UUID for performance reasons
     StringBuilder keyBuilder = new StringBuilder();
-    keyBuilder.append(flow);
+    muleEvent.getCorrelation().getSequence().ifPresent(v -> keyBuilder.append(v + DASH));
+    keyBuilder.append(muleEvent.getContext().getId());
     keyBuilder.append(DASH);
     keyBuilder.append(muleContext.getClusterId());
     keyBuilder.append(DASH);
-    keyBuilder.append(muleEvent.getContext().getId());
-    muleEvent.getCorrelation().getSequence().ifPresent(v -> keyBuilder.append("-" + v));
+    keyBuilder.append(flow);
     return new QueueKey(DEFAULT_QUEUE_STORE, keyBuilder.toString());
   }
 
