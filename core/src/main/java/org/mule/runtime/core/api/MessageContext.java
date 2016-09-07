@@ -45,13 +45,6 @@ public interface MessageContext {
   OffsetTime getReceivedTime();
 
   /**
-   * Used to determine if the correlation was set by the source connector or was generated.
-   *
-   * @return {@code true} if the source system provided a correlation id, {@code false otherwise}.
-   */
-  boolean isCorrelationIdFromSource();
-
-  /**
    * @return the name of the flow that processes events of this context.
    */
   String getOriginatingFlowName();

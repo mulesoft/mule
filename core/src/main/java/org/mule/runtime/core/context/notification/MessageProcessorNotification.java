@@ -88,7 +88,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
   private static MuleEvent produceEvent(MuleEvent sourceEvent, FlowConstruct flowConstruct) {
     String rootId = lastRootMessageId.get();
     if (sourceEvent != null && !VoidMuleEvent.getInstance().equals(sourceEvent)) {
-      lastRootMessageId.set(sourceEvent.getContext().getCorrelationId());
+      lastRootMessageId.set(sourceEvent.getCorrelationId());
       return sourceEvent;
     } else if (rootId != null && flowConstruct != null) {
       final MuleMessage msg = MuleMessage.builder().nullPayload().build();

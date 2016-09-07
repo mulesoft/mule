@@ -14,15 +14,14 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
- * Sets the outbound root message id on as a property of the message using the following key:
- * {@link org.mule.api.config.MuleProperties#MULE_ROOT_MESSAGE_ID_PROPERTY}.
+ * Sets the outbound root message id on as a property of the message.
  */
 public class OutboundRootMessageIdPropertyMessageProcessor implements MessageProcessor {
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
     return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
-        .addOutboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY, event.getContext().getCorrelationId()).build()).build();
+        .addOutboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY, event.getCorrelationId()).build()).build();
   }
 
   @Override

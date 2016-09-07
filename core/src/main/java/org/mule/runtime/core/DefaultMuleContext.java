@@ -859,20 +859,7 @@ public class DefaultMuleContext implements MuleContext {
   @Override
   public ExpressionLanguage getExpressionLanguage() {
     if (expressionLanguage == null) {
-      if (Initialisable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase())) {
-        // Transports need expression language during object construction so we need to ensure it's initilized as lifecyce
-        // ordering doesn't help in this case.  The first time the expression language is initialized it won't have been
-        // initialized with any extensions, but spring will eventually re-initialize the same instance and expression language
-        // extensions will be applied at this point.
-        this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-        try {
-          initialiseIfNeeded(expressionLanguage);
-        } catch (InitialisationException e) {
-          throw new MuleRuntimeException(e);
-        }
-      } else {
-        this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
-      }
+      this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     }
     return this.expressionLanguage;
   }

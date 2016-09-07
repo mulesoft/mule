@@ -34,4 +34,11 @@ public interface CoreMessageContext extends MessageContext {
    * @since 3.8.0
    */
   ProcessorsTrace getProcessorsTrace();
+
+  /**
+   * Used to determine if the correlation was set by the source connector or was generated.
+   *
+   * @return {@code true} if the source system provided a correlation id, {@code false otherwise}.
+   */
+  boolean isCorrelationIdFromSource();
 }

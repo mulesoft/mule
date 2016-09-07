@@ -126,7 +126,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     assertThat(result.getFlowVariableNames(), not(contains("key3")));
 
     // Root id
-    assertThat(result.getContext().getCorrelationId(), equalTo(event1.getContext().getCorrelationId()));
+    assertThat(result.getCorrelationId(), equalTo(event1.getCorrelationId()));
 
     assertEquals("value", result.getSession().getProperty("key"));
     assertEquals("value1", result.getSession().getProperty("key1"));
@@ -218,7 +218,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     assertThat(result.getFlowVariableNames(), not(contains("key3")));
 
     // Root id
-    assertThat(result.getContext().getCorrelationId(), equalTo(event1.getContext().getCorrelationId()));
+    assertThat(result.getCorrelationId(), equalTo(event1.getCorrelationId()));
   }
 
 }

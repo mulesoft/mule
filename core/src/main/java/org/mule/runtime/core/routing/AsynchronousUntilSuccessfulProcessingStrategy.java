@@ -10,6 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
+import static org.mule.runtime.core.util.StringUtils.DASH;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.core.VoidMuleEvent;
@@ -193,9 +194,14 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same events over a shared
     // object store it also adds a random trailer to support events which have been split and thus have the same id. Random number
     // was chosen over UUID for performance reasons
-    String key = format("%s-%s-%s-%d", flow, muleContext.getClusterId(), muleEvent.getId(), random.nextInt());
-
-    return new QueueKey(DEFAULT_QUEUE_STORE, key);
+    StringBuilder keyBuilder = new StringBuilder();
+    keyBuilder.append(flow);
+    keyBuilder.append(DASH);
+    keyBuilder.append(muleContext.getClusterId());
+    keyBuilder.append(DASH);
+    keyBuilder.append(muleEvent.getContext().getId());
+    muleEvent.getCorrelation().getSequence().ifPresent(v -> keyBuilder.append("-" + v));
+    return new QueueKey(DEFAULT_QUEUE_STORE, keyBuilder.toString());
   }
 
   private void abandonRetries(final MuleEvent event, final MuleEvent mutableEvent, final Exception lastException) {

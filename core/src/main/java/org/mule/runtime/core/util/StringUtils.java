@@ -20,6 +20,7 @@ import org.apache.commons.lang.CharUtils;
 public class StringUtils extends org.apache.commons.lang.StringUtils {
 
   public static final String WHITE_SPACE = " ";
+  public static final String DASH = "-";
 
   /**
    * Like {@link org.mule.runtime.core.util.StringUtils#split(String, String)}, but additionally trims whitespace from the result

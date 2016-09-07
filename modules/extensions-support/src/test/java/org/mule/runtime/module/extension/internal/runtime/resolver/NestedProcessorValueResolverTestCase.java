@@ -52,7 +52,7 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     verify(messageProcessor).process(captor.capture());
 
     MuleEvent capturedEvent = captor.getValue();
-    assertThat(capturedEvent.getId(), is(muleEvent.getId()));
+    assertThat(capturedEvent, is(muleEvent));
   }
 
   @Test

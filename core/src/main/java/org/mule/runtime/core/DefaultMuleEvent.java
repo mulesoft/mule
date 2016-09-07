@@ -65,13 +65,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   /** Immutable MuleEvent state **/
 
-  /**
-   * The Universally Unique ID for the event
-   * 
-   * @deprecated TODO MULE-9281 remove when the event becomes immutable
-   */
-  @Deprecated
-  private String id;
   private MessageContext context;
   private MuleMessage message;
   private final MuleSession session;
@@ -99,11 +92,9 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
                           MessageExchangePattern exchangePattern,
                           FlowConstruct flowConstruct, MuleSession session, boolean transacted, boolean synchronous,
                           boolean nonBlocking, Object replyToDestination, ReplyToHandler replyToHandler,
-                          FlowCallStack flowCallStack, Correlation correlation, Error error) {
+                          FlowCallStack flowCallStack, Correlation correlation, Error error, String legacyCorrelationId) {
     this.context = context;
     this.correlation = NO_CORRELATION;
-    // this.id = generateEventId(flowConstruct.getMuleContext());
-    this.id = "" + System.identityHashCode(this);
     this.flowConstruct = flowConstruct;
     this.session = session;
     this.message = message;
@@ -120,6 +111,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
     this.correlation = correlation;
     this.error = error;
+    this.legacyCorrelationId = legacyCorrelationId;
   }
 
   protected boolean resolveEventSynchronicity() {
@@ -229,21 +221,13 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  public String getId() {
-    return id;
-  }
-
-  @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder(64);
-    buf.append("MuleEvent: ").append(getId());
-    buf.append(", correlation=").append(getCorrelation().toString());
-
-    return buf.toString();
-  }
-
-  protected String generateEventId(MuleContext context) {
-    return context.getUniqueIdString();
+    return "DefaultMuleEvent{" +
+        "context=" + context +
+        ", message=" + message +
+        ", flowVariables=" + flowVariables +
+        ", error=" + error +
+        '}';
   }
 
   @Override
@@ -257,25 +241,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Override
   public FlowConstruct getFlowConstruct() {
     return flowConstruct;
-  }
-
-  @Override
-  // TODO MULE- 9281 Remove once MuleEvent is immutable
-  @Deprecated
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || this.getClass() != o.getClass()) {
-      return false;
-    }
-    DefaultMuleEvent that = (DefaultMuleEvent) o;
-    return Objects.equals(this.id, that.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return 29 * id.hashCode() + (message != null ? message.hashCode() : 0);
   }
 
   /**
@@ -441,17 +406,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return session.getSecurityContext();
   }
 
-  private MuleEvent parent;
   private Correlation correlation;
-
-  public void setParent(MuleEvent parent) {
-    this.parent = parent;
-  }
-
-  @Override
-  public MuleEvent getParent() {
-    return parent;
-  }
 
   public void setCorrelation(Correlation correlation) {
     this.correlation = correlation;
@@ -464,10 +419,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   @Override
   public String getCorrelationId() {
-    return legacyCorrelationId != null ? legacyCorrelationId : getContext().getCorrelationId()
-        + (getParent() != null && !getParent().getFlowCallStack().getElements().isEmpty()
-            ? ":" + getParent().getFlowCallStack().getElements().get(0).getProcessorPath() : "")
-        + getCorrelation().getSequence().map(s -> ":" + s.toString()).orElse("");
+    return legacyCorrelationId != null ? legacyCorrelationId : getContext().getCorrelationId();
   }
 
   /**
@@ -488,10 +440,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     currentEvent.set(event);
   }
 
-  public void setLegacyCorrelationId(String legacyCorrelationId) {
-    this.legacyCorrelationId = legacyCorrelationId;
-  }
-
+  @Deprecated
   public String getLegacyCorrelationId() {
     return this.legacyCorrelationId;
   }
@@ -505,4 +454,5 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     }
     return value;
   }
+
 }

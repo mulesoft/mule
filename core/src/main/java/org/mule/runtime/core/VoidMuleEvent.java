@@ -89,11 +89,6 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public String getId() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public MuleSession getSession() {
     throw new UnsupportedOperationException();
   }
@@ -193,8 +188,4 @@ public class VoidMuleEvent implements MuleEvent {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public MuleEvent getParent() {
-    throw new UnsupportedOperationException();
-  }
 }

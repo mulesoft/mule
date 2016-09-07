@@ -53,7 +53,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
     Arrays.sort(results, eventComparator);
     // This is a bit of a hack since we wrap the the collection of events in a
     // Mule Message to pass back
-    return MuleEvent.builder(results[0].getParent()).message(MuleMessage.builder().payload(results).build()).build();
+    return MuleEvent.builder(results[0]).message(MuleMessage.builder().payload(results).build()).build();
   }
 
 }

@@ -248,12 +248,12 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
       builder.replyToHandler(replyToHandler).replyToDestination(replyToFromMessage);
     }
     configureMuleEventBuilder(builder);
-    DefaultMuleEvent newEvent = (DefaultMuleEvent) builder.build();
-
     if (message.getCorrelationId() != null) {
-      newEvent.setLegacyCorrelationId(message.getCorrelationId());
+      builder.correlationId(message.getCorrelationId());
     }
-    newEvent.setCorrelation(message.getCorrelation());
+    builder.correlation(message.getCorrelation());
+    MuleEvent newEvent = builder.build();
+
     populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
     setCurrentEvent(event);

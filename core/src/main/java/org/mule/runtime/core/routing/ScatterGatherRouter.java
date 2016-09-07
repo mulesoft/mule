@@ -171,8 +171,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       if (exception != null) {
         if (logger.isDebugEnabled()) {
           logger.debug(
-                       String.format("route %d generated exception for MuleEvent %s", routeIndex,
-                                     event.getId()),
+                       String.format("route %d generated exception for MuleEvent %s", routeIndex, event),
                        exception);
         }
 
@@ -188,8 +187,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         }
       } else {
         if (logger.isDebugEnabled()) {
-          logger.debug(String.format("route %d executed successfully for event %s", routeIndex,
-                                     event.getId()));
+          logger.debug(String.format("route %d executed successfully for event %s", routeIndex, event));
         }
       }
 

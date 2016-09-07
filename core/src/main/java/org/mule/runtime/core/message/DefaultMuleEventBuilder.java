@@ -15,7 +15,6 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -125,21 +124,28 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   }
 
   @Override
-  public Builder correlation(Correlation correlation) {
+  public MuleEvent.Builder correlationId(String correlationId) {
+    legacyCorrelationId = correlationId;
+    this.modified = true;
+    return this;
+  }
+
+  @Override
+  public MuleEvent.Builder correlation(Correlation correlation) {
     this.correlation = correlation;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Builder error(Error error) {
+  public MuleEvent.Builder error(Error error) {
     this.error = error;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Builder synchronous(boolean synchronous) {
+  public MuleEvent.Builder synchronous(boolean synchronous) {
     this.synchronous = synchronous;
     this.modified = true;
     return this;
@@ -167,21 +173,21 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   }
 
   @Override
-  public Builder replyToDestination(Object replyToDestination) {
+  public MuleEvent.Builder replyToDestination(Object replyToDestination) {
     this.replyToDestination = replyToDestination;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Builder transacted(boolean transacted) {
+  public MuleEvent.Builder transacted(boolean transacted) {
     this.transacted = transacted;
     this.modified = true;
     return this;
   }
 
   @Override
-  public Builder session(MuleSession session) {
+  public MuleEvent.Builder session(MuleSession session) {
     this.session = session;
     this.modified = true;
     return this;
@@ -196,8 +202,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
           new DefaultMuleEvent(context, message, flowVariables, exchangePattern, flow, session, transacted,
                                synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
                                nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
-                               replyToDestination, replyToHandler, flowCallStack, correlation, error);
-      event.setLegacyCorrelationId(legacyCorrelationId);
+                               replyToDestination, replyToHandler, flowCallStack, correlation, error, legacyCorrelationId);
       return event;
     }
   }
