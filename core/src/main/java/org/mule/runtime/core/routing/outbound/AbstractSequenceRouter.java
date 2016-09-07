@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleEvent.Builder;
@@ -39,17 +38,16 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
     }
 
-    ((DefaultMuleEvent) event).setCorrelation(new Correlation(routes.size(), null));
-
+    Builder builder = MuleEvent.builder(event).correlation(new Correlation(routes.size(), null));
     List<MuleEvent> results = new ArrayList<>(routes.size());
     try {
       for (int i = 0; i < routes.size(); i++) {
         MessageProcessor mp = getRoute(i, event);
 
-        Builder builder = MuleEvent.builder(event);
         boolean filterAccepted =
             !(mp instanceof LegacyOutboundEndpoint) || ((LegacyOutboundEndpoint) mp).filterAccepts(message, builder);
         event = builder.build();
+        builder = MuleEvent.builder(event);
         if (filterAccepted) {
           AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
           MuleMessage clonedMessage = cloneMessage(event, message);
@@ -65,9 +63,9 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
         }
       }
     } catch (MuleException e) {
-      throw new CouldNotRouteOutboundMessageException(event, routes.get(0), e);
+      throw new CouldNotRouteOutboundMessageException(builder.build(), routes.get(0), e);
     }
-    return resultsHandler.aggregateResults(results, event);
+    return resultsHandler.aggregateResults(results, builder.build());
   }
 
 
