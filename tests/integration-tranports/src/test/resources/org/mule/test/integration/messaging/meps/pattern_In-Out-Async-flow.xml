@@ -23,8 +23,7 @@
         <transports:inbound-endpoint ref="inboundEndpoint"/>
         <script:component>
             <script:script engine="groovy">
-                message = org.mule.runtime.core.api.MuleMessage.builder(message).addOutboundProperty('foo', 'bar').build()
-                return "got it!"
+                return org.mule.runtime.core.api.MuleMessage.builder(message).payload("got it!").addOutboundProperty('foo', 'bar').build()
             </script:script>
         </script:component>
         <!-- Mule will now read the ReplyTo header on the message and send the response there. -->
