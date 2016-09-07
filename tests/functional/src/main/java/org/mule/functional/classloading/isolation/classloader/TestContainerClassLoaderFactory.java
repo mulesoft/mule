@@ -16,6 +16,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -68,13 +69,16 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    *        it has all the class path
    * @param containerLookupPolicy the default {@link ClassLoaderLookupPolicy} defined for a container but will be ignored due to
    *        it has to be different when running with a full class path as parent {@link ClassLoader}
+   * @param artifactDescriptor
    * @return the {@link ArtifactClassLoader} to be used for the container
    */
   @Override
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, final List<MuleModule> muleModules,
-                                                          final ClassLoaderLookupPolicy containerLookupPolicy) {
+                                                          final ClassLoaderLookupPolicy containerLookupPolicy,
+                                                          ArtifactDescriptor artifactDescriptor) {
+    final ArtifactDescriptor containerDescriptor = new ArtifactDescriptor("mule");
     final ArtifactClassLoader containerClassLoader =
-        new MuleArtifactClassLoader("mule", urls, parentClassLoader,
+        new MuleArtifactClassLoader(containerDescriptor, urls, parentClassLoader,
                                     new MuleClassLoaderLookupPolicy(Collections.emptyMap(), getBootPackages()));
     return createContainerFilteringClassLoader(withContextClassLoader(classLoader, () -> discoverModules()),
                                                containerClassLoader);

@@ -34,6 +34,15 @@ public class ApplicationDescriptor extends DeployableArtifactDescriptor {
   private File logConfigFile;
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>(0);
 
+  /**
+   * Creates a new application descriptor
+   *
+   * @param name application name. Non empty.
+   */
+  public ApplicationDescriptor(String name) {
+    super(name);
+  }
+
   public String getEncoding() {
     return encoding;
   }

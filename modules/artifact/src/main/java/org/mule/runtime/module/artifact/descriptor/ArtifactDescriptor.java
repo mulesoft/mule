@@ -8,6 +8,8 @@
 package org.mule.runtime.module.artifact.descriptor;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 
@@ -15,16 +17,22 @@ import java.io.File;
 
 public class ArtifactDescriptor {
 
-  private String name;
+  private final String name;
   private File rootFolder;
   private ArtifactClassLoaderFilter classLoaderFilter = DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 
-  public String getName() {
-    return name;
+  /**
+   * Creates a new descriptor for a named artifact
+   *
+   * @param name artifact name. Non empty.
+   */
+  public ArtifactDescriptor(String name) {
+    checkArgument(!isEmpty(name), "Artifact name cannot be empty");
+    this.name = name;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public String getName() {
+    return name;
   }
 
   public File getRootFolder() {

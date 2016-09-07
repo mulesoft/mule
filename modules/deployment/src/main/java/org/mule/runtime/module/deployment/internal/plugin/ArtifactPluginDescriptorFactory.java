@@ -51,9 +51,8 @@ public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactor
   @Override
   public ArtifactPluginDescriptor create(File pluginFolder) throws ArtifactDescriptorCreateException {
     final String pluginName = pluginFolder.getName();
-    final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor();
+    final ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor(pluginName);
     descriptor.setRootFolder(pluginFolder);
-    descriptor.setName(pluginName);
 
     final File pluginPropsFile = new File(pluginFolder, PLUGIN_PROPERTIES);
     if (pluginPropsFile.exists()) {

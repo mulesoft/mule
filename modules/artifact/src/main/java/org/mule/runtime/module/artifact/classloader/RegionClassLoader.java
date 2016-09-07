@@ -7,8 +7,10 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,25 +38,37 @@ import sun.misc.CompoundEnumeration;
  * Only a region member can export a given package, but same resources can be exported by many members. The order in which the
  * resources are found will depend on the order in which the class loaders were added to the region.
  */
-public class RegionClassLoader extends MuleArtifactClassLoader {
+public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   static {
     registerAsParallelCapable();
   }
 
-  private final List<ArtifactClassLoader> classLoaders = new ArrayList<>();
+  private final List<ArtifactClassLoader> filteredClassLoaders = new ArrayList<>();
+  private final List<ArtifactClassLoader> unfilteredClassLoaders = new ArrayList<>();
   private final Map<String, ArtifactClassLoader> packageMapping = new HashMap<>();
   private final Map<String, List<ArtifactClassLoader>> resourceMapping = new HashMap<>();
 
   /**
    * Creates a new region.
-   * 
-   * @param name name of the region. Non empty
+   *
+   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
    * @param parent parent classloader for the region. Non null
    * @param lookupPolicy lookup policy to use on the region
    */
-  public RegionClassLoader(String name, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
-    super(name, new URL[0], parent, lookupPolicy);
+  public RegionClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
+    super(artifactDescriptor, new URL[0], parent, lookupPolicy, emptyList());
+  }
+
+  @Override
+  public List<ArtifactClassLoader> getArtifactPluginClassLoaders() {
+
+    List<ArtifactClassLoader> result = emptyList();
+    if (unfilteredClassLoaders.size() > 1) {
+      result = unfilteredClassLoaders.subList(1, unfilteredClassLoaders.size());
+    }
+
+    return result;
   }
 
   /**
@@ -67,10 +81,11 @@ public class RegionClassLoader extends MuleArtifactClassLoader {
   public void addClassLoader(ArtifactClassLoader artifactClassLoader, ArtifactClassLoaderFilter filter) {
     checkArgument(artifactClassLoader != null, "artifactClassLoader cannot be null");
     checkArgument(filter != null, "filter cannot be null");
-    if (classLoaders.contains(artifactClassLoader)) {
+    if (filteredClassLoaders.contains(artifactClassLoader)) {
       throw new IllegalArgumentException("Region already contains classloader " + artifactClassLoader);
     }
-    classLoaders.add(artifactClassLoader);
+    filteredClassLoaders.add(new FilteringArtifactClassLoader(artifactClassLoader, filter));
+    unfilteredClassLoaders.add(artifactClassLoader);
 
     filter.getExportedClassPackages().forEach(p -> packageMapping.put(p, artifactClassLoader));
 
@@ -119,7 +134,7 @@ public class RegionClassLoader extends MuleArtifactClassLoader {
   @Override
   public final Enumeration<URL> findResources(final String name) throws IOException {
     final List<ArtifactClassLoader> artifactClassLoaders = resourceMapping.get(name);
-    List<Enumeration<URL>> enumerations = new ArrayList<>(classLoaders.size());
+    List<Enumeration<URL>> enumerations = new ArrayList<>(filteredClassLoaders.size());
 
     if (artifactClassLoaders != null) {
       for (ArtifactClassLoader artifactClassLoader : artifactClassLoaders) {
@@ -132,5 +147,35 @@ public class RegionClassLoader extends MuleArtifactClassLoader {
     }
 
     return new CompoundEnumeration<>(enumerations.toArray(new Enumeration[0]));
+  }
+
+  @Override
+  public void dispose() {
+    for (ArtifactClassLoader classLoader : unfilteredClassLoaders) {
+      try {
+        classLoader.dispose();
+      } catch (Exception e) {
+        // Ignore and continue
+      }
+    }
+
+    unfilteredClassLoaders.clear();
+    filteredClassLoaders.clear();
+
+    super.dispose();
+  }
+
+  @Override
+  public URL findLocalResource(String resourceName) {
+    URL resource = getOwnerClassLoader().findLocalResource(resourceName);
+
+    if (resource == null && getParent() instanceof LocalResourceLocator) {
+      resource = ((LocalResourceLocator) getParent()).findLocalResource(resourceName);
+    }
+    return resource;
+  }
+
+  private ArtifactClassLoader getOwnerClassLoader() {
+    return filteredClassLoaders.get(0);
   }
 }

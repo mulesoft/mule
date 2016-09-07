@@ -32,6 +32,7 @@ import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader
 import org.mule.runtime.module.artifact.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
@@ -90,7 +91,8 @@ public class IsolatedClassLoaderFactory {
     ClassLoaderLookupPolicy childClassLoaderLookupPolicy = testContainerClassLoaderFactory.getContainerClassLoaderLookupPolicy();
 
     RegionClassLoader regionClassLoader =
-        new RegionClassLoader("Region", containerClassLoader.getClassLoader(), childClassLoaderLookupPolicy);
+        new RegionClassLoader(new ArtifactDescriptor("Region"), containerClassLoader.getClassLoader(),
+                              childClassLoaderLookupPolicy);
 
     final List<ArtifactClassLoader> filteredPluginsArtifactClassLoaders = new ArrayList<>();
     final List<ArtifactClassLoader> pluginsArtifactClassLoaders = new ArrayList<>();
@@ -100,9 +102,9 @@ public class IsolatedClassLoaderFactory {
       for (PluginUrlClassification pluginUrlClassification : artifactUrlClassification.getPluginClassificationUrls()) {
         logClassLoaderUrls("PLUGIN (" + pluginUrlClassification.getName() + ")", pluginUrlClassification.getUrls());
 
-        MuleArtifactClassLoader pluginCL =
-            new MuleArtifactClassLoader(pluginUrlClassification.getName(), pluginUrlClassification.getUrls().toArray(new URL[0]),
-                                        regionClassLoader, childClassLoaderLookupPolicy);
+        MuleArtifactClassLoader pluginCL = new MuleArtifactClassLoader(new ArtifactDescriptor(pluginUrlClassification.getName()),
+                                                                       pluginUrlClassification.getUrls().toArray(new URL[0]),
+                                                                       regionClassLoader, childClassLoaderLookupPolicy);
         pluginsArtifactClassLoaders.add(pluginCL);
 
         ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification, pluginCL);
@@ -158,7 +160,8 @@ public class IsolatedClassLoaderFactory {
                                                                    ArtifactUrlClassification artifactUrlClassification) {
     logClassLoaderUrls("CONTAINER", artifactUrlClassification.getContainerUrls());
     MuleArtifactClassLoader launcherArtifact =
-        new MuleArtifactClassLoader("launcher", new URL[0], IsolatedClassLoaderFactory.class.getClassLoader(),
+        new MuleArtifactClassLoader(new ArtifactDescriptor("launcher"), new URL[0],
+                                    IsolatedClassLoaderFactory.class.getClassLoader(),
                                     new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
     final List<MuleModule> muleModules = Collections.<MuleModule>emptyList();
     ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
@@ -215,7 +218,8 @@ public class IsolatedClassLoaderFactory {
                                                                      ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
                                                                      ArtifactUrlClassification artifactUrlClassification) {
     logClassLoaderUrls("APP", artifactUrlClassification.getApplicationUrls());
-    return new MuleArtifactClassLoader("app", artifactUrlClassification.getApplicationUrls().toArray(new URL[0]), parent,
+    return new MuleArtifactClassLoader(new ArtifactDescriptor("app"),
+                                       artifactUrlClassification.getApplicationUrls().toArray(new URL[0]), parent,
                                        childClassLoaderLookupPolicy);
   }
 

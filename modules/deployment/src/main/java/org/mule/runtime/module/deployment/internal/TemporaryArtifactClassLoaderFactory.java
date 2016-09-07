@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.core.util.UUID.getUUID;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
@@ -28,7 +27,7 @@ public class TemporaryArtifactClassLoaderFactory implements DeployableArtifactCl
   @Override
   public ArtifactClassLoader create(ArtifactClassLoader parent, ArtifactDescriptor descriptor,
                                     List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    return new MuleDeployableArtifactClassLoader(getUUID(), new URL[0], parent.getClassLoader(),
+    return new MuleDeployableArtifactClassLoader(descriptor, new URL[0], parent.getClassLoader(),
                                                  parent.getClassLoaderLookupPolicy(), artifactPluginClassLoaders);
   }
 

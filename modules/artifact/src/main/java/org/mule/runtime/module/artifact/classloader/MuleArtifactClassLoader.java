@@ -11,17 +11,13 @@ import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation of the ArtifactClassLoader interface, that manages shutdown listeners.
@@ -34,23 +30,29 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
       "/org/mule/runtime/module/artifact/classloader/DefaultResourceReleaser.class";
-  private final String name;
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
   private LocalResourceLocator localResourceLocator;
 
   private String resourceReleaserClassLocation = DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION;
+  private ArtifactDescriptor artifactDescriptor;
 
-  public MuleArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
+  public MuleArtifactClassLoader(ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
+                                 ClassLoaderLookupPolicy lookupPolicy) {
     super(urls, parent, lookupPolicy);
-    checkArgument(!StringUtils.isEmpty(name), "Artifact name cannot be empty");
-    this.name = name;
+    checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
+    this.artifactDescriptor = artifactDescriptor;
   }
 
   @Override
   public String getArtifactName() {
-    return name;
+    return artifactDescriptor.getName();
+  }
+
+  @Override
+  public <T extends ArtifactDescriptor> T getArtifactDescriptor() {
+    return (T) artifactDescriptor;
   }
 
   protected String[] getLocalResourceLocations() {
@@ -110,11 +112,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public URL findLocalResource(String resourceName) {
-    URL resource = getLocalResourceLocator().findLocalResource(resourceName);
-    if (resource == null && getParent() instanceof LocalResourceLocator) {
-      resource = ((LocalResourceLocator) getParent()).findLocalResource(resourceName);
-    }
-    return resource;
+    return getLocalResourceLocator().findLocalResource(resourceName);
   }
 
   private LocalResourceLocator getLocalResourceLocator() {

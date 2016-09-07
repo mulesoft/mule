@@ -7,11 +7,12 @@
 package org.mule.runtime.module.deployment.internal;
 
 import org.mule.runtime.container.api.MuleFoldersUtil;
-import org.mule.runtime.module.deployment.internal.application.ApplicationClassLoader;
-import org.mule.runtime.module.deployment.internal.nativelib.NativeLibraryFinder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.deployment.internal.application.ApplicationClassLoader;
+import org.mule.runtime.module.deployment.internal.nativelib.NativeLibraryFinder;
 
 import java.net.URL;
 import java.util.List;
@@ -24,9 +25,10 @@ public class MuleApplicationClassLoader extends MuleDeployableArtifactClassLoade
 
   private NativeLibraryFinder nativeLibraryFinder;
 
-  public MuleApplicationClassLoader(String appName, ClassLoader parentCl, NativeLibraryFinder nativeLibraryFinder, List<URL> urls,
+  public MuleApplicationClassLoader(ArtifactDescriptor artifactDescriptor, ClassLoader parentCl,
+                                    NativeLibraryFinder nativeLibraryFinder, List<URL> urls,
                                     ClassLoaderLookupPolicy lookupPolicy, List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    super(appName, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders);
+    super(artifactDescriptor, urls.toArray(new URL[0]), parentCl, lookupPolicy, artifactPluginClassLoaders);
 
     this.nativeLibraryFinder = nativeLibraryFinder;
   }
