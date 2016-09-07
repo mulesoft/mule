@@ -47,7 +47,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
       return new NodeListMessageSequence((NodeList) payload);
     } else {
       throw new IllegalArgumentException(CoreMessages
-          .objectNotOfCorrectType(payload.getClass(),
+          .objectNotOfCorrectType(payload != null ? payload.getClass() : null,
                                   new Class[] {Iterable.class, Iterator.class, MessageSequence.class, Collection.class})
           .getMessage());
     }

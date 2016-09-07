@@ -54,8 +54,8 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
     final String expression = "#[validator.matchesRegex(payload, regexp, caseSensitive)]";
 
     MuleEvent event = MuleEvent.builder(getTestEvent("true"))
-    .addFlowVariable("regexp", regex)
-    .addFlowVariable("caseSensitive", false)
+        .addFlowVariable("regexp", regex)
+        .addFlowVariable("caseSensitive", false)
         .build();
 
     assertValid(expression, event);
