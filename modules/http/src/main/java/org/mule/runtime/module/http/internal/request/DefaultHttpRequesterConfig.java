@@ -74,6 +74,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
   private CookieManager cookieManager;
 
   private boolean initialised = false;
+  private boolean started = false;
 
   @Inject
   @DefaultTlsContextFactoryBuilder
@@ -140,6 +141,7 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
     if (this.authentication instanceof Stoppable) {
       ((Stoppable) this.authentication).stop();
     }
+    started = false;
   }
 
   public String getScheme() {
@@ -284,6 +286,9 @@ public class DefaultHttpRequesterConfig extends AbstractAnnotatedObject
 
   @Override
   public void start() throws MuleException {
+    if (started) {
+      return;
+    }
     httpClient.start();
     if (this.authentication instanceof Startable) {
       ((Startable) this.authentication).start();
