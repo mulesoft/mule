@@ -34,7 +34,6 @@ public class RetrieverOperations {
   private final StoreCommand storeCommand = new StoreCommand();
   private final DeleteCommand deleteCommand = new DeleteCommand();
 
-
   /**
    * List all the emails in the configured mailBoxFolder that match with the specified {@code matchWith} criteria.
    *

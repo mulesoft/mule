@@ -15,8 +15,9 @@
     <packaging>mule-extension</packaging>
 
     <properties>
-        <javaMailVersion>1.4.7</javaMailVersion>
+        <javaMailVersion>1.5.6</javaMailVersion>
         <icegreenVersion>1.5.0</icegreenVersion>
+        <javaxActivationVersion>1.1</javaxActivationVersion>
         <guavaVersion>18.0</guavaVersion>
         <powermockVersion>1.6.5</powermockVersion>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -24,9 +25,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <scope>provided</scope>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>${javaMailVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -57,7 +58,7 @@
         <dependency>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
-            <version>1.1</version>
+            <version>${javaxActivationVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

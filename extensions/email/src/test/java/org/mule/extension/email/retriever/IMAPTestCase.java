@@ -69,7 +69,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
     List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(messages, hasSize(10));
     messages.forEach(m -> {
-      assertBodyContent((String) m.getPayload());
+      assertBodyContent(m.getPayload());
       assertThat(((EmailAttributes) m.getAttributes()).getFlags().isSeen(), is(true));
     });
   }

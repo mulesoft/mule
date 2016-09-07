@@ -7,8 +7,8 @@
 package org.mule.extension.email.internal.util;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
@@ -17,7 +17,6 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -136,6 +135,6 @@ public final class EmailConnectorUtils {
             .getNonBodyParts().stream().map(p -> new EmailAttachment(((PartAttributes) p.getAttributes()).getName(),
                                                                      p.getPayload(), p.getDataType().getMediaType()))
             .collect(toList())
-        : Collections.emptyList();
+        : emptyList();
   }
 }

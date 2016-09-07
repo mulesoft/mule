@@ -35,9 +35,9 @@ public class EmailIdConsumerExecutor {
    * If no explicit {@code emailId} is provided and this method is not able to find any emailIds in the incoming
    * {@link MuleMessage} the execution of the {@link Consumer} will fail.
    *
-   * @param muleMessage
-   * @param emailId
-   * @param consumer
+   * @param muleMessage the incoming {@link MuleMessage}.
+   * @param emailId the id of the email that is wanted to perform the operation, can be {@code null}
+   * @param consumer a {@link Consumer} to be applied to an email.
    */
   public void execute(MuleMessage muleMessage, Integer emailId, Consumer<Integer> consumer) {
     if (emailId == null) {

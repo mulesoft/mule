@@ -19,12 +19,16 @@ import static org.mule.extension.email.internal.AbstractEmailConnection.USERNAME
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
-import static org.powermock.api.mockito.PowerMockito.doNothing;
+import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
+
+import java.util.Properties;
+import java.util.concurrent.Executor;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -38,13 +42,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Session.class)
+@PrepareForTest({Session.class, Store.class})
 @PowerMockIgnore("javax.management.*")
 public class RetrieverConnectionTestCase {
 
@@ -58,19 +61,25 @@ public class RetrieverConnectionTestCase {
 
   @Before
   public void setUpTestConnection() throws Exception {
+    Properties props = mock(Properties.class);
+    doReturn("").when(props).getProperty("mail.event.scope", "folder");
+    doReturn(mock(Executor.class)).when(props).get("mail.event.executor");
+
+    mockStatic(Session.class);
+    Session session = mock(Session.class);
+    doReturn(props).when(session).getProperties();
+    when(Session.getInstance(anyObject(), anyObject())).thenReturn(session);
+
     store = mock(Store.class);
-    doNothing().when(store).connect(anyString(), anyString());
+    //Mocking protected method.
+    doReturn(session).when(store, "getSession");
+    doReturn(store).when(session).getStore(anyString());
 
     TestFolder inbox = new TestFolder(store, INBOX_FOLDER);
-    when(store.getFolder(INBOX_FOLDER)).thenReturn(inbox);
+    doReturn(inbox).when(store).getFolder(INBOX_FOLDER);
 
     TestFolder recent = new TestFolder(store, RECENT_FOLDER);
-    when(store.getFolder(RECENT_FOLDER)).thenReturn(recent);
-
-    PowerMockito.mockStatic(Session.class);
-    Session session = mock(Session.class);
-    when(session.getStore(anyString())).thenReturn(store);
-    when(Session.getInstance(anyObject(), anyObject())).thenReturn(session);
+    doReturn(recent).when(store).getFolder(RECENT_FOLDER);
 
     connection = new RetrieverConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
@@ -127,7 +136,7 @@ public class RetrieverConnectionTestCase {
     private final String folderName;
     private boolean isOpen;
 
-    public TestFolder(Store store, String folderName) {
+    TestFolder(Store store, String folderName) {
       super(store);
       this.folderName = folderName;
       this.isOpen = false;
@@ -237,5 +246,4 @@ public class RetrieverConnectionTestCase {
       return new Message[0];
     }
   }
-
 }
