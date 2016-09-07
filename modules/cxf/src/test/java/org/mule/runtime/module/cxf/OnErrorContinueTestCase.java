@@ -9,7 +9,6 @@ package org.mule.runtime.module.cxf;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -152,9 +151,14 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException {
       String payload =
-          "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\"><return>Hello Anonymous</return></ns2:sayHiResponse></soap:Body></soap:Envelope>";
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(payload).build());
-      return event;
+          "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+              + "<soap:Body>"
+              + "<ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\">"
+              + "<return>Hello Anonymous</return>"
+              + "</ns2:sayHiResponse>"
+              + "</soap:Body>"
+              + "</soap:Envelope>";
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(payload).build()).build();
     }
   }
 

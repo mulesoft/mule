@@ -186,13 +186,12 @@ public class MuleUniversalConduit extends AbstractConduit {
     }
     message.put(CxfConstants.MULE_EVENT, event);
 
-    final MuleEvent finalEvent = event;
     AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM) {
 
       @Override
       public void handleMessage(Message m) throws Fault {
         try {
-          dispatchMuleMessage(m, finalEvent);
+          dispatchMuleMessage(m, (MuleEvent) m.getExchange().get(CxfConstants.MULE_EVENT));
         } catch (MuleException e) {
           throw new Fault(e);
         }
@@ -308,7 +307,10 @@ public class MuleUniversalConduit extends AbstractConduit {
       InputStream is = (InputStream) configuration.getMuleContext().getTransformationService()
           .transform(result.getMessage(), DataType.INPUT_STREAM).getPayload();
       PushbackInputStream pb = new PushbackInputStream(is);
-      result.setMessage(MuleMessage.builder(result.getMessage()).payload(pb).mediaType(XML).build());
+      result =
+          MuleEvent.builder(result).message(MuleMessage.builder(result.getMessage()).payload(pb).mediaType(XML).build()).build();
+
+      m.getExchange().put(CxfConstants.MULE_EVENT, result);
 
       int b = pb.read();
       if (b != -1) {
