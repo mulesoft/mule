@@ -22,6 +22,15 @@ public class ArtifactPluginDescriptor extends DeployableArtifactDescriptor {
   private Set<String> pluginDependencies = new HashSet<>();
   private List<ArtifactPluginDescriptor> artifactPluginDescriptors = new ArrayList<>();
 
+  /**
+   * Creates a new artifact plugin descriptor
+   *
+   * @param name artifact plugin name. Non empty.
+   */
+  public ArtifactPluginDescriptor(String name) {
+    super(name);
+  }
+
   public URL getRuntimeClassesDir() {
     return runtimeClassesDir;
   }

@@ -21,6 +21,15 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private URL[] runtimeLibs = new URL[0];
   private URL[] sharedRuntimeLibs = new URL[0];
 
+  /**
+   * Creates a new deployable artifact descriptor
+   *
+   * @param name artifact name. Non empty.
+   */
+  public DeployableArtifactDescriptor(String name) {
+    super(name);
+  }
+
   public boolean isRedeploymentEnabled() {
     return redeploymentEnabled;
   }

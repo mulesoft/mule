@@ -49,11 +49,8 @@ public class ArtifactPluginRepositoryTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws IOException {
     System.setProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHomeFolder.getRoot().getCanonicalPath());
-    when(artifactPluginDescriptorFactory.create(anyObject())).thenAnswer(invocation -> {
-      ArtifactPluginDescriptor descriptor = new ArtifactPluginDescriptor();
-      descriptor.setName(((File) invocation.getArguments()[0]).getName());
-      return descriptor;
-    });
+    when(artifactPluginDescriptorFactory.create(anyObject()))
+        .thenAnswer(invocation -> new ArtifactPluginDescriptor(((File) invocation.getArguments()[0]).getName()));
 
     pluginsLibFolder = createContainerAppPluginsFolder();
   }

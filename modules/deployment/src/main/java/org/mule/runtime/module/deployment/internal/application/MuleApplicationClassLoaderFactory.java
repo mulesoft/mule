@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
-import org.mule.runtime.module.deployment.internal.MuleApplicationClassLoader;
-import org.mule.runtime.module.deployment.internal.nativelib.NativeLibraryFinderFactory;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptor;
+import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
+import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
+import org.mule.runtime.module.deployment.internal.MuleApplicationClassLoader;
 import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.deployment.internal.nativelib.NativeLibraryFinderFactory;
+import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,10 +27,6 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getAppClassesFolder;
-import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.*;
 
 /**
  * Creates {@link MuleApplicationClassLoader} instances based on the application descriptor.
@@ -48,7 +47,7 @@ public class MuleApplicationClassLoaderFactory implements DeployableArtifactClas
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = getApplicationClassLoaderLookupPolicy(parent, descriptor);
 
-    return new MuleApplicationClassLoader(descriptor.getName(), parent.getClassLoader(),
+    return new MuleApplicationClassLoader(descriptor, parent.getClassLoader(),
                                           nativeLibraryFinderFactory.create(descriptor.getName()), urls,
                                           classLoaderLookupPolicy, artifactPluginClassLoaders);
   }

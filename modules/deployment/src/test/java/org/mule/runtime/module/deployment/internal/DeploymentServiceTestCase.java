@@ -45,19 +45,18 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.module.deployment.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.deployment.internal.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -74,10 +73,12 @@ import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.application.Application;
-import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.application.ApplicationStatus;
+import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.application.MuleApplicationClassLoaderFactory;
 import org.mule.runtime.module.deployment.internal.application.TestApplicationFactory;
 import org.mule.runtime.module.deployment.internal.builder.ApplicationFileBuilder;
@@ -88,8 +89,6 @@ import org.mule.runtime.module.deployment.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.deployment.internal.domain.TestDomainFactory;
-import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.service.ServiceRepository;
@@ -2968,11 +2967,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   private DefaultMuleDomain createDefaultDomain() {
-    DomainDescriptor descriptor = new DomainDescriptor();
-    descriptor.setName(DEFAULT_DOMAIN_NAME);
-
-    return new DefaultMuleDomain(descriptor, new DomainClassLoaderFactory(getClass().getClassLoader())
-        .create(containerClassLoader, descriptor, emptyList()));
+    return new DefaultMuleDomain(new DomainDescriptor(DEFAULT_DOMAIN_NAME),
+                                 new DomainClassLoaderFactory(getClass().getClassLoader())
+                                     .create(containerClassLoader, new DomainDescriptor(DEFAULT_DOMAIN_NAME), emptyList()));
   }
 
   /**

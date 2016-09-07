@@ -19,7 +19,6 @@ import org.mule.runtime.module.deployment.internal.application.ArtifactPluginFac
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptor;
@@ -118,7 +117,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
     checkState(artifactDescriptor != null, "artifact descriptor cannot be null");
     parentClassLoader = getParentClassLoader();
     checkState(parentClassLoader != null, "parent class loader cannot be null");
-    RegionClassLoader regionClassLoader = new RegionClassLoader("Region" + artifactId, parentClassLoader.getClassLoader(),
+    RegionClassLoader regionClassLoader = new RegionClassLoader(artifactDescriptor, parentClassLoader.getClassLoader(),
                                                                 parentClassLoader.getClassLoaderLookupPolicy());
 
     List<ArtifactPluginDescriptor> effectiveArtifactPluginDescriptors = createContainerApplicationPlugins();
@@ -136,7 +135,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
       final ArtifactClassLoaderFilter classLoaderFilter = effectiveArtifactPluginDescriptors.get(i).getClassLoaderFilter();
       regionClassLoader.addClassLoader(pluginClassLoaders.get(i), classLoaderFilter);
     }
-    return artifactClassLoader;
+    return regionClassLoader;
   }
 
   private List<ArtifactPluginDescriptor> createContainerApplicationPlugins() {
@@ -172,11 +171,7 @@ public abstract class AbstractArtifactClassLoaderBuilder<T extends AbstractArtif
 
       ArtifactPlugin artifactPlugin = artifactPluginFactory.create(artifactPluginDescriptor, parent);
       artifactPluginClassLoaders.add(artifactPlugin.getArtifactClassLoader());
-
-      final FilteringArtifactClassLoader filteringPluginClassLoader =
-          new FilteringArtifactClassLoader(artifactPlugin.getArtifactClassLoader(),
-                                           artifactPlugin.getDescriptor().getClassLoaderFilter());
-      classLoaders.add(filteringPluginClassLoader);
+      classLoaders.add(artifactPlugin.getArtifactClassLoader());
     }
     return classLoaders;
   }

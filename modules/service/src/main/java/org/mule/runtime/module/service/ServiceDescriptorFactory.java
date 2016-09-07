@@ -29,9 +29,8 @@ public class ServiceDescriptorFactory implements ArtifactDescriptorFactory<Servi
       throw new IllegalArgumentException("Service folder does not exists: " + artifactFolder.getAbsolutePath());
     }
     final String serviceName = artifactFolder.getName();
-    final ServiceDescriptor descriptor = new ServiceDescriptor();
+    final ServiceDescriptor descriptor = new ServiceDescriptor(serviceName);
     descriptor.setRootFolder(artifactFolder);
-    descriptor.setName(serviceName);
 
     final File servicePropsFile = new File(artifactFolder, SERVICE_PROPERTIES);
     if (!servicePropsFile.exists()) {

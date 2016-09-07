@@ -8,6 +8,8 @@ package org.mule.runtime.module.artifact.classloader;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
+
 import java.net.URL;
 import java.util.List;
 
@@ -23,15 +25,16 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
   /**
    * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
    *
-   * @param name artifact name
+   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
    * @param urls the URLs from which to load classes and resources
    * @param parent parent class loader in the hierarchy
    * @param lookupPolicy policy for resolving classes and resources
    * @param artifactPluginClassLoaders class loaders for the plugin artifacts contained by this artifact. Must be not null.
    */
-  public MuleDeployableArtifactClassLoader(String name, URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy,
+  public MuleDeployableArtifactClassLoader(ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
+                                           ClassLoaderLookupPolicy lookupPolicy,
                                            List<ArtifactClassLoader> artifactPluginClassLoaders) {
-    super(name, urls, parent, lookupPolicy);
+    super(artifactDescriptor, urls, parent, lookupPolicy);
     checkArgument(artifactPluginClassLoaders != null, "artifact plugin class loaders cannot be null");
     this.artifactPluginClassLoaders = artifactPluginClassLoaders;
   }

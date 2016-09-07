@@ -246,7 +246,7 @@ final class LoggerContextConfigurer {
   }
 
   private LoggerConfig getRootLogger(LoggerContext context) {
-    return ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
+    return context.getConfiguration().getRootLogger();
   }
 
   private void removeAppender(LoggerContext context, Appender appender) {

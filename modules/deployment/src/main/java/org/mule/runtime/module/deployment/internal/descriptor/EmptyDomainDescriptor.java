@@ -12,6 +12,6 @@ package org.mule.runtime.module.deployment.internal.descriptor;
 public class EmptyDomainDescriptor extends DomainDescriptor {
 
   public EmptyDomainDescriptor(String name) {
-    this.setName(name);
+    super(name);
   }
 }
