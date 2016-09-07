@@ -16,7 +16,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -28,6 +27,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.cxf.CxfConfiguration;
@@ -177,7 +177,8 @@ public class MuleUniversalConduit extends AbstractConduit {
         throw new Fault(e);
       }
     } else {
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build());
+      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build())
+          .build();
     }
 
     if (!decoupled) {

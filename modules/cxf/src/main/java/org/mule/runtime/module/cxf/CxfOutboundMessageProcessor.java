@@ -17,7 +17,6 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -28,6 +27,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.i18n.CxfMessages;
@@ -397,11 +397,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       builder.addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatusCode);
     }
 
-    Class payloadClass = payload != null ? payload.getClass() : Object.class;
     builder.payload(payload).mediaType(getMimeType());
 
-    transportResponse.setMessage(builder.build());
-    return transportResponse;
+    return MuleEvent.builder(transportResponse).message(builder.build()).build();
   }
 
   protected Object[] addHoldersToResponse(Object response, Object[] args) {

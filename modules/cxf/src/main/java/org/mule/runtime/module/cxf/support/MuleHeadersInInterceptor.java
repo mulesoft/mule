@@ -94,12 +94,13 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor {
     String corGroupSize = (String) message.get(MULE_CORRELATION_GROUP_SIZE_PROPERTY);
     String corSeq = (String) message.get(MULE_CORRELATION_SEQUENCE_PROPERTY);
 
-    // TODO RM
-    //((DefaultMuleEvent) reqEvent).setLegacyCorrelationId(corId);
-    //((DefaultMuleEvent) reqEvent).setCorrelation(new Correlation(!corGroupSize.isEmpty() ? parseInt(corGroupSize) : null,
-    //                                                             !corSeq.isEmpty() ? parseInt(corSeq) : null));
+    reqEvent = MuleEvent.builder(reqEvent).message(builder.build())
+        .correlation(new Correlation(!corGroupSize.isEmpty() ? parseInt(corGroupSize) : null,
+                                     !corSeq.isEmpty() ? parseInt(corSeq) : null))
+        .correlationId(corId)
+        .build();
 
-    reqEvent.setMessage(builder.build());
+    message.getExchange().put(CxfConstants.MULE_EVENT, reqEvent);
   }
 
   public Set<QName> getUnderstoodHeaders() {

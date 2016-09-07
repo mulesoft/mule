@@ -209,10 +209,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     } else {
       message = out.toString();
     }
-    MuleMessage resultMessage = MuleMessage.builder(event.getMessage()).payload(message).mediaType(ct).build();
-    event.setMessage(resultMessage);
-
-    return event;
+    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(message).mediaType(ct).build())
+        .build();
   }
 
   private String getUri(MuleEvent event) {
@@ -252,8 +250,8 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
               originalReplyToHandler.processReplyTo(responseEvent, responseEvent.getMessage(), replyTo);
             } catch (Exception e) {
               ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
-              responseEvent.setMessage(MuleMessage.builder(responseEvent.getMessage()).exceptionPayload(exceptionPayload)
-                  .addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build());
+              responseEvent = MuleEvent.builder(responseEvent).message(MuleMessage.builder(responseEvent.getMessage())
+                  .exceptionPayload(exceptionPayload).addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build()).build();
               processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
             }
             return responseEvent;
@@ -439,8 +437,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
       }
     }
-    responseEvent.setMessage(builder.build());
-    return responseEvent;
+    return MuleEvent.builder(responseEvent).message(builder.build()).build();
   }
 
   protected boolean shouldSoapActionHeader() {

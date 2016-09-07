@@ -71,7 +71,8 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
         messageBuilder.addOutboundProperty(key, val);
       }
     }
-    event.setMessage(messageBuilder.build());
+    event = MuleEvent.builder(event).message(messageBuilder.build()).build();
+    message.getExchange().put(CxfConstants.MULE_EVENT, event);
 
     if (!Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE))) {
       message.getInterceptorChain().pause();
