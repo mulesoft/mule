@@ -310,14 +310,13 @@ public class MuleUniversalConduit extends AbstractConduit {
       result =
           MuleEvent.builder(result).message(MuleMessage.builder(result.getMessage()).payload(pb).mediaType(XML).build()).build();
 
-      m.getExchange().put(CxfConstants.MULE_EVENT, result);
-
       int b = pb.read();
       if (b != -1) {
         pb.unread(b);
         return pb;
       }
     }
+    m.getExchange().put(CxfConstants.MULE_EVENT, result);
 
     return null;
   }

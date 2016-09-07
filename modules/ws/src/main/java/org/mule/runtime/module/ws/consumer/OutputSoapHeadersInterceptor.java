@@ -11,6 +11,7 @@ import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.MuleMessage.Builder;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
@@ -44,6 +45,8 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
       return;
     }
 
+    final Builder builder = MuleMessage.builder(event.getMessage());
+
     for (Header header : message.getHeaders()) {
       if (header instanceof SoapHeader) {
         Transformer transformer = null;
@@ -55,8 +58,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
           String key = WSConsumer.SOAP_HEADERS_PROPERTY_PREFIX + header.getName().getLocalPart();
           String value = (String) transformer.transform(header.getObject());
 
-          message.getExchange().put(CxfConstants.MULE_EVENT, MuleEvent.builder(event)
-              .message(MuleMessage.builder(event.getMessage()).addInboundProperty(key, value).build()).build());
+          builder.addInboundProperty(key, value);
         } catch (TransformerException e) {
           throw new Fault(new TransformerMessagingException(CoreMessages
               .createStaticMessage("Cannot parse content of SOAP header %s in the response", header.getName().getLocalPart()),
@@ -64,5 +66,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
         }
       }
     }
+    final MuleEvent built = MuleEvent.builder(event).message(builder.build()).build();
+    message.getExchange().put(CxfConstants.MULE_EVENT, built);
   }
 }

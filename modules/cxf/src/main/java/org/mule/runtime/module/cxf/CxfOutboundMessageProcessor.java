@@ -252,7 +252,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       return NonBlockingVoidMuleEvent.getInstance();
     } else {
       Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
-      return buildResponseMessage(event, responseHolder.value, response);
+      return buildResponseMessage(event, (MuleEvent) exchange.get(CxfConstants.MULE_EVENT), response);
     }
   }
 
