@@ -194,7 +194,7 @@ public class WSConsumer
           if (e.getCause() instanceof SoapFault) {
             SoapFault soapFault = (SoapFault) e.getCause();
 
-            event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+            event = MuleEvent.builder(e.getEvent()).message(MuleMessage.builder(e.getEvent().getMessage())
                 .payload(soapFault.getDetail() != null ? soapFault.getDetail() : null).build()).build();
 
             throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(), soapFault.getMessage(),
