@@ -505,10 +505,4 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     }
     return value;
   }
-
-  @Override
-  public void setError(Error error) {
-    this.error = error;
-  }
-
 }

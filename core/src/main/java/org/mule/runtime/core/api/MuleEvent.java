@@ -229,13 +229,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   SecurityContext getSecurityContext();
 
   /**
-   * Sets an error related to this event.
-   *
-   * @param error the error associated with this event
-   */
-  void setError(Error error);
-
-  /**
    * Create new {@link Builder}.
    *
    * @param eventContext the event context to create event instance with.
