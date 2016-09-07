@@ -6,59 +6,6 @@
     <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/extension" schemaLocation="http://www.mulesoft.org/schema/mule/extension/current/mule-extension.xsd"></xs:import>
     <xs:import namespace="http://www.mulesoft.org/schema/mule/tls" schemaLocation="http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd"></xs:import>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="mule:abstractExtensionType">
-                    <xs:annotation>
-                        <xs:documentation>Default configuration</xs:documentation>
-                    </xs:annotation>
-                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
-                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-service-threading-profile"></xs:element>
-                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="pets">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="pet">
-                                        <xs:complexType>
-                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="cage">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PetCage"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
-                            <xs:complexType>
-                                <xs:complexContent>
-                                    <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
-                                </xs:complexContent>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="threadingProfile"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
-                    <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="cage"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
-                    <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
-                    <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
-                    <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
     <xs:complexType name="org.mule.test.petstore.extension.PetCage">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
@@ -120,6 +67,90 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+    <xs:complexType name="org.mule.test.petstore.extension.ExclusiveCashier">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
+                        <xs:complexType>
+                            <xs:complexContent>
+                                <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
+                            </xs:complexContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-exclusive-cashier"></xs:element>
+    <xs:element xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" substitutionGroup="petstore:abstract-exclusive-cashier" name="exclusive-cashier">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="petstore:org.mule.test.petstore.extension.ExclusiveCashier">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" name="config">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="mule:abstractExtensionType">
+                    <xs:annotation>
+                        <xs:documentation>Default configuration</xs:documentation>
+                    </xs:annotation>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="1" maxOccurs="1" ref="extension:abstractConnectionProvider"></xs:element>
+                        <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" minOccurs="0" maxOccurs="1" ref="extension:dynamic-config-policy"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-service-threading-profile"></xs:element>
+                        <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="pets">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="pet">
+                                        <xs:complexType>
+                                            <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="cage">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PetCage"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" maxOccurs="1" name="phone-number">
+                            <xs:complexType>
+                                <xs:complexContent>
+                                    <xs:extension xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore" base="petstore:org.mule.test.petstore.extension.PhoneNumber"></xs:extension>
+                                </xs:complexContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="name"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="threadingProfile"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+                    <xs:attribute type="mule:expressionList" use="optional" name="pets"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="cage"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="required" name="cashierName"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="rothIRA"></xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="pensionPlan"></xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="phoneNumber"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" name="cash"></xs:attribute>
+                    <xs:attribute type="mule:expressionInt" use="optional" name="debt"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
     <xs:element xmlns:extension="http://www.mulesoft.org/schema/mule/extension" substitutionGroup="extension:abstractConnectionProvider" name="connection">
         <xs:complexType>
             <xs:complexContent>
@@ -176,7 +207,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCageType" substitutionGroup="mule:abstract-message-processor" name="get-cage"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetCageType" substitutionGroup="mule:abstract-message-processor" name="get-cage"></xs:element>
     <xs:complexType name="GetCageType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -193,7 +224,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientType" substitutionGroup="mule:abstract-message-processor" name="get-client"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetClientType" substitutionGroup="mule:abstract-message-processor" name="get-client"></xs:element>
     <xs:complexType name="GetClientType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -210,7 +241,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetClientOnLatchType" substitutionGroup="mule:abstract-message-processor" name="get-client-on-latch"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetClientOnLatchType" substitutionGroup="mule:abstract-message-processor" name="get-client-on-latch"></xs:element>
     <xs:complexType name="GetClientOnLatchType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -227,7 +258,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetPetsType" substitutionGroup="mule:abstract-message-processor" name="get-pets"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetPetsType" substitutionGroup="mule:abstract-message-processor" name="get-pets"></xs:element>
     <xs:complexType name="GetPetsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -245,7 +276,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Pet-sourceType" substitutionGroup="mule:abstract-message-source" name="pet-source"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="Pet-sourceType" substitutionGroup="mule:abstract-message-source" name="pet-source"></xs:element>
     <xs:complexType name="Pet-sourceType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
@@ -257,7 +288,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetBreederType" substitutionGroup="mule:abstract-message-processor" name="get-breeder"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetBreederType" substitutionGroup="mule:abstract-message-processor" name="get-breeder"></xs:element>
     <xs:complexType name="GetBreederType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
@@ -271,7 +302,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/petstore" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetCashierType" substitutionGroup="mule:abstract-message-processor" name="get-cashier"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/petstore" type="GetCashierType" substitutionGroup="mule:abstract-message-processor" name="get-cashier"></xs:element>
     <xs:complexType name="GetCashierType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">

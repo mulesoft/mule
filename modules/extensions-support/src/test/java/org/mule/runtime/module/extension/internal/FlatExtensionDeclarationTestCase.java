@@ -205,7 +205,7 @@ public class FlatExtensionDeclarationTestCase extends BaseExtensionDeclarationTe
     assertThat(extensionModel.getOperationModels().get(2).getName(), equalTo(CONSUMER));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = IllegalModelDefinitionException.class)
   public void nameClashes() {
     extensionDeclarer.withConfig(CONFIG_NAME).createdWith(mock(ConfigurationFactory.class)).describedAs("");
     factory.createFrom(extensionDeclarer, createDescribingContext());

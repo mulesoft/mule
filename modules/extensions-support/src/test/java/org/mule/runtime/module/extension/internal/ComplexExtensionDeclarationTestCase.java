@@ -45,7 +45,6 @@ import java.io.Serializable;
 
 import org.junit.Test;
 
-
 @SmallTest
 public class ComplexExtensionDeclarationTestCase extends BaseExtensionDeclarationTestCase {
 

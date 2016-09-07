@@ -20,7 +20,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.createInterceptors;
 import org.mule.common.MuleVersion;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.ValueHolder;
@@ -167,6 +166,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                              toOperations(extensionDeclaration.getOperations()),
                                              toConnectionProviders(extensionDeclaration.getConnectionProviders()),
                                              toMessageSources(extensionDeclaration.getMessageSources()),
+                                             extensionDeclaration.getTypes(),
                                              extensionDeclaration.getModelProperties(),
                                              extensionDeclaration.getExceptionEnricherFactory());
 
