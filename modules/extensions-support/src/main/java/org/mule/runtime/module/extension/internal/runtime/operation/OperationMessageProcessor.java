@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import org.mule.runtime.api.metadata.EntityMetadataProvider;
@@ -22,13 +25,12 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.util.StringUtils;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -69,6 +71,8 @@ import org.slf4j.LoggerFactory;
 public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, EntityMetadataProvider, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
+  private static final String INVALID_TARGET_MESSAGE =
+      "Flow '%s' defines an invalid usage of operation '%s' which contains %s as the operation target";
 
   private final RuntimeExtensionModel extensionModel;
   private final RuntimeOperationModel operationModel;
@@ -147,7 +151,23 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
       return VoidReturnDelegate.INSTANCE;
     }
 
-    return StringUtils.isBlank(target) ? new ValueReturnDelegate(muleContext) : new TargetReturnDelegate(target, muleContext);
+    return !isTargetPresent() ? new ValueReturnDelegate(muleContext) : new TargetReturnDelegate(target, muleContext);
+  }
+
+  private boolean isTargetPresent() {
+    if (isBlank(target)) {
+      return false;
+    }
+
+    if (target.startsWith(FLOW_VARS)) {
+      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
+                                                 format("a flowVar with the '%s' prefix", FLOW_VARS)));
+    } else if (muleContext.getExpressionLanguage().isExpression(target)) {
+      throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
+                                                 "an expression"));
+    }
+
+    return true;
   }
 
   @Override
@@ -193,11 +213,11 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
     RuntimeConfigurationModel configurationModel = configurationProvider.getModel();
     if (!configurationModel.getOperationModel(operationModel.getName()).isPresent() &&
         !configurationModel.getExtensionModel().getOperationModel(operationModel.getName()).isPresent()) {
-      throw new IllegalOperationException(String.format(
-                                                        "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
-                                                            + "The selected config does not support that operation.",
-                                                        flowConstruct.getName(), operationModel.getName(),
-                                                        configurationProvider.getName()));
+      throw new IllegalOperationException(format(
+                                                 "Flow '%s' defines an usage of operation '%s' which points to configuration '%s'. "
+                                                     + "The selected config does not support that operation.",
+                                                 flowConstruct.getName(), operationModel.getName(),
+                                                 configurationProvider.getName()));
     }
   }
 }
