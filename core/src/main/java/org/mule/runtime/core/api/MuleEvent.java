@@ -50,15 +50,10 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   /**
    * The returned value will depend on the {@link MessageSource} that created this event, and the flow that is executing the
    * event.
-   * 
+   *
    * @return the correlation id to use for this event.
    */
   String getCorrelationId();
-
-  /**
-   * @return the {@link MuleEvent}
-   */
-  MuleEvent getParent();
 
   /**
    * Returns the message payload for this event
@@ -293,6 +288,17 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * @return the builder instance
      */
     Builder removeFlowVariable(String key);
+
+    /**
+     * Set correlationId overriding the correlationId from {@link MessageContext#getCorrelationId()} that came from the source
+     * system or that was configured in the connector source. This is only used to support transports and should not be used
+     * otherwise.
+     *
+     * @param correlationId to override existing correlationId
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder correlationId(String correlationId);
 
     /**
      * Sets the correlation information to the produced event.

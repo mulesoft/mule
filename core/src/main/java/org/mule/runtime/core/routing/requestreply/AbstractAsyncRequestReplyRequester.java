@@ -164,7 +164,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   }
 
   protected String getAsyncReplyCorrelationId(MuleEvent event) {
-    return event.getCorrelationId() + event.getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(event.getContext().getCorrelationId());
+    event.getCorrelation().getSequence().ifPresent(v -> stringBuilder.append("-" + v));
+    return stringBuilder.toString();
   }
 
   protected void sendAsyncRequest(MuleEvent event) throws MuleException {

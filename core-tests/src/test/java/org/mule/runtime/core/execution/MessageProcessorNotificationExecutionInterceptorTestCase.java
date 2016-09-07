@@ -170,7 +170,6 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
     String muleEventIdToProcess = UUID.getUUID();
     when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
     when(mockMuleEvent.getReplyToHandler()).thenReturn(mockReplyToHandler);
-    when(mockMuleEvent.getId()).thenReturn(muleEventIdToProcess);
     when(mockMuleEvent.getError()).thenReturn(empty());
 
     when(mockNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)).thenReturn(true);

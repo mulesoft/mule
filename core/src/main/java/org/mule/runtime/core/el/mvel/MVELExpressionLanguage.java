@@ -81,13 +81,14 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   @Inject
   public MVELExpressionLanguage(MuleContext muleContext) {
     this.muleContext = muleContext;
+    parserConfiguration = createParserConfiguration(imports);
+    expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
   }
 
   @Override
   public void initialise() throws InitialisationException {
     parserConfiguration = createParserConfiguration(imports);
     expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
-
     loadGlobalFunctions();
     createStaticContext();
   }

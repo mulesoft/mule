@@ -7,6 +7,7 @@
 
 package org.mule.runtime.core.routing;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -156,9 +157,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       } catch (ResponseTimeoutException e) {
         exception = e;
       } catch (InterruptedException e) {
-        throw new DefaultMuleException(MessageFactory.createStaticMessage(String.format(
-                                                                                        "Was interrupted while waiting for route %d",
-                                                                                        routeIndex)),
+        throw new DefaultMuleException(MessageFactory.createStaticMessage(format("Was interrupted while waiting for route %d",
+                                                                                 routeIndex)),
                                        e);
       } catch (MessagingException e) {
         exception = wrapInDispatchException(e.getEvent(), routeIndex, route, e);
@@ -171,9 +171,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       if (exception != null) {
         if (logger.isDebugEnabled()) {
           logger.debug(
-                       String.format("route %d generated exception for MuleEvent %s", routeIndex,
-                                     event.getId()),
-                       exception);
+                       format("route %d generated exception for MuleEvent %s", routeIndex, event), exception);
         }
 
         if (exception instanceof MessagingException) {
@@ -188,8 +186,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         }
       } else {
         if (logger.isDebugEnabled()) {
-          logger.debug(String.format("route %d executed successfully for event %s", routeIndex,
-                                     event.getId()));
+          logger.debug(format("route %d executed successfully for event %s", routeIndex, event));
         }
       }
 
@@ -200,9 +197,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   }
 
   private Exception wrapInDispatchException(MuleEvent event, int routeIndex, MessageProcessor route, Exception e) {
-    return new DispatchException(MessageFactory.createStaticMessage(String.format(
-                                                                                  "route number %d failed to be executed",
-                                                                                  routeIndex)),
+    return new DispatchException(MessageFactory.createStaticMessage(format("route number %d failed to be executed", routeIndex)),
                                  event, route, e);
   }
 
@@ -215,8 +210,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
         works.add(work);
       }
     } catch (WorkException e) {
-      throw new DefaultMuleException(
-                                     MessageFactory.createStaticMessage("Could not schedule work for route"), e);
+      throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not schedule work for route"), e);
     }
 
     return works;
@@ -240,8 +234,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
       }
 
       if (threadingProfile.isDoThreading()) {
-        workManager = threadingProfile.createWorkManager(
-                                                         ThreadNameHelper.getPrefix(muleContext) + "ScatterGatherWorkManager",
+        workManager = threadingProfile.createWorkManager(ThreadNameHelper.getPrefix(muleContext) + "ScatterGatherWorkManager",
                                                          muleContext.getConfiguration().getShutdownTimeout());
       } else {
         workManager = new SerialWorkManager();

@@ -6,8 +6,10 @@
  */
 package org.mule.test.integration;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import org.mule.runtime.core.DefaultMuleEvent;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 public class PollingTestCase extends AbstractIntegrationTestCase {
@@ -37,7 +40,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
     foo = new ArrayList<String>();
     bar = new ArrayList<String>();
     events = new ArrayList<MuleEvent>();
-    eventIds = new ArrayList<String>();
+    eventIds = new ArrayList<>();
   }
 
   @Override
@@ -70,7 +73,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
 
       for (int i = 0; i < events.size(); i++) {
         assertNotNull(events.get(i));
-        assertEquals(events.get(i).getId(), eventIds.get(i));
+        assertThat(eventIds.get(i), equalTo(events.get(i).getContext().getId()));
       }
     }
   }
@@ -108,7 +111,7 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
     public MuleEvent process(MuleEvent event) throws MuleException {
       synchronized (events) {
         events.add(getCurrentEvent());
-        eventIds.add(event.getId());
+        eventIds.add(event.getContext().getId());
       }
       return event;
     }

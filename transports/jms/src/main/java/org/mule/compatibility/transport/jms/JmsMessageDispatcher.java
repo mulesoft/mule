@@ -96,7 +96,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                                       final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
       throws Exception {
     if (logger.isDebugEnabled()) {
-      logger.debug("dispatching on endpoint: " + endpoint.getEndpointURI() + ". MuleEvent id is: " + event.getId()
+      logger.debug("dispatching on endpoint: " + endpoint.getEndpointURI() + ". MuleEvent id is: " + event
           + ". Outbound transformers are: " + endpoint.getMessageProcessors());
     }
 

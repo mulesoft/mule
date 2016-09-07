@@ -125,7 +125,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
   protected MuleEvent getTestEventUsingFlow(Object data) throws Exception {
     MuleEvent event = mock(MuleEvent.class);
     MuleMessage message = MuleMessage.builder().payload(data).build();
-    when(event.getId()).thenReturn(randomNumeric(3));
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());

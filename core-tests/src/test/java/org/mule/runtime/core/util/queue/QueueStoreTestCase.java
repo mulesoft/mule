@@ -125,7 +125,8 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
 
     }
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-      assertThat((queue.poll(NUMBER_OF_ITEMS)).equals(events.get(i)), is(true));
+      assertThat(((MuleEvent) queue.poll(NUMBER_OF_ITEMS)).getContext().getId().equals(events.get(i).getContext().getId()),
+                 is(true));
     }
   }
 

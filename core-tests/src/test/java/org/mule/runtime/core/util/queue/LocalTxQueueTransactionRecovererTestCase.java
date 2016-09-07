@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.util.queue;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -22,6 +23,7 @@ import org.mule.runtime.core.util.xa.ResourceManagerException;
 import java.io.Serializable;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -67,9 +69,9 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
 
     queueTransactionRecoverer.recover();
-    Serializable muleEvent = inQueue.poll(TIMEOUT);
+    MuleEvent muleEvent = (MuleEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
-    assertThat(testEvent.equals(muleEvent), is(true));
+    assertThat(testEvent.getContext().getId(), equalTo(muleEvent.getContext().getId()));
   }
 
   @Test
@@ -103,10 +105,10 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     txLog.close();
     txLog = new LocalTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     queueTransactionRecoverer.recover();
-    Serializable muleEvent = inQueue.poll(TIMEOUT);
+    MuleEvent muleEvent = (MuleEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
-    assertThat(testEvent.equals(muleEvent), is(true));
-    muleEvent = inQueue.poll(TIMEOUT);
+    assertThat(testEvent.getContext().getId(), equalTo(muleEvent.getContext().getId()));
+    muleEvent = (MuleEvent) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, nullValue());
   }
 

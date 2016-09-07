@@ -212,7 +212,6 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     populateMessageBindings(bindings, event, eventBuilder);
 
     bindings.put(BINDING_EVENT_CONTEXT, new DefaultMuleEventContext(flow, event));
-    bindings.put(BINDING_ID, event.getId());
     bindings.put(BINDING_FLOW_CONSTRUCT, flow);
   }
 

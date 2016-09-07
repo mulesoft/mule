@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
+import static org.mule.runtime.core.util.StringUtils.DASH;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
@@ -56,7 +58,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
   private final Integer expectedSize;
   transient private MuleContext muleContext;
   private int arrivalOrderCounter = 0;
-  private Serializable lastStoredEventKey;
 
   public static final String DEFAULT_STORE_PREFIX = "DEFAULT_STORE";
 
@@ -218,25 +219,17 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
       // Using both event ID and CorrelationSequence since in certain instances
       // when an event is split up, the same event IDs are used.
       Serializable key = getEventKey(event);
-      lastStoredEventKey = key;
       eventsObjectStore.store(key, event, eventsPartitionKey);
     }
   }
 
   private String getEventKey(MuleEvent event) {
-    return event.getId() + event.getCorrelation().getSequence().map(v -> v.toString()).orElse(NOT_SET);
-  }
-
-  /**
-   * Remove the given event from the group.
-   *
-   * @param event the evnt to remove
-   * @throws ObjectStoreException
-   */
-  public void removeEvent(MuleEvent event) throws ObjectStoreException {
-    synchronized (this) {
-      eventsObjectStore.remove(event.getId(), eventsPartitionKey);
-    }
+    StringBuilder stringBuilder = new StringBuilder();
+    event.getCorrelation().getSequence().ifPresent(v -> stringBuilder.append(v + DASH));
+    stringBuilder.append(event.hashCode());
+    stringBuilder.append(DASH);
+    stringBuilder.append(event.getContext().getId());
+    return stringBuilder.toString();
   }
 
   /**
@@ -306,7 +299,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
           Iterator<Serializable> i = eventsObjectStore.allKeys(eventsPartitionKey).iterator();
           while (i.hasNext()) {
             Serializable id = i.next();
-            buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getContext().getCorrelationId());
+            buf.append(eventsObjectStore.retrieve(id, eventsPartitionKey).getCorrelationId());
             if (i.hasNext()) {
               buf.append(", ");
             }
@@ -328,12 +321,13 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
       if (size() > 0) {
 
         MuleEvent[] muleEvents = toArray(true);
+        MuleEvent lastEvent = muleEvents[muleEvents.length - 1];
 
         List<MuleMessage> messageList = Arrays.stream(muleEvents).map(event -> event.getMessage()).collect(toList());
 
         final CollectionBuilder builder = MuleMessage.builder().collectionPayload(messageList, MuleMessage.class);
         MuleEvent muleEvent =
-            MuleEvent.builder(retrieveLastStoredEvent()).message(builder.build()).session(getMergedSession()).build();
+            MuleEvent.builder(lastEvent).message(builder.build()).session(getMergedSession(muleEvents)).build();
         return muleEvent;
       } else {
         return VoidMuleEvent.getInstance();
@@ -344,26 +338,12 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
   }
 
-  private MuleEvent retrieveLastStoredEvent() throws ObjectStoreException {
-    synchronized (this) {
-      if (lastStoredEventKey == null) {
-        lastStoredEventKey = findLastStoredEventKey();
-      }
-
-      return eventsObjectStore.retrieve(lastStoredEventKey, eventsPartitionKey);
+  protected MuleSession getMergedSession(MuleEvent[] events) throws ObjectStoreException {
+    MuleSession session = new DefaultMuleSession(events[0].getSession());
+    for (int i = 1; i < events.length - 1; i++) {
+      addAndOverrideSessionProperties(session, events[i]);
     }
-  }
-
-  protected MuleSession getMergedSession() throws ObjectStoreException {
-    MuleEvent lastStoredEvent = retrieveLastStoredEvent();
-    MuleSession session = new DefaultMuleSession(lastStoredEvent.getSession());
-    for (Serializable key : eventsObjectStore.allKeys(eventsPartitionKey)) {
-      if (!key.equals(lastStoredEventKey)) {
-        MuleEvent event = eventsObjectStore.retrieve(key, eventsPartitionKey);
-        addAndOverrideSessionProperties(session, event);
-      }
-    }
-    addAndOverrideSessionProperties(session, lastStoredEvent);
+    addAndOverrideSessionProperties(session, events[events.length - 1]);
     return session;
   }
 
@@ -380,28 +360,6 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
   public void initEventsStore(PartitionableObjectStore<MuleEvent> events) throws ObjectStoreException {
     this.eventsObjectStore = events;
     events.open(eventsPartitionKey);
-  }
-
-  /**
-   * Finds the last stored event key on the event group.
-   * <p/>
-   * Event group uses {@code lastStoredEventKey} internally to differentiate the last event added to the group. When the event
-   * group is stored in an {@link org.mule.runtime.core.api.store.ObjectStore} that serializes/deserializes the instances, the
-   * eventGroup state is not keep updated. When an instance is deserialized, the events field is restored, but no the
-   * lastStoredEventKey field. As {@link #lastStoredEventKey} is used only under some scenarios and the cost of finding the last
-   * event key is high, is better to use lazy initialization for that field.
-   *
-   * @return the key of that last event added to the group. Null if no events added yet.
-   * @throws ObjectStoreException
-   */
-  private String findLastStoredEventKey() throws ObjectStoreException {
-    final MuleEvent[] muleEvents = toArray(true);
-
-    if (muleEvents.length > 0) {
-      return getEventKey(muleEvents[muleEvents.length - 1]);
-    }
-
-    return null;
   }
 
   public boolean isInitialised() {

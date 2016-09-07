@@ -24,8 +24,7 @@ public class SetCorrelationIdTransformer extends SimpleMessageProcessor {
 
   @Override
   public MuleEvent process(MuleEvent event) throws MuleException {
-    ((DefaultMuleEvent) event).setLegacyCorrelationId(correlationIdEvaluator.resolveValue(event).toString());
-    return event;
+    return MuleEvent.builder(event).correlationId(correlationIdEvaluator.resolveValue(event).toString()).build();
   }
 
 
