@@ -49,7 +49,9 @@ public final class ListCommand {
    * @param matcher a {@link Predicate} of {@link EmailAttributes} used to filter the output list @return a {@link List} of
    *        {@link MuleMessage} carrying all the emails and it's corresponding attributes.
    */
-  public List<MuleMessage> list(RetrieverConnection connection, String folderName, boolean readContent,
+  public List<MuleMessage> list(RetrieverConnection connection,
+                                String folderName,
+                                boolean readContent,
                                 Predicate<EmailAttributes> matcher) {
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);

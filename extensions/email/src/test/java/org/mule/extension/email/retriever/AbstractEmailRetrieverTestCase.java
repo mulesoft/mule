@@ -161,7 +161,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   }
 
   protected List<MuleMessage> runFlowAndGetMessages(String flowName) throws Exception {
-    return (List<MuleMessage>) runFlow(flowName).getMessage().getPayload();
+    return flowRunner(flowName).run().getMessage().getPayload();
   }
 
   protected void assertFlag(MimeMessage m, Flag flag, boolean contains) {

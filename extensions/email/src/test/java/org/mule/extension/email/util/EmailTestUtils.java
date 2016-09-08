@@ -12,11 +12,12 @@ import static javax.mail.Part.ATTACHMENT;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.util.IOUtils;
+
+import com.icegreen.greenmail.util.ServerSetup;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +35,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import com.icegreen.greenmail.util.ServerSetup;
-
 public class EmailTestUtils {
 
   public static final String EMAIL_SUBJECT = "Email Subject";
@@ -50,7 +49,6 @@ public class EmailTestUtils {
   public static final String JUANI_EMAIL = "juan.desimoni@mulesoft.com";
   public static final String ALE_EMAIL = "ale.g.marra@mulesoft.com";
   public static final String MG_EMAIL = "mariano.gonzalez@mulesoft.com";
-  public static final String[] EMAILS = {JUANI_EMAIL, ESTEBAN_EMAIL, PABLON_EMAIL, ALE_EMAIL};
 
   public static final long SERVER_STARTUP_TIMEOUT = 5000;
 
