@@ -71,8 +71,8 @@ import org.slf4j.LoggerFactory;
 public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, EntityMetadataProvider, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
-  private static final String INVALID_TARGET_MESSAGE =
-      "Flow '%s' defines an invalid usage of operation '%s' which contains %s as the operation target";
+  static final String INVALID_TARGET_MESSAGE =
+      "Flow '%s' defines an invalid usage of operation '%s' which uses %s as target";
 
   private final RuntimeExtensionModel extensionModel;
   private final RuntimeOperationModel operationModel;
@@ -161,7 +161,7 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
 
     if (target.startsWith(FLOW_VARS)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
-                                                 format("a flowVar with the '%s' prefix", FLOW_VARS)));
+                                                 format("the '%s' prefix", FLOW_VARS)));
     } else if (muleContext.getExpressionLanguage().isExpression(target)) {
       throw new IllegalOperationException(format(INVALID_TARGET_MESSAGE, flowConstruct.getName(), operationModel.getName(),
                                                  "an expression"));

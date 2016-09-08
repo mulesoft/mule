@@ -23,6 +23,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
@@ -47,8 +48,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
 
-  public static final String INVALID_TARGET =
-      "Flow '%s' defines an invalid usage of operation 'operation' which contains %s as the operation target";
   @Rule
   public ExpectedException expectedException = none();
 
@@ -195,7 +194,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     String flowName = "flowName";
     expectedException.expect(IllegalOperationException.class);
-    expectedException.expectMessage(format(INVALID_TARGET, flowName, "an expression"));
+    expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression"));
 
     target = "#[someExpression]";
     messageProcessor = createOperationMessageProcessor();
@@ -214,7 +213,8 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     String flowName = "flowName";
     expectedException.expect(IllegalOperationException.class);
-    expectedException.expectMessage(format(INVALID_TARGET, flowName, format("a flowVar with the '%s' prefix", FLOW_VARS)));
+    expectedException
+        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), format("the '%s' prefix", FLOW_VARS)));
 
     target = format("flowVars.%s", TARGET_VAR);
     messageProcessor = createOperationMessageProcessor();
