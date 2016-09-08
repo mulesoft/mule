@@ -196,8 +196,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
                         event.getMessage().setPayload(soapFault.getDetail());
 
-                        throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
-                                                     soapFault.getMessage(), soapFault.getDetail(), this);
+                        throw new SoapFaultException(event, soapFault, this);
                     }
                     else
                     {
@@ -432,7 +431,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
         if (!message.getOutboundAttachmentNames().isEmpty())
         {
-            Collection<Attachment> attachments = new HashSet<Attachment>(message.getOutboundAttachmentNames().size());
+            Collection<Attachment> attachments = new HashSet<>(message.getOutboundAttachmentNames().size());
 
             for (String outboundAttachmentName : message.getOutboundAttachmentNames())
             {
