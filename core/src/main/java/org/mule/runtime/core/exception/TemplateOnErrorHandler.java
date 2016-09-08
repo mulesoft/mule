@@ -196,7 +196,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
 
   private boolean acceptsErrorType(MuleEvent event) {
-    return errorTypeMatcher.match(event.getError().get().getErrorType());
+    return errorTypeMatcher != null && errorTypeMatcher.match(event.getError().get().getErrorType());
   }
 
   @Override

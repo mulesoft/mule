@@ -6,14 +6,13 @@
  */
 package org.mule.runtime.core.exception;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.ErrorType;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -58,8 +57,7 @@ public class DisjunctiveErrorTypeMatcherTestCase extends AbstractErrorTypeMatche
   }
 
   private ErrorTypeMatcher createMatcher(ErrorType... errorTypes) {
-    return new DisjunctiveErrorTypeMatcher(Arrays.stream(errorTypes).map(SingleErrorTypeMatcher::new)
-        .collect(Collectors.toList()));
+    return new DisjunctiveErrorTypeMatcher(stream(errorTypes).map(SingleErrorTypeMatcher::new).collect(toList()));
   }
 
 }

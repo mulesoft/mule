@@ -10,7 +10,9 @@ package org.mule.runtime.config.spring.dsl.model;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
@@ -35,7 +37,6 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.SINGLETO
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.config.ComponentIdentifier.parseComponentIdentifier;
 import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_IDENTIFIER;
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkState;
@@ -187,13 +188,11 @@ import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} definitions for the components provided by the core
@@ -272,15 +271,13 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(OnErrorContinueHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition(ERROR_TYPE_MATCHER, fromSimpleParameter(TYPE, getErrorTypeConverter())
-            .withDefaultValue(ANY_IDENTIFIER).build())
+        .withSetterParameterDefinition(ERROR_TYPE_MATCHER, fromSimpleParameter(TYPE, getErrorTypeConverter()).build())
         .asPrototype().build());
     componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy().withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition(ERROR_TYPE_MATCHER, fromSimpleParameter(TYPE, getErrorTypeConverter())
-            .withDefaultValue(ANY_IDENTIFIER).build())
+        .withSetterParameterDefinition(ERROR_TYPE_MATCHER, fromSimpleParameter(TYPE, getErrorTypeConverter()).build())
         .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
         .withSetterParameterDefinition("redeliveryExceeded", fromChildConfiguration(RedeliveryExceeded.class).build())
         .asPrototype().build());
@@ -623,11 +620,11 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private TypeConverter<String, ErrorTypeMatcher> getErrorTypeConverter() {
     return (value) -> {
       String[] errorTypeIdentifiers = value.split(",");
-      List<ErrorTypeMatcher> matchers = Arrays.stream(errorTypeIdentifiers).map((identifier) -> {
+      List<ErrorTypeMatcher> matchers = stream(errorTypeIdentifiers).map((identifier) -> {
         String parsedIdentifier = identifier.trim();
         ErrorType errorType = muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(parsedIdentifier));
         return new SingleErrorTypeMatcher(errorType);
-      }).collect(Collectors.toList());
+      }).collect(toList());
       return new DisjunctiveErrorTypeMatcher(matchers);
     };
   }
