@@ -23,6 +23,8 @@ import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.io.IOException;
 
+import static org.mule.runtime.extension.api.annotation.param.Optional.DefaultValues.PAYLOAD;
+
 /**
  * Basic set of operations for socket extension
  *
@@ -45,7 +47,7 @@ public class SocketOperations {
    */
   @MetadataScope(outputResolver = SocketMetadataResolver.class, keysResolver = SocketMetadataResolver.class)
   public OperationResult<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
-                                    @Optional(defaultValue = "#[payload]") @XmlHints(allowReferences = false) Object content,
+                                    @Optional(defaultValue = PAYLOAD) @XmlHints(allowReferences = false) Object content,
                                     @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
                                     @MetadataKeyId String hasResponse, MuleMessage muleMessage)
       throws ConnectionException, IOException {

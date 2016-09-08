@@ -8,6 +8,8 @@ package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
+import static org.mule.runtime.extension.api.annotation.param.Optional.DefaultValues.PAYLOAD;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
@@ -82,11 +84,11 @@ public class HeisenbergOperations {
         .mediaType(dt.getMediaType()).attributes(new IntegerAttributes(index)).build();
   }
 
-  public String kill(@Optional(defaultValue = "#[payload]") String victim, String goodbyeMessage) throws Exception {
+  public String kill(@Optional(defaultValue = PAYLOAD) String victim, String goodbyeMessage) throws Exception {
     return killWithCustomMessage(victim, goodbyeMessage);
   }
 
-  public String killWithCustomMessage(@Optional(defaultValue = "#[payload]") @Placement(group = KILL_WITH_GROUP,
+  public String killWithCustomMessage(@Optional(defaultValue = PAYLOAD) @Placement(group = KILL_WITH_GROUP,
       order = 1) String victim, @Placement(group = KILL_WITH_GROUP, order = 2) String goodbyeMessage) {
     return String.format("%s, %s", goodbyeMessage, victim);
   }
@@ -95,7 +97,7 @@ public class HeisenbergOperations {
     return knockedDoor.knock();
   }
 
-  public List<Ricin> killWithRicins(@Optional(defaultValue = "#[payload]") List<Ricin> ricinList) {
+  public List<Ricin> killWithRicins(@Optional(defaultValue = PAYLOAD) List<Ricin> ricinList) {
     return ricinList;
   }
 
@@ -103,7 +105,7 @@ public class HeisenbergOperations {
     return String.format("Killed with: %s , Type %s and attribute %s", weapon.kill(), type.name(), attributesOfWeapon.getBrand());
   }
 
-  public List<String> killWithMultiplesWeapons(@Optional(defaultValue = "#[payload]") List<Weapon> weaponList) {
+  public List<String> killWithMultiplesWeapons(@Optional(defaultValue = PAYLOAD) List<Weapon> weaponList) {
     return weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
   }
 
@@ -180,7 +182,7 @@ public class HeisenbergOperations {
     return literalExpression;
   }
 
-  public int[][] getGramsInStorage(@Optional(defaultValue = "#[payload]") int[][] grams) {
+  public int[][] getGramsInStorage(@Optional(defaultValue = PAYLOAD) int[][] grams) {
     return grams;
   }
 
