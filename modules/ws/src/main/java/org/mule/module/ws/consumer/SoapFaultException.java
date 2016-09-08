@@ -26,6 +26,15 @@ public class SoapFaultException extends MessagingException
     private final QName subCode;
     private final Element detail;
 
+    @Deprecated
+    public SoapFaultException(MuleEvent event, QName faultCode, QName subCode, String message, Element detail, MessageProcessor failingMessageProcessor)
+    {
+        super(CoreMessages.createStaticMessage(message), event, failingMessageProcessor);
+        this.faultCode = faultCode;
+        this.subCode = subCode;
+        this.detail = detail;
+    }
+
     public SoapFaultException(MuleEvent event, SoapFault soapFault, MessageProcessor failingMessageProcessor)
     {
         super(CoreMessages.createStaticMessage(soapFault.getMessage()), event, soapFault, failingMessageProcessor);
