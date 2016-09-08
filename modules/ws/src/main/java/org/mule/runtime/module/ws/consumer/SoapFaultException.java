@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.ws.consumer;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.w3c.dom.Element;
 
 /**
@@ -24,12 +25,11 @@ public class SoapFaultException extends MessagingException {
   private final QName subCode;
   private final Element detail;
 
-  public SoapFaultException(MuleEvent event, QName faultCode, QName subCode, String message, Element detail,
-                            MessageProcessor failingMessageProcessor) {
-    super(CoreMessages.createStaticMessage(message), event, failingMessageProcessor);
-    this.faultCode = faultCode;
-    this.subCode = subCode;
-    this.detail = detail;
+  public SoapFaultException(MuleEvent event, SoapFault soapFault, MessageProcessor failingMessageProcessor) {
+    super(CoreMessages.createStaticMessage(soapFault.getMessage()), event, soapFault, failingMessageProcessor);
+    this.faultCode = soapFault.getFaultCode();
+    this.subCode = soapFault.getSubCode();
+    this.detail = soapFault.getDetail();
   }
 
   public QName getFaultCode() {
