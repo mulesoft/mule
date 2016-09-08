@@ -159,6 +159,7 @@ public class HttpListenerWorkerThreadingProfileTestCase extends FunctionalTestCa
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
+      return context;
     });
   }
 }

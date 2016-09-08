@@ -235,7 +235,7 @@ public class FunctionalTestComponent
     }
 
     if (eventCallback != null) {
-      eventCallback.eventReceived(context, this, muleContext);
+      context = eventCallback.eventReceived(context, this, muleContext);
     }
 
     Object replyMessage;

@@ -14,7 +14,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,12 +49,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.antlr.stringtemplate.language.Expr;
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 @SmallTest
 public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
@@ -90,10 +87,6 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     mockEvent = mock(MuleEvent.class);
     mockMuleMessage = mock(MuleMessage.class);
-    doAnswer(invocation -> {
-      mockMuleMessage = (MuleMessage) invocation.getArguments()[0];
-      return null;
-    }).when(mockEvent).setMessage(any(MuleMessage.class));
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
     when(mockEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(mockEvent.getError()).thenReturn(empty());

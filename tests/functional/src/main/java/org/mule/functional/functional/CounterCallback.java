@@ -26,8 +26,10 @@ public class CounterCallback implements EventCallback {
     this.callbackCount = callbackCount;
   }
 
-  public void eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
+  @Override
+  public MuleEventContext eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
     incCallbackCount();
+    return context;
   }
 
   /**

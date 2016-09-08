@@ -12,8 +12,10 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
 
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -35,7 +37,7 @@ import org.junit.Test;
 public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextEndpointTestCase implements ExceptionListener {
 
   public static final String EXPECTING_SYNCHRONOUS_EVENT_ERROR =
-      "Exception expected: '" + AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE + "'";
+      "Exception expected: '" + SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE + "'";
 
   protected AsyncInterceptingMessageProcessor messageProcessor;
   protected TestListener target = new TestListener();
@@ -54,14 +56,14 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessOneWay() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(ONE_WAY));
 
     assertAsync(messageProcessor, event);
   }
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(REQUEST_RESPONSE));
 
     try {
       messageProcessor.process(event);
@@ -72,7 +74,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
+    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(ONE_WAY));
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -87,7 +89,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(REQUEST_RESPONSE));
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 

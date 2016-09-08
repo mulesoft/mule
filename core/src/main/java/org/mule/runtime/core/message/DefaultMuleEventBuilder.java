@@ -193,6 +193,15 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
     return this;
   }
 
+  @Deprecated
+  public MuleEvent.Builder refreshSync() {
+    this.synchronous = resolveEventSynchronicity();
+    this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
+
+    this.modified = true;
+    return this;
+  }
+
   @Override
   public MuleEvent build() {
     if (originalEvent != null && !modified) {

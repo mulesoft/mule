@@ -234,8 +234,7 @@ public final class MuleEndpointTestUtils {
 
     final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(message)
         .flow(flowConstruct).session(session).build();
-    populateFieldsFromInboundEndpoint(event, endpoint);
-    return event;
+    return populateFieldsFromInboundEndpoint(event, endpoint);
   }
 
   public static TestConnector getTestConnector(MuleContext context) throws Exception {

@@ -174,12 +174,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   boolean isSynchronous();
 
-  // TODO MULE-9281 Make MuleEvent immutable
-  void setMessage(MuleMessage message);
-
-  // TODO MULE-9281 Make MuleEvent immutable
-  void setFlowVariable(String key, Object value);
-
   /**
    * Indicates if notifications should be fired when processing this message.
    *
@@ -371,6 +365,13 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      */
     @Deprecated
     Builder session(MuleSession session);
+
+    /**
+     * 
+     * @return the builder instance
+     */
+    @Deprecated
+    Builder refreshSync();
 
     /**
      * Build a new {@link MuleEvent} based on the state configured in the {@link Builder}.

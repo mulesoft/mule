@@ -32,7 +32,10 @@ public class CorrelationResequencerTestCase extends AbstractIntegrationTestCase 
     super.doSetUp();
 
     FunctionalTestComponent testComponent = getFunctionalTestComponent("sorted");
-    testComponent.setEventCallback((context, component, muleContext) -> receiveLatch.countDown());
+    testComponent.setEventCallback((context, component, muleContext) -> {
+      receiveLatch.countDown();
+      return context;
+    });
   }
 
   @Test

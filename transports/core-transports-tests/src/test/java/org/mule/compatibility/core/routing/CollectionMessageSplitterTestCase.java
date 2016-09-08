@@ -127,7 +127,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     splitter.setMuleContext(muleContext);
     MuleEvent event =
         MuleEvent.builder(DefaultMessageContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session).build();
-    populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
+    event = populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
   }
 
@@ -172,7 +172,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
       builder.addFlowVariable(entry.getKey(), entry.getValue());
     }
     MuleEvent event = builder.build();
-    populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
+    event = populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     splitter.process(event);
     List<MuleEvent> splits = grabber.getEvents();
     assertEquals(count, splits.size());

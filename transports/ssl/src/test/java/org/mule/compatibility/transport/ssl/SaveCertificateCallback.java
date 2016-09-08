@@ -23,9 +23,10 @@ public class SaveCertificateCallback implements EventCallback {
   }
 
   @Override
-  public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
+  public MuleEventContext eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
     certificates.set(context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
     called.set(true);
+    return context;
   }
 
   public void clear() {

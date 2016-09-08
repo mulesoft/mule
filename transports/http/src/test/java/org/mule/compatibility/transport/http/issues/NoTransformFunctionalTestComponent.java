@@ -58,7 +58,7 @@ public class NoTransformFunctionalTestComponent implements Callable, MuleContext
     logger.info(msg);
 
     if (eventCallback != null) {
-      eventCallback.eventReceived(context, this, muleContext);
+      context = eventCallback.eventReceived(context, this, muleContext);
     }
 
     Object replyMessage;

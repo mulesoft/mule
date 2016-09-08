@@ -77,12 +77,12 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
 
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key1", "value1").build();
-    populateFieldsFromInboundEndpoint(event1, endpoint);
+    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
     event1.getSession().setProperty("key", "value");
 
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(flow).addFlowVariable("key2", "value2").build();
-    populateFieldsFromInboundEndpoint(event2, endpoint);
+    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
     event2.getSession().setProperty("key", "valueNEW");
     event2.getSession().setProperty("key1", "value1");
 
@@ -107,16 +107,16 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
     MuleEvent event1 =
         MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key1", "value1", simpleDateType1).build();
-    populateFieldsFromInboundEndpoint(event1, endpoint);
+    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
     MuleSession session = event1.getSession();
 
     MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(flow).session(session)
         .addFlowVariable("key2", "value2", simpleDateType1).build();
-    populateFieldsFromInboundEndpoint(event2, endpoint);
+    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
 
     MuleEvent event3 = MuleEvent.builder(context).message(message3).flow(flow).session(session)
         .addFlowVariable("key3", "value3", simpleDateType1).build();
-    populateFieldsFromInboundEndpoint(event3, endpoint);
+    event3 = populateFieldsFromInboundEndpoint(event3, endpoint);
 
     event1.getSession().setProperty("key", "value");
     event2.getSession().setProperty("key1", "value1");
@@ -157,10 +157,10 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key", "value").build();
-    populateFieldsFromInboundEndpoint(event1, endpoint);
+    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
 
     MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(flow).addFlowVariable("key2", "value2").build();
-    populateFieldsFromInboundEndpoint(event2, endpoint);
+    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
     List<MuleEvent> events = new ArrayList<>();
     events.add(null);
     events.add(event2);
@@ -178,7 +178,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
   public void aggregateSingleMuleMessageCollection() {
     MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
     MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key1", "value1").build();
-    populateFieldsFromInboundEndpoint(event1, endpoint);
+    event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
 
     MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
     MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
@@ -188,7 +188,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     list.add(message3);
     MuleMessage messageCollection = MuleMessage.builder().payload(list).build();
     MuleEvent event2 = MuleEvent.builder(context).message(messageCollection).flow(flow).addFlowVariable("key2", "value2").build();
-    populateFieldsFromInboundEndpoint(event2, endpoint);
+    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
 
     MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent>singletonList(event2), event1);
     assertSame(event2, result);
@@ -214,7 +214,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     list.add(message3);
     MuleMessage messageCollection = MuleMessage.builder().payload(list).build();
     MuleEvent event2 = MuleEvent.builder(context).message(messageCollection).flow(flow).addFlowVariable("key2", "value2").build();
-    populateFieldsFromInboundEndpoint(event2, endpoint);
+    event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
 
     List<MuleMessage> list2 = new ArrayList<>();
     list.add(message4);
@@ -222,7 +222,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     MuleMessage messageCollection2 = MuleMessage.builder().payload(list2).build();
     MuleEvent event3 =
         MuleEvent.builder(context).message(messageCollection2).flow(flow).addFlowVariable("key3", "value3").build();
-    populateFieldsFromInboundEndpoint(event3, endpoint);
+    event3 = populateFieldsFromInboundEndpoint(event3, endpoint);
 
     List<MuleEvent> events = new ArrayList<>();
     events.add(event2);

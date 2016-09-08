@@ -54,6 +54,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }
+      return context;
     };
 
     Object ftc = getComponent("testComponent");

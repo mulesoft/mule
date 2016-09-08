@@ -167,10 +167,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/baz; charset=UTF-16BE")).build();
-      event.setMessage(message);
-      return message;
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/baz; charset=UTF-16BE")).build();
     }
   }
 
@@ -178,10 +175,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=US-ASCII")).build();
-      event.setMessage(message);
-      return message;
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=US-ASCII")).build();
     }
   }
 
@@ -189,10 +183,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=UTF-8")).build();
-      event.setMessage(message);
-      return message;
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=UTF-8")).build();
     }
   }
 
@@ -200,10 +191,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=Shift_JIS")).build();
-      event.setMessage(message);
-      return message;
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=Shift_JIS")).build();
     }
   }
 
@@ -211,10 +199,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=Windows-31J")).build();
-      event.setMessage(message);
-      return message;
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=Windows-31J")).build();
     }
   }
 
@@ -222,10 +207,7 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message =
-          MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=EUC-JP")).build();
-      event.setMessage(message);
-      return message;
+      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.parse("text/plain; charset=EUC-JP")).build();
     }
   }
 }

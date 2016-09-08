@@ -55,9 +55,7 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase {
 
     @Override
     public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      final MuleMessage message = MuleMessage.builder(event.getMessage()).build();
-      event.setMessage(message);
-      return message;
+      return MuleMessage.builder(event.getMessage()).build();
     }
   }
 }

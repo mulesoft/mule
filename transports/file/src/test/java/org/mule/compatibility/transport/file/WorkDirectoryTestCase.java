@@ -48,11 +48,12 @@ public class WorkDirectoryTestCase extends FunctionalTestCase {
       assertTrue(filenames.length > 0);
       for (String filename : filenames) {
         if (filename.contains(TEST_FILENAME)) {
-          return;
+          return context;
         }
       }
 
       fail("no work dir file matching filename " + TEST_FILENAME);
+      return context;
     });
 
     writeTestMessageToInputDirectory();
