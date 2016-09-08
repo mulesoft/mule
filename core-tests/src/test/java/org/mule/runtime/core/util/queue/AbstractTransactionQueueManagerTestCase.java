@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.util.queue;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -572,18 +574,15 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
       assertEquals("Queue content", "String1", o);
 
       final Latch putExecutionLatch = new Latch();
-      Thread putExecutionThread = new Thread(new Runnable() {
-
-        public void run() {
-          try {
-            QueueSession s = mgr.getQueueSession();
-            Queue q = s.getQueue("queue1");
-            putExecutionLatch.release();
-            q.put("String1");
-          } catch (Exception e) {
-            // unlikely to happen. But if it does lets show it in the test logs.
-            logger.warn("Error using queue session", e);
-          }
+      Thread putExecutionThread = new Thread(() -> {
+        try {
+          QueueSession s1 = mgr.getQueueSession();
+          Queue q1 = s1.getQueue("queue1");
+          putExecutionLatch.release();
+          q1.put("String1");
+        } catch (Exception e) {
+          // unlikely to happen. But if it does lets show it in the test logs.
+          logger.warn("Error using queue session", e);
         }
       });
       putExecutionThread.start();
@@ -640,34 +639,31 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
       QueueSession s = mgr.getQueueSession();
       Queue q = s.getQueue("queue1");
 
-      assertEquals("Queue size", 0, q.size());
-      assertTrue(q.offer("String1", 0L));
-      assertEquals("Queue size", 1, q.size());
-      assertFalse(q.offer("String2", 1000));
-      assertEquals("Queue size", 1, q.size());
+      assertThat("Queue size", q.size(), is(0));
+      assertThat(q.offer("String1", 0L), is(true));
+      assertThat("Queue size", q.size(), is(1));
+      assertThat(q.offer("String2", 1000), is(false));
+      assertThat("Queue size", q.size(), is(1));
 
       final Latch takeExecutionLatch = new Latch();
-      final Thread takeExecutionThread = new Thread(new Runnable() {
-
-        public void run() {
-          try {
-            takeExecutionLatch.release();
-            QueueSession s = mgr.getQueueSession();
-            Queue q = s.getQueue("queue1");
-            assertEquals("Queue content", "String1", q.take());
-          } catch (Exception e) {
-            // unlikely to happen. But if it does lets show it in the test logs.
-            logger.warn("Error using queue session", e);
-          }
+      final Thread takeExecutionThread = new Thread(() -> {
+        try {
+          takeExecutionLatch.release();
+          QueueSession s1 = mgr.getQueueSession();
+          Queue q1 = s1.getQueue("queue1");
+          assertThat("Queue content", q1.take(), is("String1"));
+        } catch (Exception e) {
+          // unlikely to happen. But if it does lets show it in the test logs.
+          logger.warn("Error using queue session", e);
         }
       });
       takeExecutionThread.start();
       if (!takeExecutionLatch.await(THREAD_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
         fail("Thread executing put over queue was not executed");
       }
-      assertTrue(q.offer("String2", 1000));
+      assertThat(q.offer("String2", 1000), is(true));
       takeExecutionThread.join(THREAD_EXECUTION_TIMEOUT);
-      assertEquals("Queue size", 1, q.size());
+      assertThat("Queue size", q.size(), is(1));
 
     } finally {
       mgr.stop();
@@ -681,7 +677,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     QueueSession s = mgr.getQueueSession();
     Queue q = s.getQueue("warmRecoverQueue");
 
-    int toPopulate = 500;
+    int toPopulate = 50;
 
     // Populate queue
     Random rnd = new Random();
@@ -706,7 +702,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     Queue q = s.getQueue("warmRecoverQueue");
     mgr.start();
 
-    int toPopulate = 500;
+    int toPopulate = 50;
 
     // Populate queue
     Random rnd = new Random();

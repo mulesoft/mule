@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,10 +74,19 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     when(event.getMessage()).thenReturn(message);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class)))
-        .thenAnswer(invocation -> ((MessageProcessor) invocation.getArguments()[0]).process((MuleEvent) invocation
-            .getArguments()[1]));
+    when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class))).thenAnswer(invocation -> {
+      MessageProcessor messageProcessor = (MessageProcessor) invocation.getArguments()[0];
+      MuleEvent event = (MuleEvent) invocation.getArguments()[1];
+      return messageProcessor.process(event);
+    });
     muleContext.setTransformationService(new TransformationService(muleContext));
+  }
+
+  @After
+  public void after() {
+    processor1.dispose();
+    processor2.dispose();
+    processor3.dispose();
   }
 
   @Test
