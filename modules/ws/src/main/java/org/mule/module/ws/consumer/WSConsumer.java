@@ -176,8 +176,7 @@ public class WSConsumer implements MessageProcessor, Initialisable, MuleContextA
 
                         event.getMessage().setPayload(soapFault.getDetail());
 
-                        throw new SoapFaultException(event, soapFault.getFaultCode(), soapFault.getSubCode(),
-                                                     soapFault.getMessage(), soapFault.getDetail());
+                        throw new SoapFaultException(event, soapFault);
                     }
                     else
                     {
