@@ -7,7 +7,6 @@
        http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd">
 
-
     <spring:beans>
         <spring:import resource="protocols.xml"/>
     </spring:beans>
@@ -37,15 +36,8 @@
         <set-payload value="Consumed"/>
     </flow>
 
-    <!--TODO(gfernandes) MULE-10117 remove this when support for accessing resources is added to runner -->
-    <spring:beans>
-        <spring:bean id="onIncomingConnectionBean" scope="prototype" class="org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnectionBean"/>
-    </spring:beans>
-
     <sub-flow name="onIncomingConnection">
-        <component>
-            <spring-object bean="onIncomingConnectionBean"/>
-        </component>
+        <expression-component>new org.mule.extension.socket.SocketExtensionTestCase$OnIncomingConnection().onCall(message)
+        </expression-component>
     </sub-flow>
-
 </mule>
