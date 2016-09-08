@@ -18,7 +18,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 
 import java.io.File;
 import java.nio.file.Files;

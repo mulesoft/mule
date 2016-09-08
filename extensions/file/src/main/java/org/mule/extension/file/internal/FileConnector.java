@@ -25,9 +25,9 @@ import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
-import org.mule.runtime.module.extension.file.api.StandardFileSystemOperations;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FilePredicateBuilder;
+import org.mule.extension.file.common.api.StandardFileSystemOperations;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

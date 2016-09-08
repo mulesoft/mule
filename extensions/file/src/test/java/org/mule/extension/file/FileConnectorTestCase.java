@@ -13,8 +13,8 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
-import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;

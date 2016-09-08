@@ -13,7 +13,7 @@ import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.extension.file.common.api.FileWriteMode;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;

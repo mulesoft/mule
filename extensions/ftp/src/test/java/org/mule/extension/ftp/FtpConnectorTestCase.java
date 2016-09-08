@@ -15,8 +15,8 @@ import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
-import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
+import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 
 import java.util.Arrays;
 import java.util.Collection;

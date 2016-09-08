@@ -12,7 +12,7 @@ import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.extension.file.common.api.FileWriteMode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

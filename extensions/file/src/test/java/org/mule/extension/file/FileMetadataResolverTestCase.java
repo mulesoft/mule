@@ -9,7 +9,7 @@ package org.mule.extension.file;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.core.api.registry.RegistrationException;
-import org.mule.runtime.module.extension.file.api.FileMetadataResolverTestCommon;
+import org.mule.extension.file.common.FileMetadataResolverTestCommon;
 
 import org.junit.Before;
 import org.junit.Test;

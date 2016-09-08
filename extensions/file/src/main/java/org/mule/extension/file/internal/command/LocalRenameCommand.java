@@ -10,8 +10,8 @@ import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.command.RenameCommand;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.command.RenameCommand;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

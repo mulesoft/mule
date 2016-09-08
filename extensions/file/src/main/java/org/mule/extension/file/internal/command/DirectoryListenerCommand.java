@@ -8,7 +8,7 @@ package org.mule.extension.file.internal.command;
 
 import org.mule.extension.file.internal.DirectoryListener;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FileConnectorConfig;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

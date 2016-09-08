@@ -12,9 +12,9 @@ import org.mule.extension.ftp.internal.ftp.command.FtpCommand;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FileWriteMode;
 
 import java.io.IOException;
 import java.io.InputStream;

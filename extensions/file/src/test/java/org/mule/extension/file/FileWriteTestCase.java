@@ -13,14 +13,14 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.file.api.FileWriteMode.APPEND;
-import static org.mule.runtime.module.extension.file.api.FileWriteMode.CREATE_NEW;
-import static org.mule.runtime.module.extension.file.api.FileWriteMode.OVERWRITE;
+import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
+import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
+import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.FileUtils;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
+import org.mule.extension.file.common.api.FileWriteMode;
 
 import java.io.File;
 import java.util.Arrays;

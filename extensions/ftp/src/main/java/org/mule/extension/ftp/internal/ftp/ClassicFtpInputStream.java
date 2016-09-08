@@ -13,8 +13,8 @@ import org.mule.extension.ftp.internal.FtpInputStream;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.lock.PathLock;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.lock.PathLock;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -6,17 +6,17 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import static org.mule.runtime.module.extension.file.api.TreeNode.Builder.forDirectory;
-import static org.mule.runtime.module.extension.file.api.TreeNode.Builder.forFile;
+import static org.mule.extension.file.common.api.TreeNode.Builder.forDirectory;
+import static org.mule.extension.file.common.api.TreeNode.Builder.forFile;
 
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.TreeNode;
-import org.mule.runtime.module.extension.file.api.command.ListCommand;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.TreeNode;
+import org.mule.extension.file.common.api.command.ListCommand;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

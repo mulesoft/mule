@@ -9,8 +9,8 @@ package org.mule.extension.ftp.internal.sftp.command;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 import org.mule.extension.ftp.internal.ftp.command.MoveFtpDelegate;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.command.MoveCommand;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.command.MoveCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

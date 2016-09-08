@@ -11,7 +11,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.module.extension.file.api.FileSystem;
+import org.mule.extension.file.common.api.FileSystem;
 
 import javax.inject.Inject;
 

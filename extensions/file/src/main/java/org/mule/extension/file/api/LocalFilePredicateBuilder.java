@@ -9,7 +9,7 @@ package org.mule.extension.file.api;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.module.extension.file.api.FilePredicateBuilder;
+import org.mule.extension.file.common.api.FilePredicateBuilder;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
