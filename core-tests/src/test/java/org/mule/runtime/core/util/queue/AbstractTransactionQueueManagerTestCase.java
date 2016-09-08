@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.util.queue;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -638,11 +639,11 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
       QueueSession s = mgr.getQueueSession();
       Queue q = s.getQueue("queue1");
 
-      assertEquals("Queue size", 0, q.size());
-      assertTrue(q.offer("String1", 0L));
-      assertEquals("Queue size", 1, q.size());
-      assertFalse(q.offer("String2", 1000));
-      assertEquals("Queue size", 1, q.size());
+      assertThat("Queue size", q.size(), is(0));
+      assertThat(q.offer("String1", 0L), is(true));
+      assertThat("Queue size", q.size(), is(1));
+      assertThat(q.offer("String2", 1000), is(false));
+      assertThat("Queue size", q.size(), is(1));
 
       final Latch takeExecutionLatch = new Latch();
       final Thread takeExecutionThread = new Thread(() -> {
@@ -650,7 +651,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
           takeExecutionLatch.release();
           QueueSession s1 = mgr.getQueueSession();
           Queue q1 = s1.getQueue("queue1");
-          assertEquals("Queue content", "String1", q1.take());
+          assertThat("Queue content", q1.take(), is("String1"));
         } catch (Exception e) {
           // unlikely to happen. But if it does lets show it in the test logs.
           logger.warn("Error using queue session", e);
@@ -660,9 +661,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
       if (!takeExecutionLatch.await(THREAD_EXECUTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
         fail("Thread executing put over queue was not executed");
       }
-      assertTrue(q.offer("String2", 1000));
+      assertThat(q.offer("String2", 1000), is(true));
       takeExecutionThread.join(THREAD_EXECUTION_TIMEOUT);
-      assertEquals("Queue size", 1, q.size());
+      assertThat("Queue size", q.size(), is(1));
 
     } finally {
       mgr.stop();
