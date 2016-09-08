@@ -6,17 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.deriveModelProperties;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
-import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
@@ -40,6 +29,18 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.namespace.QName;
+
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.deriveModelProperties;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link ObjectType}
@@ -108,7 +109,7 @@ final class ObjectTypeSchemaDelegate {
 
     DslElementSyntax typeDsl = builder.getDslResolver().resolve(metadataType);
     if (paramDsl.isWrapped()) {
-      QName refQName = new QName(paramDsl.getNamespaceUri(), builder.getTopLevelAbstractName(typeDsl), paramDsl.getNamespace());
+      QName refQName = new QName(paramDsl.getNamespaceUri(), typeDsl.getAbstractElementName(), paramDsl.getNamespace());
 
       TopLevelElement objectElement = builder.createTopLevelElement(paramDsl.getElementName(), ZERO, "1");
       objectElement.setComplexType(new LocalComplexType());
@@ -154,7 +155,7 @@ final class ObjectTypeSchemaDelegate {
 
     DslElementSyntax dsl = builder.getDslResolver().resolve(metadataType);
 
-    QName qName = new QName(dsl.getNamespaceUri(), builder.getTopLevelAbstractName(dsl), dsl.getNamespace());
+    QName qName = new QName(dsl.getNamespaceUri(), dsl.getAbstractElementName(), dsl.getNamespace());
     return builder.createRefElement(qName, false);
   }
 
@@ -267,20 +268,18 @@ final class ObjectTypeSchemaDelegate {
   }
 
   private TopLevelElement registerAbstractElement(DslElementSyntax typeDsl, ObjectType baseType) {
-    String abstractName = builder.getTopLevelAbstractName(typeDsl);
-
-    TopLevelElement element = registeredGlobalElementTypes.get(typeDsl.getNamespace() + abstractName);
+    TopLevelElement element = registeredGlobalElementTypes.get(typeDsl.getNamespace() + typeDsl.getAbstractElementName());
     if (element != null) {
       return element;
     }
 
     TopLevelElement abstractElement = new TopLevelElement();
-    abstractElement.setName(abstractName);
+    abstractElement.setName(typeDsl.getAbstractElementName());
 
     QName substitutionGroup = MULE_ABSTRACT_EXTENSION;
     if (baseType != null) {
       DslElementSyntax baseDsl = builder.getDslResolver().resolve(baseType);
-      substitutionGroup = new QName(baseDsl.getNamespaceUri(), builder.getTopLevelAbstractName(baseDsl), baseDsl.getNamespace());
+      substitutionGroup = new QName(baseDsl.getNamespaceUri(), baseDsl.getAbstractElementName(), baseDsl.getNamespace());
     }
 
     abstractElement.setSubstitutionGroup(substitutionGroup);
@@ -288,7 +287,7 @@ final class ObjectTypeSchemaDelegate {
 
     builder.getSchema().getSimpleTypeOrComplexTypeOrGroup().add(abstractElement);
 
-    registeredGlobalElementTypes.put(typeDsl.getNamespace() + abstractName, abstractElement);
+    registeredGlobalElementTypes.put(typeDsl.getNamespace() + typeDsl.getAbstractElementName(), abstractElement);
     return abstractElement;
   }
 
