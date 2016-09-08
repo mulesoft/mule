@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:email="http://www.mulesoft.org/schema/mule/email"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+
+    <flow name="sendEmailWithAttachment">
+        <email:send config-ref="config" subject="Email Subject" content="emailContent" >
+            <email:to-addresses>
+                <email:to-address value="pablo.musumeci@mulesoft.com"/>
+            </email:to-addresses>
+            <email:cc-addresses>
+                <email:cc-address value="pablo.musumeci@mulesoft.com"/>
+            </email:cc-addresses>
+            <email:bcc-addresses>
+                <email:bcc-address value="esteban.wasinger@mulesoft.com"/>
+                <email:bcc-address value="alejandro.g.marra@mulesoft.com"/>
+            </email:bcc-addresses>
+            <email:attachments>
+                <email:email-attachment content="#[app.registry.jsonAttachmentResource.getURL()]" id="json-attachment"/>
+                <email:email-attachment content="#['This is the email text attachment']" id="text-attachment" contentType="text/plain"/>
+            </email:attachments>
+        </email:send>
+    </flow>
+
+    <flow name="replyAddingAttachment">
+        <email:reply config-ref="config" subject="Email Subject">
+            <email:content>
+                <email:body>Reply Email Content</email:body>
+            </email:content>
+            <email:attachments>
+                <email:email-attachment content="#[app.registry.jsonAttachmentResource.getURL()]" id="json-attachment"/>
+            </email:attachments>
+        </email:reply>
+    </flow>
+
+    <flow name="replyEmailWithAttachments">
+        <email:reply config-ref="config" content="emailContent"/>
+    </flow>
+
+    <flow name="forwardAddingAttachments">
+        <email:forward config-ref="config">
+            <email:content>
+                <email:body>More Content To Forward</email:body>
+            </email:content>
+            <email:to-addresses>
+                <email:to-address value="pablo.musumeci@mulesoft.com"/>
+            </email:to-addresses>
+            <email:attachments>
+                <email:email-attachment content="#[app.registry.jsonAttachmentResource.getURL()]" id="json-attachment"/>
+            </email:attachments>
+        </email:forward>
+    </flow>
+
+</mule>

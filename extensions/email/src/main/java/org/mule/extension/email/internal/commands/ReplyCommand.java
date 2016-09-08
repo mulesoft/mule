@@ -17,6 +17,7 @@ import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.sender.SenderConnection;
 import org.mule.runtime.api.message.MuleMessage;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
@@ -40,17 +41,25 @@ public final class ReplyCommand {
    * <p>
    * If no email message is found in the incoming {@link MuleMessage} this operation will fail.
    *
-   * @param connection the connection associated to the operation
-   * @param muleMessage the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
-   * @param content the content of the reply message.
-   * @param subject the subject of the email. is none is set then one will be created using the subject from the replying email.
-   * @param from the person who sends the email.
+   * @param connection     the connection associated to the operation
+   * @param muleMessage    the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
+   * @param content        the content of the reply message.
+   * @param subject        the subject of the email. is none is set then one will be created using the subject from the replying email.
+   * @param from           the person who sends the email.
    * @param defaultCharset the default charset of the email message to be used if the {@param content} don't specify it.
-   * @param headers a custom set of headers.
-   * @param replyToAll if this reply should be sent to all recipients of this message, or only the sender of the received email.
+   * @param headers        a custom set of headers.
+   * @param attachments    Attachments that are bounded with the email message
+   * @param replyToAll     if this reply should be sent to all recipients of this message, or only the sender of the received email.
    */
-  public void reply(SenderConnection connection, MuleMessage muleMessage, EmailContent content, String subject, String from,
-                    String defaultCharset, Map<String, String> headers, Boolean replyToAll) {
+  public void reply(SenderConnection connection,
+                    MuleMessage muleMessage,
+                    EmailContent content,
+                    String subject,
+                    String from,
+                    String defaultCharset,
+                    Map<String, String> headers,
+                    List<EmailAttachment> attachments,
+                    Boolean replyToAll) {
     EmailAttributes attributes = getAttributesFromMessage(muleMessage).orElseThrow(() -> new EmailException(NO_EMAIL_FOUND));
 
     List<String> replyTo = attributes.getReplyToAddresses();
@@ -68,7 +77,12 @@ public final class ReplyCommand {
         .put(IN_REPLY_TO_HEADER, Integer.toString(attributes.getId()));
 
     List<String> ccAddresses = replyToAll ? attributes.getCcAddresses() : emptyList();
-    List<EmailAttachment> emailAttachments = mapToEmailAttachments(muleMessage.getPayload());
+
+    ImmutableList<EmailAttachment> emailAttachments =
+        ImmutableList.<EmailAttachment>builder()
+            .addAll(mapToEmailAttachments(muleMessage.getPayload()))
+            .addAll(attachments)
+            .build();
 
     sendCommand.send(connection,
                      content,
