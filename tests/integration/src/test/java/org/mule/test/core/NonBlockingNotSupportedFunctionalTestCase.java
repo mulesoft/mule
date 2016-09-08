@@ -87,10 +87,7 @@ public class NonBlockingNotSupportedFunctionalTestCase extends AbstractIntegrati
   @Test
   public void poll() throws Exception {
     final Latch latch = new Latch();
-    ((FunctionalTestComponent) getComponent("poll")).setEventCallback((context, component, muleContext) -> {
-      latch.countDown();
-      return context;
-    });
+    ((FunctionalTestComponent) getComponent("poll")).setEventCallback((context, component, muleContext) -> latch.countDown());
     latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
     verify("poll");
   }

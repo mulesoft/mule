@@ -86,7 +86,6 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
     getFunctionalTestComponent("serverFlow").setEventCallback((context, component, muleContext) -> {
       requestPayload = getPayloadAsString(context.getMessage());
       requestURI = ((HttpRequestAttributes) context.getMessage().getAttributes()).getRequestUri();
-      return context;
     });
 
     proxyServer.start();

@@ -48,10 +48,7 @@ public class TransactionalElementLifecycleTestCase extends AbstractIntegrationTe
 
     final Latch endDlqFlowLatch = new Latch();
     FunctionalTestComponent functionalTestComponent = getFunctionalTestComponent("dlq-out");
-    functionalTestComponent.setEventCallback((context, component, muleContext) -> {
-      endDlqFlowLatch.release();
-      return context;
-    });
+    functionalTestComponent.setEventCallback((context, component, muleContext) -> endDlqFlowLatch.release());
     flowRunner("in-flow").withPayload("message").run();
     if (!endDlqFlowLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("message wasn't received by dlq flow");

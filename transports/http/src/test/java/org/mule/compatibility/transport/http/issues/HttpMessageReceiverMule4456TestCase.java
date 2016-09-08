@@ -62,7 +62,6 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
     component.setEventCallback((context, comp, muleContext) -> {
       Thread.sleep(200);
       context.getMessageAsString(muleContext);
-      return context;
     });
 
     PostMethod request = new PostMethod("http://localhost:" + dynamicPort1.getNumber());
@@ -81,7 +80,6 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
     component.setEventCallback((context, comp, muleContext) -> {
       Thread.sleep(200);
       context.getMessageAsString(muleContext);
-      return context;
     });
 
     PostMethod request = new PostMethod("http://localhost:" + dynamicPort2.getNumber());

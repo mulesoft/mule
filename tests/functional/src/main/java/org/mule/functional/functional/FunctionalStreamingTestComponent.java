@@ -152,7 +152,7 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
     logger.info(msg);
 
     if (eventCallback != null) {
-      context = eventCallback.eventReceived(context, this, muleContext);
+      eventCallback.eventReceived(context, this, muleContext);
     }
   }
 

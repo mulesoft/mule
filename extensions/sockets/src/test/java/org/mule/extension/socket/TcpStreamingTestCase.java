@@ -70,7 +70,6 @@ public class TcpStreamingTestCase extends SocketExtensionTestCase {
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }
-      return context;
     };
 
     // this works only if singleton set in descriptor

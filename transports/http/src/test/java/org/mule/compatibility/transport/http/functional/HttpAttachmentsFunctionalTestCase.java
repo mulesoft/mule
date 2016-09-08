@@ -46,7 +46,6 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase {
       assertNotNull("DataHandler with name 'attach1' should not be null", dh);
       assertEquals("We should have an attachment with foo", "foo", IOUtils.toString(dh.getInputStream()));
       assertEquals("text/plain; charset=ISO-8859-1", dh.getContentType());
-      return context;
     });
 
     MuleClient client = muleContext.getClient();

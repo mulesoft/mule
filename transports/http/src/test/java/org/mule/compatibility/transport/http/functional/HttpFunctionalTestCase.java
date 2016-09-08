@@ -45,7 +45,6 @@ public class HttpFunctionalTestCase extends FunctionalTestCase {
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
-        return context;
       };
 
       testComponent.setEventCallback(callback);

@@ -50,7 +50,6 @@ public class HttpStemTestCase extends FunctionalTestCase {
       assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
       assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
       assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
-      return context;
     };
 
     testComponent.setEventCallback(callback);

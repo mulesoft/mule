@@ -9,11 +9,11 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
     <flow name="SINGLE">
-        <test:component/>
+        <custom-processor class="org.mule.test.integration.message.AttachmentsPropagationTestCase$AttachmentsPropagator"/>
     </flow>
 
     <flow name="CHAINED">
-        <test:component/>
+        <custom-processor class="org.mule.test.integration.message.AttachmentsPropagationTestCase$AttachmentsPropagator"/>
         <flow-ref name="SINGLE"/>
     </flow>
 </mule>

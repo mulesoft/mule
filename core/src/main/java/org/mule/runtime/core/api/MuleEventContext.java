@@ -35,6 +35,13 @@ public interface MuleEventContext {
   MuleEvent getEvent();
 
   /**
+   * Sets the event for this context.
+   * 
+   * @param event
+   */
+  void setEvent(MuleEvent event);
+
+  /**
    * Returns the message transformed into its recognised or expected format. The transformer used is the one configured on the
    * endpoint through which this event was received.
    *

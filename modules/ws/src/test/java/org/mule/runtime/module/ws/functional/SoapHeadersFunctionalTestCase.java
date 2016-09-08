@@ -13,9 +13,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,7 +73,6 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
       errorCollector.checkThat(context.getMessage().getInboundProperty(HTTP_HEADER), notNullValue());
       errorCollector.checkThat(context.getMessage().getInboundProperty(SOAP_HEADER_IN), nullValue());
       errorCollector.checkThat(context.getMessage().getInboundProperty(SOAP_HEADER_INOUT), nullValue());
-      return context;
     });
 
     flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST).withOutboundProperty(SOAP_HEADER_IN, REQUEST_HEADER_IN)

@@ -25,7 +25,7 @@ public class CountdownCallback implements EventCallback {
   }
 
   @Override
-  public MuleEventContext eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
+  public void eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
     synchronized (this) {
       if (countDown.getCount() > 0) {
         countDown.countDown();
@@ -33,7 +33,6 @@ public class CountdownCallback implements EventCallback {
         throw new AssertionFailedError("Too many messages received");
       }
     }
-    return context;
   }
 
   public long getCount() throws InitialisationException {

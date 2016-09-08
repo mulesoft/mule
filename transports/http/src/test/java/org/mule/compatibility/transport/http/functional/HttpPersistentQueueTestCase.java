@@ -89,7 +89,7 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase {
     }
 
     @Override
-    public MuleEventContext eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
+    public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
       MuleMessage message = context.getMessage();
 
       Object httpMethod = message.getInboundProperty("http.method");
@@ -106,7 +106,6 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase {
       assertEquals("true", message.getInboundProperty(HttpConstants.HEADER_KEEP_ALIVE));
 
       messageDidArrive.countDown();
-      return context;
     }
   }
 

@@ -41,7 +41,6 @@ public class FileComparatorTestCase extends FunctionalTestCase {
       int index = (int) countDown.getCount() - 1;
       assertEquals(FILE_NAMES[index], context.getMessage().getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
       countDown.countDown();
-      return context;
     };
 
     ((FunctionalTestComponent) getComponent(COMPONENT_NAME)).setEventCallback(callback);

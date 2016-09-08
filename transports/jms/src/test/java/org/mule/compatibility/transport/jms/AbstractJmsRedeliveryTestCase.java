@@ -21,9 +21,9 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
-import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -96,8 +96,7 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
     return new CounterCallback() {
 
       @Override
-      public MuleEventContext eventReceived(MuleEventContext context, Object Component, MuleContext muleContext)
-          throws Exception {
+      public void eventReceived(MuleEventContext context, Object Component, MuleContext muleContext) throws Exception {
         final int count = incCallbackCount();
         logger.info("Message Delivery Count is: " + count);
         throw new FunctionalTestException();

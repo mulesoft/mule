@@ -38,10 +38,7 @@ public class HttpListenerRequestStreamingTestCase extends AbstractHttpTestCase {
   public void listenerReceivedChunkedRequest() throws Exception {
     String url = format("http://localhost:%s/", listenPort.getNumber());
     getFunctionalTestComponent("defaultFlow")
-        .setEventCallback((context, component, muleContext) -> {
-          flowReceivedMessage = context.getMessageAsString(muleContext);
-          return context;
-        });
+        .setEventCallback((context, component, muleContext) -> flowReceivedMessage = context.getMessageAsString(muleContext));
     testChunkedRequestContentAndResponse(url);
     // We check twice to verify that the chunked request is consumed completely. Otherwise second request would fail
     testChunkedRequestContentAndResponse(url);

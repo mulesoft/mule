@@ -6,30 +6,31 @@
  */
 package org.mule.test.integration.message;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.functional.EventCallback;
-import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.message.ds.StringDataSource;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.activation.DataHandler;
 
 import org.junit.Test;
 
-public class AttachmentsPropagationTestCase extends FunctionalTestCase implements EventCallback {
+public class AttachmentsPropagationTestCase extends FunctionalTestCase {
 
   private static final String ATTACHMENT_CONTENT = "<content>";
 
@@ -38,40 +39,39 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     return "org/mule/test/message/attachment-propagation.xml";
   }
 
-  @Override
-  protected void doSetUp() throws Exception {
-    super.doSetUp();
+  public static class AttachmentsPropagator implements MessageProcessor, FlowConstructAware {
 
-    FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("SINGLE");
-    ftc.setEventCallback(this);
+    private FlowConstruct flowconstruct;
 
-    ftc = (FunctionalTestComponent) getComponent("CHAINED");
-    ftc.setEventCallback(this);
-  }
+    @Override
+    public MuleEvent process(MuleEvent event) throws MuleException {
+      final MuleMessage message = event.getMessage();
+      final Builder builder = MuleMessage.builder(message);
+      final Set<String> attachmentNames = new TreeSet<>(message.getOutboundAttachmentNames());
 
-  @Override
-  public MuleEventContext eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
-    final MuleMessage message = context.getEvent().getMessage();
-    final Builder builder = MuleMessage.builder(message);
+      for (String attachmentName : message.getInboundAttachmentNames()) {
+        DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
+        builder.addOutboundAttachment(attachmentName, inboundAttachment);
+        attachmentNames.add(attachmentName);
+      }
 
-    for (String attachmentName : message.getInboundAttachmentNames()) {
-      DataHandler inboundAttachment = message.getInboundAttachment(attachmentName);
-      builder.addOutboundAttachment(attachmentName, inboundAttachment);
+      // add an attachment, named after the componentname...
+      String attachmentName = flowconstruct.getName();
+      DataHandler dataHandler = new DataHandler(new StringDataSource(ATTACHMENT_CONTENT, "doesNotMatter", MediaType.TEXT));
+      builder.addOutboundAttachment(attachmentName, dataHandler);
+      attachmentNames.add(attachmentName);
+
+      builder.payload(attachmentNames);
+
+      final MuleMessage built = builder.build();
+
+      return MuleEvent.builder(event).message(built).build();
     }
 
-    // add an attachment, named after the componentname...
-    String attachmentName = context.getFlowConstruct().getName();
-    DataHandler dataHandler = new DataHandler(new StringDataSource(ATTACHMENT_CONTENT, "doesNotMatter", MediaType.TEXT));
-    builder.addOutboundAttachment(attachmentName, dataHandler);
-
-    final MuleMessage built = builder.build();
-
-    // return the list of attachment names
-    FunctionalTestComponent fc = (FunctionalTestComponent) component;
-    fc.setReturnData(built.getOutboundAttachmentNames());
-
-    return new DefaultMuleEventContext(context.getFlowConstruct(),
-                                       MuleEvent.builder(context.getEvent()).message(message).build());
+    @Override
+    public void setFlowConstruct(FlowConstruct flowConstruct) {
+      this.flowconstruct = flowConstruct;
+    }
   }
 
   @Test
@@ -79,6 +79,7 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
     MuleMessage result = flowRunner("SINGLE").withPayload("").run().getMessage();
 
     assertThat(result, is(notNullValue()));
+    assertThat(result.getPayload(), instanceOf(Set.class));
 
     // expect SINGLE attachment from SINGLE service
     assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE"));
@@ -91,7 +92,9 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase implement
   @Test
   public void chainedFlowShouldReceiveAttachments() throws Exception {
     MuleMessage result = flowRunner("CHAINED").withPayload("").run().getMessage();
+
     assertThat(result, is(notNullValue()));
+    assertThat(result.getPayload(), instanceOf(Set.class));
 
     // expect CHAINED attachment from CHAINED service
     // and SINGLE attachment from SINGLE service

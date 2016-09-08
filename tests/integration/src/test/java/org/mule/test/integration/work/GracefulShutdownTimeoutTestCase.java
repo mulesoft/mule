@@ -46,7 +46,7 @@ public class GracefulShutdownTimeoutTestCase extends AbstractIntegrationTestCase
     testComponent.setEventCallback((context, component, muleContext) -> {
       Thread.sleep(5500);
       latch.countDown();
-      return context;
+
     });
 
     flowRunner("TestService").withPayload("test").run();

@@ -8,6 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
@@ -18,10 +19,10 @@ import org.mule.functional.functional.EventCallback;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.functional.listener.SystemExceptionListener;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.junit.Test;
@@ -132,14 +133,13 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
     return (context, component, muleContext) -> {
       context.getCurrentTransaction().rollback();
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
-      return processEventCallback.eventReceived(context, component, muleContext);
+      processEventCallback.eventReceived(context, component, muleContext);
     };
   }
 
   private EventCallback replaceTransactionWithMock() throws Exception {
     return replaceTransactionWithMock((context, component, muleContext) -> {
       // Do nothing
-      return context;
     });
   }
 

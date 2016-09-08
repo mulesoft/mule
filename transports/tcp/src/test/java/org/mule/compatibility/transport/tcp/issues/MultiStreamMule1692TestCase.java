@@ -56,7 +56,6 @@ public class MultiStreamMule1692TestCase extends FunctionalTestCase {
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }
-      return context;
     };
   }
 

@@ -218,7 +218,6 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
       assertEquals(1, latch.getCount());
       assertEquals(TEST_MESSAGE, context.transformMessageToString(muleContext));
       latch.countDown();
-      return context;
     });
     testComponent.initialise();
 

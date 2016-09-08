@@ -62,13 +62,12 @@ public class XStreamAdditionalConvertersTestCase extends AbstractIntegrationTest
     }
 
     @Override
-    public MuleEventContext eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
+    public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
       Object payload = context.getMessage().getPayload();
       assertTrue(payload instanceof TestBean);
       assertNotNull(((TestBean) payload).getCreateDate());
 
       testLatch.countDown();
-      return context;
     }
   }
 

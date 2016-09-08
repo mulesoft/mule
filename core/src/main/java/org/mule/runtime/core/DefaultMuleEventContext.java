@@ -35,7 +35,7 @@ public class DefaultMuleEventContext implements MuleEventContext {
    */
   protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleEventContext.class);
 
-  private final MuleEvent event;
+  private MuleEvent event;
   private final FlowConstruct flow;
 
   public DefaultMuleEventContext(FlowConstruct flow, MuleEvent event) {
@@ -56,6 +56,11 @@ public class DefaultMuleEventContext implements MuleEventContext {
   @Override
   public MuleEvent getEvent() {
     return event;
+  }
+
+  @Override
+  public void setEvent(MuleEvent event) {
+    this.event = event;
   }
 
   /**

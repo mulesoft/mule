@@ -32,12 +32,11 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase {
   public void testPollingHttpConnector() throws Exception {
     FunctionalTestComponent ftc = getFunctionalTestComponent("polled");
     assertNotNull(ftc);
-    ftc.setEventCallback((context, component, muleContext) -> {
-      assertEquals("The Accept header should be set on the incoming message",
-                   "application/xml",
-                   context.getMessage().<String>getInboundProperty("Accept"));
-      return context;
-    });
+    ftc.setEventCallback((context, component, muleContext) -> assertEquals(
+                                                                           "The Accept header should be set on the incoming message",
+                                                                           "application/xml",
+                                                                           context.getMessage()
+                                                                               .<String>getInboundProperty("Accept")));
 
     MuleClient client = muleContext.getClient();
     MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT).getRight().get();

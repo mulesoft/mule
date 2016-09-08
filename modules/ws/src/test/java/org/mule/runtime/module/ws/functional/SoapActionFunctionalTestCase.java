@@ -54,7 +54,6 @@ public class SoapActionFunctionalTestCase extends AbstractWSConsumerFunctionalTe
 
       assertMatchesQuoted(expectedSoapActionHeader, soapAction);
       assertMatches(expectedActionInContentType, actionInContentType);
-      return context;
     });
 
     flowRunner(flowName).withPayload("<test/>").run();

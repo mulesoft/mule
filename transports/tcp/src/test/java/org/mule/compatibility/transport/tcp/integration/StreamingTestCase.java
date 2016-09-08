@@ -66,7 +66,6 @@ public class StreamingTestCase extends FunctionalTestCase {
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }
-      return context;
     };
 
     MuleClient client = muleContext.getClient();
