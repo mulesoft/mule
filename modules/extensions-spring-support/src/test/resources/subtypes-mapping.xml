@@ -128,21 +128,13 @@
 
     <subtypes:car-door name="global-car-door" color="white"/>
     <subtypes:house-door name="global-house-door" isLocked="true"/>
-    <subtypes:parent-shape name="global-shape" area="9"/>
-    <subtypes:square name="global-square" side="3" area="9"/>
     <subtypes:triangle-alias name="global-triangle" height="6" area="3"/>
-    <subtypes:final-pojo name="global-final-pojo" someString="globalString"/>
-    <vegan:vegan-cook-book name="global-cookbook" numberOfPages="10"/>
     <subtypes:revolver name="remington" bullets="6"/>
 
     <flow name="subtypedAndConcreteParametersAsAttributes">
         <subtypes:subtyped-and-concrete-parameters
                 door="global-car-door"
-                baseShape="global-shape"
-                squareShape="global-square"
                 triangle="global-triangle"
-                finalPojo="global-final-pojo"
-                cookBook="global-cookbook"
         />
     </flow>
 

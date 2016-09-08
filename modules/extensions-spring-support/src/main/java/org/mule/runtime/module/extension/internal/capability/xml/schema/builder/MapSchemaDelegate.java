@@ -12,6 +12,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -23,7 +24,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ex
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
-import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 import java.math.BigInteger;
 
@@ -70,7 +70,7 @@ final class MapSchemaDelegate {
     final TopLevelElement mapEntryElement = new TopLevelElement();
     mapEntryElement.setName(entryValueDsl.getElementName());
     mapEntryElement.setMinOccurs(ZERO);
-    mapEntryElement.setMaxOccurs(SchemaConstants.UNBOUNDED);
+    mapEntryElement.setMaxOccurs(UNBOUNDED);
 
     valueType.accept(new MetadataTypeVisitor() {
 
@@ -82,13 +82,20 @@ final class MapSchemaDelegate {
             .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
 
         if (shouldGenerateChildElement) {
-          ExplicitGroup singleItemSequence = new ExplicitGroup();
-          singleItemSequence.setMaxOccurs("1");
+          DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType);
 
-          TopLevelElement mapItemElement = builder.createTypeRef(objectType, false);
-          singleItemSequence.getParticle().add(objectFactory.createElement(mapItemElement));
+          if (typeDsl.isWrapped()) {
+            ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(objectType, ZERO, UNBOUNDED);
+            entryComplexType.setChoice(choice);
 
-          entryComplexType.setSequence(singleItemSequence);
+          } else {
+            ExplicitGroup singleItemSequence = new ExplicitGroup();
+            singleItemSequence.setMaxOccurs("1");
+            TopLevelElement mapItemElement = builder.createTypeRef(typeDsl, objectType, false);
+            singleItemSequence.getParticle().add(objectFactory.createElement(mapItemElement));
+
+            entryComplexType.setSequence(singleItemSequence);
+          }
         }
       }
 
@@ -107,7 +114,7 @@ final class MapSchemaDelegate {
             .orElseThrow(() -> new IllegalArgumentException("Illegal DslSyntax definition of the given ArrayType. The DslElementSyntax for the item is required"));
 
         TopLevelElement itemElement =
-            builder.createTopLevelElement(itemDsl.getElementName(), ZERO, SchemaConstants.UNBOUNDED, itemComplexType);
+            builder.createTopLevelElement(itemDsl.getElementName(), ZERO, UNBOUNDED, itemComplexType);
         entryComplexType.getSequence().getParticle().add(objectFactory.createElement(itemElement));
       }
 

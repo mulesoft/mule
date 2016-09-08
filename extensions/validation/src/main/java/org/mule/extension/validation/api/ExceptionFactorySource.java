@@ -8,6 +8,7 @@ package org.mule.extension.validation.api;
 
 
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 /**
  * A {@link ObjectSource} for instance of {@link ExceptionFactory}. The reason why this is a top level class instead of just an
@@ -16,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
  * @since 3.7.0
  */
 @Alias("exceptionFactory")
+@XmlHints(allowTopLevelDefinition = true)
 public class ExceptionFactorySource extends ObjectSource<ExceptionFactory> {
 
 }

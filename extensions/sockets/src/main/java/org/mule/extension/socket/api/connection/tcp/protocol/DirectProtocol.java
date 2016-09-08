@@ -10,6 +10,7 @@ import static org.mule.extension.socket.internal.SocketUtils.getByteArray;
 
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.io.IOException;
@@ -31,21 +32,20 @@ import org.apache.commons.logging.LogFactory;
  *
  * @since 4.0
  */
+@XmlHints(allowTopLevelDefinition = true)
 public class DirectProtocol extends AbstractByteProtocol {
 
   protected static final int UNLIMITED = -1;
 
   private static final Log LOGGER = LogFactory.getLog(DirectProtocol.class);
   private static final int DEFAULT_BUFFER_SIZE = 8192;
-
+  protected int bufferSize;
   /**
    * Indicates if the data to transfer is just the Payload or the entire Mule Message
    */
   @Parameter
   @Optional(defaultValue = "true")
   private boolean payloadOnly = true;
-
-  protected int bufferSize;
 
   public DirectProtocol() {
     this(STREAM_OK, DEFAULT_BUFFER_SIZE);

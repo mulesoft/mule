@@ -15,6 +15,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  *
  * @since 4.0
  */
+@XmlHints(allowTopLevelDefinition = true)
 public class BulkQueryDefinition extends StatementDefinition<BulkQueryDefinition> {
 
   /**

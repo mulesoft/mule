@@ -7,11 +7,13 @@
 package org.mule.extension.socket.api.connection.tcp.protocol;
 
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 /**
  * Extend {@link XmlMessageProtocol} to continue reading until either a new message or EOF is found.
  */
 @Alias("xml-message-eof-protocol")
+@XmlHints(allowTopLevelDefinition = true)
 public class XmlMessageEOFProtocol extends XmlMessageProtocol {
 
   /**

@@ -8,8 +8,10 @@ package org.mule.test.subtypes.extension;
 
 
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 @Alias("triangleAlias")
+@XmlHints(allowTopLevelDefinition = true)
 public class Triangle extends ParentShape {
 
   private Integer height;

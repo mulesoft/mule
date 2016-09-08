@@ -10,6 +10,7 @@ import org.mule.extension.http.api.HttpMessageBuilder;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import javax.activation.DataHandler;
  * @since 4.0
  */
 @Alias("response-builder")
+@XmlHints(allowTopLevelDefinition = true)
 public class HttpListenerResponseBuilder extends HttpMessageBuilder {
 
   /**

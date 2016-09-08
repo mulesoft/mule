@@ -8,20 +8,16 @@ package org.mule.test.heisenberg.extension.model;
 
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 @Alias("door")
+@XmlHints(allowTopLevelDefinition = true)
 public class KnockeableDoor {
-
-  public static String knock(String value) {
-    return "Knocked on " + value;
-  }
 
   @Parameter
   private String victim;
-
   @Parameter
   private String address;
-
   @Parameter
   private KnockeableDoor previous;
 
@@ -29,6 +25,10 @@ public class KnockeableDoor {
 
   public KnockeableDoor(String victim) {
     this.victim = victim;
+  }
+
+  public static String knock(String value) {
+    return "Knocked on " + value;
   }
 
   public String knock() {

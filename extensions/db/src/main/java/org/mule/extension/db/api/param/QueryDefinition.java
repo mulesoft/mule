@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
  * @since 4.0
  */
 @Alias("query")
+@XmlHints(allowTopLevelDefinition = true)
 public class QueryDefinition extends ParameterizedStatementDefinition<QueryDefinition> {
 
   /**

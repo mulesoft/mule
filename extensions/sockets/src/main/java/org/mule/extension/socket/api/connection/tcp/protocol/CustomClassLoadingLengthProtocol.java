@@ -6,6 +6,8 @@
  */
 package org.mule.extension.socket.api.connection.tcp.protocol;
 
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -17,6 +19,7 @@ import org.apache.log4j.Logger;
  *
  * @since 2.2.6
  */
+@XmlHints(allowTopLevelDefinition = true)
 public class CustomClassLoadingLengthProtocol extends LengthProtocol {
 
   private final Logger logger = Logger.getLogger(this.getClass());

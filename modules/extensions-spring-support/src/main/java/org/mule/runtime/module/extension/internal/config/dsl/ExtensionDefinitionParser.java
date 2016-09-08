@@ -416,7 +416,8 @@ public abstract class ExtensionDefinitionParser {
 
         @Override
         public void visitObject(ObjectType objectType) {
-          if (collectionItemDsl.get().supportsTopLevelDeclaration()) {
+          DslElementSyntax itemDsl = collectionItemDsl.get();
+          if (itemDsl.supportsTopLevelDeclaration() || itemDsl.supportsChildDeclaration()) {
             try {
               new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslSyntaxResolver,
                                             parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));

@@ -19,7 +19,6 @@ import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Ex
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
-import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 /**
  * Builder delegation class to generate an XSD schema that describes an {@link ArrayType}
@@ -58,9 +57,15 @@ class CollectionSchemaDelegate {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        TopLevelElement collectionItemElement = builder.createTypeRef(objectType, false);
-        collectionItemElement.setMaxOccurs(UNBOUNDED);
-        sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
+        DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType);
+        if (typeDsl.isWrapped()) {
+          ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(objectType, ZERO, UNBOUNDED);
+          sequence.getParticle().add(objectFactory.createChoice(choice));
+        } else {
+          TopLevelElement collectionItemElement = builder.createTypeRef(typeDsl, objectType, false);
+          collectionItemElement.setMaxOccurs(UNBOUNDED);
+          sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
+        }
       }
 
       @Override
@@ -70,7 +75,7 @@ class CollectionSchemaDelegate {
 
 
         TopLevelElement collectionItemElement =
-            builder.createTopLevelElement(itemDsl.getElementName(), ZERO, SchemaConstants.UNBOUNDED);
+            builder.createTopLevelElement(itemDsl.getElementName(), ZERO, UNBOUNDED);
         collectionItemElement.setComplexType(complexType);
         sequence.getParticle().add(objectFactory.createElement(collectionItemElement));
 

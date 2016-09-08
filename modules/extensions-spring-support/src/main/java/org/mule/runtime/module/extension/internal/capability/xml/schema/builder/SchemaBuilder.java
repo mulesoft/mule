@@ -6,8 +6,41 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
-import com.google.common.collect.ImmutableMap;
-
+import static java.lang.String.format;
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.GROUP_SUFFIX;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.STRING;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.model.ArrayType;
@@ -66,6 +99,8 @@ import org.mule.runtime.module.extension.internal.model.property.InfrastructureP
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,42 +114,6 @@ import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import static java.lang.String.format;
-import static java.math.BigInteger.ONE;
-import static java.math.BigInteger.ZERO;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.GROUP_SUFFIX;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.STRING;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
-
 /**
  * Builder class to generate a XSD schema that describes a {@link ExtensionModel}
  *
@@ -123,7 +122,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML
 public final class SchemaBuilder {
 
   private static final String UNBOUNDED = "unbounded";
-  private static final String ABSTRACT_ELEMENT_MASK = "abstract-%s";
+  private static final String GLOBAL_ABSTRACT_ELEMENT_MASK = "global-%s";
 
   private final Set<StringType> registeredEnums = new LinkedHashSet<>();
   private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
@@ -425,13 +424,45 @@ public final class SchemaBuilder {
     return createAttribute(ATTRIBUTE_NAME_VALUE, genericType, true, SUPPORTED);
   }
 
-  TopLevelElement createTypeRef(ObjectType type, boolean isRequired) {
+
+  ExplicitGroup createTypeRefChoiceLocalOrGlobal(MetadataType type, BigInteger minOccurs, String maxOccurs) {
+    DslElementSyntax typeDsl = dslResolver.resolve(type);
+
     if (importedTypes.get(type) == null) {
       objectTypeDelegate.registerPojoType(type, EMPTY);
+      objectTypeDelegate.registerAbstractElement(type, typeDsl);
+      if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped())) {
+        objectTypeDelegate.registerConcreteGlobalElement(typeDsl, EMPTY, typeDsl.getAbstractElementName(),
+                                                         objectTypeDelegate.getTypeQName(typeDsl, type));
+      }
     }
 
-    DslElementSyntax refDsl = dslResolver.resolve(type);
-    QName refQName = new QName(refDsl.getNamespaceUri(), refDsl.getAbstractElementName(), refDsl.getNamespace());
+    final ExplicitGroup choice = new ExplicitGroup();
+    choice.setMinOccurs(minOccurs);
+    choice.setMaxOccurs(maxOccurs);
+
+    QName refAbstract = new QName(typeDsl.getNamespaceUri(), typeDsl.getAbstractElementName(), typeDsl.getNamespace());
+    TopLevelElement localAbstractElementRef = createRefElement(refAbstract, false);
+    choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
+
+    QName refGlobal = new QName(typeDsl.getNamespaceUri(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, typeDsl.getAbstractElementName()),
+                                typeDsl.getNamespace());
+    TopLevelElement topLevelElementRef = createRefElement(refGlobal, false);
+    choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
+
+    return choice;
+  }
+
+  TopLevelElement createTypeRef(DslElementSyntax typeDsl, ObjectType type, boolean isRequired) {
+
+    if (importedTypes.get(type) == null) {
+      objectTypeDelegate.registerPojoType(type, EMPTY);
+      objectTypeDelegate.registerAbstractElement(type, typeDsl);
+      objectTypeDelegate.registerConcreteGlobalElement(typeDsl, EMPTY, typeDsl.getAbstractElementName(),
+                                                       objectTypeDelegate.getTypeQName(typeDsl, type));
+    }
+
+    QName refQName = new QName(typeDsl.getNamespaceUri(), typeDsl.getAbstractElementName(), typeDsl.getNamespace());
     return createRefElement(refQName, isRequired);
   }
 

@@ -78,6 +78,13 @@ public class ExtensionParsingContext {
   }
 
   /**
+   * @return a {@link List} with all the types that are extended by another type
+   */
+  public List<MetadataType> getAllBaseTypes() {
+    return subTypesMapping.map(SubTypesMappingContainer::getAllBaseTypes).orElse(ImmutableList.of());
+  }
+
+  /**
    * @return a {@link List} with all the types which extend another type, in no particular order
    */
   public List<MetadataType> getAllSubTypes() {

@@ -11,7 +11,8 @@
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Weapon" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-weapon"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Weapon" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-weapon"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Weapon" abstract="true" name="abstract-weapon"></xs:element>
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-door"></xs:element>
     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-door" name="door">
         <xs:complexType>
@@ -57,7 +58,7 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-weapon" abstract="true" name="abstract-ricin"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:global-abstract-weapon" abstract="true" name="abstract-ricin"></xs:element>
     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-ricin" name="ricin">
         <xs:complexType>
             <xs:complexContent>
@@ -75,7 +76,8 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Investment" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-investment"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Investment" substitutionGroup="mule:abstract-extension" abstract="true" name="global-abstract-investment"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" type="heisenberg:org.mule.test.heisenberg.extension.model.Investment" abstract="true" name="abstract-investment"></xs:element>
     <xs:complexType name="org.mule.test.heisenberg.extension.model.CarWash">
         <xs:complexContent>
             <xs:extension xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" base="heisenberg:org.mule.test.heisenberg.extension.model.Investment">
@@ -83,46 +85,11 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-investment" abstract="true" name="abstract-car-wash"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:global-abstract-investment" abstract="true" name="abstract-car-wash"></xs:element>
     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-car-wash" name="car-wash">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.CarWash">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-weapon-attributes"></xs:element>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-weapon-attributes" name="weapon-attributes">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.PersonalInfo">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
-                <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-personal-info"></xs:element>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-personal-info" name="personal-info">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.PersonalInfo">
                     <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
@@ -222,27 +189,19 @@
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                             <xs:complexType>
-                                <xs:sequence minOccurs="1" maxOccurs="1">
+                                <xs:choice minOccurs="1" maxOccurs="1">
                                     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                </xs:sequence>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                                </xs:choice>
                             </xs:complexType>
                         </xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapons">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-weapon"></xs:element>
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                        <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapon-maps">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element minOccurs="0" maxOccurs="unbounded" name="wild-card-weapon-map">
-                                        <xs:complexType>
-                                            <xs:attribute type="xs:string" use="required" name="key"></xs:attribute>
-                                            <xs:attribute type="xs:string" use="required" name="value"></xs:attribute>
-                                        </xs:complexType>
-                                    </xs:element>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                                        <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                                    </xs:choice>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -251,9 +210,10 @@
                                 <xs:sequence>
                                     <xs:element minOccurs="0" maxOccurs="unbounded" name="weapon-value-map">
                                         <xs:complexType>
-                                            <xs:sequence maxOccurs="1">
+                                            <xs:choice minOccurs="0" maxOccurs="unbounded">
                                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                                            </xs:sequence>
+                                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                                            </xs:choice>
                                             <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
                                             <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
                                         </xs:complexType>
@@ -334,7 +294,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="listen-payments"></xs:element>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="listen-payments"></xs:element>
     <xs:complexType name="ListenPaymentsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
@@ -522,9 +482,10 @@
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="investment">
                         <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
+                            <xs:choice minOccurs="1" maxOccurs="1">
                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-investment"></xs:element>
-                            </xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-investment"></xs:element>
+                            </xs:choice>
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
@@ -753,7 +714,10 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="wild-card-weapons">
                         <xs:complexType>
                             <xs:sequence>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-weapon"></xs:element>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                                </xs:choice>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
@@ -775,7 +739,10 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon-list">
                         <xs:complexType>
                             <xs:sequence>
-                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="unbounded" ref="heisenberg:abstract-weapon"></xs:element>
+                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
+                                    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                                </xs:choice>
                             </xs:sequence>
                         </xs:complexType>
                     </xs:element>
@@ -812,15 +779,23 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithWeaponType" substitutionGroup="heisenberg-empire" name="kill-with-weapon"></xs:element>
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:complexType name="KillWithWeaponType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" name="weapon">
                         <xs:complexType>
-                            <xs:sequence minOccurs="1" maxOccurs="1">
+                            <xs:choice minOccurs="1" maxOccurs="1">
                                 <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:abstract-weapon"></xs:element>
-                            </xs:sequence>
+                                <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" minOccurs="0" maxOccurs="1" ref="heisenberg:global-abstract-weapon"></xs:element>
+                            </xs:choice>
                         </xs:complexType>
                     </xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" name="attributes-of-weapon">
