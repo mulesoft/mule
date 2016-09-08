@@ -150,10 +150,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
           }
         };
 
-        MuleEvent event = MuleEvent.builder(create(flowConstruct, "EndpointNotificationLoggerAgent")).message(msg)
-            .exchangePattern(endpoint.getExchangePattern()).flow(flowConstruct).build();
-        event.setEnableNotifications(false);
-        endpoint.process(event);
+        endpoint.process(MuleEvent.builder(create(flowConstruct, "EndpointNotificationLoggerAgent")).message(msg)
+            .exchangePattern(endpoint.getExchangePattern()).flow(flowConstruct).disableNotifications().build());
       } catch (Exception e1) {
         // TODO MULE-863: If this is an error, do something better than this
         logger

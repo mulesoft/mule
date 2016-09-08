@@ -149,11 +149,6 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public void setEnableNotifications(boolean enabled) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public boolean isAllowNonBlocking() {
     throw new UnsupportedOperationException();
   }

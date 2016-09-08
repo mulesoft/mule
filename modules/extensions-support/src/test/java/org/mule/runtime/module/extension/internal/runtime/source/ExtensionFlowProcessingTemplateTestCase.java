@@ -16,12 +16,13 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -38,7 +39,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ExtensionFlowProcessingTemplateTestCase extends AbstractMuleTestCase {
 
   @Mock
-  private DefaultMuleEvent event;
+  private MuleEvent event;
 
   @Mock
   private MessageProcessor messageProcessor;

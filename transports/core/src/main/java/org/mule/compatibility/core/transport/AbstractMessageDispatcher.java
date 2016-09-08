@@ -8,14 +8,12 @@ package org.mule.compatibility.core.transport;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
@@ -104,8 +102,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
                                                                                                resultMessage,
                                                                                                endpoint.getMuleContext());
       requestEvent.getSession().merge(storedSession);
-      MuleEvent resultEvent = MuleEvent.builder(requestEvent).message(resultMessage)
-          .correlationId(((DefaultMuleEvent) requestEvent).getLegacyCorrelationId()).build();
+      MuleEvent resultEvent = MuleEvent.builder(requestEvent).message(resultMessage).build();
       setCurrentEvent(resultEvent);
       return resultEvent;
     } else {

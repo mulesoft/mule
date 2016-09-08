@@ -85,10 +85,10 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   // Use this constructor from the builder
   public DefaultMuleEvent(MessageContext context, MuleMessage message, Map<String, TypedValue<Object>> flowVariables,
-                          MessageExchangePattern exchangePattern,
-                          FlowConstruct flowConstruct, MuleSession session, boolean transacted, boolean synchronous,
-                          boolean nonBlocking, Object replyToDestination, ReplyToHandler replyToHandler,
-                          FlowCallStack flowCallStack, Correlation correlation, Error error, String legacyCorrelationId) {
+                          MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
+                          boolean transacted, boolean synchronous, boolean nonBlocking, Object replyToDestination,
+                          ReplyToHandler replyToHandler, FlowCallStack flowCallStack, Correlation correlation, Error error,
+                          String legacyCorrelationId, boolean notificationsEnabled) {
     this.context = context;
     this.correlation = NO_CORRELATION;
     this.flowConstruct = flowConstruct;
@@ -108,6 +108,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.correlation = correlation;
     this.error = error;
     this.legacyCorrelationId = legacyCorrelationId;
+
+    this.notificationsEnabled = notificationsEnabled;
   }
 
   @Override
@@ -338,11 +340,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   @Override
   public boolean isNotificationsEnabled() {
     return notificationsEnabled;
-  }
-
-  @Override
-  public void setEnableNotifications(boolean enabled) {
-    notificationsEnabled = enabled;
   }
 
   @Override

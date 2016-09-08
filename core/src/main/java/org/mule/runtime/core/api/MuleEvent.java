@@ -182,14 +182,6 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   boolean isNotificationsEnabled();
 
   /**
-   * Enables the firing of notifications when processing the message.
-   * TODO MULE-9281 Make MuleEvent immutable
-   *
-   * @param enabled
-   */
-  void setEnableNotifications(boolean enabled);
-
-  /**
    * Indicates if the current event allows non-blocking execution and IO.
    *
    * @return true if non-blocking execution and IO is allowed. False otherwise.
@@ -359,16 +351,24 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder transacted(boolean transacted);
 
     /**
+     * Disables the firing of notifications when processing the produced event.
      * 
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    Builder disableNotifications();
+
+    /**
      * @param session
      * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder session(MuleSession session);
 
     /**
-     * 
      * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder refreshSync();
