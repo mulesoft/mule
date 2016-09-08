@@ -255,8 +255,8 @@ public class DefaultMuleApplication implements Application {
     }
   }
 
-  private static boolean isRegionClassLoaderMember(ClassLoader loggerClassLoader) {
-    return !(loggerClassLoader instanceof RegionClassLoader) && loggerClassLoader.getParent() instanceof RegionClassLoader;
+  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
+    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   @Override
