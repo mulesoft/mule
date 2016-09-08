@@ -131,6 +131,17 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
     assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2"));
   }
 
+  @Test
+  public void onErrorTypeMatchSeveral() throws Exception {
+    MuleMessage result = flowRunner("onErrorTypeMatchSeveral").withPayload(true).run().getMessage();
+    assertThat(result, is(notNullValue()));
+    assertThat(getPayloadAsString(result), is("true apt1 apt2"));
+
+    result = flowRunner("onErrorTypeMatchSeveral").withPayload(false).run().getMessage();
+    assertThat(result, is(notNullValue()));
+    assertThat(getPayloadAsString(result), is("false apt1 apt2"));
+  }
+
   public static class LoadNewsProcessor extends AbstractAnnotatedObject implements MessageProcessor {
 
     @Override

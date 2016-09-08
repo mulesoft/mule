@@ -116,4 +116,25 @@
         </error-handler>
     </flow>
 
+    <flow name="onErrorTypeMatchSeveral">
+        <choice>
+            <when expression="#[payload]">
+                <append-string-transformer message=" apt1"/>
+                <test:component throwException="true"/>
+            </when>
+            <otherwise>
+                <append-string-transformer message=" apt1"/>
+                <expression-transformer expression="#[payload.nope]"/>
+            </otherwise>
+        </choice>
+        <error-handler>
+            <on-error-continue type="TRANSFORMATION, UNKNOWN">
+                <append-string-transformer message=" apt2"/>
+            </on-error-continue>
+            <on-error-continue type="ANY">
+                <append-string-transformer message=" nope"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
 </mule>

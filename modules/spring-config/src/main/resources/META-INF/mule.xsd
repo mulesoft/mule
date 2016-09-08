@@ -1688,7 +1688,7 @@
                 <xsd:attribute name="type" type="errorIdentifierType" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The full name of the error type to match against.
+                            The full name of the error type to match against or a comma separated list of full names, to match against any of them.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -1702,7 +1702,7 @@
                 <xsd:restriction base="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The full name of the error type to match against.
+                            The full name of the error type to match against or a comma separated list of full names, to match against any of them.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:restriction>

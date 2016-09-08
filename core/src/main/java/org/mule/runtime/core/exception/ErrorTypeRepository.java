@@ -7,13 +7,12 @@
 package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.core.message.ErrorTypeBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Repository for the different {@link ErrorType}s in a mule artifact.
@@ -31,7 +30,7 @@ public class ErrorTypeRepository {
   public static final String ANY_IDENTIFIER = "ANY";
   public static final String CORE_NAMESPACE_NAME = "mule";
 
-  private static final ErrorType ANY_ERROR_TYPE =
+  protected static final ErrorType ANY_ERROR_TYPE =
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build();
   private static final ErrorType UNKNOWN_ERROR_TYPE =
       ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(UNKNOWN_ERROR_IDENTIFIER)
@@ -53,14 +52,16 @@ public class ErrorTypeRepository {
 
   }
 
-  public void addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
+  public ErrorType addErrorType(ComponentIdentifier errorTypeIdentifier, ErrorType parentErrorType) {
     ErrorTypeBuilder errorTypeBuilder =
         ErrorTypeBuilder.builder().namespace(errorTypeIdentifier.getNamespace())
             .identifier(errorTypeIdentifier.getName())
             .parentErrorType(parentErrorType);
-    if (this.errorTypes.put(errorTypeIdentifier, errorTypeBuilder.build()) != null) {
+    ErrorType errorType = errorTypeBuilder.build();
+    if (this.errorTypes.put(errorTypeIdentifier, errorType) != null) {
       throw new IllegalStateException(format("An error type with identifier %s already exists", errorTypeIdentifier));
     }
+    return errorType;
   }
 
   public ErrorType lookupErrorType(ComponentIdentifier errorTypeComponentIdentifier) {
