@@ -140,7 +140,8 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   public void runPhaseWithSuccessfulFlowProcessingNonBlocking() throws Exception {
     final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
     when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
-    when(mockTemplate.routeEvent(any(MuleEvent.class))).thenAnswer(invocation -> sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]));
+    when(mockTemplate.routeEvent(any(MuleEvent.class)))
+        .thenAnswer(invocation -> sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]));
 
     phase.runPhase(mockTemplate, mockContext, mockNotifier);
 
@@ -215,7 +216,8 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
       return null;
     }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
     when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
-    when(mockTemplate.routeEvent(any(MuleEvent.class))).thenAnswer(invocation -> sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]));
+    when(mockTemplate.routeEvent(any(MuleEvent.class)))
+        .thenAnswer(invocation -> sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]));
 
     phase.runPhase(mockTemplate, mockContext, mockNotifier);
 
@@ -291,7 +293,8 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
       return null;
     }).when(mockTemplate).sendResponseToClient(any(MuleEvent.class), any(ResponseCompletionCallback.class));
     when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
-    when(mockTemplate.routeEvent(any(MuleEvent.class))).thenAnswer(invocation -> sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]));
+    when(mockTemplate.routeEvent(any(MuleEvent.class)))
+        .thenAnswer(invocation -> sensingMessageProcessor.process((MuleEvent) invocation.getArguments()[0]));
 
     phase.runPhase(mockTemplate, mockContext, mockNotifier);
 
