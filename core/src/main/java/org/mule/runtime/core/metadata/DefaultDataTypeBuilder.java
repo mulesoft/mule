@@ -27,6 +27,7 @@ import com.google.common.cache.LoadingCache;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Proxy;
 import java.nio.charset.Charset;
@@ -51,7 +52,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
   private static ConcurrentHashMap<String, ProxyIndicator> proxyClassCache = new ConcurrentHashMap<>();
 
   private static LoadingCache<DefaultDataTypeBuilder, DataType> dataTypeCache =
-      newBuilder().softValues().build(new CacheLoader<DefaultDataTypeBuilder, DataType>() {
+      newBuilder().weakValues().build(new CacheLoader<DefaultDataTypeBuilder, DataType>() {
 
         @Override
         public DataType load(DefaultDataTypeBuilder key) throws Exception {
@@ -59,7 +60,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
         }
       });
 
-  private Class<?> type = Object.class;
+  private Reference<Class<?>> typeRef = new WeakReference<>(Object.class);
   private DataTypeBuilder itemTypeBuilder;
   private MediaType mediaType = MediaType.ANY;
 
@@ -71,18 +72,18 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
 
   public DefaultDataTypeBuilder(DataType dataType) {
     if (dataType instanceof CollectionDataType) {
-      this.type = dataType.getType();
+      this.typeRef = new WeakReference<>(dataType.getType());
       this.itemTypeBuilder = DataType.builder(((CollectionDataType) dataType).getItemDataType());
     } else {
-      this.type = dataType.getType();
+      this.typeRef = new WeakReference<>(dataType.getType());
     }
     this.mediaType = dataType.getMediaType();
   }
 
   /**
-   * Sets the given type for the {@link DataType} to be built. See {@link DataType#getType()}.
+   * Sets the given typeRef for the {@link DataType} to be built. See {@link DataType#getType()}.
    * 
-   * @param type the java type to set.
+   * @param type the java typeRef to set.
    * @return this builder.
    */
   @Override
@@ -90,7 +91,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     validateAlreadyBuilt();
 
     checkNotNull(type, "'type' cannot be null.");
-    this.type = handleProxy(type);
+    this.typeRef = new WeakReference<>(handleProxy(type));
 
     return this;
   }
@@ -159,7 +160,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
       throw new IllegalArgumentException("iteratorType " + iteratorType.getName() + " is not an Iterator type");
     }
 
-    this.type = handleProxy(iteratorType);
+    this.typeRef = new WeakReference<>(handleProxy(iteratorType));
 
     if (this.itemTypeBuilder == null) {
       this.itemTypeBuilder = DataType.builder();
@@ -169,7 +170,8 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
   }
 
   /**
-   * Sets the given type for the {@link DefaultCollectionDataType} to be built. See {@link DefaultCollectionDataType#getType()}.
+   * Sets the given type for the {@link DefaultCollectionDataType} to be built. See
+   * {@link DefaultCollectionDataType#getType()}.
    * 
    * @param collectionType the java collection type to set.
    * @return this builder.
@@ -184,12 +186,12 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
       throw new IllegalArgumentException("collectionType " + collectionType.getName() + " is not a Collection type");
     }
 
-    this.type = handleProxy(collectionType);
+    this.typeRef = new WeakReference<>(handleProxy(collectionType));
 
     if (this.itemTypeBuilder == null) {
       this.itemTypeBuilder = DataType.builder();
     }
-    final Class<?> itemType = getCollectionType((Class<? extends Iterable<?>>) type);
+    final Class<?> itemType = getCollectionType((Class<? extends Iterable<?>>) typeRef.get());
     if (itemType != null) {
       this.itemTypeBuilder.type(itemType);
     }
@@ -327,11 +329,11 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     }
 
     built = true;
-    //TODO(pablo.kraan): MULE-10452 - re-add the dataType cache but avoiding the memory-leak
-    return this.doBuild();
+    return dataTypeCache.getUnchecked(this);
   }
 
   protected DataType doBuild() {
+    Class<?> type = this.typeRef.get();
     if (Collection.class.isAssignableFrom(type) || Iterator.class.isAssignableFrom(type)) {
       return new DefaultCollectionDataType(type, itemTypeBuilder != null ? itemTypeBuilder.build() : DataType.OBJECT, mediaType,
                                            isConsumable(type));
@@ -352,7 +354,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
 
   @Override
   public int hashCode() {
-    return Objects.hash(type, itemTypeBuilder, mediaType);
+    return Objects.hash(typeRef.get(), itemTypeBuilder, mediaType);
   }
 
   @Override
@@ -368,7 +370,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
     }
     DefaultDataTypeBuilder other = (DefaultDataTypeBuilder) obj;
 
-    return Objects.equals(type, other.type) && Objects.equals(itemTypeBuilder, other.itemTypeBuilder)
+    return Objects.equals(typeRef.get(), other.typeRef.get()) && Objects.equals(itemTypeBuilder, other.itemTypeBuilder)
         && Objects.equals(mediaType, other.mediaType);
   }
 
