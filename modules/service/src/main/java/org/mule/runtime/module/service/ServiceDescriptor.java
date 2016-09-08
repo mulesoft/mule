@@ -21,6 +21,15 @@ public class ServiceDescriptor extends ArtifactDescriptor {
 
   private String serviceProviderClassName;
 
+  /**
+   * Creates a new service descriptor
+   *
+   * @param name service name. Non empty.
+   */
+  public ServiceDescriptor(String name) {
+    super(name);
+  }
+
   public String getServiceProviderClassName() {
     return serviceProviderClassName;
   }

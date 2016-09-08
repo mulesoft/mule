@@ -51,7 +51,7 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
    */
   @Override
   public MuleDeployableArtifactClassLoader build() throws IOException {
-    setArtifactDescriptor(new ArtifactDescriptor());
+    setArtifactDescriptor(new ArtifactDescriptor("temp"));
     return (MuleDeployableArtifactClassLoader) super.build();
   }
 

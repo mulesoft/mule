@@ -9,12 +9,9 @@ package org.mule.runtime.module.launcher.log4j2;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
 import org.mule.tck.size.SmallTest;
@@ -38,18 +35,22 @@ public class MuleLoggerContextFactoryTestCase {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private RegionClassLoader classLoader;
+  private ApplicationDescriptor artifactDescriptor;
 
   @Before
   public void before() throws Exception {
     when(classLoader.getArtifactName()).thenReturn(getClass().getName());
     when(classLoader.findLocalResource("log4j2.xml")).thenReturn(CONFIG_LOCATION.toURI().toURL());
+    artifactDescriptor = mock(ApplicationDescriptor.class);
+    when(classLoader.getArtifactDescriptor()).thenReturn(artifactDescriptor);
   }
 
   @Test
   public void externalConf() throws IOException {
     File customLogConfig = new File("src/test/resources/log4j2-test-custom.xml");
     assertThat(customLogConfig.exists(), is(true));
-    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory(customLogConfig);
+    when(artifactDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
+    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
 
     final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
@@ -59,18 +60,14 @@ public class MuleLoggerContextFactoryTestCase {
   public void externalConfInvalid() throws IOException {
     File customLogConfig = new File("src/test/resources/log4j2-test-custom-invalid.xml");
     assertThat(customLogConfig.exists(), is(false));
-    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory(customLogConfig);
+    when(artifactDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
+    final MuleLoggerContextFactory loggerCtxFactory = mockLoggerContextFactory();
 
     final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class));
     assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
   }
 
-  protected MuleLoggerContextFactory mockLoggerContextFactory(File customLogConfig) throws IOException {
-    final ApplicationDescriptor appDescriptor = mock(ApplicationDescriptor.class);
-    when(appDescriptor.getLogConfigFile()).thenReturn(customLogConfig);
-
-    final MuleLoggerContextFactory loggerCtxFactory = spy(new MuleLoggerContextFactory());
-    doReturn(appDescriptor).when(loggerCtxFactory).fetchApplicationDescriptor(any(ArtifactClassLoader.class));
-    return loggerCtxFactory;
+  protected MuleLoggerContextFactory mockLoggerContextFactory() throws IOException {
+    return spy(new MuleLoggerContextFactory());
   }
 }

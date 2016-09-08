@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_C
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.module.artifact.classloader.exception.NotExportedClassException;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -127,6 +128,11 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   @Override
   public String getArtifactName() {
     return artifactClassLoader.getArtifactName();
+  }
+
+  @Override
+  public <T extends ArtifactDescriptor> T getArtifactDescriptor() {
+    return artifactClassLoader.getArtifactDescriptor();
   }
 
   @Override

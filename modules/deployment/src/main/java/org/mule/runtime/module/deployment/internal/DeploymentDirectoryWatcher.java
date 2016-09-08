@@ -389,7 +389,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
           domainArchiveDeployer.deployExplodedArtifact(addedDomain);
         }
       } catch (DeploymentException e) {
-        // Ignore and continue
+        logger.error("Error deploying domain '{}'", addedDomain, e);
       }
     }
   }

@@ -88,8 +88,7 @@ public class DomainClassLoaderFactoryTestCase extends AbstractDomainTestCase {
   }
 
   private DomainDescriptor getTestDescriptor(String name) {
-    DomainDescriptor descriptor = new DomainDescriptor();
-    descriptor.setName(name);
+    DomainDescriptor descriptor = new DomainDescriptor(name);
     descriptor.setRedeploymentEnabled(false);
     return descriptor;
   }

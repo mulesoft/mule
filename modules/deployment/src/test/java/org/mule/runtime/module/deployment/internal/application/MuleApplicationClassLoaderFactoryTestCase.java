@@ -85,8 +85,7 @@ public class MuleApplicationClassLoaderFactoryTestCase extends AbstractMuleTestC
 
     MuleApplicationClassLoaderFactory classLoaderFactory = new MuleApplicationClassLoaderFactory(nativeLibraryFinderFactory);
 
-    final ApplicationDescriptor descriptor = new ApplicationDescriptor();
-    descriptor.setName(APP_NAME);
+    final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setDomain(DOMAIN_NAME);
 
     final MuleApplicationClassLoader artifactClassLoader =

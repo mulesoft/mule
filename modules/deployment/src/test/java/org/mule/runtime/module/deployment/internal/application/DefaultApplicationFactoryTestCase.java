@@ -70,8 +70,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createsApplication() throws Exception {
-    final ApplicationDescriptor descriptor = new ApplicationDescriptor();
-    descriptor.setName(APP_NAME);
+    final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setDomain(DOMAIN_NAME);
     final File[] resourceFiles = new File[0];
     descriptor.setConfigResourcesFile(resourceFiles);
@@ -148,8 +147,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void applicationDesployFailDueToDomainNotDeployed() throws Exception {
-    final ApplicationDescriptor descriptor = new ApplicationDescriptor();
-    descriptor.setName(APP_NAME);
+    final ApplicationDescriptor descriptor = new ApplicationDescriptor(APP_NAME);
     descriptor.setDomain(DOMAIN_NAME);
     when(applicationDescriptorFactory.create(any())).thenReturn(descriptor);
 

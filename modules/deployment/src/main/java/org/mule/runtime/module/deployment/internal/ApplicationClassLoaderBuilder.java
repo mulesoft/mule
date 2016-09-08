@@ -7,12 +7,12 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.core.util.Preconditions.checkState;
-
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.application.ArtifactPluginFactory;
 import org.mule.runtime.module.deployment.internal.application.MuleApplicationClassLoaderFactory;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginRepository;
 
 import java.io.IOException;
@@ -47,12 +47,13 @@ public class ApplicationClassLoaderBuilder extends AbstractArtifactClassLoaderBu
    * Creates a new {@code ArtifactClassLoader} using the provided configuration. It will create the proper class loader hierarchy
    * and filters so application classes, resources, plugins and it's domain resources are resolve correctly.
    *
-   * @return a {@code ArtifactClassLoader} created from the provided configuration.
+   * @return a {@code MuleDeployableArtifactClassLoader} created from the provided configuration.
    * @throws IOException exception cause when it was not possible to access the file provided as dependencies
    */
-  public MuleApplicationClassLoader build() throws IOException {
+  public MuleDeployableArtifactClassLoader build() throws IOException {
     checkState(domain != null, "Domain cannot be null");
-    return (MuleApplicationClassLoader) super.build();
+
+    return (MuleDeployableArtifactClassLoader) super.build();
   }
 
   /**

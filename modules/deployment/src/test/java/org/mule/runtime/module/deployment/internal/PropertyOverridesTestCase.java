@@ -34,7 +34,7 @@ import org.junit.Test;
  */
 public class PropertyOverridesTestCase extends AbstractMuleTestCase {
 
-  private Map<String, String> existingProperties = new HashMap<String, String>();
+  private Map<String, String> existingProperties = new HashMap<>();
 
   private void setSystemProperties() {
     setSystemProperty("texas", "province");
@@ -61,7 +61,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
     IOUtils.copy(input, output);
     input.close();
     output.close();
-    ApplicationDescriptor descriptor = new ApplicationDescriptor();
+    ApplicationDescriptor descriptor = new ApplicationDescriptor("app");
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(new ArtifactPluginDescriptorFactory(new ArtifactClassLoaderFilterFactory())),
                                          applicationPluginRepository);
@@ -76,7 +76,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
 
     try {
       setSystemProperties();
-      descriptor = new ApplicationDescriptor();
+      descriptor = new ApplicationDescriptor("app");
       applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
       appProps = descriptor.getAppProperties();
       assertEquals("state", appProps.get("texas"));
@@ -87,7 +87,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
       assertEquals("ipaas", appProps.get("mule.ion"));
       assertEquals("evenCooler", appProps.get("mule.mmc"));
 
-      descriptor = new ApplicationDescriptor();
+      descriptor = new ApplicationDescriptor("app");
       applicationDescriptorFactory.setApplicationProperties(descriptor, new File("nonexistent.nonexistent"));
       appProps = descriptor.getAppProperties();
       assertNull(appProps.get("texas"));

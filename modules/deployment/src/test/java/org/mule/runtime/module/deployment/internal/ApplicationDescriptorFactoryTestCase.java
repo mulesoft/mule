@@ -160,8 +160,7 @@ public class ApplicationDescriptorFactoryTestCase extends AbstractMuleTestCase {
     copyFile(createApplicationPluginFile(), new File(pluginDir, "plugin1.zip"));
 
     final ArtifactPluginRepository applicationPluginRepository = mock(ArtifactPluginRepository.class);
-    final ArtifactPluginDescriptor plugin2Descriptor = new ArtifactPluginDescriptor();
-    plugin2Descriptor.setName("plugin2");
+    final ArtifactPluginDescriptor plugin2Descriptor = new ArtifactPluginDescriptor("plugin2");
     final Set<String> exportedPackages = new HashSet<>();
     exportedPackages.add("org.foo");
     exportedPackages.add("org.bar");

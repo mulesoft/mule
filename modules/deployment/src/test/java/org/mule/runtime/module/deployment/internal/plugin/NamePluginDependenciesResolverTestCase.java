@@ -31,20 +31,13 @@ import org.junit.rules.ExpectedException;
 public class NamePluginDependenciesResolverTestCase extends AbstractMuleTestCase {
 
 
-  private final ArtifactPluginDescriptor fooPlugin = createArtifactPluginDescriptor("foo");
-  private final ArtifactPluginDescriptor barPlugin = createArtifactPluginDescriptor("bar");
-  private final ArtifactPluginDescriptor bazPlugin = createArtifactPluginDescriptor("baz");
+  private final ArtifactPluginDescriptor fooPlugin = new ArtifactPluginDescriptor("foo");
+  private final ArtifactPluginDescriptor barPlugin = new ArtifactPluginDescriptor("bar");
+  private final ArtifactPluginDescriptor bazPlugin = new ArtifactPluginDescriptor("baz");
   private final PluginDependenciesResolver dependenciesResolver = new NamePluginDependenciesResolver();
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
-  private ArtifactPluginDescriptor createArtifactPluginDescriptor(String name) {
-    final ArtifactPluginDescriptor result = new ArtifactPluginDescriptor();
-    result.setName(name);
-
-    return result;
-  }
 
   @Test
   public void resolvesIndependentPlugins() throws Exception {

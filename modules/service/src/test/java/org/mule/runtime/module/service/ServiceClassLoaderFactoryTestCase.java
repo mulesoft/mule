@@ -39,8 +39,7 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
-    descriptor = new ServiceDescriptor();
-    descriptor.setName("testService");
+    descriptor = new ServiceDescriptor("testService");
     descriptor.setRootFolder(serviceFolder.getRoot());
 
     parentClassLoader = mock(ArtifactClassLoader.class);

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -59,8 +60,8 @@ public class MuleSharedDomainClassLoaderTestCase extends AbstractMuleTestCase {
     final File resourceFile = createDomainResource(DEFAULT_DOMAIN_NAME, RESOURCE_FILE_NAME);
     final List<URL> urls = Collections.singletonList(resourceFile.toURI().toURL());
 
-    MuleSharedDomainClassLoader classLoader =
-        new MuleSharedDomainClassLoader(DEFAULT_DOMAIN_NAME, getClass().getClassLoader(), lookupPolicy, urls);
+    MuleSharedDomainClassLoader classLoader = new MuleSharedDomainClassLoader(new ArtifactDescriptor(DEFAULT_DOMAIN_NAME),
+                                                                              getClass().getClassLoader(), lookupPolicy, urls);
 
     assertThat(classLoader.findResource(RESOURCE_FILE_NAME), notNullValue());
   }
