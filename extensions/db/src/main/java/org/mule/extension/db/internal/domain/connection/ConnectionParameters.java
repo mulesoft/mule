@@ -18,7 +18,7 @@ import javax.sql.DataSource;
  *
  * @since 4.0
  */
-@ExclusiveOptionals
+@ExclusiveOptionals(isOneRequired = true)
 public class ConnectionParameters {
 
   /**

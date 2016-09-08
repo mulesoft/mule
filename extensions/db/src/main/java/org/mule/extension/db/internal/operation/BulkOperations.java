@@ -6,14 +6,9 @@
  */
 package org.mule.extension.db.internal.operation;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.extension.db.internal.domain.query.QueryType.DELETE;
-import static org.mule.extension.db.internal.domain.query.QueryType.INSERT;
-import static org.mule.extension.db.internal.domain.query.QueryType.UPDATE;
 import org.mule.extension.db.api.param.BulkQueryDefinition;
 import org.mule.extension.db.api.param.BulkScript;
+import org.mule.extension.db.api.param.QuerySettings;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.BulkUpdateExecutor;
@@ -37,6 +32,13 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.extension.db.internal.domain.query.QueryType.DELETE;
+import static org.mule.extension.db.internal.domain.query.QueryType.INSERT;
+import static org.mule.extension.db.internal.domain.query.QueryType.UPDATE;
 
 /**
  * Contains a set of operations for performing bulk
@@ -79,13 +81,14 @@ public class BulkOperations extends BaseDbOperations {
    * advantages compared to executing one single update operation various times.
    *
    * @param query           a {@link BulkQueryDefinition} as a parameter group
-   * @param parameterValues A {@link List} of {@link Map}s in which every list item represents a row
-   *                        to be inserted, and the map contains the parameter names as keys and
-   *                        the value the parameter is bound to.
+   * @param parameterValues A {@link List} of {@link Map}s in which every list item represents a
+   *                        row to be inserted, and the map contains the parameter names as keys
+   *                        and the value the parameter is bound to.
    * @param connector       the acting connector
    * @param connection      the acting connection
-   * @return an array of update counts containing one element for each executed command. The elements
-   * of the array are ordered according to the order in which commands were added to the batch.
+   * @return an array of update counts containing one element for each executed command. The
+   * elements of the array are ordered according to the order in which commands were added to the
+   * batch.
    * @throws SQLException if an error is produced
    */
   public int[] bulkUpdate(@ParameterGroup BulkQueryDefinition query,
@@ -103,13 +106,14 @@ public class BulkOperations extends BaseDbOperations {
    * advantages compared to executing one single delete operation various times.
    *
    * @param query           a {@link BulkQueryDefinition} as a parameter group
-   * @param parameterValues A {@link List} of {@link Map}s in which every list item represents a row
-   *                        to be inserted, and the map contains the parameter names as keys and
-   *                        the value the parameter is bound to.
+   * @param parameterValues A {@link List} of {@link Map}s in which every list item represents a
+   *                        row to be inserted, and the map contains the parameter names as keys
+   *                        and the value the parameter is bound to.
    * @param connector       the acting connector
    * @param connection      the acting connection
-   * @return an array of update counts containing one element for each executed command. The elements
-   * of the array are ordered according to the order in which commands were added to the batch.
+   * @return an array of update counts containing one element for each executed command. The
+   * elements of the array are ordered according to the order in which commands were added to the
+   * batch.
    * @throws SQLException if an error is produced
    */
   public int[] bulkDelete(@ParameterGroup BulkQueryDefinition query,
@@ -128,8 +132,9 @@ public class BulkOperations extends BaseDbOperations {
    * @param script     a {@link BulkScript} as a parameter group
    * @param settings   a {@link QuerySettings} as a parameter group
    * @param connection the acting connection
-   * @return an array of update counts containing one element for each executed command. The elements
-   * of the array are ordered according to the order in which commands were added to the batch.
+   * @return an array of update counts containing one element for each executed command. The
+   * elements of the array are ordered according to the order in which commands were added to the
+   * batch.
    * @throws SQLException if an error is produced
    */
   public int[] executeScript(@ParameterGroup BulkScript script,

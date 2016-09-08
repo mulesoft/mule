@@ -6,8 +6,8 @@
  */
 package org.mule.extension.db.internal.operation;
 
-import static org.mule.extension.db.internal.domain.query.QueryType.DDL;
 import org.mule.extension.db.api.param.QueryDefinition;
+import org.mule.extension.db.api.param.QuerySettings;
 import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.query.Query;
@@ -19,6 +19,9 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 import java.sql.SQLException;
 
+import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
+import static org.mule.extension.db.internal.domain.query.QueryType.DDL;
+
 /**
  * Operations to manipulate data definitions in a relational Database
  *
@@ -29,14 +32,14 @@ public class DdlOperations extends BaseDbOperations {
   /**
    * Enables execution of DDL queries against a database.
    *
-   * @param sql The text of the SQL query to be executed
-   * @param settings Parameters to configure the query
-   * @param connector           the acting connector
-   * @param connection          the acting connection
-   * @return the affected rows count
+   * @param sql        The text of the SQL query to be executed
+   * @param settings   Parameters to configure the query
+   * @param connector  the acting connector
+   * @param connection the acting connection
    * @return the number of affected rows
    */
-  public int executeDdl(@DisplayName("SQL Query Text") @Text String sql,
+  @DisplayName("Execute DDL")
+  public int executeDdl(@DisplayName(SQL_QUERY_TEXT) @Text String sql,
                         @ParameterGroup QuerySettings settings,
                         @UseConfig DbConnector connector,
                         @Connection DbConnection connection)
