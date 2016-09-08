@@ -8,17 +8,21 @@ package org.mule.module.ws.functional;
 
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.construct.Flow;
 import org.mule.module.ws.consumer.SoapFaultException;
 import org.mule.tck.listener.ExceptionListener;
 
+import org.apache.cxf.binding.soap.SoapFault;
 import org.junit.Test;
 
 public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
@@ -56,6 +60,7 @@ public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumer
             SoapFaultException soapFault = (SoapFaultException) response.getExceptionPayload().getException();
             assertTrue(soapFault.getMessage().startsWith("Hello"));
             assertEquals("Server", soapFault.getFaultCode().getLocalPart());
+            assertThat(soapFault.getCause(), instanceOf(SoapFault.class));
         }
 
     }
@@ -78,6 +83,7 @@ public class CatchExceptionStrategyFunctionalTestCase extends AbstractWSConsumer
         SoapFaultException soapFault = response.getOutboundProperty("soapFaultException");
         assertTrue(soapFault.getMessage().startsWith("Hello"));
         assertEquals("Server", soapFault.getFaultCode().getLocalPart());
+        assertThat(soapFault.getCause(), instanceOf(SoapFault.class));
     }
 
 }
