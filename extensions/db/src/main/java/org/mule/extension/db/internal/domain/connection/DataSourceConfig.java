@@ -7,33 +7,38 @@
 
 package org.mule.extension.db.internal.domain.connection;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.param.TransactionIsolation;
 import org.mule.runtime.api.config.DatabasePoolingProfile;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 
 /**
  * Maintains configuration information about how to build a {@link javax.sql.DataSource}
  */
 public class DataSourceConfig {
 
+  public static final String CONNECTION_TIMEOUT_CONFIGURATION = "Connection Timeout Configuration";
+  public static final String TRANSACTION_CONFIGURATION = "Transaction Configuration";
   /**
    * Fully-qualified name of the database driver class.
    */
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED)
   private String driverClassName;
 
   /**
@@ -49,7 +54,7 @@ public class DataSourceConfig {
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION)
+  @Placement(group = CONNECTION, order = 3)
   private String user;
 
   /**
@@ -58,7 +63,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional
   @Password
-  @Placement(group = CONNECTION)
+  @Placement(group = CONNECTION, order = 4)
   private String password;
 
   /**
@@ -69,7 +74,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "0")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED, group = CONNECTION_TIMEOUT_CONFIGURATION, order = 1)
   private Integer connectionTimeout;
 
 
@@ -79,7 +84,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "SECONDS")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED, group = CONNECTION_TIMEOUT_CONFIGURATION, order = 2)
   private TimeUnit connectionTimeoutUnit = SECONDS;
 
   /**
@@ -88,7 +93,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "NOT_CONFIGURED")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED, group = TRANSACTION_CONFIGURATION)
   private TransactionIsolation transactionIsolation = NOT_CONFIGURED;
 
   /**
@@ -97,7 +102,8 @@ public class DataSourceConfig {
   @Parameter
   @Optional(defaultValue = "false")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED, group = TRANSACTION_CONFIGURATION)
+  @DisplayName("Use XA Transactions")
   private boolean useXaTransactions = false;
 
   /**
@@ -106,7 +112,7 @@ public class DataSourceConfig {
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED)
   private DbPoolingProfile poolingProfile;
 
 

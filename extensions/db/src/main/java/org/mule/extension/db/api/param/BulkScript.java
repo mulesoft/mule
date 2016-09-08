@@ -10,7 +10,10 @@ import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
+
+import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
 
 /**
  * Parameters to configure an operation which executes a SQL script
@@ -26,7 +29,8 @@ public class BulkScript {
   @Parameter
   @Optional
   @Text
-  @DisplayName("SQL Query Text")
+  @DisplayName(SQL_QUERY_TEXT)
+  @Placement(order = 1)
   private String sql;
 
   /**
@@ -34,7 +38,7 @@ public class BulkScript {
    */
   @Parameter
   @Optional
-  @DisplayName("Script path")
+  @DisplayName("Script Path")
   private String file;
 
 

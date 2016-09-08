@@ -6,10 +6,6 @@
  */
 package org.mule.extension.db.api.param;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import org.mule.extension.db.internal.operation.QuerySettings;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
@@ -21,6 +17,11 @@ import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 
 /**
  * Base class containing common attributes for a statement.
@@ -36,7 +37,8 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
   @Parameter
   @Optional
   @Text
-  @DisplayName("SQL Query Text")
+  @DisplayName(SQL_QUERY_TEXT)
+  @Placement(order = 1)
   @MetadataKeyId
   protected String sql;
 
@@ -55,7 +57,7 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
    */
   @Parameter
   @Optional
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED)
   private List<ParameterType> parameterTypes = new LinkedList<>();
 
   /**

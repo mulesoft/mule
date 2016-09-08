@@ -6,9 +6,6 @@
  */
 package org.mule.extension.db.internal.domain.connection;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
@@ -16,6 +13,10 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
  * Base class for a vendor specific connection provider.
@@ -35,6 +36,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
    */
   @Parameter
   @Optional
+  @Placement(group = CONNECTION, order = 5)
   private String database;
 
   /**
@@ -43,7 +45,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION)
+  @Placement(group = CONNECTION, order = 1)
   private String host;
 
   /**
@@ -52,7 +54,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
    */
   @Parameter
   @Optional
-  @Placement(group = CONNECTION)
+  @Placement(group = CONNECTION, order = 2)
   private Integer port;
 
   /**
@@ -60,7 +62,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
    */
   @Parameter
   @Optional
-  @Placement(group = ADVANCED)
+  @Placement(tab = ADVANCED)
   private Map<String, String> connectionProperties;
 
   protected abstract String getUrlPrefix();
