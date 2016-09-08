@@ -7,8 +7,8 @@
 package org.mule.extension.ftp.internal;
 
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
 
 import java.nio.file.Path;
 

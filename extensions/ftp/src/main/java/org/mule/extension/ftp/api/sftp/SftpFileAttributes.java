@@ -7,7 +7,7 @@
 package org.mule.extension.ftp.api.sftp;
 
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.runtime.module.extension.file.api.AbstractFileAttributes;
+import org.mule.extension.file.common.api.AbstractFileAttributes;
 
 import com.jcraft.jsch.SftpATTRS;
 

@@ -10,10 +10,10 @@ import static java.lang.String.format;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.internal.LocalFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.TreeNode;
-import org.mule.runtime.module.extension.file.api.command.ListCommand;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.TreeNode;
+import org.mule.extension.file.common.api.command.ListCommand;
 
 import java.io.File;
 import java.nio.file.Files;

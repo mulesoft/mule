@@ -7,8 +7,8 @@
 package org.mule.extension.ftp.internal.ftp.connection;
 
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileSystem;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileSystem;
 
 import java.io.InputStream;
 

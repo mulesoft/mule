@@ -11,8 +11,8 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.walkFileTree;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.command.DeleteCommand;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;

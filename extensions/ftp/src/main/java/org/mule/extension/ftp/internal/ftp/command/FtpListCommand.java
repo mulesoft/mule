@@ -12,10 +12,10 @@ import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.TreeNode;
-import org.mule.runtime.module.extension.file.api.command.ListCommand;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.TreeNode;
+import org.mule.extension.file.common.api.command.ListCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;

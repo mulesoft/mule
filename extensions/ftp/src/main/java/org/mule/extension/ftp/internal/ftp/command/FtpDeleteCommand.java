@@ -9,9 +9,9 @@ package org.mule.extension.ftp.internal.ftp.command;
 import static java.lang.String.format;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.command.DeleteCommand;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.command.DeleteCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;

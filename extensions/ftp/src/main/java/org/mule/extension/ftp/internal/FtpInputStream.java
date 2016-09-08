@@ -14,9 +14,9 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
-import org.mule.runtime.module.extension.file.api.lock.PathLock;
-import org.mule.runtime.module.extension.file.api.stream.AbstractFileInputStream;
-import org.mule.runtime.module.extension.file.api.stream.LazyStreamSupplier;
+import org.mule.extension.file.common.api.lock.PathLock;
+import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
+import org.mule.extension.file.common.api.stream.LazyStreamSupplier;
 
 import java.io.IOException;
 import java.io.InputStream;

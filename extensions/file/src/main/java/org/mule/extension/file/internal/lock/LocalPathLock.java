@@ -7,7 +7,7 @@
 package org.mule.extension.file.internal.lock;
 
 import static java.lang.String.format;
-import org.mule.runtime.module.extension.file.api.lock.PathLock;
+import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;

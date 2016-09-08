@@ -17,8 +17,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.FtpTestHarness;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.TreeNode;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.TreeNode;
 
 import java.nio.file.Paths;
 import java.util.List;

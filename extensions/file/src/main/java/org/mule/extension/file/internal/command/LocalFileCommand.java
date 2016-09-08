@@ -9,8 +9,8 @@ package org.mule.extension.file.internal.command;
 import static java.lang.String.format;
 import org.mule.extension.file.internal.FileConnector;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.command.FileCommand;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.command.FileCommand;
 
 import java.io.File;
 import java.nio.file.Files;

@@ -11,12 +11,12 @@ import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.file.api.FileAttributes;
-import org.mule.runtime.module.extension.file.api.FileConnectorConfig;
-import org.mule.runtime.module.extension.file.api.FileContentWrapper;
-import org.mule.runtime.module.extension.file.api.FileWriteMode;
-import org.mule.runtime.module.extension.file.api.FileWriterVisitor;
-import org.mule.runtime.module.extension.file.api.command.WriteCommand;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FileContentWrapper;
+import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.FileWriterVisitor;
+import org.mule.extension.file.common.api.command.WriteCommand;
 
 import java.io.OutputStream;
 import java.nio.file.Path;
