@@ -30,4 +30,8 @@
         <spring:import resource="smtp-flows.xml"/>
     </spring:beans>
 
+    <spring:beans>
+        <spring:import resource="smtp-attachment-flows.xml"/>
+    </spring:beans>
+
 </mule>

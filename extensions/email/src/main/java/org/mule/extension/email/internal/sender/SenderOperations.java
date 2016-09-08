@@ -71,10 +71,10 @@ public class SenderOperations {
                        toAddresses,
                        configuration.getFrom(),
                        configuration.getDefaultCharset(),
-                       ccAddresses != null ? ccAddresses : emptyList(),
-                       bccAddresses != null ? bccAddresses : emptyList(),
+                       ensureNotNullList(ccAddresses),
+                       ensureNotNullList(bccAddresses),
                        mergeHeaders(headers, configuration.getHeaders()),
-                       attachments);
+                       ensureNotNullList(attachments));
   }
 
   /**
@@ -92,6 +92,7 @@ public class SenderOperations {
    * @param ccAddresses   List of "Cc" (carbon copy) email message recipients
    * @param bccAddresses  List of "Bcc" (blind carbon copy) email message recipients
    * @param headers       Map of custom headers that are bounded with the email message
+   * @param attachments   Attachments that are bounded with the email message
    */
   @Summary("Forwards an email message")
   public void forward(@Connection SenderConnection connection,
@@ -101,17 +102,19 @@ public class SenderOperations {
                       @Optional String subject, List<String> toAddresses,
                       @Optional List<String> ccAddresses,
                       @Optional List<String> bccAddresses,
-                      @DisplayName("Additional Headers") @Optional Map<String, String> headers) {
+                      @DisplayName("Additional Headers") @Optional Map<String, String> headers,
+                      @Optional List<EmailAttachment> attachments) {
     forwardCommand.forward(connection,
                            muleMessage,
                            content,
                            subject,
                            configuration.getFrom(),
                            configuration.getDefaultCharset(),
-                           toAddresses,
-                           ccAddresses,
-                           bccAddresses,
-                           mergeHeaders(headers, configuration.getHeaders()));
+                           ensureNotNullList(toAddresses),
+                           ensureNotNullList(ccAddresses),
+                           ensureNotNullList(bccAddresses),
+                           mergeHeaders(headers, configuration.getHeaders()),
+                           ensureNotNullList(attachments));
   }
 
   /**
@@ -127,6 +130,7 @@ public class SenderOperations {
    * @param content       Content of the reply message
    * @param subject       Subject of the email message, if not set, the subject of the replied email message will be used
    * @param headers       Map of custom headers that are bounded with the email message
+   * @param attachments   Attachments that are bounded with the email message
    * @param replyToAll    Whether this reply should be sent to all recipients of this message
    */
   @Summary("Replies an email message")
@@ -136,7 +140,8 @@ public class SenderOperations {
                     @DisplayName("Email Content") EmailContent content,
                     @Optional String subject,
                     @Optional @DisplayName("Additional Headers") Map<String, String> headers,
-                    @Optional(defaultValue = "false") Boolean replyToAll) {
+                    @Optional(defaultValue = "false") Boolean replyToAll,
+                    @Optional List<EmailAttachment> attachments) {
     replyOperation.reply(connection,
                          muleMessage,
                          content,
@@ -144,6 +149,7 @@ public class SenderOperations {
                          configuration.getFrom(),
                          configuration.getDefaultCharset(),
                          mergeHeaders(headers, configuration.getHeaders()),
+                         ensureNotNullList(attachments),
                          replyToAll);
   }
 
@@ -155,12 +161,18 @@ public class SenderOperations {
    * @return a {@link Map} with the complete pair of headers.
    */
   private Map<String, String> mergeHeaders(Map<String, String> opeHeaders, Map<String, String> configHeaders) {
-
     ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
     mapBuilder.putAll(configHeaders);
     if (opeHeaders != null) {
       mapBuilder.putAll(opeHeaders);
     }
     return mapBuilder.build();
+  }
+
+  /**
+   * @return an emptyList if the list is {@code null}, the {@link List} instance otherwise.
+   */
+  private <T> List<T> ensureNotNullList(List<T> list) {
+    return list != null ? list : emptyList();
   }
 }
