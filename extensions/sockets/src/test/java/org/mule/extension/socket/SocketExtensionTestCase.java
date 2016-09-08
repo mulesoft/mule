@@ -14,8 +14,7 @@ import static org.junit.rules.ExpectedException.none;
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -94,17 +93,15 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
     receivedMessages = null;
   }
 
-  // TODO(gfernandes) MULE-10117 remove this when support for accessing resources is added to runner
-  public static class OnIncomingConnectionBean implements Callable {
+  public static class OnIncomingConnection {
 
-    @Override
-    public Object onCall(MuleEventContext eventContext) throws Exception {
-      MuleMessage originalMessage = eventContext.getEvent().getMessage();
-      MuleMessage message = MuleMessage.builder().payload(originalMessage.getPayload())
-          .mediaType(originalMessage.getDataType().getMediaType()).attributes(originalMessage.getAttributes()).build();
+    @SuppressWarnings("unused")
+    public Object onCall(MessageContext messageContext) throws Exception {
+      MuleMessage message = MuleMessage.builder().payload(messageContext.getPayload())
+          .mediaType(messageContext.getDataType().getMediaType()).attributes(messageContext.getAttributes()).build();
       receivedMessages.add(message);
 
-      return eventContext.getEvent();
+      return messageContext;
     }
   }
 
