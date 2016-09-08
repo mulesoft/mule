@@ -39,7 +39,6 @@ import static org.mule.runtime.core.exception.ErrorTypeRepository.ANY_IDENTIFIER
 import static org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.config.spring.MuleConfigurationConfigurator;
@@ -64,6 +63,7 @@ import org.mule.runtime.config.spring.dsl.spring.ConfigurableObjectFactory;
 import org.mule.runtime.config.spring.dsl.spring.ExcludeDefaultObjectMethods;
 import org.mule.runtime.config.spring.dsl.spring.PooledComponentObjectFactory;
 import org.mule.runtime.config.spring.factories.AsyncMessageProcessorsFactoryBean;
+import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.spring.factories.MessageProcessorFilterPairFactoryBean;
@@ -71,7 +71,6 @@ import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.runtime.config.spring.factories.ScatterGatherRouterFactoryBean;
 import org.mule.runtime.config.spring.factories.SubflowMessageProcessorChainFactoryBean;
-import org.mule.runtime.config.spring.factories.BlockMessageProcessorFactoryBean;
 import org.mule.runtime.config.spring.factories.WatermarkFactoryBean;
 import org.mule.runtime.config.spring.util.SpringBeanLookup;
 import org.mule.runtime.core.api.EncryptionStrategy;
@@ -103,10 +102,13 @@ import org.mule.runtime.core.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
+import org.mule.runtime.core.exception.DisjunctiveErrorTypeMatcher;
 import org.mule.runtime.core.exception.ErrorHandler;
+import org.mule.runtime.core.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.exception.RedeliveryExceeded;
+import org.mule.runtime.core.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.AbstractExpressionTransformer;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
@@ -124,6 +126,7 @@ import org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.processor.BlockMessageProcessor;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
@@ -132,7 +135,6 @@ import org.mule.runtime.core.processor.simple.AddPropertyProcessor;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.processor.BlockMessageProcessor;
 import org.mule.runtime.core.routing.AggregationStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
 import org.mule.runtime.core.routing.FirstSuccessful;
@@ -185,11 +187,13 @@ import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition} definitions for the components provided by the core
@@ -235,7 +239,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String ALL = "all";
   private static final String POLL = "poll";
   private static final String REQUEST_REPLY = "request-reply";
-  private static final String ERROR_TYPE = "errorType";
+  private static final String ERROR_TYPE_MATCHER = "errorTypeMatcher";
   private static final String TYPE = "type";
   private static final String TX_ACTION = "transactionalAction";
   private static final String TX_TYPE = "transactionType";
@@ -268,14 +272,14 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withTypeDefinition(fromType(OnErrorContinueHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition("errorType", fromSimpleParameter(TYPE, getErrorTypeConverter())
+        .withSetterParameterDefinition(ERROR_TYPE_MATCHER, fromSimpleParameter(TYPE, getErrorTypeConverter())
             .withDefaultValue(ANY_IDENTIFIER).build())
         .asPrototype().build());
     componentBuildingDefinitions.add(exceptionStrategyBaseBuilder.copy().withIdentifier(ON_ERROR_PROPAGATE)
         .withTypeDefinition(fromType(OnErrorPropagateHandler.class))
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, fromChildCollectionConfiguration(MessageProcessor.class).build())
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
-        .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE, getErrorTypeConverter())
+        .withSetterParameterDefinition(ERROR_TYPE_MATCHER, fromSimpleParameter(TYPE, getErrorTypeConverter())
             .withDefaultValue(ANY_IDENTIFIER).build())
         .withSetterParameterDefinition("maxRedeliveryAttempts", fromSimpleParameter("maxRedeliveryAttempts").build())
         .withSetterParameterDefinition("redeliveryExceeded", fromChildConfiguration(RedeliveryExceeded.class).build())
@@ -616,8 +620,16 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     return TransactionType::valueOf;
   }
 
-  private TypeConverter<String, ErrorType> getErrorTypeConverter() {
-    return (value) -> muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(value));
+  private TypeConverter<String, ErrorTypeMatcher> getErrorTypeConverter() {
+    return (value) -> {
+      String[] errorTypeIdentifiers = value.split(",");
+      List<ErrorTypeMatcher> matchers = Arrays.stream(errorTypeIdentifiers).map((identifier) -> {
+        String parsedIdentifier = identifier.trim();
+        ErrorType errorType = muleContext.getErrorTypeRepository().lookupErrorType(parseComponentIdentifier(parsedIdentifier));
+        return new SingleErrorTypeMatcher(errorType);
+      }).collect(Collectors.toList());
+      return new DisjunctiveErrorTypeMatcher(matchers);
+    };
   }
 
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {

@@ -8,9 +8,6 @@ package org.mule.runtime.core.context;
 
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
-
-import javax.resource.spi.work.WorkListener;
-
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -56,6 +53,7 @@ import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
+import org.mule.runtime.core.exception.ErrorTypeRepository;
 import org.mule.runtime.core.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
@@ -65,6 +63,8 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.SplashScreen;
 import org.mule.runtime.core.work.DefaultWorkListener;
 import org.mule.runtime.core.work.MuleWorkManager;
+
+import javax.resource.spi.work.WorkListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +125,9 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     JavaObjectSerializer defaultObjectSerializer = new JavaObjectSerializer();
     defaultObjectSerializer.setMuleContext(muleContext);
     muleContext.setObjectSerializer(defaultObjectSerializer);
-    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(createDefaultErrorTypeRepository()));
+    ErrorTypeRepository defaultErrorTypeRepository = createDefaultErrorTypeRepository();
+    muleContext.setErrorTypeRepository(defaultErrorTypeRepository);
+    muleContext.setErrorTypeLocator(createDefaultErrorTypeLocator(defaultErrorTypeRepository));
 
     return muleContext;
   }

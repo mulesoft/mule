@@ -291,15 +291,30 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     assertThat(customPath.isPresent(), is(false));
   }
 
-  private void verifyFlow(String flowName) throws InterruptedException {
+  @Test
+  public void typeMatchSeveral() throws Exception {
+    verifyFlow("onErrorPropagateTypeMatchSeveral", true);
+    Optional<MuleMessage> anyPath = muleContext.getClient().request("queue://any", TIMEOUT).getRight();
+    assertThat(anyPath.isPresent(), is(false));
+    verifyFlow("onErrorPropagateTypeMatchSeveral", false);
+    anyPath = muleContext.getClient().request("queue://any", TIMEOUT).getRight();
+    assertThat(anyPath.isPresent(), is(false));
+
+  }
+
+  private void verifyFlow(String flowName, Object payload) throws InterruptedException {
     try {
-      flowRunner(flowName).withPayload(MESSAGE).asynchronously().run().getMessage();
+      flowRunner(flowName).withPayload(payload).asynchronously().run().getMessage();
     } catch (Exception e) {
       assertThat(e.getCause(), is(instanceOf(FunctionalTestException.class)));
       if (!CallMessageProcessor.latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
         fail("custom message processor wasn't call");
       }
     }
+  }
+
+  private void verifyFlow(String flowName) throws InterruptedException {
+    verifyFlow(flowName, MESSAGE);
   }
 
   public static class CallMessageProcessor implements MessageProcessor {

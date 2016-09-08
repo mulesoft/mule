@@ -208,5 +208,25 @@
             </on-error-propagate>
         </error-handler>
     </flow>
+
+    <flow name="onErrorPropagateTypeMatchSeveral">
+        <append-string-transformer message=" apt1"/>
+        <choice>
+            <when expression="#[payload]">
+                <test:component throwException="true"/>
+            </when>
+            <otherwise>
+                <expression-transformer expression="#[payload.nope]"/>
+            </otherwise>
+        </choice>
+        <error-handler>
+            <on-error-propagate type="UNKNOWN,EXPRESSION">
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorPropagateTestCase$CallMessageProcessor"/>
+            </on-error-propagate>
+            <on-error-propagate type="ANY">
+                <test:queue name="any"/>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
     
 </mule>

@@ -8,8 +8,6 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
-
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -35,11 +33,10 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   private MessageProcessorChain configuredMessageProcessors;
   private MessageProcessor replyToMessageProcessor = new ReplyToPropertyRequestReplyReplier();
-  private ErrorType errorType = null;
+
+  private ErrorTypeMatcher errorTypeMatcher = null;
   private String when;
   private boolean handleException;
-
-
 
   @Override
   final public MuleEvent handleException(MessagingException exception, MuleEvent event) {
@@ -51,7 +48,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   }
 
 
+
   private class ExceptionMessageProcessor extends AbstractRequestResponseMessageProcessor {
+
 
     private MessagingException exception;
 
@@ -174,9 +173,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
-    if (this.errorType == null) {
-      this.errorType = muleContext.getErrorTypeRepository().getAnyErrorType();
-    }
     super.doInitialise(muleContext);
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder =
         new DefaultMessageProcessorChainBuilder(this.flowConstruct);
@@ -186,7 +182,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       throw new InitialisationException(e, this);
     }
   }
-
 
   public void setWhen(String when) {
     this.when = when;
@@ -199,13 +194,14 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         || (when != null && muleContext.getExpressionLanguage().evaluateBoolean(when, event, flowConstruct));
   }
 
+
   private boolean acceptsErrorType(MuleEvent event) {
-    return event.getError().get().getErrorType().equals(errorType);
+    return errorTypeMatcher.match(event.getError().get().getErrorType());
   }
 
   @Override
   public boolean acceptsAll() {
-    return muleContext.getErrorTypeRepository().getAnyErrorType().equals(errorType) && when == null;
+    return errorTypeMatcher == null && when == null;
   }
 
   protected MuleEvent afterRouting(MessagingException exception, MuleEvent event) {
@@ -225,8 +221,8 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
     this.handleException = handleException;
   }
 
-  public void setErrorType(ErrorType errorType) {
-    this.errorType = errorType;
+  public void setErrorTypeMatcher(ErrorTypeMatcher errorTypeMatcher) {
+    this.errorTypeMatcher = errorTypeMatcher;
   }
 
 }
