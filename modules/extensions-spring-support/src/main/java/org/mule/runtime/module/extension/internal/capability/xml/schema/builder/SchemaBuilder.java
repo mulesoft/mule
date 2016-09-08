@@ -31,7 +31,6 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
@@ -167,7 +166,7 @@ public final class SchemaBuilder {
     Optional<SubTypesModelProperty> subTypesProperty = extensionModel.getModelProperty(SubTypesModelProperty.class);
     builder.withTypeMapping(subTypesProperty.isPresent() ? subTypesProperty.get().getSubTypesMapping() : ImmutableMap.of());
 
-    extensionModel.getModelProperty(ExportModelProperty.class).ifPresent(e -> builder.withExportedTypes(e.getExportedTypes()));
+    builder.withTypes(extensionModel.getTypes());
 
     return builder;
   }
@@ -191,8 +190,8 @@ public final class SchemaBuilder {
     return this;
   }
 
-  private SchemaBuilder withExportedTypes(List<MetadataType> exportedTypes) {
-    exportedTypes.stream().filter(t -> dslResolver.resolve(t).supportsTopLevelDeclaration())
+  private SchemaBuilder withTypes(Collection<ObjectType> types) {
+    types.stream().filter(t -> dslResolver.resolve(t).supportsTopLevelDeclaration())
         .forEach(t -> objectTypeDelegate.registerPojoType(t, t.getDescription().orElse(EMPTY)));
     return this;
   }

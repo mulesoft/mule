@@ -11,3 +11,4 @@ org.mule.runtime.module.extension.internal.introspection.enricher.SubTypesModelE
 org.mule.runtime.module.extension.internal.introspection.enricher.DisplayModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.ParameterGroupModelEnricher
 org.mule.runtime.module.extension.internal.introspection.enricher.DynamicMetadataModelEnricher
+org.mule.runtime.module.extension.internal.introspection.enricher.ExtensionTypesModelEnricher

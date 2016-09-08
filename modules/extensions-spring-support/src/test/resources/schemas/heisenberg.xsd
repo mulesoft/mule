@@ -15,11 +15,11 @@
     <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-door"></xs:element>
     <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-door" name="door">
         <xs:complexType>
-          <xs:complexContent>
-            <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor">
-              <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-            </xs:extension>
-          </xs:complexContent>
+            <xs:complexContent>
+                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.KnockeableDoor">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
     <xs:complexType name="org.mule.test.heisenberg.extension.model.KnockeableDoor">
@@ -88,6 +88,41 @@
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.CarWash">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-weapon-attributes"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-weapon-attributes" name="weapon-attributes">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes">
+                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="org.mule.test.heisenberg.extension.model.PersonalInfo">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+                <xs:attribute type="mule:expressionString" use="optional" default="Heisenberg" name="myName"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="optional" default="50" name="age"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-personal-info"></xs:element>
+    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-personal-info" name="personal-info">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.PersonalInfo">
                     <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
                 </xs:extension>
             </xs:complexContent>
@@ -299,7 +334,7 @@
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-    <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="listen-payments"></xs:element>
+    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="ListenPaymentsType" substitutionGroup="mule:abstract-message-source" name="listen-payments"></xs:element>
     <xs:complexType name="ListenPaymentsType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
@@ -777,23 +812,6 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/heisenberg" type="KillWithWeaponType" substitutionGroup="heisenberg-empire" name="kill-with-weapon"></xs:element>
-    <xs:complexType name="org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes">
-        <xs:complexContent>
-            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionString" use="optional" name="brand"></xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-    <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-extension" abstract="true" name="abstract-weapon-attributes"></xs:element>
-    <xs:element xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg" substitutionGroup="heisenberg:abstract-weapon-attributes" name="weapon-attributes">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="heisenberg:org.mule.test.heisenberg.extension.model.Weapon.WeaponAttributes">
-                    <xs:attribute type="xs:string" use="optional" name="name"></xs:attribute>
-                </xs:extension>
-            </xs:complexContent>
-        </xs:complexType>
-    </xs:element>
     <xs:complexType name="KillWithWeaponType">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
