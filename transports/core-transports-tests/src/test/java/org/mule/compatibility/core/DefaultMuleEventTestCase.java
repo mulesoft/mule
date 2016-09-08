@@ -41,7 +41,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     MuleEvent event =
         MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).flow(flow).build();
-    populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
+    event = populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(true));
   }
@@ -53,7 +53,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleTestCase {
     when(flow.getMuleContext()).thenReturn(muleContext);
     MuleEvent event =
         MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).flow(flow).build();
-    populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
+    event = populateFieldsFromInboundEndpoint(event, createMockTransactionalInboundEndpoint());
     assertThat(event.isSynchronous(), equalTo(true));
     assertThat(event.isTransacted(), equalTo(true));
   }

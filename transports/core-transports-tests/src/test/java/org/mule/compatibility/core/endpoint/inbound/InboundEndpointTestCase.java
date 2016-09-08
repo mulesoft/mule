@@ -342,8 +342,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     Flow flow = getTestFlow();
     final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
         .session(getTestSession(null, muleContext)).build();
-    populateFieldsFromInboundEndpoint(event, ep);
-    return event;
+    return populateFieldsFromInboundEndpoint(event, ep);
   }
 
   protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception {
@@ -351,8 +350,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
         .message(MuleMessage.builder().payload(RESPONSE_MESSAGE).build()).flow(flow).session(getTestSession(null, muleContext))
         .build();
-    populateFieldsFromInboundEndpoint(event, ep);
-    return event;
+    return populateFieldsFromInboundEndpoint(event, ep);
   }
 
   protected MuleEvent assertMessageSent(boolean sync) throws MuleException {

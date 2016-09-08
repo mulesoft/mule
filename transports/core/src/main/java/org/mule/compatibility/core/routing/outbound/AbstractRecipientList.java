@@ -11,7 +11,6 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
@@ -49,7 +48,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
     List<Object> recipients = getRecipients(event);
     List<MuleEvent> results = new ArrayList<>();
 
-    ((DefaultMuleEvent) event).setCorrelation(new Correlation(recipients.size(), null));
+    event = MuleEvent.builder(event).correlation(new Correlation(recipients.size(), null)).build();
 
     OutboundEndpoint endpoint = null;
     for (Object recipient : recipients) {

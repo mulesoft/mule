@@ -58,8 +58,7 @@ public class HttpUndefinedMethodsBodyTestCase extends FunctionalTestCase {
 
   private void sendRequestAndAssertMethod(String payload, String expectedContent) throws Exception {
     Flow flow = (Flow) getFlowConstruct("requestFlow");
-    MuleEvent event = getTestEvent(payload);
-    event.setFlowVariable("method", method);
+    MuleEvent event = MuleEvent.builder(getTestEvent(payload)).addFlowVariable("method", method).build();
     event = flow.process(event);
 
     assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));

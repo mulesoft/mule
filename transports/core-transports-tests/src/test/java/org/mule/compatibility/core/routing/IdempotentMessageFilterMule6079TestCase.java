@@ -79,8 +79,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
       MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
       MuleEvent newEvent = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
           .session(session).build();
-      populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);
-      MuleEvent event = newEvent;
+      MuleEvent event = populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);
 
       try {
         event = idempotentMessageFilter.process(event);

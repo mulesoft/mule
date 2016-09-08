@@ -16,9 +16,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_FORBIDDEN;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.junit.Rule;
-import org.junit.Test;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
@@ -26,6 +23,9 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
 
@@ -62,9 +62,8 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
 
     @Override
     public MuleEvent handleException(MessagingException ex, MuleEvent event) {
-      event.setMessage(MuleMessage.builder(event.getMessage()).addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_FORBIDDEN))
-          .build());
-      return event;
+      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+          .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_FORBIDDEN)).build()).build();
     }
   }
 }

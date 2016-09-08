@@ -69,7 +69,6 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
     Flow flow = getTestFlow();
     final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
         .session(getTestSession(null, muleContext)).build();
-    populateFieldsFromInboundEndpoint(event, endpoint);
-    return event;
+    return populateFieldsFromInboundEndpoint(event, endpoint);
   }
 }

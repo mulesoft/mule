@@ -10,8 +10,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.ENDPOINT_PROPERTY_
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 
 public class DefaultMuleEventEndpointUtils {
@@ -20,18 +21,15 @@ public class DefaultMuleEventEndpointUtils {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  public static void populateFieldsFromInboundEndpoint(MuleEvent event, InboundEndpoint endpoint) {
-    ((DefaultMuleEvent) event).setEndpointFields(endpoint.getEncoding(), endpoint.getExchangePattern(),
-                                                 endpoint.getTransactionConfig().isTransacted());
+  public static MuleEvent populateFieldsFromInboundEndpoint(MuleEvent event, InboundEndpoint endpoint) {
+    Builder builder = MuleEvent.builder(event);
 
-    fillProperties(event, endpoint);
-  }
+    if (!event.getMessage().getDataType().getMediaType().getCharset().isPresent() && endpoint.getEncoding() != null) {
+      builder.message(MuleMessage.builder(event.getMessage())
+          .mediaType(DataType.builder(event.getMessage().getDataType()).charset(endpoint.getEncoding()).build().getMediaType())
+          .build());
+    }
 
-  /**
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  protected static void fillProperties(MuleEvent event, InboundEndpoint endpoint) {
     if (endpoint != null && endpoint.getProperties() != null) {
       for (Object name : endpoint.getProperties().keySet()) {
         String prop = (String) name;
@@ -40,10 +38,17 @@ public class DefaultMuleEventEndpointUtils {
         if (!ignoreProperty(prop, event.getMessage())) {
           // inbound endpoint flowVariables are in the invocation scope
           Object value = endpoint.getProperties().get(prop);
-          event.setFlowVariable(prop, value);
+          builder.addFlowVariable(prop, value);
         }
       }
     }
+
+    builder.exchangePattern(endpoint.getExchangePattern())
+        .transacted(endpoint.getTransactionConfig().isTransacted())
+        .refreshSync()
+        .build();
+
+    return builder.build();
   }
 
   /**

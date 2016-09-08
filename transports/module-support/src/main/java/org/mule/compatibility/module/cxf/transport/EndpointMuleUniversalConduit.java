@@ -6,18 +6,17 @@
  */
 package org.mule.compatibility.module.cxf.transport;
 
+import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -28,6 +27,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.cxf.CxfConfiguration;
@@ -144,7 +144,8 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
         throw new Fault(e);
       }
     } else {
-      event.setMessage(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(MediaType.XML).build());
+      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build())
+          .build();
     }
 
     if (!decoupled) {
@@ -170,32 +171,30 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
 
   protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
     try {
-      reqEvent.setMessage(MuleMessage.builder(reqEvent.getMessage())
-          .addOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString())
-          .build());
-
       if (reqEvent.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-        reqEvent = MuleEvent.builder(reqEvent).replyToHandler(new NonBlockingReplyToHandler() {
+        reqEvent = MuleEvent.builder(reqEvent).message(MuleMessage.builder(reqEvent.getMessage())
+            .addOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString())
+            .build()).replyToHandler(new NonBlockingReplyToHandler() {
 
-          @Override
-          public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
-            try {
-              Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
-              holder.value = event;
-              sendResultBackToCxf(m, event);
-            } catch (IOException e) {
-              processExceptionReplyTo(new MessagingException(event, e), replyTo);
-            }
-            return event;
-          }
+              @Override
+              public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+                try {
+                  Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
+                  holder.value = event;
+                  sendResultBackToCxf(m, event);
+                } catch (IOException e) {
+                  processExceptionReplyTo(new MessagingException(event, e), replyTo);
+                }
+                return event;
+              }
 
-          @Override
-          public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-            originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-          }
-        }).build();
+              @Override
+              public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
+                originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
+              }
+            }).build();
       }
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(reqEvent);

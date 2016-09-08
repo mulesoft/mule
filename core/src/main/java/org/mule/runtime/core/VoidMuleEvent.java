@@ -129,11 +129,6 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public void setMessage(MuleMessage message) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public <T> T getFlowVariable(String key) {
     throw new UnsupportedOperationException();
   }
@@ -144,22 +139,12 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public void setFlowVariable(String key, Object value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public Set<String> getFlowVariableNames() {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean isNotificationsEnabled() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setEnableNotifications(boolean enabled) {
     throw new UnsupportedOperationException();
   }
 

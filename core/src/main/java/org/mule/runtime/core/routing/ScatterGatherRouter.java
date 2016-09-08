@@ -10,7 +10,7 @@ package org.mule.runtime.core.routing;
 import static java.lang.String.format;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleEvent;
@@ -128,7 +128,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     List<ProcessingMuleEventWork> works = executeWork(event);
     MuleEvent response = processResponses(event, works);
 
-    if (response instanceof DefaultMuleEvent) {
+    if (!(response instanceof VoidMuleEvent)) {
       // use a copy instead of a resetAccessControl
       // to assure that all property changes
       // are flushed from the worker thread to this one

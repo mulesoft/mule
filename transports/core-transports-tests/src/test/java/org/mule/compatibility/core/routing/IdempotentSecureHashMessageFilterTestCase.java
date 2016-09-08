@@ -48,7 +48,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
 
     MuleMessage okMessage = MuleMessage.builder().payload("OK").build();
     MuleEvent event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
-    populateFieldsFromInboundEndpoint(event, endpoint1);
+    event = populateFieldsFromInboundEndpoint(event, endpoint1);
 
     // This one will process the event on the target endpoint
     MuleEvent processedEvent = ir.process(event);
@@ -57,14 +57,14 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     // This will not process, because the message is a duplicate
     okMessage = MuleMessage.builder().payload("OK").build();
     event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
-    populateFieldsFromInboundEndpoint(event, endpoint1);
+    event = populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNull(processedEvent);
 
     // This will process, because the message is not a duplicate
     okMessage = MuleMessage.builder().payload("Not OK").build();
     event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
-    populateFieldsFromInboundEndpoint(event, endpoint1);
+    event = populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNotNull(processedEvent);
   }

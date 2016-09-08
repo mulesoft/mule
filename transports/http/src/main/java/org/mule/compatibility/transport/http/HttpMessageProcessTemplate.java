@@ -222,9 +222,9 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
           HttpResponse expected = new HttpResponse();
           expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
           expected.setKeepAlive(true);
-          final MuleEvent event = MuleEvent.builder(muleEvent.getContext())
+          MuleEvent event = MuleEvent.builder(muleEvent.getContext())
               .message(MuleMessage.builder().payload(expected).build()).flow(getFlowConstruct()).build();
-          populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
+          event = populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 
           setCurrentEvent(event);
           httpServerConnection.writeResponse(expected);
@@ -387,7 +387,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   protected HttpResponse doBad(RequestLine requestLine) throws MuleException {
     MuleMessage message = getMessageReceiver().createMuleMessage(null);
     MuleEvent event = MuleEvent.builder(getMuleEvent().getContext()).message(message).flow(getFlowConstruct()).build();
-    populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
+    event = populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
     setCurrentEvent(event);
     HttpResponse response = new HttpResponse();
     response.setStatusLine(requestLine.getHttpVersion(), SC_BAD_REQUEST);

@@ -15,6 +15,7 @@ import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MessageContext;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleEvent.Builder;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -50,6 +51,7 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   private MuleSession session = new DefaultMuleSession();
   private MuleEvent originalEvent;
   private boolean modified;
+  private boolean notificationsEnabled = true;
 
   public DefaultMuleEventBuilder(MessageContext messageContext) {
     this.context = messageContext;
@@ -81,6 +83,8 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
 
     this.session = event.getSession();
     this.error = event.getError().orElse(null);
+
+    this.notificationsEnabled = event.isNotificationsEnabled();
 
     event.getFlowVariableNames().forEach(key -> this.flowVariables
         .put(key, new TypedValue<>(event.getFlowVariable(key), event.getFlowVariableDataType(key))));
@@ -194,6 +198,23 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
   }
 
   @Override
+  public Builder disableNotifications() {
+    this.notificationsEnabled = false;
+    this.modified = true;
+    return this;
+  }
+
+  @Override
+  @Deprecated
+  public MuleEvent.Builder refreshSync() {
+    this.synchronous = resolveEventSynchronicity();
+    this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
+
+    this.modified = true;
+    return this;
+  }
+
+  @Override
   public MuleEvent build() {
     if (originalEvent != null && !modified) {
       return originalEvent;
@@ -201,8 +222,8 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
       DefaultMuleEvent event =
           new DefaultMuleEvent(context, message, flowVariables, exchangePattern, flow, session, transacted,
                                synchronous == null ? (resolveEventSynchronicity() && replyToHandler == null) : synchronous,
-                               nonBlocking || isFlowConstructNonBlockingProcessingStrategy(),
-                               replyToDestination, replyToHandler, flowCallStack, correlation, error, legacyCorrelationId);
+                               nonBlocking || isFlowConstructNonBlockingProcessingStrategy(), replyToDestination, replyToHandler,
+                               flowCallStack, correlation, error, legacyCorrelationId, notificationsEnabled);
       return event;
     }
   }

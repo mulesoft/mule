@@ -11,6 +11,7 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
@@ -38,7 +39,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase {
   @Test
   public final void testRoutingExceptionNullMessageValidProcessor() throws MuleException {
     MessageProcessor processor = mock(MessageProcessor.class);
-    RoutingException rex = new RoutingException(mock(DefaultMuleEvent.class), processor);
+    RoutingException rex = new RoutingException(mock(MuleEvent.class), processor);
     assertSame(processor, rex.getRoute());
   }
 

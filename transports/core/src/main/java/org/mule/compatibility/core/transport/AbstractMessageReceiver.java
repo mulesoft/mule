@@ -22,7 +22,6 @@ import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.message.MuleCompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MessageContext;
@@ -254,7 +253,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     builder.correlation(message.getCorrelation());
     MuleEvent newEvent = builder.build();
 
-    populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
+    newEvent = populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
     setCurrentEvent(event);
     if (session.getSecurityContext() != null && session.getSecurityContext().getAuthentication() != null) {

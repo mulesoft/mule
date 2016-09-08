@@ -10,10 +10,10 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -98,10 +98,9 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
       String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
       logger.debug("Setting recipients to '" + recipients + "'");
 
-      event.setMessage(MuleMessage.builder(event.getMessage())
+      return MuleMessage.builder(event.getMessage())
           .addOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY, recipients)
-          .build());
-      return event.getMessage();
+          .build();
     }
 
   }

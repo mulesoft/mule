@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -65,8 +64,8 @@ public class MessageChunkSplitter extends AbstractSplitter {
       buffer = new byte[len];
       System.arraycopy(data, pos, buffer, 0, buffer.length);
       pos += len;
-      final DefaultMuleEvent childEvent = (DefaultMuleEvent) MuleEvent.builder(event)
-          .message(MuleMessage.builder(message).payload(buffer).build()).correlation(new Correlation(parts, count)).build();
+      final MuleEvent childEvent = MuleEvent.builder(event).message(MuleMessage.builder(message).payload(buffer).build())
+          .correlation(new Correlation(parts, count)).build();
 
       messageParts.add(childEvent);
     }

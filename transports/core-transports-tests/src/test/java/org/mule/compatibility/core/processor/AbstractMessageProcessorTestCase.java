@@ -129,8 +129,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
         .message(MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build()).flow(flow)
         .session(getTestSession(null, muleContext)).build();
-    populateFieldsFromInboundEndpoint(event, endpoint);
-    return event;
+    return populateFieldsFromInboundEndpoint(event, endpoint);
   }
 
   protected OutboundEndpoint createTestOutboundEndpoint(Transformer transformer,
@@ -206,8 +205,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
         .message(MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build()).flow(flow)
         .session(getTestSession(null, muleContext)).build();
-    populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(REQUEST_RESPONSE));
-    return event;
+    return populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(REQUEST_RESPONSE));
   }
 
   protected MuleMessage createTestResponseMuleMessage() {

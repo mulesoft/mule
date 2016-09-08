@@ -44,7 +44,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextEndpoint
     MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
     MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow2)
         .session(session).build();
-    populateFieldsFromInboundEndpoint(event, endpoint1);
+    event = populateFieldsFromInboundEndpoint(event, endpoint1);
 
     // This one will process the event on the target endpoint
     MuleEvent processedEvent = ir.process(event);
@@ -54,7 +54,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextEndpoint
     okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
     event = MuleEvent.builder(DefaultMessageContext.create(flow2, TEST_CONNECTOR)).message(okMessage).flow(flow2).session(session)
         .build();
-    populateFieldsFromInboundEndpoint(event, endpoint1);
+    event = populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);
     assertNull(processedEvent);
   }

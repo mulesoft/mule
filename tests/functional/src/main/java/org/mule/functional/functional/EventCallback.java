@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.MuleEventContext;
  *
  * @see FunctionalTestComponent
  */
-
 public interface EventCallback {
 
   public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception;

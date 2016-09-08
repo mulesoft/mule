@@ -174,26 +174,12 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   boolean isSynchronous();
 
-  // TODO MULE-9281 Make MuleEvent immutable
-  void setMessage(MuleMessage message);
-
-  // TODO MULE-9281 Make MuleEvent immutable
-  void setFlowVariable(String key, Object value);
-
   /**
    * Indicates if notifications should be fired when processing this message.
    *
    * @return true if notifications are enabled, false otherwise
    */
   boolean isNotificationsEnabled();
-
-  /**
-   * Enables the firing of notifications when processing the message.
-   * TODO MULE-9281 Make MuleEvent immutable
-   *
-   * @param enabled
-   */
-  void setEnableNotifications(boolean enabled);
 
   /**
    * Indicates if the current event allows non-blocking execution and IO.
@@ -365,12 +351,27 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder transacted(boolean transacted);
 
     /**
+     * Disables the firing of notifications when processing the produced event.
      * 
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    Builder disableNotifications();
+
+    /**
      * @param session
      * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder session(MuleSession session);
+
+    /**
+     * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
+     */
+    @Deprecated
+    Builder refreshSync();
 
     /**
      * Build a new {@link MuleEvent} based on the state configured in the {@link Builder}.

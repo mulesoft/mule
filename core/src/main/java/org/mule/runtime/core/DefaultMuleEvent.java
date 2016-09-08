@@ -21,9 +21,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -31,7 +29,6 @@ import org.mule.runtime.core.connector.DefaultReplyToHandler;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.message.Correlation;
 import org.mule.runtime.core.metadata.TypedValue;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.CopyOnWriteCaseInsensitiveMap;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
@@ -42,7 +39,6 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -89,10 +85,10 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   // Use this constructor from the builder
   public DefaultMuleEvent(MessageContext context, MuleMessage message, Map<String, TypedValue<Object>> flowVariables,
-                          MessageExchangePattern exchangePattern,
-                          FlowConstruct flowConstruct, MuleSession session, boolean transacted, boolean synchronous,
-                          boolean nonBlocking, Object replyToDestination, ReplyToHandler replyToHandler,
-                          FlowCallStack flowCallStack, Correlation correlation, Error error, String legacyCorrelationId) {
+                          MessageExchangePattern exchangePattern, FlowConstruct flowConstruct, MuleSession session,
+                          boolean transacted, boolean synchronous, boolean nonBlocking, Object replyToDestination,
+                          ReplyToHandler replyToHandler, FlowCallStack flowCallStack, Correlation correlation, Error error,
+                          String legacyCorrelationId, boolean notificationsEnabled) {
     this.context = context;
     this.correlation = NO_CORRELATION;
     this.flowConstruct = flowConstruct;
@@ -112,22 +108,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     this.correlation = correlation;
     this.error = error;
     this.legacyCorrelationId = legacyCorrelationId;
-  }
 
-  protected boolean resolveEventSynchronicity() {
-    return transacted
-        || isFlowConstructSynchronous()
-        || exchangePattern.hasResponse() && !isFlowConstructNonBlockingProcessingStrategy();
-  }
-
-  private boolean isFlowConstructSynchronous() {
-    return (flowConstruct instanceof ProcessingDescriptor) && ((ProcessingDescriptor) flowConstruct)
-        .isSynchronous();
-  }
-
-  protected boolean isFlowConstructNonBlockingProcessingStrategy() {
-    return (flowConstruct instanceof Pipeline)
-        && ((Pipeline) flowConstruct).getProcessingStrategy() instanceof NonBlockingProcessingStrategy;
+    this.notificationsEnabled = notificationsEnabled;
   }
 
   @Override
@@ -324,8 +306,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
 
   }
 
-  @Override
-  public void setMessage(MuleMessage message) {
+  private void setMessage(MuleMessage message) {
     this.message = message;
   }
 
@@ -357,18 +338,8 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
   }
 
   @Override
-  public void setFlowVariable(String key, Object value) {
-    flowVariables.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
-  }
-
-  @Override
   public boolean isNotificationsEnabled() {
     return notificationsEnabled;
-  }
-
-  @Override
-  public void setEnableNotifications(boolean enabled) {
-    notificationsEnabled = enabled;
   }
 
   @Override
@@ -381,36 +352,12 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return flowCallStack;
   }
 
-  /**
-   * @deprecated This should be used only by the compatibility module.
-   * @param encoding
-   * @param exchangePattern
-   * @param transacted
-   */
-  @Deprecated
-  public void setEndpointFields(Charset encoding, MessageExchangePattern exchangePattern, boolean transacted) {
-    if (!message.getDataType().getMediaType().getCharset().isPresent() && encoding != null) {
-      this.message = MuleMessage.builder(message)
-          .mediaType(DataType.builder(message.getDataType()).charset(encoding).build().getMediaType())
-          .build();
-    }
-    this.exchangePattern = exchangePattern;
-    this.transacted = transacted;
-
-    this.synchronous = resolveEventSynchronicity();
-    this.nonBlocking = isFlowConstructNonBlockingProcessingStrategy();
-  }
-
   @Override
   public SecurityContext getSecurityContext() {
     return session.getSecurityContext();
   }
 
   private Correlation correlation;
-
-  public void setCorrelation(Correlation correlation) {
-    this.correlation = correlation;
-  }
 
   @Override
   public Correlation getCorrelation() {
