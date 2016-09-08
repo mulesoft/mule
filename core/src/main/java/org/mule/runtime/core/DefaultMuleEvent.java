@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <code>DefaultMuleEvent</code> represents any data event occurring in the Mule environment. All data sent or received within the
  * Mule environment will be passed between components as an MuleEvent.
- * <p/>
+ * <p>
  * The MuleEvent holds some data and provides helper methods for obtaining the data in a format that the receiving Mule component
  * understands. The event can also maintain any number of flowVariables that can be set and retrieved by Mule components.
  */
@@ -122,9 +122,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return message;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Optional<Error> getError() {
     return ofNullable(error);
@@ -217,9 +214,6 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
     return session;
   }
 
-  /**
-   * Gets the recipient service of this event
-   */
   @Override
   public FlowConstruct getFlowConstruct() {
     return flowConstruct;
@@ -393,6 +387,7 @@ public class DefaultMuleEvent implements MuleEvent, DeserializationPostInitialis
    * configuration.
    *
    * @return legacy correlationId if set, otherwise {@code null}.
+   * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
   public String getLegacyCorrelationId() {

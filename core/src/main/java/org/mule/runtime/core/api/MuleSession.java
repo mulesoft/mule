@@ -23,6 +23,7 @@ import java.util.Set;
  * from an inbound property using a specific strategy.
  *
  * @see SessionHandler
+ * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
 public interface MuleSession extends Serializable {

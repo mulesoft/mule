@@ -24,15 +24,13 @@ import java.util.Map;
 
 /**
  * Legacy implementation of {@link MuleEvent}
- * <p/>
+ * <p>
  * Holds a MuleMessage payload and provides helper methods for obtaining the data in a format that the receiving Mule component
  * understands. The event can also maintain any number of properties that can be set and retrieved by Mule components.
  *
- * @see MuleEvent
+ * @see org.mule.runtime.api.message.MuleEvent
  * @see MuleMessage
- * @deprecated Use {@link MuleEvent} instead
  */
-@Deprecated
 public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   /**
@@ -69,7 +67,9 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param muleContext the Mule node.
    * @return the contents of the message as a byte array
    * @throws MuleException if the message cannot be converted into an array of bytes
+   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
+  @Deprecated
   byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException;
 
   /**
@@ -81,7 +81,9 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @return the message transformed into it's recognised or expected format.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
+   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
+  @Deprecated
   <T> T transformMessage(Class<T> outputType, MuleContext muleContext) throws TransformerException;
 
   /**
@@ -93,7 +95,9 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @return the message transformed into it's recognised or expected format.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
+   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
+  @Deprecated
   Object transformMessage(DataType outputType, MuleContext muleContext) throws TransformerException;
 
   /**
@@ -105,7 +109,9 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @return the message transformed into it's recognised or expected format as a Strings.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer
+   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
+  @Deprecated
   String transformMessageToString(MuleContext muleContext) throws TransformerException;
 
   /**
@@ -114,7 +120,9 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
+   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
+  @Deprecated
   String getMessageAsString(MuleContext muleContext) throws MuleException;
 
   /**
@@ -124,21 +132,25 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @param muleContext the Mule node.
    * @return the message contents as a string
    * @throws MuleException if the message cannot be converted into a string
+   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
    */
+  @Deprecated
   String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException;
 
   /**
    * Retrieves the service session for the current event
    * 
    * @return the service session for the event
+   * @deprecated Transport infrastructure is deprecated.
    */
+  @Deprecated
   MuleSession getSession();
 
   /**
    * Retrieves the service for the current event
    * 
    * @return the service for the event
-   * @deprecated TODO MULE-10302 remove this.
+   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
    */
   @Deprecated
   FlowConstruct getFlowConstruct();
@@ -154,24 +166,42 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
 
   /**
    * Returns the message exchange pattern for this event
+   * 
+   * @deprecated TODO MULE-10445 Mule 4 - New Threading model
    */
+  @Deprecated
   MessageExchangePattern getExchangePattern();
 
   /**
    * Returns true is this event is being processed in a transaction
+   * 
+   * @deprecated TODO MULE-10445 Mule 4 - New Threading model
    */
+  @Deprecated
   boolean isTransacted();
 
   /**
    * Return the replyToHandler (if any) that will be used to perform async reply
+   * 
+   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
    */
+  @Deprecated
   ReplyToHandler getReplyToHandler();
 
   /**
    * Return the destination (if any) that will be passed to the reply-to handler.
+   * 
+   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
    */
+  @Deprecated
   Object getReplyToDestination();
 
+  /**
+   * 
+   * @return
+   * @deprecated MULE-10445 Mule 4 - New Threading model
+   */
+  @Deprecated
   boolean isSynchronous();
 
   /**
@@ -185,13 +215,15 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * Indicates if the current event allows non-blocking execution and IO.
    *
    * @return true if non-blocking execution and IO is allowed. False otherwise.
+   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
    */
+  @Deprecated
   boolean isAllowNonBlocking();
 
   /**
    * Events have a stack of executed flows (same as a call stack), so that at any given instant an application developer can
    * determine where this event came from.
-   * <p/>
+   * <p>
    * This will only be enabled if {@link DefaultMuleConfiguration#isFlowTrace()} is {@code true}. If {@code false}, the stack will
    * always be empty.
    * 
@@ -282,6 +314,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      *
      * @param correlationId to override existing correlationId
      * @return the builder instance
+     * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder correlationId(String correlationId);
@@ -306,6 +339,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param synchronous
      * @return the builder instance
+     * @deprecated MULE-10445 Mule 4 - New Threading model
      */
     @Deprecated
     Builder synchronous(boolean synchronous);
@@ -314,6 +348,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param exchangePattern
      * @return the builder instance
+     * @deprecated MULE-10445 Mule 4 - New Threading model
      */
     @Deprecated
     Builder exchangePattern(MessageExchangePattern exchangePattern);
@@ -322,6 +357,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param replyToHandler
      * @return the builder instance
+     * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
      */
     @Deprecated
     Builder replyToHandler(ReplyToHandler replyToHandler);
@@ -330,6 +366,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param replyToDestination
      * @return the builder instance
+     * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
      */
     @Deprecated
     Builder replyToDestination(Object replyToDestination);
@@ -338,6 +375,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param flow
      * @return the builder instance
+     * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
      */
     @Deprecated
     Builder flow(FlowConstruct flow);
@@ -346,6 +384,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param transacted
      * @return the builder instance
+     * @deprecated TODO MULE-10445 Mule 4 - New Threading model
      */
     @Deprecated
     Builder transacted(boolean transacted);

@@ -33,7 +33,6 @@ import java.util.Map;
 
 public class DefaultMuleEventBuilder implements MuleEvent.Builder {
 
-
   private MessageContext context;
   private MuleMessage message;
   private Map<String, TypedValue<Object>> flowVariables = new HashMap<>();
@@ -89,7 +88,6 @@ public class DefaultMuleEventBuilder implements MuleEvent.Builder {
     event.getFlowVariableNames().forEach(key -> this.flowVariables
         .put(key, new TypedValue<>(event.getFlowVariable(key), event.getFlowVariableDataType(key))));
   }
-
 
   @Override
   public MuleEvent.Builder message(MuleMessage message) {

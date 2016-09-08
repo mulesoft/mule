@@ -101,7 +101,9 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @param key
      * @param value
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder addInboundProperty(String key, Serializable value);
 
     /**
@@ -109,7 +111,9 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @param value
      * @param mediaType
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder addInboundProperty(String key, Serializable value, MediaType mediaType);
 
     /**
@@ -117,14 +121,18 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @param value
      * @param dataType
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder addInboundProperty(String key, Serializable value, DataType dataType);
 
     /**
      * @param key
      * @param value
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder addOutboundProperty(String key, Serializable value);
 
     /**
@@ -132,7 +140,9 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @param value
      * @param mediaType
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder addOutboundProperty(String key, Serializable value, MediaType mediaType);
 
     /**
@@ -140,51 +150,57 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @param value
      * @param dataType
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder addOutboundProperty(String key, Serializable value, DataType dataType);
 
     /**
      * @param key
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder removeInboundProperty(String key);
 
     /**
      * @param key
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder removeOutboundProperty(String key);
 
     /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
      * @param key
      * @param value
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
      */
     @Deprecated
     Builder addInboundAttachment(String key, DataHandler value);
 
     /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
      * @param key
      * @param value
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
      */
     @Deprecated
     Builder addOutboundAttachment(String key, DataHandler value);
 
     /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
      * @param key
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
      */
     @Deprecated
     Builder removeInboundAttachment(String key);
 
     /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
      * @param key
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
      */
     @Deprecated
     Builder removeOutboundAttachment(String key);
@@ -192,27 +208,31 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     /**
      * @param inboundProperties
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder inboundProperties(Map<String, Serializable> inboundProperties);
 
     /**
      * @param outboundProperties
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
      */
+    @Deprecated
     Builder outboundProperties(Map<String, Serializable> outboundProperties);
 
     /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
      * @param inboundAttachments
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
      */
     @Deprecated
     Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
 
     /**
-     * @deprecated use {@link DefaultMultiPartPayload} instead.
      * @param outbundAttachments
      * @return
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
      */
     @Deprecated
     Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);

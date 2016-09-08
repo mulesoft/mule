@@ -24,7 +24,9 @@ import java.security.PrivilegedAction;
  * @see org.mule.runtime.core.transformer.simple.ByteArrayToSerializable
  * @see org.mule.runtime.core.transformer.wire.SerializationWireFormat
  * @see org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat
+ * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
  */
+@Deprecated
 public interface DeserializationPostInitialisable {
 
   public class Implementation {
@@ -33,19 +35,15 @@ public interface DeserializationPostInitialisable {
       try {
         final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", MuleContext.class);
 
-        Object o = AccessController.doPrivileged(new PrivilegedAction<Object>() {
-
-          @Override
-          public Object run() {
-            try {
-              m.setAccessible(true);
-              m.invoke(object, muleContext);
-              return null;
-            } catch (Exception e) {
-              return e;
-            }
-
+        Object o = AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+          try {
+            m.setAccessible(true);
+            m.invoke(object, muleContext);
+            return null;
+          } catch (Exception e) {
+            return e;
           }
+
         });
 
         if (o != null) {
