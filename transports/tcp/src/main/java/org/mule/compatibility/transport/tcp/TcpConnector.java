@@ -16,7 +16,7 @@ import org.mule.compatibility.transport.tcp.protocols.SafeProtocol;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.model.streaming.CallbackOutputStream;
@@ -200,7 +200,7 @@ public class TcpConnector extends AbstractConnector {
     }
   }
 
-  public OutputStream getOutputStream(final ImmutableEndpoint endpoint, MuleMessage message) throws MuleException {
+  public OutputStream getOutputStream(final ImmutableEndpoint endpoint, InternalMessage message) throws MuleException {
     final Socket socket;
     try {
       socket = getSocket(endpoint);

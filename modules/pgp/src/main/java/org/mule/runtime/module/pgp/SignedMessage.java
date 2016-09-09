@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
 
-public class SignedMessage implements Message {
+public class SignedMessage implements PgpMessage {
 
   private LazyTransformedInputStream encryptedMessage;
 
@@ -30,7 +30,7 @@ public class SignedMessage implements Message {
     return false;
   }
 
-  public Message getContents() throws IOException {
+  public PgpMessage getContents() throws IOException {
     String contents = IOUtils.toString(this.encryptedMessage);
     return new LiteralMessage(contents.getBytes());
   }

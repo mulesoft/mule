@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -48,16 +48,17 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase {
     byte[] msg = loadEncryptedMessage();
     Map<String, Serializable> props = createMessageProperties();
 
-    flowRunner("echo").withPayload(getTestEvent(MuleMessage.builder().payload(new String(msg)).inboundProperties(props).build()))
+    flowRunner("echo")
+        .withPayload(getTestEvent(InternalMessage.builder().payload(new String(msg)).inboundProperties(props).build()))
         .asynchronously().run();
 
-    MuleMessage message = client.request("test://output", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = client.request("test://output", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("This is a test message.\r\nThis is another line.\r\n", getPayloadAsString(message));
   }
 
   @Test
   public void testAuthenticationNotAuthorised() throws Exception {
-    MuleEvent replyEvent =
+    Event replyEvent =
         flowRunner("echo").withPayload("An unsigned message").withInboundProperties(createMessageProperties()).run();
     assertThat(replyEvent.getError().isPresent(), is(true));
     assertThat(replyEvent.getError().get().getDetailedDescription(), is(MESSAGE_EXCEPTION));

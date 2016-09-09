@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class InOutOutInTestCase extends FunctionalTestCase {
 
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "bar");
-    MuleMessage result = client.send("inboundEndpoint", "some data", props).getRight();
+    InternalMessage result = client.send("inboundEndpoint", "some data", props).getRight();
     assertNotNull(result);
     assertEquals("bar header received", result.getPayload());
   }

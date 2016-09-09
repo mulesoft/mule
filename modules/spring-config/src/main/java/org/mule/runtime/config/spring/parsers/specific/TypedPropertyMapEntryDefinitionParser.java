@@ -13,7 +13,7 @@ import org.mule.runtime.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.runtime.config.spring.parsers.assembly.DefaultBeanAssembler;
 import org.mule.runtime.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 import org.mule.runtime.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -75,7 +75,7 @@ public class TypedPropertyMapEntryDefinitionParser extends ChildMapEntryDefiniti
     private AbstractBeanDefinition getTypedValue(PropertyValues sourceProperties) {
       AbstractBeanDefinition dataType = buildDataTypeDefinition(Object.class.getName(), sourceProperties);
 
-      BeanDefinitionBuilder typedValueBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(TypedValue.class);
+      BeanDefinitionBuilder typedValueBeanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DefaultTypedValue.class);
       if (sourceProperties.contains(VALUE_REF)) {
         String valueRef = (String) sourceProperties.getPropertyValue(VALUE_REF).getValue();
 

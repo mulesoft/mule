@@ -13,7 +13,7 @@ import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -74,13 +74,13 @@ public class NonBlockingNotSupportedFunctionalTestCase extends AbstractIntegrati
     int correlationGroupSize = 3;
 
     flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
-        .withCorrelation(new Correlation(correlationGroupSize, 1)).nonBlocking().runNoVerify();
+        .withCorrelation(new GroupCorrelation(correlationGroupSize, 1)).nonBlocking().runNoVerify();
 
     flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
-        .withCorrelation(new Correlation(correlationGroupSize, 2)).nonBlocking().runNoVerify();
+        .withCorrelation(new GroupCorrelation(correlationGroupSize, 2)).nonBlocking().runNoVerify();
 
     flowRunner("aggregator").withPayload(TEST_MESSAGE).withSourceCorrelationId(correlationId)
-        .withCorrelation(new Correlation(correlationGroupSize, 3)).nonBlocking().run();
+        .withCorrelation(new GroupCorrelation(correlationGroupSize, 3)).nonBlocking().run();
   }
 
   @Test

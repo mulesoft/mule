@@ -14,7 +14,7 @@ import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.Locale;
@@ -36,7 +36,7 @@ abstract class ValidationSupport {
   @Inject
   protected MuleContext muleContext;
 
-  protected void validateWith(Validator validator, ValidationContext validationContext, MuleEvent event) throws Exception {
+  protected void validateWith(Validator validator, ValidationContext validationContext, Event event) throws Exception {
     ValidationResult result = validator.validate(event);
     if (result.isError()) {
       result = evaluateCustomMessage(result, validationContext);
@@ -60,7 +60,7 @@ abstract class ValidationSupport {
     return result;
   }
 
-  protected ValidationContext createContext(ValidationOptions options, MuleEvent muleEvent, ValidationExtension config) {
+  protected ValidationContext createContext(ValidationOptions options, Event muleEvent, ValidationExtension config) {
     return new ValidationContext(options, muleEvent, config);
   }
 
@@ -69,7 +69,7 @@ abstract class ValidationSupport {
     return new Locale(locale);
   }
 
-  protected void logSuccessfulValidation(Validator validator, MuleEvent event) {
+  protected void logSuccessfulValidation(Validator validator, Event event) {
     if (logger.isDebugEnabled()) {
       logger.debug("Successfully executed validator {}", ToStringBuilder.reflectionToString(validator));
     }

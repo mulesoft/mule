@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.request.client;
 
 import org.mule.extension.http.api.request.client.UriParameters;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpConstants.Protocols;
 
 import java.util.function.Function;
@@ -20,11 +20,11 @@ import java.util.function.Function;
 public class DefaultUriParameters implements UriParameters {
 
   private final Protocols scheme;
-  private final Function<MuleEvent, String> host;
-  private final Function<MuleEvent, Integer> port;
+  private final Function<Event, String> host;
+  private final Function<Event, Integer> port;
 
 
-  public DefaultUriParameters(Protocols protocol, Function<MuleEvent, String> host, Function<MuleEvent, Integer> port) {
+  public DefaultUriParameters(Protocols protocol, Function<Event, String> host, Function<Event, Integer> port) {
     this.scheme = protocol;
     this.host = host;
     this.port = port;
@@ -36,12 +36,12 @@ public class DefaultUriParameters implements UriParameters {
   }
 
   @Override
-  public Function<MuleEvent, String> getHost() {
+  public Function<Event, String> getHost() {
     return host;
   }
 
   @Override
-  public Function<MuleEvent, Integer> getPort() {
+  public Function<Event, Integer> getPort() {
     return port;
   }
 }

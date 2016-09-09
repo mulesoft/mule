@@ -17,8 +17,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 
 import java.util.Optional;
@@ -31,9 +31,9 @@ import org.mockito.Mockito;
 
 public class PayloadTestCase extends AbstractELTestCase {
 
-  private MuleEvent event;
-  private MuleMessage message;
-  private MuleEvent.Builder eventBuilder;
+  private Event event;
+  private InternalMessage message;
+  private Event.Builder eventBuilder;
 
   public PayloadTestCase(String mvelOptimizer) {
     super(mvelOptimizer);
@@ -41,11 +41,11 @@ public class PayloadTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() {
-    event = mock(MuleEvent.class);
-    eventBuilder = mock(MuleEvent.Builder.class);
+    event = mock(Event.class);
+    eventBuilder = mock(Event.Builder.class);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    message = mock(MuleMessage.class);
+    message = mock(InternalMessage.class);
     when(event.getMessage()).thenAnswer(invocation -> message);
   }
 
@@ -58,10 +58,10 @@ public class PayloadTestCase extends AbstractELTestCase {
 
   @Test
   public void assignPayload() throws Exception {
-    message = MuleMessage.builder().payload("").build();
+    message = InternalMessage.builder().payload("").build();
     when(event.getMessage()).thenReturn(message);
     evaluate("payload = 'foo'", event, eventBuilder);
-    ArgumentCaptor<MuleMessage> argument = ArgumentCaptor.forClass(MuleMessage.class);
+    ArgumentCaptor<InternalMessage> argument = ArgumentCaptor.forClass(InternalMessage.class);
     verify(eventBuilder).message(argument.capture());
     assertThat(argument.getValue().getPayload(), equalTo("foo"));
   }

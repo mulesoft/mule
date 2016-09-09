@@ -16,11 +16,11 @@ import static org.mule.functional.functional.InvocationCountMessageProcessor.get
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
@@ -88,7 +88,7 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testFullConfigurationMP() throws Exception {
     final String payload = RandomStringUtils.randomAlphanumeric(20);
-    final MuleMessage response = flowRunner("full-config-with-mp").withPayload(payload).run().getMessage();
+    final InternalMessage response = flowRunner("full-config-with-mp").withPayload(payload).run().getMessage();
     assertThat(getPayloadAsString(response), is("ACK"));
 
     final List<Object> receivedPayloads = ponderUntilMessageCountReceivedByTargetMessageProcessor(3);
@@ -213,9 +213,9 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
     }
   }
 
-  static class CustomMP implements MessageProcessor {
+  static class CustomMP implements Processor {
 
-    private static List<MuleEvent> processedEvents = new ArrayList<>();
+    private static List<Event> processedEvents = new ArrayList<>();
 
     public static void clearCount() {
       processedEvents.clear();
@@ -225,24 +225,24 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
       return processedEvents.size();
     }
 
-    public static List<MuleEvent> getProcessedEvents() {
+    public static List<Event> getProcessedEvents() {
       return processedEvents;
     }
 
     @Override
-    public MuleEvent process(final MuleEvent event) throws MuleException {
+    public Event process(final Event event) throws MuleException {
       processedEvents.add(event);
       return null;
     }
   }
 
-  static class WaitMeasure implements MessageProcessor {
+  static class WaitMeasure implements Processor {
 
     public static long totalWait;
     private long firstAttemptTime = 0;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       if (firstAttemptTime == 0) {
         firstAttemptTime = System.currentTimeMillis();
       } else {

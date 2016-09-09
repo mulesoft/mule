@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 
 
 /**
- * Creates query loggers with different implementations depending on whether a given {@link Log}
- * has the debug level enabled or not
+ * Creates query loggers with different implementations depending on whether a given {@link Log} has the debug level enabled or
+ * not
  */
 public class DefaultQueryLoggerFactory implements QueryLoggerFactory {
 

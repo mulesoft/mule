@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 import javax.jms.JMSException;
@@ -35,11 +35,11 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler {
     this.connector = connector;
   }
 
-  protected MuleMessage createMuleMessage(Message message, MuleContext muleContext) {
+  protected InternalMessage createMuleMessage(Message message, MuleContext muleContext) {
     try {
       return connector.createMuleMessageFactory().create(message, getDefaultEncoding(muleContext));
     } catch (Exception e) {
-      return MuleMessage.builder().payload(message).build();
+      return InternalMessage.builder().payload(message).build();
     }
   }
 }

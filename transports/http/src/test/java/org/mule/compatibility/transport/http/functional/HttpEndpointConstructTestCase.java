@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -29,7 +29,8 @@ public class HttpEndpointConstructTestCase extends FunctionalTestCase {
   @Test
   public void testHttpEndpointConstruct() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null).getRight();
+    InternalMessage response =
+        client.send("http://localhost:" + dynamicPort1.getNumber() + "/testA", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE, getPayloadAsString(response));
   }
 }

@@ -6,23 +6,23 @@
  */
 package org.mule.test.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.MissingResourceException;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-public class MessagesTestCase extends AbstractMuleTestCase {
+public class I18nMessagesTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testMessageLoading() throws Exception {
-    Message message = CoreMessages.authFailedForUser("Fred");
+    I18nMessage message = CoreMessages.authFailedForUser("Fred");
     assertEquals("Authentication failed for principal Fred", message.getMessage());
     assertEquals(135, message.getCode());
   }
@@ -41,7 +41,7 @@ public class MessagesTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testGoodBundle() {
-    Message message = TestMessages.testMessage("one", "two", "three");
+    I18nMessage message = TestI18nMessages.testMessage("one", "two", "three");
     assertEquals("Testing, Testing, one, two, three", message.getMessage());
     assertEquals(1, message.getCode());
   }

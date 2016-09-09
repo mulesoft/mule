@@ -11,13 +11,13 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
- * The {@code foreach} {@link MessageProcessor} allows iterating over a collection payload, or any collection obtained by an
+ * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an
  * expression, generating a message for each element.
  * <p>
  * The number of the message being processed is stored in {@code #[variable:counter]} and the root message is store in
@@ -50,17 +50,17 @@ import org.w3c.dom.Document;
  * <p>
  * Defining a groupSize greater than one, allows iterating over collections of elements of the specified size.
  * <p>
- * The {@link MuleEvent} sent to the next message processor is the same that arrived to foreach.
+ * The {@link Event} sent to the next message processor is the same that arrived to foreach.
  */
-public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, MessageProcessor {
+public class Foreach extends AbstractMessageProcessorOwner implements Initialisable, Processor {
 
   public static final String ROOT_MESSAGE_PROPERTY = "rootMessage";
   public static final String COUNTER_PROPERTY = "counter";
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private List<MessageProcessor> messageProcessors;
-  private MessageProcessor ownedMessageProcessor;
+  private List<Processor> messageProcessors;
+  private Processor ownedMessageProcessor;
   private AbstractMessageSequenceSplitter splitter;
   private MessageFilter filter;
   private String collectionExpression;
@@ -71,48 +71,48 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private boolean xpathCollection;
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     String parentMessageProp = rootMessageVariableName != null ? rootMessageVariableName : ROOT_MESSAGE_PROPERTY;
     Object previousCounterVar = null;
     Object previousRootMessageVar = null;
-    if (event.getFlowVariableNames().contains(counterVariableName)) {
-      previousCounterVar = event.getFlowVariable(counterVariableName);
+    if (event.getVariableNames().contains(counterVariableName)) {
+      previousCounterVar = event.getVariable(counterVariableName);
     }
-    if (event.getFlowVariableNames().contains(parentMessageProp)) {
-      previousRootMessageVar = event.getFlowVariable(parentMessageProp);
+    if (event.getVariableNames().contains(parentMessageProp)) {
+      previousRootMessageVar = event.getVariable(parentMessageProp);
     }
-    MuleMessage message = event.getMessage();
-    final Builder requestBuilder = MuleEvent.builder(event);
+    InternalMessage message = event.getMessage();
+    final Builder requestBuilder = Event.builder(event);
     boolean transformed = false;
     if (xpathCollection) {
-      MuleMessage transformedMessage = transformPayloadIfNeeded(message);
+      InternalMessage transformedMessage = transformPayloadIfNeeded(message);
       if (transformedMessage != message) {
         transformed = true;
         message = transformedMessage;
         requestBuilder.message(transformedMessage);
       }
     }
-    requestBuilder.addFlowVariable(parentMessageProp, message);
-    final Builder responseBuilder = MuleEvent.builder(doProcess(requestBuilder.build()));
+    requestBuilder.addVariable(parentMessageProp, message);
+    final Builder responseBuilder = Event.builder(doProcess(requestBuilder.build()));
     if (transformed) {
       responseBuilder.message(transformBack(message));
     } else {
       responseBuilder.message(message);
     }
     if (previousCounterVar != null) {
-      responseBuilder.addFlowVariable(counterVariableName, previousCounterVar);
+      responseBuilder.addVariable(counterVariableName, previousCounterVar);
     } else {
-      responseBuilder.removeFlowVariable(counterVariableName);
+      responseBuilder.removeVariable(counterVariableName);
     }
     if (previousRootMessageVar != null) {
-      responseBuilder.addFlowVariable(parentMessageProp, previousRootMessageVar);
+      responseBuilder.addVariable(parentMessageProp, previousRootMessageVar);
     } else {
-      responseBuilder.removeFlowVariable(parentMessageProp);
+      responseBuilder.removeVariable(parentMessageProp);
     }
     return responseBuilder.build();
   }
 
-  protected MuleEvent doProcess(MuleEvent event) throws MuleException, MessagingException {
+  protected Event doProcess(Event event) throws MuleException, MessagingException {
     try {
       return ownedMessageProcessor.process(event);
     } catch (MessagingException e) {
@@ -126,7 +126,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
   }
 
-  private MuleMessage transformPayloadIfNeeded(MuleMessage message) throws TransformerException {
+  private InternalMessage transformPayloadIfNeeded(InternalMessage message) throws TransformerException {
     Object payload = message.getPayload();
     if (payload instanceof Document || payload.getClass().getName().startsWith("org.dom4j.")) {
       return message;
@@ -135,12 +135,12 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
   }
 
-  private MuleMessage transformBack(MuleMessage message) throws TransformerException {
+  private InternalMessage transformBack(InternalMessage message) throws TransformerException {
     return muleContext.getTransformationService().transform(message, DataType.STRING);
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
+  protected List<Processor> getOwnedMessageProcessors() {
     return singletonList(ownedMessageProcessor);
   }
 
@@ -149,7 +149,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     NotificationUtils.addMessageProcessorPathElements(messageProcessors, pathElement);
   }
 
-  public void setMessageProcessors(List<MessageProcessor> messageProcessors) throws MuleException {
+  public void setMessageProcessors(List<Processor> messageProcessors) throws MuleException {
     this.messageProcessors = messageProcessors;
   }
 
@@ -160,16 +160,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
       splitter = new ExpressionSplitter(expressionConfig) {
 
         @Override
-        protected void propagateFlowVars(MuleEvent previousResult, final Builder builder) {
+        protected void propagateFlowVars(Event previousResult, final Builder builder) {
           for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
-            builder.addFlowVariable(flowVarName, previousResult.getFlowVariable(flowVarName),
-                                    previousResult.getFlowVariableDataType(flowVarName));
+            builder.addVariable(flowVarName, previousResult.getVariable(flowVarName),
+                                previousResult.getVariableDataType(flowVarName));
           }
         }
 
         @Override
-        protected Set<String> resolvePropagatedFlowVars(MuleEvent previousResult) {
-          return previousResult != null ? previousResult.getFlowVariableNames() : emptySet();
+        protected Set<String> resolvePropagatedFlowVars(Event previousResult) {
+          return previousResult != null ? previousResult.getVariableNames() : emptySet();
         }
 
       };
@@ -185,7 +185,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
     try {
 
-      List<MessageProcessor> chainProcessors = new ArrayList<>();
+      List<Processor> chainProcessors = new ArrayList<>();
       chainProcessors.add(splitter);
       chainProcessors.add(DefaultMessageProcessorChain.from(muleContext, messageProcessors));
       ownedMessageProcessor = new DefaultMessageProcessorChainBuilder(muleContext).chain(chainProcessors).build();
@@ -218,14 +218,14 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private static class CollectionMapSplitter extends CollectionSplitter {
 
     @Override
-    protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event) {
+    protected MessageSequence<?> splitMessageIntoSequence(Event event) {
       Object payload = event.getMessage().getPayload();
       if (payload instanceof Map<?, ?>) {
-        List<MuleEvent> list = new LinkedList<>();
+        List<Event> list = new LinkedList<>();
         Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();
         for (Entry<?, ?> entry : set) {
           // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
-          list.add(MuleEvent.builder(event).message(MuleMessage.builder().payload(entry.getValue()).build()).build());
+          list.add(Event.builder(event).message(InternalMessage.builder().payload(entry.getValue()).build()).build());
         }
         return new CollectionMessageSequence(list);
       }
@@ -233,16 +233,16 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     }
 
     @Override
-    protected void propagateFlowVars(MuleEvent previousResult, final Builder builder) {
+    protected void propagateFlowVars(Event previousResult, final Builder builder) {
       for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
-        builder.addFlowVariable(flowVarName, previousResult.getFlowVariable(flowVarName),
-                                previousResult.getFlowVariableDataType(flowVarName));
+        builder.addVariable(flowVarName, previousResult.getVariable(flowVarName),
+                            previousResult.getVariableDataType(flowVarName));
       }
     }
 
     @Override
-    protected Set<String> resolvePropagatedFlowVars(MuleEvent previousResult) {
-      return previousResult != null ? previousResult.getFlowVariableNames() : emptySet();
+    protected Set<String> resolvePropagatedFlowVars(Event previousResult) {
+      return previousResult != null ? previousResult.getVariableNames() : emptySet();
     }
 
   }

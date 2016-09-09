@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.routing.MessageFilter;
 import java.util.List;
 
 /**
- * This {@link ProcessorExecutor} implementation executes each {@link MessageProcessor} in succession in the same thread until or
+ * This {@link ProcessorExecutor} implementation executes each {@link Processor} in succession in the same thread until or
  * processors have been invoked or one of the following is returned by a processor:
  * <li>{@link org.mule.runtime.core.VoidMuleEvent}</li>
  * <li>{@code null}</li>
@@ -31,12 +31,12 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
 
   protected final MessageProcessorExecutionTemplate messageProcessorExecutionTemplate;
   protected final boolean copyOnVoidEvent;
-  protected final List<MessageProcessor> processors;
+  protected final List<Processor> processors;
 
-  protected MuleEvent event;
+  protected Event event;
   private int index;
 
-  public BlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
+  public BlockingProcessorExecutor(Event event, List<Processor> processors,
                                    MessageProcessorExecutionTemplate messageProcessorExecutionTemplate, boolean copyOnVoidEvent) {
     this.event = event;
     this.processors = processors;
@@ -45,8 +45,8 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
   }
 
   @Override
-  public final MuleEvent execute() throws MessagingException {
-    MuleEvent result = event;
+  public final Event execute() throws MessagingException {
+    Event result = event;
     while (hasNext() && isEventValid(event)) {
       result = executeNext();
       if (!isEventValid(result)) {
@@ -57,7 +57,7 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
     return result;
   }
 
-  private boolean isEventValid(MuleEvent result) {
+  private boolean isEventValid(Event result) {
     return result != null && !(result instanceof VoidMuleEvent);
   }
 
@@ -65,16 +65,16 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
     return index < processors.size();
   }
 
-  protected MuleEvent executeNext() throws MessagingException {
-    MessageProcessor processor = nextProcessor();
+  protected Event executeNext() throws MessagingException {
+    Processor processor = nextProcessor();
 
     preProcess(processor);
 
     if (copyOnVoidEvent
         && !(processor instanceof Transformer || processor instanceof MessageFilter || processor instanceof Component
             || (processor instanceof LegacyOutboundEndpoint && !((LegacyOutboundEndpoint) processor).mayReturnVoidEvent()))) {
-      MuleEvent copy = MuleEvent.builder(event).build();
-      MuleEvent result = messageProcessorExecutionTemplate.execute(processor, event);
+      Event copy = Event.builder(event).build();
+      Event result = messageProcessorExecutionTemplate.execute(processor, event);
 
       if (isUseEventCopy(result)) {
         setCurrentEvent(copy);
@@ -86,13 +86,13 @@ public class BlockingProcessorExecutor implements ProcessorExecutor {
     }
   }
 
-  protected boolean isUseEventCopy(MuleEvent result) {
+  protected boolean isUseEventCopy(Event result) {
     return VoidMuleEvent.getInstance().equals(result);
   }
 
-  protected void preProcess(MessageProcessor processor) {}
+  protected void preProcess(Processor processor) {}
 
-  protected MessageProcessor nextProcessor() {
+  protected Processor nextProcessor() {
     return processors.get(index++);
   }
 

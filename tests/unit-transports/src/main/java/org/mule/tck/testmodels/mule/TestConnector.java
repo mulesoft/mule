@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
 /**
@@ -198,7 +198,7 @@ public class TestConnector extends AbstractConnector {
     return disposeCount;
   }
 
-  public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
+  public Processor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
     return ((AbstractEndpoint) endpoint).getMessageProcessorChain(null);
   }
 

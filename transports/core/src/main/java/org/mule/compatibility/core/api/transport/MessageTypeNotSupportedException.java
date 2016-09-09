@@ -8,11 +8,11 @@ package org.mule.compatibility.core.api.transport;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 /**
- * <code>MessageTypeNotSupportedException</code> is thrown when a {@link MuleMessage} instance is to be created with an payload
- * type that is not of supported type by that {@link MuleMessageFactory}.
+ * <code>MessageTypeNotSupportedException</code> is thrown when a {@link Message} instance is to be created with an payload type
+ * that is not of supported type by that {@link MuleMessageFactory}.
  * 
  * @deprecated Transport infrastructure is deprecated.
  */

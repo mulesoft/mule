@@ -20,14 +20,14 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.util.UUID;
@@ -58,11 +58,11 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   private InboundEndpoint mockInboundEndpoint;
   private FileMuleMessageFactory mockMessageFactory;
   @Mock
-  private MuleMessage mockMessage;
+  private InternalMessage mockMessage;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MessageProcessor mockMessageProcessor;
+  private Processor mockMessageProcessor;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleEvent mockMuleEvent;
+  private Event mockMuleEvent;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MessagingExceptionHandler mockMessagingExceptionHandler;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -80,7 +80,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   *  Message processed successfully
+   * Message processed successfully
    */
   @Test
   public void testProcessFileAndDeleteIt() throws Exception {
@@ -94,7 +94,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   *  Message processing fails but exception is handled
+   * Message processing fails but exception is handled
    */
   @Test
   public void testProcessFileThatFailsThrowHandleExceptionThenDeleteIt() throws Exception {
@@ -109,7 +109,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   *  Message processing fails and exception is not handled
+   * Message processing fails and exception is not handled
    */
   @Test
   public void testProcessFileThatFailsThrowsUnhandledExceptionThenDoNotDeleteIt() throws Exception {
@@ -124,8 +124,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   *  Streaming file
-   *  Message processed successfully
+   * Streaming file Message processed successfully
    */
   @Test
   public void testProcessStreamingFileTheDoNotDeleteIt() throws Exception {
@@ -136,14 +135,13 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     FileMessageReceiver fileMessageReceiver = createFileMessageReceiver();
     File file = createMockFile("text.csv");
     fileMessageReceiver.processFile(file);
-    //Using streaming, files can't be removed since the stream can still
-    //in used, for instance, if we sent the payload to a vm queue
+    // Using streaming, files can't be removed since the stream can still
+    // in used, for instance, if we sent the payload to a vm queue
     assertThat(file.exists(), is(true));
   }
 
   /**
-   *  Streaming file
-   *  Message processing fails but exception is handled
+   * Streaming file Message processing fails but exception is handled
    */
   @Test
   public void testProcessStreamingFileThatFailsThrowHandleExceptionThenDoNotDeleteIt() throws Exception {
@@ -159,8 +157,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   /**
-   *  Streaming file
-   *  Message processing fails and exception is not handled
+   * Streaming file Message processing fails and exception is not handled
    */
   @Test
   public void testProcessStreamingFileThatFailsThrowsUnhandledExceptionThenDoNotDeleteIt() throws Exception {
@@ -176,7 +173,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
   }
 
   private void configureListenerToThrow(MessagingException mockMessagingException) throws Exception {
-    when(mockMessageProcessor.process(any(MuleEvent.class))).thenThrow(mockMessagingException);
+    when(mockMessageProcessor.process(any(Event.class))).thenThrow(mockMessagingException);
   }
 
   private void configureStreaming() {
@@ -215,10 +212,10 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockFlowConstruct.getExceptionListener()).thenReturn(mockMessagingExceptionHandler);
     when(mockHandledMessagingException.causedRollback()).thenReturn(false);
     when(mockUnhandledMessagingException.causedRollback()).thenReturn(true);
-    MuleEvent mockMessageProcessorResponseEvent = mock(MuleEvent.class);
+    Event mockMessageProcessorResponseEvent = mock(Event.class);
     when(mockMessageProcessorResponseEvent.getError()).thenReturn(empty());
     when(mockMessageProcessor.process(any())).thenReturn(mockMessageProcessorResponseEvent);
-    when(mockMessagingExceptionHandler.handleException(any(MessagingException.class), any(MuleEvent.class)))
+    when(mockMessagingExceptionHandler.handleException(any(MessagingException.class), any(Event.class)))
         .thenAnswer(invocationOnMock -> {
           if (invocationOnMock.getArguments()[0] == mockHandledMessagingException) {
             return this.mockMuleEvent;
@@ -229,7 +226,7 @@ public class FileMessageReceiverMessageProcessingTestCase extends AbstractMuleTe
     when(mockInboundEndpoint.getMuleContext().getRegistry().get(OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER))
         .thenReturn(mockMessageManager);
     when(mockInboundEndpoint.getMuleContext().getRegistry().get(OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
-    MuleEvent mockMuleEvent = mock(MuleEvent.class);
+    Event mockMuleEvent = mock(Event.class);
     when(mockMuleEvent.getError()).thenReturn(empty());
     when(mockMessageProcessor.process(any())).thenReturn(mockMuleEvent);
   }

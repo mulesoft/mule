@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.lifecycle.EmptyLifecycleCallback;
@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li>Is constructed with unique name and {@link MuleContext}.
  * <li>Uses a {@link MessageSource} as the source of messages.
- * <li>Uses a chain of {@link MessageProcessor}s to process messages.
- * <li>Has lifecycle and propagates this lifecycle to both {@link MessageSource} and {@link MessageProcessor}s in the correct
+ * <li>Uses a chain of {@link Processor}s to process messages.
+ * <li>Has lifecycle and propagates this lifecycle to both {@link MessageSource} and {@link Processor}s in the correct
  * order depending on the lifecycle phase.
  * <li>Allows an {@link ExceptionListener} to be set.
  * </ul>

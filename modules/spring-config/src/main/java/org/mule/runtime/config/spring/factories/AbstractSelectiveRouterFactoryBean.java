@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.factories;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.AbstractSelectiveRouter;
 import org.mule.runtime.core.routing.MessageProcessorFilterPair;
 
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.FactoryBean;
 public abstract class AbstractSelectiveRouterFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean, MuleContextAware {
 
-  private MessageProcessor defaultProcessor;
+  private Processor defaultProcessor;
   private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
   private MuleContext muleContext;
 

@@ -33,7 +33,7 @@ import org.mule.extension.db.internal.parser.SimpleQueryTemplateParser;
 import org.mule.extension.db.internal.resolver.param.GenericParamTypeResolverFactory;
 import org.mule.extension.db.internal.resolver.param.ParamTypeResolverFactory;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -88,7 +88,7 @@ abstract class AbstractQueryResolver<T extends StatementDefinition> implements Q
       return queryTemplates.get(statementDefinition.getSql(),
                                 () -> createQueryTemplate(statementDefinition, connector, connection));
     } catch (ExecutionException e) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage("Could not resolve query: " + statementDefinition.getSql(), e));
     }
   }

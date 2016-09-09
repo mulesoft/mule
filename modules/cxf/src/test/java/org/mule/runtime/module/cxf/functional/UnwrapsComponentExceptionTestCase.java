@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.cxf.example.HelloWorld;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -37,10 +37,11 @@ public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase {
 
   @Test
   public void testReceivesComponentExceptionMessage() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
 
-    MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
-                                                        newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
+                                                            newOptions().method(POST.name()).disableStatusCodeValidation()
+                                                                .build())
         .getRight();
 
     assertTrue("Component exception was not managed", getPayloadAsString(received).contains(ERROR_MESSAGE));

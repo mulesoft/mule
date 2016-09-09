@@ -9,8 +9,8 @@ package org.mule.runtime.module.json.filters;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
@@ -39,7 +39,7 @@ public class IsJsonFilter implements Filter, MuleContextAware {
   }
 
   @Override
-  public boolean accept(MuleMessage obj, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage obj, Event.Builder builder) {
     if (MediaType.APPLICATION_JSON.matches(obj.getDataType().getMediaType())) {
       return true;
     }

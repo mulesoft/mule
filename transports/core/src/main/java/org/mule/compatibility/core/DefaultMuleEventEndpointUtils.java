@@ -11,9 +11,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPER
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalMessage;
 
 public class DefaultMuleEventEndpointUtils {
 
@@ -21,11 +21,11 @@ public class DefaultMuleEventEndpointUtils {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  public static MuleEvent populateFieldsFromInboundEndpoint(MuleEvent event, InboundEndpoint endpoint) {
-    Builder builder = MuleEvent.builder(event);
+  public static Event populateFieldsFromInboundEndpoint(Event event, InboundEndpoint endpoint) {
+    Builder builder = Event.builder(event);
 
     if (!event.getMessage().getDataType().getMediaType().getCharset().isPresent() && endpoint.getEncoding() != null) {
-      builder.message(MuleMessage.builder(event.getMessage())
+      builder.message(InternalMessage.builder(event.getMessage())
           .mediaType(DataType.builder(event.getMessage().getDataType()).charset(endpoint.getEncoding()).build().getMediaType())
           .build());
     }
@@ -38,7 +38,7 @@ public class DefaultMuleEventEndpointUtils {
         if (!ignoreProperty(prop, event.getMessage())) {
           // inbound endpoint flowVariables are in the invocation scope
           Object value = endpoint.getProperties().get(prop);
-          builder.addFlowVariable(prop, value);
+          builder.addVariable(prop, value);
         }
       }
     }
@@ -63,7 +63,7 @@ public class DefaultMuleEventEndpointUtils {
    * @param message
    * @return true if the property should be ignored, false otherwise
    */
-  private static boolean ignoreProperty(String key, MuleMessage message) {
+  private static boolean ignoreProperty(String key, InternalMessage message) {
     if (key == null || key.startsWith(ENDPOINT_PROPERTY_PREFIX)) {
       return true;
     }

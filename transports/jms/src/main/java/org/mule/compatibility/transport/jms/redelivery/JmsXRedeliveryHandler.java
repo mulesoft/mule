@@ -10,10 +10,10 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.JmsConstants;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -56,9 +56,9 @@ public class JmsXRedeliveryHandler extends AbstractRedeliveryHandler {
     try {
       deliveryCount = message.getIntProperty(JmsConstants.JMS_X_DELIVERY_COUNT);
     } catch (NumberFormatException nex) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage(String.format(
-                                                                                      "Invalid use of %s. Message is flagged with JMSRedelivered, but JMSXDeliveryCount is not set",
-                                                                                      getClass().getName())));
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(String.format(
+                                                                                          "Invalid use of %s. Message is flagged with JMSRedelivered, but JMSXDeliveryCount is not set",
+                                                                                          getClass().getName())));
     }
 
     int redeliveryCount = deliveryCount - 1;
@@ -69,11 +69,11 @@ public class JmsXRedeliveryHandler extends AbstractRedeliveryHandler {
       }
 
       if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST) {
-        MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
+        InternalMessage msg = createMuleMessage(message, endpoint.getMuleContext());
         throw new MessageRedeliveredException(messageId, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
       }
     } else if (redeliveryCount > connectorRedelivery) {
-      MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
+      InternalMessage msg = createMuleMessage(message, endpoint.getMuleContext());
       throw new MessageRedeliveredException(messageId, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
     } else {
       if (logger.isDebugEnabled()) {

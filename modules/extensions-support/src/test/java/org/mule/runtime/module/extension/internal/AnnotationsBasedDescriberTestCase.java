@@ -42,7 +42,7 @@ import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.MuleVersion;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -370,7 +370,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertParameter(parameters, "weapon", "", toMetadataType(Weapon.class), false, SUPPORTED, null);
     assertParameter(parameters, "weaponTypeFunction", "",
                     TYPE_BUILDER.objectType().id(Function.class.getName())
-                        .with(new ClassInformationAnnotation(Function.class, asList(MuleEvent.class, WeaponType.class)))
+                        .with(new ClassInformationAnnotation(Function.class, asList(Event.class, WeaponType.class)))
                         .with(new TypeAliasAnnotation(Function.class.getSimpleName())).build(),
                     false, SUPPORTED, null);
     assertParameter(parameters, "wildCardWeapons", "", arrayOf(List.class, objectTypeBuilder(Weapon.class)), false, SUPPORTED,

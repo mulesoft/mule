@@ -7,7 +7,7 @@
 package org.mule.extension.file.internal;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.EventedFileAttributes;
 import org.mule.extension.file.api.FileEventType;

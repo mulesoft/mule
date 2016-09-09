@@ -11,9 +11,9 @@ import static java.util.Collections.singletonList;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
@@ -129,13 +129,13 @@ public class SimpleCallableJavaComponent extends AbstractJavaComponent {
   }
 
   @Override
-  protected Object invokeComponentInstance(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+  protected Object invokeComponentInstance(Event event, Event.Builder eventBuilder) throws Exception {
     Object result = ((Callable) objectFactory.getInstance(muleContext)).onCall(new DefaultMuleEventContext(flowConstruct, event));
     if (result instanceof VoidResult) {
       // This will rewire the current message
       return event.getMessage();
     } else if (result != null) {
-      if (result instanceof MuleMessage) {
+      if (result instanceof InternalMessage) {
         return result;
       } else {
         return muleContext.getTransformationService()

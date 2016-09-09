@@ -7,21 +7,21 @@
 package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.core.PropertyScope;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.Set;
 
 public class RemovePropertyProcessor extends AbstractRemoveVariablePropertyProcessor {
 
   @Override
-  protected MuleEvent removeProperty(MuleEvent event, String propertyName) {
-    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build())
+  protected Event removeProperty(Event event, String propertyName) {
+    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build())
         .build();
   }
 
   @Override
-  protected Set<String> getPropertyNames(MuleEvent event) {
+  protected Set<String> getPropertyNames(Event event) {
     return event.getMessage().getOutboundPropertyNames();
   }
 

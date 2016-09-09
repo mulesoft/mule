@@ -8,7 +8,7 @@ package org.mule.runtime.module.oauth2.internal;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class DynamicFlowFactory {
    * @return a new flow
    * @throws MuleException if there was a failure registering the flow in mule.
    */
-  public static Flow createDynamicFlow(final MuleContext muleContext, String flowName, List<MessageProcessor> messageProcessors)
+  public static Flow createDynamicFlow(final MuleContext muleContext, String flowName, List<Processor> messageProcessors)
       throws MuleException {
     final Flow flow = new Flow(flowName, muleContext);
     flow.setMessageProcessors(messageProcessors);

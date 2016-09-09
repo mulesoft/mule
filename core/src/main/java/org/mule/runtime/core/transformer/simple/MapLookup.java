@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
@@ -33,11 +33,12 @@ public class MapLookup extends AbstractTransformer {
       if (key != null) {
         return ((Map) src).get(key);
       } else {
-        throw new TransformerException(MessageFactory
+        throw new TransformerException(I18nMessageFactory
             .createStaticMessage("Property 'key' must be set in order to use this transformer."));
       }
     } else {
-      throw new TransformerException(MessageFactory.createStaticMessage("Message to transform must be of type java.util.Map"));
+      throw new TransformerException(I18nMessageFactory
+          .createStaticMessage("Message to transform must be of type java.util.Map"));
     }
   }
 

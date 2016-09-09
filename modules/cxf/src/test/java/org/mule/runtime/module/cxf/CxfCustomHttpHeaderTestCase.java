@@ -19,7 +19,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -47,7 +47,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
   private static final String SOAP_RESPONSE =
       "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body><ns1:onReceiveResponse xmlns:ns1=\"http://functional.functional.mule.org/\"><ns1:return xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"xsd:string\">Test String Received</ns1:return></ns1:onReceiveResponse></soap:Body></soap:Envelope>";
 
-  private List<MuleMessage> notificationMsgList = new ArrayList<>();
+  private List<InternalMessage> notificationMsgList = new ArrayList<>();
   private Latch latch = new Latch();
 
   @Rule
@@ -79,8 +79,9 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
     props.put(MULE_METHOD_PROPERTY, "onReceive");
     props.put(myProperty, myProperty);
 
-    MuleMessage reply = muleContext.getClient()
-        .send(String.format(endpointAddress), MuleMessage.builder().payload(REQUEST_PAYLOAD).outboundProperties(props).build(),
+    InternalMessage reply = muleContext.getClient()
+        .send(String.format(endpointAddress),
+              InternalMessage.builder().payload(REQUEST_PAYLOAD).outboundProperties(props).build(),
               HTTP_REQUEST_OPTIONS)
         .getRight();
 

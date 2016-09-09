@@ -16,9 +16,9 @@ import org.mule.compatibility.transport.file.filters.FilenameWildcardFilter;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -423,8 +423,8 @@ public class FileConnector extends AbstractConnector {
    * @throws org.mule.api.MuleException
    */
   @Override
-  public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException {
-    MuleMessage message = event.getMessage();
+  public OutputStream getOutputStream(OutboundEndpoint endpoint, Event event) throws MuleException {
+    InternalMessage message = event.getMessage();
     String address = endpoint.getEndpointURI().getAddress();
     String writeToDirectory = message.getOutboundProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY);
     if (writeToDirectory == null) {
@@ -481,7 +481,7 @@ public class FileConnector extends AbstractConnector {
     }
   }
 
-  private String generateFilename(MuleEvent event, String pattern) {
+  private String generateFilename(Event event, String pattern) {
     if (pattern == null) {
       pattern = getOutputPattern();
     }

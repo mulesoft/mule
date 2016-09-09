@@ -17,15 +17,15 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.runtime.core.exception.MessagingExceptionHandlerToSystemAdapter;
@@ -59,11 +59,11 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testCustomProcessorInFlow() throws Exception {
-    final MuleEvent muleEvent = runFlow("customProcessorInFlow");
-    MuleMessage response = muleEvent.getMessage();
+    final Event muleEvent = runFlow("customProcessorInFlow");
+    InternalMessage response = muleEvent.getMessage();
 
     assertNotNull(response);
-    assertTrue(muleEvent.getFlowVariable("expectedHandler"));
+    assertTrue(muleEvent.getVariable("expectedHandler"));
     assertTrue(injectedMessagingExceptionHandler instanceof DefaultMessagingExceptionStrategy);
   }
 
@@ -72,7 +72,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("asyncInFlow").withPayload(MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outFlow4", 3000).getRight().get();
+    InternalMessage response = client.request("test://outFlow4", 3000).getRight().get();
     assertNotNull(response);
     assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
@@ -82,7 +82,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("untilSuccessfulInFlow").withPayload(MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outFlow5", 3000).getRight().get();
+    InternalMessage response = client.request("test://outFlow5", 3000).getRight().get();
 
     assertNotNull(response);
     assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
@@ -92,11 +92,11 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
   public void testCustomProcessorInScope() throws Exception {
     LinkedList<String> list = new LinkedList<>();
     list.add(MESSAGE);
-    final MuleEvent muleEvent = flowRunner("customProcessorInScope").withPayload(list).run();
-    MuleMessage response = muleEvent.getMessage();
+    final Event muleEvent = flowRunner("customProcessorInScope").withPayload(list).run();
+    InternalMessage response = muleEvent.getMessage();
 
     assertNotNull(response);
-    assertTrue(muleEvent.getFlowVariable("expectedHandler"));
+    assertTrue(muleEvent.getVariable("expectedHandler"));
     assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
 
@@ -105,7 +105,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("customProcessorInTransactionalScope").withPayload(MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outTransactional1", 3000).getRight().get();
+    InternalMessage response = client.request("test://outTransactional1", 3000).getRight().get();
 
     assertNotNull(response);
 
@@ -130,7 +130,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner("customProcessorInExceptionStrategy").withPayload(MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://outStrategy1", 3000).getRight().get();
+    InternalMessage response = client.request("test://outStrategy1", 3000).getRight().get();
 
     assertNotNull(response);
 
@@ -168,7 +168,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request(expected, 3000).getRight().get();
+    InternalMessage response = client.request(expected, 3000).getRight().get();
 
     assertNotNull(response);
   }
@@ -178,36 +178,36 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     try {
       flowRunner(flowName).withPayload(MESSAGE).withInboundProperties(messageProperties).asynchronously().run();
     } catch (Exception e) {
-      //do nothing
+      // do nothing
     }
 
     assertFalse(latch.await(3, TimeUnit.SECONDS));
     verify(latch).countDown();
   }
 
-  public static class ExecutionCountProcessor implements MessageProcessor {
+  public static class ExecutionCountProcessor implements Processor {
 
     @Override
-    public synchronized MuleEvent process(MuleEvent event) throws MuleException {
+    public synchronized Event process(Event event) throws MuleException {
       latch.countDown();
       return event;
     }
   }
 
   public static class ExceptionHandlerVerifierProcessor
-      implements MessageProcessor, MessagingExceptionHandlerAware, FlowConstructAware {
+      implements Processor, MessagingExceptionHandlerAware, FlowConstructAware {
 
     private MessagingExceptionHandler messagingExceptionHandler;
     private FlowConstruct flowConstruct;
 
     @Override
-    public synchronized MuleEvent process(MuleEvent event) throws MuleException {
+    public synchronized Event process(Event event) throws MuleException {
       Boolean expectedHandler = messagingExceptionHandler != null;
       if (expectedHandler) {
         expectedHandler = messagingExceptionHandler.equals(flowConstruct.getExceptionListener());
       }
       injectedMessagingExceptionHandler = messagingExceptionHandler;
-      return MuleEvent.builder(event).addFlowVariable("expectedHandler", expectedHandler).build();
+      return Event.builder(event).addVariable("expectedHandler", expectedHandler).build();
     }
 
     @Override

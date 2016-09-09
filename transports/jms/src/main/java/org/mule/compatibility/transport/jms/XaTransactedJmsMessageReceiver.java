@@ -9,12 +9,12 @@ package org.mule.compatibility.transport.jms;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -154,11 +154,11 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
   public void poll() throws Exception {
     logger.debug("Polling...");
 
-    ExecutionTemplate<MuleEvent> processingCallback = createExecutionTemplate();
-    ExecutionCallback<MuleEvent> cb = new ExecutionCallback<MuleEvent>() {
+    ExecutionTemplate<Event> processingCallback = createExecutionTemplate();
+    ExecutionCallback<Event> cb = new ExecutionCallback<Event>() {
 
       @Override
-      public MuleEvent process() throws Exception {
+      public Event process() throws Exception {
         try {
           return doProcess();
         } catch (Exception e) {
@@ -182,7 +182,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         }
       }
 
-      protected MuleEvent doProcess() throws Exception {
+      protected Event doProcess() throws Exception {
         try {
           List messages = getMessages();
           if (messages != null && messages.size() > 0) {
@@ -216,7 +216,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
   }
 
   @Override
-  protected List<MuleMessage> getMessages() throws Exception {
+  protected List<InternalMessage> getMessages() throws Exception {
     Session session = this.connector.getTransactionalResource(endpoint);
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     MessageConsumer consumer = createConsumer();
@@ -259,7 +259,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
       redeliveryHandler.get().handleRedelivery(message, (InboundEndpoint) endpoint, flowConstruct);
     }
 
-    MuleCompatibilityMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
+    CompatibilityMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
     routeMessage(messageToRoute);
     closeConsumerIfRequired(consumer);
     return null;
@@ -293,7 +293,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
   }
 
   @Override
-  protected MuleEvent processMessage(Object msg) throws Exception {
+  protected Event processMessage(Object msg) throws Exception {
     // This method is never called as the
     // message is processed when received
     return null;

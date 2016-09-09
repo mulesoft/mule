@@ -7,8 +7,8 @@
 package org.mule.compatibility.transport.jms.transformers;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -40,8 +40,8 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    final MuleMessage message = event.getMessage();
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+    final InternalMessage message = event.getMessage();
     try {
       if (logger.isDebugEnabled()) {
         logger.debug("Source object is " + ClassUtils.getSimpleName(message.getDataType().getType()));

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -35,7 +35,7 @@ public class ChunkingTestCase extends FunctionalTestCase {
 
     byte[] msg = new byte[100 * 1024];
 
-    MuleMessage result =
+    InternalMessage result =
         client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("/foo")).getMessageSource()).getAddress(),
                     msg, null)
             .getRight();

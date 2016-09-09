@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -58,7 +58,7 @@ public class DefaultOperationContextTestCase extends AbstractMuleTestCase {
   private ResolverSetResult resolverSetResult;
 
   @Mock
-  private MuleEvent event;
+  private Event event;
 
   @Mock
   private MuleContext muleContext;

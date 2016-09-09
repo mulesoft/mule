@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.simple.ByteArrayToHexString;
@@ -34,7 +34,7 @@ public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter {
   private final ByteArrayToHexString byteArrayToHexString = new ByteArrayToHexString();
 
   @Override
-  protected String getIdForEvent(MuleEvent event) throws MuleException {
+  protected String getIdForEvent(Event event) throws MuleException {
     try {
       Object payload = event.getMessage().getPayload();
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);

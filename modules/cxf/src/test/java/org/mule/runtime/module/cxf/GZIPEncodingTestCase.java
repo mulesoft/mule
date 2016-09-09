@@ -14,7 +14,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_ENCODING;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -66,8 +66,8 @@ public class GZIPEncodingTestCase extends FunctionalTestCase {
 
   @Test
   public void proxyWithGZIPResponse() throws Exception {
-    MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy",
-                                                        getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS)
+    InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/proxy",
+                                                            getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS)
         .getRight();
     validateResponse(response);
   }
@@ -76,14 +76,14 @@ public class GZIPEncodingTestCase extends FunctionalTestCase {
   public void proxyWithGZIPRequestAndResponse() throws Exception {
     Map<String, Serializable> properties = new HashMap<>();
     properties.put(CONTENT_ENCODING, "gzip,deflate");
-    MuleMessage response = muleContext.getClient()
+    InternalMessage response = muleContext.getClient()
         .send("http://localhost:" + httpPortProxy.getNumber() + "/proxy",
-              MuleMessage.builder().payload(gzip(getAllRequest)).outboundProperties(properties).build(), HTTP_REQUEST_OPTIONS)
+              InternalMessage.builder().payload(gzip(getAllRequest)).outboundProperties(properties).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     validateResponse(response);
   }
 
-  private void validateResponse(MuleMessage response) throws Exception {
+  private void validateResponse(InternalMessage response) throws Exception {
     String unzipped = unzip(new ByteArrayInputStream(getPayloadAsBytes(response)));
     assertTrue(XMLUnit.compareXML(getAllResponse, unzipped).identical());
     assertEquals(GZIP, response.getInboundProperty(CONTENT_ENCODING));

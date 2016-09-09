@@ -7,14 +7,14 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
 
-  private List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<>();
+  private List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
   private MessageProcessorChain configuredMessageProcessors;
   private FlowConstruct flowConstruct;
 
@@ -39,11 +39,11 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
     }
   }
 
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return Collections.unmodifiableList(messageProcessors);
   }
 
-  public void setMessageProcessors(List<MessageProcessor> processors) {
+  public void setMessageProcessors(List<Processor> processors) {
     if (processors != null) {
       this.messageProcessors.clear();
       this.messageProcessors.addAll(processors);
@@ -52,14 +52,14 @@ public class RedeliveryExceeded implements FlowConstructAware, Initialisable {
     }
   }
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleEvent result = event;
+  public Event process(Event event) throws MuleException {
+    Event result = event;
     if (!messageProcessors.isEmpty()) {
       result = configuredMessageProcessors.process(event);
     }
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
-      result = MuleEvent.builder(result).error(null)
-          .message(MuleMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
+      result = Event.builder(result).error(null)
+          .message(InternalMessage.builder(result.getMessage()).exceptionPayload(null).build()).build();
     }
     return result;
   }

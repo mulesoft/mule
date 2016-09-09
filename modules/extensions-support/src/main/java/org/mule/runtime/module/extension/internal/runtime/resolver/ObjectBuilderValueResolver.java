@@ -7,14 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
 
 /**
- * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(MuleEvent)} on each
- * {@link #resolve(MuleEvent)}.
+ * A {@link ValueResolver} which wraps an {@link ObjectBuilder} and calls {@link ObjectBuilder#build(Event)} on each
+ * {@link #resolve(Event)}.
  * <p/>
  * It implements {@link Lifecycle} and propagates all lifecycle events to the underlying {@code builder}
  *
@@ -33,12 +33,12 @@ public class ObjectBuilderValueResolver<T> implements ValueResolver<T> {
   /**
    * Delegates to {@code builder}
    *
-   * @param event a {@link MuleEvent}
+   * @param event a {@link Event}
    * @return the {@code builder}'s output object
    * @throws MuleException
    */
   @Override
-  public T resolve(MuleEvent event) throws MuleException {
+  public T resolve(Event event) throws MuleException {
     return builder.build(event);
   }
 

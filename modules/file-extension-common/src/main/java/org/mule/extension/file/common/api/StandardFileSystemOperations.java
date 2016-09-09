@@ -9,9 +9,9 @@ package org.mule.extension.file.common.api;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
@@ -58,7 +58,7 @@ public class StandardFileSystemOperations {
    * @param config the config that is parameterizing this operation
    * @param directoryPath the path to the directory to be listed
    * @param recursive whether to include the contents of sub-directories. Defaults to false.
-   * @param message the {@link MuleMessage} on which this operation was triggered
+   * @param message the {@link Message} on which this operation was triggered
    * @param matchWith a matcher used to filter the output list
    * @return a {@link TreeNode} object representing the listed directory
    * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
@@ -66,7 +66,7 @@ public class StandardFileSystemOperations {
   @Summary("List all the files from given directory")
   @MetadataScope(outputResolver = FileTreeNodeMetadataResolver.class)
   public TreeNode list(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String directoryPath,
-                       @Optional(defaultValue = "false") boolean recursive, MuleMessage message,
+                       @Optional(defaultValue = "false") boolean recursive, Message message,
                        @Optional @Summary("Matcher to filter the listed files") @Placement(
                            group = FileDisplayConstants.MATCHER) FilePredicateBuilder matchWith) {
     fileSystem.changeToBaseDir(config);
@@ -74,9 +74,9 @@ public class StandardFileSystemOperations {
   }
 
   /**
-   * Obtains the content and metadata of a file at a given path. The operation itself returns a {@link MuleMessage} which payload
-   * is a {@link InputStream} with the file's content, and the metadata is represent as a {@link FileAttributes} object that's
-   * placed as the message {@link MuleMessage#getAttributes() attributes}.
+   * Obtains the content and metadata of a file at a given path. The operation itself returns a {@link Message} which payload is a
+   * {@link InputStream} with the file's content, and the metadata is represent as a {@link FileAttributes} object that's placed
+   * as the message {@link Message#getAttributes() attributes}.
    * <p>
    * If the {@code lock} parameter is set to {@code true}, then a file system level lock will be placed on the file until the
    * input stream this operation returns is closed or fully consumed. Because the lock is actually provided by the host file
@@ -89,7 +89,7 @@ public class StandardFileSystemOperations {
    *
    * @param config the config that is parameterizing this operation
    * @param fileSystem a reference to the host {@link FileSystem}
-   * @param message the incoming {@link MuleMessage}
+   * @param message the incoming {@link Message}
    * @param path the path to the file to be read
    * @param lock whether or not to lock the file. Defaults to false.
    * @return the file's content and metadata on a {@link FileAttributes} instance
@@ -99,7 +99,7 @@ public class StandardFileSystemOperations {
   @Summary("Obtains the content and metadata of a file at a given path")
   @MetadataScope(attributesResolver = FileAttributesMetadataResolver.class)
   public OperationResult<InputStream, FileAttributes> read(@UseConfig FileConnectorConfig config,
-                                                           @Connection FileSystem fileSystem, MuleMessage message,
+                                                           @Connection FileSystem fileSystem, Message message,
                                                            @DisplayName("File Path") String path,
                                                            @Optional(defaultValue = "false") boolean lock) {
     fileSystem.changeToBaseDir(config);
@@ -123,7 +123,7 @@ public class StandardFileSystemOperations {
    * {@code null} contents are not allowed and will result in an {@link IllegalArgumentException}.
    * <p>
    * To support pass-through scenarios, the {@code path} attribute is optional. If not provided, then the current
-   * {@link MuleMessage#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
+   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
    * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
    * thrown.
    * <p>
@@ -138,13 +138,13 @@ public class StandardFileSystemOperations {
    * @param config the {@link FileConnectorConfig} on which the operation is being executed
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path the path of the file to be written
-   * @param content the content to be written into the file. Defaults to the current {@link MuleMessage} payload
+   * @param content the content to be written into the file. Defaults to the current {@link Message} payload
    * @param mode a {@link FileWriteMode}. Defaults to {@code OVERWRITE}
    * @param lock whether or not to lock the file. Defaults to false
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
    * @param encoding when {@code content} is a {@link String}, this attribute specifies the encoding to be used when writing. If
    *        not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
-   * @param event The current {@link MuleEvent}
+   * @param event The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Writes the given \"Content\" in the file pointed by \"Path\"")
@@ -156,7 +156,7 @@ public class StandardFileSystemOperations {
                     @Optional(defaultValue = "false") boolean lock,
                     @Optional(defaultValue = "true") boolean createParentDirectories,
                     @Optional @Summary("Encoding when trying to write a String file. If not set, defaults to the configuration one or the Mule default") String encoding,
-                    MuleEvent event) {
+                    Event event) {
     if (content == null) {
       throw new IllegalArgumentException("Cannot write a null content");
     }
@@ -175,7 +175,7 @@ public class StandardFileSystemOperations {
    * Copies the file at the {@code sourcePath} into the {@code targetPath}.
    * <p>
    * To support pass-through scenarios, the {@code sourcePath} attribute is optional. If not provided, then the current
-   * {@link MuleMessage#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
+   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
    * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
    * thrown.
    * <p>
@@ -199,13 +199,13 @@ public class StandardFileSystemOperations {
    * @param targetPath the target directory where the file is going to be copied
    * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-   * @param event the {@link MuleEvent} which triggered this operation
+   * @param event the {@link Event} which triggered this operation
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Copies a file in another directory")
   public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "false") boolean overwrite,
-                   @Optional(defaultValue = "true") boolean createParentDirectories, MuleEvent event) {
+                   @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
     fileSystem.changeToBaseDir(config);
     validateTargetPath(targetPath);
     sourcePath = resolvePath(sourcePath, event, "sourcePath");
@@ -222,7 +222,7 @@ public class StandardFileSystemOperations {
    * Moves the file at the {@code sourcePath} into the {@code targetPath}.
    * <p>
    * To support pass-through scenarios, the {@code sourcePath} attribute is optional. If not provided, then the current
-   * {@link MuleMessage#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
+   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
    * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
    * thrown.
    * <p>
@@ -246,13 +246,13 @@ public class StandardFileSystemOperations {
    * @param targetPath the target directory
    * @param overwrite whether or not overwrite the file if the target destination already exists.
    * @param createParentDirectories whether or not to attempt creating any parent directories which don't exists.
-   * @param event The current {@link MuleEvent}
+   * @param event The current {@link Event}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
   @Summary("Moves a file to another directory")
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "false") boolean overwrite,
-                   @Optional(defaultValue = "true") boolean createParentDirectories, MuleEvent event) {
+                   @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
     fileSystem.changeToBaseDir(config);
     validateTargetPath(targetPath);
     sourcePath = resolvePath(sourcePath, event, "sourcePath");
@@ -263,19 +263,19 @@ public class StandardFileSystemOperations {
    * Deletes the file pointed by {@code path}, provided that it's not locked
    * <p>
    * To support pass-through scenarios, the {@code path} attribute is optional. If not provided, then the current
-   * {@link MuleMessage#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
+   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
    * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
    * thrown.
    *
    * @param config the config that is parameterizing this operation
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path the path to the file to be deleted
-   * @param event The current {@link MuleEvent}
+   * @param event The current {@link Event}
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
   @Summary("Deletes a file")
   public void delete(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
-                     MuleEvent event) {
+                     Event event) {
     fileSystem.changeToBaseDir(config);
     path = resolvePath(path, event, "path");
     fileSystem.delete(config, path);
@@ -285,7 +285,7 @@ public class StandardFileSystemOperations {
    * Renames the file pointed by {@code path} to the name provided on the {@code to} parameter
    * <p>
    * To support pass-through scenarios, the {@code path} attribute is optional. If not provided, then the current
-   * {@link MuleMessage#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
+   * {@link Message#getAttributes()} value will be tested to be an instance of {@link FileAttributes}, in which case
    * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
    * thrown.
    * <p>
@@ -297,12 +297,12 @@ public class StandardFileSystemOperations {
    * @param path the path to the file to be renamed
    * @param to the file's new name
    * @param overwrite whether or not overwrite the file if the target destination already exists.
-   * @param event The current {@link MuleEvent}
+   * @param event The current {@link Event}
    */
   // TODO: MULE-9715
   @Summary("Renames a file")
   public void rename(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
-                     @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, MuleEvent event) {
+                     @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
     checkArgument(get(to).getNameCount() == 1,
                   format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",
                          to));
@@ -324,12 +324,12 @@ public class StandardFileSystemOperations {
     fileSystem.createDirectory(config, directoryPath);
   }
 
-  private String resolvePath(String path, MuleEvent event, String attributeName) {
+  private String resolvePath(String path, Event event, String attributeName) {
     if (!StringUtils.isBlank(path)) {
       return path;
     }
 
-    MuleMessage message = event.getMessage();
+    Message message = event.getMessage();
     if (message.getAttributes() instanceof FileAttributes) {
       return ((FileAttributes) message.getAttributes()).getPath();
     }

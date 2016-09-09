@@ -10,7 +10,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -22,16 +22,16 @@ import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
@@ -116,7 +116,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
   public void initialise() throws InitialisationException {
     if (bus == null) {
       throw new InitialisationException(
-                                        MessageFactory
+                                        I18nMessageFactory
                                             .createStaticMessage("No CXF bus instance, this component has not been initialized properly."),
                                         this);
     }
@@ -147,7 +147,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     // if http request
     String requestPath = parseHttpRequestProperty(requestPropertyManager.getRequestPath(event.getMessage()));
     try {
@@ -176,7 +176,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     return uriBase;
   }
 
-  protected MuleEvent generateWSDLOrXSD(MuleEvent event, String req)
+  protected Event generateWSDLOrXSD(Event event, String req)
       throws IOException {
     // TODO: Is there a way to make this not so ugly?
     String ctxUri = requestPropertyManager.getBasePath(event.getMessage());
@@ -209,11 +209,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     } else {
       message = out.toString();
     }
-    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(message).mediaType(ct).build())
+    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(message).mediaType(ct).build())
         .build();
   }
 
-  private String getUri(MuleEvent event) {
+  private String getUri(Event event) {
     String scheme = requestPropertyManager.getScheme(event);
     String host = event.getMessage().getInboundProperty("Host");
     String ctx = requestPropertyManager.getRequestPath(event.getMessage());
@@ -221,18 +221,18 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     return scheme + "://" + host + ctx;
   }
 
-  protected MuleEvent sendToDestination(MuleEvent event) throws MuleException, IOException {
+  protected Event sendToDestination(Event event) throws MuleException, IOException {
     try {
       final Exchange exchange = new ExchangeImpl();
 
-      final MuleEvent originalEvent = event;
+      final Event originalEvent = event;
       if (event.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
 
-        event = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
+        event = Event.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
           @Override
-          public MuleEvent processReplyTo(MuleEvent responseEvent, MuleMessage returnMessage, Object replyTo)
+          public Event processReplyTo(Event responseEvent, InternalMessage returnMessage, Object replyTo)
               throws MuleException {
             try {
               // CXF execution chain was suspended, so we need to resume it.
@@ -243,14 +243,14 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
               exchange.getInMessage().getInterceptorChain().resume();
 
               // Process the response
-              responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+              responseEvent = (Event) exchange.get(CxfConstants.MULE_EVENT);
               responseEvent = processResponse(originalEvent, exchange, responseEvent);
 
               // Continue the non blocking execution
               originalReplyToHandler.processReplyTo(responseEvent, responseEvent.getMessage(), replyTo);
             } catch (Exception e) {
               ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
-              responseEvent = MuleEvent.builder(responseEvent).message(MuleMessage.builder(responseEvent.getMessage())
+              responseEvent = Event.builder(responseEvent).message(InternalMessage.builder(responseEvent.getMessage())
                   .exceptionPayload(exceptionPayload).addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build()).build();
               processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
             }
@@ -266,7 +266,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         setCurrentEvent(event);
       }
 
-      MuleEvent responseEvent = sendThroughCxf(event, exchange);
+      Event responseEvent = sendThroughCxf(event, exchange);
 
       if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
         return processResponse(event, exchange, responseEvent);
@@ -279,10 +279,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     }
   }
 
-  private MuleEvent sendThroughCxf(MuleEvent event, Exchange exchange) throws TransformerException, IOException {
+  private Event sendThroughCxf(Event event, Exchange exchange) throws TransformerException, IOException {
     final MessageImpl m = new MessageImpl();
     m.setExchange(exchange);
-    final MuleMessage muleReqMsg = event.getMessage();
+    final InternalMessage muleReqMsg = event.getMessage();
     String method = muleReqMsg.getInboundProperty(HTTP_METHOD_PROPERTY);
 
     MediaType ct = muleReqMsg.getDataType().getMediaType();
@@ -385,7 +385,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     try {
       d.getMessageObserver().onMessage(m);
     } catch (SuspendedInvocationException e) {
-      MuleEvent responseEvent = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+      Event responseEvent = (Event) exchange.get(CxfConstants.MULE_EVENT);
 
       if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
         throw e;
@@ -393,17 +393,17 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     }
 
     // get the response event
-    return (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
+    return (Event) exchange.get(CxfConstants.MULE_EVENT);
   }
 
-  private MuleEvent processResponse(MuleEvent event, Exchange exchange, MuleEvent responseEvent) {
+  private Event processResponse(Event event, Exchange exchange, Event responseEvent) {
     // If there isn't one, there was probably a fault, so use the original event
     if (responseEvent == null || VoidMuleEvent.getInstance().equals(responseEvent) || !event.getExchangePattern().hasResponse()) {
       return null;
     }
 
-    final MuleMessage message = responseEvent.getMessage();
-    MuleMessage.Builder builder = MuleMessage.builder(message);
+    final InternalMessage message = responseEvent.getMessage();
+    InternalMessage.Builder builder = InternalMessage.builder(message);
 
     BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
     if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
@@ -437,7 +437,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
       }
     }
-    return MuleEvent.builder(responseEvent).message(builder.build()).build();
+    return Event.builder(responseEvent).message(builder.build()).build();
   }
 
   protected boolean shouldSoapActionHeader() {
@@ -450,7 +450,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
   }
 
   @Override
-  public MuleEvent processNext(MuleEvent event) throws MuleException {
+  public Event processNext(Event event) throws MuleException {
     return super.processNext(event);
   }
 
@@ -492,7 +492,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     return outputHandler;
   }
 
-  private void setPayload(MuleEvent ctx, final MessageImpl m, Object payload) throws TransformerException {
+  private void setPayload(Event ctx, final MessageImpl m, Object payload) throws TransformerException {
     if (payload instanceof Reader) {
       m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader((Reader) payload));
     } else if (payload instanceof byte[]) {
@@ -527,7 +527,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
    * @return The inputstream for the current message
    * @throws MuleException
    */
-  protected InputStream getMessageStream(MuleEvent context) throws MuleException {
+  protected InputStream getMessageStream(Event context) throws MuleException {
     InputStream is;
     Object eventMsgPayload = context.getMessage().getPayload();
 
@@ -539,7 +539,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     return is;
   }
 
-  protected String getSoapAction(MuleMessage message) {
+  protected String getSoapAction(InternalMessage message) {
     String action = message.getInboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
 
     if (action != null && action.startsWith("\"") && action.endsWith("\"") && action.length() >= 2) {

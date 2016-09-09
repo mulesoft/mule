@@ -9,7 +9,7 @@ package org.mule.test.integration.messaging.meps;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -39,7 +39,7 @@ public class InOptionalOutTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     String listenerUrl = format("http://localhost:%s/", port.getNumber());
-    MuleMessage result = client.send(listenerUrl, "some data", null).getRight();
+    InternalMessage result = client.send(listenerUrl, "some data", null).getRight();
     assertNotNull(result);
     assertEquals(StringUtils.EMPTY, getPayloadAsString(result));
 

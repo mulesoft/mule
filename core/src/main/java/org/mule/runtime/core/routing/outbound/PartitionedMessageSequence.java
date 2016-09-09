@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing.outbound;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.routing.MessageSequence;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class PartitionedMessageSequence<Q> implements MessageSequence<Collection
 
   public PartitionedMessageSequence(MessageSequence<Q> seq, int groupSize) {
     if (groupSize <= 1) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("group size must be greater than 1"));
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("group size must be greater than 1"));
     }
     this.delegate = seq;
     this.groupSize = groupSize;

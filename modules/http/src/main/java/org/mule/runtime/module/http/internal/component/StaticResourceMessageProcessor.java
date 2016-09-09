@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal.component;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.MOVED_TEMPORARILY;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
@@ -17,13 +17,13 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -40,7 +40,7 @@ import javax.activation.MimetypesFileTypeMap;
  * allows the user to specify a resourceBase which refers to the local directory from where files will be served from.
  * Additionally, a default file can be specificed for URLs where no file is set
  */
-public class StaticResourceMessageProcessor implements MessageProcessor, Initialisable {
+public class StaticResourceMessageProcessor implements Processor, Initialisable {
 
   public static final String DEFAULT_MIME_TYPE = "application/octet-stream";
   public static final String ANY_PATH = "/*";
@@ -58,7 +58,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (StringUtils.isEmpty(resourceBase)) {
       throw new ConfigurationException(createStaticMessage("No ResourceBase Defined as part of the static resource message processor."));
     }
@@ -80,17 +80,17 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
     }
 
     File file = new File(resourceBase + path);
-    MuleEvent resultEvent = event;
+    Event resultEvent = event;
 
     if (file.isDirectory() && path.endsWith("/")) {
       file = new File(resourceBase + path + defaultFile);
     } else if (file.isDirectory()) {
       // Return a 302 with the new location
-      MuleMessage message = MuleMessage.builder().nullPayload()
+      InternalMessage message = InternalMessage.builder().nullPayload()
           .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(MOVED_TEMPORARILY.getStatusCode()))
           .addOutboundProperty(CONTENT_LENGTH, 0)
           .addOutboundProperty(LOCATION, event.getMessage().getInboundProperty(HTTP_REQUEST_PATH_PROPERTY) + "/").build();
-      resultEvent = MuleEvent.builder(event).message(message).build();
+      resultEvent = Event.builder(event).message(message).build();
     }
 
     InputStream in = null;
@@ -107,10 +107,10 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
         mimetype = DEFAULT_MIME_TYPE;
       }
 
-      MuleMessage message = MuleMessage.builder().nullPayload().mediaType(MediaType.parse(mimetype))
+      InternalMessage message = InternalMessage.builder().nullPayload().mediaType(MediaType.parse(mimetype))
           .addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(OK.getStatusCode()))
           .addOutboundProperty(CONTENT_LENGTH, buffer.length).build();
-      resultEvent = MuleEvent.builder(event).message(message).build();
+      resultEvent = Event.builder(event).message(message).build();
     } catch (IOException e) {
       throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBase + path)));
     } finally {

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
@@ -28,13 +28,13 @@ public class RoundRobin extends AbstractOutboundRouter {
    * Process the event using the next target route in sequence
    */
   @Override
-  public MuleEvent route(MuleEvent event) throws MuleException {
+  public Event route(Event event) throws MuleException {
     int modulo = getAndIncrementModuloN(routes.size());
     if (modulo < 0) {
       throw new CouldNotRouteOutboundMessageException(this);
     }
 
-    MessageProcessor mp = routes.get(modulo);
+    Processor mp = routes.get(modulo);
     try {
       return doProcessRoute(mp, event);
     } catch (MuleException ex) {
@@ -59,7 +59,7 @@ public class RoundRobin extends AbstractOutboundRouter {
   }
 
   @Override
-  public boolean isMatch(MuleEvent message, MuleEvent.Builder builder) throws MuleException {
+  public boolean isMatch(Event message, Event.Builder builder) throws MuleException {
     return true;
   }
 }

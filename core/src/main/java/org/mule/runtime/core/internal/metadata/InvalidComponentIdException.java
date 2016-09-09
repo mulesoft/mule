@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.metadata;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.metadata.ComponentId;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Represents that the given {@link ComponentId} is invalid due that the Component could not be found in the current
@@ -22,7 +22,7 @@ public class InvalidComponentIdException extends MuleException {
   /**
    * @param message the exception message
    */
-  InvalidComponentIdException(Message message) {
+  InvalidComponentIdException(I18nMessage message) {
     super(message);
   }
 
@@ -30,7 +30,7 @@ public class InvalidComponentIdException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  InvalidComponentIdException(Message message, Throwable cause) {
+  InvalidComponentIdException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

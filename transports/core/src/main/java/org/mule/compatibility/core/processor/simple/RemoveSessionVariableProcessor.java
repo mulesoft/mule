@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.processor.simple;
 
 import org.mule.runtime.core.PropertyScope;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.processor.simple.AbstractRemoveVariablePropertyProcessor;
 
 import java.util.Set;
@@ -15,13 +15,13 @@ import java.util.Set;
 public class RemoveSessionVariableProcessor extends AbstractRemoveVariablePropertyProcessor {
 
   @Override
-  protected MuleEvent removeProperty(MuleEvent event, String propertyName) {
+  protected Event removeProperty(Event event, String propertyName) {
     event.getSession().removeProperty(propertyName);
     return event;
   }
 
   @Override
-  protected Set<String> getPropertyNames(MuleEvent event) {
+  protected Set<String> getPropertyNames(Event event) {
     return event.getSession().getPropertyNamesAsSet();
   }
 

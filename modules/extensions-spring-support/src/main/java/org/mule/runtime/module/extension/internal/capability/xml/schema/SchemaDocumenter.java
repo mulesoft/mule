@@ -12,7 +12,7 @@ import static org.mule.runtime.module.extension.internal.capability.xml.schema.A
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getOperationMethods;
 import static org.mule.runtime.module.extension.internal.capability.xml.schema.AnnotationProcessorUtils.getTypeElementsAnnotatedWith;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
@@ -88,7 +88,8 @@ final class SchemaDocumenter {
         documentOperationParameters(operation, documentation);
       }
     } catch (Exception e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Exception found while trying to document XSD schema"),
+      throw new MuleRuntimeException(I18nMessageFactory
+          .createStaticMessage("Exception found while trying to document XSD schema"),
                                      e);
     }
   }

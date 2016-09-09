@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
 
@@ -54,7 +54,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent beforeRouting(MessagingException exception, MuleEvent event) {
+  protected Event beforeRouting(MessagingException exception, Event event) {
     if (!isRedeliveryExhausted(exception)) {
       rollback(exception);
     }
@@ -62,8 +62,8 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
-    List<MessageProcessor> messageProcessors = new ArrayList<>(super.getMessageProcessors().size()
+  protected List<Processor> getOwnedMessageProcessors() {
+    List<Processor> messageProcessors = new ArrayList<>(super.getMessageProcessors().size()
         + (redeliveryExceeded == null ? 0 : redeliveryExceeded.getMessageProcessors().size()));
     messageProcessors.addAll(super.getMessageProcessors());
     if (redeliveryExceeded != null) {
@@ -77,8 +77,8 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent route(MuleEvent event, MessagingException t) throws MessagingException {
-    MuleEvent resultEvent = event;
+  protected Event route(Event event, MessagingException t) throws MessagingException {
+    Event resultEvent = event;
     if (isRedeliveryExhausted(t)) {
       if (redeliveryExceeded != null) {
         markExceptionAsHandled(t);
@@ -100,7 +100,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent processReplyTo(MuleEvent event, Exception e) {
+  protected Event processReplyTo(Event event, Exception e) {
     if (isRedeliveryExhausted(e)) {
       return super.processReplyTo(event, e);
     } else {

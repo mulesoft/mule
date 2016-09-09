@@ -17,9 +17,9 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.component.AbstractComponent;
@@ -138,10 +138,10 @@ public class RestServiceWrapper extends AbstractComponent {
   }
 
   @Override
-  public Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+  public Object doInvoke(Event event, Event.Builder eventBuilder) throws Exception {
     Object requestBody;
 
-    MuleMessage message = event.getMessage();
+    InternalMessage message = event.getMessage();
     Object request = message.getPayload();
     String tempUrl = serviceUrl;
     if (muleContext.getExpressionLanguage().isExpression(serviceUrl)) {
@@ -160,7 +160,7 @@ public class RestServiceWrapper extends AbstractComponent {
     // if post
     else {
       if (MediaType.ANY.matches(message.getDataType().getMediaType())) {
-        message = MuleMessage.builder(message).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build();
+        message = InternalMessage.builder(message).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build();
       }
 
       StringBuilder requestBodyBuffer = new StringBuilder();
@@ -172,22 +172,22 @@ public class RestServiceWrapper extends AbstractComponent {
     tempUrl = urlBuffer.toString();
     logger.info("Invoking REST service: " + tempUrl);
 
-    message = MuleMessage.builder(message).addOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod).build();
+    message = InternalMessage.builder(message).addOutboundProperty(HTTP_METHOD_PROPERTY, httpMethod).build();
 
     EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(tempUrl, muleContext);
     endpointBuilder.setExchangePattern(REQUEST_RESPONSE);
     OutboundEndpoint outboundEndpoint = endpointBuilder.buildOutboundEndpoint();
 
-    Either<Error, MuleMessage> clientResponse = muleContext.getClient().send(outboundEndpoint.getEndpointURI().toString(),
-                                                                             MuleMessage.builder(message)
-                                                                                 .payload(requestBody).build());
+    Either<Error, InternalMessage> clientResponse = muleContext.getClient().send(outboundEndpoint.getEndpointURI().toString(),
+                                                                                 InternalMessage.builder(message)
+                                                                                     .payload(requestBody).build());
 
     if (clientResponse.isLeft()) {
       handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl)));
     }
 
-    MuleEvent result = MuleEvent.builder(event.getContext()).message(clientResponse.getRight()).flow(flowConstruct).build();
-    Builder builder = MuleEvent.builder(result);
+    Event result = Event.builder(event.getContext()).message(clientResponse.getRight()).flow(flowConstruct).build();
+    Builder builder = Event.builder(result);
     if (isErrorPayload(result, builder)) {
       handleException(new RestServiceException(failedToInvokeRestService(tempUrl)));
     }
@@ -219,7 +219,7 @@ public class RestServiceWrapper extends AbstractComponent {
   // is a POST and
   // requestBodyBuffer must contain the body of the http method at the end of this
   // function call
-  private void setRESTParams(StringBuilder url, MuleEvent event, Object body, Map args, boolean optional,
+  private void setRESTParams(StringBuilder url, Event event, Object body, Map args, boolean optional,
                              StringBuilder requestBodyBuffer) {
     String sep;
 
@@ -284,7 +284,7 @@ public class RestServiceWrapper extends AbstractComponent {
     }
   }
 
-  protected boolean isErrorPayload(MuleEvent event, MuleEvent.Builder builder) {
+  protected boolean isErrorPayload(Event event, Event.Builder builder) {
     return errorFilter != null && errorFilter.accept(event, builder);
   }
 

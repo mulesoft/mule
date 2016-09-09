@@ -10,11 +10,11 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
@@ -25,9 +25,9 @@ import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
 import java.util.concurrent.ExecutorService;
 
-public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProcessor implements MessageProcessor, Disposable {
+public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProcessor implements Processor, Disposable {
 
-  public MuleEvent event;
+  public Event event;
   public Latch latch = new Latch();
   public Thread thread;
   private ExecutorService executor = newSingleThreadExecutor(new NamedThreadFactory(SensingNullMessageProcessor.class.getName()));
@@ -46,11 +46,11 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
   }
 
   @Override
-  protected void processNonBlocking(final MuleEvent event, CompletionHandler completionHandler) throws MuleException {
+  protected void processNonBlocking(final Event event, CompletionHandler completionHandler) throws MuleException {
     executor.execute(() -> {
       try {
         sense(event);
-        MuleEvent eventToProcess = event;
+        Event eventToProcess = event;
         if (StringUtils.isNotEmpty(appendString)) {
           eventToProcess = append(eventToProcess);
         }
@@ -62,14 +62,14 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
     });
   }
 
-  private void sense(MuleEvent event) {
+  private void sense(Event event) {
     sleepIfNeeded();
     this.event = event;
     thread = Thread.currentThread();
   }
 
   @Override
-  protected MuleEvent processBlocking(MuleEvent event) throws MuleException {
+  protected Event processBlocking(Event event) throws MuleException {
     sense(event);
     if (StringUtils.isNotEmpty(appendString)) {
       event = append(event);
@@ -87,12 +87,12 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
   }
 
   @Override
-  public boolean isNonBlocking(MuleEvent event) {
+  public boolean isNonBlocking(Event event) {
     return super.isNonBlocking(event) && enableNonBlocking;
   }
 
-  private MuleEvent append(MuleEvent event) {
-    return MuleEvent.builder(event).message(MuleMessage.builder().payload(event.getMessage().getPayload() + appendString).build())
+  private Event append(Event event) {
+    return Event.builder(event).message(InternalMessage.builder().payload(event.getMessage().getPayload() + appendString).build())
         .build();
   }
 
@@ -125,10 +125,10 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
 
   class InternalMessageSource implements MessageSource {
 
-    MessageProcessor listener;
+    Processor listener;
 
     @Override
-    public void setListener(MessageProcessor listener) {
+    public void setListener(Processor listener) {
       this.listener = listener;
 
     }

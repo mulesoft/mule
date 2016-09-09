@@ -8,9 +8,9 @@ package org.mule.extension.validation.internal;
 
 import static org.reflections.ReflectionUtils.getConstructors;
 import static org.reflections.ReflectionUtils.withParameters;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.runtime.core.util.ClassUtils;
@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
  * Default implementation of {@link ExceptionFactory}.
  * <p/>
  * In order to create the {@link Exception} instances, it scans the requested {@link Class}es for a public {@link Constructor}
- * which receives two arguments assignable from {@link ValidationResult} and {@link MuleEvent}. If it's not found, a new search is
+ * which receives two arguments assignable from {@link ValidationResult} and {@link Event}. If it's not found, a new search is
  * done looking for a constructor with a single argument assignable from {@link ValidationResult}. If such {@link Constructor} is
  * not found then it tries with a default one. If it's still not found then an {@link IllegalArgumentException} exception is
  * thrown because the requested {@link Class} does not comply with the rules of this factory. For performance reasons, the
@@ -70,19 +70,19 @@ public class DefaultExceptionFactory implements ExceptionFactory {
       });
 
   @Override
-  public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, MuleEvent event) {
+  public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, Event event) {
     ConstructorDelegate<T> constructorDelegate = (ConstructorDelegate<T>) get(constructorCache, exceptionClass);
     try {
       return constructorDelegate.createException(result, result.getMessage(), event);
     } catch (Exception e) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage(String.format("Could not create exception of type %s. Exception message was:\n%s",
                                              exceptionClass.getName(), result.getMessage())));
     }
   }
 
   @Override
-  public Exception createException(ValidationResult result, String exceptionClassName, MuleEvent event) {
+  public Exception createException(ValidationResult result, String exceptionClassName, Event event) {
     return createException(result, get(classCache, exceptionClassName), event);
   }
 
@@ -99,7 +99,7 @@ public class DefaultExceptionFactory implements ExceptionFactory {
   }
 
   private <T extends Exception> ConstructorDelegate<T> selectMostCompleteConstructor(Class<T> exceptionType) {
-    Collection<Constructor> candidate = getConstructors(exceptionType, withParameters(ValidationResult.class, MuleEvent.class));
+    Collection<Constructor> candidate = getConstructors(exceptionType, withParameters(ValidationResult.class, Event.class));
     if (!CollectionUtils.isEmpty(candidate)) {
       return new ValidationResultAndEventConstructorDelegate<>((Constructor<T>) candidate.iterator().next());
     }
@@ -122,7 +122,7 @@ public class DefaultExceptionFactory implements ExceptionFactory {
 
   private interface ConstructorDelegate<T extends Exception> {
 
-    T createException(ValidationResult validationResult, String message, MuleEvent event) throws Exception;
+    T createException(ValidationResult validationResult, String message, Event event) throws Exception;
   }
 
   private class ValidationResultAndEventConstructorDelegate<T extends Exception> implements ConstructorDelegate<T> {
@@ -134,7 +134,7 @@ public class DefaultExceptionFactory implements ExceptionFactory {
     }
 
     @Override
-    public T createException(ValidationResult validationResult, String message, MuleEvent event) throws Exception {
+    public T createException(ValidationResult validationResult, String message, Event event) throws Exception {
       return constructor.newInstance(validationResult, event);
     }
   }
@@ -148,7 +148,7 @@ public class DefaultExceptionFactory implements ExceptionFactory {
     }
 
     @Override
-    public T createException(ValidationResult validationResult, String message, MuleEvent event) throws Exception {
+    public T createException(ValidationResult validationResult, String message, Event event) throws Exception {
       return constructor.newInstance(validationResult);
     }
   }
@@ -162,7 +162,7 @@ public class DefaultExceptionFactory implements ExceptionFactory {
     }
 
     @Override
-    public T createException(ValidationResult validationResult, String message, MuleEvent event) throws Exception {
+    public T createException(ValidationResult validationResult, String message, Event event) throws Exception {
       return constructor.newInstance(message);
     }
   }

@@ -18,19 +18,19 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.session.NullSessionHandler;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -65,7 +65,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase {
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.applyTransformers(any(MuleMessage.class), any(MuleEvent.class), anyList()))
+    when(transformationService.applyTransformers(any(InternalMessage.class), any(Event.class), anyList()))
         .thenAnswer(answer -> answer.getArguments()[0]);
   }
 
@@ -79,13 +79,13 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase {
   @Test
   public void routeMessageRequestResponseReturnsEvent() throws MuleException {
     MessageReceiver receiver = createMessageReciever(REQUEST_RESPONSE);
-    MuleCompatibilityMessage request = createRequestMessage();
+    CompatibilityMessage request = createRequestMessage();
 
     assertEquals(request.getPayload(), receiver.routeMessage(request).getMessage().getPayload().toString());
   }
 
-  protected MuleCompatibilityMessage createRequestMessage() {
-    return (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder().payload("").build();
+  protected CompatibilityMessage createRequestMessage() {
+    return (CompatibilityMessage) new MuleCompatibilityMessageBuilder().payload("").build();
   }
 
   protected MessageReceiver createMessageReciever(MessageExchangePattern mep) throws MuleException {
@@ -104,11 +104,11 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase {
     when(endpoint.getExchangePattern()).thenReturn(mep);
     when(endpoint.getMuleContext()).thenReturn(muleContext);
 
-    MuleEvent responseEvent = mock(MuleEvent.class);
+    Event responseEvent = mock(Event.class);
     when(responseEvent.getSession()).thenReturn(muleSession);
 
-    MessageProcessor listener = mock(MessageProcessor.class);
-    when(listener.process(any(MuleEvent.class))).thenAnswer(invocation -> (MuleEvent) invocation.getArguments()[0]);
+    Processor listener = mock(Processor.class);
+    when(listener.process(any(Event.class))).thenAnswer(invocation -> (Event) invocation.getArguments()[0]);
 
     MessageReceiver messageReceiver = new TestMessageReceiver(connector, flowConstruct, endpoint);
     messageReceiver.setListener(listener);

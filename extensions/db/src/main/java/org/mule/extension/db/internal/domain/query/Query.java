@@ -23,7 +23,7 @@ public class Query {
    * Creates a query from a template and a set of parameter values
    *
    * @param queryTemplate template describing the query
-   * @param paramValues   parameter values for the query
+   * @param paramValues parameter values for the query
    */
   public Query(QueryTemplate queryTemplate, List<QueryParamValue> paramValues) {
     this.paramValues = paramValues;

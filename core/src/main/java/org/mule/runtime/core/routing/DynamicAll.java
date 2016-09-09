@@ -7,12 +7,12 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 
 /**
@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.routing.RouterResultsHandler;
  * aggregated.
  *
  */
-public class DynamicAll implements MessageProcessor, MuleContextAware, Initialisable {
+public class DynamicAll implements Processor, MuleContextAware, Initialisable {
 
   private MulticastingRoutingStrategy routingStrategy;
   private DynamicRouteResolver dynamicRouteResolver;
@@ -36,7 +36,7 @@ public class DynamicAll implements MessageProcessor, MuleContextAware, Initialis
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return routingStrategy.route(event, dynamicRouteResolver.resolveRoutes(event));
   }
 

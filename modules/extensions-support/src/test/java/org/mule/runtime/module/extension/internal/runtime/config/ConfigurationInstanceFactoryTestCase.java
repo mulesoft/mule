@@ -20,7 +20,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -74,7 +74,7 @@ public class ConfigurationInstanceFactoryTestCase extends AbstractMuleTestCase {
   private Interceptor interceptor2;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleEvent event;
+  private Event event;
 
   private ResolverSet resolverSet;
   private ConfigurationInstanceFactory<TestConfig> factory;

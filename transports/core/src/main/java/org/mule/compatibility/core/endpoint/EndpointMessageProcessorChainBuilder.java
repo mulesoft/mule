@@ -8,7 +8,7 @@ package org.mule.compatibility.core.endpoint;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -47,7 +47,7 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
   }
 
   @Override
-  protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException {
+  protected Processor initializeMessageProcessor(Object processor) throws MuleException {
     if (processor instanceof AbstractMessageProcessorChain) {
       processor = new EndpointAwareMessageProcessorChain((AbstractMessageProcessorChain) processor);
     } else if (processor instanceof SecurityFilterMessageProcessor) {
@@ -75,7 +75,7 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
     @Override
     public void setEndpoint(ImmutableEndpoint ep) {
       this.endpoint = ep;
-      for (MessageProcessor processor : chain.getMessageProcessors()) {
+      for (Processor processor : chain.getMessageProcessors()) {
         if (processor instanceof EndpointAware) {
           ((EndpointAware) processor).setEndpoint(ep);
         }
@@ -88,7 +88,7 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return chain.process(event);
     }
 
@@ -138,7 +138,7 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
     }
 
     @Override
-    public List<MessageProcessor> getMessageProcessors() {
+    public List<Processor> getMessageProcessors() {
       return chain.getMessageProcessors();
     }
   }
@@ -187,7 +187,7 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return sfmp.process(event);
     }
 
@@ -202,7 +202,7 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
     }
 
     @Override
-    public void setListener(MessageProcessor next) {
+    public void setListener(Processor next) {
       sfmp.setListener(next);
     }
 

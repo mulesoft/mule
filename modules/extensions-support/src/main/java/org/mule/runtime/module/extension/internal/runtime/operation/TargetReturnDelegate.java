@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
@@ -15,7 +15,7 @@ import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapte
  * An implementation of {@link AbstractReturnDelegate} which sets the output message on a variable which key is taken from the
  * {@link #target} field.
  * <p>
- * The target variable will always contain a {@link MuleMessage}, even if the operation returned a simple value
+ * The target variable will always contain a {@link Message}, even if the operation returned a simple value
  * <p>
  * The original message is left untouched.
  *
@@ -38,7 +38,7 @@ final class TargetReturnDelegate extends AbstractReturnDelegate {
 
   @Override
   public MuleEvent asReturnValue(Object value, OperationContextAdapter operationContext) {
-    return org.mule.runtime.core.api.MuleEvent.builder(operationContext.getEvent())
-        .addFlowVariable(target, toMessage(value, operationContext)).build();
+    return org.mule.runtime.core.api.Event.builder(operationContext.getEvent())
+        .addVariable(target, toMessage(value, operationContext)).build();
   }
 }

@@ -21,7 +21,7 @@ import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsTransactionFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -82,7 +82,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase {
       }
     });
 
-    MuleMessage result = client.request("jms://replyTo.queue", 2000);
+    InternalMessage result = client.request("jms://replyTo.queue", 2000);
     assertNull(result);
   }
 
@@ -128,7 +128,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase {
       // this is ok
     }
 
-    MuleMessage result = client.request("jms://replyTo.queue", 2000);
+    InternalMessage result = client.request("jms://replyTo.queue", 2000);
     assertNull(result);
   }
 
@@ -171,10 +171,10 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase {
     });
 
     for (int i = 0; i < 100; i++) {
-      MuleMessage result = client.request("jms://replyTo.queue", 2000);
+      InternalMessage result = client.request("jms://replyTo.queue", 2000);
       assertNotNull(result);
     }
-    MuleMessage result = client.request("jms://replyTo.queue", 2000);
+    InternalMessage result = client.request("jms://replyTo.queue", 2000);
     assertNull(result);
   }
 

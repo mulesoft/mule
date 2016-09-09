@@ -12,7 +12,7 @@ import static org.mule.runtime.core.context.notification.TransactionNotification
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -54,11 +54,11 @@ public class JmsMessageRequester extends AbstractMessageRequester {
    *
    * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
    *        data available. If no data becomes available before the timeout elapses, null will be returned
-   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was avaialable
+   * @return the result of the request wrapped in a Message object. Null will be returned if no data was avaialable
    * @throws Exception if the call to the underlying protocal cuases an exception
    */
   @Override
-  protected MuleMessage doRequest(long timeout) throws Exception {
+  protected InternalMessage doRequest(long timeout) throws Exception {
     Session session = null;
     MessageConsumer consumer = null;
     boolean cleanupListenerRegistered = false;

@@ -9,13 +9,13 @@ package org.mule.compatibility.transport.jms.integration;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
@@ -60,11 +60,11 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
   public void testMessageAwareTransformerChainedWithObjectToJMSMessage() throws Exception {
     setCurrentEvent(getTestEvent("test"));
 
-    MuleMessage message = getTestMuleMessage("This is a test TextMessage");
+    InternalMessage message = getTestMuleMessage("This is a test TextMessage");
 
     SetTestRecipientsTransformer trans = new SetTestRecipientsTransformer();
     trans.setMuleContext(muleContext);
-    MuleMessage result1 = (MuleMessage) trans.transform(message);
+    InternalMessage result1 = (InternalMessage) trans.transform(message);
 
     // Check that transformer 1 set message property ok.
     assertEquals("vm://recipient1, vm://recipient1, vm://recipient3",
@@ -94,11 +94,11 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) {
+    public Object transformMessage(Event event, Charset outputEncoding) {
       String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";
       logger.debug("Setting recipients to '" + recipients + "'");
 
-      return MuleMessage.builder(event.getMessage())
+      return InternalMessage.builder(event.getMessage())
           .addOutboundProperty(ExpressionRecipientList.DEFAULT_SELECTOR_PROPERTY, recipients)
           .build();
     }

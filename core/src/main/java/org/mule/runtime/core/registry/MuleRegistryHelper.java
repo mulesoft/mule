@@ -476,7 +476,7 @@ public class MuleRegistryHelper implements MuleRegistry, RegistryProvider {
   }
 
   public void postObjectRegistrationActions(Object value) {
-    //TODO MULE-10238 - Remove this check once SimpleRegistry gets removed
+    // TODO MULE-10238 - Remove this check once SimpleRegistry gets removed
     if (!postProcessedObjects.containsKey(value)) {
       postProcessedObjects.put(value, value);
       if (value instanceof TransformerResolver) {

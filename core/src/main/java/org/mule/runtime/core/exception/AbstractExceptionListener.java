@@ -13,14 +13,14 @@ import static org.mule.runtime.core.context.notification.SecurityNotification.SE
 
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
@@ -52,7 +52,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList<>();
+  protected List<Processor> messageProcessors = new CopyOnWriteArrayList<>();
 
   protected AtomicBoolean initialised = new AtomicBoolean(false);
 
@@ -90,11 +90,11 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return messageProcessors;
   }
 
-  public void setMessageProcessors(List<MessageProcessor> processors) {
+  public void setMessageProcessors(List<Processor> processors) {
     if (processors != null) {
       this.messageProcessors.clear();
       this.messageProcessors.addAll(processors);
@@ -103,13 +103,13 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     }
   }
 
-  public void addEndpoint(MessageProcessor processor) {
+  public void addEndpoint(Processor processor) {
     if (processor != null) {
       messageProcessors.add(processor);
     }
   }
 
-  public boolean removeMessageProcessor(MessageProcessor processor) {
+  public boolean removeMessageProcessor(Processor processor) {
     return messageProcessors.remove(processor);
   }
 
@@ -157,16 +157,16 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   /**
    * Routes the current exception to an error endpoint such as a Dead Letter Queue (jms) This method is only invoked if there is a
-   * MuleMessage available to dispatch. The message dispatched from this method will be an <code>ExceptionMessage</code> which
-   * contains the exception thrown the MuleMessage and any context information.
+   * Message available to dispatch. The message dispatched from this method will be an <code>ExceptionMessage</code> which
+   * contains the exception thrown the Message and any context information.
    *
    * @param event the MuleEvent being processed when the exception occurred
    * @param flowConstruct the flow that was processing the event when the exception occurred.
    * @param t the exception thrown. This will be sent with the ExceptionMessage
    * @see ExceptionMessage
    */
-  protected MuleEvent routeException(MuleEvent event, FlowConstruct flowConstruct, Throwable t) {
-    MuleEvent result = event;
+  protected Event routeException(Event event, FlowConstruct flowConstruct, Throwable t) {
+    Event result = event;
 
     if (!messageProcessors.isEmpty()) {
       try {
@@ -178,14 +178,14 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         ExceptionMessage msg =
             new ExceptionMessage(event, t, flowConstruct.getName(), event.getContext().getOriginatingConnectorName());
 
-        MuleMessage exceptionMessage = MuleMessage.builder(event.getMessage()).payload(msg).build();
+        InternalMessage exceptionMessage = InternalMessage.builder(event.getMessage()).payload(msg).build();
 
         MulticastingRouter router = buildRouter();
         router.setRoutes(getMessageProcessors());
         router.setMuleContext(muleContext);
 
         // Route the ExceptionMessage to the new router
-        result = router.route(MuleEvent.builder(event).message(exceptionMessage).build());
+        result = router.route(Event.builder(event).message(exceptionMessage).build());
       } catch (Exception e) {
         logFatal(event, e);
       }
@@ -201,7 +201,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     return router;
   }
 
-  protected void closeStream(MuleMessage message) {
+  protected void closeStream(InternalMessage message) {
     if (muleContext == null || muleContext.isDisposing() || muleContext.isDisposed()) {
       return;
     }
@@ -215,7 +215,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    *
    * @param t the exception thrown
    */
-  protected void logException(Throwable t, MuleEvent event) {
+  protected void logException(Throwable t, Event event) {
     if (this.muleContext.getExpressionLanguage().evaluateBoolean(logException, event, flowConstruct, true, true)) {
       doLogException(t);
     }
@@ -237,7 +237,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
    * @param event The MuleEvent currently being processed
    * @param t the fatal exception to log
    */
-  protected void logFatal(MuleEvent event, Throwable t) {
+  protected void logFatal(Event event, Throwable t) {
     FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incFatalError();
@@ -246,7 +246,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     String logUniqueId = defaultString(event.getCorrelationId(), NOT_SET);
 
     String printableLogMessage =
-        format("Message identification summary here: id={0}, correlation={1}", logUniqueId, event.getCorrelation());
+        format("Message identification summary here: id={0}, correlation={1}", logUniqueId, event.getGroupCorrelation());
 
     logger.error("Failed to dispatch message to error queue after it failed to process.  This may cause message loss. "
         + (event.getMessage() == null ? "" : printableLogMessage), t);
@@ -306,7 +306,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
+  protected List<Processor> getOwnedMessageProcessors() {
     return messageProcessors;
   }
 
@@ -330,11 +330,11 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
   }
 
   void processOutboundRouterStatistics() {
-    List<MessageProcessor> processors = getMessageProcessors();
+    List<Processor> processors = getMessageProcessors();
     FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (isNotEmpty(processors) && statistics instanceof ServiceStatistics) {
       if (statistics.isEnabled()) {
-        for (MessageProcessor endpoint : processors) {
+        for (Processor endpoint : processors) {
           ((ServiceStatistics) statistics).getOutboundRouterStat().incrementRoutedMessage(endpoint);
         }
       }

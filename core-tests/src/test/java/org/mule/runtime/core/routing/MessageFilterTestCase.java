@@ -13,7 +13,7 @@ import static org.junit.Assert.assertSame;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -28,9 +28,9 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
     mp.setListener(listener);
 
-    MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+    Event inEvent = getTestEvent(TEST_MESSAGE);
 
-    MuleEvent resultEvent = mp.process(inEvent);
+    Event resultEvent = mp.process(inEvent);
 
     assertNotNull(listener.event);
     assertEquals(inEvent.getMessage(), resultEvent.getMessage());
@@ -42,9 +42,9 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setListener(out);
 
-    MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+    Event inEvent = getTestEvent(TEST_MESSAGE);
 
-    MuleEvent resultEvent = mp.process(inEvent);
+    Event resultEvent = mp.process(inEvent);
 
     assertNull(out.event);
     assertNull(resultEvent);
@@ -58,9 +58,9 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     mp.setListener(out);
     mp.setUnacceptedMessageProcessor(unaccepted);
 
-    MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+    Event inEvent = getTestEvent(TEST_MESSAGE);
 
-    MuleEvent resultEvent = mp.process(inEvent);
+    Event resultEvent = mp.process(inEvent);
 
     assertNotNull(out.event);
     assertEquals(inEvent.getMessage(), resultEvent.getMessage());
@@ -74,9 +74,9 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setListener(out);
 
-    MuleEvent inEvent = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
+    Event inEvent = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
 
-    MuleEvent resultEvent = mp.process(inEvent);
+    Event resultEvent = mp.process(inEvent);
 
     assertNull(out.event);
     assertSame(VoidMuleEvent.getInstance(), resultEvent);

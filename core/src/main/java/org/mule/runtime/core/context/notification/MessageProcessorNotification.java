@@ -12,13 +12,13 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent {
@@ -28,7 +28,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
   public static final int MESSAGE_PROCESSOR_PRE_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 1;
   public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
 
-  private final transient MessageProcessor processor;
+  private final transient Processor processor;
   private final transient FlowConstruct flowConstruct;
   private final String processorPath;
 
@@ -41,7 +41,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
   private MessagingException exceptionThrown;
 
 
-  public MessageProcessorNotification(FlowConstruct flowConstruct, MuleEvent event, MessageProcessor processor,
+  public MessageProcessorNotification(FlowConstruct flowConstruct, Event event, Processor processor,
                                       MessagingException exceptionThrown, int action) {
     super(produceEvent(event, flowConstruct), action, flowConstruct.getName());
     this.exceptionThrown = exceptionThrown;
@@ -57,14 +57,14 @@ public class MessageProcessorNotification extends ServerNotification implements 
   }
 
   @Override
-  public MuleEvent getSource() {
+  public Event getSource() {
     if (source instanceof String) {
       return null;
     }
-    return (MuleEvent) super.getSource();
+    return (Event) super.getSource();
   }
 
-  public MessageProcessor getProcessor() {
+  public Processor getProcessor() {
     return processor;
   }
 
@@ -85,14 +85,14 @@ public class MessageProcessorNotification extends ServerNotification implements 
   /**
    * If event is null, produce and event with the proper message root ID, to allow it to be correlated with others in the thread
    */
-  private static MuleEvent produceEvent(MuleEvent sourceEvent, FlowConstruct flowConstruct) {
+  private static Event produceEvent(Event sourceEvent, FlowConstruct flowConstruct) {
     String rootId = lastRootMessageId.get();
     if (sourceEvent != null && !VoidMuleEvent.getInstance().equals(sourceEvent)) {
       lastRootMessageId.set(sourceEvent.getCorrelationId());
       return sourceEvent;
     } else if (rootId != null && flowConstruct != null) {
-      final MuleMessage msg = MuleMessage.builder().nullPayload().build();
-      return MuleEvent.builder(create(flowConstruct, "MessageProcessorNotification", lastRootMessageId.get())).message(msg)
+      final InternalMessage msg = InternalMessage.builder().nullPayload().build();
+      return Event.builder(create(flowConstruct, "MessageProcessorNotification", lastRootMessageId.get())).message(msg)
           .flow(flowConstruct).exchangePattern(REQUEST_RESPONSE).build();
     } else {
       return null;

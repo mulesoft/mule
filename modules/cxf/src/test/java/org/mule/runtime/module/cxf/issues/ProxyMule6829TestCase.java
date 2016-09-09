@@ -20,7 +20,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -60,7 +60,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
 
     @Override
     public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
-      QName cxfOperation = context.getEvent().getFlowVariable("cxf_operation");
+      QName cxfOperation = context.getEvent().getVariable("cxf_operation");
       cxfOperationName = cxfOperation.getLocalPart();
 
       latch.countDown();
@@ -88,7 +88,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
             + "</soapenv:Envelope>";
 
     String soapOperation = "EchoOperation1";
-    MuleMessage response = executeSoap11Call(msgEchoOperation1, soapOperation);
+    InternalMessage response = executeSoap11Call(msgEchoOperation1, soapOperation);
     assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
@@ -108,7 +108,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
             + "</soapenv:Envelope>";
 
     String soapOperation = "EchoOperation2";
-    MuleMessage response = executeSoap11Call(msgEchoOperation2, soapOperation);
+    InternalMessage response = executeSoap11Call(msgEchoOperation2, soapOperation);
     assertTrue(latch.await(1000L, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
@@ -128,7 +128,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
             + "</soap:Envelope>";
 
     String soapOperation = "EchoOperation1";
-    MuleMessage response = executeSoap12Call(msgEchoOperation1, soapOperation);
+    InternalMessage response = executeSoap12Call(msgEchoOperation1, soapOperation);
     assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
@@ -148,7 +148,7 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
             + "</soap:Envelope>";
 
     String soapOperation = "EchoOperation2";
-    MuleMessage response = executeSoap12Call(msgEchoOperation2, soapOperation);
+    InternalMessage response = executeSoap12Call(msgEchoOperation2, soapOperation);
     assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
     String cxfOperationName = testCxfEventCallback.getCxfOperationName();
     assertEquals(soapOperation, cxfOperationName);
@@ -157,17 +157,17 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
     assertTrue(payload.contains("hello world"));
   }
 
-  private MuleMessage executeSoap11Call(String msgString, String soapAction) throws MuleException {
-    MuleMessage msg = MuleMessage.builder().payload(msgString).addOutboundProperty("soapAction", soapAction).build();
+  private InternalMessage executeSoap11Call(String msgString, String soapAction) throws MuleException {
+    InternalMessage msg = InternalMessage.builder().payload(msgString).addOutboundProperty("soapAction", soapAction).build();
 
     return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService11", msg,
                                         HTTP_REQUEST_OPTIONS)
         .getRight();
   }
 
-  private MuleMessage executeSoap12Call(String msgString, String soapAction) throws MuleException {
+  private InternalMessage executeSoap12Call(String msgString, String soapAction) throws MuleException {
     String contentType = APP_SOAP_XML.withCharset(UTF_8).toRfcString() + ";action=\"" + soapAction + "\"";
-    MuleMessage msg = MuleMessage.builder().payload(msgString).mediaType(MediaType.parse(contentType)).build();
+    InternalMessage msg = InternalMessage.builder().payload(msgString).mediaType(MediaType.parse(contentType)).build();
 
     return muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/EchoService12", msg,
                                         HTTP_REQUEST_OPTIONS)

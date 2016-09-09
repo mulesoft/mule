@@ -7,7 +7,7 @@
 package org.mule.test.usecases.routing.lookup;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -32,7 +32,7 @@ public class ValidateResponse extends AbstractTransformer {
     if (response != null && response.contains("<ErrorStatus>Success</ErrorStatus>")) {
       return response;
     } else {
-      throw new TransformerException(MessageFactory.createStaticMessage("Invalid response from service: " + response));
+      throw new TransformerException(I18nMessageFactory.createStaticMessage("Invalid response from service: " + response));
     }
   }
 }

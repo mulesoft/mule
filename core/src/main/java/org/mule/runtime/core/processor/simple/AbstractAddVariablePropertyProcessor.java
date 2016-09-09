@@ -9,12 +9,12 @@ package org.mule.runtime.core.processor.simple;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -39,15 +39,15 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     Object keyValue = identifierEvaluator.resolveValue(event);
     String key = (keyValue == null ? null : keyValue.toString());
     if (key == null) {
       logger.error("Setting Null variable keys is not supported, this entry is being ignored");
       return event;
     } else {
-      final Builder builder = MuleEvent.builder(event);
-      TypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event, builder);
+      final Builder builder = Event.builder(event);
+      DefaultTypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event, builder);
       event = builder.build();
       if (typedValue.getValue() == null) {
         if (logger.isDebugEnabled()) {
@@ -68,8 +68,8 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
   }
 
   private Charset getEncoding(Object src) {
-    if (src instanceof MuleMessage) {
-      return ((MuleMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
+    if (src instanceof InternalMessage) {
+      return ((InternalMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
     } else {
       return getDefaultEncoding(muleContext);
     }
@@ -83,7 +83,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
    * @param value value of the property or variable to add
    * @param dataType data type of the property or variable to add
    */
-  protected abstract MuleEvent addProperty(MuleEvent event, String propertyName, T value, DataType dataType);
+  protected abstract Event addProperty(Event event, String propertyName, T value, DataType dataType);
 
   /**
    * Removes the property from a property or variables scope.
@@ -91,7 +91,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
    * @param event event to which property is to be removed
    * @param propertyName name of the property or variable to remove
    */
-  protected abstract MuleEvent removeProperty(MuleEvent event, String propertyName);
+  protected abstract Event removeProperty(Event event, String propertyName);
 
   public void setIdentifier(String identifier) {
     if (StringUtils.isBlank(identifier)) {

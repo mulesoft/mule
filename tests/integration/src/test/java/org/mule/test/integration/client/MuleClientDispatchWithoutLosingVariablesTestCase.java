@@ -10,12 +10,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -37,8 +37,8 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIn
   }
 
   private void doSendMessageToHttp(String flowName) throws Exception {
-    MuleMessage result = flowRunner(flowName).withPayload("TEST1").run().getMessage();
-    assertThat(result, notNullValue(MuleMessage.class));
+    InternalMessage result = flowRunner(flowName).withPayload("TEST1").run().getMessage();
+    assertThat(result, notNullValue(InternalMessage.class));
     FlowAssert.verify(flowName);
   }
 
@@ -66,11 +66,11 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIn
     doSendMessageToHttp("flowVarsFlowUsingJavaComponent");
   }
 
-  public static class MessageProcessorDispatchFlowUsingNewMuleClient implements MessageProcessor {
+  public static class MessageProcessorDispatchFlowUsingNewMuleClient implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+    public Event process(Event event) throws MuleException {
+      muleContext.getClient().dispatch(getUrl("innertest"), InternalMessage.builder().payload("payload").build());
       return event;
 
     }
@@ -80,7 +80,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIn
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      muleContext.getClient().dispatch(getUrl("innertest"), MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().dispatch(getUrl("innertest"), InternalMessage.builder().payload("payload").build());
       return eventContext.getMessage();
     }
   }
@@ -89,7 +89,7 @@ public class MuleClientDispatchWithoutLosingVariablesTestCase extends AbstractIn
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      muleContext.getClient().send(getUrl("innerrequestresponsetest"), MuleMessage.builder().payload("payload").build());
+      muleContext.getClient().send(getUrl("innerrequestresponsetest"), InternalMessage.builder().payload("payload").build());
       return eventContext.getMessage();
     }
   }

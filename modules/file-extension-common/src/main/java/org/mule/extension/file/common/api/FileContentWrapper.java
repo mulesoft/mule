@@ -123,7 +123,7 @@ public final class FileContentWrapper {
     }
   }
 
-  private org.mule.runtime.core.api.MuleEvent castEvent() {
-    return (org.mule.runtime.core.api.MuleEvent) event;
+  private org.mule.runtime.core.api.Event castEvent() {
+    return (org.mule.runtime.core.api.Event) event;
   }
 }

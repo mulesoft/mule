@@ -15,7 +15,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromUndefinedSimpleAttributes;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.config.spring.dsl.model.CoreComponentBuildingDefinitionProvider.getMuleMessageTransformerBaseBuilder;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.compatibility.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.compatibility.config.spring.factories.OutboundEndpointFactoryBean;
@@ -31,7 +31,7 @@ import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicy;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -66,7 +66,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
     componentBuildingDefinitions.add(getOutboundEndpointBuildingDefinitionBuilder().build());
     componentBuildingDefinitions.add(getEndpointBuildingDefinitionBuilder().build());
     componentBuildingDefinitions
-        .add(baseDefinition.copy().withIdentifier(ENDPOINT_RESPONSE_ELEMENT).withTypeDefinition(fromType(MessageProcessor.class))
+        .add(baseDefinition.copy().withIdentifier(ENDPOINT_RESPONSE_ELEMENT).withTypeDefinition(fromType(Processor.class))
             .withObjectFactoryType(MessageProcessorChainFactoryBean.class).build());
     componentBuildingDefinitions.add(baseDefinition.copy().withIdentifier("service-overrides")
         .withObjectFactoryType(ServiceOverridesObjectFactory.class).withTypeDefinition(fromType(Map.class))
@@ -125,7 +125,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
         .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
+        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(Processor.class).build())
         .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
         .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
         .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
@@ -145,7 +145,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
         .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
+        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(Processor.class).build())
         .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
         .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
         .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())
@@ -167,7 +167,7 @@ public class TransportComponentBuildingDefinitionProvider implements ComponentBu
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicy.class).build())
         .withSetterParameterDefinition("exchangePattern", fromSimpleParameter("exchange-pattern").build())
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
-        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(MessageProcessor.class).build())
+        .withSetterParameterDefinition("messageProcessors", fromChildCollectionConfiguration(Processor.class).build())
         .withSetterParameterDefinition("disableTransportTransformer", fromSimpleParameter("disableTransportTransformer").build())
         .withSetterParameterDefinition("mimeType", fromSimpleParameter("mimeType").build())
         .withSetterParameterDefinition("redeliveryPolicy", fromChildConfiguration(AbstractRedeliveryPolicy.class).build())

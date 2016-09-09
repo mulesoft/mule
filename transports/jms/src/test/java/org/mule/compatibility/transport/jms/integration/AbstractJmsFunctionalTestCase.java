@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -420,20 +420,20 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase {
     client.dispatch(getInboundEndpoint(), payload, props);
   }
 
-  protected MuleMessage receiveMessage() throws Exception {
+  protected InternalMessage receiveMessage() throws Exception {
     return receiveMessage(DEFAULT_OUTPUT_MESSAGE);
   }
 
-  protected MuleMessage receiveMessage(Object expected) throws Exception {
-    MuleMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
+  protected InternalMessage receiveMessage(Object expected) throws Exception {
+    InternalMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
     assertEquals(expected, result.getPayload());
     return result;
   }
 
-  protected MuleMessage receiveMessage(byte[] expected) throws Exception {
-    MuleMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
+  protected InternalMessage receiveMessage(byte[] expected) throws Exception {
+    InternalMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
     byte[] bytes = getPayloadAsBytes(result);

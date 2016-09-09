@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase {
   public void testClientSend() throws Exception {
     MuleClient client = new MuleClient(muleContext);
 
-    MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
+    InternalMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
     assertNotNull(message);
     assertEquals("Received: Test Client Send message", message.getPayload());
   }
@@ -43,7 +43,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase {
     MuleClient client = new MuleClient(muleContext);
 
     for (int i = 0; i < INTERATIONS; i++) {
-      MuleMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
+      InternalMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
       assertNotNull(message);
       assertEquals("Received: Test Client Send message " + i, message.getPayload());
     }
@@ -84,7 +84,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase {
     Thread.sleep(5000);
     start = System.currentTimeMillis();
     for (i = 0; i < INTERATIONS; i++) {
-      MuleMessage message = client.request("jms://replyTo.queue", 5000);
+      InternalMessage message = client.request("jms://replyTo.queue", 5000);
       assertNotNull("message should not be null from Reply queue", message);
       logger.debug("Count is " + i);
       logger.debug("ReplyTo Message is: " + getPayloadAsString(message));

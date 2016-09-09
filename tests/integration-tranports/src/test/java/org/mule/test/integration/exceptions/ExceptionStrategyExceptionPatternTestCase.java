@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
@@ -69,7 +69,7 @@ public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCas
     if (!exceptionLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("exception should be thrown");
     }
-    MuleMessage muleMessage = client.request("jms://out", TIMEOUT).getRight().get();
+    InternalMessage muleMessage = client.request("jms://out", TIMEOUT).getRight().get();
     assertThat(muleMessage, IsNull.notNullValue());
   }
 

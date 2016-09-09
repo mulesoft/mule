@@ -51,7 +51,7 @@ public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
 
     // Apparently Derby has a bug: when there are no resultset returned, then
     // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
-    //assertThat(payload.size(), equalTo(2));
+    // assertThat(payload.size(), equalTo(2));
     // Compares string in to avoid problems when different DB return different integer classes (BigDecimal, integer, etc)
 
     assertThat("6", equalTo(payload.get("myInt").toString()));
@@ -63,7 +63,7 @@ public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
 
     // Apparently Derby has a bug: when there are no resultset returned, then
     // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
-    //assertThat(payload.size(), equalTo(2));
+    // assertThat(payload.size(), equalTo(2));
     // Compares string in to avoid problems when different DB return different integer classes (BigDecimal, integer, etc)
     assertThat(payload.get("result1").toString(), IsEqual.equalTo("12"));
     assertThat(payload.get("result2").toString(), IsEqual.equalTo("60"));
@@ -75,7 +75,7 @@ public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
 
     // Apparently Derby has a bug: when there are no resultset returned, then
     // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
-    //assertThat(payload.size(), equalTo(2));
+    // assertThat(payload.size(), equalTo(2));
     assertThat(payload.get("result"), equalTo("foobar"));
   }
 
@@ -85,8 +85,8 @@ public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
 
     // Apparently Derby has a bug: when there are no resultset returned, then
     // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
-    //assertThat(payload.size(), equalTo(2));
-    //assertThat((Integer) payload.get("updateCount1"), equalTo(0));
+    // assertThat(payload.size(), equalTo(2));
+    // assertThat((Integer) payload.get("updateCount1"), equalTo(0));
     // Compares string in to avoid problems when different DB return different integer classes (BigDecimal, integer, etc)
 
     assertThat("3", equalTo(payload.get("count").toString()));

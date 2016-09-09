@@ -6,15 +6,15 @@
  */
 package org.mule.extension.http.api.request.validator;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.api.message.MuleMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * Signals that an error occurred while validating a {@link MuleMessage}
+ * Signals that an error occurred while validating a {@link Message}
  *
  * @since 4.0
  */

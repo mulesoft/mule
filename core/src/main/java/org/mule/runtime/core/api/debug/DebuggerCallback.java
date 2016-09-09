@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.debug;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface DebuggerCallback {
    *
    * @param event The event that is being debugged. Non null
    */
-  void onExecutionBegun(MuleEvent event);
+  void onExecutionBegun(Event event);
 
   /**
    * Notifies when the execution is paused for debugging the current execution state.
@@ -31,12 +31,12 @@ public interface DebuggerCallback {
    * @param frameStack The frame stack. Non null
    * @param location The location where it was stopped. Non null
    */
-  void onExecutionPaused(MuleEvent event, List<DebuggerFrame> frameStack, String location);
+  void onExecutionPaused(Event event, List<DebuggerFrame> frameStack, String location);
 
   /**
    * Notifies when the execution of the event has ended.
    *
    * @param event The event being debugged. Non null
    */
-  void onExecutionEnded(MuleEvent event);
+  void onExecutionEnded(Event event);
 }

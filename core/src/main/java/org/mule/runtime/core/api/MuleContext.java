@@ -363,8 +363,8 @@ public interface MuleContext extends Lifecycle {
 
   /**
    * Gets application wide instance of {@link TransformationService} used for applying
-   * {@link org.mule.runtime.core.api.transformer.Transformer}'s to a {@link MuleMessage} and for obtaining different
-   * representations of the message payload.
+   * {@link org.mule.runtime.core.api.transformer.Transformer}'s to a {@link Message} and for obtaining different representations
+   * of the message payload.
    *
    * @return transformation service
    */
@@ -405,7 +405,8 @@ public interface MuleContext extends Lifecycle {
   ErrorTypeLocator getErrorTypeLocator();
 
   /**
-   * @return an error type repository to get access to the {@link org.mule.runtime.api.message.ErrorType} instances of this artifact.
+   * @return an error type repository to get access to the {@link org.mule.runtime.api.message.ErrorType} instances of this
+   *         artifact.
    */
   ErrorTypeRepository getErrorTypeRepository();
 }

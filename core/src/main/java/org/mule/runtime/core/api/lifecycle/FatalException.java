@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>FatalException</code> can be thrown during initialisation or during execution to indicate that something fatal has
@@ -23,7 +23,7 @@ public class FatalException extends LifecycleException {
    * @param message the exception message
    * @param component the object that failed during a lifecycle method call
    */
-  public FatalException(Message message, Object component) {
+  public FatalException(I18nMessage message, Object component) {
     super(message, component);
   }
 
@@ -32,7 +32,7 @@ public class FatalException extends LifecycleException {
    * @param cause the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
-  public FatalException(Message message, Throwable cause, Object component) {
+  public FatalException(I18nMessage message, Throwable cause, Object component) {
     super(message, cause, component);
   }
 

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.File;
@@ -35,7 +35,7 @@ public class AbstractFileRecursiveFilterTestCase extends FunctionalTestCase {
   public void filtersFiles() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
     assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
   }

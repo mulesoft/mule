@@ -13,11 +13,11 @@ import static org.mule.runtime.core.client.DefaultLocalMuleClient.MESSAGE_FILTER
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 
 import org.hamcrest.core.Is;
@@ -58,19 +58,19 @@ public class MessageFilterTestCase extends FunctionalTestCase {
     assertEquals("OK-DEF(rejected!-1)", rejectMesage);
     rejectMesage = null;
 
-    MuleMessage response = client.send("vm://order.validation", "OK-ABC-DEF", null).getRight();
+    InternalMessage response = client.send("vm://order.validation", "OK-ABC-DEF", null).getRight();
     assertEquals("OK-ABC-DEF(success)", getPayloadAsString(response));
     assertNull(rejectMesage);
   }
 
-  public static class Reject1 implements MessageProcessor {
+  public static class Reject1 implements Processor {
 
     public void setName(String name) {
       // ignore name
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       try {
         String payload = event.getMessageAsString(muleContext);
         rejectMesage = payload + "(rejected!-1)";
@@ -81,14 +81,14 @@ public class MessageFilterTestCase extends FunctionalTestCase {
     }
   }
 
-  public static class Reject2 implements MessageProcessor {
+  public static class Reject2 implements Processor {
 
     public void setName(String name) {
       // ignore name
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       try {
         String payload = event.getMessageAsString(muleContext);
         rejectMesage = payload + "(rejected!-2)";

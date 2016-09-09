@@ -12,7 +12,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -42,7 +42,7 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   public void before() {
     when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
     when(operationModel.getOutput())
-        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(String.class), false, emptySet()));
     when(operationModel.getName()).thenReturn("operation");
   }
 
@@ -54,14 +54,14 @@ public class OperationReturnTypeModelValidatorTestCase extends AbstractMuleTestC
   @Test(expected = IllegalOperationModelDefinitionException.class)
   public void muleEventReturnType() {
     when(operationModel.getOutput())
-        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(MuleEvent.class), false, emptySet()));
     validator.validate(extensionModel);
   }
 
   @Test(expected = IllegalOperationModelDefinitionException.class)
   public void muleMessageReturnType() {
     when(operationModel.getOutput())
-        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(MuleMessage.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(Message.class), false, emptySet()));
     validator.validate(extensionModel);
   }
 }

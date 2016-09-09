@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.transformer;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.nio.charset.Charset;
@@ -22,7 +22,7 @@ public class TransformerTemplate extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     try {
       return callback.doTransform(event.getMessage());
     } catch (TransformerException e) {
@@ -34,7 +34,7 @@ public class TransformerTemplate extends AbstractMessageTransformer {
 
   public interface TransformerCallback {
 
-    public Object doTransform(MuleMessage message) throws Exception;
+    public Object doTransform(InternalMessage message) throws Exception;
   }
 
   public static class OverwitePayloadCallback implements TransformerCallback {
@@ -46,7 +46,7 @@ public class TransformerTemplate extends AbstractMessageTransformer {
     }
 
     @Override
-    public Object doTransform(MuleMessage message) throws Exception {
+    public Object doTransform(InternalMessage message) throws Exception {
       return payload;
     }
   }

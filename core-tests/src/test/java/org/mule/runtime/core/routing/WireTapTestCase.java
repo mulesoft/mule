@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -34,8 +34,8 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testWireTapNoFilter() throws Exception {
-    MuleEvent event = getTestEvent("data");
-    MuleEvent primaryOutput = wireTap.process(event);
+    Event event = getTestEvent("data");
+    Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);
 
@@ -47,8 +47,8 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   public void testWireTapFilterAccepted() throws Exception {
     wireTap.setFilter((message, builder) -> true);
 
-    MuleEvent event = getTestEvent("data");
-    MuleEvent primaryOutput = wireTap.process(event);
+    Event event = getTestEvent("data");
+    Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);
 
@@ -60,8 +60,8 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   public void testWireTapFilterUnaccepted() throws Exception {
     wireTap.setFilter((message, builder) -> false);
 
-    MuleEvent event = getTestEvent("data");
-    MuleEvent primaryOutput = wireTap.process(event);
+    Event event = getTestEvent("data");
+    Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);
 
@@ -72,8 +72,8 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   public void testWireTapNullTap() throws Exception {
     wireTap.setTap(null);
 
-    MuleEvent event = getTestEvent("data");
-    MuleEvent primaryOutput = wireTap.process(event);
+    Event event = getTestEvent("data");
+    Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);
   }

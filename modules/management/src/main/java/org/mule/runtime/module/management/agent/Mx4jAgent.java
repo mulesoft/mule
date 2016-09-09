@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -161,7 +161,7 @@ public class Mx4jAgent extends AbstractAgent {
 
   public void start() throws MuleException {
     if (mBeanServer == null) {
-      throw new InitialisationException(MessageFactory.createStaticMessage("mBeanServer has not yet been created"), this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("mBeanServer has not yet been created"), this);
     }
 
     try {

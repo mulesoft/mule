@@ -35,9 +35,9 @@ import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionE
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -48,7 +48,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
@@ -106,7 +106,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Mock
   private WorkManager workManager;
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MessageProcessor messageProcessor;
+  private Processor messageProcessor;
   @Mock
   private FlowConstruct flowConstruct;
   @Mock(extraInterfaces = Lifecycle.class)
@@ -118,7 +118,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Mock
   private ExceptionEnricherFactory enricherFactory;
   @Mock
-  private MuleMessage muleMessage;
+  private InternalMessage muleMessage;
   @Mock
   private ConfigurationProvider configurationProvider;
   @Mock(answer = RETURNS_DEEP_STUBS)
@@ -126,7 +126,7 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
   @Mock
   private ConfigurationInstance configurationInstance;
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleEvent event;
+  private Event event;
   private ExtensionMessageSource messageSource;
 
   @Before
@@ -169,12 +169,12 @@ public class ExtensionMessageSourceTestCase extends AbstractMuleContextTestCase 
     CompletionHandler completionHandler = mock(CompletionHandler.class);
     messageSource.handle(muleMessage, completionHandler);
 
-    ArgumentCaptor<MuleEvent> eventCaptor = ArgumentCaptor.forClass(MuleEvent.class);
+    ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
     verify(messageProcessor).process(eventCaptor.capture());
 
-    MuleEvent event = eventCaptor.getValue();
+    Event event = eventCaptor.getValue();
     assertThat(event.getMessage(), is(sameInstance(muleMessage)));
-    verify(completionHandler).onCompletion(any(MuleMessage.class), any(ExceptionCallback.class));
+    verify(completionHandler).onCompletion(any(InternalMessage.class), any(ExceptionCallback.class));
   }
 
   @Test

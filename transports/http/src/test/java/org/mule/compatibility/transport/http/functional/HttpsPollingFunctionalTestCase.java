@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -30,7 +30,7 @@ public class HttpsPollingFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void httpsPolling() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("vm://toTest", 60000).getRight().get();
+    InternalMessage message = client.request("vm://toTest", 60000).getRight().get();
     assertNotNull(message);
     assertEquals("/ received", getPayloadAsString(message));
   }

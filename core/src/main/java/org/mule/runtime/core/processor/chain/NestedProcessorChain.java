@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Map;
 
 /**
- * An implementation of {@link NestedProcessor} that wraps a {@link MessageProcessor} and allows to execute it
+ * An implementation of {@link NestedProcessor} that wraps a {@link Processor} and allows to execute it
  *
  * @since 3.7.0
  */
@@ -23,13 +23,13 @@ public class NestedProcessorChain implements NestedProcessor {
   /**
    * Chain that will be executed upon calling process
    */
-  private MessageProcessor chain;
+  private Processor chain;
   /**
    * Event that will be cloned for dispatching
    */
-  private MuleEvent event;
+  private Event event;
 
-  public NestedProcessorChain(MuleEvent event, MessageProcessor chain) {
+  public NestedProcessorChain(Event event, Processor chain) {
     this.event = event;
     this.chain = chain;
   }
@@ -39,7 +39,7 @@ public class NestedProcessorChain implements NestedProcessor {
    *
    * @param value Value to set
    */
-  public void setChain(MessageProcessor value) {
+  public void setChain(Processor value) {
     this.chain = value;
   }
 
@@ -48,7 +48,7 @@ public class NestedProcessorChain implements NestedProcessor {
    *
    * @param value Value to set
    */
-  public void setEvent(MuleEvent value) {
+  public void setEvent(Event value) {
     this.event = value;
   }
 
@@ -59,20 +59,20 @@ public class NestedProcessorChain implements NestedProcessor {
 
   @Override
   public Object process(Object payload) throws Exception {
-    MuleEvent muleEvent = MuleEvent.builder(event).message(MuleMessage.builder().payload(payload).build()).build();
+    Event muleEvent = Event.builder(event).message(InternalMessage.builder().payload(payload).build()).build();
     return chain.process(muleEvent).getMessage().getPayload();
   }
 
   @Override
   public Object processWithExtraProperties(Map<String, Object> properties) throws Exception {
-    MuleEvent muleEvent = MuleEvent.builder(event).flowVariables(properties).build();
+    Event muleEvent = Event.builder(event).variables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload();
   }
 
   @Override
   public Object process(Object payload, Map<String, Object> properties) throws Exception {
-    MuleEvent muleEvent =
-        MuleEvent.builder(event).message(MuleMessage.builder().payload(payload).build()).flowVariables(properties).build();
+    Event muleEvent =
+        Event.builder(event).message(InternalMessage.builder().payload(payload).build()).variables(properties).build();
     return chain.process(muleEvent).getMessage().getPayload();
   }
 }

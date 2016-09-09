@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.core.enricher;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.MessageProcessors;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
@@ -60,40 +60,40 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
   private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
 
-  private MessageProcessor enrichmentProcessor;
+  private Processor enrichmentProcessor;
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return new EnricherProcessor(enrichmentProcessor, muleContext).process(event);
   }
 
-  protected MuleEvent enrich(MuleEvent currentEvent,
-                             MuleEvent enrichmentEvent,
-                             String sourceExpressionArg,
-                             String targetExpressionArg,
-                             ExpressionLanguage expressionLanguage) {
+  protected Event enrich(Event currentEvent,
+                         Event enrichmentEvent,
+                         String sourceExpressionArg,
+                         String targetExpressionArg,
+                         ExpressionLanguage expressionLanguage) {
     if (StringUtils.isEmpty(sourceExpressionArg)) {
       sourceExpressionArg = "#[payload:]";
     }
 
-    TypedValue typedValue = expressionLanguage.evaluateTyped(sourceExpressionArg, enrichmentEvent, flowConstruct);
+    DefaultTypedValue typedValue = expressionLanguage.evaluateTyped(sourceExpressionArg, enrichmentEvent, flowConstruct);
 
-    if (typedValue.getValue() instanceof MuleMessage) {
-      MuleMessage muleMessage = (MuleMessage) typedValue.getValue();
-      typedValue = new TypedValue(muleMessage.getPayload(), muleMessage.getDataType());
+    if (typedValue.getValue() instanceof InternalMessage) {
+      InternalMessage muleMessage = (InternalMessage) typedValue.getValue();
+      typedValue = new DefaultTypedValue(muleMessage.getPayload(), muleMessage.getDataType());
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {
-      MuleEvent.Builder eventBuilder = MuleEvent.builder(currentEvent);
+      Event.Builder eventBuilder = Event.builder(currentEvent);
       expressionLanguage.enrich(targetExpressionArg, currentEvent, eventBuilder, flowConstruct, typedValue);
       return eventBuilder.build();
     } else {
-      return MuleEvent.builder(currentEvent).message(MuleMessage.builder(currentEvent.getMessage())
+      return Event.builder(currentEvent).message(InternalMessage.builder(currentEvent.getMessage())
           .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }
 
-  public void setEnrichmentMessageProcessor(MessageProcessor enrichmentProcessor) {
+  public void setEnrichmentMessageProcessor(Processor enrichmentProcessor) {
     if (!(enrichmentProcessor instanceof MessageProcessorChain)) {
       this.enrichmentProcessor = MessageProcessors.singletonChain(muleContext, enrichmentProcessor);
     } else {
@@ -108,7 +108,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
   /**
    * For spring
    */
-  public void setMessageProcessor(MessageProcessor enrichmentProcessor) {
+  public void setMessageProcessor(Processor enrichmentProcessor) {
     setEnrichmentMessageProcessor(enrichmentProcessor);
   }
 
@@ -156,7 +156,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
+  protected List<Processor> getOwnedMessageProcessors() {
     return Collections.singletonList(enrichmentProcessor);
   }
 
@@ -175,38 +175,38 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
    */
   private class EnricherProcessor extends AbstractRequestResponseMessageProcessor implements InternalMessageProcessor {
 
-    private MuleEvent eventToEnrich;
+    private Event eventToEnrich;
 
-    protected EnricherProcessor(MessageProcessor enrichmentProcessor, MuleContext muleContext) {
+    protected EnricherProcessor(Processor enrichmentProcessor, MuleContext muleContext) {
       this.next = enrichmentProcessor;
       this.muleContext = muleContext;
     }
 
     @Override
-    protected MuleEvent processBlocking(MuleEvent event) throws MuleException {
+    protected Event processBlocking(Event event) throws MuleException {
       this.eventToEnrich = event;
       return super.processBlocking(copyEventForEnrichment(event));
     }
 
     @Override
-    protected MuleEvent processNonBlocking(MuleEvent event) throws MuleException {
+    protected Event processNonBlocking(Event event) throws MuleException {
       this.eventToEnrich = event;
-      MuleEvent result =
-          processNext(copyEventForEnrichment(MuleEvent.builder(event).replyToHandler(createReplyToHandler(event)).build()));
+      Event result =
+          processNext(copyEventForEnrichment(Event.builder(event).replyToHandler(createReplyToHandler(event)).build()));
       if (!(result instanceof NonBlockingVoidMuleEvent)) {
         result = processResponse(result, event);
       }
       return result;
     }
 
-    private MuleEvent copyEventForEnrichment(MuleEvent event) {
-      MuleEvent copy = MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
+    private Event copyEventForEnrichment(Event event) {
+      Event copy = Event.builder(event).session(new DefaultMuleSession(event.getSession())).build();
       setCurrentEvent(copy);
       return copy;
     }
 
     @Override
-    protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
+    protected Event processResponse(Event response, final Event request) throws MuleException {
       final ExpressionLanguage expressionLanguage = muleContext.getExpressionLanguage();
 
       if (response != null && !VoidMuleEvent.getInstance().equals(eventToEnrich)) {

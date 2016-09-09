@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getResolver;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -46,7 +46,7 @@ public class CollectionValueResolverTestCase extends AbstractMuleTestCase {
   private List<ValueResolver> childResolvers;
   private List<Integer> expectedValues;
   private MuleContext muleContext;
-  private MuleEvent event;
+  private Event event;
 
   public CollectionValueResolverTestCase(Class<? extends Collection> collectionType) {
     this.collectionType = collectionType;
@@ -55,7 +55,7 @@ public class CollectionValueResolverTestCase extends AbstractMuleTestCase {
   @Before
   public void before() throws Exception {
     muleContext = mock(MuleContext.class);
-    event = mock(MuleEvent.class);
+    event = mock(Event.class);
 
     collectionType = ArrayList.class;
     childResolvers = new ArrayList();
@@ -93,7 +93,7 @@ public class CollectionValueResolverTestCase extends AbstractMuleTestCase {
     childResolvers.clear();
     resolver = createCollectionResolver(childResolvers);
 
-    Collection<Object> resolved = (Collection<Object>) resolver.resolve(mock(MuleEvent.class));
+    Collection<Object> resolved = (Collection<Object>) resolver.resolve(mock(Event.class));
     assertThat(resolved, notNullValue());
     assertThat(resolved.size(), equalTo(0));
   }
@@ -115,13 +115,13 @@ public class CollectionValueResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void collectionOfExpectedType() throws Exception {
-    Collection<Object> resolved = (Collection<Object>) resolver.resolve(mock(MuleEvent.class));
+    Collection<Object> resolved = (Collection<Object>) resolver.resolve(mock(Event.class));
     assertThat(resolved, instanceOf(collectionType));
   }
 
   @Test
   public void resolvedCollectionIsMutalbe() throws Exception {
-    Collection<Object> resolved = (Collection<Object>) resolver.resolve(mock(MuleEvent.class));
+    Collection<Object> resolved = (Collection<Object>) resolver.resolve(mock(Event.class));
     int originalSize = resolved.size();
     resolved.add(-1);
 

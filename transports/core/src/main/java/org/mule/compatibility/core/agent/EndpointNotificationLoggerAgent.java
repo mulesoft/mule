@@ -13,8 +13,8 @@ import org.mule.compatibility.core.context.notification.EndpointMessageNotificat
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.agent.AbstractNotificationLoggerAgent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -111,10 +111,10 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         // is being used for notifications then ignore.
         return;
       }
-      MuleMessage msg = MuleMessage.builder().payload(e).build();
+      InternalMessage msg = InternalMessage.builder().payload(e).build();
       try {
         // TODO: Filters should really be applied by the endpoint
-        if (endpoint.getFilter() != null && !endpoint.getFilter().accept(msg, MuleEvent
+        if (endpoint.getFilter() != null && !endpoint.getFilter().accept(msg, Event
             .builder(DefaultMessageContext.create(endpoint.getFlowConstruct(), "EndpointNotificationLoggerAgent")))) {
           if (logger.isInfoEnabled()) {
             logger.info("Message not accepted with filter: " + endpoint.getFilter());
@@ -150,7 +150,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
           }
         };
 
-        endpoint.process(MuleEvent.builder(create(flowConstruct, "EndpointNotificationLoggerAgent")).message(msg)
+        endpoint.process(Event.builder(create(flowConstruct, "EndpointNotificationLoggerAgent")).message(msg)
             .exchangePattern(endpoint.getExchangePattern()).flow(flowConstruct).disableNotifications().build());
       } catch (Exception e1) {
         // TODO MULE-863: If this is an error, do something better than this

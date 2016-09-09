@@ -17,8 +17,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Pooling configuration for JDBC Data Sources capable of
- * pooling connections
+ * Pooling configuration for JDBC Data Sources capable of pooling connections
  *
  * @since 4.0
  */
@@ -58,8 +57,8 @@ public class DbPoolingProfile implements DatabasePoolingProfile {
   private int preparedStatementCacheSize = 5;
 
   /**
-   * The number of milliseconds a client trying to obtain a connection waits for
-   * it to be checked-in or acquired when the pool is exhausted. Zero (default) means wait indefinitely
+   * The number of milliseconds a client trying to obtain a connection waits for it to be checked-in or acquired when the pool is
+   * exhausted. Zero (default) means wait indefinitely
    */
   @Parameter
   @Optional(defaultValue = "30")

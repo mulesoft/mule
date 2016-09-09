@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.connector;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.OperationOptions;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * Provider of operation for a Mule connector.
@@ -28,15 +28,15 @@ public interface ConnectorOperationProvider {
   boolean supportsUrl(String url);
 
   /**
-   * A {@link org.mule.runtime.core.api.processor.MessageProcessor} that contains the behaviour for the URL
+   * A {@link org.mule.runtime.core.api.processor.Processor} that contains the behaviour for the URL
    *
    * @param url an URL for creating an operation
    * @param operationOptions the operation options
    * @param exchangePattern exchange pattern to use to execute the request.
-   * @return a {@link org.mule.runtime.core.api.processor.MessageProcessor} that fulfills the operation
+   * @return a {@link org.mule.runtime.core.api.processor.Processor} that fulfills the operation
    * @throws MuleException
    */
-  MessageProcessor getMessageProcessor(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern)
+  Processor getMessageProcessor(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern)
       throws MuleException;
 
 }

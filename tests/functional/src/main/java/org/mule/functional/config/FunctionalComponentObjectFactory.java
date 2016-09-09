@@ -12,7 +12,7 @@ import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 
 /**
@@ -20,7 +20,7 @@ import org.mule.runtime.core.component.DefaultJavaComponent;
  *
  * @since 4.0
  */
-public class FunctionalComponentObjectFactory implements ObjectFactory<MessageProcessor> {
+public class FunctionalComponentObjectFactory implements ObjectFactory<Processor> {
 
   private FunctionalTestComponent component = newComponentInstance();
 
@@ -29,7 +29,7 @@ public class FunctionalComponentObjectFactory implements ObjectFactory<MessagePr
   }
 
   @Override
-  public MessageProcessor getObject() throws Exception {
+  public Processor getObject() throws Exception {
     return new DefaultJavaComponent(getFunctionalComponentObjectFactory());
   }
 

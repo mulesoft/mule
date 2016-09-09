@@ -21,13 +21,13 @@ import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.MuleManifest;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -48,7 +48,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
- * Converts a {@link MuleMessage} into an Http response.
+ * Converts a {@link Message} into an Http response.
  */
 public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
 
@@ -80,7 +80,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     Object src = event.getMessage().getPayload();
 
     // Note this transformer excepts Null as we must always return a result
@@ -97,7 +97,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
       } else {
         response =
             createResponse(src, outputEncoding, event.getMessage(), event.getError(), event.getCorrelationId(),
-                           event.getCorrelation());
+                           event.getGroupCorrelation());
       }
 
       // Ensure there's a content type header
@@ -148,7 +148,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
       final String method = event.getMessage().getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY);
       if ("HEAD".equalsIgnoreCase(method)) {
         // this is a head request, we don't want to send the actual content
-        response.setBody((MuleMessage) null, muleContext);
+        response.setBody((InternalMessage) null, muleContext);
       }
       return response;
     } catch (Exception e) {
@@ -157,9 +157,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
 
   }
 
-  protected HttpResponse createResponse(Object src, Charset encoding, MuleMessage msg, Optional<Error> errorOptional,
+  protected HttpResponse createResponse(Object src, Charset encoding, InternalMessage msg, Optional<Error> errorOptional,
                                         String correlationId,
-                                        Correlation correlation)
+                                        GroupCorrelation correlation)
       throws IOException, TransformerException {
     HttpResponse response = new HttpResponse();
 

@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +117,7 @@ public class CommonsPoolObjectPool implements ObjectPool {
     if (pool != null) {
       return pool.borrowObject();
     } else {
-      throw new InitialisationException(MessageFactory.createStaticMessage("Object pool has not been initialized."), this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Object pool has not been initialized."), this);
     }
   }
 

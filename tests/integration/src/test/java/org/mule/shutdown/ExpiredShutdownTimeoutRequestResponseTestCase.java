@@ -11,7 +11,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
@@ -56,7 +56,7 @@ public class ExpiredShutdownTimeoutRequestResponseTestCase extends AbstractShutd
       @Override
       public void run() {
         try {
-          MuleMessage muleMessage = MuleMessage.builder().payload(TEST_MESSAGE).build();
+          InternalMessage muleMessage = InternalMessage.builder().payload(TEST_MESSAGE).build();
           Error error =
               client.send(url, muleMessage,
                           HttpRequestOptionsBuilder.newOptions().disableStatusCodeValidation().method(POST.name()).build())

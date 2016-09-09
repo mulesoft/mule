@@ -26,11 +26,11 @@ import static org.mule.runtime.module.oauth2.internal.authorizationcode.state.Re
 import static org.springframework.util.StringUtils.isEmpty;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -78,7 +78,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
   }
 
   @Override
-  protected MessageProcessor createRedirectUrlProcessor() {
+  protected Processor createRedirectUrlProcessor() {
     return event -> {
       int authorizationStatus = 0;
       int statusCodeToReturn = OK.getStatusCode();
@@ -94,7 +94,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
           logger.debug("Redirect url request code: " + authorizationCode);
         }
 
-        MuleEvent tokenUrlResponse = callTokenUrl(event, authorizationCode);
+        Event tokenUrlResponse = callTokenUrl(event, authorizationCode);
 
         String decodedState = stateDecoder.decodeOriginalState();
         String encodedResourceOwnerId = stateDecoder.decodeResourceOwnerId();
@@ -140,7 +140,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
       final String finalResponseMessage = responseMessage;
       final int finalStatusCodeToReturn = statusCodeToReturn;
       final int finalAuthorizationStatus = authorizationStatus;
-      MuleMessage.Builder builder = MuleMessage.builder(event.getMessage()).payload(finalResponseMessage)
+      InternalMessage.Builder builder = InternalMessage.builder(event.getMessage()).payload(finalResponseMessage)
           .addOutboundProperty(HTTP_STATUS_PROPERTY, finalStatusCodeToReturn);
       String onCompleteRedirectToValue = stateDecoder.decodeOnCompleteRedirectTo();
       if (!isEmpty(onCompleteRedirectToValue)) {
@@ -150,16 +150,16 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                                                                 String.valueOf(finalAuthorizationStatus)));
       }
 
-      return MuleEvent.builder(event).message(builder.build()).build();
+      return Event.builder(event).message(builder.build()).build();
     };
   }
 
-  private MuleEvent callTokenUrl(MuleEvent event, String authorizationCode) throws MuleException, TokenUrlResponseException {
+  private Event callTokenUrl(Event event, String authorizationCode) throws MuleException, TokenUrlResponseException {
     event = setMapPayloadWithTokenRequestParameters(event, authorizationCode);
     return invokeTokenUrl(event);
   }
 
-  private String processAuthorizationCode(final MuleEvent event) throws NoAuthorizationCodeException {
+  private String processAuthorizationCode(final Event event) throws NoAuthorizationCodeException {
     final Map<String, String> queryParams = event.getMessage().getInboundProperty(HTTP_QUERY_PARAMS);
     final String authorizationCode = queryParams.get(CODE_PARAMETER);
     if (authorizationCode == null) {
@@ -174,24 +174,24 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     return tokenResponseProcessor.getAccessToken() != null;
   }
 
-  private MuleEvent setMapPayloadWithTokenRequestParameters(final MuleEvent event, final String authorizationCode) {
+  private Event setMapPayloadWithTokenRequestParameters(final Event event, final String authorizationCode) {
     final HashMap<String, String> formData = new HashMap<>();
     formData.put(CODE_PARAMETER, authorizationCode);
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_AUTHENTICATION_CODE);
     formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
-    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(formData).build()).build();
+    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(formData).build()).build();
   }
 
-  private MuleEvent setMapPayloadWithRefreshTokenRequestParameters(final MuleEvent event, final String refreshToken) {
+  private Event setMapPayloadWithRefreshTokenRequestParameters(final Event event, final String refreshToken) {
     final HashMap<String, String> formData = new HashMap<>();
     formData.put(OAuthConstants.REFRESH_TOKEN_PARAMETER, refreshToken);
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
     formData.put(GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_REFRESH_TOKEN);
     formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
-    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(formData).build()).build();
+    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(formData).build()).build();
   }
 
   private void logResourceOwnerOAuthContextBeforeUpdate(ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
@@ -200,7 +200,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     }
   }
 
-  private TokenResponseProcessor processTokenUrlResponse(MuleEvent tokenUrlResponse)
+  private TokenResponseProcessor processTokenUrlResponse(Event tokenUrlResponse)
       throws TokenNotFoundException, TransformerException {
     final TokenResponseProcessor tokenResponseProcessor = TokenResponseProcessor
         .createAuthorizationCodeProcessor(tokenResponseConfiguration, getMuleContext().getExpressionLanguage());
@@ -256,10 +256,10 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
    * @param resourceOwnerOAuthContext oauth context for who we need to update the access token.
    */
   @Override
-  public void doRefreshToken(final MuleEvent currentEvent, final ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
+  public void doRefreshToken(final Event currentEvent, final ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
     try {
-      MuleEvent muleEvent = MuleEvent.builder(currentEvent)
-          .message(MuleMessage.builder(currentEvent.getMessage()).outboundProperties(emptyMap()).build())
+      Event muleEvent = Event.builder(currentEvent)
+          .message(InternalMessage.builder(currentEvent.getMessage()).outboundProperties(emptyMap()).build())
           .session(new DefaultMuleSession(currentEvent.getSession())).build();
       final String userRefreshToken = resourceOwnerOAuthContext.getRefreshToken();
       if (userRefreshToken == null) {
@@ -268,7 +268,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
                                                                         resourceOwnerOAuthContext.getResourceOwnerId()));
       }
       muleEvent = setMapPayloadWithRefreshTokenRequestParameters(muleEvent, userRefreshToken);
-      final MuleEvent refreshTokenResponse = invokeTokenUrl(muleEvent);
+      final Event refreshTokenResponse = invokeTokenUrl(muleEvent);
 
       logResourceOwnerOAuthContextBeforeUpdate(resourceOwnerOAuthContext);
       TokenResponseProcessor tokenResponseProcessor = processTokenUrlResponse(refreshTokenResponse);

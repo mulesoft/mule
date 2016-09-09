@@ -11,7 +11,7 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
@@ -43,7 +43,7 @@ public class ConnectionArgumentResolver implements ArgumentResolver<Object> {
     try {
       return connectionHandler.getConnection();
     } catch (ConnectionException e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage(String
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage(String
           .format("Error was found trying to obtain a connection to execute operation '%s' of extension '%s'",
                   operationContext.getOperationModel().getName(),
                   operationContext.getExtensionModel().getName())), e);

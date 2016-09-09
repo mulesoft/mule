@@ -11,13 +11,14 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
+
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -27,7 +28,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -43,8 +44,8 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
-  private Message mockMessage = mock(Message.class);
-  private MessageProcessor mockMP = mock(MessageProcessor.class);
+  private I18nMessage mockMessage = mock(I18nMessage.class);
+  private Processor mockMP = mock(Processor.class);
 
   @Override
   protected String getConfigFile() {
@@ -164,7 +165,7 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
   }
 
   private void callTypeAndThrowException(Exception exception, String expectedMessage) throws Exception {
-    MuleMessage response = flowRunner("matchesHandlerUsingType")
+    InternalMessage response = flowRunner("matchesHandlerUsingType")
         .withPayload("0")
         .withFlowVariable("exception", exception)
         .run()
@@ -182,7 +183,7 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
     ftc.setEventCallback((context, component, muleContext) -> {
       throw exceptionToThrow;
     });
-    MuleMessage response =
+    InternalMessage response =
         flowRunner("matchesHandlerUsingWhen").withPayload(payload).run().getMessage();
     assertThat(getPayloadAsString(response), is(expectedMessage));
   }
@@ -211,11 +212,11 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
   public static class AnotherTotallyDifferentKindOfException extends Exception {
   }
 
-  public static class ThrowExceptionProcessor implements MessageProcessor {
+  public static class ThrowExceptionProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      Throwable exception = event.getFlowVariable("exception");
+    public Event process(Event event) throws MuleException {
+      Throwable exception = event.getVariable("exception");
       if (exception instanceof MuleException) {
         throw (MuleException) exception;
       } else if (exception instanceof RuntimeException) {

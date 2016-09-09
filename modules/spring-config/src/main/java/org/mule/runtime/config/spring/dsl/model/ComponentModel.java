@@ -28,8 +28,8 @@ import org.springframework.beans.factory.config.BeanReference;
  * artifact configuration file.
  * <p/>
  * Every {@code ComponentModel} represents the configuration of a core configuration or an extension configuration. Which
- * configuration element this object represents is identified by a
- * {@link ComponentIdentifier} that can be retrieved using {@code #getIdentifier}.
+ * configuration element this object represents is identified by a {@link ComponentIdentifier} that can be retrieved using
+ * {@code #getIdentifier}.
  * <p/>
  * It may have simple configuration parameters which are retrieve by using {@code #getParameters} or complex parameters which are
  * retrieved using {@code #getInnerComponents}.

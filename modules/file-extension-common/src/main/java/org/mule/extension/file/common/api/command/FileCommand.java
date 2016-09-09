@@ -7,8 +7,8 @@
 package org.mule.extension.file.common.api.command;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.api.message.MuleMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
@@ -163,8 +163,8 @@ public abstract class FileCommand<F extends FileSystem> {
 
   /**
    * Returns an {@link IllegalArgumentException} explaining that a
-   * {@link FileSystem#read(FileConnectorConfig, MuleMessage, String, boolean)} operation was attempted on a {@code path} pointing
-   * to a directory
+   * {@link FileSystem#read(FileConnectorConfig, Message, String, boolean)} operation was attempted on a {@code path} pointing to
+   * a directory
    *
    * @param path the {@link Path} on which a read was attempted
    * @return {@link RuntimeException}
@@ -175,8 +175,8 @@ public abstract class FileCommand<F extends FileSystem> {
 
   /**
    * Returns a {@link IllegalArgumentException} explaining that a
-   * {@link FileSystem#list(FileConnectorConfig, String, boolean, MuleMessage, Predicate)} operation was attempted on a
-   * {@code path} pointing to a file.
+   * {@link FileSystem#list(FileConnectorConfig, String, boolean, Message, Predicate)} operation was attempted on a {@code path}
+   * pointing to a file.
    *
    * @param path the {@link Path} on which a list was attempted
    * @return {@link RuntimeException}
@@ -188,8 +188,8 @@ public abstract class FileCommand<F extends FileSystem> {
 
   /**
    * Returns a {@link IllegalArgumentException} explaining that a
-   * {@link FileSystem#list(FileConnectorConfig, String, boolean, MuleMessage, Predicate)} operation was attempted on a
-   * {@code path} pointing to a file.
+   * {@link FileSystem#list(FileConnectorConfig, String, boolean, Message, Predicate)} operation was attempted on a {@code path}
+   * pointing to a file.
    *
    * @param path the {@link Path} on which a list was attempted
    * @return {@link RuntimeException}

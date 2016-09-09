@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.spring.security;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -38,7 +38,7 @@ public class AuthorizationFilter extends AbstractSecurityFilter {
   private Collection<String> requiredAuthorities = new HashSet<>();
 
   @Override
-  public MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  public Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     Authentication auth = event.getSession().getSecurityContext().getAuthentication();
     if (auth == null) {

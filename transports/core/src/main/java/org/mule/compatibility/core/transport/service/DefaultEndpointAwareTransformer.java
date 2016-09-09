@@ -11,9 +11,9 @@ import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -94,8 +94,8 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
   }
 
   protected Charset resolveEncoding(Object src) {
-    if (src instanceof MuleMessage) {
-      return ((MuleMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding());
+    if (src instanceof InternalMessage) {
+      return ((InternalMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding());
     } else {
       return getDefaultEncoding();
     }
@@ -127,7 +127,7 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return transformer.process(event);
   }
 

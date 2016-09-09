@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.construct.Flow;
@@ -35,7 +35,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     muleContext.start();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("TEST", response.getPayload());
   }
 
@@ -67,7 +67,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
     muleContext.fireNotification(new ClusterNodeNotification("primary", ClusterNodeNotification.PRIMARY_CLUSTER_NODE_SELECTED));
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("TEST", response.getPayload());
   }
 

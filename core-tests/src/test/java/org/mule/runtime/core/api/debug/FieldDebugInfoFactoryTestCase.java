@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.debug.FieldDebugInfoFactory.FieldEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -31,7 +31,7 @@ public class FieldDebugInfoFactoryTestCase extends AbstractMuleTestCase {
   public static final String FIELD_NAME = "foo";
   public static final String STRING_VALUE = "bar";
 
-  private final MuleEvent event = mock(MuleEvent.class);
+  private final Event event = mock(Event.class);
   private final AttributeEvaluator attributeEvaluator = mock(AttributeEvaluator.class);
   private final FieldEvaluator fieldEvaluator = mock(FieldEvaluator.class);
 

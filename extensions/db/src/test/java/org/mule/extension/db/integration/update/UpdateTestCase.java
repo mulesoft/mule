@@ -16,7 +16,7 @@ import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -57,24 +57,24 @@ public class UpdateTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void update() throws Exception {
-    MuleMessage response = flowRunner("update").run().getMessage();
+    Message response = flowRunner("update").run().getMessage();
     verifyUpdatedRecord(response.getPayload());
   }
 
   @Test
   public void updateDynamic() throws Exception {
-    MuleMessage response = flowRunner("updateDynamic").run().getMessage();
+    Message response = flowRunner("updateDynamic").run().getMessage();
     verifyUpdatedRecord(response.getPayload());
   }
 
   @Test
   public void updateParameterized() throws Exception {
-    MuleMessage response = flowRunner("updateParameterized").withPayload(PLUTO).run().getMessage();
+    Message response = flowRunner("updateParameterized").withPayload(PLUTO).run().getMessage();
     assertAffectedRows(response.getPayload(), 1);
     assertPlanetRecordsFromQuery(PLUTO);
   }
 
-  private void assertMergeResult(MuleMessage response) throws SQLException {
+  private void assertMergeResult(Message response) throws SQLException {
     StatementResult result = response.getPayload();
     assertThat(result.getAffectedRows(), is(3));
 

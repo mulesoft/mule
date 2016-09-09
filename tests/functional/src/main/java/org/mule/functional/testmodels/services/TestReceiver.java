@@ -6,7 +6,7 @@
  */
 package org.mule.functional.testmodels.services;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
 
 import org.mule.runtime.core.util.StringMessageUtils;
 

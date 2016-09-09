@@ -9,7 +9,7 @@ package org.mule.compatibility.core.api.transport;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 
@@ -61,7 +61,7 @@ public interface MessageRequester extends Connectable, MessageRequesting, Lifecy
    */
   InboundEndpoint getEndpoint();
 
-  MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
+  InternalMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 
-  MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
+  InternalMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

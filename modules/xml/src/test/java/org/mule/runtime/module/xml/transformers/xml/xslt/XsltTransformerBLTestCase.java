@@ -14,11 +14,10 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.junit.Test;
 
 /**
- * This test case validates that the XSLT transformer is not vulnerable to
- * Billion Laughs attack when internal entity expansion is disabled
+ * This test case validates that the XSLT transformer is not vulnerable to Billion Laughs attack when internal entity expansion is
+ * disabled
  * <p>
- * <b>EIP Reference:</b> <a
- * href="https://en.wikipedia.org/wiki/Billion_laughs"<a/>
+ * <b>EIP Reference:</b> <a href="https://en.wikipedia.org/wiki/Billion_laughs"<a/>
  * </p>
  */
 public class XsltTransformerBLTestCase extends FunctionalTestCase {

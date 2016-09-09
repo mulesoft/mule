@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpConstants;
 
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
   @Override
-  public void validate(MuleEvent responseEvent) throws ResponseValidatorException {
+  public void validate(Event responseEvent) throws ResponseValidatorException {
     int status = responseEvent.getMessage().getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
 
     if (belongs(status)) {

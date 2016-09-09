@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.vm;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.ContinuousPollingReceiverWorker;
 import org.mule.compatibility.core.transport.PollingReceiverWorker;
@@ -16,9 +16,9 @@ import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -78,22 +78,22 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
     // template method
   }
 
-  public void onMessage(MuleMessage message) throws MuleException {
+  public void onMessage(InternalMessage message) throws MuleException {
     // Rewrite the message to treat it as a new message
-    MuleCompatibilityMessage newMessage =
-        (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder(message).payload(message.getPayload()).build();
+    CompatibilityMessage newMessage =
+        (CompatibilityMessage) new MuleCompatibilityMessageBuilder(message).payload(message.getPayload()).build();
     routeMessage(newMessage);
   }
 
-  public MuleMessage onCall(final MuleCompatibilityMessage message) throws MuleException {
+  public InternalMessage onCall(final CompatibilityMessage message) throws MuleException {
 
     ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
     // TODO remove code to change message MuleContext once MULE-7357 gets fixed
     try {
       Thread.currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
-      ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-      MuleEvent resultEvent = executionTemplate.execute(() -> {
-        MuleEvent event = routeMessage(message);
+      ExecutionTemplate<Event> executionTemplate = createExecutionTemplate();
+      Event resultEvent = executionTemplate.execute(() -> {
+        Event event = routeMessage(message);
         if (event != null && !VoidMuleEvent.getInstance().equals(event) && getEndpoint().getExchangePattern().hasResponse()) {
           return event;
         }
@@ -122,14 +122,14 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
    * It's impossible to process all messages in the receive transaction
    */
   @Override
-  protected List<MuleMessage> getMessages() throws Exception {
+  protected List<InternalMessage> getMessages() throws Exception {
     if (isReceiveMessagesInTransaction()) {
-      MuleMessage message = getFirstMessage();
+      InternalMessage message = getFirstMessage();
       if (message == null) {
         return null;
       }
 
-      List<MuleMessage> messages = new ArrayList<>(1);
+      List<InternalMessage> messages = new ArrayList<>(1);
       messages.add(message);
       return messages;
     } else {
@@ -137,18 +137,18 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
     }
   }
 
-  protected List<MuleMessage> getFirstMessages() throws Exception {
+  protected List<InternalMessage> getFirstMessages() throws Exception {
     // The queue from which to pull events
     QueueSession qs = connector.getTransactionalResource(endpoint);
     Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
 
     // The list of retrieved messages that will be returned
-    List<MuleMessage> messages = new LinkedList<>();
+    List<InternalMessage> messages = new LinkedList<>();
 
     int batchSize = getBatchSize(queue.size());
 
     // try to get the first event off the queue
-    MuleMessage message = getMessage(queue, connector.getQueueTimeout());
+    InternalMessage message = getMessage(queue, connector.getQueueTimeout());
 
     if (message != null) {
       messages.add(message);
@@ -166,16 +166,16 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
     return messages;
   }
 
-  private MuleMessage getMessage(Queue queue, int timeout) throws InterruptedException {
+  private InternalMessage getMessage(Queue queue, int timeout) throws InterruptedException {
     Serializable polledItem = queue.poll(timeout);
-    if (polledItem instanceof MuleEvent) {
-      return ((MuleEvent) polledItem).getMessage();
+    if (polledItem instanceof Event) {
+      return ((Event) polledItem).getMessage();
     } else {
-      return (MuleMessage) polledItem;
+      return (InternalMessage) polledItem;
     }
   }
 
-  protected MuleMessage getFirstMessage() throws Exception {
+  protected InternalMessage getFirstMessage() throws Exception {
     // The queue from which to pull events
     QueueSession qs = connector.getTransactionalResource(endpoint);
     Queue queue = qs.getQueue(endpoint.getEndpointURI().getAddress());
@@ -195,8 +195,8 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
   }
 
   @Override
-  protected MuleEvent processMessage(Object msg) throws Exception {
-    return routeMessage((MuleCompatibilityMessage) msg);
+  protected Event processMessage(Object msg) throws Exception {
+    return routeMessage((CompatibilityMessage) msg);
   }
 
   /*

@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.core.api.cache;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * Defines a way to process a {@link MuleEvent} using a cache.
+ * Defines a way to process a {@link Event} using a cache.
  */
 public interface CachingStrategy {
 
   /**
-   * Processes a {@link MuleEvent} using a caching schema. Uses a message processor to process the request when it is not found in
-   * the cache or when it must be processed without using the cache.
+   * Processes a {@link Event} using a caching schema. Uses a message processor to process the request when it is not found in the
+   * cache or when it must be processed without using the cache.
    * <p/>
    * Different calls to this method using the same request does not implies that the same instance will be returned. Each
    * implementation could choose to create new instances every time.
@@ -27,5 +27,5 @@ public interface CachingStrategy {
    * @return a response for the request that could be obtained using the cache.
    * @throws MuleException
    */
-  MuleEvent process(MuleEvent request, MessageProcessor messageProcessor) throws MuleException;
+  Event process(Event request, Processor messageProcessor) throws MuleException;
 }

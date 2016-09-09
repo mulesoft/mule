@@ -8,7 +8,7 @@ package org.mule.runtime.core.message;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 
 /**
@@ -16,8 +16,9 @@ import org.mule.runtime.core.api.MuleSession;
  */
 public interface SessionHandler {
 
-  MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context) throws MuleException;
+  InternalMessage storeSessionInfoToMessage(MuleSession session, InternalMessage message, MuleContext context)
+      throws MuleException;
 
-  MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException;
+  MuleSession retrieveSessionInfoFromMessage(InternalMessage message, MuleContext muleContext) throws MuleException;
 
 }

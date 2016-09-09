@@ -21,17 +21,15 @@ import java.sql.Statement;
 /**
  * Creates {@link Statement} based on the type and parameters of a given query:
  *
- * _CallableStatement for stored p rocedure queries
- * _PreparedStatement for queries with input parameters
- * _Standard Statement otherwise
+ * _CallableStatement for stored p rocedure queries _PreparedStatement for queries with input parameters _Standard Statement
+ * otherwise
  */
 public class QueryStatementFactory implements ConfigurableStatementFactory {
 
   private int maxRows;
 
   /**
-   * There is no int value to indicate that the property was not set, so
-   * using null to indicate that
+   * There is no int value to indicate that the property was not set, so using null to indicate that
    */
   private Integer fetchSize;
 

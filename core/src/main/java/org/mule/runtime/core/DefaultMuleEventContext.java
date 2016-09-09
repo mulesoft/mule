@@ -8,10 +8,10 @@ package org.mule.runtime.core;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -35,10 +35,10 @@ public class DefaultMuleEventContext implements MuleEventContext {
    */
   protected static final Logger logger = LoggerFactory.getLogger(DefaultMuleEventContext.class);
 
-  private MuleEvent event;
+  private Event event;
   private final FlowConstruct flow;
 
-  public DefaultMuleEventContext(FlowConstruct flow, MuleEvent event) {
+  public DefaultMuleEventContext(FlowConstruct flow, Event event) {
     this.flow = flow;
     this.event = event;
   }
@@ -49,17 +49,17 @@ public class DefaultMuleEventContext implements MuleEventContext {
    * @return the message payload for this event
    */
   @Override
-  public MuleMessage getMessage() {
+  public InternalMessage getMessage() {
     return event.getMessage();
   }
 
   @Override
-  public MuleEvent getEvent() {
+  public Event getEvent() {
     return event;
   }
 
   @Override
-  public void setEvent(MuleEvent event) {
+  public void setEvent(Event event) {
     this.event = event;
   }
 

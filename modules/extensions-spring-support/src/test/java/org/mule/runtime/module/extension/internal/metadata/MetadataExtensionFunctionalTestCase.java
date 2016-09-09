@@ -28,7 +28,7 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -99,7 +99,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
 
   protected MetadataType personType;
   protected ComponentId componentId;
-  protected MuleEvent event;
+  protected Event event;
   protected MetadataManager metadataManager;
   protected ClassTypeLoader typeLoader;
   protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);

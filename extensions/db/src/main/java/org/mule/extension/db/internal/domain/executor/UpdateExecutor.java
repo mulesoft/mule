@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Executes queries that return an update count or an update count and auto
- * generated keys
+ * Executes queries that return an update count or an update count and auto generated keys
  */
 public class UpdateExecutor extends AbstractSingleQueryExecutor {
 

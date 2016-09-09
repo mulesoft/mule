@@ -16,7 +16,7 @@ import org.mule.extension.validation.internal.ValidationMessages;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.exception.MessagingException;
 
 @ArtifactClassLoaderRunnerConfig(exportPluginClasses = {ValidationMessages.class})
@@ -41,7 +41,7 @@ abstract class ValidationTestCase extends MuleArtifactFunctionalTestCase {
     runner.reset();
   }
 
-  protected void assertInvalid(FlowRunner runner, Message expectedMessage) throws Exception {
+  protected void assertInvalid(FlowRunner runner, I18nMessage expectedMessage) throws Exception {
     Exception e = runner.runExpectingException();
     assertThat(e, is(instanceOf(MessagingException.class)));
     assertThat(e.getCause(), is(instanceOf(ValidationException.class)));

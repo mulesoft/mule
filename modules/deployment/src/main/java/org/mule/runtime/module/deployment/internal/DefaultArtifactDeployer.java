@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.module.deployment.api.DeploymentException;
 import org.mule.runtime.module.deployment.internal.artifact.DeployableArtifact;
 
@@ -30,7 +30,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       }
 
       final String msg = String.format("Failed to deploy artifact [%s]", artifact.getArtifactName());
-      throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
     }
   }
 
@@ -44,7 +44,7 @@ public class DefaultArtifactDeployer<T extends DeployableArtifact> implements Ar
       }
 
       final String msg = String.format("Failed to undeployArtifact artifact [%s]", artifact.getArtifactName());
-      throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
     }
   }
 

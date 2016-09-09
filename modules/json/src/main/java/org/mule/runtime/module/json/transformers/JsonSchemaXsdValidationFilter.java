@@ -9,8 +9,8 @@ package org.mule.runtime.module.json.transformers;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.IOUtils;
@@ -40,14 +40,14 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
   protected JsonToXml jToX;
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     String jsonString = null;
-    MuleMessage msg = event.getMessage();
+    InternalMessage msg = event.getMessage();
 
     try {
       if (isReturnResult()) {
@@ -61,16 +61,16 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
           IOUtils.copy(transformerInputs.getReader(), jsonWriter);
         }
         jsonString = jsonWriter.toString();
-        msg = MuleMessage.builder(msg).payload(jsonString).build();
+        msg = InternalMessage.builder(msg).payload(jsonString).build();
         builder.message(msg);
       }
       String xmlString = (String) jToX
           .transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
-      MuleMessage xmlMessage = MuleMessage.builder().payload(xmlString).build();
+      InternalMessage xmlMessage = InternalMessage.builder().payload(xmlString).build();
       boolean accepted =
-          super.accept(MuleEvent.builder(event.getContext()).message(xmlMessage).flow(flowConstruct).build(), builder);
+          super.accept(Event.builder(event.getContext()).message(xmlMessage).flow(flowConstruct).build(), builder);
       if (jsonString != null) {
-        msg = MuleMessage.builder(msg).payload(jsonString).build();
+        msg = InternalMessage.builder(msg).payload(jsonString).build();
         builder.message(msg);
       }
       return accepted;

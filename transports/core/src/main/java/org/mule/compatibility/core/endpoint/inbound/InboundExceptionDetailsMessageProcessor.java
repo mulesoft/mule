@@ -9,11 +9,11 @@ package org.mule.compatibility.core.endpoint.inbound;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.util.ObjectUtils;
 
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * property that should be set. The name of the property is defined by the error.code.property property in the same properties
  * file.
  */
-public class InboundExceptionDetailsMessageProcessor implements MessageProcessor, MuleContextAware {
+public class InboundExceptionDetailsMessageProcessor implements Processor, MuleContextAware {
 
   private static final Logger logger = LoggerFactory.getLogger(InboundExceptionDetailsMessageProcessor.class);
 
@@ -39,7 +39,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event != null && !VoidMuleEvent.getInstance().equals(event)) {
       if (event.getMessage().getExceptionPayload() != null) {
         event = setExceptionDetails(event, connector, event.getMessage().getExceptionPayload().getException());
@@ -55,7 +55,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
    * @param event
    * @param exception
    */
-  protected MuleEvent setExceptionDetails(MuleEvent event, Connector connector, Throwable exception) {
+  protected Event setExceptionDetails(Event event, Connector connector, Throwable exception) {
     String propName = ExceptionHelper.getErrorCodePropertyName(connector.getProtocol(), muleContext);
     // If we dont find a error code property we can assume there are not
     // error code mappings for this connector
@@ -64,7 +64,7 @@ public class InboundExceptionDetailsMessageProcessor implements MessageProcessor
       if (logger.isDebugEnabled()) {
         logger.debug("Setting error code for: " + connector.getProtocol() + ", " + propName + "=" + code);
       }
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty(propName, code).build())
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty(propName, code).build())
           .build();
     }
     return event;

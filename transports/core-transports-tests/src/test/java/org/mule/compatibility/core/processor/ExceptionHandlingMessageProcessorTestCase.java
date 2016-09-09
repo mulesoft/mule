@@ -13,7 +13,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.processor.ExceptionHandlingMessageProcessor;
 
@@ -39,9 +39,9 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     TestListener listener = new TestListener();
     mp.setListener(listener);
 
-    MuleEvent event = createTestOutboundEvent();
+    Event event = createTestOutboundEvent();
 
-    MuleEvent result = mp.process(event);
+    Event result = mp.process(event);
 
     assertSame(event, listener.sensedEvent);
     assertSame(event, result);
@@ -54,9 +54,9 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
     mp.setListener(new ExceptionThrowingMessageProcessor());
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+    Event event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent resultEvent = mp.process(event);
+    Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
     assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);
@@ -71,9 +71,9 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
     mp.setListener(new ExceptionThrowingMessageProcessor());
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+    Event event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent resultEvent = mp.process(event);
+    Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
     assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);
@@ -88,9 +88,9 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
     mp.setListener(new ExceptionThrowingMessageProcessor());
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+    Event event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent resultEvent = mp.process(event);
+    Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
     assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);
@@ -105,9 +105,9 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
     InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
     mp.setListener(new ExceptionThrowingMessageProcessor());
 
-    MuleEvent event = createTestOutboundEvent(exceptionListener);
+    Event event = createTestOutboundEvent(exceptionListener);
 
-    MuleEvent resultEvent = mp.process(event);
+    Event resultEvent = mp.process(event);
     assertNotNull(resultEvent);
     assertNotNull("exception expected", resultEvent.getError());
     assertTrue(resultEvent.getError().get().getException() instanceof IllegalStateException);

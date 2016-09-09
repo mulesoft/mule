@@ -33,7 +33,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -175,7 +175,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
       runner.withPayload(payload);
     }
 
-    MuleMessage response = runner.run().getMessage();
+    Message response = runner.run().getMessage();
     assertThat(response.getPayload(), is(instanceOf(Map.class)));
     return response.getPayload();
 

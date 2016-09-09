@@ -7,11 +7,11 @@
 package org.mule.runtime.core.util;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import java.util.regex.Pattern;
 
@@ -68,19 +68,19 @@ public class AttributeEvaluator {
     return attributeType.equals(AttributeType.PARSE_EXPRESSION);
   }
 
-  public TypedValue resolveTypedValue(MuleEvent event, MuleEvent.Builder eventBuilder) {
+  public DefaultTypedValue resolveTypedValue(Event event, Event.Builder eventBuilder) {
     if (isExpression()) {
       return expressionLanguage.evaluateTyped(attributeValue, event, eventBuilder, null);
     } else if (isParseExpression()) {
       final String value = expressionLanguage.parse(attributeValue, event, null);
-      return new TypedValue(value, DataType.builder().type(String.class).build());
+      return new DefaultTypedValue(value, DataType.builder().type(String.class).build());
     } else {
       Class<?> type = attributeValue == null ? Object.class : String.class;
-      return new TypedValue(attributeValue, DataType.builder().type(type).build());
+      return new DefaultTypedValue(attributeValue, DataType.builder().type(type).build());
     }
   }
 
-  public Object resolveValue(MuleEvent event) {
+  public Object resolveValue(Event event) {
     if (isExpression()) {
       return expressionLanguage.evaluate(attributeValue, event, null);
     } else if (isParseExpression()) {
@@ -90,7 +90,7 @@ public class AttributeEvaluator {
     }
   }
 
-  public Integer resolveIntegerValue(MuleEvent event) {
+  public Integer resolveIntegerValue(Event event) {
     final Object value = resolveValue(event);
     if (value == null) {
       return null;
@@ -105,7 +105,7 @@ public class AttributeEvaluator {
     }
   }
 
-  public String resolveStringValue(MuleEvent event) {
+  public String resolveStringValue(Event event) {
     final Object value = resolveValue(event);
     if (value == null) {
       return null;
@@ -113,7 +113,7 @@ public class AttributeEvaluator {
     return value.toString();
   }
 
-  public Boolean resolveBooleanValue(MuleEvent event) {
+  public Boolean resolveBooleanValue(Event event) {
     final Object value = resolveValue(event);
     if (value == null || value instanceof Boolean) {
       return (Boolean) value;

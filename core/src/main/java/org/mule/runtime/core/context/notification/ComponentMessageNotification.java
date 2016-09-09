@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -33,7 +33,7 @@ public class ComponentMessageNotification extends ServerNotification {
    * @param message
    * @param action
    */
-  public ComponentMessageNotification(MuleMessage message, Component component, FlowConstruct flowConstruct, int action) {
+  public ComponentMessageNotification(InternalMessage message, Component component, FlowConstruct flowConstruct, int action) {
     super(message, action);
     this.flowConstruct = flowConstruct;
     this.component = component;
@@ -60,8 +60,8 @@ public class ComponentMessageNotification extends ServerNotification {
   }
 
   @Override
-  public MuleMessage getSource() {
-    return (MuleMessage) super.getSource();
+  public InternalMessage getSource() {
+    return (InternalMessage) super.getSource();
   }
 
   public FlowConstruct getFlowConstruct() {

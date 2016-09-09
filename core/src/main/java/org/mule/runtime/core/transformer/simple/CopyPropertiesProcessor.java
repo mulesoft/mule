@@ -7,14 +7,14 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.WildcardAttributeEvaluator;
 
@@ -23,7 +23,7 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CopyPropertiesProcessor implements MessageProcessor, MuleContextAware, Initialisable {
+public class CopyPropertiesProcessor implements Processor, MuleContextAware, Initialisable {
 
   private static final Logger logger = LoggerFactory.getLogger(CopyPropertiesProcessor.class);
 
@@ -37,11 +37,11 @@ public class CopyPropertiesProcessor implements MessageProcessor, MuleContextAwa
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    final MuleEvent.Builder resultBuilder = MuleEvent.builder(event);
-    MuleMessage message = event.getMessage();
+  public Event process(Event event) throws MuleException {
+    final Event.Builder resultBuilder = Event.builder(event);
+    InternalMessage message = event.getMessage();
     if (wildcardPropertyNameEvaluator.hasWildcards()) {
-      final Builder builder = MuleMessage.builder(message);
+      final Builder builder = InternalMessage.builder(message);
       wildcardPropertyNameEvaluator
           .processValues(message.getInboundPropertyNames(),
                          matchedValue -> builder.addOutboundProperty(matchedValue, message.getInboundProperty(matchedValue),
@@ -53,7 +53,7 @@ public class CopyPropertiesProcessor implements MessageProcessor, MuleContextAwa
         String propertyName = keyValue.toString();
         Serializable propertyValue = message.getInboundProperty(propertyName);
         if (propertyValue != null) {
-          resultBuilder.message(MuleMessage.builder(message)
+          resultBuilder.message(InternalMessage.builder(message)
               .addOutboundProperty(propertyName, propertyValue, message.getInboundPropertyDataType(propertyName)).build());
         } else {
           logger.info("Property value for is null, no property will be copied");

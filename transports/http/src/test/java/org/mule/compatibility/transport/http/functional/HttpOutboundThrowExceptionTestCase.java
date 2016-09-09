@@ -12,7 +12,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.transport.http.HttpRequest;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -47,9 +47,10 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
   @Test
   public void errorStatusPropagation() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send("errorPropagationEndpoint",
-                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build())
+                    InternalMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8"))
+                        .build())
             .getRight();
     assertThat((String) result.getInboundProperty("http.status"), is("400"));
   }
@@ -57,9 +58,10 @@ public class HttpOutboundThrowExceptionTestCase extends AbstractMockHttpServerTe
   @Test
   public void errorStatusThrowException() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send("exceptionOnErrorStatusEndpoint",
-                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build())
+                    InternalMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8"))
+                        .build())
             .getRight();
     assertThat((String) result.getInboundProperty("http.status"), is("500"));
   }

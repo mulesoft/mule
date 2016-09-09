@@ -11,7 +11,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.IOException;
 
@@ -95,7 +95,7 @@ public class BasicHttpProxyToHttpsTestCase extends AbstractHttpRequestTestCase {
    */
   @Test
   public void validProxyHttpConnectToHttpsAuth() throws Exception {
-    MuleMessage response = runFlow("httpFlow").getMessage();
+    InternalMessage response = runFlow("httpFlow").getMessage();
 
     assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
     assertThat(getPayloadAsString(response), CoreMatchers.equalTo(AUTHORIZED));

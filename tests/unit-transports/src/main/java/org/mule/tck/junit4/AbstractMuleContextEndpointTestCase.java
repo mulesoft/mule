@@ -13,7 +13,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -77,11 +77,11 @@ public abstract class AbstractMuleContextEndpointTestCase extends AbstractMuleCo
     return MuleEndpointTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
   }
 
-  public static MuleEvent getTestEvent(Object data, InboundEndpoint endpoint) throws Exception {
+  public static Event getTestEvent(Object data, InboundEndpoint endpoint) throws Exception {
     return MuleEndpointTestUtils.getTestEvent(data, endpoint, muleContext);
   }
 
-  public static MuleEvent getTestEvent(Object data, Flow flow, InboundEndpoint endpoint) throws Exception {
+  public static Event getTestEvent(Object data, Flow flow, InboundEndpoint endpoint) throws Exception {
     return MuleEndpointTestUtils.getTestEvent(data, flow, endpoint, muleContext);
   }
 

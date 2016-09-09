@@ -8,7 +8,7 @@ package org.mule.compatibility.core.transformer.simple;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -37,7 +37,7 @@ public class MessageProcessorTransformerAdaptor extends AbstractMessageTransform
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
         return messageProcessor.process(event);
@@ -49,7 +49,7 @@ public class MessageProcessorTransformerAdaptor extends AbstractMessageTransform
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     try {
       return messageProcessor.process(event).getMessage();
     } catch (MuleException e) {

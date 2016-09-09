@@ -9,11 +9,11 @@ package org.mule.tck.util;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -23,12 +23,12 @@ import org.hamcrest.TypeSafeMatcher;
 
 public class FlowTraceUtils {
 
-  public static class FlowStackAsserter implements MessageProcessor {
+  public static class FlowStackAsserter implements Processor {
 
     public static FlowCallStack stackToAssert;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       stackToAssert = event.getFlowCallStack().clone();
       return event;
     }
@@ -39,7 +39,7 @@ public class FlowTraceUtils {
     public static CountDownLatch latch;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       super.process(event);
       latch.countDown();
       return event;

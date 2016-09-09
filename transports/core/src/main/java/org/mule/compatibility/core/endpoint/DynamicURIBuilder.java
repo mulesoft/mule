@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 
 import java.io.UnsupportedEncodingException;
@@ -43,7 +43,7 @@ public class DynamicURIBuilder {
     }
   }
 
-  public String build(MuleEvent event) throws URISyntaxException, UnsupportedEncodingException {
+  public String build(Event event) throws URISyntaxException, UnsupportedEncodingException {
     String resolvedUri = resolveAddress(event);
 
     if (logger.isDebugEnabled()) {
@@ -54,7 +54,7 @@ public class DynamicURIBuilder {
     return resolvedUri;
   }
 
-  private String resolveAddress(final MuleEvent event) throws URISyntaxException, UnsupportedEncodingException {
+  private String resolveAddress(final Event event) throws URISyntaxException, UnsupportedEncodingException {
     final MuleContext muleContext = templateUriBuilder.getMuleContext();
     String resolvedAddress = templateUriBuilder.getTransformedConstructor(input -> {
       String token = (String) input;

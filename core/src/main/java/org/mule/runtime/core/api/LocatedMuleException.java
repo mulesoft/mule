@@ -9,7 +9,7 @@ package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
@@ -39,7 +39,7 @@ public class LocatedMuleException extends MuleException {
    * @param message the exception message
    * @param component the object that failed during a lifecycle method call
    */
-  public LocatedMuleException(Message message, Object component) {
+  public LocatedMuleException(I18nMessage message, Object component) {
     super(message);
     setLocation(component);
   }
@@ -49,7 +49,7 @@ public class LocatedMuleException extends MuleException {
    * @param cause the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
-  public LocatedMuleException(Message message, Throwable cause, Object component) {
+  public LocatedMuleException(I18nMessage message, Throwable cause, Object component) {
     super(message, cause);
     setLocation(component);
   }

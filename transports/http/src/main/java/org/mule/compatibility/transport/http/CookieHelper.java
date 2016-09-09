@@ -7,8 +7,8 @@
 package org.mule.compatibility.transport.http;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * header. The HTTP message can have several of these Cookie headers and each of them can store 1 or more cookies. One problem
  * with this is that in Mule we use {@link Map} instances to store the HTTP headers and this means that we can only have one
  * object with the key {@linkplain HttpConnector#HTTP_COOKIES_PROPERTY "cookies"} (yes, we use that constant instead of
- * {@linkplain HttpConstants#HEADER_COOKIE "Cookie"} when we store the cookies inside a {@link MuleMessage}).
+ * {@linkplain HttpConstants#HEADER_COOKIE "Cookie"} when we store the cookies inside a {@link Message}).
  * </p>
  * <p>
  * In an HTTP message going from server to client the Cookies go in their own {@linkplain HttpConstants#HEADER_COOKIE_SET
@@ -275,7 +275,7 @@ public class CookieHelper {
    * @param destinationUri the host, port and path of this {@link URI} will be used as the data of the cookies that are added.
    * @param muleContext the Mule node.
    */
-  public static void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event,
+  public static void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, Event event,
                                         URI destinationUri, MuleContext muleContext) {
     CookieStorageType.resolveCookieStorageType(cookiesObject).addCookiesToClient(client, cookiesObject, policy, event,
                                                                                  destinationUri, muleContext);
@@ -421,7 +421,7 @@ enum CookieStorageType {
     }
 
     @Override
-    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event, URI destinationUri,
+    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, Event event, URI destinationUri,
                                    MuleContext muleContext) {
       Cookie[] cookies = (Cookie[]) cookiesObject;
 
@@ -514,7 +514,7 @@ enum CookieStorageType {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event, URI destinationUri,
+    public void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, Event event, URI destinationUri,
                                    MuleContext muleContext) {
       Map<String, String> cookieMap = (Map<String, String>) cookiesObject;
 
@@ -619,9 +619,9 @@ enum CookieStorageType {
   public abstract String getCookieValueFromCookies(Object cookiesObject, String cookieName);
 
   /**
-   * @see CookieHelper#addCookiesToClient(HttpClient, Object, String, MuleEvent, URI)
+   * @see CookieHelper#addCookiesToClient(HttpClient, Object, String, Event, URI)
    */
-  public abstract void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, MuleEvent event,
+  public abstract void addCookiesToClient(HttpClient client, Object cookiesObject, String policy, Event event,
                                           URI destinationUri, MuleContext muleContext);
 
   /**

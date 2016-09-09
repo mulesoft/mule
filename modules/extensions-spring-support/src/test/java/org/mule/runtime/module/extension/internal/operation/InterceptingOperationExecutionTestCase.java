@@ -16,7 +16,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -47,14 +47,14 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
 
   @Test
   public void interceptingWithoutNext() throws Exception {
-    MuleMessage message = flowRunner("interceptingWithoutNext").run().getMessage();
+    Message message = flowRunner("interceptingWithoutNext").run().getMessage();
     assertThat(message.getPayload(), is(instanceOf(Banana.class)));
     assertThat(message.getAttributes(), is(instanceOf(VeganAttributes.class)));
   }
 
   @Test
   public void interceptChain() throws Exception {
-    MuleMessage message = flowRunner("interceptingBanana").run().getMessage();
+    Message message = flowRunner("interceptingBanana").run().getMessage();
     assertThat(message.getPayload(), is(instanceOf(Banana.class)));
     final Banana banana = message.getPayload();
 
@@ -68,7 +68,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
 
   @Test
   public void interceptInvalidPayload() throws Exception {
-    MuleMessage message = flowRunner("interceptingNotBanana").run().getMessage();
+    Message message = flowRunner("interceptingNotBanana").run().getMessage();
 
     assertThat(message.getPayload(), is(not(instanceOf(Fruit.class))));
 
@@ -93,7 +93,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
     MuleEvent event = flowRunner("interceptingWithTarget").withPayload(payload).run();
     assertThat(event.getMessage().getPayload(), is(payload));
 
-    MuleMessage message = event.getFlowVariable("banana");
+    Message message = event.getVariable("banana");
     assertThat(message.getPayload(), is(instanceOf(Banana.class)));
     final Banana banana = message.getPayload();
 
@@ -110,7 +110,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
     MuleEvent event = flowRunner("nestedInterceptingWithTarget").run();
     assertThat(event.getMessage().getPayload(), is(instanceOf(Banana.class)));
 
-    MuleMessage targetMessage = event.getFlowVariable("banana");
+    Message targetMessage = event.getVariable("banana");
     assertThat(targetMessage.getPayload(), is(instanceOf(Banana.class)));
 
     assertThat(event.getMessage().getPayload(), is(not(sameInstance(targetMessage.getPayload()))));

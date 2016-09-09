@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 /**
- * Performs authentication based on a username and password. The username and password are retrieved from the {@link MuleMessage}
+ * Performs authentication based on a username and password. The username and password are retrieved from the {@link Message}
  * based on expressions specified via the username and password setters. These are then used to create a DefaultMuleAuthentication
  * object which is passed to the authenticate method of the {@link SecurityManager}.
  */
@@ -39,7 +39,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
    * @throws org.mule.runtime.core.api.security.SecurityException if authentication fails
    */
   @Override
-  public MuleEvent authenticate(MuleEvent event)
+  public Event authenticate(Event event)
       throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException {
     Authentication authentication = getAuthenticationToken(event);
     Authentication authResult;
@@ -65,7 +65,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
     return event;
   }
 
-  protected Authentication getAuthenticationToken(MuleEvent event) throws UnauthorisedException {
+  protected Authentication getAuthenticationToken(Event event) throws UnauthorisedException {
     ExpressionLanguage expressionLanguage = muleContext.getExpressionLanguage();
 
     Object usernameEval = expressionLanguage.evaluate(username, event, null);

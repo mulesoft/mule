@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -97,7 +97,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
 
     HttpRequestOptions options = newOptions().enableFollowsRedirect().tlsContextFactory(createClientTlsContextFactory()).build();
 
-    muleContext.getClient().send(localAuthorizationUrl.getValue(), MuleMessage.builder().nullPayload().build(), options);
+    muleContext.getClient().send(localAuthorizationUrl.getValue(), InternalMessage.builder().nullPayload().build(), options);
 
     final List<LoggedRequest> requests = findAll(getRequestedFor(urlMatching(AUTHORIZE_PATH + ".*")));
     assertThat(requests.size(), is(1));
@@ -127,7 +127,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
         .put(OAuthConstants.CODE_PARAMETER, AUTHENTICATION_CODE).put(OAuthConstants.STATE_PARAMETER, state.getValue()).build();
 
     muleContext.getClient().send(redirectUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams),
-                                 MuleMessage.builder().nullPayload().build(),
+                                 InternalMessage.builder().nullPayload().build(),
                                  newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
 
     verifyRequestDoneToTokenUrlForAuthorizationCode();

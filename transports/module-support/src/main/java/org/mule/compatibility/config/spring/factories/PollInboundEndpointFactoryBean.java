@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 /**
  * Spring FactoryBean used to create concrete instances of inbound endpoints
@@ -37,7 +37,7 @@ public class PollInboundEndpointFactoryBean extends AbstractEndpointFactoryBean 
     if (ef != null) {
       return ef.getInboundEndpoint(this);
     } else {
-      throw new ConfigurationException(MessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
+      throw new ConfigurationException(I18nMessageFactory.createStaticMessage("EndpointFactory not found in Registry"));
     }
   }
 

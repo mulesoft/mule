@@ -12,7 +12,7 @@ import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.metadata.SocketMetadataResolver;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -35,12 +35,12 @@ public class SocketOperations {
    * Sends the data using the client associated to the {@link RequesterConnection}.
    * <p>
    * If {@code hasResponse} is set, the operation blocks until a response is received or the timeout is met, in which case the
-   * operation will return a {@link MuleMessage} with {@code null} payload.
+   * operation will return a {@link Message} with {@code null} payload.
    *
    * @param content data that will be serialized and sent through the socket.
    * @param hasResponse whether the operation should await for a response or not
    * @param outputEncoding encoding that will be used to serialize the {@code data} if its type is {@link String}.
-   * @param muleMessage if there is no response expected, the outcome of the operation will be the same {@link MuleMessage} as the
+   * @param muleMessage if there is no response expected, the outcome of the operation will be the same {@link Message} as the
    *        input.
    * @throws ConnectionException if the connection couldn't be established, if the remote host was unavailable.
    */
@@ -48,7 +48,7 @@ public class SocketOperations {
   public OperationResult<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
                                     @Optional(defaultValue = PAYLOAD) @XmlHints(allowReferences = false) Object content,
                                     @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
-                                    @MetadataKeyId String hasResponse, MuleMessage muleMessage)
+                                    @MetadataKeyId String hasResponse, Message muleMessage)
       throws ConnectionException, IOException {
     SocketClient client = connection.getClient();
 

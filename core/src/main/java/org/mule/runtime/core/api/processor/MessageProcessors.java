@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -29,21 +29,21 @@ public class MessageProcessors {
     // do not instantiate
   }
 
-  public static MessageProcessorChain singletonChain(MuleContext muleContext, MessageProcessor mp) {
+  public static MessageProcessorChain singletonChain(MuleContext muleContext, Processor mp) {
     return DefaultMessageProcessorChain.from(muleContext, mp);
   }
 
-  public static MessageProcessor lifecyleAwareMessageProcessorWrapper(final MessageProcessor mp) {
+  public static Processor lifecyleAwareMessageProcessorWrapper(final Processor mp) {
     return new LifecyleAwareMessageProcessorWrapper(mp);
   }
 
   private static class LifecyleAwareMessageProcessorWrapper
-      implements MessageProcessor, Lifecycle, MuleContextAware, FlowConstructAware {
+      implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
 
-    private MessageProcessor delegate;
+    private Processor delegate;
 
 
-    public LifecyleAwareMessageProcessorWrapper(MessageProcessor delegate) {
+    public LifecyleAwareMessageProcessorWrapper(Processor delegate) {
       this.delegate = delegate;
     }
 
@@ -90,7 +90,7 @@ public class MessageProcessors {
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return delegate.process(event);
     }
   }

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
@@ -33,7 +33,7 @@ public class ConnectionProviderResolver implements ValueResolver<ConnectionProvi
   }
 
   @Override
-  public ConnectionProvider resolve(MuleEvent event) throws MuleException {
+  public ConnectionProvider resolve(Event event) throws MuleException {
     return valueResolver.resolve(event);
   }
 

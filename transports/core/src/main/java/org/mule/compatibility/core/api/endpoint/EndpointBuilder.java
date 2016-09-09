@@ -11,7 +11,7 @@ import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -78,13 +78,13 @@ public interface EndpointBuilder extends MuleContextAware, Cloneable {
 
   void setRetryPolicyTemplate(RetryPolicyTemplate retryPolicyTemplate);
 
-  void setMessageProcessors(List<MessageProcessor> messageProcessors);
+  void setMessageProcessors(List<Processor> messageProcessors);
 
-  void addMessageProcessor(MessageProcessor messageProcessor);
+  void addMessageProcessor(Processor messageProcessor);
 
-  void setResponseMessageProcessors(List<MessageProcessor> responseMessageProcessors);
+  void setResponseMessageProcessors(List<Processor> responseMessageProcessors);
 
-  void addResponseMessageProcessor(MessageProcessor responseMessageProcessor);
+  void addResponseMessageProcessor(Processor responseMessageProcessor);
 
   void setDisableTransportTransformer(boolean disableTransportTransformer);
 

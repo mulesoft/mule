@@ -7,18 +7,18 @@
 package org.mule.runtime.module.deployment.api;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  *
  */
 public class DeploymentException extends MuleRuntimeException {
 
-  public DeploymentException(Message message) {
+  public DeploymentException(I18nMessage message) {
     super(message);
   }
 
-  public DeploymentException(Message message, Throwable cause) {
+  public DeploymentException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

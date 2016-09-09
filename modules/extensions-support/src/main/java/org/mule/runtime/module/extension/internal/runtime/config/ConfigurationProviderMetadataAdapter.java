@@ -21,7 +21,7 @@ import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataContext;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
@@ -87,7 +87,7 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
   }
 
   private MetadataContext getMetadataContext() throws MetadataResolvingException {
-    MuleEvent fakeEvent = getInitialiserEvent(muleContext);
+    Event fakeEvent = getInitialiserEvent(muleContext);
     return new DefaultMetadataContext(Optional.of(get(fakeEvent)),
                                       connectionManager,
                                       metadataManager.getMetadataCache(getName()),

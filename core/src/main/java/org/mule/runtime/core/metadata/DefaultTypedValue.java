@@ -8,34 +8,37 @@
 package org.mule.runtime.core.metadata;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 
 import java.io.Serializable;
 
 /**
- * Maintains a value that has an associated {@link DataType}
+ * Maintains a content that has an associated {@link DataType}
  */
-public class TypedValue<T> implements Serializable {
+public class DefaultTypedValue<T> implements TypedValue<T>, Serializable {
 
   private static final long serialVersionUID = -2533879516750283994L;
 
-  private final T value;
+  private final T content;
   private final DataType dataType;
 
-  public TypedValue(T value, DataType dataType) {
-    this.value = value;
+  public DefaultTypedValue(T content, DataType dataType) {
+    this.content = content;
     if (dataType == null) {
-      this.dataType = DataType.fromObject(value);
+      this.dataType = DataType.fromObject(content);
     } else {
       this.dataType = dataType;
     }
   }
 
+  @Override
   public DataType getDataType() {
     return dataType;
   }
 
+  @Override
   public T getValue() {
-    return value;
+    return content;
   }
 
 }

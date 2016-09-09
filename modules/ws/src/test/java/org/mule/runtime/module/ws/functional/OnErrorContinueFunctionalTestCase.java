@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.module.ws.consumer.SoapFaultException;
 
@@ -60,7 +60,7 @@ public class OnErrorContinueFunctionalTestCase extends AbstractWSConsumerFunctio
 
     assertThat(event.getError().isPresent(), is(false));
 
-    SoapFaultException soapFault = ((MuleMessage) event.getMessage()).getOutboundProperty("soapFaultException");
+    SoapFaultException soapFault = ((InternalMessage) event.getMessage()).getOutboundProperty("soapFaultException");
     assertThat(soapFault.getMessage(), startsWith("Hello"));
     assertThat(soapFault.getFaultCode().getLocalPart(), is("Server"));
     assertThat(soapFault.getCause(), instanceOf(SoapFault.class));

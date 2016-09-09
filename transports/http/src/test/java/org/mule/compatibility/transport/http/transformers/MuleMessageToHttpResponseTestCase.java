@@ -21,7 +21,7 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -45,7 +45,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCa
     cookiesOutbound[0] = new Cookie("domain", "name-out-1", "value-out-1");
     cookiesOutbound[1] = new Cookie("domain", "name-out-2", "value-out-2");
 
-    MuleMessage msg = MuleMessage.builder(createMockMessage()).addOutboundProperty("Set-Cookie", cookiesOutbound).build();
+    InternalMessage msg = InternalMessage.builder(createMockMessage()).addOutboundProperty("Set-Cookie", cookiesOutbound).build();
 
     MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
 
@@ -62,7 +62,7 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCa
 
   @Test
   public void testSetDateOnOutbound() throws Exception {
-    MuleMessage msg = createMockMessage();
+    InternalMessage msg = createMockMessage();
 
     MuleMessageToHttpResponse transformer = getMuleMessageToHttpResponse();
     HttpResponse response = transformer.createResponse(null, UTF_8, msg, empty(), null, null);
@@ -86,13 +86,13 @@ public class MuleMessageToHttpResponseTestCase extends AbstractMuleContextTestCa
     assertThat("Missing 'Date' header", hasDateHeader, is(true));
   }
 
-  private MuleMessage createMockMessage() throws TransformerException {
-    MuleMessage msg = MuleMessage.builder().payload(new Object()).build();
+  private InternalMessage createMockMessage() throws TransformerException {
+    InternalMessage msg = InternalMessage.builder().payload(new Object()).build();
     muleContext = spy(muleContext);
     TransformationService transformationService = mock(TransformationService.class);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    doReturn(MuleMessage.builder().payload((OutputHandler) (event, out) -> {
-    }).build()).when(transformationService).transform(any(MuleMessage.class), any(DataType.class));
+    doReturn(InternalMessage.builder().payload((OutputHandler) (event, out) -> {
+    }).build()).when(transformationService).transform(any(InternalMessage.class), any(DataType.class));
     return msg;
   }
 

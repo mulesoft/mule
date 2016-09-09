@@ -7,18 +7,18 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Exception through by routing strategies when routing fails
  */
 public class RoutingFailedException extends MuleException {
 
-  public RoutingFailedException(Message message) {
+  public RoutingFailedException(I18nMessage message) {
     super(message);
   }
 
-  public RoutingFailedException(Message message, Throwable cause) {
+  public RoutingFailedException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

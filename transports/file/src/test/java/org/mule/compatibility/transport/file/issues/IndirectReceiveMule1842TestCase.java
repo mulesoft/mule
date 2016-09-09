@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.file.AbstractFileFunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -45,7 +45,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
 
     // then read from the queue that the polling receiver will write to
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("receive", 3000).getRight().get();
+    InternalMessage message = client.request("receive", 3000).getRight().get();
     checkReceivedMessage(message);
   }
 }

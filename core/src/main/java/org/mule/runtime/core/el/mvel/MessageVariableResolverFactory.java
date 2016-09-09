@@ -10,8 +10,8 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
@@ -30,13 +30,13 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
   public static final String FLOW_VARS = "flowVars";
   public static final String SESSION_VARS = "sessionVars";
 
-  protected MuleEvent event;
-  protected MuleEvent.Builder eventBuilder;
+  protected Event event;
+  protected Event.Builder eventBuilder;
   protected MuleContext muleContext;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final MuleEvent event, final MuleEvent.Builder eventBuilder) {
+                                        final Event event, final Event.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;
@@ -49,7 +49,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
    * @param next
    */
   public MessageVariableResolverFactory(final ParserConfiguration parserConfiguration, final MuleContext muleContext,
-                                        final MuleEvent event, final MuleEvent.Builder eventBuilder,
+                                        final Event event, final Event.Builder eventBuilder,
                                         final VariableResolverFactory next) {
     this(parserConfiguration, muleContext, event, eventBuilder);
     setNextFactory(next);
@@ -69,7 +69,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
       } else if (PAYLOAD.equals(name)) {
         return new MuleVariableResolver<>(PAYLOAD, new MessageContext(event, eventBuilder, muleContext).getPayload(), null,
                                           (name1, value, newValue) -> eventBuilder
-                                              .message(MuleMessage.builder(event.getMessage()).payload(newValue).build()));
+                                              .message(InternalMessage.builder(event.getMessage()).payload(newValue).build()));
       } else if (FLOW_VARS.equals(name)) {
         return new MuleImmutableVariableResolver<Map<String, Object>>(FLOW_VARS, new FlowVariableMapContext(event, eventBuilder),
                                                                       null);
@@ -81,7 +81,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
           Throwable exception = event.getMessage().getExceptionPayload().getException();
           return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
         } else {
-          return new MuleImmutableVariableResolver<MuleMessage>(EXCEPTION, null, null);
+          return new MuleImmutableVariableResolver<InternalMessage>(EXCEPTION, null, null);
         }
       } else if (SESSION_VARS.equals(name)) {
         return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS,
@@ -94,7 +94,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
     return super.getNextFactoryVariableResolver(name);
   }
 
-  private MessagingException wrapIfNecessary(MuleEvent event, Throwable exception) {
+  private MessagingException wrapIfNecessary(Event event, Throwable exception) {
     if (exception instanceof MessagingException) {
       return (MessagingException) exception;
     } else {

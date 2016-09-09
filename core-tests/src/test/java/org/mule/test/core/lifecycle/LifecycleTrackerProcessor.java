@@ -7,18 +7,18 @@
 package org.mule.test.core.lifecycle;
 
 import static org.mockito.Mockito.mock;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
 
 /**
  * @author David Dossot (david@dossot.net)
  */
-public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implements FlowConstructAware, MessageProcessor {
+public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implements FlowConstructAware, Processor {
 
   public static String LIFECYCLE_TRACKER_PROCESSOR_PROPERTY = "lifecycle";
   public static String FLOW_CONSRUCT_PROPERTY = "flowConstruct";
@@ -50,11 +50,11 @@ public class LifecycleTrackerProcessor extends AbstractLifecycleTracker implemen
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    event = MuleEvent.builder(event)
-        .message(MuleMessage.builder(event.getMessage())
+  public Event process(Event event) throws MuleException {
+    event = Event.builder(event)
+        .message(InternalMessage.builder(event.getMessage())
             .addOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY, getTracker().toString()).build())
-        .addFlowVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct).build();
+        .addVariable(FLOW_CONSRUCT_PROPERTY, flowConstruct).build();
     return event;
   }
 }

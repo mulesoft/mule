@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
@@ -68,7 +68,7 @@ public class ProxyNonBlockingTestCase extends FunctionalTestCase {
 
   private void doTest(String path, String request, String expectedResponse) throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send("http://localhost:" + dynamicPort.getNumber() + path, getTestMuleMessage(request), HTTP_REQUEST_OPTIONS)
             .getRight();
     String resString = getPayloadAsString(result);

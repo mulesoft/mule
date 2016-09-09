@@ -8,10 +8,10 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,19 +24,19 @@ import java.util.List;
  * single Collection with elements A, B, C and D.
  * 
  * This transformer will also work on MuleMessageCollections. In this case, it will take the individual Collection payloads of
- * each MuleMessage and merge them into a single Collection on a new MuleMessage.
+ * each Message and merge them into a single Collection on a new Message.
  */
-public class CombineCollectionsTransformer implements MessageProcessor {
+public class CombineCollectionsTransformer implements Processor {
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleMessage msg = event.getMessage();
+  public Event process(Event event) throws MuleException {
+    InternalMessage msg = event.getMessage();
 
     List<Object> payload = new ArrayList<>();
     Class<?> itemType = Object.class;
     if (MULE_MESSAGE_COLLECTION.isCompatibleWith(msg.getDataType())) {
-      itemType = MuleMessage.class;
-      for (MuleMessage child : (Collection<MuleMessage>) msg.getPayload()) {
+      itemType = InternalMessage.class;
+      for (InternalMessage child : (Collection<InternalMessage>) msg.getPayload()) {
         Object childPayload = child.getPayload();
         if (childPayload instanceof Collection) {
           payload.addAll((Collection) childPayload);
@@ -51,8 +51,8 @@ public class CombineCollectionsTransformer implements MessageProcessor {
       payload.add(msg.getPayload());
     }
 
-    MuleMessage listMessage = MuleMessage.builder(msg).collectionPayload(payload, itemType).build();
-    return MuleEvent.builder(event).message(listMessage).build();
+    InternalMessage listMessage = InternalMessage.builder(msg).collectionPayload(payload, itemType).build();
+    return Event.builder(event).message(listMessage).build();
   }
 
   private void add(List<Object> newPayload, Collection existingPayload) {

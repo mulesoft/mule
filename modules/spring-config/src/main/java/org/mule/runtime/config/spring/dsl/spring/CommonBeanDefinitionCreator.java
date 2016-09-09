@@ -232,9 +232,9 @@ public class CommonBeanDefinitionCreator extends BeanDefinitionCreator {
     componentModel.setBeanDefinition(wrappedBeanDefinition);
   }
 
-  //TODO MULE-9638 Remove once we don't mix spring beans with mule beans.
+  // TODO MULE-9638 Remove once we don't mix spring beans with mule beans.
   private void processSpringOrMuleProperties(ComponentModel componentModel, BeanDefinitionBuilder beanDefinitionBuilder) {
-    //for now we skip custom-transformer since requires injection by the object factory.
+    // for now we skip custom-transformer since requires injection by the object factory.
     if (genericPropertiesCustomProcessingIdentifiers.contains(componentModel.getIdentifier())) {
       return;
     }

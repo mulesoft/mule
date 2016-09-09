@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import javax.resource.spi.work.WorkEvent;
@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 public class AsyncWorkListener implements WorkListener {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
-  protected MessageProcessor target;
+  protected Processor target;
 
-  public AsyncWorkListener(MessageProcessor target) {
+  public AsyncWorkListener(Processor target) {
     this.target = target;
   }
 

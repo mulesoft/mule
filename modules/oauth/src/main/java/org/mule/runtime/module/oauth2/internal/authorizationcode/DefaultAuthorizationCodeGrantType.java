@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -94,7 +94,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   }
 
   @Override
-  public void refreshToken(final MuleEvent currentFlowEvent, final String resourceOwnerId) throws MuleException {
+  public void refreshToken(final Event currentFlowEvent, final String resourceOwnerId) throws MuleException {
     tokenRequestHandler.refreshToken(currentFlowEvent, resourceOwnerId);
   }
 
@@ -148,7 +148,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   }
 
   @Override
-  public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException {
+  public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
     final String resourceOwnerId = resourceOwnerIdEvaluator.resolveStringValue(muleEvent);
     if (resourceOwnerId == null) {
       throw new RequestAuthenticationException(createStaticMessage(String
@@ -165,7 +165,7 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
   }
 
   @Override
-  public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) throws MuleException {
+  public boolean shouldRetry(final Event firstAttemptResponseEvent) throws MuleException {
     if (!StringUtils.isBlank(getRefreshTokenWhen())) {
       final Object value = muleContext.getExpressionLanguage().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
       if (!(value instanceof Boolean)) {

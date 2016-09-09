@@ -12,7 +12,7 @@ import static org.mule.extension.validation.internal.ImmutableValidationResult.e
 import org.mule.extension.validation.api.ExceptionFactory;
 import org.mule.extension.validation.api.ValidationException;
 import org.mule.extension.validation.api.ValidationResult;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Rule;
@@ -68,12 +68,12 @@ public class ValidationExceptionTestCase extends ValidationTestCase {
   public static class TestExceptionFactory implements ExceptionFactory {
 
     @Override
-    public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, MuleEvent event) {
+    public <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, Event event) {
       return (T) new ValidationException(error(MESSAGE_FAILED));
     }
 
     @Override
-    public Exception createException(ValidationResult result, String exceptionClassName, MuleEvent event) {
+    public Exception createException(ValidationResult result, String exceptionClassName, Event event) {
       return new ValidationException(error(MESSAGE_FAILED));
     }
   }

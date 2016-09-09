@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.functional.Either;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
@@ -76,15 +76,16 @@ public class JmsSharedConnectorTestCase extends DomainFunctionalTestCase {
   }
 
   private void executeScenario(final String inQueue, final String outQueue) throws Exception {
-    getMuleContextForApp(CLIENT_APP).getClient().dispatch(queueAddress(inQueue), MuleMessage.builder().payload("test").build());
-    final AtomicReference<MuleMessage> response = new AtomicReference<>();
+    getMuleContextForApp(CLIENT_APP).getClient().dispatch(queueAddress(inQueue),
+                                                          InternalMessage.builder().payload("test").build());
+    final AtomicReference<InternalMessage> response = new AtomicReference<>();
     new PollingProber(10000, 100).check(new Probe() {
 
       @Override
       public boolean isSatisfied() {
-        MuleMessage responseMessage = null;
+        InternalMessage responseMessage = null;
         try {
-          Either<Error, Optional<MuleMessage>> result =
+          Either<Error, Optional<InternalMessage>> result =
               getMuleContextForApp(CLIENT_APP).getClient().request(queueAddress(outQueue), 10);
           if (result.getRight().isPresent()) {
             responseMessage = result.getRight().get();

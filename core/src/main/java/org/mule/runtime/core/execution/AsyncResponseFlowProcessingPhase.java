@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_ERROR_RESPONSE;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
@@ -14,9 +14,9 @@ import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutio
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -33,7 +33,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This phase routes the message through the flow.
  * <p>
- * To participate of this phase, {@link org.mule.runtime.core.execution.MessageProcessTemplate} must implement {@link org.mule.runtime.core.execution.FlowProcessingPhaseTemplate}
+ * To participate of this phase, {@link org.mule.runtime.core.execution.MessageProcessTemplate} must implement
+ * {@link org.mule.runtime.core.execution.FlowProcessingPhaseTemplate}
  */
 public class AsyncResponseFlowProcessingPhase
     extends NotificationFiringProcessingPhase<AsyncResponseFlowProcessingPhaseTemplate> {
@@ -67,11 +68,11 @@ public class AsyncResponseFlowProcessingPhase
                                             (messageProcessContext.getTransactionConfig() == null ? new MuleTransactionConfig()
                                                 : messageProcessContext.getTransactionConfig()),
                                             exceptionHandler);
-            final MuleEvent response = transactionTemplate.execute(() -> {
-              MuleEvent muleEvent = template.getMuleEvent();
+            final Event response = transactionTemplate.execute(() -> {
+              Event muleEvent = template.getMuleEvent();
               fireNotification(messageSource, muleEvent, messageProcessContext.getFlowConstruct(), MESSAGE_RECEIVED);
               if (muleEvent.isAllowNonBlocking()) {
-                muleEvent = MuleEvent.builder(muleEvent)
+                muleEvent = Event.builder(muleEvent)
                     .replyToHandler(new ExceptionHandlingReplyToHandlerDecorator(new FlowProcessingNonBlockingReplyToHandler(template,
                                                                                                                              messageProcessContext
                                                                                                                                  .getFlowConstruct(),
@@ -121,7 +122,7 @@ public class AsyncResponseFlowProcessingPhase
       }
 
       @Override
-      public MuleEvent responseSentWithFailure(MessagingException e, MuleEvent event) {
+      public Event responseSentWithFailure(MessagingException e, Event event) {
         phaseResultNotifier.phaseFailure(e);
         return event;
       }
@@ -138,9 +139,9 @@ public class AsyncResponseFlowProcessingPhase
       }
 
       @Override
-      public MuleEvent responseSentWithFailure(final MessagingException e, final MuleEvent event) {
+      public Event responseSentWithFailure(final MessagingException e, final Event event) {
         return executeCallback(() -> {
-          final MuleEvent exceptionStrategyResult = exceptionListener.handleException(e, event);
+          final Event exceptionStrategyResult = exceptionListener.handleException(e, event);
           phaseResultNotifier.phaseSuccessfully();
           return exceptionStrategyResult;
         }, phaseResultNotifier);
@@ -148,7 +149,7 @@ public class AsyncResponseFlowProcessingPhase
     };
   }
 
-  private MuleEvent executeCallback(final Callback callback, PhaseResultNotifier phaseResultNotifier) {
+  private Event executeCallback(final Callback callback, PhaseResultNotifier phaseResultNotifier) {
     try {
       return callback.execute();
     } catch (Exception callbackException) {
@@ -167,7 +168,7 @@ public class AsyncResponseFlowProcessingPhase
 
   private interface Callback {
 
-    MuleEvent execute() throws Exception;
+    Event execute() throws Exception;
 
   }
 
@@ -189,7 +190,7 @@ public class AsyncResponseFlowProcessingPhase
     }
 
     @Override
-    public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
       fireNotification(null, event, flow, MESSAGE_RESPONSE);
       template.sendResponseToClient(event, createResponseCompletationCallback(phaseResultNotifier, exceptionHandler));
       return event;

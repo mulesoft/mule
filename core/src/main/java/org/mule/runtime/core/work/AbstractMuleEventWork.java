@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.work;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
 import javax.resource.spi.work.Work;
@@ -21,9 +21,9 @@ import javax.resource.spi.work.Work;
  */
 public abstract class AbstractMuleEventWork implements Work {
 
-  protected MuleEvent event;
+  protected Event event;
 
-  public AbstractMuleEventWork(MuleEvent event) {
+  public AbstractMuleEventWork(Event event) {
     // Event must be copied here rather than once work is executed, so main flow can't mutate the message
     // before work execution
     this(event, true);
@@ -34,8 +34,8 @@ public abstract class AbstractMuleEventWork implements Work {
    * event is queued before being processed asynchronously like with
    * {@link org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor}
    */
-  public AbstractMuleEventWork(MuleEvent event, boolean copyEvent) {
-    this.event = copyEvent ? MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build() : event;
+  public AbstractMuleEventWork(Event event, boolean copyEvent) {
+    this.event = copyEvent ? Event.builder(event).session(new DefaultMuleSession(event.getSession())).build() : event;
   }
 
   @Override
@@ -56,7 +56,7 @@ public abstract class AbstractMuleEventWork implements Work {
     // no-op
   }
 
-  public MuleEvent getEvent() {
+  public Event getEvent() {
     return event;
   }
 }

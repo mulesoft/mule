@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -15,9 +16,9 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 
 /**
- * <code>SerializableToByteArray</code> converts a serializable object or a String to a byte array. If <code>MuleMessage</code> is
- * configured as a source type on this transformer by calling <code>setAcceptMuleMessage(true)</code> then the MuleMessage will be
- * serialised. This is useful for transports such as TCP where the message headers would normally be lost.
+ * <code>SerializableToByteArray</code> converts a serializable object or a String to a byte array. If <code>Message</code> is
+ * configured as a source type on this transformer by calling {@link #setAcceptMuleMessage(boolean)} then the {@link Message} will
+ * be serialised. This is useful for transports such as TCP where the message headers would normally be lost.
  */
 public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer {
 
@@ -46,8 +47,8 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
   @Override
   public Object doTransform(Object src, Charset outputEncoding) throws TransformerException {
     /*
-     * If the MuleMessage source type has been registered then we can assume that the whole message is to be serialised, not just
-     * the payload. This can be useful for protocols such as tcp where the protocol does not support headers and the whole message
+     * If the Message source type has been registered then we can assume that the whole message is to be serialised, not just the
+     * payload. This can be useful for protocols such as tcp where the protocol does not support headers and the whole message
      * needs to be serialized.
      */
 

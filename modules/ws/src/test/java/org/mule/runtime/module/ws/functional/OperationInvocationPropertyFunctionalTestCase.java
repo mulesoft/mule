@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import org.hamcrest.Matchers;
@@ -35,19 +35,19 @@ public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSCon
 
   @Test
   public void consumerWorksWithOperationInvocationPropertyDefined() throws Exception {
-    MuleEvent event =
+    Event event =
         flowRunner("echo").withPayload(ECHO_REQUEST).withFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE).run();
 
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
-    assertThat(event.getFlowVariable(CxfConstants.OPERATION), is(OPERATION_VALUE));
+    assertThat(event.getVariable(CxfConstants.OPERATION), is(OPERATION_VALUE));
   }
 
 
   @Test
   public void consumerWorksWithNoOperationInvocationPropertyDefined() throws Exception {
-    MuleEvent event = flowRunner("echo").withPayload(ECHO_REQUEST).run();
+    Event event = flowRunner("echo").withPayload(ECHO_REQUEST).run();
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
 
-    assertThat(event.getFlowVariableNames(), not(contains(CxfConstants.OPERATION)));
+    assertThat(event.getVariableNames(), not(contains(CxfConstants.OPERATION)));
   }
 }

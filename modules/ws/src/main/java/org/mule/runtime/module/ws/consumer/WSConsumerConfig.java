@@ -13,14 +13,14 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectorOperationLocator;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.Preconditions;
@@ -50,7 +50,7 @@ public class WSConsumerConfig implements MuleContextAware {
   /**
    * Creates an outbound endpoint for the service address.
    */
-  public MessageProcessor createOutboundMessageProcessor(FlowConstruct flowConstruct) throws MuleException {
+  public Processor createOutboundMessageProcessor(FlowConstruct flowConstruct) throws MuleException {
     Preconditions.checkState(StringUtils.isNotEmpty(serviceAddress), "No serviceAddress provided in WS consumer config");
 
     if (connectorConfig != null && connector != null) {
@@ -62,16 +62,16 @@ public class WSConsumerConfig implements MuleContextAware {
     return createHttpRequester(flowConstruct);
   }
 
-  private MessageProcessor createHttpRequester(FlowConstruct flowConstruct) throws MuleException {
-    return new MessageProcessor() {
+  private Processor createHttpRequester(FlowConstruct flowConstruct) throws MuleException {
+    return new Processor() {
 
       private HttpRequestOptions requestOptions;
 
       @Override
-      public MuleEvent process(MuleEvent event) throws MuleException {
+      public Event process(Event event) throws MuleException {
         ConnectorOperationLocator connectorOperationLocator =
             muleContext.getRegistry().get(OBJECT_CONNECTOR_MESSAGE_PROCESSOR_LOCATOR);
-        MessageProcessor messageProcessor =
+        Processor messageProcessor =
             connectorOperationLocator.locateConnectorOperation(serviceAddress, getRequestOptions(), REQUEST_RESPONSE);
         if (messageProcessor instanceof FlowConstructAware) {
           ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);

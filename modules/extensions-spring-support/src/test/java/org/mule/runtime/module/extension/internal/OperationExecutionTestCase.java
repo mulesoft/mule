@@ -27,9 +27,9 @@ import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -86,17 +86,17 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     FlowRunner runner = flowRunner("sayMyNameOnTarget").withPayload("");
     runner.spyObjects();
 
-    MuleEvent responseEvent = runner.run();
+    Event responseEvent = runner.run();
 
     assertThat(responseEvent.getMessage().getPayload(), is(""));
 
-    MuleMessage responseMessage = responseEvent.getFlowVariable("myFace");
+    InternalMessage responseMessage = responseEvent.getVariable("myFace");
     assertThat(responseMessage.getPayload(), is(HEISENBERG));
   }
 
   @Test
   public void voidOperationWithoutParameters() throws Exception {
-    MuleEvent responseEvent = flowRunner("die").withPayload(EMPTY).run();
+    Event responseEvent = flowRunner("die").withPayload(EMPTY).run();
 
     assertThat(responseEvent.getMessageAsString(muleContext), is(EMPTY));
     assertThat(getConfig(HEISENBERG).getEndingHealth(), is(DEAD));
@@ -146,7 +146,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void optionalParameterWithDefaultOverride() throws Exception {
-    MuleEvent event = flowRunner("customKillWithoutDefault").withPayload("").withFlowVariable("goodbye", GOODBYE_MESSAGE)
+    Event event = flowRunner("customKillWithoutDefault").withPayload("").withFlowVariable("goodbye", GOODBYE_MESSAGE)
         .withFlowVariable("victim", VICTIM).run();
 
     assertKillPayload(event);
@@ -154,7 +154,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void oneNestedOperation() throws Exception {
-    MuleEvent event = runFlow("killOne");
+    Event event = runFlow("killOne");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
 
     assertThat(expected, is(event.getMessageAsString(muleContext)));
@@ -162,7 +162,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void manyNestedOperations() throws Exception {
-    MuleEvent event = runFlow("killMany");
+    Event event = runFlow("killMany");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n" + "bye bye, Frank\n"
         + "bye bye, Nazi dudes\n";
 
@@ -171,7 +171,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void manyNestedOperationsSupportedButOnlyOneProvided() throws Exception {
-    MuleEvent event = runFlow("killManyButOnlyOneProvided");
+    Event event = runFlow("killManyButOnlyOneProvided");
     String expected = "Killed the following because I'm the one who knocks:\n" + "bye bye, Gustavo Fring\n";
 
     assertThat(expected, is(event.getMessageAsString(muleContext)));
@@ -255,14 +255,14 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     Ricin ricinWeapon = new Ricin();
     ricinWeapon.setMicrogramsPerKilo(10L);
 
-    MuleEvent event = flowRunner("killWithWeapon").withPayload(EMPTY).withFlowVariable("weapon", ricinWeapon).run();
+    Event event = flowRunner("killWithWeapon").withPayload(EMPTY).withFlowVariable("weapon", ricinWeapon).run();
     assertThat(event.getMessageAsString(muleContext), is(KILL_RESULT));
   }
 
 
   @Test
   public void connectionProviderDefaultValueSaulPhoneNumber() throws Exception {
-    MuleEvent getSaulNumber = runFlow("getSaulNumber");
+    Event getSaulNumber = runFlow("getSaulNumber");
     assertThat(getSaulNumber.getMessage().getPayload(), is(SAUL_OFFICE_NUMBER));
   }
 
@@ -274,7 +274,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     ricinWeapon2.setMicrogramsPerKilo(10L);
 
     List<Weapon> weaponList = Arrays.asList(ricinWeapon1, ricinWeapon2);
-    MuleEvent event = flowRunner("killWithMultipleWeapons").withPayload(EMPTY).withFlowVariable("weapons", weaponList).run();
+    Event event = flowRunner("killWithMultipleWeapons").withPayload(EMPTY).withFlowVariable("weapons", weaponList).run();
 
     List<String> result = weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
     assertThat(event.getMessage().getPayload(), is(result));
@@ -322,7 +322,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithLiteralArgument() throws Exception {
-    MuleEvent event = flowRunner("literalEcho").withPayload(EMPTY).run();
+    Event event = flowRunner("literalEcho").withPayload(EMPTY).run();
     assertThat(event.getMessage().getPayload(), is("#[money]"));
   }
 
@@ -375,7 +375,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     assertThat(actual, is(knock(expected)));
   }
 
-  private void assertKillPayload(MuleEvent event) throws MuleException {
+  private void assertKillPayload(Event event) throws MuleException {
     assertThat(event.getMessageAsString(muleContext), is(String.format("%s, %s", GOODBYE_MESSAGE, VICTIM)));
   }
 
@@ -384,7 +384,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void doTestExpressionEnemy(Object enemyIndex) throws Exception {
-    MuleEvent event = flowRunner("expressionEnemy").withPayload(EMPTY).withFlowVariable("enemy", enemyIndex).run();
+    Event event = flowRunner("expressionEnemy").withPayload(EMPTY).withFlowVariable("enemy", enemyIndex).run();
 
     assertThat(event.getMessageAsString(muleContext), is(GUSTAVO_FRING));
   }

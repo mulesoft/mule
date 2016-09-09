@@ -7,7 +7,7 @@
 package org.mule.runtime.core.source.polling;
 
 import static org.mule.runtime.core.DefaultMessageContext.create;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedNull;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -15,9 +15,9 @@ import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutio
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -70,7 +70,7 @@ public class PollingMessageSource
    * The {@link org.mule.runtime.core.api.schedule.Scheduler} instance used to execute the scheduled jobs
    */
   private Scheduler scheduler;
-  private MessageProcessor listener;
+  private Processor listener;
   private FlowConstruct flowConstruct;
   private MuleContext muleContext;
   private boolean started;
@@ -89,11 +89,11 @@ public class PollingMessageSource
    * 
   </p>
    */
-  protected MessageProcessor sourceMessageProcessor;
+  protected Processor sourceMessageProcessor;
 
   /**
    * <p>
-   * The {@link MessageProcessorPollingOverride} that affects the routing of the {@link MuleEvent}
+   * The {@link MessageProcessorPollingOverride} that affects the routing of the {@link Event}
    * </p>
    */
   protected MessageProcessorPollingOverride override;
@@ -104,7 +104,7 @@ public class PollingMessageSource
    * @param override interceptor for each triggered operation
    * @param schedulerFactory factory for the scheduler
    */
-  public PollingMessageSource(MuleContext muleContext, MessageProcessor sourceMessageProcessor,
+  public PollingMessageSource(MuleContext muleContext, Processor sourceMessageProcessor,
                               MessageProcessorPollingOverride override, SchedulerFactory<Runnable> schedulerFactory) {
     this.muleContext = muleContext;
     this.sourceMessageProcessor = sourceMessageProcessor;
@@ -194,29 +194,29 @@ public class PollingMessageSource
    * @throws Exception
    */
   public void poll() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(StringUtils.EMPTY).build();
+    InternalMessage request = InternalMessage.builder().payload(StringUtils.EMPTY).build();
     pollWith(request);
   }
 
-  private void pollWith(final MuleMessage request) throws Exception {
-    ExecutionTemplate<MuleEvent> executionTemplate =
+  private void pollWith(final InternalMessage request) throws Exception {
+    ExecutionTemplate<Event> executionTemplate =
         createMainExecutionTemplate(muleContext, flowConstruct, flowConstruct.getExceptionListener());
     try {
       final MessageProcessorPollingInterceptor interceptor = override.interceptor();
       if (interceptor instanceof MuleContextAware) {
         ((MuleContextAware) interceptor).setMuleContext(muleContext);
       }
-      MuleEvent muleEvent = executionTemplate.execute(new ExecutionCallback<MuleEvent>() {
+      Event muleEvent = executionTemplate.execute(new ExecutionCallback<Event>() {
 
         @Override
-        public MuleEvent process() throws Exception {
-          MuleEvent event = MuleEvent.builder(create(flowConstruct, getPollingUniqueName())).message(request)
+        public Event process() throws Exception {
+          Event event = Event.builder(create(flowConstruct, getPollingUniqueName())).message(request)
               .exchangePattern(ONE_WAY).flow(flowConstruct).build();
           event = interceptor.prepareSourceEvent(event);
 
           setCurrentEvent(event);
 
-          MuleEvent sourceEvent = sourceMessageProcessor.process(event);
+          Event sourceEvent = sourceMessageProcessor.process(event);
           if (isNewMessage(sourceEvent)) {
             muleContext.getNotificationManager()
                 .fireNotification(new ConnectorMessageNotification(this, sourceEvent.getMessage(), getPollingUniqueName(),
@@ -308,9 +308,9 @@ public class PollingMessageSource
    * @param event result of the polled message processor
    * @return true if the polled message processor return new content, false otherwise
    */
-  protected boolean isNewMessage(MuleEvent event) {
+  protected boolean isNewMessage(Event event) {
     if (event != null && !VoidMuleEvent.getInstance().equals(event) && event.getMessage() != null) {
-      MuleMessage message = event.getMessage();
+      InternalMessage message = event.getMessage();
       return message.getPayload() != null;
     }
     return false;
@@ -328,7 +328,7 @@ public class PollingMessageSource
 
 
   @Override
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     this.listener = listener;
   }
 

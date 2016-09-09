@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.work;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.runtime.core.DefaultMuleEvent;
+
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -139,6 +139,7 @@ public class WorkerContext implements Work {
     }
   }
 
+  @Override
   public void release() {
     worker.release();
   }
@@ -228,6 +229,7 @@ public class WorkerContext implements Work {
     return workException;
   }
 
+  @Override
   public void run() {
     if (isTimedOut()) {
       // In case of a time out, one releases the start and end latches

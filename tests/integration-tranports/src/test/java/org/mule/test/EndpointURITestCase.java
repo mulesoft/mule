@@ -15,8 +15,8 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.DynamicOutboundEndpoint;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -53,13 +53,13 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
     private String uri;
     private boolean isDynamic;
     private String resultUri;
-    private MuleMessage message;
+    private InternalMessage message;
     {
       Map<String, Serializable> inbound = new HashMap<>();
       inbound.put("prop1", "apple");
       inbound.put("prop2", "orange");
       inbound.put("prop3", "banana");
-      message = MuleMessage.builder().payload("Hello, world").inboundProperties(inbound).build();
+      message = InternalMessage.builder().payload("Hello, world").inboundProperties(inbound).build();
     }
 
     public EndpointUri(String uri, String resultUri) {
@@ -85,7 +85,7 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
       String epUri;
       if (ep instanceof DynamicOutboundEndpoint) {
         Flow flow = getTestFlow();
-        epUri = muleContext.getExpressionLanguage().parse(ep.getAddress(), MuleEvent
+        epUri = muleContext.getExpressionLanguage().parse(ep.getAddress(), Event
             .builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build(), flow);
       } else {
         epUri = ep.getAddress();

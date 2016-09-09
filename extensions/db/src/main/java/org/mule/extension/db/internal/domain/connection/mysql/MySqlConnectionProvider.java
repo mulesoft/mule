@@ -17,12 +17,10 @@ import javax.sql.DataSource;
 /**
  * Creates connections to a MySQL database.
  *
- * Connection can be specified through a URL, or through
- * convenience parameters exposed to spare the user from
- * the need of knowing the specific URL format.
+ * Connection can be specified through a URL, or through convenience parameters exposed to spare the user from the need of knowing
+ * the specific URL format.
  * <p>
- * Notice those parameters are ignored if a specific URL
- * is provided.
+ * Notice those parameters are ignored if a specific URL is provided.
  *
  * @since 4.0
  */

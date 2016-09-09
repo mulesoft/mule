@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
  * Filters messages that have a consumable payload.
  * <p>
- * The filter accepts only {@link MuleMessage} instances that have a no consumable payload. Check is done using
+ * The filter accepts only {@link Message} instances that have a no consumable payload. Check is done using
  * {@see org.mule.runtime.api.metadata.DataType#isStreamType}.
  */
 public class ConsumableMuleMessageFilter implements Filter {
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     return !message.getDataType().isStreamType();
   }
 }

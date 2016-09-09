@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.Preconditions;
 
 import java.util.Collections;
@@ -38,7 +38,7 @@ public final class AggregationContext {
         return false;
       }
 
-      MuleEvent event = (MuleEvent) object;
+      Event event = (Event) object;
       return event.getError().isPresent();
     }
   };
@@ -46,37 +46,37 @@ public final class AggregationContext {
   /**
    * the original event from wich the events to be aggregated were splitted from
    */
-  private final MuleEvent originalEvent;
+  private final Event originalEvent;
 
   /**
    * The events to be aggregated. These events need to be ordered so that each event's index corresponds to the index of each
    * route
    */
-  private final List<MuleEvent> events;
+  private final List<Event> events;
 
   /**
    * Creates a new instance
    * 
-   * @param originalEvent a {@link MuleEvent}. Can be <code>null</code>
-   * @param events a {@link List} of {@link MuleEvent}. Cannot be <code>null</code> but could be empty. In that case, is up to
-   *        each consumer to decide wether to fail or not
+   * @param originalEvent a {@link Event}. Can be <code>null</code>
+   * @param events a {@link List} of {@link Event}. Cannot be <code>null</code> but could be empty. In that case, is up to each
+   *        consumer to decide wether to fail or not
    */
-  public AggregationContext(MuleEvent originalEvent, List<MuleEvent> events) {
+  public AggregationContext(Event originalEvent, List<Event> events) {
     Preconditions.checkArgument(events != null, "events cannot be null");
     this.originalEvent = originalEvent;
     this.events = Collections.unmodifiableList(events);
   }
 
   /**
-   * Returns all the {@link MuleEvent}s which messages have a not <code>null</code> {@link ExceptionPayload} and a not
+   * Returns all the {@link Event}s which messages have a not <code>null</code> {@link ExceptionPayload} and a not
    * <code>null</code> {@link ExceptionPayload#getException()}. Notice that this is a select operation. Each time this method is
    * invoked the result will be re-calculated
    * 
-   * @return a list of {@link MuleEvent}. It could be empty but it will never be <code>null</code>
+   * @return a list of {@link Event}. It could be empty but it will never be <code>null</code>
    */
   @SuppressWarnings("unchecked")
-  public List<MuleEvent> collectEventsWithExceptions() {
-    return (List<MuleEvent>) CollectionUtils.select(this.events, failedEventsPredicate);
+  public List<Event> collectEventsWithExceptions() {
+    return (List<Event>) CollectionUtils.select(this.events, failedEventsPredicate);
   }
 
   /**
@@ -88,7 +88,7 @@ public final class AggregationContext {
   public NavigableMap<Integer, Throwable> collectRouteExceptions() {
     NavigableMap<Integer, Throwable> routes = new TreeMap<Integer, Throwable>();
     for (int i = 0; i < this.events.size(); i++) {
-      MuleEvent event = this.events.get(i);
+      Event event = this.events.get(i);
       if (failedEventsPredicate.evaluate(event)) {
         routes.put(i, event.getError().get().getException());
       }
@@ -98,22 +98,22 @@ public final class AggregationContext {
   }
 
   /**
-   * The exact opposite to {@link #collectEventsWithExceptions()} Returns all the {@link MuleEvent}s which messages have a
+   * The exact opposite to {@link #collectEventsWithExceptions()} Returns all the {@link Event}s which messages have a
    * <code>null</code> {@link ExceptionPayload} or a <code>null</code> {@link ExceptionPayload#getException()}. Notice that this
    * is a collect operation. Each time this method is invoked the result will be re-calculated
    * 
-   * @return a list of {@link MuleEvent}. It could be empty but it will never be <code>null</code>
+   * @return a list of {@link Event}. It could be empty but it will never be <code>null</code>
    */
   @SuppressWarnings("unchecked")
-  public List<MuleEvent> collectEventsWithoutExceptions() {
-    return (List<MuleEvent>) CollectionUtils.selectRejected(this.events, failedEventsPredicate);
+  public List<Event> collectEventsWithoutExceptions() {
+    return (List<Event>) CollectionUtils.selectRejected(this.events, failedEventsPredicate);
   }
 
-  public MuleEvent getOriginalEvent() {
+  public Event getOriginalEvent() {
     return this.originalEvent;
   }
 
-  public List<MuleEvent> getEvents() {
+  public List<Event> getEvents() {
     return this.events;
   }
 

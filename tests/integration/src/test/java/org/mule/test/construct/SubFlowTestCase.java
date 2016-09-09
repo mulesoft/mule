@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.core.lifecycle.LifecycleTrackerProcessor.FLOW_CONSRUCT_PROPERTY;
 import static org.mule.test.core.lifecycle.LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -25,45 +25,45 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testProcessorChainViaProcessorRef() throws Exception {
-    MuleEvent result = flowRunner("ProcessorChainViaProcessorRef").withPayload("").run();
+    Event result = flowRunner("ProcessorChainViaProcessorRef").withPayload("").run();
     assertThat(result.getMessageAsString(muleContext), is("1xyz2"));
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getFlowVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
                is(muleContext.getRegistry().lookupFlowConstruct("ProcessorChainViaProcessorRef")));
   }
 
   @Test
   public void testProcessorChainViaFlowRef() throws Exception {
-    MuleEvent result = flowRunner("ProcessorChainViaFlowRef").withPayload("").run();
+    Event result = flowRunner("ProcessorChainViaFlowRef").withPayload("").run();
     assertThat(result.getMessageAsString(muleContext), is("1xyz2"));
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getFlowVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
                is(muleContext.getRegistry().lookupFlowConstruct("ProcessorChainViaFlowRef")));
   }
 
   @Test
   public void testSubFlowViaProcessorRef() throws Exception {
-    MuleEvent result = flowRunner("SubFlowViaProcessorRef").withPayload("").run();
+    Event result = flowRunner("SubFlowViaProcessorRef").withPayload("").run();
     assertThat(result.getMessageAsString(muleContext), is("1xyz2"));
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getFlowVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
                is(muleContext.getRegistry().lookupFlowConstruct("SubFlowViaProcessorRef")));
   }
 
   @Test
   public void testSubFlowViaFlowRef() throws Exception {
-    MuleEvent result = flowRunner("SubFlowViaFlowRef").withPayload("").run();
+    Event result = flowRunner("SubFlowViaFlowRef").withPayload("").run();
     assertThat(result.getMessageAsString(muleContext), is("1xyz2"));
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getFlowVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
                is(muleContext.getRegistry().lookupFlowConstruct("SubFlowViaFlowRef")));
   }
 

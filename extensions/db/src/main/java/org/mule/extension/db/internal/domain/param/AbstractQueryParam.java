@@ -10,8 +10,7 @@ package org.mule.extension.db.internal.domain.param;
 import org.mule.extension.db.internal.domain.type.DbType;
 
 /**
- * Defines a base class for implementing different kind of { @link QueryParam}
- * classes.
+ * Defines a base class for implementing different kind of { @link QueryParam} classes.
  */
 public class AbstractQueryParam implements QueryParam {
 

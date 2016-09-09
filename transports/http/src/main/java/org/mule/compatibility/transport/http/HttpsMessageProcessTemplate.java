@@ -12,9 +12,9 @@ import static org.mule.compatibility.transport.http.HttpsConnector.PEER_CERTIFIC
 
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.WorkManager;
 
 public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate {
@@ -25,7 +25,7 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate {
   }
 
   @Override
-  public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException {
+  public Event beforeRouteEvent(Event muleEvent) throws MuleException {
     try {
       long timeout = ((HttpsConnector) getConnector()).getSslHandshakeTimeout();
       boolean handshakeComplete = getHttpServerConnection().getSslSocketHandshakeCompleteLatch().await(timeout, MILLISECONDS);
@@ -35,14 +35,14 @@ public class HttpsMessageProcessTemplate extends HttpMessageProcessTemplate {
     } catch (InterruptedException e) {
       throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(), muleEvent, e);
     }
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(muleEvent.getMessage());
+    InternalMessage.Builder messageBuilder = InternalMessage.builder(muleEvent.getMessage());
     if (getHttpServerConnection().getPeerCertificateChain() != null) {
       messageBuilder.addOutboundProperty(PEER_CERTIFICATES, getHttpServerConnection().getPeerCertificateChain());
     }
     if (getHttpServerConnection().getLocalCertificateChain() != null) {
       messageBuilder.addOutboundProperty(LOCAL_CERTIFICATES, getHttpServerConnection().getLocalCertificateChain());
     }
-    muleEvent = MuleEvent.builder(muleEvent).message(messageBuilder.build()).build();
+    muleEvent = Event.builder(muleEvent).message(messageBuilder.build()).build();
 
     super.beforeRouteEvent(muleEvent);
     return muleEvent;

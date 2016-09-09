@@ -17,9 +17,9 @@ import static org.mule.runtime.api.metadata.MediaType.JSON;
 
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpFileAttributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 
@@ -46,7 +46,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
   @Test
   public void read() throws Exception {
-    MuleMessage message = readHelloWorld().getMessage();
+    Message message = readHelloWorld().getMessage();
 
     assertThat(message.getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
     assertThat(message.getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
@@ -60,7 +60,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
   public void readBinary() throws Exception {
     testHarness.createBinaryFile();
 
-    MuleMessage response = readPath(BINARY_FILE_NAME);
+    Message response = readPath(BINARY_FILE_NAME);
 
     assertThat(response.getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
     assertThat(response.getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
@@ -75,7 +75,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
   @Test
   public void readWithForcedMimeType() throws Exception {
-    MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
+    Event event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
     assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
     assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
   }
@@ -94,7 +94,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
   @Test
   public void readLockReleasedOnContentConsumed() throws Exception {
-    MuleMessage message = readWithLock();
+    Message message = readWithLock();
     getPayloadAsString(message);
 
     assertThat(isLocked(message), is(false));
@@ -102,7 +102,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
   @Test
   public void readLockReleasedOnEarlyClose() throws Exception {
-    MuleMessage message = readWithLock();
+    Message message = readWithLock();
     ((InputStream) message.getPayload()).close();
 
     assertThat(isLocked(message), is(false));
@@ -114,8 +114,8 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
     testHarness.assertAttributes(HELLO_PATH, fileAttributes);
   }
 
-  private MuleMessage readWithLock() throws Exception {
-    MuleMessage message = flowRunner("readWithLock").run().getMessage();
+  private Message readWithLock() throws Exception {
+    Message message = flowRunner("readWithLock").run().getMessage();
 
     assertThat(isLocked(message), is(true));
     return message;

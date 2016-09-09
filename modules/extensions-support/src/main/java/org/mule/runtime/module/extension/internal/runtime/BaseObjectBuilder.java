@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
 import static org.springframework.util.ReflectionUtils.setField;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -58,7 +58,7 @@ public abstract class BaseObjectBuilder<T> implements ObjectBuilder<T> {
    * {@inheritDoc}
    */
   @Override
-  public T build(MuleEvent event) throws MuleException {
+  public T build(Event event) throws MuleException {
     T object = instantiateObject();
 
     for (Map.Entry<Field, ValueResolver<Object>> resolver : resolvers.entrySet()) {

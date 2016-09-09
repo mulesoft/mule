@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getFlowVariableOrNull;
 import static org.mule.runtime.core.routing.UntilSuccessful.DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 import static org.mule.runtime.core.routing.UntilSuccessful.PROCESS_ATTEMPT_COUNT_PROPERTY_NAME;
 import static org.mule.runtime.core.util.StringUtils.DASH;
@@ -15,9 +15,9 @@ import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAU
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
@@ -28,7 +28,7 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.ErrorBuilder;
@@ -48,13 +48,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Until successful asynchronous processing strategy.
  * <p/>
- * It will return successfully to the flow executing the router once it was able to
- * store the message in the object store.
+ * It will return successfully to the flow executing the router once it was able to store the message in the object store.
  * <p/>
- * After that it will asynchronously try to process the message through the internal route.
- * If route was not successfully executed after the configured retry count then the message
- * will be routed to the defined dead letter queue route or in case there is no dead letter
- * queue route then it will be handled by the flow exception strategy.
+ * After that it will asynchronously try to process the message through the internal route. If route was not successfully executed
+ * after the configured retry count then the message will be routed to the defined dead letter queue route or in case there is no
+ * dead letter queue route then it will be handled by the flow exception strategy.
  */
 public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilSuccessfulProcessingStrategy
     implements Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware {
@@ -70,7 +68,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   public void initialise() throws InitialisationException {
     if (getUntilSuccessfulConfiguration().getObjectStore() == null) {
       throw new InitialisationException(
-                                        MessageFactory
+                                        I18nMessageFactory
                                             .createStaticMessage("A ListableObjectStore must be configured on UntilSuccessful."),
                                         this);
     }
@@ -96,9 +94,9 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   }
 
   @Override
-  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MuleException {
+  protected Event doRoute(Event event, FlowConstruct flow) throws MuleException {
     try {
-      final MuleEvent event1 = event;
+      final Event event1 = event;
       final Serializable eventStoreKey = storeEvent(event1, flow);
       scheduleForProcessing(eventStoreKey, true);
       if (getUntilSuccessfulConfiguration().getAckExpression() == null) {
@@ -107,7 +105,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       return processResponseThroughAckResponseExpression(event);
     } catch (final Exception e) {
       throw new MessagingException(
-                                   MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, e,
+                                   I18nMessageFactory.createStaticMessage("Failed to schedule the event for processing"), event,
+                                   e,
                                    getUntilSuccessfulConfiguration().getRouter());
     }
   }
@@ -118,7 +117,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
         try {
           scheduleForProcessing(eventStoreKey, true);
         } catch (final Exception e) {
-          logger.error(MessageFactory
+          logger.error(I18nMessageFactory
               .createStaticMessage("Failed to schedule for processing event stored with key: " + eventStoreKey).toString(), e);
         }
       }
@@ -154,17 +153,17 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   private void incrementProcessAttemptCountAndRescheduleOrRemoveFromStore(final Serializable eventStoreKey,
                                                                           Exception lastException) {
     try {
-      final MuleEvent event = getUntilSuccessfulConfiguration().getObjectStore().remove(eventStoreKey);
+      final Event event = getUntilSuccessfulConfiguration().getObjectStore().remove(eventStoreKey);
 
       final Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, event);
       final Integer deliveryAttemptCount =
           configuredAttempts != null ? configuredAttempts : DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
 
-      MuleEvent incrementedEvent = event;
+      Event incrementedEvent = event;
       if (deliveryAttemptCount <= getUntilSuccessfulConfiguration().getMaxRetries()) {
         // we store the incremented version unless the max attempt count has been reached
-        incrementedEvent = MuleEvent.builder(incrementedEvent)
-            .addFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1).build();
+        incrementedEvent = Event.builder(incrementedEvent)
+            .addVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1).build();
         getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, incrementedEvent);
         this.scheduleForProcessing(eventStoreKey, false);
       } else {
@@ -175,27 +174,27 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     }
   }
 
-  private Serializable storeEvent(final MuleEvent event, FlowConstruct flow) throws ObjectStoreException {
+  private Serializable storeEvent(final Event event, FlowConstruct flow) throws ObjectStoreException {
     Integer configuredAttempts = getFlowVariableOrNull(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, event);
     final Integer deliveryAttemptCount =
         configuredAttempts != null ? configuredAttempts : DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE;
     return storeEvent(event, flow, deliveryAttemptCount);
   }
 
-  private Serializable storeEvent(MuleEvent event, FlowConstruct flow, final int deliveryAttemptCount)
+  private Serializable storeEvent(Event event, FlowConstruct flow, final int deliveryAttemptCount)
       throws ObjectStoreException {
-    event = MuleEvent.builder(event).addFlowVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount).build();
+    event = Event.builder(event).addVariable(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount).build();
     final Serializable eventStoreKey = buildQueueKey(event, flow, muleContext);
     getUntilSuccessfulConfiguration().getObjectStore().store(eventStoreKey, event);
     return eventStoreKey;
   }
 
-  public static Serializable buildQueueKey(final MuleEvent muleEvent, FlowConstruct flow, MuleContext muleContext) {
+  public static Serializable buildQueueKey(final Event muleEvent, FlowConstruct flow, MuleContext muleContext) {
     // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same events over a shared
     // object store it also adds a random trailer to support events which have been split and thus have the same id. Random number
     // was chosen over UUID for performance reasons
     StringBuilder keyBuilder = new StringBuilder();
-    muleEvent.getCorrelation().getSequence().ifPresent(v -> keyBuilder.append(v + DASH));
+    muleEvent.getGroupCorrelation().getSequence().ifPresent(v -> keyBuilder.append(v + DASH));
     keyBuilder.append(muleEvent.getContext().getId());
     keyBuilder.append(DASH);
     keyBuilder.append(muleContext.getClusterId());
@@ -204,22 +203,22 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     return new QueueKey(DEFAULT_QUEUE_STORE, keyBuilder.toString());
   }
 
-  private void abandonRetries(final MuleEvent event, final MuleEvent mutableEvent, final Exception lastException) {
+  private void abandonRetries(final Event event, final Event mutableEvent, final Exception lastException) {
     if (getUntilSuccessfulConfiguration().getDlqMP() == null) {
       logger.info("Retry attempts exhausted and no DLQ defined");
-      //mutableEvent should be a local copy of event
+      // mutableEvent should be a local copy of event
       messagingExceptionHandler
           .handleException(new MessagingException(mutableEvent, buildRetryPolicyExhaustedException(lastException)), mutableEvent);
       return;
     }
-    //we need another local copy in case mutableEvent is modified in the DLQ
-    MuleEvent eventCopy = event;
+    // we need another local copy in case mutableEvent is modified in the DLQ
+    Event eventCopy = event;
     logger.info("Retry attempts exhausted, routing message to DLQ: " + getUntilSuccessfulConfiguration().getDlqMP());
     try {
       RetryPolicyExhaustedException exception = buildRetryPolicyExhaustedException(lastException);
 
-      MuleEvent mutatedEvent = MuleEvent.builder(mutableEvent)
-          .message(MuleMessage.builder(mutableEvent.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
+      Event mutatedEvent = Event.builder(mutableEvent)
+          .message(InternalMessage.builder(mutableEvent.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
               .build())
           .error(ErrorBuilder.builder(exception).errorType(muleContext.getErrorTypeLocator().lookupErrorType(exception)).build())
           .build();
@@ -239,7 +238,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
       return new RetryPolicyExhaustedException(CoreMessages.createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, e.getMessage()),
                                                e, this);
     } else {
-      // the logger processes only the inner-most MuleException, which should be a MessagingException. In order to not lose information, we have to re-wrap its cause with this new exception.
+      // the logger processes only the inner-most MuleException, which should be a MessagingException. In order to not lose
+      // information, we have to re-wrap its cause with this new exception.
       if (muleException.getCause() != null) {
         RetryPolicyExhaustedException retryPolicyExhaustedException = new RetryPolicyExhaustedException(CoreMessages
             .createStaticMessage(UNTIL_SUCCESSFUL_MSG_PREFIX, muleException.getMessage()),
@@ -265,8 +265,8 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   }
 
   private void retrieveAndProcessEvent(final Serializable eventStoreKey) throws ObjectStoreException {
-    final MuleEvent persistedEvent = getUntilSuccessfulConfiguration().getObjectStore().retrieve(eventStoreKey);
-    final MuleEvent mutableEvent = persistedEvent;
+    final Event persistedEvent = getUntilSuccessfulConfiguration().getObjectStore().retrieve(eventStoreKey);
+    final Event mutableEvent = persistedEvent;
     processEvent(mutableEvent);
     removeFromStore(eventStoreKey);
   }

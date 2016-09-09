@@ -11,8 +11,8 @@ import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
@@ -48,7 +48,7 @@ public class WildcardFilter implements Filter, ObjectFilter, MuleContextAware {
   }
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     try {
       return accept(muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
     } catch (Exception e) {

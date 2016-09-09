@@ -10,7 +10,7 @@ import org.mule.runtime.core.transformer.simple.ByteArrayToMuleMessage;
 import org.mule.runtime.core.transformer.simple.MuleMessageToByteArray;
 
 /**
- * Wire format using Java serialization to serialize MuleMessage objects accross the wire
+ * Wire format using Java serialization to serialize Message objects accross the wire
  */
 public class SerializedMuleMessageWireFormat extends TransformerPairWireFormat {
 

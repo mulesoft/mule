@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -32,7 +32,7 @@ public class TCPTimeoutsTest extends FunctionalTestCase {
   public void testOutboundResponseTimeoutSet() throws Exception {
     final MuleClient client = new DefaultLocalMuleClient(muleContext);
 
-    final MuleMessage result = client.send("vm://testIn", TEST_MESSAGE, null).getRight();
+    final InternalMessage result = client.send("vm://testIn", TEST_MESSAGE, null).getRight();
 
     assertThat(result.getPayload(), is(nullValue()));
   }

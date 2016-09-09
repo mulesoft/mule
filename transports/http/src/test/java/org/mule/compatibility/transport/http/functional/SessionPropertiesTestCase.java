@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -53,7 +53,7 @@ public class SessionPropertiesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     Map<String, Serializable> properties = Collections.emptyMap();
-    MuleMessage response =
+    InternalMessage response =
         client.send("http://localhost:" + dynamicPort1.getNumber() + "/Flow1s1", "some message", properties).getRight();
     assertNotNullAndNotExceptionResponse(response);
   }
@@ -63,12 +63,12 @@ public class SessionPropertiesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     Map<String, Serializable> properties = Collections.emptyMap();
-    MuleMessage response =
+    InternalMessage response =
         client.send("http://localhost:" + dynamicPort4.getNumber() + "/Flow1s2", "some message", properties).getRight();
     assertNotNullAndNotExceptionResponse(response);
   }
 
-  private void assertNotNullAndNotExceptionResponse(MuleMessage response) {
+  private void assertNotNullAndNotExceptionResponse(InternalMessage response) {
     assertNotNull(response);
   }
 }

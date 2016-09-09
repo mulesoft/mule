@@ -23,13 +23,13 @@ import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.config.ChainedThreadingProfile;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -75,12 +75,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
-  private MuleEvent event;
+  private Event event;
   private ServerNotificationManager notificationManager;
   private TestPipeline pipeline;
   private final String pipelineName = "testPipeline";
 
-  private MessageContext context;
+  private EventContext context;
 
   @Before
   public void createMocks() throws Exception {
@@ -103,7 +103,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.setMessageSource(source);
     pipeline.initialise();
 
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
         .flow(pipeline).build();
 
     source.trigger(event);
@@ -127,7 +127,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     assertRequestResponseNonBlockingWithMessageProcessor(new StringAppendTransformer(""), 0);
   }
 
-  private void assertRequestResponseNonBlockingWithMessageProcessor(MessageProcessor messageProcessor, int extraCompletes)
+  private void assertRequestResponseNonBlockingWithMessageProcessor(Processor messageProcessor, int extraCompletes)
       throws Exception {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);
@@ -136,7 +136,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build())
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
     source.trigger(event);
 
@@ -158,7 +158,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.setMessageSource(source);
     pipeline.initialise();
 
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
         .flow(pipeline).build();
 
     source.trigger(event);
@@ -180,12 +180,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-    List<MessageProcessor> processors = new ArrayList<>();
+    List<Processor> processors = new ArrayList<>();
     processors.add(new ExceptionThrowingMessageProcessor());
     pipeline.setMessageProcessors(processors);
     pipeline.initialise();
 
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
         .flow(pipeline).build();
 
     try {
@@ -205,7 +205,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-    List<MessageProcessor> processors = new ArrayList<>();
+    List<Processor> processors = new ArrayList<>();
     processors.add(new ExceptionThrowingMessageProcessor());
     processors.add(new SensingNullMessageProcessor());
     pipeline.setMessageProcessors(processors);
@@ -213,7 +213,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build())
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
 
     try {
@@ -236,7 +236,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-    List<MessageProcessor> processors = new ArrayList<>();
+    List<Processor> processors = new ArrayList<>();
     processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
     processors.add(new SensingNullMessageProcessor());
     pipeline.setMessageProcessors(processors);
@@ -244,7 +244,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
 
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build())
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(pipeline).build();
 
     try {
@@ -271,12 +271,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-    List<MessageProcessor> processors = new ArrayList<>();
+    List<Processor> processors = new ArrayList<>();
     processors.add(new ResponseMessageProcessorAdapter(new ExceptionThrowingMessageProcessor()));
     pipeline.setMessageProcessors(processors);
     pipeline.initialise();
 
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(REQUEST_RESPONSE)
         .flow(pipeline).build();
 
     try {
@@ -297,12 +297,12 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-    List<MessageProcessor> processors = new ArrayList<>();
+    List<Processor> processors = new ArrayList<>();
     processors.add(new ExceptionThrowingMessageProcessor());
     pipeline.setMessageProcessors(processors);
     pipeline.initialise();
 
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
         .flow(pipeline).build();
 
     try {
@@ -324,7 +324,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     final CountDownLatch latch = new CountDownLatch(1);
     pipeline.setMessageSource(source);
     pipeline.setExceptionListener(new DefaultMessagingExceptionStrategy());
-    List<MessageProcessor> processors = new ArrayList<>();
+    List<Processor> processors = new ArrayList<>();
     processors.add(event -> {
       latch.countDown();
       throw new RuntimeException("error");
@@ -333,7 +333,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline.initialise();
     pipeline.start();
 
-    event = MuleEvent.builder(context).message(MuleMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
+    event = Event.builder(context).message(InternalMessage.builder().payload("request").build()).exchangePattern(ONE_WAY)
         .flow(pipeline).build();
 
     source.trigger(event);
@@ -374,7 +374,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
     @Override
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-      builder.chain((MessageProcessor) event -> {
+      builder.chain((Processor) event -> {
         latch.countDown();
         return event;
       });
@@ -384,7 +384,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     @Override
     protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
       super.configurePostProcessors(builder);
-      builder.chain((MessageProcessor) event -> {
+      builder.chain((Processor) event -> {
         latch.countDown();
         return event;
       });
@@ -400,9 +400,9 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
     private int expectedAction;
     private boolean exceptionExpected;
-    private MuleEvent event;
+    private Event event;
 
-    public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, MuleEvent event) {
+    public PipelineMessageNotificiationArgumentMatcher(int expectedAction, boolean exceptionExpected, Event event) {
       this.expectedAction = expectedAction;
       this.exceptionExpected = exceptionExpected;
       this.event = event;
@@ -420,19 +420,19 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
 
       if (exceptionExpected) {
         return expectedAction == notification.getAction() && exception != null && notification.getSource() != null
-            && (this.event == null || this.event.getMessage().equals(((MuleEvent) notification.getSource()).getMessage()));
+            && (this.event == null || this.event.getMessage().equals(((Event) notification.getSource()).getMessage()));
       } else {
         return expectedAction == notification.getAction() && exception == null && notification.getSource() != null
-            && (this.event == null || this.event.getMessage().equals(((MuleEvent) notification.getSource()).getMessage()));
+            && (this.event == null || this.event.getMessage().equals(((Event) notification.getSource()).getMessage()));
       }
 
     }
   }
 
-  public static class ExceptionThrowingMessageProcessor implements MessageProcessor {
+  public static class ExceptionThrowingMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       throw new IllegalStateException();
     }
   }

@@ -10,8 +10,8 @@ import static org.mule.extension.validation.internal.ImmutableValidationResult.o
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.util.ArrayUtils;
 
 import java.util.Collection;
@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 public class NotEmptyValidator extends AbstractValidator {
 
   private final Object value;
-  private Message errorMessage;
+  private I18nMessage errorMessage;
 
   public NotEmptyValidator(Object value, ValidationContext validationContext) {
     super(validationContext);
@@ -37,7 +37,7 @@ public class NotEmptyValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(MuleEvent event) {
+  public ValidationResult validate(Event event) {
     if (value == null) {
       errorMessage = getMessages().valueIsNull();
       return fail();
@@ -74,7 +74,7 @@ public class NotEmptyValidator extends AbstractValidator {
   }
 
   @Override
-  protected Message getDefaultErrorMessage() {
+  protected I18nMessage getDefaultErrorMessage() {
     return errorMessage;
   }
 }

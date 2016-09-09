@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.xml.ws.soap.SOAPFaultException;
@@ -36,7 +36,7 @@ public class WsCustomValidatorTestCase extends FunctionalTestCase {
   @Test
   public void testSuccessfulAuthentication() throws Exception {
     ClientPasswordCallback.setPassword("secret");
-    MuleMessage received = flowRunner("cxfClient").withPayload("me").run().getMessage();
+    InternalMessage received = flowRunner("cxfClient").withPayload("me").run().getMessage();
 
     assertNotNull(received);
     assertEquals("Hello me", getPayloadAsString(received));

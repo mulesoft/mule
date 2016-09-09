@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationCallback;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.BeanUtils;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -86,7 +86,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
 
   public void initialise() throws InitialisationException {
     if ((objectClassName == null) || (objectClass == null)) {
-      throw new InitialisationException(MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Object factory has not been initialized."), this);
     }
     disposed = false;
   }
@@ -106,7 +106,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
    */
   public Object getInstance(MuleContext muleContext) throws Exception {
     if (objectClass == null || disposed) {
-      throw new InitialisationException(MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Object factory has not been initialized."), this);
     }
 
     Object object = ClassUtils.instanciateClass(objectClass);

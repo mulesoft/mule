@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.tcp.protocols;
 
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.runtime.core.ResponseOutputStream;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;
@@ -69,8 +69,8 @@ public abstract class AbstractByteProtocol implements TcpProtocol {
       } else {
         throw new IOException("TCP protocol " + ClassUtils.getSimpleName(getClass()) + " cannot handle streaming");
       }
-    } else if (data instanceof MuleMessage) {
-      write(os, ((MuleMessage) data).getPayload());
+    } else if (data instanceof InternalMessage) {
+      write(os, ((InternalMessage) data).getPayload());
     } else if (data instanceof byte[]) {
       writeByteArray(os, (byte[]) data);
     } else if (data instanceof String) {

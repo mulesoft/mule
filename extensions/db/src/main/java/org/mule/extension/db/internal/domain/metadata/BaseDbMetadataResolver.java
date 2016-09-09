@@ -56,7 +56,7 @@ public class BaseDbMetadataResolver implements MetadataContentResolver<String> {
 
     QueryTemplate queryTemplate = parseQuery(query);
     List<InputQueryParam> inputParams = queryTemplate.getInputParams();
-    //No metadata when no input parameters
+    // No metadata when no input parameters
     if (inputParams.size() == 0) {
       return typeBuilder.nullType().build();
     }

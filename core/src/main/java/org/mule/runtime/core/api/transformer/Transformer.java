@@ -11,7 +11,7 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * <code>Transformer</code> can be chained together to covert message payloads from one object type to another.
  */
-public interface Transformer extends MessageProcessor, Initialisable, Disposable, NameableObject, MuleContextAware {
+public interface Transformer extends Processor, Initialisable, Disposable, NameableObject, MuleContextAware {
 
   /**
    * Determines if a particular source class can be handled by this transformer

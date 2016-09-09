@@ -6,28 +6,28 @@
  */
 package org.mule.runtime.module.spring.security.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class SpringSecurityMessages extends MessageFactory {
+public class SpringSecurityMessages extends I18nMessageFactory {
 
   private static final SpringSecurityMessages factory = new SpringSecurityMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("spring-security");
 
-  public static Message basicFilterCannotHandleHeader(String header) {
+  public static I18nMessage basicFilterCannotHandleHeader(String header) {
     return factory.createMessage(BUNDLE_PATH, 1, header);
   }
 
-  public static Message authRealmMustBeSetOnFilter() {
+  public static I18nMessage authRealmMustBeSetOnFilter() {
     return factory.createMessage(BUNDLE_PATH, 2);
   }
 
-  public static Message noGrantedAuthority(String authority) {
+  public static I18nMessage noGrantedAuthority(String authority) {
     return factory.createMessage(BUNDLE_PATH, 3, authority);
   }
 
-  public static Message springAuthenticationRequired() {
+  public static I18nMessage springAuthenticationRequired() {
     return factory.createMessage(BUNDLE_PATH, 4);
   }
 }

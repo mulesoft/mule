@@ -14,7 +14,7 @@ import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -41,7 +41,7 @@ public class HttpFunctionalTestCase extends FunctionalTestCase {
 
     if (checkPathProperties) {
       EventCallback callback = (context, component, muleContext) -> {
-        MuleMessage msg = context.getMessage();
+        InternalMessage msg = context.getMessage();
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
         assertEquals("/", msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
@@ -51,9 +51,10 @@ public class HttpFunctionalTestCase extends FunctionalTestCase {
     }
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send("clientEndpoint",
-                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build())
+                    InternalMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8"))
+                        .build())
             .getRight();
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
   }

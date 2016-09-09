@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.vm.functional.transactions;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class TransactionWithRecipientListTestCase extends FunctionalTestCase {
   public void testRecipientListRouterUseDefinedTransaction() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("vm://input", "test", null).getRight();
+    InternalMessage response = client.send("vm://input", "test", null).getRight();
     assertEquals("test Received", getPayloadAsString(response));
   }
 }

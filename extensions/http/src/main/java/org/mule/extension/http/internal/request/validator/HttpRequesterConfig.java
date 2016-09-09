@@ -19,7 +19,7 @@ import org.mule.extension.http.api.request.RamlApiConfiguration;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.internal.request.HttpRequestOperations;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -61,7 +61,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
   @Parameter
   @Optional(defaultValue = "/")
   @Placement(group = URL_CONFIGURATION, order = 1)
-  private Function<MuleEvent, String> basePath;
+  private Function<Event, String> basePath;
 
   /**
    * Specifies whether to follow redirects or not. Default value is true.
@@ -69,7 +69,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
   @Parameter
   @Optional(defaultValue = "true")
   @Placement(group = OTHER_SETTINGS)
-  private Function<MuleEvent, Boolean> followRedirects;
+  private Function<Event, Boolean> followRedirects;
 
   /**
    * By default, the response will be parsed (for example, a multipart response will be mapped as a Mule message with null payload
@@ -80,7 +80,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
   @Optional(defaultValue = "true")
   @Placement(group = OTHER_SETTINGS)
   @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
-  private Function<MuleEvent, Boolean> parseResponse;
+  private Function<Event, Boolean> parseResponse;
 
   /**
    * Defines if the request should be sent using streaming or not. If this attribute is not present, the behavior will depend on
@@ -92,7 +92,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
   @Placement(group = OTHER_SETTINGS)
   @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, "
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
-  private Function<MuleEvent, HttpStreamingType> requestStreamingMode;
+  private Function<Event, HttpStreamingType> requestStreamingMode;
 
   /**
    * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
@@ -101,7 +101,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
   @Parameter
   @Optional(defaultValue = "AUTO")
   @Placement(group = OTHER_SETTINGS)
-  private Function<MuleEvent, HttpSendBodyMode> sendBodyMode;
+  private Function<Event, HttpSendBodyMode> sendBodyMode;
 
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response. If this value is
@@ -110,7 +110,7 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
   @Parameter
   @Optional
   @Placement(group = OTHER_SETTINGS)
-  private Function<MuleEvent, Integer> responseTimeout;
+  private Function<Event, Integer> responseTimeout;
 
   /**
    * If true, cookies received in HTTP responses will be stored, and sent in subsequent HTTP requests.
@@ -142,27 +142,27 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
     }
   }
 
-  public Function<MuleEvent, String> getBasePath() {
+  public Function<Event, String> getBasePath() {
     return basePath;
   }
 
-  public Function<MuleEvent, Boolean> getFollowRedirects() {
+  public Function<Event, Boolean> getFollowRedirects() {
     return followRedirects;
   }
 
-  public Function<MuleEvent, Boolean> getParseResponse() {
+  public Function<Event, Boolean> getParseResponse() {
     return parseResponse;
   }
 
-  public Function<MuleEvent, HttpStreamingType> getRequestStreamingMode() {
+  public Function<Event, HttpStreamingType> getRequestStreamingMode() {
     return requestStreamingMode;
   }
 
-  public Function<MuleEvent, HttpSendBodyMode> getSendBodyMode() {
+  public Function<Event, HttpSendBodyMode> getSendBodyMode() {
     return sendBodyMode;
   }
 
-  public Function<MuleEvent, Integer> getResponseTimeout() {
+  public Function<Event, Integer> getResponseTimeout() {
     return responseTimeout;
   }
 

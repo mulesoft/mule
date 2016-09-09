@@ -15,7 +15,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseTransformer;
@@ -35,12 +35,12 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase {
   public void testGlobalEndpoint1() throws MuleException {
     ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
 
-    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    List<Processor> processors = endpoint.getMessageProcessors();
     assertNotNull(processors);
     assertEquals(1, processors.size());
     assertTrue(processors.get(0) instanceof TestInboundTransformer);
     // For backwards-compatibility only
-    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    List<Processor> transformers = endpoint.getMessageProcessors();
     assertNotNull(transformers);
     assertEquals(1, transformers.size());
     assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -60,13 +60,13 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase {
   public void testGlobalEndpoint2() throws MuleException {
     ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
 
-    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    List<Processor> processors = endpoint.getMessageProcessors();
     assertNotNull(processors);
     assertEquals(2, processors.size());
     assertTrue(processors.get(0) instanceof TestInboundTransformer);
     assertTrue(processors.get(1) instanceof TestInboundTransformer);
     // For backwards-compatibility only
-    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    List<Processor> transformers = endpoint.getMessageProcessors();
     assertNotNull(transformers);
     assertEquals(2, transformers.size());
     assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -90,12 +90,12 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase {
     Object flow = muleContext.getRegistry().lookupObject("globalEndpoints");
     ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
-    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    List<Processor> processors = endpoint.getMessageProcessors();
     assertNotNull(processors);
     assertEquals(1, processors.size());
     assertTrue(processors.get(0) instanceof TestInboundTransformer);
     // For backwards-compatibility only
-    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    List<Processor> transformers = endpoint.getMessageProcessors();
     assertNotNull(transformers);
     assertEquals(1, transformers.size());
     assertTrue(transformers.get(0) instanceof TestInboundTransformer);
@@ -144,12 +144,12 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase {
     Object flow = muleContext.getRegistry().lookupObject("localEndpoints");
     ImmutableEndpoint endpoint = (ImmutableEndpoint) ((Flow) flow).getMessageSource();
 
-    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    List<Processor> processors = endpoint.getMessageProcessors();
     assertNotNull(processors);
     assertEquals(1, processors.size());
     assertTrue(processors.get(0) instanceof TestInboundTransformer);
     // For backwards-compatibility only
-    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    List<Processor> transformers = endpoint.getMessageProcessors();
     assertNotNull(transformers);
     assertEquals(1, transformers.size());
     assertTrue(transformers.get(0) instanceof TestInboundTransformer);

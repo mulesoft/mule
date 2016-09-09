@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
@@ -30,7 +30,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ProcessorExecutorFactoryTestCase extends AbstractMuleTestCase {
 
   @Mock
-  private MuleEvent muleEvent;
+  private Event muleEvent;
 
   @Test
   public void flow() {

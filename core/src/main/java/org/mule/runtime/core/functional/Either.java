@@ -15,11 +15,9 @@ import java.util.function.Function;
  *
  * Only one value can be present at any given type.
  *
- * This class can be used as a monad to interact and chain functions
- * to be executed over the possible return values.
+ * This class can be used as a monad to interact and chain functions to be executed over the possible return values.
  *
- * Most likely the left type represent an error or failure result and the
- * right value represent a successful result.
+ * Most likely the left type represent an error or failure result and the right value represent a successful result.
  *
  * @param <L> the type of the left value
  * @param <R> the type of the right value
@@ -60,6 +58,7 @@ final public class Either<L, R> {
 
   /**
    * Allows to execute a function over the left value if it is present
+   * 
    * @param lFunc the function to apply to the left value
    * @param <T> the return type of the function.
    * @return a new {@code Either} created from the result of applying the function.
@@ -70,6 +69,7 @@ final public class Either<L, R> {
 
   /**
    * Allows to execute a function over the right value if it is present
+   * 
    * @param rFunc the function to apply to the right value
    * @param <T> the return type of the function.
    * @return a new {@code Either} created from the result of applying the function.
@@ -79,8 +79,7 @@ final public class Either<L, R> {
   }
 
   /**
-   * Receives a {@link Consumer} functions for both, the left and right value
-   * and applies the one over the value that is present.
+   * Receives a {@link Consumer} functions for both, the left and right value and applies the one over the value that is present.
    *
    * @param lFunc the function to apply to the left value
    * @param rFunc the function to apply to the right value

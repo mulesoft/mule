@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -39,7 +39,7 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase {
                                                                                .<String>getInboundProperty("Accept")));
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result.getPayload());
     assertEquals("foo", getPayloadAsString(result));
   }

@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -56,7 +56,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
   @Test
   public void testDeadLetterQueueWithInboundEndpointException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
@@ -71,7 +71,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
   @Test
   public void testDeadLetterQueueWithInboundEndpointResponseException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null).getRight();
     // TODO PLG - ES - fix this, dlq is failing because transaction was already commited by next flow despite is called using
     // one-way with vm
     /*
@@ -90,7 +90,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
   @Test
   public void testDeadLetterQueueWithComponentException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
@@ -105,7 +105,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
   @Test
   public void testDeadLetterQueueWithOutboundEndpointException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
@@ -120,7 +120,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
   @Test
   public void testDeadLetterQueueWithOutboundEndpointResponseException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in5", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in5", ORIGINAL_MESSAGE, null).getRight();
     // TODO PLG - ES - fix this issue, the response must have an exception since there was a failire in the flow. It seems that
     // response chain was not executed
     /*
@@ -151,7 +151,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
       deadLetterQueueLatch.release();
-      MuleMessage message = eventContext.getMessage();
+      InternalMessage message = eventContext.getMessage();
       assertThat(message, IsNull.<Object>notNullValue());
       assertThat(message.getPayload(), IsInstanceOf.instanceOf(ExceptionMessage.class));
       return eventContext.getMessage();

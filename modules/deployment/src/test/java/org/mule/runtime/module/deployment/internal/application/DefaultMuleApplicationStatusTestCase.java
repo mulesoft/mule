@@ -29,8 +29,8 @@ import java.util.Collections;
 import org.junit.Test;
 
 /**
- * This tests verifies that the {@link DefaultMuleApplication} status is set
- * correctly depending on its {@link org.mule.runtime.core.api.MuleContext}'s lifecycle phase
+ * This tests verifies that the {@link DefaultMuleApplication} status is set correctly depending on its
+ * {@link org.mule.runtime.core.api.MuleContext}'s lifecycle phase
  */
 public class DefaultMuleApplicationStatusTestCase extends AbstractMuleContextTestCase {
 

@@ -6,15 +6,15 @@
  */
 package org.mule.functional.functional;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -197,7 +197,7 @@ public class FunctionalTestComponent
    * @param event the current event
    * @return a concatenated string of the current payload and the appendString
    */
-  protected String append(String contents, MuleEvent event) {
+  protected String append(String contents, Event event) {
     return contents + muleContext.getExpressionLanguage().parse(appendString, event, flowConstruct);
   }
 
@@ -224,7 +224,7 @@ public class FunctionalTestComponent
       logger.info(msg);
     }
 
-    final MuleMessage message = context.getMessage();
+    final InternalMessage message = context.getMessage();
     if (isLogMessageDetails() && logger.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
 

@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -36,7 +36,7 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
         muleContext.getExtensionManager().getConfiguration("petstore", getTestEvent(""));
     assertThat(config, is(notNullValue()));
 
-    MuleEvent response = runFlow("getPets");
+    Event response = runFlow("getPets");
     List<String> pets = response.getMessage().getPayload();
     PetStoreConnector configValue = (PetStoreConnector) config.getValue();
     assertThat(pets, containsInAnyOrder(configValue.getPets().toArray()));

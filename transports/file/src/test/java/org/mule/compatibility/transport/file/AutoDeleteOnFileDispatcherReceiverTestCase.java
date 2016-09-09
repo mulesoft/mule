@@ -8,12 +8,12 @@ package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.probe.PollingProber;
@@ -36,10 +36,10 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   public void testAutoDeleteFalseOnDispatcher() throws Exception {
     ((FileConnector) connector).setAutoDelete(false);
 
-    MuleEvent event = getTestEvent("TestData");
+    Event event = getTestEvent("TestData");
     setCurrentEvent(event);
 
-    MuleMessage message =
+    InternalMessage message =
         muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName + "?connector=FileConnector", 50000).getRight()
             .get();
     // read the payload into a string so the file is deleted on InputStream.close()
@@ -57,10 +57,10 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   public void testAutoDeleteTrueOnDispatcher() throws Exception {
     ((FileConnector) connector).setAutoDelete(true);
 
-    MuleEvent event = getTestEvent("TestData");
+    Event event = getTestEvent("TestData");
     setCurrentEvent(event);
 
-    MuleMessage message = muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName, 50000).getRight().get();
+    InternalMessage message = muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName, 50000).getRight().get();
     assertNotNull(message.getPayload());
     assertTrue(message.getPayload() instanceof InputStream);
 

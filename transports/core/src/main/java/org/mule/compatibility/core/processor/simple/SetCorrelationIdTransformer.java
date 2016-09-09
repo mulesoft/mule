@@ -6,8 +6,7 @@
  */
 package org.mule.compatibility.core.processor.simple;
 
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
@@ -23,8 +22,8 @@ public class SetCorrelationIdTransformer extends SimpleMessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    return MuleEvent.builder(event).correlationId(correlationIdEvaluator.resolveValue(event).toString()).build();
+  public Event process(Event event) throws MuleException {
+    return Event.builder(event).correlationId(correlationIdEvaluator.resolveValue(event).toString()).build();
   }
 
 

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RoutingException;
@@ -48,16 +48,16 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
   }
 
   @Override
-  public MuleEvent route(MuleEvent event) throws RoutingException {
-    MuleEvent result;
+  public Event route(Event event) throws RoutingException {
+    Event result;
 
-    MuleMessage message = event.getMessage();
+    InternalMessage message = event.getMessage();
 
     if (routes == null || routes.size() == 0) {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
     }
 
-    MessageProcessor ep = getRoute(0, event);
+    Processor ep = getRoute(0, event);
 
     try {
       result = sendRequest(event, createEventToRoute(event, message), ep, true);
@@ -78,13 +78,13 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
   }
 
   @Override
-  public boolean isMatch(MuleEvent event, MuleEvent.Builder builder) throws MuleException {
+  public boolean isMatch(Event event, Event.Builder builder) throws MuleException {
     if (getFilter() == null) {
       return true;
     }
 
-    MuleMessage message = muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers);
-    event = MuleEvent.builder(event).message(message).build();
+    InternalMessage message = muleContext.getTransformationService().applyTransformers(event.getMessage(), null, transformers);
+    event = Event.builder(event).message(message).build();
     builder.message(message);
 
     return getFilter().accept(event, builder);
@@ -106,7 +106,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
    * @return the endpoint at the index, with any template tags resolved
    * @throws CouldNotRouteOutboundMessageException if the template causs the endpoint to become illegal or malformed
    */
-  public MessageProcessor getRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException {
+  public Processor getRoute(int index, Event event) throws CouldNotRouteOutboundMessageException {
     if (!useTemplates) {
       return routes.get(index);
     } else {
@@ -114,7 +114,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
     }
   }
 
-  protected MessageProcessor getTemplateRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException {
+  protected Processor getTemplateRoute(int index, Event event) throws CouldNotRouteOutboundMessageException {
     return routes.get(index);
   }
 

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.context.notification;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 
@@ -40,7 +40,8 @@ public class EndpointMessageNotification extends ConnectorMessageNotification {
 
   private ImmutableEndpoint immutableEndpoint;
 
-  public EndpointMessageNotification(MuleMessage resource, ImmutableEndpoint endpoint, FlowConstruct flowConstruct, int action) {
+  public EndpointMessageNotification(InternalMessage resource, ImmutableEndpoint endpoint, FlowConstruct flowConstruct,
+                                     int action) {
     super(null, resource, endpoint.getEndpointURI().toString(), flowConstruct, action);
     this.immutableEndpoint = endpoint;
   }

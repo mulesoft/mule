@@ -9,7 +9,7 @@ package org.mule.runtime.module.xml.transformers.xml.wire;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
@@ -51,9 +51,9 @@ public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTest
     // TODO This wire-format wraps desrialized payloads in a message. See
     // MULE-3118
     // See test implementation in AbstractMuleMessageWireFormatTestCase.
-    assertTrue(outObject instanceof MuleMessage);
-    assertEquals("Walmart", ((Orange) ((MuleMessage) outObject).getPayload()).getBrand());
-    assertEquals("val1", ((Orange) ((MuleMessage) outObject).getPayload()).getMapProperties().get("key1"));
+    assertTrue(outObject instanceof InternalMessage);
+    assertEquals("Walmart", ((Orange) ((InternalMessage) outObject).getPayload()).getBrand());
+    assertEquals("val1", ((Orange) ((InternalMessage) outObject).getPayload()).getMapProperties().get("key1"));
   }
 
 }

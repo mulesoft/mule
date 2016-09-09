@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
@@ -41,7 +41,7 @@ public abstract class ParameterGroupAwareObjectBuilder<T> extends BaseObjectBuil
   }
 
   @Override
-  public final T build(MuleEvent event) throws MuleException {
+  public final T build(Event event) throws MuleException {
     return build(resolverSet.resolve(event));
   }
 

@@ -18,7 +18,7 @@ import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void returnsDefaultArray() throws Exception {
-    MuleMessage response = flowRunner("returnsDefaultArray").run().getMessage();
+    Message response = flowRunner("returnsDefaultArray").run().getMessage();
 
     assertRecords(response.getPayload(),
                   new Record(new Field("REGION_NAME", NORTHWEST.getName()), new Field("ZIPS", NORTHWEST.getZips())),
@@ -59,7 +59,7 @@ public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void returnsMappedObjectArray() throws Exception {
-    MuleMessage response = flowRunner("returnsCustomArray").run().getMessage();
+    Message response = flowRunner("returnsCustomArray").run().getMessage();
 
     assertRecords(response.getPayload(),
                   new Record(new Field("CONTACT_NAME", CONTACT1.getName()), new Field("DETAILS", CONTACT1.getDetails())),

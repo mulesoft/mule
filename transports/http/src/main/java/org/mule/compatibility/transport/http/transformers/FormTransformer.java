@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.http.transformers;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
 public class FormTransformer extends AbstractMessageTransformer {
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     try {
       String v = event.getMessageAsString(muleContext);
       Map<String, Object> values = new HashMap<>();

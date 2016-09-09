@@ -8,15 +8,15 @@ package org.mule.compatibility.core.api.component;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /* 
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface InterfaceBinding extends MessageProcessor {
+public interface InterfaceBinding extends Processor {
 
   /**
    * This method is responsible for routing the Message via the MuleSession. The logic for this method will change for each type
@@ -36,7 +36,7 @@ public interface InterfaceBinding extends MessageProcessor {
    *        dispatching to.
    */
   @Override
-  MuleEvent process(MuleEvent event) throws MuleException;
+  Event process(Event event) throws MuleException;
 
   /**
    * @deprecated Transport infrastructure is deprecated.

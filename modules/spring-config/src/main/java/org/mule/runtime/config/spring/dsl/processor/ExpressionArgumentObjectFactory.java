@@ -42,7 +42,7 @@ public class ExpressionArgumentObjectFactory implements ObjectFactory<Expression
 
   /**
    * @param optional true if the expression may resolve to null and do not fail, false otherwise.
-     */
+   */
   public void setOptional(boolean optional) {
     this.optional = optional;
   }

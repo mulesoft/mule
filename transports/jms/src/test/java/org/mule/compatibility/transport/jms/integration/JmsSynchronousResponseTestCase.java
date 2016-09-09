@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.transport.jms.JmsConstants;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -31,7 +31,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
   public void testResponseWithoutReplyTo() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("out1", "TEST_MESSAGE", null).getRight();
+    InternalMessage response = client.send("out1", "TEST_MESSAGE", null).getRight();
     assertNotNull(response);
     assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
     assertJmsMessageIdPresent(response);
@@ -41,7 +41,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
   public void testResponseWithoutReplyToEndpointProperties() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("out2", "TEST_MESSAGE", null).getRight();
+    InternalMessage response = client.send("out2", "TEST_MESSAGE", null).getRight();
     assertNotNull(response);
     assertTrue("Response is not a JMS Message", response.getPayload() instanceof javax.jms.Message);
     assertJmsMessageIdPresent(response);
@@ -51,12 +51,12 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
   public void testResponseWithReplyTo() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("out3", "TEST_MESSAGE", null).getRight();
+    InternalMessage response = client.send("out3", "TEST_MESSAGE", null).getRight();
     assertNotNull(response);
     assertFalse("Response should not be NullPayload", response.getPayload() == null);
   }
 
-  private void assertJmsMessageIdPresent(MuleMessage message) {
+  private void assertJmsMessageIdPresent(InternalMessage message) {
     String messageId = message.getInboundProperty(JmsConstants.JMS_MESSAGE_ID);
     assertTrue("JMSMessageID is missing", StringUtils.isNotBlank(messageId));
   }

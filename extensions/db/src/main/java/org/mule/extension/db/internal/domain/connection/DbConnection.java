@@ -22,8 +22,7 @@ import java.util.List;
 public interface DbConnection extends TransactionalConnection {
 
   /**
-   * Returns the {@link StatementResultIteratorFactory} used to create
-   * the {@link StatementResultIterator} for this connection.
+   * Returns the {@link StatementResultIteratorFactory} used to create the {@link StatementResultIterator} for this connection.
    *
    * @param resultSetHandler used to process resultSets created from this connection
    * @return the {@link StatementResultIterator} for this connection.
@@ -46,20 +45,18 @@ public interface DbConnection extends TransactionalConnection {
   Connection getJdbcConnection();
 
   /**
-   * Closes the underlying JDBC connection, provided that {@link #isStreaming()} is
-   * {@code false}
+   * Closes the underlying JDBC connection, provided that {@link #isStreaming()} is {@code false}
    */
   void release();
 
   /**
-   * Starts streaming. Invoke this method when a streaming resultset generated with {@code this}
-   * connection is about to be iterated
+   * Starts streaming. Invoke this method when a streaming resultset generated with {@code this} connection is about to be
+   * iterated
    */
   void beginStreaming();
 
   /**
-   * @return whether {@link #beginStreaming()} has been invoked on {@code this} instance
-   * but {@link #endStreaming()} has not
+   * @return whether {@link #beginStreaming()} has been invoked on {@code this} instance but {@link #endStreaming()} has not
    */
   boolean isStreaming();
 

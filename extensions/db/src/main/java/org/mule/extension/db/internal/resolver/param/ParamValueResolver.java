@@ -8,7 +8,7 @@
 package org.mule.extension.db.internal.resolver.param;
 
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.List;
 
@@ -20,10 +20,10 @@ public interface ParamValueResolver {
   /**
    * Resolves query parameters
    *
-   * @param muleEvent      event used to evaluate any parameter value expression
+   * @param muleEvent event used to evaluate any parameter value expression
    * @param templateParams parameters defined in the query template
    * @return the list of resolved parameters to use. Non null
    */
-  List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams);
+  List<QueryParamValue> resolveParams(Event muleEvent, List<QueryParamValue> templateParams);
 
 }

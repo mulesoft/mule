@@ -21,8 +21,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 public class QueryDefinition extends ParameterizedStatementDefinition<QueryDefinition> {
 
   /**
-   * A reference to a globally defined query
-   * to be used as a template
+   * A reference to a globally defined query to be used as a template
    */
   @Parameter
   @Optional

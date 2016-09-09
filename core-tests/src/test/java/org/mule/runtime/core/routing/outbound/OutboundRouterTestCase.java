@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -27,19 +27,19 @@ public class OutboundRouterTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testAddGoodProcessor() throws Exception {
     AbstractOutboundRouter router = new DummyOutboundRouter();
-    MessageProcessor processor = getTestMessageProcessor();
+    Processor processor = getTestMessageProcessor();
     router.addRoute(processor);
     assertNotNull(router.getRoutes());
     assertTrue(router.getRoutes().contains(processor));
   }
 
-  private MessageProcessor getTestMessageProcessor() {
-    return mock(MessageProcessor.class);
+  private Processor getTestMessageProcessor() {
+    return mock(Processor.class);
   }
 
   @Test
   public void testSetGoodProcessors() throws Exception {
-    List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+    List<Processor> list = new ArrayList<Processor>();
     list.add(getTestMessageProcessor());
     list.add(getTestMessageProcessor());
     AbstractOutboundRouter router = new DummyOutboundRouter();
@@ -87,12 +87,12 @@ public class OutboundRouterTestCase extends AbstractMuleContextTestCase {
   private static class DummyOutboundRouter extends AbstractOutboundRouter {
 
     @Override
-    public boolean isMatch(MuleEvent event, MuleEvent.Builder builder) throws MuleException {
+    public boolean isMatch(Event event, Event.Builder builder) throws MuleException {
       return false;
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event) throws MuleException {
+    protected Event route(Event event) throws MuleException {
       return null;
     }
   }

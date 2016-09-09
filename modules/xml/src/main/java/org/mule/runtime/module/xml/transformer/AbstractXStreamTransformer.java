@@ -8,7 +8,7 @@ package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.module.xml.transformer.datatype.CollectionDataTypeXStreamConverter;
 import org.mule.runtime.module.xml.transformer.datatype.SimpleDataTypeXStreamConverter;
@@ -60,7 +60,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
           instance = xstream.get();
         }
       } catch (Exception e) {
-        throw new TransformerException(MessageFactory.createStaticMessage("Unable to initialize XStream"), e);
+        throw new TransformerException(I18nMessageFactory.createStaticMessage("Unable to initialize XStream"), e);
       }
     }
 

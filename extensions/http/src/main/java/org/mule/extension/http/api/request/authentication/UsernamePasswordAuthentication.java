@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.request.authentication;
 
 import org.mule.extension.http.internal.request.HttpRequestBuilder;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
@@ -35,12 +35,12 @@ public abstract class UsernamePasswordAuthentication implements HttpAuthenticati
   private String password;
 
   @Override
-  public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException {
+  public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
     // do nothing
   }
 
   @Override
-  public boolean shouldRetry(MuleEvent firstAttemptResponseEvent) throws MuleException {
+  public boolean shouldRetry(Event firstAttemptResponseEvent) throws MuleException {
     return false;
   }
 

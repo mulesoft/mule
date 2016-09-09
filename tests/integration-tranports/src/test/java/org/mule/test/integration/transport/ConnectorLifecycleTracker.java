@@ -11,7 +11,7 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +88,7 @@ public class ConnectorLifecycleTracker extends AbstractConnector {
     this.property1 = property1;
   }
 
-  public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
+  public Processor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
     return null;
   }
 }

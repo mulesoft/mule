@@ -20,8 +20,8 @@ import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMe
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -46,8 +46,8 @@ import java.util.Map;
 
 public class HttpRequestToMuleEvent {
 
-  public static MuleEvent transform(final HttpRequestContext requestContext, final MuleContext muleContext,
-                                    final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath)
+  public static Event transform(final HttpRequestContext requestContext, final MuleContext muleContext,
+                                final FlowConstruct flowConstruct, Boolean parseRequest, ListenerPath listenerPath)
       throws HttpRequestParsingException {
     final HttpRequest request = requestContext.getRequest();
     final Collection<String> headerNames = request.getHeaderNames();
@@ -106,10 +106,11 @@ public class HttpRequestToMuleEvent {
       }
     }
 
-    final MuleMessage message = MuleMessage.builder().payload(payload).mediaType(mediaType).inboundProperties(inboundProperties)
-        .outboundProperties(outboundProperties).build();
+    final InternalMessage message =
+        InternalMessage.builder().payload(payload).mediaType(mediaType).inboundProperties(inboundProperties)
+            .outboundProperties(outboundProperties).build();
     // TODO does a correlation id come as a header that we may use?
-    return MuleEvent.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(message)
+    return Event.builder(create(flowConstruct, resolveUri(requestContext).toString())).message(message)
         .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(new DefaultMuleSession()).build();
   }
 

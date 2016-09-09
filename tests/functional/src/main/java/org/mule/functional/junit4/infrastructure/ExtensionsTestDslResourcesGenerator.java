@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Implementation of an {@link AbstractResourcesGenerator} that writes the DSL generated resources to
- * the specified target directory but also exposes the content to be shared for testing purposes.
+ * Implementation of an {@link AbstractResourcesGenerator} that writes the DSL generated resources to the specified target
+ * directory but also exposes the content to be shared for testing purposes.
  *
  * @since 4.0
  */

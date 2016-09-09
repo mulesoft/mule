@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
 /**
@@ -14,5 +14,5 @@ import org.mule.runtime.core.api.context.MuleContextAware;
  */
 public interface FilenameParser extends MuleContextAware {
 
-  public String getFilename(MuleEvent event, String pattern);
+  public String getFilename(Event event, String pattern);
 }

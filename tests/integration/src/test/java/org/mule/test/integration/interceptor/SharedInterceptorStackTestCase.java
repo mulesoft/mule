@@ -8,9 +8,9 @@ package org.mule.test.integration.interceptor;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -26,21 +26,21 @@ public class SharedInterceptorStackTestCase extends AbstractIntegrationTestCase 
 
   @Test
   public void testSharedInterceptorOnServiceOne() throws Exception {
-    MuleMessage response = flowRunner("serviceOne").withPayload(TEST_MESSAGE).run().getMessage();
+    InternalMessage response = flowRunner("serviceOne").withPayload(TEST_MESSAGE).run().getMessage();
     assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
   }
 
   @Test
   public void testSharedInterceptorOnServiceTwo() throws Exception {
-    MuleMessage response = flowRunner("serviceTwo").withPayload(TEST_MESSAGE).run().getMessage();
+    InternalMessage response = flowRunner("serviceTwo").withPayload(TEST_MESSAGE).run().getMessage();
     assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload());
   }
 
   public static class CustomInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      return processNext(MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+    public Event process(Event event) throws MuleException {
+      return processNext(Event.builder(event).message(InternalMessage.builder(event.getMessage())
           .payload(event.getMessage().getPayload().toString() + " CustomInterceptor").build()).build());
     }
   }

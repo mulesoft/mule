@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class OperationReturnTypeModelValidator implements ModelValidator {
 
-  private final List<Class<?>> illegalReturnTypes = ImmutableList.of(MuleEvent.class, MuleMessage.class);
+  private final List<Class<?>> illegalReturnTypes = ImmutableList.of(MuleEvent.class, Message.class);
 
   @Override
   public void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException {

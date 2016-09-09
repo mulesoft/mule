@@ -6,29 +6,29 @@
  */
 package org.mule.tck;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.util.ObjectUtils;
 
 public class TriggerableMessageSource implements NonBlockingMessageSource {
 
-  protected MessageProcessor listener;
+  protected Processor listener;
 
   public TriggerableMessageSource() {
     // empty
   }
 
-  public TriggerableMessageSource(MessageProcessor listener) {
+  public TriggerableMessageSource(Processor listener) {
     this.listener = listener;
   }
 
-  public MuleEvent trigger(MuleEvent event) throws MuleException {
+  public Event trigger(Event event) throws MuleException {
     return listener.process(event);
   }
 
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     this.listener = listener;
   }
 

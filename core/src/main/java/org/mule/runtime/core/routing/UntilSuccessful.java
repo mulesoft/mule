@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -15,9 +15,9 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
@@ -51,7 +51,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   static final int DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE = 1;
   private static final long DEFAULT_MILLIS_BETWEEN_RETRIES = 60 * 1000;
 
-  private ListableObjectStore<MuleEvent> objectStore;
+  private ListableObjectStore<Event> objectStore;
   private int maxRetries = 5;
   private Long millisBetweenRetries = null;
   private Long secondsBetweenRetries = null;
@@ -60,7 +60,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   private ExpressionFilter failureExpressionFilter;
   private String eventKeyPrefix;
   protected Object deadLetterQueue;
-  protected MessageProcessor dlqMP;
+  protected Processor dlqMP;
   private boolean synchronous = false;
   private ThreadingProfile threadingProfile;
   private UntilSuccessfulProcessingStrategy untilSuccessfulStrategy;
@@ -68,12 +68,12 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   @Override
   public void initialise() throws InitialisationException {
     if (routes.isEmpty()) {
-      throw new InitialisationException(MessageFactory
+      throw new InitialisationException(I18nMessageFactory
           .createStaticMessage("One message processor must be configured within UntilSuccessful."), this);
     }
 
     if (routes.size() > 1) {
-      throw new InitialisationException(MessageFactory
+      throw new InitialisationException(I18nMessageFactory
           .createStaticMessage("Only one message processor is allowed within UntilSuccessful."
               + " Use a Processor Chain to group several message processors into one."), this);
     }
@@ -94,7 +94,7 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
     failureExpressionFilter.setMuleContext(muleContext);
 
     if ((ackExpression != null) && (!muleContext.getExpressionLanguage().isExpression(ackExpression))) {
-      throw new InitialisationException(MessageFactory.createStaticMessage("Invalid ackExpression: " + ackExpression), this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Invalid ackExpression: " + ackExpression), this);
     }
 
     if (synchronous) {
@@ -120,10 +120,10 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   }
 
   protected void resolveDlqMessageProcessor() throws InitialisationException {
-    if (deadLetterQueue instanceof MessageProcessor) {
-      dlqMP = (MessageProcessor) deadLetterQueue;
+    if (deadLetterQueue instanceof Processor) {
+      dlqMP = (Processor) deadLetterQueue;
     } else {
-      throw new InitialisationException(MessageFactory
+      throw new InitialisationException(I18nMessageFactory
           .createStaticMessage("deadLetterQueue-ref is not a valid mesage processor: " + deadLetterQueue), null, this);
     }
   }
@@ -170,21 +170,21 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   }
 
   @Override
-  public boolean isMatch(final MuleEvent event, MuleEvent.Builder builder) throws MuleException {
+  public boolean isMatch(final Event event, Event.Builder builder) throws MuleException {
     return true;
   }
 
   @Override
-  protected MuleEvent route(final MuleEvent event) throws MuleException {
+  protected Event route(final Event event) throws MuleException {
     return untilSuccessfulStrategy.route(event, flowConstruct);
   }
 
   @Override
-  public ListableObjectStore<MuleEvent> getObjectStore() {
+  public ListableObjectStore<Event> getObjectStore() {
     return objectStore;
   }
 
-  public void setObjectStore(final ListableObjectStore<MuleEvent> objectStore) {
+  public void setObjectStore(final ListableObjectStore<Event> objectStore) {
     this.objectStore = objectStore;
   }
 
@@ -259,12 +259,12 @@ public class UntilSuccessful extends AbstractOutboundRouter implements UntilSucc
   }
 
   @Override
-  public MessageProcessor getDlqMP() {
+  public Processor getDlqMP() {
     return dlqMP;
   }
 
   @Override
-  public MessageProcessor getRoute() {
+  public Processor getRoute() {
     final DefaultMessageProcessorChain chain = DefaultMessageProcessorChain.from(muleContext, routes.get(0));
     chain.setTemplateMuleContext(muleContext);
     return chain;

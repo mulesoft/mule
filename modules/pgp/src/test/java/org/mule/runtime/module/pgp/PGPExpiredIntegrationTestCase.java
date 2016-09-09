@@ -15,10 +15,10 @@ import org.junit.Test;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.util.Optional;
@@ -47,10 +47,10 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase {
     assertTrue(ipke.getMessage().contains("has expired"));
   }
 
-  public static class ExceptionSaver implements MessageProcessor {
+  public static class ExceptionSaver implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       Optional<Error> error = event.getError();
       exceptionFromFlow = error.get().getException();
 

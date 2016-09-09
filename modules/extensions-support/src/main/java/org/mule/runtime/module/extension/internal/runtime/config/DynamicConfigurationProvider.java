@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -82,18 +82,18 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
    * Evaluates {@link #resolverSet} using the given {@code muleEvent} and returns an instance produced with the result. For
    * equivalent {@link ResolverSetResult}s it will return the same instance.
    *
-   * @param muleEvent the current {@link MuleEvent}
+   * @param muleEvent the current {@link Event}
    * @return the resolved {@link ConfigurationInstance}
    */
   @Override
   public ConfigurationInstance get(Object muleEvent) {
     return withContextClassLoader(getExtensionClassLoader(), () -> {
-      ResolverSetResult result = resolverSet.resolve((MuleEvent) muleEvent);
-      return getConfiguration(result, (MuleEvent) muleEvent);
+      ResolverSetResult result = resolverSet.resolve((Event) muleEvent);
+      return getConfiguration(result, (Event) muleEvent);
     });
   }
 
-  private ConfigurationInstance getConfiguration(ResolverSetResult resolverSetResult, MuleEvent event) throws Exception {
+  private ConfigurationInstance getConfiguration(ResolverSetResult resolverSetResult, Event event) throws Exception {
     ConfigurationInstance configuration;
     cacheReadLock.lock();
     try {
@@ -129,7 +129,7 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
     stats.updateLastUsed();
   }
 
-  private ConfigurationInstance createConfiguration(ResolverSetResult result, MuleEvent event) throws MuleException {
+  private ConfigurationInstance createConfiguration(ResolverSetResult result, Event event) throws MuleException {
     ConfigurationInstance configuration = configurationInstanceFactory
         .createConfiguration(getName(), result, Optional.ofNullable(connectionProviderResolver.resolve(event)));
 

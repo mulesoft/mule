@@ -24,14 +24,14 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
@@ -66,12 +66,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.setMessageSource(directInboundMessageSource);
 
     dynamicProcessorContainer = mock(DynamicMessageProcessorContainer.class);
-    when(dynamicProcessorContainer.process(any(MuleEvent.class))).then(invocation -> {
+    when(dynamicProcessorContainer.process(any(Event.class))).then(invocation -> {
       Object[] args = invocation.getArguments();
-      return (MuleEvent) args[0];
+      return (Event) args[0];
     });
 
-    List<MessageProcessor> processors = new ArrayList<>();
+    List<Processor> processors = new ArrayList<>();
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("d")));
@@ -80,7 +80,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     processors.add(new StringAppendTransformer("c"));
     processors.add(dynamicProcessorContainer);
     processors.add(event -> {
-      return MuleEvent.builder(event).addFlowVariable("thread", Thread.currentThread()).build();
+      return Event.builder(event).addVariable("thread", Thread.currentThread()).build();
     });
     processors.add(sensingMessageProcessor);
     flow.setMessageProcessors(processors);
@@ -106,8 +106,8 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessOneWayEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    MuleEvent event = MuleTestUtils.getTestEvent("hello", ONE_WAY, muleContext);
-    MuleEvent response = directInboundMessageSource.process(event);
+    Event event = MuleTestUtils.getTestEvent("hello", ONE_WAY, muleContext);
+    Event response = directInboundMessageSource.process(event);
 
     new PollingProber(50, 5).check(new JUnitProbe() {
 
@@ -117,7 +117,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
         assertEquals(event.getMessage(), response.getMessage());
 
         assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
-        assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
+        assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getVariable("thread"));
         return true;
       }
     });
@@ -127,13 +127,13 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
+    Event response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
 
     assertEquals("helloabcdef", response.getMessageAsString(muleContext));
-    assertEquals(Thread.currentThread(), response.getFlowVariable("thread"));
+    assertEquals(Thread.currentThread(), response.getVariable("thread"));
 
     assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
-    assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getFlowVariable("thread"));
+    assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getVariable("thread"));
 
   }
 
@@ -142,7 +142,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.initialise();
     flow.start();
 
-    MessageProcessor processorInSubflow = event -> event;
+    Processor processorInSubflow = event -> event;
 
     assertThat(flow.getProcessorPath(sensingMessageProcessor), is("/test-flow/processors/8"));
     assertThat(flow.getProcessorPath(dynamicProcessorContainer), is("/test-flow/processors/6"));
@@ -198,12 +198,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.initialise();
     flow.start();
 
-    MessageProcessor appendPre = new StringAppendTransformer("1");
-    MessageProcessor appendPost2 = new StringAppendTransformer("4");
+    Processor appendPre = new StringAppendTransformer("1");
+    Processor appendPost2 = new StringAppendTransformer("4");
 
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
+    Event response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
     assertEquals("hello12abcdef34", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
@@ -219,12 +219,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   @Test
   public void testFailStartingMessageSourceOnLifecycleShouldStopStartedPipelineProcesses() throws Exception {
     MessageSource mockMessageSource = mock(MessageSource.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
-    doThrow(new LifecycleException(mock(Message.class), "Error starting component")).when(((Startable) mockMessageSource))
+    doThrow(new LifecycleException(mock(I18nMessage.class), "Error starting component")).when(((Startable) mockMessageSource))
         .start();
     flow.setMessageSource(mockMessageSource);
 
-    MessageProcessor mockMessageProcessor =
-        mock(MessageProcessor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
+    Processor mockMessageProcessor =
+        mock(Processor.class, withSettings().extraInterfaces(Startable.class, Stoppable.class));
     flow.getMessageProcessors().add(mockMessageProcessor);
 
     flow.initialise();

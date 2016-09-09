@@ -14,8 +14,9 @@ import org.mule.extension.email.internal.commands.ExpungeCommand;
 import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.extension.email.internal.retriever.RetrieverOperations;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
@@ -38,16 +39,16 @@ public class IMAPOperations {
   /**
    * Marks an incoming email as READ.
    * <p>
-   * This operation can target a single email, but if no emailID is specified and the incoming {@link MuleMessage} is carrying a
-   * list of emails this operation will mark all the emails that the {@link MuleMessage} is carrying if they belong to the
-   * specified folder.
+   * This operation can target a single email, but if no emailID is specified and the incoming {@link Message} is carrying a list
+   * of emails this operation will mark all the emails that the {@link Message} is carrying if they belong to the specified
+   * folder.
    *
-   * @param message The incoming {@link MuleMessage}.
+   * @param message The incoming {@link Message}.
    * @param connection The corresponding {@link RetrieverConnection} instance.
    * @param mailboxFolder Folder where the emails are going to be marked as read
-   * @param emailId Email ID Number of the email to mark as read, if there is no email in the incoming {@link MuleMessage}.
+   * @param emailId Email ID Number of the email to mark as read, if there is no email in the incoming {@link InternalMessage}.
    */
-  public void markAsRead(MuleMessage message, @Connection RetrieverConnection connection,
+  public void markAsRead(Message message, @Connection RetrieverConnection connection,
                          @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                          @Optional @Summary("Email ID Number of the email to mark as read") @DisplayName("Email ID") Integer emailId) {
     setFlagCommand.set(message, connection, mailboxFolder, emailId, SEEN);
@@ -58,17 +59,17 @@ public class IMAPOperations {
    * <p>
    * All DELETED marked emails are going to be eliminated from the mailbox when one of
    * {@link IMAPOperations#expungeFolder(RetrieverConnection, String)} or
-   * {@link RetrieverOperations#delete(MuleMessage, RetrieverConnection, String, Integer)} is executed.
+   * {@link RetrieverOperations#delete(InternalMessage, RetrieverConnection, String, Integer)} is executed.
    * <p>
-   * This operation can target a single email, but also if the incoming {@link MuleMessage} is carrying a list of emails this
-   * operation will mark all the emails that the {@link MuleMessage} is carrying.
+   * This operation can target a single email, but also if the incoming {@link Message} is carrying a list of emails this
+   * operation will mark all the emails that the {@link Message} is carrying.
    *
-   * @param message The incoming {@link MuleMessage}.
+   * @param message The incoming {@link Message}.
    * @param connection The corresponding {@link RetrieverConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be marked as deleted
-   * @param emailId Email ID Number of the email to mark as deleted, if there is no email in the incoming {@link MuleMessage}.
+   * @param emailId Email ID Number of the email to mark as deleted, if there is no email in the incoming {@link InternalMessage}.
    */
-  public void markAsDeleted(MuleMessage message, @Connection RetrieverConnection connection,
+  public void markAsDeleted(Message message, @Connection RetrieverConnection connection,
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                             @Optional @Summary("Email ID Number of the email to mark as deleted") @DisplayName("Email ID") Integer emailId) {
     setFlagCommand.set(message, connection, mailboxFolder, emailId, DELETED);

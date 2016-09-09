@@ -8,7 +8,7 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class RoundRobinTestCase extends AbstractIntegrationTestCase {
     for (int i = 0, j = 0; i < NUMBER_OF_WRITERS * NUMBER_OF_MESSAGES; i++) {
       // Message should be disrtibuted uniformly among endpoints
       String path = "test://output" + j;
-      MuleMessage msg = client.request(path, 0).getRight().get();
+      InternalMessage msg = client.request(path, 0).getRight().get();
       assertNotNull(msg);
       logger.debug(path + ": " + getPayloadAsString(msg));
       j = (j + 1) % NUMBER_OF_ENDPOINTS;

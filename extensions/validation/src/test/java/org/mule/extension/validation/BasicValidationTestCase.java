@@ -19,7 +19,7 @@ import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 
 import com.google.common.base.Joiner;
@@ -279,7 +279,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
   public static class TestCustomValidator implements Validator {
 
     @Override
-    public ValidationResult validate(MuleEvent event) {
+    public ValidationResult validate(Event event) {
       return error(CUSTOM_VALIDATOR_MESSAGE);
     }
   }

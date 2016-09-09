@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile;
 import static org.mule.compatibility.transport.file.FileTestUtils.createFolder;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.nio.charset.Charset;
@@ -38,7 +38,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
     createDataFile(tmpDir, TEST_MESSAGE_EUC_JP_ENCODED, ENCODING);
 
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("vm://receive", FIVE_SECONDS_TIMEOUT).getRight().get();
+    InternalMessage message = client.request("vm://receive", FIVE_SECONDS_TIMEOUT).getRight().get();
 
     assertThat(message, not(nullValue()));
     assertThat(message.getDataType().getMediaType().getCharset().get(), is(ENCODING));

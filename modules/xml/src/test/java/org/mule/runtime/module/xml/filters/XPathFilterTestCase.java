@@ -18,8 +18,8 @@ import static org.mockito.Mockito.when;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -69,7 +69,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testAcceptMessage() throws Exception {
     final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    MuleEvent event = getTestEvent(null, muleContext);
+    Event event = getTestEvent(null, muleContext);
     XPathFilter filter = new XPathFilter() {
 
       @Override
@@ -83,19 +83,19 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
       }
     };
 
-    Builder builder = MuleEvent.builder(event);
+    Builder builder = Event.builder(event);
     assertFalse("shouldn't accept a message if no payload is set.", filter.accept(event, builder));
 
     event = getTestEvent(new Object(), muleContext);
     filter.setPattern("/some/pattern = null");
-    builder = MuleEvent.builder(event);
+    builder = Event.builder(event);
     assertTrue(filter.accept(event, builder));
     assertEquals("null", filter.getExpectedValue());
     assertEquals("/some/pattern", filter.getPattern().trim());
     assertSame(document, builder.build().getMessage().getPayload());
 
     event = getTestEvent(new Object(), muleContext);
-    builder = MuleEvent.builder(event);
+    builder = Event.builder(event);
     filter.setExpectedValue(null);
     assertTrue(filter.accept(event, builder));
     assertEquals("true", filter.getExpectedValue());

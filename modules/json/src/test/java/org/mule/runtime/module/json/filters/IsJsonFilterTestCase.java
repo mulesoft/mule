@@ -9,7 +9,7 @@ package org.mule.runtime.module.json.filters;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -28,25 +28,25 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFilterFalse() throws Exception {
     assertFalse(filter
-        .accept(MuleMessage.builder().payload("This is definitely not JSON.").build().getPayload()));
+        .accept(Message.builder().payload("This is definitely not JSON.").build().getPayload()));
   }
 
   @Test
   public void testFilterFalse2() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder()
+    assertFalse(filter.accept(Message.builder()
         .payload("{name=\"This may be JSON\",bool:}").build().getPayload()));
   }
 
   @Test
   public void testFilterFalse3() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder()
+    assertFalse(filter.accept(Message.builder()
         .payload("[name=\"This may be JSON\",bool:]").build().getPayload()));
   }
 
   @Test
   public void testFilterTrue() throws Exception {
     assertTrue(filter.accept(
-                             org.mule.runtime.core.api.MuleMessage.builder()
+                             org.mule.runtime.core.api.InternalMessage.builder()
                                  .payload("{\n" + "        \"in_reply_to_user_id\":null,\n"
                                      + "        \"text\":\"test from Mule: " + "6ffca02b-9d52-475e-8b17-946acdb01492\"}")
                                  .build().getPayload()));
@@ -54,12 +54,12 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFilterNull() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().nullPayload().build().getPayload()));
+    assertFalse(filter.accept(Message.builder().nullPayload().build().getPayload()));
   }
 
   @Test
   public void testFilterWithObject() throws Exception {
-    assertFalse(filter.accept(MuleMessage.builder().payload(new Object()).build().getPayload()));
+    assertFalse(filter.accept(Message.builder().payload(new Object()).build().getPayload()));
   }
 
 }

@@ -12,8 +12,7 @@ import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.api.message.ErrorType;
 
 /**
- * Builder for {@link ErrorType}. This must be the only mechanism to create an instance
- * of {@code ErrorType}.
+ * Builder for {@link ErrorType}. This must be the only mechanism to create an instance of {@code ErrorType}.
  *
  * @since 4.0
  */
@@ -36,7 +35,7 @@ public final class ErrorTypeBuilder {
    *
    * @param identifier the string representation
    * @return {@code this} builder
-     */
+   */
   public ErrorTypeBuilder identifier(String identifier) {
     this.identifier = identifier;
     return this;
@@ -47,7 +46,7 @@ public final class ErrorTypeBuilder {
    *
    * @param namespace the error type namespace
    * @return {@code this} builder
-     */
+   */
   public ErrorTypeBuilder namespace(String namespace) {
     this.namespace = namespace;
     return this;
@@ -58,7 +57,7 @@ public final class ErrorTypeBuilder {
    *
    * @param parentErrorType the parent error type
    * @return {@code this} builder
-     */
+   */
   public ErrorTypeBuilder parentErrorType(ErrorType parentErrorType) {
     this.parentErrorType = parentErrorType;
     return this;
@@ -68,7 +67,7 @@ public final class ErrorTypeBuilder {
    * Creates a new instance of the configured error type.
    *
    * @return the error type with the provided configuration.
-     */
+   */
   public ErrorType build() {
     checkState(identifier != null, "string representation cannot be null");
     checkState(namespace != null, "namespace representation cannot be null");

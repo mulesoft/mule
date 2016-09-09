@@ -10,7 +10,7 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -47,13 +47,13 @@ public class ProxyValidationComparisonTestCase extends FunctionalTestCase {
   }
 
   private void testResponsesWithPayload(String payload) throws Exception {
-    MuleMessage responseWithValidation = getResponseFor(payload + "Validation");
-    MuleMessage responseWithNoValidation = getResponseFor(payload + "NoValidation");
+    InternalMessage responseWithValidation = getResponseFor(payload + "Validation");
+    InternalMessage responseWithNoValidation = getResponseFor(payload + "NoValidation");
 
     assertXMLEqual(getPayloadAsString(responseWithValidation), getPayloadAsString(responseWithNoValidation));
   }
 
-  private MuleMessage getResponseFor(String path) throws MuleException {
+  private InternalMessage getResponseFor(String path) throws MuleException {
     return muleContext.getClient().send(String.format("http://localhost:%s/services/%s", httpPort.getNumber(), path),
                                         getTestMuleMessage(ONE_LINER_REQUEST), HTTP_REQUEST_OPTIONS)
         .getRight();

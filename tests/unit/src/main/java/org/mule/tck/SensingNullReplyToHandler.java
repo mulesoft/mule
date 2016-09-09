@@ -7,20 +7,20 @@
 package org.mule.tck;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 public class SensingNullReplyToHandler implements NonBlockingReplyToHandler {
 
-  public MuleEvent event;
+  public Event event;
   public Exception exception;
   public Latch latch = new Latch();
 
   @Override
-  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+  public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
     this.event = event;
     latch.countDown();
     return event;

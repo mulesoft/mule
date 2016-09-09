@@ -22,8 +22,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 /**
- * Base class for {@link StatementDefinition} implementations which have
- * a {@link Map} of input parameters.
+ * Base class for {@link StatementDefinition} implementations which have a {@link Map} of input parameters.
  *
  * @param <T> the generic type of the implementing type
  * @since 4.0
@@ -33,9 +32,8 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
 
 
   /**
-   * A {@link Map} which keys are the name of an input parameter to be set on
-   * the JDBC prepared statement. Each parameter should be referenced in the sql
-   * text using a semicolon prefix (E.g: {@code where id = :myParamName)}).
+   * A {@link Map} which keys are the name of an input parameter to be set on the JDBC prepared statement. Each parameter should
+   * be referenced in the sql text using a semicolon prefix (E.g: {@code where id = :myParamName)}).
    * <p>
    * The map's values will contain the actual assignation for each parameter.
    */
@@ -46,8 +44,7 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
   protected LinkedHashMap<String, Object> inputParameters = new LinkedHashMap<>();
 
   /**
-   * Returns a {@link Map} which keys are the names of the input
-   * parameters and the values are its values
+   * Returns a {@link Map} which keys are the names of the input parameters and the values are its values
    */
   public Map<String, Object> getParameterValues() {
     return unmodifiableMap(inputParameters);
@@ -78,7 +75,7 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * Adds a new input parameter
    *
    * @param paramName the parameter name
-   * @param value     the parameter value
+   * @param value the parameter value
    */
   public void addInputParameter(String paramName, Object value) {
     inputParameters.put(paramName, value);

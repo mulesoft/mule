@@ -11,7 +11,7 @@ import static javax.mail.Part.ATTACHMENT;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
 
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import javax.mail.Header;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
@@ -38,18 +37,18 @@ public class EmailContentProcessor {
 
   private static final String ERROR_PROCESSING_MESSAGE = "Error while processing message content.";
 
-  private final List<MuleMessage> attachmentParts = new LinkedList<>();
+  private final List<Message> attachmentParts = new LinkedList<>();
   private final StringJoiner body = new StringJoiner("\n");
 
   /**
    * Creates an instance and process the message content.
    * <p>
    * Hided constructor, can only get a new instance out of this class using the factory method
-   * {@link EmailContentProcessor#process(Message)}.
+   * {@link EmailContentProcessor#process(javax.mail.Message)}.
    *
-   * @param message the {@link Message} to be processed.
+   * @param message the {@link javax.mail.Message} to be processed.
    */
-  private EmailContentProcessor(Message message) {
+  private EmailContentProcessor(javax.mail.Message message) {
     processPart(message);
   }
 
@@ -59,7 +58,7 @@ public class EmailContentProcessor {
    * @param message the {@link Message} to be processed.
    * @return a new {@link EmailContentProcessor} instance.
    */
-  public static EmailContentProcessor process(Message message) {
+  public static EmailContentProcessor process(javax.mail.Message message) {
     return new EmailContentProcessor(message);
   }
 
@@ -73,7 +72,7 @@ public class EmailContentProcessor {
   /**
    * @return an {@link ImmutableMap} with the attachments of an email message.
    */
-  public List<MuleMessage> getAttachments() {
+  public List<Message> getAttachments() {
     return ImmutableList.copyOf(attachmentParts);
   }
 
@@ -114,7 +113,7 @@ public class EmailContentProcessor {
           headers.put(h.getName(), new LinkedList<>(singletonList(h.getValue())));
         }
 
-        attachmentParts.add(MuleMessage.builder().payload(part.getInputStream()).mediaType(MediaType.parse(part.getContentType()))
+        attachmentParts.add(Message.builder().payload(part.getInputStream()).mediaType(MediaType.parse(part.getContentType()))
             .attributes(new PartAttributes(part.getFileName(), part.getFileName(), part.getSize(), headers)).build());
       } else {
         if (isText(content)) {

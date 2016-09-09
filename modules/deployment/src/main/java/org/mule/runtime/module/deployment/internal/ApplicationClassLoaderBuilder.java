@@ -18,8 +18,7 @@ import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginReposito
 import java.io.IOException;
 
 /**
- * {@link ArtifactClassLoader} builder for class loaders required by
- * {@link Application} artifacts
+ * {@link ArtifactClassLoader} builder for class loaders required by {@link Application} artifacts
  *
  * @since 4.0
  */

@@ -12,7 +12,7 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getResolver;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -56,7 +56,7 @@ public class ConfigurationObjectBuilderTestCase extends AbstractMuleTestCase {
   private RuntimeConfigurationModel configurationModel;
 
   @Mock
-  private MuleEvent event;
+  private Event event;
 
   private TestConfig configuration;
 

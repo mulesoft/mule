@@ -11,7 +11,7 @@ import static org.mule.extension.db.integration.TestRecordUtil.assertMessageCont
 import static org.mule.extension.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public abstract class AbstractStoredProcedureReturningStreamingResultsetsTestCas
 
   @Test
   public void getResultSet() throws Exception {
-    MuleMessage response = flowRunner("getResultSet").run().getMessage();
+    Message response = flowRunner("getResultSet").run().getMessage();
     assertMessageContains(response, getAllPlanetRecords());
   }
 

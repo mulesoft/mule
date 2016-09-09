@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transaction;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.transaction.constraints.BatchConstraint;
 import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
@@ -23,7 +23,7 @@ public class BatchConstraintTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testConstraintFilter() throws Exception {
-    MuleEvent testEvent = Mockito.mock(MuleEvent.class);
+    Event testEvent = Mockito.mock(Event.class);
     BatchConstraint filter = new BatchConstraint();
     filter.setBatchSize(3);
     assertEquals(3, filter.getBatchSize());

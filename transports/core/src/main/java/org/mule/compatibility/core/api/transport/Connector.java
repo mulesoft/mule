@@ -10,12 +10,12 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transport.LegacyConnector;
 import org.mule.runtime.core.message.SessionHandler;
@@ -46,7 +46,7 @@ public interface Connector extends LegacyConnector {
    * @param flowConstruct reference to the flow construct that the listener is part of for use as context for logging,
    *        notifications and error handling.
    */
-  public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct) throws Exception;
+  public void registerListener(InboundEndpoint endpoint, Processor listener, FlowConstruct flowConstruct) throws Exception;
 
   /**
    * Unregisters the listener for the given endpoints. This will mean that the listener that was registered for this endpoint will
@@ -118,10 +118,10 @@ public interface Connector extends LegacyConnector {
    * @param endpoint the endpoint to use when connecting to the resource
    * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
    *        data available. If no data becomes available before the timeout elapses, null will be returned
-   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was avaialable
+   * @return the result of the request wrapped in a Message object. Null will be returned if no data was avaialable
    * @throws Exception if the call to the underlying protocal cuases an exception
    */
-  MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
+  InternalMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
 
   /**
    * Will get the output stream for this type of transport. Typically this will be called only when Streaming is being used on an
@@ -132,7 +132,7 @@ public interface Connector extends LegacyConnector {
    * @param event the current event being processed
    * @return the output stream to use for this request
    */
-  OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException;
+  OutputStream getOutputStream(OutboundEndpoint endpoint, Event event) throws MuleException;
 
   RetryPolicyTemplate getRetryPolicyTemplate();
 

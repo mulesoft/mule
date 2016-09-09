@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.store;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * This exception class is thrown in cases when an exception occurs while operating on an {@link ObjectStore}.
@@ -18,11 +18,11 @@ public class ObjectStoreException extends MuleException {
     super();
   }
 
-  public ObjectStoreException(Message message, Throwable cause) {
+  public ObjectStoreException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
-  public ObjectStoreException(Message message) {
+  public ObjectStoreException(I18nMessage message) {
     super(message);
   }
 

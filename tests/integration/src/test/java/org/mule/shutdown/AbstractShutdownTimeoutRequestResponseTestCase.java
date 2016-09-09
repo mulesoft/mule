@@ -8,9 +8,9 @@ package org.mule.shutdown;
 
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -30,10 +30,10 @@ public abstract class AbstractShutdownTimeoutRequestResponseTestCase extends Abs
     waitLatch = new Latch();
   }
 
-  private static class BlockMessageProcessor implements MessageProcessor {
+  private static class BlockMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       waitLatch.release();
 
       try {

@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.api.component;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
 
 /**
- * A <code>Component</code> component processes a {@link MuleEvent} by invoking the component instance that has been configured,
+ * A <code>Component</code> component processes a {@link Event} by invoking the component instance that has been configured,
  * optionally returning a result.
  * <p/>
  * Implementations of <code>Component</code> can use different types of component implementation, implement component instance
  * pooling or implement <em>bindings</em> which allow for service composition.
  */
-public interface Component extends MessageProcessor, FlowConstructAware {
+public interface Component extends Processor, FlowConstructAware {
 
   /**
    * Component statistics are used to gather component statistics such as sync/async invocation counts and total and average

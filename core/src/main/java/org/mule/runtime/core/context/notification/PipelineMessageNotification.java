@@ -7,7 +7,7 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -34,11 +34,11 @@ public class PipelineMessageNotification extends ServerNotification implements B
 
   protected MessagingException exception;
 
-  public PipelineMessageNotification(Pipeline pipeline, MuleEvent event, int action) {
+  public PipelineMessageNotification(Pipeline pipeline, Event event, int action) {
     super(event, action, pipeline.getName());
   }
 
-  public PipelineMessageNotification(Pipeline pipeline, MuleEvent event, int action, MessagingException exception) {
+  public PipelineMessageNotification(Pipeline pipeline, Event event, int action, MessagingException exception) {
     this(pipeline, event, action);
     this.exception = exception;
   }

@@ -8,7 +8,7 @@ package org.mule.extension.validation.internal;
 
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 /**
  * A context object to gather different components that are necessary for performing a validation
@@ -19,18 +19,18 @@ public final class ValidationContext {
 
   private final ValidationMessages messages;
   private final ValidationOptions options;
-  private final MuleEvent muleEvent;
+  private final Event muleEvent;
   private final ValidationExtension config;
 
-  public ValidationContext(ValidationMessages messages, ValidationOptions options, MuleEvent muleEvent) {
+  public ValidationContext(ValidationMessages messages, ValidationOptions options, Event muleEvent) {
     this(messages, options, muleEvent, null);
   }
 
-  public ValidationContext(ValidationOptions options, MuleEvent muleEvent, ValidationExtension config) {
+  public ValidationContext(ValidationOptions options, Event muleEvent, ValidationExtension config) {
     this(config.getMessageFactory(), options, muleEvent, config);
   }
 
-  public ValidationContext(ValidationMessages messages, ValidationOptions options, MuleEvent muleEvent,
+  public ValidationContext(ValidationMessages messages, ValidationOptions options, Event muleEvent,
                            ValidationExtension config) {
     this.messages = messages;
     this.options = options;
@@ -57,11 +57,11 @@ public final class ValidationContext {
   }
 
   /**
-   * Returns the {@link MuleEvent} on which the validation was triggered
+   * Returns the {@link Event} on which the validation was triggered
    *
-   * @return a {@link MuleEvent}
+   * @return a {@link Event}
    */
-  public MuleEvent getMuleEvent() {
+  public Event getMuleEvent() {
     return muleEvent;
   }
 

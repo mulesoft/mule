@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -33,12 +33,12 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTest
     // Create message to send over wire
     Map<String, Serializable> messageProerties = new HashMap<>();
     messageProerties.put("key1", "val1");
-    MuleMessage inMessage = MuleMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
+    InternalMessage inMessage = InternalMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
 
     Object outMessage = readWrite(inMessage);
 
     // NOTE: Since we are not using SerializedMuleMessageWireFormat we only get
-    // the payload back and not the MuleMessage.
+    // the payload back and not the Message.
     assertTrue(outMessage instanceof String);
     assertEquals("testMessage", outMessage);
   }

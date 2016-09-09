@@ -7,12 +7,12 @@
 package org.mule.runtime.module.json.transformers;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.json.JsonData;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
@@ -52,12 +52,12 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter {
   private String schemaLocations;
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     JsonNode data;
     Object input = event.getMessage().getPayload();
     Object output = input;
@@ -83,7 +83,7 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter {
         return false;
       }
 
-      builder.message(MuleMessage.builder(event.getMessage()).payload(output).build());
+      builder.message(InternalMessage.builder(event.getMessage()).payload(output).build());
       ProcessingReport report = jsonSchema.validate(data);
 
       if (LOGGER.isDebugEnabled()) {
@@ -114,7 +114,7 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter {
       JsonSchemaFactory schemaFactory = JsonSchemaFactory.byDefault();
       jsonSchema = schemaFactory.getJsonSchema(jsonNode);
     } catch (Exception e) {
-      Message msg = MessageFactory.createStaticMessage("Unable to load or parse JSON Schema file at: " + schemaLocations);
+      I18nMessage msg = I18nMessageFactory.createStaticMessage("Unable to load or parse JSON Schema file at: " + schemaLocations);
       throw new InitialisationException(msg, e, this);
     }
   }

@@ -7,16 +7,16 @@
 package org.mule.runtime.core.component;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -28,10 +28,10 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
 import org.mule.runtime.core.context.notification.OptimisedNotificationHandler;
 import org.mule.runtime.core.management.stats.ComponentStatistics;
@@ -83,7 +83,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     lifecycleManager = new ComponentLifecycleManager(getName(), this);
   }
 
-  private MuleEvent invokeInternal(MuleEvent event) throws MuleException {
+  private Event invokeInternal(Event event) throws MuleException {
     // Ensure we have event in ThreadLocal
     setCurrentEvent(event);
 
@@ -105,14 +105,14 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
         startTime = System.currentTimeMillis();
       }
 
-      MuleEvent.Builder resultEventBuilder = MuleEvent.builder(event);
+      Event.Builder resultEventBuilder = Event.builder(event);
       Object result = doInvoke(event, resultEventBuilder);
 
       if (statistics.isEnabled()) {
         statistics.addExecutionTime(System.currentTimeMillis() - startTime);
       }
 
-      MuleEvent resultEvent = createResultEvent(event, resultEventBuilder, result);
+      Event resultEvent = createResultEvent(event, resultEventBuilder, result);
       fireComponentNotification(resultEvent.getMessage(),
                                 ComponentMessageNotification.COMPONENT_POST_INVOKE);
 
@@ -125,7 +125,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (interceptorChain == null) {
       return invokeInternal(event);
     } else {
@@ -133,10 +133,10 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     }
   }
 
-  protected MuleEvent createResultEvent(MuleEvent event, MuleEvent.Builder resultEventBuilder, Object result)
+  protected Event createResultEvent(Event event, Event.Builder resultEventBuilder, Object result)
       throws MuleException {
-    if (result instanceof MuleMessage) {
-      return resultEventBuilder.message((MuleMessage) result).build();
+    if (result instanceof InternalMessage) {
+      return resultEventBuilder.message((InternalMessage) result).build();
     } else if (result instanceof VoidResult) {
       return event;
     } else {
@@ -147,7 +147,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     }
   }
 
-  protected abstract Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception;
+  protected abstract Object doInvoke(Event event, Event.Builder eventBuilder) throws Exception;
 
   @Override
   public String toString() {
@@ -176,7 +176,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
   public final void initialise() throws InitialisationException {
     if (flowConstruct == null) {
       throw new InitialisationException(
-                                        MessageFactory
+                                        I18nMessageFactory
                                             .createStaticMessage("Component has not been initialized properly, no flow constuct."),
                                         this);
     }
@@ -187,7 +187,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
       for (Interceptor interceptor : interceptors) {
         chainBuilder.chain(interceptor);
       }
-      chainBuilder.chain((MessageProcessor) event -> invokeInternal(event));
+      chainBuilder.chain((Processor) event -> invokeInternal(event));
       interceptorChain = chainBuilder.build();
       applyLifecycleAndDependencyInjection(interceptorChain);
       doInitialise();
@@ -247,7 +247,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     // Default implementation is no-op
   }
 
-  protected void fireComponentNotification(MuleMessage message, int action) {
+  protected void fireComponentNotification(InternalMessage message, int action) {
     if (notificationHandler != null
         && notificationHandler.isNotificationEnabled(ComponentMessageNotification.class)) {
       notificationHandler.fireNotification(new ComponentMessageNotification(message, this,

@@ -19,13 +19,10 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
- * Base class for a vendor specific connection provider.
- * Connection can be specified through a URL, or through
- * convenience parameters exposed to spare the user from
- * the need of knowing the specific URL format.
+ * Base class for a vendor specific connection provider. Connection can be specified through a URL, or through convenience
+ * parameters exposed to spare the user from the need of knowing the specific URL format.
  * <p>
- * Notice those parameters are ignored if a specific URL
- * is provided.
+ * Notice those parameters are ignored if a specific URL is provided.
  *
  * @since 4.0
  */
@@ -40,8 +37,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
   private String database;
 
   /**
-   * Configures just the host part of the JDBC URL (and leaves the rest of the default
-   * JDBC URL untouched).
+   * Configures just the host part of the JDBC URL (and leaves the rest of the default JDBC URL untouched).
    */
   @Parameter
   @Optional
@@ -49,8 +45,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
   private String host;
 
   /**
-   * Configures just the port part of the JDBC URL (and leaves the rest of the default
-   * JDBC URL untouched).
+   * Configures just the port part of the JDBC URL (and leaves the rest of the default JDBC URL untouched).
    */
   @Parameter
   @Optional

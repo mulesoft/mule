@@ -14,7 +14,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -45,7 +45,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     // this will submit the xml via a POST request
-    MuleMessage message =
+    InternalMessage message =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", getTestMuleMessage(xml), httpOptions)
             .getRight();
     assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
@@ -66,7 +66,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     // this will submit the xml via a POST request
-    MuleMessage message =
+    InternalMessage message =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", getTestMuleMessage(xml), httpOptions)
             .getRight();
     assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
@@ -81,7 +81,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     // this will submit the xml via a POST request
-    MuleMessage message =
+    InternalMessage message =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions).getRight();
     assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
 
@@ -102,7 +102,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     // this will submit the xml via a POST request
-    MuleMessage message =
+    InternalMessage message =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", getTestMuleMessage(xml), httpOptions).getRight();
     assertThat(getPayloadAsString(message), equalTo("some"));
   }

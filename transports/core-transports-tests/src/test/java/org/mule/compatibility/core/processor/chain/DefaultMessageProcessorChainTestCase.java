@@ -24,12 +24,12 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Pipeline;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
@@ -89,14 +89,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testOneWayOutboundEndpointWithService() throws Exception {
-    MuleEvent event = getTestEventUsingFlow("");
+    Event event = getTestEventUsingFlow("");
 
-    MessageProcessor mp = mock(MessageProcessor.class, withSettings().extraInterfaces(OutboundEndpoint.class));
+    Processor mp = mock(Processor.class, withSettings().extraInterfaces(OutboundEndpoint.class));
     OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
     when(outboundEndpoint.getExchangePattern()).thenReturn(ONE_WAY);
 
     MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
-    MuleEvent response = chain.process(event);
+    Event response = chain.process(event);
     assertNull(response);
 
     assertEquals(1, threads);
@@ -104,27 +104,27 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testOneWayOutboundEndpointWithFlow() throws Exception {
-    MuleEvent event = getTestEventUsingFlow("");
+    Event event = getTestEventUsingFlow("");
 
-    MessageProcessor mp = mock(MessageProcessor.class, withSettings().extraInterfaces(OutboundEndpoint.class));
+    Processor mp = mock(Processor.class, withSettings().extraInterfaces(OutboundEndpoint.class));
     OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
     when(outboundEndpoint.getExchangePattern()).thenReturn(ONE_WAY);
     when(outboundEndpoint.mayReturnVoidEvent()).thenAnswer(invocation -> {
       MessageExchangePattern exchangePattern = ((OutboundEndpoint) invocation.getMock()).getExchangePattern();
       return exchangePattern == null ? true : !exchangePattern.hasResponse();
     });
-    when(mp.process(any(MuleEvent.class))).thenReturn(VoidMuleEvent.getInstance());
+    when(mp.process(any(Event.class))).thenReturn(VoidMuleEvent.getInstance());
 
     MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
-    MuleEvent response = chain.process(event);
+    Event response = chain.process(event);
     assertThat(event.getMessage(), is(response.getMessage()));
 
     assertEquals(1, threads);
   }
 
-  protected MuleEvent getTestEventUsingFlow(Object data) throws Exception {
-    MuleEvent event = mock(MuleEvent.class);
-    MuleMessage message = MuleMessage.builder().payload(data).build();
+  protected Event getTestEventUsingFlow(Object data) throws Exception {
+    Event event = mock(Event.class);
+    InternalMessage message = InternalMessage.builder().payload(data).build();
     when(event.getMessage()).thenReturn(message);
     when(event.getExchangePattern()).thenReturn(exchangePattern);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());

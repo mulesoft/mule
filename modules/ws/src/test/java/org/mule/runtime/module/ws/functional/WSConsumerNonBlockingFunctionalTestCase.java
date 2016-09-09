@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 
@@ -70,28 +70,28 @@ public class WSConsumerNonBlockingFunctionalTestCase extends AbstractWSConsumerF
 
   @Test
   public void webServiceConsumerMidFlow() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(ECHO_REQUEST).build();
+    InternalMessage request = InternalMessage.builder().payload(ECHO_REQUEST).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/inMidFlow", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     assertThat(getPayloadAsString(response), equalTo(TEST_MESSAGE));
   }
 
   @Override
   protected void assertValidResponse(String address, Object payload, Map<String, Serializable> properties) throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(payload).inboundProperties(properties).build();
+    InternalMessage request = InternalMessage.builder().payload(payload).inboundProperties(properties).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response =
+    InternalMessage response =
         client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build()).getRight();
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
   }
 
   @Override
   protected void assertSoapFault(String address, String message, String expectedErrorMessage) throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(message).build();
+    InternalMessage request = InternalMessage.builder().payload(message).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response =
+    InternalMessage response =
         client.send(address, request, newOptions().method(POST.name()).disableStatusCodeValidation().build()).getRight();
     String responsePayload = getPayloadAsString(response);
     assertThat(responsePayload, Matchers.containsString(expectedErrorMessage));

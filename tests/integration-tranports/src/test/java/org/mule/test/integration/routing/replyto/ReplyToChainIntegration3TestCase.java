@@ -11,8 +11,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -34,7 +34,7 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://pojo1", message, null);
-    MuleMessage result = client.request("jms://response", 10000).getRight().get();
+    InternalMessage result = client.request("jms://response", 10000).getRight().get();
     assertNotNull(result);
     assertEquals("Received: " + message, result.getPayload());
   }
@@ -42,8 +42,8 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase {
   public static class SetReplyTo extends AbstractMessageTransformer {
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      return MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
+    public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+      return InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
     }
   }
 }

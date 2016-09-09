@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transaction.constraints;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 /**
  * <code>BatchConstraint</code> is a filter that counts on every execution and returns true when the batch size value equals the
@@ -20,7 +20,7 @@ public class BatchConstraint extends ConstraintFilter {
   // @GuardedBy(this)
   private int batchCount = 0;
 
-  public boolean accept(MuleEvent event) {
+  public boolean accept(Event event) {
     synchronized (this) {
       batchCount++;
       return batchCount == batchSize;

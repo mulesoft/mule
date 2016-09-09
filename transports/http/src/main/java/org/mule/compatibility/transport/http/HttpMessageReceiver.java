@@ -13,13 +13,13 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.core.transport.TransportMessageProcessContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.runtime.core.execution.MessageProcessContext;
 import org.mule.runtime.core.util.MapUtils;
@@ -86,18 +86,18 @@ public class HttpMessageReceiver extends AbstractMessageReceiver {
 
       muleMessageFactory = factory;
     } catch (CreateException ce) {
-      Message message = MessageFactory.createStaticMessage(ce.getMessage());
+      I18nMessage message = I18nMessageFactory.createStaticMessage(ce.getMessage());
       throw new InitialisationException(message, ce, this);
     }
   }
 
   @Override
-  protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
+  protected InternalMessage handleUnacceptedFilter(InternalMessage message) {
     if (logger.isDebugEnabled()) {
       logger.debug("Message request '" + message.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY)
           + "' is being rejected since it does not match the filter on this endpoint: " + endpoint);
     }
-    return MuleMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(SC_NOT_ACCEPTABLE)).build();
+    return InternalMessage.builder(message).addOutboundProperty(HTTP_STATUS_PROPERTY, String.valueOf(SC_NOT_ACCEPTABLE)).build();
   }
 
   public List<Transformer> getResponseTransportTransformers() {

@@ -22,15 +22,15 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.util.MapUtils;
@@ -109,19 +109,19 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver {
       outboundEndpoint = getEndpointFactory(muleContext).getOutboundEndpoint(endpointBuilder);
     }
 
-    MuleMessage.Builder requestBuider =
-        MuleMessage.builder().payload(StringUtils.EMPTY).inboundProperties(outboundEndpoint.getProperties());
+    InternalMessage.Builder requestBuider =
+        InternalMessage.builder().payload(StringUtils.EMPTY).inboundProperties(outboundEndpoint.getProperties());
     if (etag != null && checkEtag) {
       requestBuider.addOutboundProperty(HEADER_IF_NONE_MATCH, etag);
     }
     requestBuider.addOutboundProperty(HTTP_METHOD_PROPERTY, "GET");
 
     // TODO can a correlation id come as a header?
-    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flowConstruct, getEndpoint().getAddress()))
+    Event event = Event.builder(DefaultMessageContext.create(flowConstruct, getEndpoint().getAddress()))
         .message(requestBuider.build()).exchangePattern(outboundEndpoint.getExchangePattern()).flow(flowConstruct).build();
 
-    MuleEvent result = outboundEndpoint.process(event);
-    MuleCompatibilityMessage message = null;
+    Event result = outboundEndpoint.process(event);
+    CompatibilityMessage message = null;
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
       message = new MuleCompatibilityMessageBuilder(result.getMessage()).build();
     }

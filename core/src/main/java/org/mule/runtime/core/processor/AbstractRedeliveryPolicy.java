@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.MessageProcessorFilterPair;
 
@@ -30,11 +30,11 @@ import org.mule.runtime.core.routing.MessageProcessorFilterPair;
  * to be considered "consumed".
  */
 public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessageProcessor
-    implements MessageProcessor, Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
+    implements Processor, Lifecycle, MuleContextAware, FlowConstructAware, MessagingExceptionHandlerAware {
 
   protected FlowConstruct flowConstruct;
   protected int maxRedeliveryCount;
-  protected MessageProcessor deadLetterQueue;
+  protected Processor deadLetterQueue;
   public static final int REDELIVERY_FAIL_ON_FIRST = 0;
   private MessagingExceptionHandler messagingExceptionHandler;
 
@@ -86,7 +86,7 @@ public abstract class AbstractRedeliveryPolicy extends AbstractInterceptingMessa
     this.maxRedeliveryCount = maxRedeliveryCount;
   }
 
-  public MessageProcessor getTheFailedMessageProcessor() {
+  public Processor getTheFailedMessageProcessor() {
     return deadLetterQueue;
   }
 

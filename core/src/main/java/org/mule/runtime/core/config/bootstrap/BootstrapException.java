@@ -7,7 +7,7 @@
 package org.mule.runtime.core.config.bootstrap;
 
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Represents exceptions during the bootstrap configuration process
@@ -19,11 +19,11 @@ public class BootstrapException extends ConfigurationException {
    */
   private static final long serialVersionUID = 3658223240493754960L;
 
-  public BootstrapException(Message message, Throwable cause) {
+  public BootstrapException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
-  public BootstrapException(Message message) {
+  public BootstrapException(I18nMessage message) {
     super(message);
   }
 }

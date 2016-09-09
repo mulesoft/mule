@@ -7,8 +7,8 @@
 package org.mule.test.transformers;
 
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
@@ -27,9 +27,9 @@ public class TransformerWeightingFunctionalTestCase extends AbstractIntegrationT
 
   @Test
   public void findTwoTransformers() throws Exception {
-    final MuleEvent muleEvent = flowRunner("test").withPayload(XML_REQUEST).run();
+    final Event muleEvent = flowRunner("test").withPayload(XML_REQUEST).run();
 
-    MuleMessage response = muleEvent.getMessage();
+    InternalMessage response = muleEvent.getMessage();
     XMLAssert.assertXMLEqual(XML_REQUEST, getPayloadAsString(response));
   }
 }

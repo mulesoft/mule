@@ -7,7 +7,7 @@
 package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.nio.charset.Charset;
@@ -15,9 +15,9 @@ import java.nio.charset.Charset;
 /**
  * <code>ObjectToXml</code> converts any object to XML using Xstream. Xstream uses some clever tricks so objects that get
  * marshalled to XML do not need to implement any interfaces including Serializable and you don't even need to specify a default
- * constructor. If <code>MuleMessage</code> is configured as a source type on this transformer by calling
- * <code>setAcceptMuleMessage(true)</code> then the MuleMessage will be serialised. This is useful for transports such as TCP
- * where the message headers would normally be lost.
+ * constructor. If <code>Message</code> is configured as a source type on this transformer by calling
+ * <code>setAcceptMuleMessage(true)</code> then the Message will be serialised. This is useful for transports such as TCP where
+ * the message headers would normally be lost.
  */
 
 public class ObjectToXml extends AbstractXStreamTransformer {
@@ -40,12 +40,12 @@ public class ObjectToXml extends AbstractXStreamTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     Object src = event.getMessage().getPayload();
     /*
-     * If the MuleMessage source type has been registered that we can assume that the whole message is to be serialised to Xml,
-     * not just the payload. This can be useful for protocols such as tcp where the protocol does not support headers, thus the
-     * whole messgae needs to be serialized
+     * If the Message source type has been registered that we can assume that the whole message is to be serialised to Xml, not
+     * just the payload. This can be useful for protocols such as tcp where the protocol does not support headers, thus the whole
+     * messgae needs to be serialized
      */
     if (this.isAcceptMuleMessage()) {
       src = event.getMessage();

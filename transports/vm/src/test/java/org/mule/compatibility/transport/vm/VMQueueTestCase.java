@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class VMQueueTestCase extends FunctionalTestCase {
   public void testSingleMessage() throws Exception {
     MuleClient client = muleContext.getClient();
     client.dispatch("queue", "Marco", null);
-    MuleMessage response = client.request("queue", WAIT).getRight().get();
+    InternalMessage response = client.request("queue", WAIT).getRight().get();
     assertNotNull("Response is null", response);
     assertEquals("Marco", response.getPayload());
   }
@@ -50,7 +50,7 @@ public class VMQueueTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < 3; ++i) {
-      MuleMessage response = client.request("queue", WAIT).getRight().get();
+      InternalMessage response = client.request("queue", WAIT).getRight().get();
       assertNotNull("Response is null", response);
       String person = (String) response.getPayload();
       assertTrue(person, polos.contains(person));
@@ -68,7 +68,7 @@ public class VMQueueTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < 3; ++i) {
-      MuleMessage response = client.request("queue", WAIT).getRight().get();
+      InternalMessage response = client.request("queue", WAIT).getRight().get();
       assertNotNull("Response is null", response);
       String person = (String) response.getPayload();
       String personName = new StringTokenizer(person).nextToken();
@@ -87,7 +87,7 @@ public class VMQueueTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < 3; ++i) {
-      MuleMessage response = client.request("queue", WAIT).getRight().get();
+      InternalMessage response = client.request("queue", WAIT).getRight().get();
       assertNotNull("Response is null", response);
       String person = (String) response.getPayload();
       String personName = new StringTokenizer(person).nextToken();

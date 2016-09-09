@@ -58,8 +58,7 @@ public class ConfigurableObjectFactory<T> extends AbstractAnnotatedObject implem
   }
 
   /**
-   * Sets a {@link ConfigurableInstanceFactory} to create a do custom configuration for the
-   * object to be used at runtime.
+   * Sets a {@link ConfigurableInstanceFactory} to create a do custom configuration for the object to be used at runtime.
    *
    * @param factory the factory to create the runtime object instance.
    */

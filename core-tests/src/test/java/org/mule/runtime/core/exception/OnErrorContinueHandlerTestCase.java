@@ -21,11 +21,11 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.util.StreamCloserService;
@@ -54,9 +54,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
   @Mock
   private MessagingException mockException;
 
-  private MuleEvent muleEvent;
+  private Event muleEvent;
 
-  private MuleMessage muleMessage = MuleMessage.builder().payload("").build();
+  private InternalMessage muleMessage = InternalMessage.builder().payload("").build();
   @Mock
   private StreamCloserService mockStreamCloserService;
   @Spy
@@ -66,7 +66,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   private Flow flow;
 
-  private MessageContext context;
+  private EventContext context;
 
   private OnErrorContinueHandler onErrorContinueHandler;
 
@@ -83,14 +83,14 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
 
     context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
-    muleEvent = MuleEvent.builder(context).message(muleMessage).flow(flow).build();
+    muleEvent = Event.builder(context).message(muleMessage).flow(flow).build();
   }
 
   @Test
   public void testHandleExceptionWithNoConfig() throws Exception {
     configureXaTransactionAndSingleResourceTransaction();
 
-    MuleEvent resultEvent = onErrorContinueHandler.handleException(mockException, muleEvent);
+    Event resultEvent = onErrorContinueHandler.handleException(mockException, muleEvent);
     assertThat(resultEvent.getMessage().getPayload(), equalTo(muleEvent.getMessage().getPayload()));
 
     verify(mockTransaction, times(0)).setRollbackOnly();
@@ -107,7 +107,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler
         .setMessageProcessors(asList(createSetStringMessageProcessor("A"), createSetStringMessageProcessor("B")));
     onErrorContinueHandler.initialise();
-    final MuleEvent result = onErrorContinueHandler.handleException(mockException, muleEvent);
+    final Event result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
     assertThat(result.getMessage().getPayload(), is("B"));
     assertThat(result.getError().isPresent(), is(false));
@@ -115,52 +115,52 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
-    MuleEvent lastEventCreated = MuleEvent.builder(context).message(muleMessage).flow(flow).build();
+    Event lastEventCreated = Event.builder(context).message(muleMessage).flow(flow).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createChagingEventMessageProcessor(MuleEvent.builder(context).message(muleMessage).flow(flow)
+        .setMessageProcessors(asList(createChagingEventMessageProcessor(Event.builder(context).message(muleMessage).flow(flow)
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.initialise();
-    MuleEvent exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
+    Event exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
     assertThat(exceptionHandlingResult.getCorrelationId(), is(lastEventCreated.getCorrelationId()));
   }
 
   /**
-   *  On fatal error, the exception strategies are not supposed to use MuleMessage.toString() as it could
-   * potentially log sensible data.
+   * On fatal error, the exception strategies are not supposed to use Message.toString() as it could potentially log sensible
+   * data.
    */
   @Test
   public void testMessageToStringNotCalledOnFailure() throws Exception {
-    muleEvent = MuleEvent.builder(muleEvent).message(spy(muleMessage)).build();
+    muleEvent = Event.builder(muleEvent).message(spy(muleMessage)).build();
     muleEvent = spy(muleEvent);
     when(mockException.getStackTrace()).thenReturn(new StackTraceElement[0]);
 
-    MuleEvent lastEventCreated = MuleEvent.builder(context).message(muleMessage).flow(flow).build();
+    Event lastEventCreated = Event.builder(context).message(muleMessage).flow(flow).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createFailingEventMessageProcessor(MuleEvent.builder(context).message(muleMessage).flow(flow)
+        .setMessageProcessors(asList(createFailingEventMessageProcessor(Event.builder(context).message(muleMessage).flow(flow)
             .build()),
                                      createFailingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.initialise();
-    when(muleEvent.getMessage().toString()).thenThrow(new RuntimeException("MuleMessage.toString() should not be called"));
+    when(muleEvent.getMessage().toString()).thenThrow(new RuntimeException("Message.toString() should not be called"));
 
     expectedException.expect(Exception.class);
-    MuleEvent exceptionHandlingResult =
+    Event exceptionHandlingResult =
         exceptionHandlingResult = onErrorContinueHandler.handleException(mockException, muleEvent);
   }
 
-  private MessageProcessor createChagingEventMessageProcessor(final MuleEvent lastEventCreated) {
+  private Processor createChagingEventMessageProcessor(final Event lastEventCreated) {
     return event -> lastEventCreated;
   }
 
-  private MessageProcessor createFailingEventMessageProcessor(final MuleEvent lastEventCreated) {
+  private Processor createFailingEventMessageProcessor(final Event lastEventCreated) {
     return event -> {
       throw new DefaultMuleException(mockException);
     };
   }
 
-  private MessageProcessor createSetStringMessageProcessor(final String appendText) {
+  private Processor createSetStringMessageProcessor(final String appendText) {
     return event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(appendText).build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(appendText).build()).build();
     };
   }
 

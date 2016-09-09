@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.hamcrest.core.Is;
@@ -49,7 +49,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-queue", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -60,7 +60,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-topic", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -74,7 +74,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -88,7 +88,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-optional-jndi", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -112,7 +112,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -123,7 +123,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_jndi-topic-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -137,7 +137,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }
@@ -151,7 +151,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase {
 
     client.dispatch("ep_non-jndi-queue-optional-jndi-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(result));
   }

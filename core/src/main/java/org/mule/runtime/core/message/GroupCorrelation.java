@@ -8,35 +8,33 @@ package org.mule.runtime.core.message;
 
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.api.message.Message;
+
 import java.io.Serializable;
 import java.util.Optional;
 
-import org.mule.runtime.api.message.MuleMessage;
-
 /**
- * Immutable container for correlation properties relative to a {@link MuleMessage}.
- * <p>
- * TODO MULE-10115 Review how correlation is implemented/achieved
+ * Immutable container for correlation properties relative to a {@link Message}.
  * 
  * @since 4.0
  */
-public class Correlation implements Serializable {
+public class GroupCorrelation implements Serializable {
 
   private static final long serialVersionUID = -5687080761804624442L;
 
   public static final String NOT_SET = "<not set>";
-  public static final Correlation NO_CORRELATION = new Correlation(null, null);
+  public static final GroupCorrelation NO_CORRELATION = new GroupCorrelation(null, null);
 
   private final Integer groupSize;
   private final Integer sequence;
 
   /**
-   * Builds a new {@link Correlation} with the given parameters.
+   * Builds a new {@link GroupCorrelation} with the given parameters.
    * 
    * @param groupSize see {@link #getGroupSize()}.
    * @param sequence see {@link #getSequence()}.
    */
-  public Correlation(Integer groupSize, Integer sequence) {
+  public GroupCorrelation(Integer groupSize, Integer sequence) {
     this.groupSize = groupSize;
     this.sequence = sequence;
   }

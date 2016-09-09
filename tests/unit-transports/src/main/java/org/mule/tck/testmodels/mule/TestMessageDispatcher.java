@@ -11,8 +11,8 @@ import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -42,14 +42,14 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected void doDispatch(MuleEvent event) throws Exception {
+  protected void doDispatch(Event event) throws Exception {
     if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail")) {
       throw new RoutingException((OutboundEndpoint) endpoint);
     }
   }
 
   @Override
-  protected MuleMessage doSend(MuleEvent event) throws Exception {
+  protected InternalMessage doSend(Event event) throws Exception {
     if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail")) {
       throw new RoutingException((OutboundEndpoint) endpoint);
     }
@@ -57,16 +57,16 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected void doSendNonBlocking(MuleEvent event, final CompletionHandler<MuleMessage, Exception, Void> completionHandler) {
+  protected void doSendNonBlocking(Event event, final CompletionHandler<InternalMessage, Exception, Void> completionHandler) {
     if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail")) {
       completionHandler.onFailure(new RoutingException((OutboundEndpoint) endpoint));
     } else {
       try {
-        final MuleMessage response = event.getMessage();
-        event = MuleEvent.builder(event).replyToHandler(new ReplyToHandler() {
+        final InternalMessage response = event.getMessage();
+        event = Event.builder(event).replyToHandler(new ReplyToHandler() {
 
           @Override
-          public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) {
+          public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) {
             completionHandler.onCompletion(response, (ExceptionCallback<Void, Exception>) (exception -> {
               // TODO MULE-9629
               return null;

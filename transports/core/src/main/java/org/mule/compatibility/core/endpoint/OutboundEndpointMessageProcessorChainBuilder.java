@@ -9,7 +9,7 @@ package org.mule.compatibility.core.endpoint;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 /**
@@ -31,7 +31,7 @@ public class OutboundEndpointMessageProcessorChainBuilder extends DefaultMessage
   }
 
   @Override
-  protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException {
+  protected Processor initializeMessageProcessor(Object processor) throws MuleException {
     if (processor instanceof EndpointAware) {
       ((EndpointAware) processor).setEndpoint(endpoint);
     }

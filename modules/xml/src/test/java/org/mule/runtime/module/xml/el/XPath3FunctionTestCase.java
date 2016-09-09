@@ -13,11 +13,11 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.runtime.module.xml.xpath.XPathReturnType;
@@ -65,8 +65,8 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
   @Test
   public void messagePayloadChangedWhenPayloadConsumed() throws Exception {
-    MuleEvent event = getTestEvent(new ByteArrayInputStream(ROOT_FOO_BAR.getBytes()));
-    final Builder builder = MuleEvent.builder(event);
+    Event event = getTestEvent(new ByteArrayInputStream(ROOT_FOO_BAR.getBytes()));
+    final Builder builder = Event.builder(event);
     assertThat((String) doEvaluate("xpath3('/root/@foo')", event, builder), equalTo(BAR));
     assertThat(builder.build().getMessage().getPayload(), instanceOf(Node.class));
   }
@@ -80,35 +80,35 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
     types.put(XPathReturnType.NUMBER, Double.class);
     types.put(XPathReturnType.STRING, String.class);
 
-    MuleEvent event = getTestEvent(ROOT_FOO_BAR);
+    Event event = getTestEvent(ROOT_FOO_BAR);
     for (Map.Entry<XPathReturnType, Class<?>> entry : types.entrySet()) {
       String expression = String.format("xpath3('/root/@foo', payload, '%s')", entry.getKey().name());
-      assertThat(doEvaluate(expression, event, MuleEvent.builder(event)), instanceOf(entry.getValue()));
+      assertThat(doEvaluate(expression, event, Event.builder(event)), instanceOf(entry.getValue()));
     }
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void noArgs() throws Exception {
-    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
-    doEvaluate("xpath3()", event, MuleEvent.builder(event));
+    final Event event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3()", event, Event.builder(event));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void tooManyArgs() throws Exception {
-    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
-    doEvaluate("xpath3('/root/@foo', payload, 'STRING_DATA_TYPE', 'one too many')", event, MuleEvent.builder(event));
+    final Event event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3('/root/@foo', payload, 'STRING_DATA_TYPE', 'one too many')", event, Event.builder(event));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void blankExpression() throws Exception {
-    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
-    doEvaluate("xpath3('')", event, MuleEvent.builder(event));
+    final Event event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3('')", event, Event.builder(event));
   }
 
   @Test(expected = ExpressionRuntimeException.class)
   public void notAStringExpression() throws Exception {
-    final MuleEvent event = getTestEvent(ROOT_FOO_BAR);
-    doEvaluate("xpath3(System.out)", event, MuleEvent.builder(event));
+    final Event event = getTestEvent(ROOT_FOO_BAR);
+    doEvaluate("xpath3(System.out)", event, Event.builder(event));
   }
 
   @Test
@@ -130,40 +130,40 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
 
   @Test
   public void parametrized() throws Exception {
-    MuleEvent event = MuleEvent.builder(getTestEvent(ROOT_FOO_BAR)).addFlowVariable("foo", "bar").build();
-    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
+    Event event = Event.builder(getTestEvent(ROOT_FOO_BAR)).addVariable("foo", "bar").build();
+    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, Event.builder(event));
     assertThat(result, instanceOf(Node.class));
     assertThat((((Node) result)).getAttributes().getNamedItem("foo").getNodeValue(), equalTo("bar"));
   }
 
   @Test
   public void emptyParametrizedResult() throws Exception {
-    MuleEvent event = MuleEvent.builder(getTestEvent(ROOT_FOO_BAR)).addFlowVariable("foo", "not a bar").build();
-    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
+    Event event = Event.builder(getTestEvent(ROOT_FOO_BAR)).addVariable("foo", "not a bar").build();
+    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, Event.builder(event));
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void autoConvertNumericType() throws Exception {
-    MuleEvent event = MuleEvent.builder(getTestEvent("<root foo=\"33\"/>")).addFlowVariable("foo", 33).build();
-    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, MuleEvent.builder(event));
+    Event event = Event.builder(getTestEvent("<root foo=\"33\"/>")).addVariable("foo", 33).build();
+    Object result = doEvaluate("xpath3('/root[@foo=$foo]', payload, 'NODE')", event, Event.builder(event));
     assertThat(result, instanceOf(Node.class));
     assertThat((((Node) result)).getAttributes().getNamedItem("foo").getNodeValue(), equalTo("33"));
   }
 
   private void evaluateFooFromPayload(Object payload) throws Exception {
-    MuleMessage message = MuleMessage.builder().payload(payload).build();
-    MuleEvent event = MuleEvent.builder(getTestEvent("")).message(message).build();
+    InternalMessage message = InternalMessage.builder().payload(payload).build();
+    Event event = Event.builder(getTestEvent("")).message(message).build();
 
-    assertThat((String) doEvaluate("xpath3('/root/@foo')", event, MuleEvent.builder(event)), equalTo(BAR));
+    assertThat((String) doEvaluate("xpath3('/root/@foo')", event, Event.builder(event)), equalTo(BAR));
   }
 
   private void evaluateFooFromFlowVar(Object payload) throws Exception {
-    MuleEvent event = MuleEvent.builder(getTestEvent("")).addFlowVariable("input", payload).build();
-    assertThat((String) doEvaluate("xpath3('/root/@foo', flowVars['input'])", event, MuleEvent.builder(event)), equalTo(BAR));
+    Event event = Event.builder(getTestEvent("")).addVariable("input", payload).build();
+    assertThat((String) doEvaluate("xpath3('/root/@foo', flowVars['input'])", event, Event.builder(event)), equalTo(BAR));
   }
 
-  private Object doEvaluate(String expression, MuleEvent event, Builder builder) throws Exception {
+  private Object doEvaluate(String expression, Event event, Builder builder) throws Exception {
 
     setCurrentEvent(event);
     try {

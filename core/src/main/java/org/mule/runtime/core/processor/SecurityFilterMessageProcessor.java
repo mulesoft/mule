@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -47,7 +47,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (filter != null) {
       event = filter.doFilter(event);
     }

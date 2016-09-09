@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -109,7 +109,7 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase {
     IdentifiableCustomRouteResolver.routes.add(new IdentifiableCustomRouteResolver.AddLetterMessageProcessor(LETTER_D));
   }
 
-  private MuleEvent runFlowAndAssertResponse(String flowName, Map<String, Object> flowVars, Object expectedMessage)
+  private Event runFlowAndAssertResponse(String flowName, Map<String, Object> flowVars, Object expectedMessage)
       throws Exception {
     FlowRunner runner = flowRunner(flowName).withPayload(TEST_MESSAGE);
     if (flowVars != null) {
@@ -117,7 +117,7 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase {
         runner = runner.withFlowVariable(key, flowVars.get(key));
       }
     }
-    MuleEvent response = runner.run();
+    Event response = runner.run();
     assertThat(response.getMessageAsString(muleContext), is(expectedMessage));
     return response;
   }

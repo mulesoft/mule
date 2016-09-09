@@ -7,7 +7,7 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.error;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.ValidationContext;
@@ -40,9 +40,9 @@ abstract class AbstractValidator implements Validator {
   /**
    * Implementations need to implement this method to return the error message in case the validation failed
    *
-   * @return a {@link Message}
+   * @return a {@link I18nMessage}
    */
-  protected abstract Message getDefaultErrorMessage();
+  protected abstract I18nMessage getDefaultErrorMessage();
 
   /**
    * Generates a {@link ValidationResult} which {@link ValidationResult#isError()} method returns {@code true} and which message

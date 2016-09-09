@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
@@ -25,11 +25,11 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -53,14 +53,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link MessageProcessor} capable of executing extension operations.
+ * A {@link Processor} capable of executing extension operations.
  * <p>
  * It obtains a configuration instance, evaluate all the operation parameters and executes a {@link RuntimeOperationModel} by
  * using a {@link #operationExecutor}. This message processor is capable of serving the execution of any {@link OperationModel} of
  * any {@link RuntimeExtensionModel}.
  * <p>
  * A {@link #operationExecutor} is obtained by invoking {@link RuntimeOperationModel#getExecutor()}. That instance will be use to
- * serve all invokations of {@link #process(MuleEvent)} on {@code this} instance but will not be shared with other instances of
+ * serve all invokations of {@link #process(Event)} on {@code this} instance but will not be shared with other instances of
  * {@link OperationMessageProcessor}. All the {@link Lifecycle} events that {@code this} instance receives will be propagated to
  * the {@link #operationExecutor}.
  * <p>
@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public class OperationMessageProcessor extends ExtensionComponent implements MessageProcessor, EntityMetadataProvider, Lifecycle {
+public class OperationMessageProcessor extends ExtensionComponent implements Processor, EntityMetadataProvider, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OperationMessageProcessor.class);
   static final String INVALID_TARGET_MESSAGE =
@@ -99,8 +99,8 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    return (MuleEvent) withContextClassLoader(getExtensionClassLoader(), () -> {
+  public Event process(Event event) throws MuleException {
+    return (Event) withContextClassLoader(getExtensionClassLoader(), () -> {
       Optional<ConfigurationInstance> configuration = getConfiguration(event);
       OperationContextAdapter operationContext = createOperationContext(configuration, event);
       return doProcess(event, operationContext);
@@ -109,13 +109,13 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
     });
   }
 
-  protected org.mule.runtime.api.message.MuleEvent doProcess(MuleEvent event, OperationContextAdapter operationContext)
+  protected org.mule.runtime.api.message.MuleEvent doProcess(Event event, OperationContextAdapter operationContext)
       throws MuleException {
     Object result = executeOperation(operationContext, event);
     return returnDelegate.asReturnValue(result, operationContext);
   }
 
-  private Object executeOperation(OperationContextAdapter operationContext, MuleEvent event) throws MuleException {
+  private Object executeOperation(OperationContextAdapter operationContext, Event event) throws MuleException {
     try {
       return executionMediator.execute(operationExecutor, operationContext);
     } catch (MessagingException e) {
@@ -128,11 +128,11 @@ public class OperationMessageProcessor extends ExtensionComponent implements Mes
     }
   }
 
-  private MessagingException wrapInMessagingException(MuleEvent event, Throwable e) {
+  private MessagingException wrapInMessagingException(Event event, Throwable e) {
     return new MessagingException(createStaticMessage(e.getMessage()), event, e, this);
   }
 
-  private OperationContextAdapter createOperationContext(Optional<ConfigurationInstance> configuration, MuleEvent event)
+  private OperationContextAdapter createOperationContext(Optional<ConfigurationInstance> configuration, Event event)
       throws MuleException {
     return new DefaultOperationContext(extensionModel, configuration, resolverSet.resolve(event), operationModel, event,
                                        muleContext);

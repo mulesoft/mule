@@ -7,10 +7,10 @@
 package org.mule.compatibility.core.endpoint.outbound;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 
 import java.io.Serializable;
@@ -30,10 +30,10 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestR
   }
 
   @Override
-  protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
+  protected Event processResponse(Event response, final Event request) throws MuleException {
     if (isEventValid(response)) {
-      final MuleMessage message = response.getMessage();
-      final Builder builder = MuleMessage.builder(message);
+      final InternalMessage message = response.getMessage();
+      final Builder builder = InternalMessage.builder(message);
 
       // Properties which should be carried over from the request message
       // to the response message
@@ -44,7 +44,7 @@ public class OutboundResponsePropertiesMessageProcessor extends AbstractRequestR
         }
       }
 
-      response = MuleEvent.builder(response).correlation(request.getCorrelation()).message(builder.build()).build();
+      response = Event.builder(response).groupCorrelation(request.getGroupCorrelation()).message(builder.build()).build();
     }
     return response;
   }

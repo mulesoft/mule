@@ -8,7 +8,7 @@ package org.mule.runtime.module.cxf.support;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.xml.transformer.DelayedResult;
 
@@ -54,9 +54,9 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor 
     objs.clear();
 
     for (Object o : originalParts) {
-      if (o instanceof MuleMessage) {
+      if (o instanceof InternalMessage) {
         try {
-          MuleMessage muleMsg = (MuleMessage) o;
+          InternalMessage muleMsg = (InternalMessage) o;
           final Object payload = cleanUpPayload(muleMsg.getPayload());
 
           if (payload instanceof DelayedResult) {

@@ -21,8 +21,8 @@ public class MappedStructResolvedDbType<T> extends ResolvedDbType {
   /**
    * Creates a new instance
    *
-   * @param id          identifier for the type
-   * @param name        type name. Non Empty.
+   * @param id identifier for the type
+   * @param name type name. Non Empty.
    * @param mappedClass class used to map values of this type from the database to Java representations.
    */
   public MappedStructResolvedDbType(int id, String name, Class<T> mappedClass) {

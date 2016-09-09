@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.FutureMessageResult;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.concurrent.TimeoutException;
 
@@ -33,7 +33,7 @@ public class HttpConnectionTimeoutTestCase extends FunctionalTestCase {
     final MuleClient client = new MuleClient(muleContext);
     FutureMessageResult result = client.sendAsync("vm://testInput", TEST_MESSAGE, null);
 
-    MuleMessage message = null;
+    InternalMessage message = null;
     try {
       message = result.getResult(1000).getRight();
     } catch (TimeoutException e) {

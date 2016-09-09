@@ -18,12 +18,12 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.util.CharSetUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -107,7 +107,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
       fail("message should have been delivered at least 5 times");
     }
     assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
-    MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT).getRight().get();
+    InternalMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT).getRight().get();
     assertThat(dlqMessage, notNullValue());
     assertThat(getPayloadAsString(dlqMessage), is(MESSAGE_EXPECTED));
   }
@@ -121,7 +121,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     if (!latch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("message should have been delivered at least 5 times");
     }
-    MuleMessage result = client.send("vm://in5", MESSAGE, null, TIMEOUT).getRight();
+    InternalMessage result = client.send("vm://in5", MESSAGE, null, TIMEOUT).getRight();
     assertThat(result, notNullValue());
     assertThat(getPayloadAsString(result), is(MESSAGE + " Rolled Back"));
   }
@@ -129,7 +129,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   @Test
   public void testFullyDefinedRollbackExceptionStrategyWithComponent() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = null;
+    InternalMessage result = null;
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
       result = client.send("vm://in6", MESSAGE, null, TIMEOUT).getRight();
       assertThat(result, notNullValue());
@@ -155,7 +155,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
       fail("message should have been delivered at least 5 times");
     }
     assertThat(deliveredTimes.intValue(), is(EXPECTED_DELIVERED_TIMES));
-    MuleMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT).getRight().get();
+    InternalMessage dlqMessage = client.request("jms://dlq?connector=activeMq", TIMEOUT).getRight().get();
     assertThat(dlqMessage, notNullValue());
     assertThat(getPayloadAsString(dlqMessage), is(MESSAGE_EXPECTED));
   }
@@ -163,7 +163,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   @Test
   public void testHttpAlwaysRollbackUsingMuleClient() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response =
+    InternalMessage response =
         client.send(format("http://localhost:%s", dynamicPort1.getNumber()), getTestMuleMessage(JSON_REQUEST),
                     newOptions().disableStatusCodeValidation().responseTimeout(TIMEOUT).build())
             .getRight();
@@ -183,7 +183,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   @Test
   public void testHttpRedeliveryExhaustedRollbackUsingMuleClient() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = null;
+    InternalMessage response = null;
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).disableStatusCodeValidation().responseTimeout(TIMEOUT).build();
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
@@ -220,7 +220,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   @Test
   public void testFullyDefinedRollbackExceptionStrategy() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = null;
+    InternalMessage result = null;
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
       result = client.send("vm://in2", MESSAGE, null, TIMEOUT).getRight();
       assertThat(result, notNullValue());
@@ -278,23 +278,23 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   @Test
   public void typeMatch() throws Exception {
     verifyFlow("onErrorPropagateTypeMatch");
-    Optional<MuleMessage> customPath = muleContext.getClient().request("queue://custom1", TIMEOUT).getRight();
+    Optional<InternalMessage> customPath = muleContext.getClient().request("queue://custom1", TIMEOUT).getRight();
     assertThat(customPath.isPresent(), is(false));
-    Optional<MuleMessage> anyPath = muleContext.getClient().request("queue://any1", TIMEOUT).getRight();
+    Optional<InternalMessage> anyPath = muleContext.getClient().request("queue://any1", TIMEOUT).getRight();
     assertThat(anyPath.isPresent(), is(false));
   }
 
   @Test
   public void typeMatchAny() throws Exception {
     verifyFlow("onErrorPropagateTypeMatchAny");
-    Optional<MuleMessage> customPath = muleContext.getClient().request("queue://custom2", TIMEOUT).getRight();
+    Optional<InternalMessage> customPath = muleContext.getClient().request("queue://custom2", TIMEOUT).getRight();
     assertThat(customPath.isPresent(), is(false));
   }
 
   @Test
   public void typeMatchSeveral() throws Exception {
     verifyFlow("onErrorPropagateTypeMatchSeveral", true);
-    Optional<MuleMessage> anyPath = muleContext.getClient().request("queue://any", TIMEOUT).getRight();
+    Optional<InternalMessage> anyPath = muleContext.getClient().request("queue://any", TIMEOUT).getRight();
     assertThat(anyPath.isPresent(), is(false));
     verifyFlow("onErrorPropagateTypeMatchSeveral", false);
     anyPath = muleContext.getClient().request("queue://any", TIMEOUT).getRight();
@@ -317,12 +317,12 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     verifyFlow(flowName, MESSAGE);
   }
 
-  public static class CallMessageProcessor implements MessageProcessor {
+  public static class CallMessageProcessor implements Processor {
 
     public static Latch latch = new Latch();
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       latch.release();
       return event;
     }

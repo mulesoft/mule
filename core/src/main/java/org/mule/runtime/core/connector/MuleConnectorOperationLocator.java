@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 
 import java.util.ArrayList;
@@ -57,8 +57,8 @@ public class MuleConnectorOperationLocator implements ConnectorOperationLocator,
   }
 
   @Override
-  public MessageProcessor locateConnectorOperation(String url, OperationOptions operationOptions,
-                                                   MessageExchangePattern exchangePattern)
+  public Processor locateConnectorOperation(String url, OperationOptions operationOptions,
+                                            MessageExchangePattern exchangePattern)
       throws MuleException {
     for (ConnectorOperationProvider connectorOperationProvider : connectorOperationProviders) {
       if (connectorOperationProvider.supportsUrl(url)) {

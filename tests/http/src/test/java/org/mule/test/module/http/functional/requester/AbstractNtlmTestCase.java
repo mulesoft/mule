@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.NetworkUtils;
 
 import com.ning.http.client.ntlm.NTLMEngine;
@@ -86,7 +86,7 @@ public abstract class AbstractNtlmTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void validNtlmAuth() throws Exception {
-    MuleMessage response = runFlow(getFlowName()).getMessage();
+    InternalMessage response = runFlow(getFlowName()).getMessage();
 
     assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_OK));
     assertThat(getPayloadAsString(response), equalTo(AUTHORIZED));

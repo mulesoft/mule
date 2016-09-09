@@ -9,7 +9,7 @@ package org.mule.runtime.module.xml.transformers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.xml.util.XMLTestUtils;
 
@@ -28,7 +28,7 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase {
 
   @Test
   public void xmlSourceParam() throws Exception {
-    MuleEvent event = flowRunner("xmlSourceParam").withPayload(XMLTestUtils.toSource("simple.xml"))
+    Event event = flowRunner("xmlSourceParam").withPayload(XMLTestUtils.toSource("simple.xml"))
         .withFlowVariable("xml", XMLTestUtils.toSource("test.xml")).run();
 
     assertExpected(event);
@@ -36,13 +36,13 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase {
 
   @Test
   public void xmlStringParam() throws Exception {
-    MuleEvent event = flowRunner("xmlStringParam").withPayload(XMLTestUtils.toSource("simple.xml"))
+    Event event = flowRunner("xmlStringParam").withPayload(XMLTestUtils.toSource("simple.xml"))
         .withFlowVariable("xml", XMLTestUtils.toSource("test.xml")).run();
 
     assertExpected(event);
   }
 
-  private void assertExpected(MuleEvent event) throws Exception {
+  private void assertExpected(Event event) throws Exception {
     assertThat(XMLUnit.compareXML(event.getMessage().getPayload().toString(), EXPECTED).similar(), is(true));
   }
 

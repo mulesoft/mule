@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -45,7 +45,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase {
   @Ignore("MULE-6926: Flaky Test")
   @Test
   public void testProxyEnvelope() throws Exception {
-    MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-envelope");
+    InternalMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-envelope");
     assertFalse(getPayloadAsString(result).contains("Fault"));
     assertTrue(getPayloadAsString(result).contains("joe"));
   }
@@ -53,17 +53,17 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase {
   @Ignore("MULE-6926: Flaky Test")
   @Test
   public void testProxyBody() throws Exception {
-    MuleMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-body");
+    InternalMessage result = sendRequest("http://localhost:" + dynamicPort.getNumber() + "/proxy-body");
 
     assertFalse(getPayloadAsString(result).contains("Fault"));
     assertFalse(getPayloadAsString(result).contains("joe"));
   }
 
-  protected MuleMessage sendRequest(String url) throws MuleException {
+  protected InternalMessage sendRequest(String url) throws MuleException {
     InputStream stream = getClass().getResourceAsStream(getMessageResource());
     assertNotNull(stream);
 
-    return muleContext.getClient().send(url, MuleMessage.builder().payload(stream).build(), HTTP_REQUEST_OPTIONS).getRight();
+    return muleContext.getClient().send(url, InternalMessage.builder().payload(stream).build(), HTTP_REQUEST_OPTIONS).getRight();
   }
 
   protected String getMessageResource() {

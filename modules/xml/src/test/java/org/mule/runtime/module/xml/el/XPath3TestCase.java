@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.xml.xpath.XPathReturnType;
 import org.mule.runtime.core.util.IOUtils;
@@ -96,8 +96,8 @@ public class XPath3TestCase extends FunctionalTestCase {
 
   @Test
   public void payloadConsumed() throws Exception {
-    MuleEvent event = flowRunner("payloadConsumed").withPayload(getOthello()).run();
-    assertThat((String) event.getFlowVariable("result"), equalTo("3556"));
+    Event event = flowRunner("payloadConsumed").withPayload(getOthello()).run();
+    assertThat((String) event.getVariable("result"), equalTo("3556"));
     assertThat(event.getMessage().getPayload(), instanceOf(Node.class));
   }
 

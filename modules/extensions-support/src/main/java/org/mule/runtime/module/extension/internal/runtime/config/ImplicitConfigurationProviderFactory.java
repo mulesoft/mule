@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -24,11 +24,11 @@ public interface ImplicitConfigurationProviderFactory {
    * Creates an implicit configuration provider
    *
    * @param extensionModel the {@link ExtensionModel} from which a {@link ConfigurationModel} is to be selected
-   * @param muleEvent the current {@link MuleEvent}
+   * @param muleEvent the current {@link Event}
    * @param muleContext the Mule node.
    * @return a {@link ConfigurationProvider}
    * @throws IllegalStateException if it's not possible to create an implicit configuration automatically
    */
-  ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel, MuleEvent muleEvent,
+  ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel, Event muleEvent,
                                                             MuleContext muleContext);
 }

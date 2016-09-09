@@ -12,8 +12,8 @@ import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 import org.junit.Test;
@@ -25,14 +25,14 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractMessagePro
     InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
     InboundExceptionDetailsMessageProcessor mp = new InboundExceptionDetailsMessageProcessor(endpoint.getConnector());
     mp.setMuleContext(muleContext);
-    MuleEvent event = createTestInboundEvent(endpoint);
+    Event event = createTestInboundEvent(endpoint);
 
     RuntimeException exception = new RuntimeException();
-    event = MuleEvent.builder(event)
-        .message(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+    event = Event.builder(event)
+        .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .error(createErrorMock(exception)).build();
 
-    MuleEvent result = mp.process(event);
+    Event result = mp.process(event);
 
     assertNotNull(result);
     final int status = result.getMessage().getOutboundProperty("status", 0);

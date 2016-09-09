@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -33,7 +33,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
   @Test
   public void testRequestUsingLoopbackAddressAtLoopbackAddress() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result;
+    InternalMessage result;
 
     // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
     result = client.send(getTransportName() + "://127.0.0.1:" + dynamicPort1.getNumber(), TEST_MESSAGE, null).getRight();
@@ -43,7 +43,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
   @Test
   public void testRequestUsingLocalhostAtLocalhost() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result;
+    InternalMessage result;
 
     // Request using localhost address at endpoint listening at localhost should get an appropiate response.
     result = client.send(getTransportName() + "://localhost:" + dynamicPort2.getNumber(), TEST_MESSAGE, null).getRight();
@@ -53,7 +53,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
   @Test
   public void testRequestUsingLoopbackAddressAtAllAddresses() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result;
+    InternalMessage result;
 
     // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
     result = client.send(getTransportName() + "://127.0.0.1:" + dynamicPort3.getNumber(), TEST_MESSAGE, null).getRight();
@@ -63,7 +63,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
   @Test
   public void testRequestNotUsingLoopbackAddressAtLoopbackAddress() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result;
+    InternalMessage result;
 
     // Iterate over local addresses.
     for (InetAddress inetAddress : localInetAddresses) {
@@ -82,7 +82,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
   @Test
   public void testRequestNotUsingLoopbackAddressAtAllAddresses() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result;
+    InternalMessage result;
 
     // Iterate over local addresses.
     for (InetAddress inetAddress : localInetAddresses) {

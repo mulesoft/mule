@@ -7,10 +7,10 @@
 package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.runtime.module.xml.util.XMLUtils;
 
@@ -39,12 +39,12 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset encoding) throws TransformerException {
     Object src = event.getMessage().getPayload();
     try {
       XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), src);
       if (xsr == null) {
-        throw new TransformerException(MessageFactory
+        throw new TransformerException(I18nMessageFactory
             .createStaticMessage("Unable to convert " + src.getClass() + " to XMLStreamReader."), this);
       }
 

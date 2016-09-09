@@ -10,7 +10,7 @@ import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.routing.ScatterGatherRouter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -48,7 +48,7 @@ public class ScatterGatherOneRouteTest extends AbstractMuleTestCase {
   @Test(expected = InitialisationException.class)
   public void oneRouteProgramatically() throws Exception {
     ScatterGatherRouter sc = new ScatterGatherRouter();
-    sc.setRoutes(Collections.<MessageProcessor>emptyList());
+    sc.setRoutes(Collections.<Processor>emptyList());
 
     try {
       sc.initialise();

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -295,7 +295,8 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(pathName).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName), e);
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to create a canonical file for " + pathName),
+                                     e);
     }
   }
 
@@ -311,7 +312,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(uri).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Unable to create a canonical file for " + uri), e);
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Unable to create a canonical file for " + uri), e);
     }
   }
 
@@ -327,7 +328,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(parent, child).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
     }
   }
@@ -344,7 +345,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     try {
       return new File(parent, child).getCanonicalFile();
     } catch (IOException e) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage("Unable to create a canonical file for parent: " + parent + " and child: " + child), e);
     }
   }

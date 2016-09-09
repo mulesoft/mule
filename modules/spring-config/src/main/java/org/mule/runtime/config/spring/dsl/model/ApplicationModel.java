@@ -17,7 +17,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceInfoProvider.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.to;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.pluralize;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
@@ -276,16 +276,14 @@ public class ApplicationModel {
   }
 
   /**
-   * Creates the effective application model to be used to generate
-   * the runtime objects of the mule configuration.
+   * Creates the effective application model to be used to generate the runtime objects of the mule configuration.
    */
   private void createEffectiveModel() {
     processSourcesRedeliveryPolicy();
   }
 
   /**
-   * Process from any message source the redelivery-policy to make it part of the final
-   * pipeline.
+   * Process from any message source the redelivery-policy to make it part of the final pipeline.
    */
   private void processSourcesRedeliveryPolicy() {
     executeOnEveryFlow(flowComponentModel -> {

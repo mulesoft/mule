@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
@@ -35,28 +35,28 @@ public class GlobalInterceptingMessageProcessorsTestCase extends AbstractIntegra
   public void testConfig() throws Exception {
     Flow flow1 = muleContext.getRegistry().lookupObject("flow1");
     assertNotNull(flow1);
-    List<MessageProcessor> mpList = flow1.getMessageProcessors();
+    List<Processor> mpList = flow1.getMessageProcessors();
 
-    MessageProcessor mp1 = muleContext.getRegistry().lookupObject("idempotentFilter");
+    Processor mp1 = muleContext.getRegistry().lookupObject("idempotentFilter");
     assertTrue(mp1 instanceof IdempotentMessageFilter);
     IdempotentMessageFilter imf = (IdempotentMessageFilter) mp1;
     assertEquals(imf.getIdExpression(), "#[payload:]");
     assertMpPresent(mpList, mp1, IdempotentMessageFilter.class);
 
-    MessageProcessor mp2 = muleContext.getRegistry().lookupObject("messageFilter");
+    Processor mp2 = muleContext.getRegistry().lookupObject("messageFilter");
     assertTrue(mp2 instanceof MessageFilter);
     MessageFilter mf = (MessageFilter) mp2;
     assertTrue(mf.getFilter() instanceof WildcardFilter);
     assertFalse(mf.isThrowOnUnaccepted());
     assertMpPresent(mpList, mp2, MessageFilter.class);
 
-    MessageProcessor mp3 = muleContext.getRegistry().lookupObject("idempotentSecureHashMessageFilter");
+    Processor mp3 = muleContext.getRegistry().lookupObject("idempotentSecureHashMessageFilter");
     assertTrue(mp3 instanceof IdempotentSecureHashMessageFilter);
     IdempotentSecureHashMessageFilter ishmf = (IdempotentSecureHashMessageFilter) mp3;
     assertEquals(ishmf.getMessageDigestAlgorithm(), "MDA5");
     assertMpPresent(mpList, mp3, IdempotentSecureHashMessageFilter.class);
 
-    MessageProcessor mp4 = muleContext.getRegistry().lookupObject("combineCollectionsTransformer");
+    Processor mp4 = muleContext.getRegistry().lookupObject("combineCollectionsTransformer");
     assertTrue(mp4 instanceof CombineCollectionsTransformer);
     assertMpPresent(mpList, mp4, CombineCollectionsTransformer.class);
   }
@@ -65,10 +65,10 @@ public class GlobalInterceptingMessageProcessorsTestCase extends AbstractIntegra
    * Check that the list of message processors contains a duplicate of the MP looked up in the registry (ie. that the MP is a
    * prototype, not a singleton)
    */
-  private void assertMpPresent(List<MessageProcessor> mpList, MessageProcessor mp, Class<?> clazz) {
+  private void assertMpPresent(List<Processor> mpList, Processor mp, Class<?> clazz) {
     assertFalse(mpList.contains(mp));
 
-    for (MessageProcessor theMp : mpList) {
+    for (Processor theMp : mpList) {
       if (clazz.isInstance(theMp)) {
         return;
       }

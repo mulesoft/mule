@@ -35,8 +35,8 @@ public class QueryTemplate {
    * Creates a static SQL query template.
    *
    * @param sqlText sql text containing placeholders for each input and output parameter.
-   * @param type    the type of SQL query.
-   * @param params  parameters definitions for the query. Non null
+   * @param type the type of SQL query.
+   * @param params parameters definitions for the query. Non null
    */
   public QueryTemplate(String sqlText, QueryType type, List<QueryParam> params) {
     this(sqlText, type, params, false);
@@ -46,8 +46,8 @@ public class QueryTemplate {
    * Creates a SQL query template.
    *
    * @param sqlText sql text containing placeholders for each input and output parameter.
-   * @param type    the type of SQL query.
-   * @param params  parameters definitions for the query. Non null
+   * @param type the type of SQL query.
+   * @param params parameters definitions for the query. Non null
    * @param dynamic indicates whether or not the query is dynamic
    */
   public QueryTemplate(String sqlText, QueryType type, List<QueryParam> params, boolean dynamic) {
@@ -64,6 +64,7 @@ public class QueryTemplate {
 
   /**
    * Creates a SQL template from another query template
+   * 
    * @param source query template to clone
    */
   public QueryTemplate(QueryTemplate source) {
@@ -135,8 +136,8 @@ public class QueryTemplate {
   /**
    * Indicates whether or not the query is dynamic.
    * <p/>
-   * A query is dynamic when the effective SQL text that will be used to execute it will
-   * be resolved on runtime depending on external information.
+   * A query is dynamic when the effective SQL text that will be used to execute it will be resolved on runtime depending on
+   * external information.
    */
   public boolean isDynamic() {
     return dynamic;
@@ -145,8 +146,7 @@ public class QueryTemplate {
   /**
    * Indicates whether or not the query uses named parameters.
    *
-   * @return true if the query uses named parameters, false if there are
-   * inline or no parameters
+   * @return true if the query uses named parameters, false if there are inline or no parameters
    */
   public boolean usesNamedParameters() {
     return namedParams;

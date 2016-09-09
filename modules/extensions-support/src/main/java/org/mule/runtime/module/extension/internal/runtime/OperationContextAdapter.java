@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
@@ -29,9 +29,9 @@ import java.util.Optional;
 public interface OperationContextAdapter extends OperationContext {
 
   /**
-   * Returns the {@link MuleEvent} on which an operation is to be executed
+   * Returns the {@link Event} on which an operation is to be executed
    */
-  MuleEvent getEvent();
+  Event getEvent();
 
   /**
    * Returns the value associated with the {@code key}

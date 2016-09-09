@@ -10,7 +10,7 @@ import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.List;
@@ -31,23 +31,23 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
 
   protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
 
-  protected MessageProcessor responseProcessor;
+  protected Processor responseProcessor;
 
   public ResponseMessageProcessorAdapter() {
     super();
   }
 
-  public ResponseMessageProcessorAdapter(MessageProcessor responseProcessor) {
+  public ResponseMessageProcessorAdapter(Processor responseProcessor) {
     super();
     this.responseProcessor = responseProcessor;
   }
 
-  public void setProcessor(MessageProcessor processor) {
+  public void setProcessor(Processor processor) {
     this.responseProcessor = processor;
   }
 
   @Override
-  protected MuleEvent processResponse(MuleEvent response, final MuleEvent request) throws MuleException {
+  protected Event processResponse(Event response, final Event request) throws MuleException {
     if (responseProcessor == null || !isEventValid(response)) {
       return response;
     } else {
@@ -58,13 +58,13 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
 
   class CopyOnNullNonBlockingProcessorExecutor extends NonBlockingProcessorExecutor {
 
-    public CopyOnNullNonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
+    public CopyOnNullNonBlockingProcessorExecutor(Event event, List<Processor> processors,
                                                   MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent) {
       super(event, processors, executionTemplate, copyOnVoidEvent, flowConstruct);
     }
 
     @Override
-    protected boolean isUseEventCopy(MuleEvent result) {
+    protected boolean isUseEventCopy(Event result) {
       return super.isUseEventCopy(result) || result == null;
     }
   }

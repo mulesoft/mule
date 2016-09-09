@@ -6,25 +6,24 @@
  */
 package org.mule.runtime.core.el.context;
 
+import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+
 import java.io.Serializable;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 
-import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.Correlation;
-
 /**
  * Exposes information about the current Mule message:
  *
- * <li> <b>correlationId</b>         <i>The message correlationId.</i>
- * <li> <b>correlationSequence</b>   <i>The message correlation sequence number.</i>
- * <li> <b>correlationGroupSize</b>  <i>The message correlation group size.</i>
+ * <li><b>correlationId</b> <i>The message correlationId.</i>
+ * <li><b>correlationSequence</b> <i>The message correlation sequence number.</i>
+ * <li><b>correlationGroupSize</b> <i>The message correlation group size.</i>
  * <li><b>dataType</b> <i>The message data type (org.mule.runtime.core.api.transformer.DataType).</i>
  * <li><b>replyTo</b> <i>The message reply to destination. (mutable)</i>
  * <li><b>payload</b> <i>The message payload (mutable). You can also use message.payloadAs(Class clazz). Note: If the message
@@ -36,11 +35,11 @@ import org.mule.runtime.core.message.Correlation;
  */
 public class MessageContext {
 
-  private MuleEvent event;
-  private MuleEvent.Builder eventBuilder;
+  private Event event;
+  private Event.Builder eventBuilder;
   private MuleContext muleContext;
 
-  public MessageContext(MuleEvent event, MuleEvent.Builder eventBuilder, MuleContext muleContext) {
+  public MessageContext(Event event, Event.Builder eventBuilder, MuleContext muleContext) {
     this.event = event;
     this.eventBuilder = eventBuilder;
     this.muleContext = muleContext;
@@ -51,11 +50,11 @@ public class MessageContext {
   }
 
   public int getCorrelationSequence() {
-    return event.getCorrelation().getSequence().orElse(-1);
+    return event.getGroupCorrelation().getSequence().orElse(-1);
   }
 
   public int getCorrelationGroupSize() {
-    return event.getCorrelation().getSequence().orElse(-1);
+    return event.getGroupCorrelation().getSequence().orElse(-1);
   }
 
   public DataType getDataType() {
@@ -93,7 +92,7 @@ public class MessageContext {
   }
 
   public void setPayload(Object payload) {
-    eventBuilder.message(MuleMessage.builder(event.getMessage()).payload(payload).build());
+    eventBuilder.message(InternalMessage.builder(event.getMessage()).payload(payload).build());
     event = eventBuilder.build();
 
   }

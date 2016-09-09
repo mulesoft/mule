@@ -9,9 +9,9 @@ package org.mule.runtime.module.ws.consumer;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
@@ -39,13 +39,13 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
 
   @Override
   public void handleMessage(SoapMessage message) throws Fault {
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
 
     if (event == null || event instanceof NonBlockingVoidMuleEvent) {
       return;
     }
 
-    final Builder builder = MuleMessage.builder(event.getMessage());
+    final Builder builder = InternalMessage.builder(event.getMessage());
 
     for (Header header : message.getHeaders()) {
       if (header instanceof SoapHeader) {
@@ -66,7 +66,7 @@ public class OutputSoapHeadersInterceptor extends AbstractSoapInterceptor {
         }
       }
     }
-    final MuleEvent built = MuleEvent.builder(event).message(builder.build()).build();
+    final Event built = Event.builder(event).message(builder.build()).build();
     message.getExchange().put(CxfConstants.MULE_EVENT, built);
   }
 }

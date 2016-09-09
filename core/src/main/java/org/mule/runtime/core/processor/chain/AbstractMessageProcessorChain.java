@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -47,16 +47,16 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   protected final transient Logger log = LoggerFactory.getLogger(getClass());
   protected String name;
-  protected List<MessageProcessor> processors;
+  protected List<Processor> processors;
   protected FlowConstruct flowConstruct;
 
-  public AbstractMessageProcessorChain(String name, List<MessageProcessor> processors) {
+  public AbstractMessageProcessorChain(String name, List<Processor> processors) {
     this.name = name;
     this.processors = processors;
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (log.isDebugEnabled()) {
       log.debug(String.format("Invoking %s with event %s", this, event));
     }
@@ -67,11 +67,11 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     return doProcess(event);
   }
 
-  protected abstract MuleEvent doProcess(MuleEvent event) throws MuleException;
+  protected abstract Event doProcess(Event event) throws MuleException;
 
   @Override
   public void initialise() throws InitialisationException {
-    for (MessageProcessor processor : processors) {
+    for (Processor processor : processors) {
       // MULE-5002 TODO review MP Lifecycle
       initialiseIfNeeded(processor);
     }
@@ -79,9 +79,9 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void start() throws MuleException {
-    List<MessageProcessor> startedProcessors = new ArrayList<>();
+    List<Processor> startedProcessors = new ArrayList<>();
     try {
-      for (MessageProcessor processor : processors) {
+      for (Processor processor : processors) {
         if (processor instanceof Startable) {
           ((Startable) processor).start();
           startedProcessors.add(processor);
@@ -93,8 +93,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     }
   }
 
-  private void stop(List<MessageProcessor> processorsToStop) throws MuleException {
-    for (MessageProcessor processor : processorsToStop) {
+  private void stop(List<Processor> processorsToStop) throws MuleException {
+    for (Processor processor : processorsToStop) {
       if (processor instanceof Stoppable) {
         ((Stoppable) processor).stop();
       }
@@ -108,7 +108,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void dispose() {
-    for (MessageProcessor processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof Disposable) {
         ((Disposable) processor).dispose();
       }
@@ -118,7 +118,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    for (MessageProcessor processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof FlowConstructAware) {
         ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
       }
@@ -139,7 +139,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
       string.append(String.format(" '%s' ", name));
     }
 
-    Iterator<MessageProcessor> mpIterator = processors.iterator();
+    Iterator<Processor> mpIterator = processors.iterator();
 
     final String nl = String.format("%n");
 
@@ -147,7 +147,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     if (mpIterator.hasNext()) {
       string.append(String.format("%n[ "));
       while (mpIterator.hasNext()) {
-        MessageProcessor mp = mpIterator.next();
+        Processor mp = mpIterator.next();
         final String indented = StringUtils.replace(mp.toString(), nl, String.format("%n  "));
         string.append(String.format("%n  %s", indented));
         if (mpIterator.hasNext()) {
@@ -161,7 +161,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   }
 
   @Override
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return processors;
   }
 
@@ -173,7 +173,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    for (MessageProcessor processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof MessagingExceptionHandlerAware) {
         ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
       }
@@ -182,7 +182,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setMuleContext(MuleContext context) {
-    for (MessageProcessor processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof MuleContextAware) {
         ((MuleContextAware) processor).setMuleContext(context);
       }

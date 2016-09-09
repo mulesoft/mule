@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.context;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>MuleContextException</code> is thrown when an exception occurs with Mule Context objects
@@ -22,7 +22,7 @@ public class MuleContextException extends MuleException {
   /**
    * @param message the exception message
    */
-  public MuleContextException(Message message) {
+  public MuleContextException(I18nMessage message) {
     super(message);
   }
 
@@ -30,7 +30,7 @@ public class MuleContextException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public MuleContextException(Message message, Throwable cause) {
+  public MuleContextException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

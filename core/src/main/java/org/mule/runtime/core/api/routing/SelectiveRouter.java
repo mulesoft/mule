@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
@@ -16,13 +16,13 @@ import org.mule.runtime.core.api.routing.filter.Filter;
  * If the implementation supports the use of a default route then this will be used to route any events that don't match any other
  * routes.
  */
-public interface SelectiveRouter extends MessageProcessor {
+public interface SelectiveRouter extends Processor {
 
-  void addRoute(MessageProcessor processor, Filter filter);
+  void addRoute(Processor processor, Filter filter);
 
-  void updateRoute(MessageProcessor processor, Filter filter);
+  void updateRoute(Processor processor, Filter filter);
 
-  void removeRoute(MessageProcessor processor);
+  void removeRoute(Processor processor);
 
-  void setDefaultRoute(MessageProcessor processor);
+  void setDefaultRoute(Processor processor);
 }

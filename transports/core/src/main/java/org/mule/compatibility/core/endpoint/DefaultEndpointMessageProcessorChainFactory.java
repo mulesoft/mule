@@ -24,8 +24,8 @@ import org.mule.compatibility.core.endpoint.outbound.OutboundSessionHandlerMessa
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.EndpointTransactionalInterceptingMessageProcessor;
@@ -39,8 +39,8 @@ import java.util.List;
 public class DefaultEndpointMessageProcessorChainFactory implements EndpointMessageProcessorChainFactory {
 
   /** Override this method to change the default MessageProcessors. */
-  protected List<MessageProcessor> createInboundMessageProcessors(InboundEndpoint endpoint) {
-    List<MessageProcessor> list = new ArrayList<>();
+  protected List<Processor> createInboundMessageProcessors(InboundEndpoint endpoint) {
+    List<Processor> list = new ArrayList<>();
 
     list.add(new InboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
     list.add(new InboundEndpointPropertyMessageProcessor(endpoint));
@@ -51,8 +51,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
   }
 
   /** Override this method to change the default MessageProcessors. */
-  protected List<MessageProcessor> createInboundResponseMessageProcessors(InboundEndpoint endpoint) {
-    List<MessageProcessor> list = new ArrayList<>();
+  protected List<Processor> createInboundResponseMessageProcessors(InboundEndpoint endpoint) {
+    List<Processor> list = new ArrayList<>();
 
     list.add(new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()));
     list.add(new ReplyToPropertyRequestReplyReplier());
@@ -61,10 +61,10 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
   }
 
   /** Override this method to change the default MessageProcessors. */
-  protected List<MessageProcessor> createOutboundMessageProcessors(OutboundEndpoint endpoint) throws MuleException {
+  protected List<Processor> createOutboundMessageProcessors(OutboundEndpoint endpoint) throws MuleException {
     Connector connector = endpoint.getConnector();
 
-    List<MessageProcessor> list = new ArrayList<>();
+    List<Processor> list = new ArrayList<>();
 
     // Log but don't proceed if connector is not started
     list.add(new OutboundLoggingMessageProcessor());
@@ -83,13 +83,13 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
   }
 
   /** Override this method to change the default MessageProcessors. */
-  protected List<MessageProcessor> createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException {
+  protected List<Processor> createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException {
     return Collections.emptyList();
   }
 
   @Override
-  public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct,
-                                                             MessageProcessor target)
+  public Processor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct,
+                                                      Processor target)
       throws MuleException {
     // -- REQUEST CHAIN --
     DefaultMessageProcessorChainBuilder requestChainBuilder = new EndpointMessageProcessorChainBuilder(endpoint, flowConstruct);
@@ -105,7 +105,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
     // -- INVOKE FLOW --
     if (target == null) {
-      throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
+      throw new ConfigurationException(I18nMessageFactory
+          .createStaticMessage("No listener (target) has been set for this endpoint"));
     }
     requestChainBuilder.chain(target);
 
@@ -134,7 +135,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
   }
 
   @Override
-  public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target)
+  public Processor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, Processor target)
       throws MuleException {
     // -- REQUEST CHAIN --
     DefaultMessageProcessorChainBuilder requestChainBuilder = new OutboundEndpointMessageProcessorChainBuilder(endpoint);
@@ -147,7 +148,8 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
     // -- INVOKE MESSAGE DISPATCHER --
     if (target == null) {
-      throw new ConfigurationException(MessageFactory.createStaticMessage("No listener (target) has been set for this endpoint"));
+      throw new ConfigurationException(I18nMessageFactory
+          .createStaticMessage("No listener (target) has been set for this endpoint"));
     }
 
     if (!endpoint.getExchangePattern().hasResponse()) {

@@ -15,7 +15,7 @@ import static org.mule.functional.functional.FlowAssert.verify;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
@@ -102,7 +102,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
 
   @Test
   public void filterRejects() throws Exception {
-    MuleEvent result = flowRunner("filterRejects").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
+    Event result = flowRunner("filterRejects").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
         .nonBlocking().run();
     assertThat(result, is(nullValue()));
   }
@@ -115,7 +115,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
 
   @Test
   public void filterAfterNonBlockingRejects() throws Exception {
-    MuleEvent result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE)
+    Event result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
     assertThat(result, is(nullValue()));
   }
@@ -128,14 +128,14 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
 
   @Test
   public void filterBeforeNonBlockingRejects() throws Exception {
-    MuleEvent result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE)
+    Event result = flowRunner("filterAfterNonBlockingRejects").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void filterAfterEnricherBeforeNonBlocking() throws Exception {
-    MuleEvent result = flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE)
+    Event result = flowRunner("filterAfterEnricherBeforeNonBlocking").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
     assertThat(result, is(nullValue()));
   }
@@ -167,30 +167,30 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
 
   @Test
   public void responseWithNullEvent() throws Exception {
-    MuleEvent result = flowRunner("responseWithNullEvent").withPayload(TEST_MESSAGE)
+    Event result = flowRunner("responseWithNullEvent").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
     assertThat(result, is(nullValue()));
   }
 
   @Test
   public void enricherIssue() throws Exception {
-    MuleEvent result = flowRunner("enricherIssue").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
+    Event result = flowRunner("enricherIssue").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
         .nonBlocking().run();
     assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test
   public void enricherIssueNonBlocking() throws Exception {
-    MuleEvent result = flowRunner("enricherIssueNonBlocking").withPayload(TEST_MESSAGE)
+    Event result = flowRunner("enricherIssueNonBlocking").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
     assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test
   public void enricherFlowVar() throws Exception {
-    MuleEvent result = flowRunner("enricherFlowVar").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
+    Event result = flowRunner("enricherFlowVar").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
         .nonBlocking().run();
-    assertThat(result.getFlowVariable(FOO), is(equalTo(TEST_MESSAGE)));
+    assertThat(result.getVariable(FOO), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test

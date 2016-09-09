@@ -17,8 +17,8 @@ import org.junit.Test;
 
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
@@ -27,12 +27,11 @@ import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
- * Verify that no inbound messages are lost when exceptions occur.
- * The message must either make it all the way to the SEDA queue (in the case of
- * an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * Verify that no inbound messages are lost when exceptions occur. The message must either make it all the way to the SEDA queue
+ * (in the case of an asynchronous inbound endpoint), or be restored/rolled back at the source.
  * 
- * In the case of the HTTP transport, there is no way to restore the source message
- * so an exception is simply returned to the client.
+ * In the case of the HTTP transport, there is no way to restore the source message so an exception is simply returned to the
+ * client.
  */
 public class InboundMessageLossTestCase extends FunctionalTestCase {
 
@@ -118,10 +117,10 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
   public static class Handler extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(MessagingException ex, MuleEvent event) {
+    public Event handleException(MessagingException ex, Event event) {
       doHandleException(ex, event);
       ex.setHandled(true);
-      return MuleEvent.builder(event).message(MuleMessage.builder().payload("Success!").build()).build();
+      return Event.builder(event).message(InternalMessage.builder().payload("Success!").build()).build();
     }
   }
 
@@ -131,14 +130,14 @@ public class InboundMessageLossTestCase extends FunctionalTestCase {
   public static class BadHandler extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(MessagingException ex, MuleEvent event) {
+    public Event handleException(MessagingException ex, Event event) {
       doHandleException(ex, event);
       MessagingException exception = new MessagingException(event, new RuntimeException("Bad news!"));
-      MuleMessage message = MuleMessage.builder()
+      InternalMessage message = InternalMessage.builder()
           .nullPayload()
           .exceptionPayload(new DefaultExceptionPayload(exception))
           .build();
-      return MuleEvent.builder(event).message(message).build();
+      return Event.builder(event).message(message).build();
     }
   }
 }

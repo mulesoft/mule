@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.xml.util;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.stax.DelegateXMLStreamReader;
@@ -231,8 +231,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
    * @return null if no XMLStreamReader can be created for the object type
    * @throws XMLStreamException
    * @deprecated As of 3.7.0, use
-   *             {@link #toXMLStreamReader(javax.xml.stream.XMLInputFactory, org.mule.runtime.core.api.MuleEvent, Object)}
-   *             instead.
+   *             {@link #toXMLStreamReader(javax.xml.stream.XMLInputFactory, org.mule.runtime.core.api.Event, Object)} instead.
    */
   @Deprecated
   public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, Object obj)
@@ -246,7 +245,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
    * @return null if no XMLStreamReader can be created for the object type
    * @throws XMLStreamException
    */
-  public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, MuleEvent event,
+  public static javax.xml.stream.XMLStreamReader toXMLStreamReader(javax.xml.stream.XMLInputFactory factory, Event event,
                                                                    Object obj)
       throws XMLStreamException {
     if (obj instanceof javax.xml.stream.XMLStreamReader) {
@@ -363,14 +362,14 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
     }
   }
 
-  public static Node toDOMNode(Object src, MuleEvent event) throws Exception {
+  public static Node toDOMNode(Object src, Event event) throws Exception {
     DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
     builderFactory.setNamespaceAware(true);
 
     return toDOMNode(src, event, builderFactory);
   }
 
-  public static Node toDOMNode(Object src, MuleEvent event, DocumentBuilderFactory factory) throws Exception {
+  public static Node toDOMNode(Object src, Event event, DocumentBuilderFactory factory) throws Exception {
     if (src instanceof Node) {
       return (Node) src;
     } else if (src instanceof InputSource) {
@@ -590,7 +589,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
   public static List<Node> select(String xpath, Node node) throws XPathExpressionException {
     XPath xp = createXPath(node);
     NodeList nl = (NodeList) xp.evaluate(xpath, node, XPathConstants.NODESET);
-    List<Node> nodeList = new ArrayList<Node>(nl.getLength());
+    List<Node> nodeList = new ArrayList<>(nl.getLength());
     for (int i = 0; i < nl.getLength(); i++) {
       nodeList.add(nl.item(i));
     }
@@ -626,7 +625,7 @@ public class XMLUtils extends org.mule.runtime.core.util.XMLUtils {
 
     @Override
     public Iterator<String> getPrefixes(String namespaceURI) {
-      List<String> list = new ArrayList<String>();
+      List<String> list = new ArrayList<>();
       list.add(getPrefix(namespaceURI));
       return list.iterator();
     }

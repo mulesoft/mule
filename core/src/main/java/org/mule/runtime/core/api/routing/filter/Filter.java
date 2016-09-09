@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.api.routing.filter;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 /**
- * The <code>Filter</code> interface allows MuleMessage filtering.
+ * The <code>Filter</code> interface allows Message filtering.
  */
 
 public interface Filter {
@@ -26,7 +26,7 @@ public interface Filter {
    *         will be removed when filters are cleaned up.
    */
   @Deprecated
-  boolean accept(MuleMessage message, MuleEvent.Builder builder);
+  boolean accept(InternalMessage message, Event.Builder builder);
 
   /**
    * Checks a given event against this filter.
@@ -37,7 +37,7 @@ public interface Filter {
    * @param builder an event builder in case the filter needs to make changes to the event.
    * @return <code>true</code> if the event matches the filter
    */
-  default boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  default boolean accept(Event event, Event.Builder builder) {
     return accept(event.getMessage(), builder);
   }
 

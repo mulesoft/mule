@@ -11,12 +11,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -39,22 +39,22 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MuleMessage message1 = MuleMessage.of("test event A");
-    MuleMessage message2 = MuleMessage.of("test event B");
-    MuleMessage message3 = MuleMessage.of("test event C");
+    InternalMessage message1 = InternalMessage.of("test event A");
+    InternalMessage message2 = InternalMessage.of("test event B");
+    InternalMessage message3 = InternalMessage.of("test event C");
 
-    MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
 
-    MuleEvent event1 = MuleEvent.builder(context).message(message1).correlation(new Correlation(3, null)).flow(getTestFlow())
+    Event event1 = Event.builder(context).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(getTestFlow())
         .session(session).build();
-    MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(getTestFlow()).session(session).build();
-    MuleEvent event3 = MuleEvent.builder(context).message(message3).flow(getTestFlow()).session(session).build();
+    Event event2 = Event.builder(context).message(message2).flow(getTestFlow()).session(session).build();
+    Event event3 = Event.builder(context).message(message3).flow(getTestFlow()).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
-    MuleEvent resultEvent = router.process(event3);
+    Event resultEvent = router.process(event3);
     assertNotNull(resultEvent);
-    MuleMessage resultMessage = resultEvent.getMessage();
+    InternalMessage resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
     String payload = getPayloadAsString(resultMessage);
 

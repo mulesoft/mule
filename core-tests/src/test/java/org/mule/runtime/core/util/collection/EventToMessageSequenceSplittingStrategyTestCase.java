@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.routing.MessageSequence;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -34,7 +34,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class EventToMessageSequenceSplittingStrategyTestCase extends AbstractMuleTestCase {
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleEvent event;
+  private Event event;
 
   private EventToMessageSequenceSplittingStrategy strategy = new EventToMessageSequenceSplittingStrategy();
   private Collection<String> testCollection = Arrays.asList("Apple", "Banana", "Kiwi");

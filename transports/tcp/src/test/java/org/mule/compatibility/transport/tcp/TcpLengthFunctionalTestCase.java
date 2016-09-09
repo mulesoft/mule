@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -43,7 +43,7 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
+    InternalMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
   }
 

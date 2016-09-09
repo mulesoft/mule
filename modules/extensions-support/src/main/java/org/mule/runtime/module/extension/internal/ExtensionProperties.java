@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal;
 
 import static org.mule.runtime.core.api.config.MuleProperties.PROPERTY_PREFIX;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
@@ -43,8 +43,8 @@ public class ExtensionProperties {
 
   /**
    * The name of a synthetic parameter that's automatically added to all non void operations. The meaning of it is requesting the
-   * runtime to place the resulting {@link MuleMessage} on a flowVar pointed by this parameter instead of replacing the message
-   * carried by the {@link MuleEvent} that's travelling through the pipeline
+   * runtime to place the resulting {@link Message} on a flowVar pointed by this parameter instead of replacing the message
+   * carried by the {@link Event} that's travelling through the pipeline
    */
   public static final String TARGET_ATTRIBUTE = "target";
 

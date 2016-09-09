@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * TODO document
@@ -23,22 +23,22 @@ public class AggregationException extends RoutingException {
 
   private EventGroup eventGroup = null;
 
-  public AggregationException(EventGroup eventGroup, MessageProcessor endpoint) {
+  public AggregationException(EventGroup eventGroup, Processor endpoint) {
     super(endpoint);
     this.eventGroup = eventGroup;
   }
 
-  public AggregationException(EventGroup eventGroup, MessageProcessor endpoint, Throwable cause) {
+  public AggregationException(EventGroup eventGroup, Processor endpoint, Throwable cause) {
     super(endpoint, cause);
     this.eventGroup = eventGroup;
   }
 
-  public AggregationException(Message message, EventGroup eventGroup, MessageProcessor endpoint) {
+  public AggregationException(I18nMessage message, EventGroup eventGroup, Processor endpoint) {
     super(message, endpoint);
     this.eventGroup = eventGroup;
   }
 
-  public AggregationException(Message message, EventGroup eventGroup, MessageProcessor endpoint, Throwable cause) {
+  public AggregationException(I18nMessage message, EventGroup eventGroup, Processor endpoint, Throwable cause) {
     super(message, endpoint, cause);
     this.eventGroup = eventGroup;
   }

@@ -7,22 +7,22 @@
 package org.mule.runtime.module.json.validation;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link MessageProcessor} that uses a {@link JsonSchemaValidator} to validate a json in the payload to a given schema
+ * A {@link Processor} that uses a {@link JsonSchemaValidator} to validate a json in the payload to a given schema
  *
  * @since 3.6.0
  */
-public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware {
+public class ValidateJsonSchemaMessageProcessor implements Processor, Initialisable, MuleContextAware {
 
   private String schemaLocation;
   private JsonSchemaDereferencing dereferencing = JsonSchemaDereferencing.CANONICAL;
@@ -38,7 +38,7 @@ public class ValidateJsonSchemaMessageProcessor implements MessageProcessor, Ini
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return validator.validate(event, muleContext);
   }
 

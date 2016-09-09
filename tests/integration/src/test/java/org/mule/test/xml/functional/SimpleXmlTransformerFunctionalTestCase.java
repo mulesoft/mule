@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class SimpleXmlTransformerFunctionalTestCase extends AbstractIntegrationT
   }
 
   protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException {
-    MuleMessage message = client.request(endpoint, RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = client.request(endpoint, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
     assertNotNull(message.getPayload());
     assertThat(message.getDataType().getType().getName(), message.getPayload(), instanceOf(clazz));

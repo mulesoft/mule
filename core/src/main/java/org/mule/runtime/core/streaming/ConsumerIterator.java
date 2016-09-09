@@ -15,9 +15,9 @@ import java.util.Iterator;
 /**
  * Implementation of {@link Iterator} that takes its elements from a {@link Consumer}.
  * <p>
- * This iterator also implements {@link Closeable}. Closing this iterator will cause the underlying consumer to be closed.
- * If for any reason the underlying consumer gets closed (either because this iterator closed it or some other reason),
- * then this iterator will consider that it has no more items.
+ * This iterator also implements {@link Closeable}. Closing this iterator will cause the underlying consumer to be closed. If for
+ * any reason the underlying consumer gets closed (either because this iterator closed it or some other reason), then this
+ * iterator will consider that it has no more items.
  * <p>
  * The {@link Iterator#remove()} operation is not allowed on this instance
  *

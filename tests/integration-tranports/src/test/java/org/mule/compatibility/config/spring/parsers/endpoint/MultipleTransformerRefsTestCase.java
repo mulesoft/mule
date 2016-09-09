@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.util.List;
@@ -21,8 +21,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * This really tests the handling of multiple references in
- * {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
+ * This really tests the handling of multiple references in {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}
  */
 @Ignore("MULE-10226 - To be fixed once mule transports parsers are migrated to new parsing method")
 public class MultipleTransformerRefsTestCase extends AbstractEndpointTestCase {
@@ -35,7 +34,7 @@ public class MultipleTransformerRefsTestCase extends AbstractEndpointTestCase {
   @Test
   public void testMultipleRefs() throws MuleException {
     ImmutableEndpoint endpoint = doTest("many");
-    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    List<Processor> transformers = endpoint.getMessageProcessors();
     assertNotNull(transformers);
     // this lets us check ordering before size, safely, which is useful on failure
     assertTrue(transformers.size() > 0);
@@ -49,7 +48,7 @@ public class MultipleTransformerRefsTestCase extends AbstractEndpointTestCase {
   @Test
   public void testSingleRef() throws MuleException {
     ImmutableEndpoint endpoint = doTest("single");
-    List<MessageProcessor> transformers = endpoint.getMessageProcessors();
+    List<Processor> transformers = endpoint.getMessageProcessors();
     assertNotNull(transformers);
     assertEquals(1, transformers.size());
     assertEquals("a", ((Transformer) transformers.get(0)).getName());

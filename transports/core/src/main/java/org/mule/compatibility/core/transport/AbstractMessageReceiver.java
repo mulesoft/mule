@@ -8,7 +8,7 @@ package org.mule.compatibility.core.transport;
 
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.runtime.core.DefaultMessageContext.create;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
@@ -20,15 +20,15 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -36,7 +36,7 @@ import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -65,10 +65,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   protected FlowConstruct flowConstruct;
 
   /**
-   * {@link MessageProcessor} chain used to process messages once the transport specific {@link MessageReceiver} has received
-   * transport message and created the {@link MuleEvent}
+   * {@link Processor} chain used to process messages once the transport specific {@link MessageReceiver} has received
+   * transport message and created the {@link Event}
    */
-  protected MessageProcessor listener;
+  protected Processor listener;
 
   /**
    * Stores the key to this receiver, as used by the Connector to store the receiver.
@@ -160,35 +160,35 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   }
 
   @Override
-  public final MuleEvent routeMessage(MuleCompatibilityMessage message) throws MuleException {
+  public final Event routeMessage(CompatibilityMessage message) throws MuleException {
     Transaction tx = TransactionCoordination.getInstance().getTransaction();
     return routeMessage(message, tx, null);
   }
 
   @Override
-  public final MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans) throws MuleException {
+  public final Event routeMessage(CompatibilityMessage message, Transaction trans) throws MuleException {
     return routeMessage(message, trans, null);
   }
 
   @Override
-  public final MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans, OutputStream outputStream)
+  public final Event routeMessage(CompatibilityMessage message, Transaction trans, OutputStream outputStream)
       throws MuleException {
     return routeMessage(message, new DefaultMuleSession(), trans, outputStream);
   }
 
-  public final MuleEvent routeMessage(MuleCompatibilityMessage message,
-                                      MuleSession session,
-                                      Transaction trans,
-                                      OutputStream outputStream)
+  public final Event routeMessage(CompatibilityMessage message,
+                                  MuleSession session,
+                                  Transaction trans,
+                                  OutputStream outputStream)
       throws MuleException {
     return routeMessage(message, session, outputStream);
   }
 
-  public final MuleEvent routeMessage(MuleCompatibilityMessage message, MuleSession session, OutputStream outputStream)
+  public final Event routeMessage(CompatibilityMessage message, MuleSession session, OutputStream outputStream)
       throws MuleException {
     message = warnIfMuleClientSendUsed(message);
 
-    MuleEvent muleEvent = createMuleEvent(message, outputStream);
+    Event muleEvent = createMuleEvent(message, outputStream);
 
     if (!endpoint.isDisableTransportTransformer()) {
       muleEvent = applyInboundTransformers(muleEvent);
@@ -197,7 +197,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return routeEvent(muleEvent);
   }
 
-  protected MuleCompatibilityMessage warnIfMuleClientSendUsed(MuleCompatibilityMessage message) {
+  protected CompatibilityMessage warnIfMuleClientSendUsed(CompatibilityMessage message) {
     MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(message);
     final Object remoteSyncProperty = message.getInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     messageBuilder.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
@@ -209,20 +209,20 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return messageBuilder.build();
   }
 
-  protected MuleEvent applyInboundTransformers(MuleEvent event) throws MuleException {
-    return MuleEvent.builder(event)
+  protected Event applyInboundTransformers(Event event) throws MuleException {
+    return Event.builder(event)
         .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultInboundTransformers))
         .build();
 
   }
 
-  protected MuleEvent applyResponseTransformers(MuleEvent event) throws MuleException {
-    return MuleEvent.builder(event)
+  protected Event applyResponseTransformers(Event event) throws MuleException {
+    return Event.builder(event)
         .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultResponseTransformers))
         .build();
   }
 
-  protected MuleMessage handleUnacceptedFilter(MuleMessage message) {
+  protected InternalMessage handleUnacceptedFilter(InternalMessage message) {
     if (logger.isDebugEnabled()) {
       logger.debug("Message " + message + " failed to pass filter on endpoint: " + endpoint
           + ". Message is being ignored");
@@ -230,9 +230,9 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return message;
   }
 
-  protected MuleEvent createMuleEvent(MuleCompatibilityMessage message, OutputStream outputStream)
+  protected Event createMuleEvent(CompatibilityMessage message, OutputStream outputStream)
       throws MuleException {
-    MuleEvent event;
+    Event event;
     MuleSession session = connector.getSessionHandler().retrieveSessionInfoFromMessage(message, flowConstruct.getMuleContext());
 
     if (session == null) {
@@ -240,9 +240,9 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     }
     final Object replyToFromMessage = getReplyToDestination(message);
 
-    final MessageContext executionContext = create(flowConstruct, getEndpoint().getAddress(), message.getCorrelationId());
+    final EventContext executionContext = create(flowConstruct, getEndpoint().getAddress(), message.getCorrelationId());
 
-    final Builder builder = MuleEvent.builder(executionContext).message(message).flow(flowConstruct).session(session);
+    final Builder builder = Event.builder(executionContext).message(message).flow(flowConstruct).session(session);
     if (replyToFromMessage != null) {
       builder.replyToHandler(replyToHandler).replyToDestination(replyToFromMessage);
     }
@@ -250,8 +250,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     if (message.getCorrelationId() != null) {
       builder.correlationId(message.getCorrelationId());
     }
-    builder.correlation(message.getCorrelation());
-    MuleEvent newEvent = builder.build();
+    builder.groupCorrelation(message.getCorrelation());
+    Event newEvent = builder.build();
 
     newEvent = populateFieldsFromInboundEndpoint(newEvent, getEndpoint());
     event = newEvent;
@@ -266,7 +266,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     // Nothing to do, subclasses may override
   }
 
-  protected Object getReplyToDestination(MuleMessage message) {
+  protected Object getReplyToDestination(InternalMessage message) {
     return message.getInboundProperty(MULE_REPLY_TO_PROPERTY);
   }
 
@@ -332,7 +332,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   }
 
   @Override
-  public void setListener(MessageProcessor processor) {
+  public void setListener(Processor processor) {
     this.listener = processor;
   }
 
@@ -350,7 +350,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
   }
 
-  protected ExecutionTemplate<MuleEvent> createExecutionTemplate() {
+  protected ExecutionTemplate<Event> createExecutionTemplate() {
     return createMainExecutionTemplate(endpoint.getMuleContext(), flowConstruct, endpoint.getTransactionConfig(),
                                        flowConstruct.getExceptionListener());
   }
@@ -413,8 +413,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     return new TrackingWorkManager(() -> getConnectorWorkManager(), shutdownTimeout);
   }
 
-  public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException {
-    MuleEvent resultEvent = listener.process(muleEvent);
+  public Event routeEvent(Event muleEvent) throws MuleException {
+    Event resultEvent = listener.process(muleEvent);
     if (resultEvent != null
         && !VoidMuleEvent.getInstance().equals(resultEvent)
         && resultEvent.getError().isPresent()

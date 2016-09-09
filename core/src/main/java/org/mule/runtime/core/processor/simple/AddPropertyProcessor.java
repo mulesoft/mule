@@ -8,22 +8,22 @@ package org.mule.runtime.core.processor.simple;
 
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.Serializable;
 
 public class AddPropertyProcessor extends AbstractAddVariablePropertyProcessor<Serializable> {
 
   @Override
-  protected MuleEvent addProperty(MuleEvent event, String propertyName, Serializable value, DataType dataType) {
-    return MuleEvent.builder(event)
-        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(propertyName, value, dataType).build()).build();
+  protected Event addProperty(Event event, String propertyName, Serializable value, DataType dataType) {
+    return Event.builder(event)
+        .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(propertyName, value, dataType).build()).build();
   }
 
   @Override
-  protected MuleEvent removeProperty(MuleEvent event, String propertyName) {
-    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build())
+  protected Event removeProperty(Event event, String propertyName) {
+    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).removeOutboundProperty(propertyName).build())
         .build();
   }
 

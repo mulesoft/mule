@@ -9,11 +9,12 @@ package org.mule.extension.email.internal.commands;
 import static java.lang.String.format;
 import static java.nio.file.Paths.get;
 import static javax.mail.Folder.READ_ONLY;
-import static org.mule.runtime.core.util.FileUtils.write;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import static org.apache.commons.io.FileUtils.write;
+
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.exception.EmailRetrieverException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.runtime.api.message.Message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
@@ -40,30 +40,30 @@ public final class StoreCommand {
    * Stores the specified email of id {@code emailId} into the configured {@code localDirectory}.
    * <p>
    * if no emailId is specified, the operation will try to find an email or {@link List} of emails in the incoming
-   * {@link MuleMessage}.
+   * {@link Message}.
    * <p>
-   * If no email(s) are found in the {@link MuleMessage} and no {@code emailId} is specified. the operation will fail.
+   * If no email(s) are found in the {@link Message} and no {@code emailId} is specified. the operation will fail.
    * <p>
    * The emails are stored as mime message in a ".txt" format.
    * <p>
    * The name of the email file is composed by the subject and the received date of the email.
    *
    * @param connection the associated {@link RetrieverConnection}.
-   * @param muleMessage the incoming {@link MuleMessage}.
+   * @param muleMessage the incoming {@link Message}.
    * @param folderName the name of the folder where the email(s) is going to be fetched.
    * @param localDirectory the localDirectory where the emails are going to be stored.
    * @param fileName the name of the file that is going to be stored. The operation will append the email number and received date
    *        in the end.
    * @param emailId the optional number of the email to be marked. for default the email is taken from the incoming
-   *        {@link MuleMessage}.
+   *        {@link Message}.
    * @param overwrite if should overwrite a file that already exist or not.
    */
-  public void store(RetrieverConnection connection, MuleMessage muleMessage, String folderName, String localDirectory,
+  public void store(RetrieverConnection connection, Message muleMessage, String folderName, String localDirectory,
                     final String fileName, Integer emailId, boolean overwrite) {
     Folder folder = connection.getFolder(folderName, READ_ONLY);
     executor.execute(muleMessage, emailId, id -> {
       try {
-        Message message = folder.getMessage(id);
+        javax.mail.Message message = folder.getMessage(id);
         Path emailFilePath = get(localDirectory, formatEmailFileName(message, fileName));
         File emailFile = emailFilePath.toFile();
         if (emailFile.exists()) {
@@ -87,7 +87,7 @@ public final class StoreCommand {
    * @param message the email to be stored.
    * @param emailFile the file where the email will be written.
    */
-  private void writeContent(Message message, File emailFile) throws IOException, MessagingException {
+  private void writeContent(javax.mail.Message message, File emailFile) throws IOException, MessagingException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     message.writeTo(outputStream);
     write(emailFile, outputStream.toString());
@@ -103,7 +103,7 @@ public final class StoreCommand {
    * @param fileName the fileName specified by the user. Can be null.
    * @return a file name in a {fileName|subject}-emailId_receivedDate format.
    */
-  private String formatEmailFileName(Message message, String fileName) {
+  private String formatEmailFileName(javax.mail.Message message, String fileName) {
     int messageNumber = message.getMessageNumber();
     try {
       Date receivedDate = message.getReceivedDate() != null ? message.getReceivedDate() : new Date();

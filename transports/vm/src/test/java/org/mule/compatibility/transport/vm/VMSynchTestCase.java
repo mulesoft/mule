@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class VMSynchTestCase extends FunctionalTestCase {
   @Test
   public void testSingleMessage() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("vm://bridge", "Message", null).getRight();
+    InternalMessage response = client.send("vm://bridge", "Message", null).getRight();
     assertNotNull("Response is null", response);
     assertEquals("Message Received", response.getPayload());
   }

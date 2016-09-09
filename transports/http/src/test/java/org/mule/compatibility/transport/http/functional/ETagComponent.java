@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.functional;
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -19,9 +19,9 @@ public class ETagComponent implements Callable {
 
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
-    MuleMessage message = eventContext.getMessage();
+    InternalMessage message = eventContext.getMessage();
 
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(message);
+    InternalMessage.Builder messageBuilder = InternalMessage.builder(message);
     String etag = message.getOutboundProperty(HttpConstants.HEADER_IF_NONE_MATCH);
     if ((etag != null) && etag.equals(ETAG_VALUE)) {
       messageBuilder.payload(StringUtils.EMPTY);

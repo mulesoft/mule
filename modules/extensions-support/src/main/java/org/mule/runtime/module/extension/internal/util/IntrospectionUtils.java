@@ -101,7 +101,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} representing the given {@link Class} type.
    *
-   * @param type       the {@link Class} being introspected
+   * @param type the {@link Class} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    */
@@ -114,7 +114,7 @@ public final class IntrospectionUtils {
    * {@link OperationResult}, then it returns the type of the {@code Output} generic. If the {@link OperationResult} type is being
    * used in its raw form, then an {@link AnyType} will be returned.
    *
-   * @param method     the {@link Method} being introspected
+   * @param method the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -147,7 +147,7 @@ public final class IntrospectionUtils {
    * If the {@code method} returns a {@link OperationResult}, then it returns the type of the {@code Attributes} generic. In any
    * other case (including raw uses of {@link OperationResult}) it will return a {@link NullType}
    *
-   * @param method     the {@link Method} being introspected
+   * @param method the {@link Method} being introspected
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType}
    * @throws IllegalArgumentException is method is {@code null}
@@ -212,10 +212,10 @@ public final class IntrospectionUtils {
   /**
    * Returns an array of {@link MetadataType} representing each of the given {@link Method}'s argument types.
    *
-   * @param method     a not {@code null} {@link Method}
+   * @param method a not {@code null} {@link Method}
    * @param typeLoader a {@link ClassTypeLoader} to be used to create the returned {@link MetadataType}s
    * @return an array of {@link MetadataType} matching the method's arguments. If the method doesn't take any, then the array will
-   * be empty
+   *         be empty
    * @throws IllegalArgumentException is method is {@code null}
    */
   public static MetadataType[] getMethodArgumentTypes(Method method, ClassTypeLoader typeLoader) {
@@ -237,7 +237,7 @@ public final class IntrospectionUtils {
   /**
    * Returns a {@link MetadataType} describing the given {@link Field}'s type
    *
-   * @param field      a not {@code null} {@link Field}
+   * @param field a not {@code null} {@link Field}
    * @param typeLoader a {@link ClassTypeLoader} used to create the {@link MetadataType}
    * @return a {@link MetadataType} matching the field's type
    * @throws IllegalArgumentException if field is {@code null}
@@ -497,7 +497,7 @@ public final class IntrospectionUtils {
    * Given a {@link Set} of Annotation classes and a {@link MetadataType} that describes a component parameter, indicates if the
    * parameter is considered as a multilevel {@link MetadataKeyId}
    *
-   * @param annotations   of the parameter
+   * @param annotations of the parameter
    * @param parameterType of the parameter
    * @return a boolean indicating if the Parameter is considered as a multilevel {@link MetadataKeyId}
    */
@@ -511,7 +511,7 @@ public final class IntrospectionUtils {
    * <p>
    * To be a parameter container means that the parameter is a {@link ParameterGroup} or a multilevel {@link MetadataKeyId}.
    *
-   * @param annotations   of the component parameter
+   * @param annotations of the component parameter
    * @param parameterType of the component parameter
    * @return a boolean indicating if the parameter is considered as a parameter container
    */

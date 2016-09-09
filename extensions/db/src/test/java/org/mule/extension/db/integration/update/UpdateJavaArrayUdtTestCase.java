@@ -15,7 +15,7 @@ import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.ContactDetails;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -48,13 +48,13 @@ public class UpdateJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void updatesStringArray() throws Exception {
-    MuleMessage response = flowRunner("updatesStringArray").run().getMessage();
+    Message response = flowRunner("updatesStringArray").run().getMessage();
     assertThat(response.getPayload(), Matchers.<Object>equalTo(new Object[] {"93101", "97201", "99210"}));
   }
 
   @Test
   public void updatesMappedObjectArray() throws Exception {
-    MuleMessage response = flowRunner("updatesStructArray").run().getMessage();
+    Message response = flowRunner("updatesStructArray").run().getMessage();
 
     assertThat(response.getPayload(), instanceOf(Object[].class));
     final Object[] arrayPayload = response.getPayload();

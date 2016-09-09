@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.connector;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 
 /**
@@ -20,7 +20,7 @@ import org.mule.runtime.core.exception.MessagingException;
 @Deprecated
 public interface ReplyToHandler {
 
-  MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
+  Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException;
 
   /**
    * Processes replyTo in the case an exception occurred. Not all implementations will implement this if for example they should

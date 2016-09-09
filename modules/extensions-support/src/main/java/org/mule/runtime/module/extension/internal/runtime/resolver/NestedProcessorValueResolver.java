@@ -7,40 +7,40 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import javax.inject.Inject;
 
 /**
- * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link MuleEvent} in a {@link NestedProcessor}. This
- * resolver returns new instances per every invocation
+ * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link Event} in a {@link NestedProcessor}. This resolver
+ * returns new instances per every invocation
  *
  * @since 3.7.0
  */
 public final class NestedProcessorValueResolver extends AbstractNestedProcessorValueResolver<NestedProcessor> {
 
-  private final MessageProcessor messageProcessor;
+  private final Processor messageProcessor;
 
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   private MuleContext muleContext;
 
-  public NestedProcessorValueResolver(MessageProcessor messageProcessor) {
+  public NestedProcessorValueResolver(Processor messageProcessor) {
     this.messageProcessor = messageProcessor;
   }
 
   /**
    * Returns a {@link NestedProcessor} that wraps the {@code event}
    *
-   * @param event a {@link MuleEvent}
+   * @param event a {@link Event}
    * @return a {@link NestedProcessor}
    * @throws MuleException
    */
   @Override
-  public NestedProcessor resolve(MuleEvent event) throws MuleException {
+  public NestedProcessor resolve(Event event) throws MuleException {
     return toNestedProcessor(messageProcessor, event, muleContext);
   }
 

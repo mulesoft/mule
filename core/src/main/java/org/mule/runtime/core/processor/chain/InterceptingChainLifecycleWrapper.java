@@ -9,10 +9,10 @@ package org.mule.runtime.core.processor.chain;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.List;
@@ -26,13 +26,13 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
   private DefaultMessageProcessorChain chain;
   private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
 
-  public InterceptingChainLifecycleWrapper(DefaultMessageProcessorChain chain, List<MessageProcessor> processors, String name) {
+  public InterceptingChainLifecycleWrapper(DefaultMessageProcessorChain chain, List<Processor> processors, String name) {
     super(name, processors);
     this.chain = chain;
   }
 
   @Override
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return chain.getMessageProcessors();
   }
 
@@ -42,12 +42,12 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
   }
 
   @Override
-  protected MuleEvent doProcess(MuleEvent event) throws MuleException {
+  protected Event doProcess(Event event) throws MuleException {
     return chain.process(event);
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event == null) {
       return null;
     }

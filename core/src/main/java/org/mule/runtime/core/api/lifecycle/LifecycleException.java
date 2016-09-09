@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.lifecycle;
 
 import org.mule.runtime.core.api.LocatedMuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /** <code>LifecycleException</code> TODO */
 
@@ -23,7 +23,7 @@ public class LifecycleException extends LocatedMuleException {
    * @param message the exception message
    * @param component the object that failed during a lifecycle method call
    */
-  public LifecycleException(Message message, Object component) {
+  public LifecycleException(I18nMessage message, Object component) {
     super(message, component);
     this.component = component;
   }
@@ -33,7 +33,7 @@ public class LifecycleException extends LocatedMuleException {
    * @param cause the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
-  public LifecycleException(Message message, Throwable cause, Object component) {
+  public LifecycleException(I18nMessage message, Throwable cause, Object component) {
     super(message, cause, component);
     this.component = component;
   }

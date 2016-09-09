@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -43,7 +43,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
   public void testNullPayload() throws Exception {
     MuleMessageFactory factory = createMuleMessageFactory();
 
-    MuleMessage message = factory.create(null, encoding);
+    InternalMessage message = factory.create(null, encoding);
     assertNotNull(message);
     assertEquals(null, message.getPayload());
   }
@@ -53,7 +53,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
     MuleMessageFactory factory = createMuleMessageFactory();
 
     Object payload = getValidTransportMessage();
-    MuleMessage message = factory.create(payload, encoding);
+    InternalMessage message = factory.create(payload, encoding);
     assertNotNull(message);
     assertEquals(payload, message.getPayload());
   }

@@ -6,98 +6,98 @@
  */
 package org.mule.runtime.module.cxf.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
-public class CxfMessages extends MessageFactory {
+public class CxfMessages extends I18nMessageFactory {
 
   private static final CxfMessages factory = new CxfMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("cxf");
 
-  public static Message serviceIsNull(String serviceName) {
+  public static I18nMessage serviceIsNull(String serviceName) {
     return factory.createMessage(BUNDLE_PATH, 8, serviceName);
   }
 
-  public static Message annotationsRequireJava5() {
+  public static I18nMessage annotationsRequireJava5() {
     return factory.createMessage(BUNDLE_PATH, 9);
   }
 
-  public static Message couldNotInitAnnotationProcessor(Object object) {
+  public static I18nMessage couldNotInitAnnotationProcessor(Object object) {
     return factory.createMessage(BUNDLE_PATH, 10, object);
   }
 
-  public static Message unableToInitBindingProvider(String bindingProvider) {
+  public static I18nMessage unableToInitBindingProvider(String bindingProvider) {
     return factory.createMessage(BUNDLE_PATH, 11, bindingProvider);
   }
 
-  public static Message unableToLoadServiceClass(String classname) {
+  public static I18nMessage unableToLoadServiceClass(String classname) {
     return factory.createMessage(BUNDLE_PATH, 12, classname);
   }
 
-  public static Message unableToConstructAdapterForNullMessage() {
+  public static I18nMessage unableToConstructAdapterForNullMessage() {
     return factory.createMessage(BUNDLE_PATH, 13);
   }
 
-  public static Message inappropriateMessageTypeForAttachments(org.apache.cxf.message.Message message) {
+  public static I18nMessage inappropriateMessageTypeForAttachments(org.apache.cxf.message.Message message) {
     String className = message.getClass().getName();
     return factory.createMessage(BUNDLE_PATH, 14, className);
   }
 
-  public static Message bothServiceClassAndWsdlUrlAreRequired() {
+  public static I18nMessage bothServiceClassAndWsdlUrlAreRequired() {
     return factory.createMessage(BUNDLE_PATH, 15);
   }
 
-  public static Message incorrectlyFormattedEndpointUri(String uri) {
+  public static I18nMessage incorrectlyFormattedEndpointUri(String uri) {
     return factory.createMessage(BUNDLE_PATH, 16, uri);
   }
 
-  public static Message invalidFrontend(String frontend) {
+  public static I18nMessage invalidFrontend(String frontend) {
     return factory.createMessage(BUNDLE_PATH, 17, frontend);
   }
 
-  public static Message portNotFound(String port) {
+  public static I18nMessage portNotFound(String port) {
     return factory.createMessage(BUNDLE_PATH, 18, port);
   }
 
-  public static Message mustSpecifyPort() {
+  public static I18nMessage mustSpecifyPort() {
     return factory.createMessage(BUNDLE_PATH, 19);
   }
 
-  public static Message wsdlNotFound(String loc) {
+  public static I18nMessage wsdlNotFound(String loc) {
     return factory.createMessage(BUNDLE_PATH, 20, loc);
   }
 
-  public static Message noOperationWasFoundOrSpecified() {
+  public static I18nMessage noOperationWasFoundOrSpecified() {
     return factory.createMessage(BUNDLE_PATH, 21);
   }
 
-  public static Message javaComponentRequiredForInboundEndpoint() {
+  public static I18nMessage javaComponentRequiredForInboundEndpoint() {
     return factory.createMessage(BUNDLE_PATH, 22);
   }
 
-  public static Message serviceClassRequiredWithPassThrough() {
+  public static I18nMessage serviceClassRequiredWithPassThrough() {
     return factory.createMessage(BUNDLE_PATH, 23);
   }
 
-  public static Message invalidPayloadToArgumentsParameter(String nullPayloadParameterValue) {
+  public static I18nMessage invalidPayloadToArgumentsParameter(String nullPayloadParameterValue) {
     return factory.createMessage(BUNDLE_PATH, 24, nullPayloadParameterValue);
   }
 
-  public static Message invalidOrMissingNamespace(QName serviceQName, List<QName> probableServices, List<QName> allServices) {
+  public static I18nMessage invalidOrMissingNamespace(QName serviceQName, List<QName> probableServices, List<QName> allServices) {
     return factory.createMessage(BUNDLE_PATH, 25, String.valueOf(serviceQName), String.valueOf(probableServices),
                                  String.valueOf(allServices));
   }
 
-  public static Message onlyServiceOrClientClassIsValid() {
+  public static I18nMessage onlyServiceOrClientClassIsValid() {
     return factory.createMessage(BUNDLE_PATH, 26);
   }
 
-  public static Message couldNotFindEndpoint(QName endpointNameThatCannotBeFound, List<QName> availableEndpoingNames) {
+  public static I18nMessage couldNotFindEndpoint(QName endpointNameThatCannotBeFound, List<QName> availableEndpoingNames) {
     return factory.createMessage(BUNDLE_PATH, 27, String.valueOf(endpointNameThatCannotBeFound),
                                  String.valueOf(availableEndpoingNames));
   }

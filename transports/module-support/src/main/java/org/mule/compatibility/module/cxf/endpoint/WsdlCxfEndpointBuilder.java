@@ -14,7 +14,7 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.module.cxf.builder.WsdlClientMessageProcessorBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class WsdlCxfEndpointBuilder extends AbstractMetaEndpointBuilder {
 
     try {
       // List must be mutable as it gets cleared on Mule shutdown
-      messageProcessors = new ArrayList<MessageProcessor>(Arrays.asList(new FlowConfiguringMessageProcessor(builder)));
+      messageProcessors = new ArrayList<Processor>(Arrays.asList(new FlowConfiguringMessageProcessor(builder)));
     } catch (final Exception e) {
       throw new EndpointException(e);
     }

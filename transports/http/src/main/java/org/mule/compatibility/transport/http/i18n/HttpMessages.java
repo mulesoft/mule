@@ -6,94 +6,94 @@
  */
 package org.mule.compatibility.transport.http.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.net.URI;
 
-public class HttpMessages extends MessageFactory {
+public class HttpMessages extends I18nMessageFactory {
 
   private static final HttpMessages factory = new HttpMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("http");
 
-  public static Message requestFailedWithStatus(String string) {
+  public static I18nMessage requestFailedWithStatus(String string) {
     return factory.createMessage(BUNDLE_PATH, 3, string);
   }
 
-  public static Message unableToGetEndpointUri(String requestURI) {
+  public static I18nMessage unableToGetEndpointUri(String requestURI) {
     return factory.createMessage(BUNDLE_PATH, 4, requestURI);
   }
 
-  public static Message receiverPropertyNotSet() {
+  public static I18nMessage receiverPropertyNotSet() {
     return factory.createMessage(BUNDLE_PATH, 7);
   }
 
-  public static Message httpParameterNotSet(String string) {
+  public static I18nMessage httpParameterNotSet(String string) {
     return factory.createMessage(BUNDLE_PATH, 8, string);
   }
 
-  public static Message malformedSyntax() {
+  public static I18nMessage malformedSyntax() {
     return factory.createMessage(BUNDLE_PATH, 11);
   }
 
-  public static Message methodNotAllowed(String method) {
+  public static I18nMessage methodNotAllowed(String method) {
     return factory.createMessage(BUNDLE_PATH, 12, method);
   }
 
-  public static Message failedToConnect(URI uri) {
+  public static I18nMessage failedToConnect(URI uri) {
     return factory.createMessage(BUNDLE_PATH, 13, uri);
   }
 
-  public static Message cannotBindToAddress(String path) {
+  public static I18nMessage cannotBindToAddress(String path) {
     return factory.createMessage(BUNDLE_PATH, 14, path);
   }
 
-  public static Message eventPropertyNotSetCannotProcessRequest(String property) {
+  public static I18nMessage eventPropertyNotSetCannotProcessRequest(String property) {
     return factory.createMessage(BUNDLE_PATH, 15, property);
   }
 
-  public static Message unsupportedMethod(String method) {
+  public static I18nMessage unsupportedMethod(String method) {
     return factory.createMessage(BUNDLE_PATH, 16, method);
   }
 
-  public static Message couldNotSendExpect100() {
+  public static I18nMessage couldNotSendExpect100() {
     return factory.createMessage(BUNDLE_PATH, 17);
   }
 
-  public static Message requestLineIsMalformed(String line) {
+  public static I18nMessage requestLineIsMalformed(String line) {
     return factory.createMessage(BUNDLE_PATH, 18, line);
   }
 
-  public static Message pollingReciverCannotbeUsed() {
+  public static I18nMessage pollingReciverCannotbeUsed() {
     return factory.createMessage(BUNDLE_PATH, 19);
   }
 
-  public static Message sslHandshakeDidNotComplete() {
+  public static I18nMessage sslHandshakeDidNotComplete() {
     return factory.createMessage(BUNDLE_PATH, 20);
   }
 
-  public static Message customHeaderMapDeprecated() {
+  public static I18nMessage customHeaderMapDeprecated() {
     return factory.createMessage(BUNDLE_PATH, 21);
   }
 
-  public static Message basicFilterCannotHandleHeader(String header) {
+  public static I18nMessage basicFilterCannotHandleHeader(String header) {
     return factory.createMessage(BUNDLE_PATH, 22, header);
   }
 
-  public static Message authRealmMustBeSetOnFilter() {
+  public static I18nMessage authRealmMustBeSetOnFilter() {
     return factory.createMessage(BUNDLE_PATH, 23);
   }
 
-  public static Message noResourceBaseDefined() {
+  public static I18nMessage noResourceBaseDefined() {
     return factory.createMessage(BUNDLE_PATH, 24);
   }
 
-  public static Message fileNotFound(String file) {
+  public static I18nMessage fileNotFound(String file) {
     return factory.createMessage(BUNDLE_PATH, 25, file);
   }
 
-  public static Message noReceiverFoundForUrl(String url) {
+  public static I18nMessage noReceiverFoundForUrl(String url) {
     return factory.createMessage(BUNDLE_PATH, 26, url);
   }
 

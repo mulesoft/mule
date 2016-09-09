@@ -12,7 +12,6 @@ import static org.mule.extension.email.api.EmailContentProcessor.process;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 
 import javax.activation.DataHandler;
-import javax.mail.Message;
 import javax.mail.Multipart;
 
 import org.junit.Test;
@@ -26,7 +25,7 @@ public class ForwardTestCase extends SMTPTestCase {
   @Test
   public void forwardEmail() throws Exception {
     flowRunner(FORWARD_EMAIL).withPayload(EMAIL_CONTENT).withAttributes(getTestAttributes()).run();
-    Message[] messages = getReceivedMessagesAndAssertCount(1);
+    javax.mail.Message[] messages = getReceivedMessagesAndAssertCount(1);
     String body = process(messages[0]).getBody();
     assertBodyContent(body);
   }
@@ -34,7 +33,7 @@ public class ForwardTestCase extends SMTPTestCase {
   @Test
   public void forwardEmailWithContent() throws Exception {
     flowRunner(FORWARD_EMAIL_WITH_CONTENT).withPayload(EMAIL_CONTENT).withAttributes(getTestAttributes()).run();
-    Message[] messages = getReceivedMessagesAndAssertCount(1);
+    javax.mail.Message[] messages = getReceivedMessagesAndAssertCount(1);
     String body = process(messages[0]).getBody();
     assertThat(body, containsString("More Content To Forward"));
     assertThat(body, containsString(EMAIL_CONTENT));
@@ -47,7 +46,7 @@ public class ForwardTestCase extends SMTPTestCase {
         .withPayload(EMAIL_CONTENT)
         .withAttributes(getTestAttributes()).run();
 
-    Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
+    javax.mail.Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
     Multipart content = (Multipart) repliedMessage.getContent();
 
     DataHandler attachment = content.getBodyPart(1).getDataHandler();

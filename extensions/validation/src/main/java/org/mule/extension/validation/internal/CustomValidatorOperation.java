@@ -10,7 +10,7 @@ import org.mule.extension.validation.api.ObjectSource;
 import org.mule.extension.validation.api.ValidationExtension;
 import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -46,7 +46,7 @@ public final class CustomValidatorOperation extends ValidationSupport {
       });
 
   public void customValidator(@ParameterGroup ObjectSource<Validator> source, @ParameterGroup ValidationOptions options,
-                              MuleEvent event, @UseConfig ValidationExtension config)
+                              Event event, @UseConfig ValidationExtension config)
       throws Exception {
     ValidatorSource validatorSource = new ValidatorSource(source.getType(), source.getRef());
     Validator validator = validatorSource.getObject(muleContext);
@@ -55,7 +55,7 @@ public final class CustomValidatorOperation extends ValidationSupport {
   }
 
   @Override
-  protected void logSuccessfulValidation(Validator validator, MuleEvent event) {
+  protected void logSuccessfulValidation(Validator validator, Event event) {
     if (logger.isDebugEnabled()) {
       logger.debug("Successfully executed custom validator of type {} on message: {}", validator.getClass().getName(),
                    event.getMessage());

@@ -13,9 +13,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 
 import org.mule.extension.file.api.LocalFileAttributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
@@ -46,7 +46,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void read() throws Exception {
-    MuleEvent response = readHelloWorld();
+    Event response = readHelloWorld();
 
     assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
     assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
@@ -63,7 +63,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
     File binaryFile = new File(temporaryFolder.getRoot(), binaryFileName);
     FileUtils.writeByteArrayToFile(binaryFile, binaryPayload);
 
-    MuleEvent response = getPath(binaryFile.getAbsolutePath());
+    Event response = getPath(binaryFile.getAbsolutePath());
 
     assertThat(response.getMessage().getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
     assertThat(response.getMessage().getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
@@ -78,7 +78,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readWithForcedMimeType() throws Exception {
-    MuleEvent event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
+    Event event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
     assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
     assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
   }
@@ -138,12 +138,12 @@ public class FileReadTestCase extends FileConnectorTestCase {
     assertThat(filePayload.isRegularFile(), is(true));
   }
 
-  private MuleMessage readWithLock() throws Exception {
+  private Message readWithLock() throws Exception {
     return readWithLock(HELLO_PATH);
   }
 
-  private MuleMessage readWithLock(String path) throws Exception {
-    MuleMessage message = flowRunner("readWithLock").withFlowVariable("path", path).run().getMessage();
+  private Message readWithLock(String path) throws Exception {
+    Message message = flowRunner("readWithLock").withFlowVariable("path", path).run().getMessage();
     assertThat(((AbstractFileInputStream) message.getPayload()).isLocked(), is(true));
 
     return message;

@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.PreferredObjectSelector;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -35,7 +35,7 @@ public abstract class ThreadPoolFactory implements MuleContextAware {
     ThreadPoolFactory threadPoolFactory = selector.select(threadPoolFactoryServices.iterator());
 
     if (threadPoolFactory == null) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage("Couldn't find config via SPI mechanism. Corrupted Mule core jar?"));
     }
 

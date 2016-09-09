@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.http.internal.request;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 public interface ResponseValidator {
 
-  public void validate(MuleEvent responseEvent) throws ResponseValidatorException;
+  public void validate(Event responseEvent) throws ResponseValidatorException;
 
 }

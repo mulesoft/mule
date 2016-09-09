@@ -26,7 +26,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
@@ -86,7 +86,7 @@ public abstract class ExtensionsTestUtils {
     return getResolver(value, null, true);
   }
 
-  public static ValueResolver getResolver(Object value, MuleEvent event, boolean dynamic, Class<?>... extraInterfaces)
+  public static ValueResolver getResolver(Object value, Event event, boolean dynamic, Class<?>... extraInterfaces)
       throws Exception {
     ValueResolver resolver;
     if (ArrayUtils.isEmpty(extraInterfaces)) {
@@ -95,7 +95,7 @@ public abstract class ExtensionsTestUtils {
       resolver = mock(ValueResolver.class, withSettings().extraInterfaces(extraInterfaces));
     }
 
-    when(resolver.resolve(event != null ? same(event) : any(MuleEvent.class))).thenReturn(value);
+    when(resolver.resolve(event != null ? same(event) : any(Event.class))).thenReturn(value);
     when(resolver.isDynamic()).thenReturn(dynamic);
 
     return resolver;
@@ -125,11 +125,11 @@ public abstract class ExtensionsTestUtils {
     });
   }
 
-  public static <C> C getConfigurationFromRegistry(String key, MuleEvent muleEvent, MuleContext muleContext) throws Exception {
+  public static <C> C getConfigurationFromRegistry(String key, Event muleEvent, MuleContext muleContext) throws Exception {
     return (C) getConfigurationInstanceFromRegistry(key, muleEvent, muleContext).getValue();
   }
 
-  public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, MuleEvent muleEvent,
+  public static ConfigurationInstance getConfigurationInstanceFromRegistry(String key, Event muleEvent,
                                                                            MuleContext muleContext)
       throws Exception {
     ExtensionManager extensionManager = muleContext.getExtensionManager();

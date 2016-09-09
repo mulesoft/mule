@@ -19,11 +19,11 @@ import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
@@ -58,9 +58,9 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessOneWay() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
 
-    MuleEvent result = messageProcessor.process(event);
+    Event result = messageProcessor.process(event);
 
     assertThat(latch.await(10000, TimeUnit.MILLISECONDS), is(true));
     assertThat(target.sensedEvent, notNullValue());
@@ -79,9 +79,9 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
 
-    MuleEvent result = messageProcessor.process(event);
+    Event result = messageProcessor.process(event);
 
     latch.await(10000, TimeUnit.MILLISECONDS);
     assertNotNull(target.sensedEvent);
@@ -100,7 +100,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -117,7 +117,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -130,15 +130,15 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     }
   }
 
-  protected void assertSync(MessageProcessor processor, MuleEvent event) throws MuleException {
-    MuleEvent result = processor.process(event);
+  protected void assertSync(Processor processor, Event event) throws MuleException {
+    Event result = processor.process(event);
 
     assertSame(event, target.sensedEvent);
     assertSame(event, result);
   }
 
-  protected void assertAsync(MessageProcessor processor, MuleEvent event) throws MuleException, InterruptedException {
-    MuleEvent result = processor.process(event);
+  protected void assertAsync(Processor processor, Event event) throws MuleException, InterruptedException {
+    Event result = processor.process(event);
 
     latch.await(10000, TimeUnit.MILLISECONDS);
     assertNotNull(target.sensedEvent);
@@ -151,7 +151,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     assertNull(exceptionThrown);
   }
 
-  protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(MessageProcessor listener) throws Exception {
+  protected AsyncDelegateMessageProcessor createAsyncDelegatMessageProcessor(Processor listener) throws Exception {
     AsyncDelegateMessageProcessor mp =
         new AsyncDelegateMessageProcessor(listener, new AsynchronousProcessingStrategy(), "thread");
     mp.setMuleContext(muleContext);
@@ -160,13 +160,13 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     return mp;
   }
 
-  class TestListener implements MessageProcessor {
+  class TestListener implements Processor {
 
-    MuleEvent sensedEvent;
+    Event sensedEvent;
     Thread thread;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       sensedEvent = event;
       thread = Thread.currentThread();
       latch.countDown();

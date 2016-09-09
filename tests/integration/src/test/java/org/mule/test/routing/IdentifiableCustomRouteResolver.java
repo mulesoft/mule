@@ -8,11 +8,11 @@ package org.mule.test.routing;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.IdentifiableDynamicRouteResolver;
 
@@ -25,19 +25,19 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
 
   private MuleContext muleContext;
 
-  static List<MessageProcessor> routes = new ArrayList<>();
+  static List<Processor> routes = new ArrayList<>();
 
   @Override
-  public List<MessageProcessor> resolveRoutes(MuleEvent event) {
+  public List<Processor> resolveRoutes(Event event) {
     return routes;
   }
 
   @Override
-  public String getRouteIdentifier(MuleEvent event) throws MessagingException {
+  public String getRouteIdentifier(Event event) throws MessagingException {
     return muleContext.getExpressionLanguage().parse(ID_EXPRESSION, event, null);
   }
 
-  public static class AddLetterMessageProcessor implements MessageProcessor {
+  public static class AddLetterMessageProcessor implements Processor {
 
     private String letter;
 
@@ -46,9 +46,9 @@ public class IdentifiableCustomRouteResolver implements IdentifiableDynamicRoute
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       try {
-        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(letter).build()).build();
+        return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(letter).build()).build();
       } catch (Exception e) {
         throw new DefaultMuleException(e);
       }

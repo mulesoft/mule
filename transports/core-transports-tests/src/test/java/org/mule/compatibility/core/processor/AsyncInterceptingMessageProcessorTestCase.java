@@ -17,11 +17,11 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -56,14 +56,14 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessOneWay() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(ONE_WAY));
+    Event event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(ONE_WAY));
 
     assertAsync(messageProcessor, event);
   }
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(REQUEST_RESPONSE));
+    Event event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(REQUEST_RESPONSE));
 
     try {
       messageProcessor.process(event);
@@ -74,7 +74,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(ONE_WAY));
+    Event event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(ONE_WAY));
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -89,7 +89,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(REQUEST_RESPONSE));
+    Event event = getTestEvent(TEST_MESSAGE, getTestTransactedInboundEndpoint(REQUEST_RESPONSE));
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -102,8 +102,8 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     }
   }
 
-  protected void assertAsync(MessageProcessor processor, MuleEvent event) throws MuleException, InterruptedException {
-    MuleEvent result = processor.process(event);
+  protected void assertAsync(Processor processor, Event event) throws MuleException, InterruptedException {
+    Event result = processor.process(event);
 
     latch.await(10000, TimeUnit.MILLISECONDS);
     assertNotNull(target.sensedEvent);
@@ -117,7 +117,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     assertNull(exceptionThrown);
   }
 
-  protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
+  protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
     AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new TestWorkManagerSource());
     mp.setMuleContext(muleContext);
@@ -125,13 +125,13 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     return mp;
   }
 
-  class TestListener implements MessageProcessor {
+  class TestListener implements Processor {
 
-    MuleEvent sensedEvent;
+    Event sensedEvent;
     Thread thread;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       sensedEvent = event;
       thread = Thread.currentThread();
       latch.countDown();

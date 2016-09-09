@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf.support;
 
 import static com.google.common.net.HttpHeaders.CONTENT_ENCODING;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +24,7 @@ public abstract class AbstractProxyGZIPInterceptor extends AbstractPhaseIntercep
     super(phase);
   }
 
-  protected boolean isEncoded(MuleMessage message) {
+  protected boolean isEncoded(InternalMessage message) {
     boolean isEncoded = false;
 
     String contentEncoding = message.getInboundProperty(CONTENT_ENCODING);

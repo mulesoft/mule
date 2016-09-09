@@ -7,8 +7,8 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 /**
- * Object that represents the configuration to be used to resolve
- * which method should be executed in a {@link org.mule.runtime.core.api.component.Component}.
+ * Object that represents the configuration to be used to resolve which method should be executed in a
+ * {@link org.mule.runtime.core.api.component.Component}.
  *
  * @since 4.0
  */
@@ -39,7 +39,8 @@ public class MethodEntryPoint {
   }
 
   /**
-   * @param enabled if the method should be consider or not as a possible entry point of a {@link org.mule.runtime.core.api.component.Component}
+   * @param enabled if the method should be consider or not as a possible entry point of a
+   *        {@link org.mule.runtime.core.api.component.Component}
    */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;

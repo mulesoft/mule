@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.common.api.stream;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.lock.PathLock;
 
@@ -27,9 +27,9 @@ import org.springframework.cglib.proxy.MethodInterceptor;
  * <p>
  * Because in most implementations the actual reading of the stream requires initialising/maintaining a connection, instances are
  * created through a {@link LazyStreamSupplier}. This allows such connection/resource to be provisioned lazily. This is very
- * useful in cases such as {@link FileSystem#list(String, boolean, MuleMessage, Predicate)}. Being able to only lazily establish
- * the connections, prevents the connector from opening many connections at the same time, at the risk that many of them might end
- * up not being necessary at the same place.
+ * useful in cases such as {@link FileSystem#list(String, boolean, Message, Predicate)}. Being able to only lazily establish the
+ * connections, prevents the connector from opening many connections at the same time, at the risk that many of them might end up
+ * not being necessary at the same place.
  *
  * @since 4.0
  */

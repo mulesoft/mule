@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -57,7 +57,7 @@ public class HttpContinueFunctionalTestCase extends FunctionalTestCase {
     props.put(HttpConnector.HTTP_PARAMS_PROPERTY, params);
 
     stopWatch.start();
-    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props).getRight();
+    InternalMessage result = client.send("clientEndpoint", TEST_MESSAGE, props).getRight();
     stopWatch.stop();
 
     assertNotNull(result);

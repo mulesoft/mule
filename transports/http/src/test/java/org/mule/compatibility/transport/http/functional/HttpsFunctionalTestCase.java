@@ -14,7 +14,7 @@ import org.mule.compatibility.transport.http.HttpsConnector;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -46,7 +46,7 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase {
 
     final AtomicBoolean callbackMade = new AtomicBoolean(false);
     EventCallback callback = (context, component, muleContext) -> {
-      MuleMessage msg = context.getMessage();
+      InternalMessage msg = context.getMessage();
       assertTrue(callbackMade.compareAndSet(false, true));
       assertNotNull(msg.getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
     };
@@ -54,9 +54,10 @@ public class HttpsFunctionalTestCase extends HttpFunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result =
+    InternalMessage result =
         client.send("clientEndpoint",
-                    MuleMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8")).build())
+                    InternalMessage.builder().payload(TEST_MESSAGE).mediaType(MediaType.parse("text/plain;charset=UTF-8"))
+                        .build())
             .getRight();
 
     assertNotNull(result);

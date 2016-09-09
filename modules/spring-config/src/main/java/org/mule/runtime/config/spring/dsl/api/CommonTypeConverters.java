@@ -14,8 +14,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.springframework.util.ClassUtils;
 
 /**
- * Set of common {@link TypeConverter}s to be reused in different
- * {@link ComponentBuildingDefinitionProvider}s
+ * Set of common {@link TypeConverter}s to be reused in different {@link ComponentBuildingDefinitionProvider}s
  *
  * @since 4.0
  */

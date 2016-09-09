@@ -13,7 +13,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 
 import org.mule.extension.socket.SocketExtensionTestCase;
 import org.mule.extension.socket.api.SocketAttributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
@@ -46,7 +46,7 @@ public class SslCertificatesTestCase extends SocketExtensionTestCase {
   protected void doTests(int numberOfMessages) throws Exception {
 
     for (int i = 0; i < numberOfMessages; ++i) {
-      org.mule.runtime.core.api.MuleMessage muleMessage =
+      org.mule.runtime.core.api.InternalMessage muleMessage =
           flowRunner("ssl-send-and-receive").withPayload(TEST_STRING).run().getMessage();
 
       String payload = IOUtils.toString((InputStream) muleMessage.getPayload());
@@ -57,7 +57,7 @@ public class SslCertificatesTestCase extends SocketExtensionTestCase {
 
   }
 
-  protected void assertCertificate(MuleMessage message) throws Exception {
+  protected void assertCertificate(Message message) throws Exception {
     String payload = IOUtils.toString((InputStream) message.getPayload());
     assertThat(payload, is(notNullValue()));
     SocketAttributes attributes = (SocketAttributes) message.getAttributes();

@@ -9,7 +9,7 @@ package org.mule.test.integration.exceptions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -32,7 +32,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractIntegrat
     tester2.start();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage msg;
+    InternalMessage msg;
     for (int i = 0; i < numMessages; ++i) {
       msg = client.request("test://out", 5000).getRight().get();
       assertNotNull(msg);

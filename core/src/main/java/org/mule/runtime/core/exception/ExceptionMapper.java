@@ -7,7 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import java.util.Optional;
 import java.util.Set;
@@ -38,11 +38,11 @@ public class ExceptionMapper {
   }
 
   /**
-   * Using the set of {@link ExceptionMapping}s which this instance was configured with, it resolves
-   * the {@link ErrorType} associated with the exception.
+   * Using the set of {@link ExceptionMapping}s which this instance was configured with, it resolves the {@link ErrorType}
+   * associated with the exception.
    *
-   * Resolution is done based on the different mappings taking into account most specific error types first
-   * and then the more general ones.
+   * Resolution is done based on the different mappings taking into account most specific error types first and then the more
+   * general ones.
    *
    * If no error type can be find then {@link Optional#empty()} will be returned.
    *

@@ -14,8 +14,8 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.io.Serializable;
@@ -44,7 +44,7 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
 
   @Override
   public void handleMessage(Message message) throws Fault {
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
 
     if (event == null || event instanceof NonBlockingVoidMuleEvent) {
       return;
@@ -54,7 +54,7 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
       return;
     }
 
-    MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage());
+    InternalMessage.Builder messageBuilder = InternalMessage.builder(event.getMessage());
 
     extractAndSetContentType(message, messageBuilder);
     extractAndSet(message, messageBuilder, Message.RESPONSE_CODE, HTTP_STATUS_PROPERTY);
@@ -71,7 +71,7 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
         messageBuilder.addOutboundProperty(key, val);
       }
     }
-    event = MuleEvent.builder(event).message(messageBuilder.build()).build();
+    event = Event.builder(event).message(messageBuilder.build()).build();
     message.getExchange().put(CxfConstants.MULE_EVENT, event);
 
     if (!Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE))) {
@@ -79,7 +79,7 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
     }
   }
 
-  private void extractAndSet(Message message, MuleMessage.Builder builder, String cxfHeader, String muleHeader) {
+  private void extractAndSet(Message message, InternalMessage.Builder builder, String cxfHeader, String muleHeader) {
     if (message.get(cxfHeader) instanceof Serializable) {
       Serializable val = (Serializable) message.get(cxfHeader);
       if (val != null) {
@@ -90,7 +90,7 @@ public class MuleProtocolHeadersOutInterceptor extends AbstractPhaseInterceptor<
     }
   }
 
-  private void extractAndSetContentType(Message message, MuleMessage.Builder builder) {
+  private void extractAndSetContentType(Message message, InternalMessage.Builder builder) {
     String ct = (String) message.get(Message.CONTENT_TYPE);
     if (ct != null) {
       builder.mediaType(MediaType.parse(ct).withCharset(getEncoding(message)));

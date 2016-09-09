@@ -7,7 +7,7 @@
 
 package org.mule.runtime.config.spring.factories;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
@@ -44,7 +44,7 @@ public class AggregationStrategyDefinitionParser extends ChildDefinitionParser {
     private AggregationStrategy ref;
 
     @Override
-    public MuleEvent aggregate(AggregationContext context) throws MuleException {
+    public Event aggregate(AggregationContext context) throws MuleException {
       return this.ref.aggregate(context);
     }
 

@@ -9,10 +9,10 @@ package org.mule.compatibility.core.api.exception;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class EndpointMessageRedeliveredException extends MessageRedeliveredException {
 
@@ -28,7 +28,7 @@ public class EndpointMessageRedeliveredException extends MessageRedeliveredExcep
    */
   @Deprecated
   protected EndpointMessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery,
-                                                InboundEndpoint endpoint, MuleEvent event, Message message) {
+                                                InboundEndpoint endpoint, Event event, I18nMessage message) {
     super(messageId, redeliveryCount, maxRedelivery, event, message);
     this.endpoint = endpoint;
   }
@@ -38,7 +38,7 @@ public class EndpointMessageRedeliveredException extends MessageRedeliveredExcep
    */
   @Deprecated
   public EndpointMessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint,
-                                             MuleEvent event, Message message, MessageProcessor failingMessageProcessor) {
+                                             Event event, I18nMessage message, Processor failingMessageProcessor) {
     super(messageId, redeliveryCount, maxRedelivery, event, message, failingMessageProcessor);
     this.endpoint = endpoint;
   }
@@ -48,7 +48,7 @@ public class EndpointMessageRedeliveredException extends MessageRedeliveredExcep
    */
   @Deprecated
   public EndpointMessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint,
-                                             MuleEvent event, MessageProcessor failingMessageProcessor) {
+                                             Event event, Processor failingMessageProcessor) {
     this(messageId, redeliveryCount, maxRedelivery, endpoint, event,
          TransportCoreMessages.createStaticMessage("Maximum redelivery attempts reached"), failingMessageProcessor);
   }

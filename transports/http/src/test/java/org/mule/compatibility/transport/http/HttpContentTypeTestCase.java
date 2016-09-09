@@ -11,7 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -35,7 +35,7 @@ public class HttpContentTypeTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     String url = String.format("http://localhost:%s/testInput", httpPort.getNumber());
 
-    MuleMessage response = client.send(url, MuleMessage.builder().payload(TEST_MESSAGE).build()).getRight();
+    InternalMessage response = client.send(url, InternalMessage.builder().payload(TEST_MESSAGE).build()).getRight();
 
     assertContentType(response);
   }
@@ -45,12 +45,12 @@ public class HttpContentTypeTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     String url = String.format("http://localhost:%s/requestClient", httpPort.getNumber());
 
-    MuleMessage response = client.send(url, MuleMessage.builder().payload(TEST_MESSAGE).build()).getRight();
+    InternalMessage response = client.send(url, InternalMessage.builder().payload(TEST_MESSAGE).build()).getRight();
 
     assertThat(getPayloadAsString(response), equalTo(EXPECTED_CONTENT_TYPE));
   }
 
-  private void assertContentType(MuleMessage response) {
+  private void assertContentType(InternalMessage response) {
     assertThat(response.getDataType().getMediaType().toRfcString(), equalTo(EXPECTED_CONTENT_TYPE));
   }
 }

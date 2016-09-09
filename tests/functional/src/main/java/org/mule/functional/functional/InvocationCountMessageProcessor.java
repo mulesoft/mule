@@ -6,11 +6,11 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Test message processor to keep count of number of invocations.
  */
-public class InvocationCountMessageProcessor implements MessageProcessor, Initialisable {
+public class InvocationCountMessageProcessor implements Processor, Initialisable {
 
   private static Map<String, AtomicInteger> invocationCountPerMessageProcessor = new HashMap<String, AtomicInteger>();
   private final AtomicInteger invocationCount = new AtomicInteger();
@@ -27,7 +27,7 @@ public class InvocationCountMessageProcessor implements MessageProcessor, Initia
 
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     invocationCount.incrementAndGet();
     return event;
   }

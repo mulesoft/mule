@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util.xa;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class ResourceManagerSystemException extends ResourceManagerException {
 
@@ -25,7 +25,7 @@ public class ResourceManagerSystemException extends ResourceManagerException {
   /**
    * @param message
    */
-  public ResourceManagerSystemException(Message message) {
+  public ResourceManagerSystemException(I18nMessage message) {
     super(message);
   }
 
@@ -40,7 +40,7 @@ public class ResourceManagerSystemException extends ResourceManagerException {
    * @param message
    * @param cause
    */
-  public ResourceManagerSystemException(Message message, Throwable cause) {
+  public ResourceManagerSystemException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

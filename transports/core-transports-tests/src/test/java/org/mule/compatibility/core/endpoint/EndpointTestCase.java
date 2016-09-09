@@ -23,7 +23,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -73,8 +73,8 @@ public class EndpointTestCase extends AbstractMuleTestCase {
     final RetryPolicyTemplate retryPolicyTemplate = mock(RetryPolicyTemplate.class);
     final AbstractRedeliveryPolicy redeliveryPolicy = mock(IdempotentRedeliveryPolicy.class);
     final EndpointMessageProcessorChainFactory messageProcessorsFactory = mock(EndpointMessageProcessorChainFactory.class);
-    final List<MessageProcessor> messageProcessors = new ArrayList<>();
-    final List<MessageProcessor> responseMessageProcessors = new ArrayList<>();
+    final List<Processor> messageProcessors = new ArrayList<>();
+    final List<Processor> responseMessageProcessors = new ArrayList<>();
     final MediaType mimeType = MediaType.TEXT;
     final boolean disableTransportTransformer = true;
 
@@ -115,7 +115,7 @@ public class EndpointTestCase extends AbstractMuleTestCase {
                          responseMessageProcessors, disableTransportTransformer, mimeType) {
 
       @Override
-      protected MessageProcessor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException {
+      protected Processor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException {
         return null;
       }
 

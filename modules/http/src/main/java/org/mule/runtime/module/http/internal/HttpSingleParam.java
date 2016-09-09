@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -36,7 +36,7 @@ public class HttpSingleParam extends HttpParam implements Initialisable, MuleCon
   }
 
   @Override
-  public void resolve(ParameterMap parameterMap, MuleEvent muleEvent, MuleContext muleContext) {
+  public void resolve(ParameterMap parameterMap, Event muleEvent, MuleContext muleContext) {
     parameterMap.put(name.resolveStringValue(muleEvent), value.resolveStringValue(muleEvent));
   }
 

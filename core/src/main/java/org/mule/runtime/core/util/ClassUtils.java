@@ -10,7 +10,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.runtime.core.util.ExceptionUtils.tryExpecting;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.routing.filters.WildcardFilter;

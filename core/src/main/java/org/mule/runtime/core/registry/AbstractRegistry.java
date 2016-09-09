@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.lifecycle.RegistryLifecycleManager;
 import org.mule.runtime.core.util.UUID;
 
@@ -166,7 +166,7 @@ public abstract class AbstractRegistry implements Registry {
     if (objects.size() == 1) {
       return objects.iterator().next();
     } else if (objects.size() > 1) {
-      throw new RegistrationException(MessageFactory
+      throw new RegistrationException(I18nMessageFactory
           .createStaticMessage("More than one object of type " + type + " registered but only one expected."));
     } else {
       return null;

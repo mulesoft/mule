@@ -13,11 +13,11 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -45,7 +45,7 @@ public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTest
     assertExceptionMessage(client.request("test://flow1out", RECEIVE_TIMEOUT).getRight().get());
   }
 
-  private void assertExceptionMessage(MuleMessage out) {
+  private void assertExceptionMessage(InternalMessage out) {
     assertThat(out, notNullValue());
     assertThat(out.getPayload(), instanceOf(ExceptionMessage.class));
     ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
@@ -54,10 +54,10 @@ public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTest
     assertThat(exceptionMessage.getPayload(), is("test"));
   }
 
-  public static class ExceptionThrowingProcessor implements MessageProcessor {
+  public static class ExceptionThrowingProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       throw new MessagingException(event, new FunctionalTestException());
     }
   }

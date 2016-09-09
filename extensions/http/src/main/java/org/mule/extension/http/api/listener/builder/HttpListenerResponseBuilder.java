@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.listener.builder;
 
 import org.mule.extension.http.api.HttpMessageBuilder;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -33,42 +33,42 @@ public class HttpListenerResponseBuilder extends HttpMessageBuilder {
    */
   @Parameter
   @Optional
-  private Function<MuleEvent, Integer> statusCode;
+  private Function<Event, Integer> statusCode;
 
   /**
    * HTTP reason phrase the response should have.
    */
   @Parameter
   @Optional
-  private Function<MuleEvent, String> reasonPhrase;
+  private Function<Event, String> reasonPhrase;
 
   /**
    * HTTP headers the response should have, as an expression. Will override the headers attribute.
    */
   @Parameter
   @Optional
-  private Function<MuleEvent, Map> headersRef;
+  private Function<Event, Map> headersRef;
 
   /**
    * HTTP parts the message should include, as an expression. Will override the parts attribute.
    */
   @Parameter
   @Optional
-  private Function<MuleEvent, List> partsRef;
+  private Function<Event, List> partsRef;
 
-  public Integer getStatusCode(MuleEvent event) {
+  public Integer getStatusCode(Event event) {
     return statusCode != null ? statusCode.apply(event) : null;
   }
 
-  public String getReasonPhrase(MuleEvent event) {
+  public String getReasonPhrase(Event event) {
     return reasonPhrase != null ? reasonPhrase.apply(event) : null;
   }
 
-  public Map<String, String> getHeaders(MuleEvent event) {
+  public Map<String, String> getHeaders(Event event) {
     return headersRef != null ? headersRef.apply(event) : headers;
   }
 
-  public Map<String, DataHandler> getParts(MuleEvent event) {
+  public Map<String, DataHandler> getParts(Event event) {
     return partsRef != null ? getResolvedParts(partsRef.apply(event)) : getParts();
   }
 }

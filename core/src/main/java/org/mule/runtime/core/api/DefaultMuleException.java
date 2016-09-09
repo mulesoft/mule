@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 /**
  * <code>MuleException</code> Is the base exception type for the Mule application any other exceptions thrown by Mule code will be
@@ -21,25 +21,25 @@ public class DefaultMuleException extends MuleException {
   private static final long serialVersionUID = 2554735072826262515L;
 
   public DefaultMuleException(String message) {
-    this(MessageFactory.createStaticMessage(message));
+    this(I18nMessageFactory.createStaticMessage(message));
   }
 
   /**
    * @param message the exception message
    */
-  public DefaultMuleException(Message message) {
+  public DefaultMuleException(I18nMessage message) {
     super(message);
   }
 
   public DefaultMuleException(String message, Throwable cause) {
-    this(MessageFactory.createStaticMessage(message), cause);
+    this(I18nMessageFactory.createStaticMessage(message), cause);
   }
 
   /**
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public DefaultMuleException(Message message, Throwable cause) {
+  public DefaultMuleException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

@@ -8,7 +8,7 @@ package org.mule.runtime.module.scripting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class GroovyRegistryLookupTestCase extends FunctionalTestCase {
 
   @Test
   public void testBindingCallout() throws Exception {
-    MuleMessage response = flowRunner("sayHello").withPayload("").run().getMessage();
+    InternalMessage response = flowRunner("sayHello").withPayload("").run().getMessage();
     assertNotNull(response);
     assertEquals("hello", getPayloadAsString(response));
   }

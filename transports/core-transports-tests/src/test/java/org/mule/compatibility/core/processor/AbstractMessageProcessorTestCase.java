@@ -23,16 +23,16 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -61,8 +61,8 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
   protected static final String TEST_URI = "test://myTestUri";
   protected static String RESPONSE_MESSAGE = "response-message";
-  protected static MuleMessage responseMessage;
-  protected Answer<MuleEvent> echoEventAnswer = invocation -> (MuleEvent) invocation.getArguments()[0];
+  protected static InternalMessage responseMessage;
+  protected Answer<Event> echoEventAnswer = invocation -> (Event) invocation.getArguments()[0];
 
   @Override
   protected void doSetUp() throws Exception {
@@ -113,10 +113,10 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
       endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
     }
     if (transformer != null) {
-      endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
+      endpointBuilder.setMessageProcessors(Collections.<Processor>singletonList(transformer));
     }
     if (responseTransformer != null) {
-      endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>singletonList(responseTransformer));
+      endpointBuilder.setResponseMessageProcessors(Collections.<Processor>singletonList(responseTransformer));
     }
     endpointBuilder.setExchangePattern(exchangePattern);
     endpointBuilder.setTransactionConfig(txConfig);
@@ -124,10 +124,10 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     return endpoint;
   }
 
-  protected MuleEvent createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
+  protected Event createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
     Flow flow = getTestFlow();
-    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build()).flow(flow)
+    final Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build()).flow(flow)
         .session(getTestSession(null, muleContext)).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
   }
@@ -174,10 +174,10 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
       endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
     }
     if (transformer != null) {
-      endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
+      endpointBuilder.setMessageProcessors(Collections.<Processor>singletonList(transformer));
     }
     if (responseTransformer != null) {
-      endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>singletonList(responseTransformer));
+      endpointBuilder.setResponseMessageProcessors(Collections.<Processor>singletonList(responseTransformer));
     }
     endpointBuilder.setExchangePattern(exchangePattern);
     endpointBuilder.setTransactionConfig(txConfig);
@@ -189,11 +189,11 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     // template method
   }
 
-  protected MuleEvent createTestOutboundEvent() throws Exception {
+  protected Event createTestOutboundEvent() throws Exception {
     return createTestOutboundEvent(null);
   }
 
-  protected MuleEvent createTestOutboundEvent(MessagingExceptionHandler exceptionListener) throws Exception {
+  protected Event createTestOutboundEvent(MessagingExceptionHandler exceptionListener) throws Exception {
     Map<String, Serializable> props = new HashMap<>();
     props.put("prop1", "value1");
     props.put("port", 12345);
@@ -202,14 +202,14 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     if (exceptionListener != null) {
       flow.setExceptionListener(exceptionListener);
     }
-    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build()).flow(flow)
+    final Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build()).flow(flow)
         .session(getTestSession(null, muleContext)).build();
     return populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(REQUEST_RESPONSE));
   }
 
-  protected MuleMessage createTestResponseMuleMessage() {
-    return MuleMessage.builder().payload(RESPONSE_MESSAGE).build();
+  protected InternalMessage createTestResponseMuleMessage() {
+    return InternalMessage.builder().payload(RESPONSE_MESSAGE).build();
   }
 
   public static class TestFilter implements Filter {
@@ -221,7 +221,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     }
 
     @Override
-    public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+    public boolean accept(InternalMessage message, Event.Builder builder) {
       return accept;
     }
   }
@@ -238,12 +238,12 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     }
   }
 
-  public static class TestListener implements MessageProcessor {
+  public static class TestListener implements Processor {
 
-    public MuleEvent sensedEvent;
+    public Event sensedEvent;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       sensedEvent = event;
       return event;
     }
@@ -279,10 +279,10 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     }
   }
 
-  public static class ExceptionThrowingMessageProcessor implements MessageProcessor {
+  public static class ExceptionThrowingMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       throw new IllegalStateException();
     }
   }
@@ -292,21 +292,21 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     public Exception sensedException;
 
     @Override
-    public MuleEvent handleException(MessagingException exception, MuleEvent event) {
+    public Event handleException(MessagingException exception, Event event) {
       sensedException = exception;
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).nullPayload()
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).nullPayload()
           .exceptionPayload(new DefaultExceptionPayload(exception)).build()).error(createErrorMock(exception)).build();
     }
 
   }
 
-  public class ObjectAwareProcessor implements MessageProcessor, EndpointAware, MuleContextAware {
+  public class ObjectAwareProcessor implements Processor, EndpointAware, MuleContextAware {
 
     public MuleContext context;
     public ImmutableEndpoint endpoint;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return null;
     }
 
@@ -326,10 +326,10 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     }
   }
 
-  protected MuleEvent getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
+  protected Event getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
       throws Exception {
-    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(payload).build())
+    return Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload(payload).build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(replyToHandler).flow(flow).build();
   }
 }

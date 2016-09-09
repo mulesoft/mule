@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.message;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,5 +25,5 @@ public interface OutputHandler {
    * @param out the output stream to write to
    * @throws IOException in case of error
    */
-  void write(MuleEvent event, OutputStream out) throws IOException;
+  void write(Event event, OutputStream out) throws IOException;
 }

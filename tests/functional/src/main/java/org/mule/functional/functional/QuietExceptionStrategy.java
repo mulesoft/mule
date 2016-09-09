@@ -6,7 +6,7 @@
  */
 package org.mule.functional.functional;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 
 /**
@@ -19,7 +19,7 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy {
   }
 
   @Override
-  protected MuleEvent doHandleException(Exception e, MuleEvent event) {
+  protected Event doHandleException(Exception e, Event event) {
     logger.debug("Ignoring", e);
     return event;
   }

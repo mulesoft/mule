@@ -16,8 +16,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.mvel2.compiler.AbstractParser;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
@@ -109,24 +109,24 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testVariableAlias() throws Exception {
-    MuleEvent event = getTestEvent("foo");
+    Event event = getTestEvent("foo");
 
     assertThat(expressionLanguage.evaluate("p", event, flowConstruct), is("foo"));
   }
 
   @Test
   public void testAssignValueToVariableAlias() throws Exception {
-    MuleEvent event = getTestEvent("");
+    Event event = getTestEvent("");
 
-    MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+    Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.evaluate("p='bar'", event, eventBuilder, flowConstruct);
     assertThat(eventBuilder.build().getMessage().getPayload(), is("bar"));
   }
 
   @Test
   public void testMuleMessageAvailableAsVariable() throws Exception {
-    MuleEvent event = getTestEvent("");
-    MuleMessage message = event.getMessage();
+    Event event = getTestEvent("");
+    InternalMessage message = event.getMessage();
     expressionLanguage.evaluate("p=m.uniqueId", event, flowConstruct);
   }
 
@@ -143,10 +143,10 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testMuleMessageAvailableInFunction() throws RegistrationException, InitialisationException {
-    MuleEvent event = mock(MuleEvent.class);
+    Event event = mock(Event.class);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    MuleMessage message = mock(MuleMessage.class);
+    InternalMessage message = mock(InternalMessage.class);
     when(event.getMessage()).thenReturn(message);
 
     assertThat(expressionLanguage.evaluate("muleMessage()", event, flowConstruct), is(message));

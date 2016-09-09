@@ -6,8 +6,8 @@
  */
 package org.mule.test.filters;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +20,7 @@ public class FilterCounter implements Filter {
    * Increments the counter if it passes the filter
    */
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     if ("true".equals(message.getInboundProperty("pass"))) {
       counter.incrementAndGet();
       return true;

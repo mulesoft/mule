@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.lang.reflect.Method;
 
@@ -30,12 +30,12 @@ public class CallableEntryPointResolver implements EntryPointResolver {
     try {
       callableMethod = Callable.class.getMethod("onCall", new Class[] {MuleEventContext.class});
     } catch (NoSuchMethodException e) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage("Panic! No onCall(MuleEventContext) method found in the Callable interface."));
     }
   }
 
-  public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
+  public InvocationResult invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
     if (component instanceof Callable) {
       Object result = ((Callable) component).onCall(context);
       return new InvocationResult(this, result, callableMethod);

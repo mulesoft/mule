@@ -7,8 +7,8 @@
 package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 public final class UnsupportedMessageDispatcher extends AbstractMessageDispatcher {
 
@@ -17,12 +17,12 @@ public final class UnsupportedMessageDispatcher extends AbstractMessageDispatche
   }
 
   @Override
-  protected void doDispatch(MuleEvent event) throws Exception {
+  protected void doDispatch(Event event) throws Exception {
     throw new UnsupportedOperationException("Dispatch not supported for this transport.");
   }
 
   @Override
-  protected MuleMessage doSend(MuleEvent event) throws Exception {
+  protected InternalMessage doSend(Event event) throws Exception {
     throw new UnsupportedOperationException("Send not supported for this transport.");
   }
 

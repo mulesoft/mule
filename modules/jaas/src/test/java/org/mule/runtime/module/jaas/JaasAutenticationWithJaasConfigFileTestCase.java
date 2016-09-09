@@ -9,7 +9,7 @@ package org.mule.runtime.module.jaas;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
   @Test
   public void goodAuthentication() throws Exception {
     SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
-    MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
+    InternalMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
         .withPayload("Test").run().getMessage();
 
     assertNotNull(message);
@@ -34,7 +34,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
   @Test
   public void anotherGoodAuthentication() throws Exception {
     SecurityHeader securityHeader = createSecurityHeader("anon", "anon");
-    MuleMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
+    InternalMessage message = flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
         .withPayload("Test").run().getMessage();
 
     assertNotNull(message);

@@ -12,8 +12,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -30,14 +30,14 @@ public class CacheControlTestCase extends AbstractMuleTestCase {
   private static final String HEADER_MUST_REVALIDATE = "#[header:mustRevalidate]";
   private static final String HEADER_NO_CACHE = "#[header:noCache]";
   private static final String HEADER_NO_STORE = "#[header:noStore]";
-  private MuleMessage muleMessage;
-  private MuleEvent muleEvent;
+  private InternalMessage muleMessage;
+  private Event muleEvent;
   private ExpressionLanguage expressionLanguage;
 
   @Before
   public void setUp() {
-    muleMessage = mock(MuleMessage.class);
-    muleEvent = mock(MuleEvent.class);
+    muleMessage = mock(InternalMessage.class);
+    muleEvent = mock(Event.class);
     expressionLanguage = mock(ExpressionLanguage.class);
   }
 
@@ -89,7 +89,7 @@ public class CacheControlTestCase extends AbstractMuleTestCase {
   }
 
   private void mockParse() {
-    when(expressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(expressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 }

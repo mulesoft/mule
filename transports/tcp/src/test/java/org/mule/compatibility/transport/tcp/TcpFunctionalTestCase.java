@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.tcp;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -31,7 +31,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
+    InternalMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
   }
 
@@ -40,7 +40,7 @@ public class TcpFunctionalTestCase extends FunctionalTestCase {
     long now = System.currentTimeMillis();
     int count = 1000;
     for (int i = 0; i < count; i++) {
-      MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
+      InternalMessage result = client.send("clientEndpoint", TEST_MESSAGE, null).getRight();
       assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
     long later = System.currentTimeMillis();

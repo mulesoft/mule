@@ -7,18 +7,18 @@
 package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Exception thrown when there's a failure writing the response using the transport infrastructure.
  */
 public class ResponseDispatchException extends MuleException {
 
-  public ResponseDispatchException(Message message) {
+  public ResponseDispatchException(I18nMessage message) {
     super(message);
   }
 
-  public ResponseDispatchException(Message message, Throwable cause) {
+  public ResponseDispatchException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

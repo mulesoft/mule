@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http.functional;
 
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.util.Map;
@@ -22,7 +22,7 @@ public class HttpOutboundHeadersPropagationComponent implements Callable {
 
   @Override
   public Object onCall(MuleEventContext muleEventContext) throws Exception {
-    MuleMessage m = muleEventContext.getMessage();
+    InternalMessage m = muleEventContext.getMessage();
     Map<String, Object> headers = new TreeMap<>();
     for (String s : m.getInboundPropertyNames()) {
       headers.put(s, m.getInboundProperty(s));

@@ -11,7 +11,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.Part;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -47,7 +47,7 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory {
   }
 
   @Override
-  protected void addAttachments(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
+  protected void addAttachments(InternalMessage.Builder messageBuilder, Object transportMessage) throws Exception {
     if (parts != null) {
       try {
         for (Part part : parts) {
@@ -70,7 +70,7 @@ public class HttpMultipartMuleMessageFactory extends HttpMuleMessageFactory {
         if (part.getName().equals("payload")) {
           for (String name : part.getHeaderNames()) {
             if (HEADER_CONTENT_TYPE.equalsIgnoreCase(name)) {
-              // TODO MULE-9986 need MuleMessage to support multipart payload
+              // TODO MULE-9986 need Message to support multipart payload
               headers.put("multipart_" + HEADER_CONTENT_TYPE, headers.get(name));
             }
             headers.put(name, part.getHeader(name));

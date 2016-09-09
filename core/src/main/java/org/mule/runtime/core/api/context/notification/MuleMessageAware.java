@@ -6,18 +6,15 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 /**
- * Signals that a Notification can have a {@link MuleMessage} available through it. The message set will be the one available when
- * the notification was triggered. Note that the message returned may also be a
- * {@link org.mule.runtime.core.api.MuleMessageCollection} if there was more than one message available when the notification was
- * created.
+ * Signals that a Notification can have a {@link Message} available through it. The message set will be the one available when the
+ * notification was triggered.
  *
- * @see org.mule.runtime.core.api.MuleMessage
- * @see org.mule.runtime.core.api.MuleMessageCollection
+ * @see org.mule.runtime.core.api.InternalMessage
  */
 public interface MuleMessageAware {
 
-  public MuleMessage getMessage();
+  public InternalMessage getMessage();
 }

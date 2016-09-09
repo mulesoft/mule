@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -23,7 +23,7 @@ import org.springframework.beans.factory.FactoryBean;
 
 public class MessageProcessorFilterPairFactoryBean implements FactoryBean<MessageProcessorFilterPair>, MuleContextAware {
 
-  private List<MessageProcessor> messageProcessors;
+  private List<Processor> messageProcessors;
   private Filter filter = new ExpressionFilter();
   private MuleContext muleContext;
 
@@ -31,7 +31,7 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
     this.filter = filter;
   }
 
-  public void setMessageProcessors(List<MessageProcessor> messageProcessors) {
+  public void setMessageProcessors(List<Processor> messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
@@ -43,8 +43,8 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
   public MessageProcessorFilterPair getObject() throws Exception {
     MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     for (Object processor : messageProcessors) {
-      if (processor instanceof MessageProcessor) {
-        builder.chain((MessageProcessor) processor);
+      if (processor instanceof Processor) {
+        builder.chain((Processor) processor);
       } else if (processor instanceof MessageProcessorBuilder) {
         builder.chain((MessageProcessorBuilder) processor);
       } else {

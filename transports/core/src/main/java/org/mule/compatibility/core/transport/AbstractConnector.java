@@ -39,9 +39,9 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.ThreadingProfile;
@@ -57,7 +57,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
@@ -66,7 +66,7 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationHelper;
 import org.mule.runtime.core.message.SessionHandler;
@@ -172,7 +172,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   protected volatile MessageRequesterFactory requesterFactory;
 
   /**
-   * Factory used to create new {@link MuleMessage} instances
+   * Factory used to create new {@link Message} instances
    */
   protected MuleMessageFactory muleMessageFactory;
 
@@ -593,7 +593,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    * </p>
    * <p/>
    * <b>Attention!</b> This method is not meant to be used by client code directly. It is only publicly available to service
-   * message receivers which should be used as <em>real</em> factories to create {@link MuleMessage} instances.
+   * message receivers which should be used as <em>real</em> factories to create {@link Message} instances.
    *
    * @see MessageReceiver#createMuleMessage(Object)
    * @see MessageReceiver#createMuleMessage(Object, String)
@@ -1039,7 +1039,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   }
 
   @Override
-  public void registerListener(InboundEndpoint endpoint, MessageProcessor messageProcessorChain, FlowConstruct flowConstruct)
+  public void registerListener(InboundEndpoint endpoint, Processor messageProcessorChain, FlowConstruct flowConstruct)
       throws Exception {
     connectionLock.lock();
     try {
@@ -1263,7 +1263,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    *
    * @param notification the notification to fire.
    * @param muleContext the Mule node.
-   * @param event a {@link MuleEvent}
+   * @param event a {@link Event}
    */
   public void fireNotification(ServerNotification notification, MuleContext muleContext) {
     notificationHelper.fireNotification(notification, muleContext);
@@ -1339,7 +1339,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
           if (validateConnections && context.getLastFailure() instanceof EndpointConnectException) {
             Connectable failed = ((EndpointConnectException) context.getLastFailure()).getFailed();
             if (!failed.validateConnection(context).isOk()) {
-              throw new EndpointConnectException(MessageFactory
+              throw new EndpointConnectException(I18nMessageFactory
                   .createStaticMessage("Still unable to connect to resource " + failed.getClass().getName()),
                                                  context.getLastFailure(), failed);
             }
@@ -1809,9 +1809,9 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
   }
 
   @Override
-  public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception {
+  public InternalMessage request(InboundEndpoint endpoint, long timeout) throws Exception {
     MessageRequester requester = null;
-    MuleMessage result = null;
+    InternalMessage result = null;
 
     try {
       requester = this.getRequester(endpoint);
@@ -1831,7 +1831,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    * @param requester
    * @param result
    */
-  protected MuleMessage setupRequestReturn(final InboundEndpoint endpoint, final MessageRequester requester, MuleMessage result) {
+  protected InternalMessage setupRequestReturn(final InboundEndpoint endpoint, final MessageRequester requester,
+                                               InternalMessage result) {
     if (result != null && result.getPayload() instanceof InputStream) {
       DelegatingInputStream is = new DelegatingInputStream((InputStream) result.getPayload()) {
 
@@ -1844,7 +1845,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
           }
         }
       };
-      return MuleMessage.builder(result).payload(is).mediaType(result.getDataType().getMediaType()).build();
+      return InternalMessage.builder(result).payload(is).mediaType(result.getDataType().getMediaType()).build();
     } else {
       returnRequester(endpoint, requester);
       return result;
@@ -1997,7 +1998,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    * @throws MuleException in case of any error
    */
   @Override
-  public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException {
+  public OutputStream getOutputStream(OutboundEndpoint endpoint, Event event) throws MuleException {
     throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol()).toString());
   }
 
@@ -2121,7 +2122,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     requesters.setMaxWait(maxWait);
   }
 
-  public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
+  public Processor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
     if (endpoint.getExchangePattern().hasResponse() || !getDispatcherThreadingProfile().isDoThreading()) {
       return new DispatcherMessageProcessor(endpoint);
     } else {
@@ -2161,7 +2162,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
   }
 
-  class DispatcherMessageProcessor implements MessageProcessor, Disposable {
+  class DispatcherMessageProcessor implements Processor, Disposable {
 
     private OutboundNotificationMessageProcessor notificationMessageProcessor;
     private OutboundEndpoint endpoint;
@@ -2171,7 +2172,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       MessageDispatcher dispatcher = null;
       try {
         dispatcher = borrowDispatcher(endpoint);
@@ -2182,7 +2183,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
           }
           notificationMessageProcessor.dispatchNotification(notificationMessageProcessor.createBeginNotification(event));
         }
-        MuleEvent result = dispatcher.process(event);
+        Event result = dispatcher.process(event);
 
         if (fireNotification) {
           // We need to invoke notification message processor with request

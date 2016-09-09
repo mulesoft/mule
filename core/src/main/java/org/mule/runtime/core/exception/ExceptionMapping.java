@@ -43,7 +43,7 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
 
   /**
    * @return the error type of this mapping.
-     */
+   */
   public ErrorType getErrorType() {
     return errorType;
   }

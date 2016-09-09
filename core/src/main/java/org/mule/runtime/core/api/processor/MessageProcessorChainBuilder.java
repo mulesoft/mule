@@ -14,7 +14,7 @@ package org.mule.runtime.core.api.processor;
  */
 public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
 
-  MessageProcessorChainBuilder chain(MessageProcessor... processors);
+  MessageProcessorChainBuilder chain(Processor... processors);
 
   MessageProcessorChainBuilder chain(MessageProcessorBuilder... builders);
 }

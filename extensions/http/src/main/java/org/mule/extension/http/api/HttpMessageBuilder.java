@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
 import org.mule.runtime.core.api.MuleRuntimeException;

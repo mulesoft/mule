@@ -7,10 +7,10 @@
 package org.mule.runtime.core.transformer.simple;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;
@@ -41,7 +41,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
       return new OutputHandler() {
 
         @Override
-        public void write(MuleEvent event, OutputStream out) throws IOException {
+        public void write(Event event, OutputStream out) throws IOException {
           out.write(((String) src).getBytes(encoding));
         }
       };
@@ -49,7 +49,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
       return new OutputHandler() {
 
         @Override
-        public void write(MuleEvent event, OutputStream out) throws IOException {
+        public void write(Event event, OutputStream out) throws IOException {
           out.write((byte[]) src);
         }
       };
@@ -57,7 +57,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
       return new OutputHandler() {
 
         @Override
-        public void write(MuleEvent event, OutputStream out) throws IOException {
+        public void write(Event event, OutputStream out) throws IOException {
           InputStream is = (InputStream) src;
           try {
             IOUtils.copyLarge(is, out);
@@ -70,12 +70,12 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
       return new OutputHandler() {
 
         @Override
-        public void write(MuleEvent event, OutputStream out) throws IOException {
+        public void write(Event event, OutputStream out) throws IOException {
           muleContext.getObjectSerializer().serialize(src, out);
         }
       };
     } else {
-      throw new TransformerException(MessageFactory
+      throw new TransformerException(I18nMessageFactory
           .createStaticMessage("Unable to convert " + src.getClass() + " to OutputHandler."));
     }
   }

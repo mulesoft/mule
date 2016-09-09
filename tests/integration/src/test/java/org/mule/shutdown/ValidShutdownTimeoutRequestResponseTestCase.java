@@ -9,7 +9,7 @@ package org.mule.shutdown;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -57,8 +57,8 @@ public class ValidShutdownTimeoutRequestResponseTestCase extends AbstractShutdow
       @Override
       public void run() {
         try {
-          MuleMessage muleMessage = MuleMessage.builder().payload(payload).build();
-          MuleMessage result = client.send(url, muleMessage).getRight();
+          InternalMessage muleMessage = InternalMessage.builder().payload(payload).build();
+          InternalMessage result = client.send(url, muleMessage).getRight();
           results[0] = payload.equals(getPayloadAsString(result));
         } catch (Exception e) {
           // Ignore

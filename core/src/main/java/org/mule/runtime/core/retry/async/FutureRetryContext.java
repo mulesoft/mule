@@ -9,7 +9,7 @@ package org.mule.runtime.core.retry.async;
 import java.util.Map;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 
 /**
@@ -35,7 +35,7 @@ public class FutureRetryContext implements RetryContext {
     }
   }
 
-  public void addReturnMessage(MuleMessage result) {
+  public void addReturnMessage(InternalMessage result) {
     checkState();
     delegate.addReturnMessage(result);
   }
@@ -45,7 +45,7 @@ public class FutureRetryContext implements RetryContext {
     return delegate.getDescription();
   }
 
-  public MuleMessage getFirstReturnMessage() {
+  public InternalMessage getFirstReturnMessage() {
     checkState();
     return delegate.getFirstReturnMessage();
   }
@@ -55,12 +55,12 @@ public class FutureRetryContext implements RetryContext {
     return delegate.getMetaInfo();
   }
 
-  public MuleMessage[] getReturnMessages() {
+  public InternalMessage[] getReturnMessages() {
     checkState();
     return delegate.getReturnMessages();
   }
 
-  public void setReturnMessages(MuleMessage[] returnMessages) {
+  public void setReturnMessages(InternalMessage[] returnMessages) {
     checkState();
     delegate.setReturnMessages(returnMessages);
   }

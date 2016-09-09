@@ -16,7 +16,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
@@ -39,8 +39,8 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
 
   @Test
   public void testXmlContentType() throws Exception {
-    MuleMessage result =
-        client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("<OK/>").mediaType(MediaType.XML).build())
+    InternalMessage result =
+        client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("<OK/>").mediaType(MediaType.XML).build())
             .getRight();
     assertNotNull(result.getExceptionPayload());
     assertTrue(result.getExceptionPayload().getException() instanceof MessagingException);
@@ -49,8 +49,8 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
   @Test
   public void testPlainContentType() throws Exception {
     EchoComponent.setExpectedContentType("text/plain");
-    MuleMessage response =
-        client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
+    InternalMessage response =
+        client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
             .getRight();
     assertNotNull(response);
     assertEquals("OK", response.getPayload());
@@ -59,7 +59,8 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
   @Test
   public void testDefaultContentType() throws Exception {
     EchoComponent.setExpectedContentType("text/plain");
-    MuleMessage response = client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").build()).getRight();
+    InternalMessage response =
+        client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
     assertEquals("OK", response.getPayload());
   }
@@ -67,8 +68,8 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
   @Test
   public void testXmlContentTypePlainPayload() throws Exception {
     EchoComponent.setExpectedContentType("text/xml");
-    MuleMessage result =
-        client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
+    InternalMessage result =
+        client.send("vm://in2?connector=vm-in2", InternalMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
             .getRight();
     assertNotNull(result.getExceptionPayload());
     assertTrue(result.getExceptionPayload().getException() instanceof MessagingException);
@@ -80,7 +81,7 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      MuleMessage message = eventContext.getMessage();
+      InternalMessage message = eventContext.getMessage();
       final MediaType parse = MediaType.parse(expectedContentType);
       assertThat(message.getDataType().getMediaType().getPrimaryType(), is(parse.getPrimaryType()));
       assertThat(message.getDataType().getMediaType().getSubType(), is(parse.getSubType()));

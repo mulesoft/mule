@@ -14,12 +14,10 @@ import static org.mule.runtime.core.util.Preconditions.checkState;
 import javax.xml.namespace.QName;
 
 /**
- * Unique identifier for a configuration option. Every configuration option
- * has a namespace and an identifier.
+ * Unique identifier for a configuration option. Every configuration option has a namespace and an identifier.
  *
- * The namespace define the extension that defines the component. Even
- * core configuration has a namespace even though there's no namespace
- * used in the configuration files.
+ * The namespace define the extension that defines the component. Even core configuration has a namespace even though there's no
+ * namespace used in the configuration files.
  *
  * @since 4.0
  */

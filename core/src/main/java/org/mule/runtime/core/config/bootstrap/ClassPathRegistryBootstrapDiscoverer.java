@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.config.bootstrap;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.PropertiesUtils.discoverProperties;
 
 import java.io.IOException;

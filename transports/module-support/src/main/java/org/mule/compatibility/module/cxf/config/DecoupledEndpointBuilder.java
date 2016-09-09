@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
 import org.mule.runtime.module.cxf.CxfOutboundMessageProcessor;
@@ -32,7 +32,7 @@ public class DecoupledEndpointBuilder {
       cxfInboundMP.setMuleContext(muleContext);
       cxfInboundMP.setBus(bus);
 
-      List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
+      List<Processor> mps = new ArrayList<Processor>();
       mps.add(cxfInboundMP);
 
       EndpointBuilder ep = getEndpointFactory(muleContext).getEndpointBuilder(decoupledEndpoint);

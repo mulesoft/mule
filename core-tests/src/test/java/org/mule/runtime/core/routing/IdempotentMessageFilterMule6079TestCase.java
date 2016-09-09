@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -71,8 +71,8 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 
     @Override
     public void run() {
-      MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
+      InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+      Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
           .session(session).build();
 
       try {

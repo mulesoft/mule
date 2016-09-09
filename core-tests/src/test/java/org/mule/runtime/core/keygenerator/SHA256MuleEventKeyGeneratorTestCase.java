@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -37,14 +37,14 @@ public class SHA256MuleEventKeyGeneratorTestCase extends AbstractMuleContextTest
 
   @Test
   public void generatesKeyApplyingSHA256ToPayload() throws Exception {
-    MuleEvent event = getTestEvent(TEST_INPUT);
+    Event event = getTestEvent(TEST_INPUT);
     String key = (String) keyGenerator.generateKey(event);
     assertEquals(TEST_HASH, key);
   }
 
   @Test(expected = NotSerializableException.class)
   public void failsToGenerateKeyWhenCannotReadPayload() throws Exception {
-    MuleEvent event = mock(MuleEvent.class);
+    Event event = mock(Event.class);
     when(event.getMessageAsBytes(muleContext)).thenThrow(new DefaultMuleException("Fail"));
     keyGenerator.generateKey(event);
   }

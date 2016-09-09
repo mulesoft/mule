@@ -14,15 +14,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
@@ -47,7 +47,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCase {
 
   @Mock
-  protected MuleEvent event;
+  protected Event event;
 
   @Mock
   protected MessageProcessorExecutionTemplate executionTemplate;
@@ -60,7 +60,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
   protected SensingNullMessageProcessor processor1 = new SensingNullMessageProcessor(A);
   protected SensingNullMessageProcessor processor2 = new SensingNullMessageProcessor(B);
   protected SensingNullMessageProcessor processor3 = new SensingNullMessageProcessor(C);
-  protected List<MessageProcessor> processors = new ArrayList<>();
+  protected List<Processor> processors = new ArrayList<>();
 
   @Before
   public void before() throws Exception {
@@ -70,13 +70,13 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
 
     setCurrentEvent(event);
 
-    MuleMessage message = MuleMessage.builder().payload("").build();
+    InternalMessage message = InternalMessage.builder().payload("").build();
     when(event.getMessage()).thenReturn(message);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    when(executionTemplate.execute(any(MessageProcessor.class), any(MuleEvent.class))).thenAnswer(invocation -> {
-      MessageProcessor messageProcessor = (MessageProcessor) invocation.getArguments()[0];
-      MuleEvent event = (MuleEvent) invocation.getArguments()[1];
+    when(executionTemplate.execute(any(Processor.class), any(Event.class))).thenAnswer(invocation -> {
+      Processor messageProcessor = (Processor) invocation.getArguments()[0];
+      Event event = (Event) invocation.getArguments()[1];
       return messageProcessor.process(event);
     });
     muleContext.setTransformationService(new TransformationService(muleContext));
@@ -118,7 +118,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     when(event.isSynchronous()).thenReturn(true);
   }
 
-  protected void assertBlockingExecution(List<MessageProcessor> processors)
+  protected void assertBlockingExecution(List<Processor> processors)
       throws MuleException {
     ProcessorExecutor executor = createProcessorExecutor(processors);
 
@@ -138,7 +138,7 @@ public class BlockingProcessorExecutorTestCase extends AbstractMuleContextTestCa
     assertThat(processor3.thread, equalTo(Thread.currentThread()));
   }
 
-  protected ProcessorExecutor createProcessorExecutor(List<MessageProcessor> processors) {
+  protected ProcessorExecutor createProcessorExecutor(List<Processor> processors) {
     return new BlockingProcessorExecutor(event, processors, executionTemplate, true);
   }
 }

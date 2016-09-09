@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.util.OneTimeWarning;
@@ -48,7 +48,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
           "not recommended if unsupported message processors are being used.  ");
 
 
-  public NonBlockingProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
+  public NonBlockingProcessorExecutor(Event event, List<Processor> processors,
                                       MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent,
                                       FlowConstruct flowConstruct) {
     super(event, processors, executionTemplate, copyOnVoidEvent);
@@ -58,12 +58,12 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
   }
 
   @Override
-  protected void preProcess(MessageProcessor processor) {
+  protected void preProcess(Processor processor) {
     if (event.isAllowNonBlocking()) {
       if (!processorSupportsNonBlocking(processor)) {
         fallbackWarning.warn(processor.getClass());
         // Make event synchronous so that non-blocking is not used
-        event = MuleEvent.builder(event).flow(flowConstruct).synchronous(true).build();
+        event = Event.builder(event).flow(flowConstruct).synchronous(true).build();
         // Update RequestContext ThreadLocal for backwards compatibility
         setCurrentEvent(event);
       }
@@ -72,7 +72,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
         // Even if there is no ReplyToHandler available, using non-blocking processing anyway for a non-blocking
         // message processor if a response isn't required.
         if (!(messageExchangePattern.hasResponse() && replyToHandler == null)) {
-          event = MuleEvent.builder(event).replyToHandler(new NonBlockingProcessorExecutorReplyToHandler()).build();
+          event = Event.builder(event).replyToHandler(new NonBlockingProcessorExecutorReplyToHandler()).build();
           // Update RequestContext ThreadLocal for backwards compatibility
           setCurrentEvent(event);
         }
@@ -80,7 +80,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
     }
   }
 
-  private boolean processorSupportsNonBlocking(MessageProcessor processor) {
+  private boolean processorSupportsNonBlocking(Processor processor) {
     if (processor instanceof NonBlockingSupported) {
       return true;
     } else if (processor instanceof AsyncInterceptingMessageProcessor && !messageExchangePattern.hasResponse()) {
@@ -90,19 +90,19 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
     }
   }
 
-  private MuleEvent resume(final MuleEvent event) throws MuleException {
+  private Event resume(final Event event) throws MuleException {
     this.event = recreateEventWithOriginalReplyToHandler(event);
 
-    MuleEvent result = execute();
+    Event result = execute();
     if (!(result instanceof NonBlockingVoidMuleEvent) && replyToHandler != null) {
       result = replyToHandler.processReplyTo(result, null, null);
     }
     return result;
   }
 
-  private MuleEvent recreateEventWithOriginalReplyToHandler(MuleEvent event) {
+  private Event recreateEventWithOriginalReplyToHandler(Event event) {
     if (event != null) {
-      event = MuleEvent.builder(event).replyToHandler(replyToHandler).build();
+      event = Event.builder(event).replyToHandler(replyToHandler).build();
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(event);
     }
@@ -112,7 +112,7 @@ public class NonBlockingProcessorExecutor extends BlockingProcessorExecutor {
   class NonBlockingProcessorExecutorReplyToHandler implements NonBlockingReplyToHandler {
 
     @Override
-    public MuleEvent processReplyTo(final MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+    public Event processReplyTo(final Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
       try {
         return resume(event);
       } catch (Throwable e) {

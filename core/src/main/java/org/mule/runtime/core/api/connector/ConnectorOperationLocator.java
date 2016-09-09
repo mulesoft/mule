@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.connector;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.OperationOptions;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * Locator for a MessageProcessor which is an operation from a Mule connector that fulfills the operation required.
@@ -25,7 +25,7 @@ public interface ConnectorOperationLocator {
    * @return the operation configured for the url and options
    * @throws MuleException
    */
-  MessageProcessor locateConnectorOperation(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern)
+  Processor locateConnectorOperation(String url, OperationOptions operationOptions, MessageExchangePattern exchangePattern)
       throws MuleException;
 
 }

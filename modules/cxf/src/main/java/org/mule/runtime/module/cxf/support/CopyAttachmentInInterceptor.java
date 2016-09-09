@@ -8,8 +8,8 @@ package org.mule.runtime.module.cxf.support;
 
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.util.Collection;
@@ -28,12 +28,12 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor {
 
   @Override
   public void handleMessage(Message message) throws Fault {
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
     Collection<Attachment> atts = message.getAttachments();
 
     if (atts != null && !atts.isEmpty()) {
-      message.getExchange().put(CxfConstants.MULE_EVENT, MuleEvent.builder(event).addFlowVariable(CxfConstants.ATTACHMENTS, atts)
-          .message(MuleMessage.builder(event.getMessage())
+      message.getExchange().put(CxfConstants.MULE_EVENT, Event.builder(event).addVariable(CxfConstants.ATTACHMENTS, atts)
+          .message(InternalMessage.builder(event.getMessage())
               .addOutboundProperty(CONTENT_TYPE, event.getMessage().getInboundProperty(CONTENT_TYPE)).build())
           .build());
     }

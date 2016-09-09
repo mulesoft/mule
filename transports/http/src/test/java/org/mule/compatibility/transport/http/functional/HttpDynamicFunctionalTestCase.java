@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -43,7 +43,7 @@ public class HttpDynamicFunctionalTestCase extends FunctionalTestCase {
     props.put("port", dynamicPort1.getNumber());
     props.put("path", "foo");
 
-    MuleMessage result = client.send("clientEndpoint", TEST_REQUEST, props).getRight();
+    InternalMessage result = client.send("clientEndpoint", TEST_REQUEST, props).getRight();
     assertEquals(TEST_REQUEST + " Received 1", getPayloadAsString(result));
 
     props.put("port", dynamicPort2.getNumber());

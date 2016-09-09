@@ -25,10 +25,10 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -78,21 +78,21 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
 
 
   private MuleContext muleContext;
-  private MuleMessage mockMuleMessage;
+  private InternalMessage mockMuleMessage;
   private ExpressionLanguage mockExpressionLanguage = mock(ExpressionLanguage.class);
-  private MuleEvent mockEvent;
+  private Event mockEvent;
 
   @Before
   public void setUp() {
     muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    mockEvent = mock(MuleEvent.class);
-    mockMuleMessage = mock(MuleMessage.class);
+    mockEvent = mock(Event.class);
+    mockMuleMessage = mock(InternalMessage.class);
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
     when(mockEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(mockEvent.getError()).thenReturn(empty());
     final Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    EventContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
     when(mockEvent.getContext()).thenReturn(executionContext);
     mockExpressionLanguage = mock(ExpressionLanguage.class);
     when(muleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
@@ -101,7 +101,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testEmptyHttpResponseBuilder() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).build();
 
     mockParse();
     HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
@@ -114,7 +114,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testHttpResponseBuilderAttributes() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).build();
 
     httpResponseBuilder.setContentType("text/html");
     httpResponseBuilder.setStatus(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR));
@@ -130,7 +130,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testHttpResponseBuilderAttributesWithExpressions() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).build();
 
     httpResponseBuilder.setStatus(HEADER_STATUS);
     httpResponseBuilder.setContentType(HEADER_CONTENT_TYPE);
@@ -405,7 +405,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     outboundProperties.put(HttpConstants.HEADER_LOCATION, "http://localhost:9090");
 
     mockParse();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).outboundProperties(outboundProperties).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).outboundProperties(outboundProperties).build();
 
     HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
     Header[] resultHeaders = httpResponse.getHeaders();
@@ -530,7 +530,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private void mockParse() {
-    when(mockExpressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 }

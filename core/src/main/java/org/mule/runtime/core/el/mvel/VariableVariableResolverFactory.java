@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el.mvel;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 
@@ -15,12 +15,12 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
 
   private static final long serialVersionUID = -4433478558175131280L;
 
-  private MuleEvent event;
-  private MuleEvent.Builder eventBuilder;
+  private Event event;
+  private Event.Builder eventBuilder;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public VariableVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
-                                         MuleEvent.Builder eventBuilder) {
+  public VariableVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, Event event,
+                                         Event.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
   }
@@ -31,7 +31,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
     if (event == null) {
       return false;
     }
-    return event.getFlowVariableNames().contains(name)
+    return event.getVariableNames().contains(name)
         || (event.getSession() != null && event.getSession().getPropertyNamesAsSet().contains(name));
   }
 
@@ -39,7 +39,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
   @Override
   public VariableResolver getVariableResolver(String name) {
 
-    if (event != null && event.getFlowVariableNames().contains(name)) {
+    if (event != null && event.getVariableNames().contains(name)) {
       return new FlowVariableVariableResolver(name);
     } else if (event != null && event.getSession().getPropertyNamesAsSet().contains(name)) {
       return new SessionVariableVariableResolver(name);
@@ -79,12 +79,12 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
 
     @Override
     public Object getValue() {
-      return event.getFlowVariable(name);
+      return event.getVariable(name);
     }
 
     @Override
     public void setValue(Object value) {
-      eventBuilder.addFlowVariable(name, value);
+      eventBuilder.addVariable(name, value);
       event = eventBuilder.build();
     }
   }

@@ -9,16 +9,16 @@ package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 /**
- * Modifies the payload of a {@link MuleMessage} according to the provided value.
+ * Modifies the payload of a {@link Message} according to the provided value.
  */
 public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
@@ -27,12 +27,12 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    final Builder builder = MuleMessage.builder(event.getMessage());
-    final org.mule.runtime.core.api.MuleEvent.Builder eventBuilder = MuleEvent.builder(event);
+  public Event process(Event event) throws MuleException {
+    final Builder builder = InternalMessage.builder(event.getMessage());
+    final org.mule.runtime.core.api.Event.Builder eventBuilder = Event.builder(event);
 
     if (dataType == null) {
-      final TypedValue typedValue = resolveTypedValue(event, eventBuilder);
+      final DefaultTypedValue typedValue = resolveTypedValue(event, eventBuilder);
       builder.payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
     } else {
       Object value = resolveValue(event);
@@ -44,7 +44,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     return eventBuilder.message(builder.build()).build();
   }
 
-  private Object resolveValue(MuleEvent event) {
+  private Object resolveValue(Event event) {
     Object value;
     if (valueEvaluator.getRawValue() == null) {
       value = null;
@@ -54,9 +54,9 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
     return value;
   }
 
-  private TypedValue resolveTypedValue(MuleEvent event, MuleEvent.Builder eventBuilder) {
+  private DefaultTypedValue resolveTypedValue(Event event, Event.Builder eventBuilder) {
     if (valueEvaluator.getRawValue() == null) {
-      return new TypedValue(null, DataType.OBJECT);
+      return new DefaultTypedValue(null, DataType.OBJECT);
     } else {
       return valueEvaluator.resolveTypedValue(event, eventBuilder);
     }

@@ -8,9 +8,9 @@ package org.mule.runtime.core.processor;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -67,10 +67,10 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
     return transformer;
   }
 
-  private static class ReturnNullMP implements MessageProcessor {
+  private static class ReturnNullMP implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return null;
     }
   }

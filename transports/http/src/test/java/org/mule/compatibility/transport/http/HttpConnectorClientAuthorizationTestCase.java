@@ -17,8 +17,8 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -50,7 +50,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
   private static final String HEADER_AUTHORIZATION_VALUE = "headerAuthValue";
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleEvent mockMuleEvent;
+  private Event mockMuleEvent;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private HttpClient mockHttpClient;
@@ -63,7 +63,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
 
   private URI uri;
 
-  private MuleMessage message;
+  private InternalMessage message;
 
   private Charset encoding;
 
@@ -72,7 +72,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
   @Before
   public void setup() throws URISyntaxException {
     uri = new URI(URI_WITHOUT_CREDENTIALS);
-    message = MuleMessage.builder().payload(StringUtils.EMPTY).build();
+    message = InternalMessage.builder().payload(StringUtils.EMPTY).build();
     encoding = getDefaultEncoding(muleContext);
     connector = new HttpConnector(muleContext);
     connector.setName("test");
@@ -94,7 +94,7 @@ public class HttpConnectorClientAuthorizationTestCase extends AbstractMuleContex
 
   @Test
   public void testWithAuthorizationHeader() throws Exception {
-    message = MuleMessage.builder(message).addOutboundProperty(HEADER_AUTHORIZATION, HEADER_AUTHORIZATION_VALUE).build();
+    message = InternalMessage.builder(message).addOutboundProperty(HEADER_AUTHORIZATION, HEADER_AUTHORIZATION_VALUE).build();
 
     when(mockMuleEvent.getMessage()).thenReturn(message);
     when(mockImmutableEndpoint.getProperty(HEADER_AUTHORIZATION)).thenReturn(HEADER_AUTHORIZATION_VALUE);

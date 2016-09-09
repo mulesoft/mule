@@ -16,7 +16,7 @@ import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class UpdateStoredProcedure extends AbstractDbIntegrationTestCase {
 
   @Test
   public void testRequestResponse() throws Exception {
-    MuleMessage response = flowRunner("updateStoredProcedure").run().getMessage();
+    Message response = flowRunner("updateStoredProcedure").run().getMessage();
 
     assertAffectedRows(response.getPayload(), testDatabase instanceof DerbyTestDatabase ? 0 : 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());

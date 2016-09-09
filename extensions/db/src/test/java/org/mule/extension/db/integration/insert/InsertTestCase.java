@@ -12,7 +12,7 @@ import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -38,7 +38,7 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void insert() throws Exception {
-    MuleMessage response = flowRunner("insert").run().getMessage();
+    Message response = flowRunner("insert").run().getMessage();
     StatementResult result = response.getPayload();
     assertThat(result.getAffectedRows(), is(1));
     assertThat(result.getGeneratedKeys().isEmpty(), is(true));
@@ -47,14 +47,14 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void insertDynamic() throws Exception {
     final String planet = "'Mercury'";
-    MuleMessage response = flowRunner("insertDynamic").withPayload(planet).run().getMessage();
+    Message response = flowRunner("insertDynamic").withPayload(planet).run().getMessage();
     assertInsert(response.getPayload(), planet);
   }
 
   @Test
   public void usesParameterizedQuery() throws Exception {
     final String planet = "Pluto";
-    MuleMessage response = flowRunner("insertParameterized").withPayload(planet).run().getMessage();
+    Message response = flowRunner("insertParameterized").withPayload(planet).run().getMessage();
     assertInsert(response.getPayload(), planet);
   }
 

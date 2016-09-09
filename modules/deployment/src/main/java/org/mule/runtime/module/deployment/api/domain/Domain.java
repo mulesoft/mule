@@ -12,8 +12,7 @@ import org.mule.runtime.module.deployment.internal.artifact.DeployableArtifact;
 import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
 
 /**
- * A domain is a deployable Artifact that contains shared resources for
- * {@link Application}
+ * A domain is a deployable Artifact that contains shared resources for {@link Application}
  * <p/>
  * A domain can just consist of a set of jar libraries to share between the domain applications or it can also contain shared
  * resources such as connectors or other mule components.

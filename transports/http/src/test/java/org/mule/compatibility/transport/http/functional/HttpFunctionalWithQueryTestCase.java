@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -36,7 +36,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("clientEndpoint1", MuleMessage.builder().nullPayload().build()).getRight();
+    InternalMessage result = client.send("clientEndpoint1", InternalMessage.builder().nullPayload().build()).getRight();
     assertEquals("boobar", getPayloadAsString(result));
   }
 
@@ -46,7 +46,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase {
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "noo");
     props.put("far", "nar");
-    MuleMessage result = client.send("clientEndpoint2", null, props).getRight();
+    InternalMessage result = client.send("clientEndpoint2", null, props).getRight();
     assertEquals("noonar", getPayloadAsString(result));
   }
 

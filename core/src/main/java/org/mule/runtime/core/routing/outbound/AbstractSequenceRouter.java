@@ -7,17 +7,17 @@
 package org.mule.runtime.core.routing.outbound;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 
 import java.util.ArrayList;
@@ -31,28 +31,28 @@ import java.util.List;
 public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
 
   @Override
-  public MuleEvent route(MuleEvent event) throws RoutingException {
-    MuleMessage message = event.getMessage();
+  public Event route(Event event) throws RoutingException {
+    InternalMessage message = event.getMessage();
 
     if (routes == null || routes.size() == 0) {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
     }
 
-    Builder builder = MuleEvent.builder(event).correlation(new Correlation(routes.size(), null));
-    List<MuleEvent> results = new ArrayList<>(routes.size());
+    Builder builder = Event.builder(event).groupCorrelation(new GroupCorrelation(routes.size(), null));
+    List<Event> results = new ArrayList<>(routes.size());
     try {
       for (int i = 0; i < routes.size(); i++) {
-        MessageProcessor mp = getRoute(i, event);
+        Processor mp = getRoute(i, event);
 
         boolean filterAccepted =
             !(mp instanceof LegacyOutboundEndpoint) || ((LegacyOutboundEndpoint) mp).filterAccepts(message, builder);
         event = builder.build();
-        builder = MuleEvent.builder(event);
+        builder = Event.builder(event);
         if (filterAccepted) {
           AbstractRoutingStrategy.validateMessageIsNotConsumable(event, message);
-          MuleMessage clonedMessage = cloneMessage(event, message);
+          InternalMessage clonedMessage = cloneMessage(event, message);
 
-          MuleEvent result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
+          Event result = sendRequest(event, createEventToRoute(event, clonedMessage), mp, true);
           if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
             results.add(result);
           }
@@ -78,5 +78,5 @@ public abstract class AbstractSequenceRouter extends FilteringOutboundRouter {
    * @throws MuleException when the router should stop processing throwing an exception without returning any results to the
    *         caller.
    */
-  protected abstract boolean continueRoutingMessageAfter(MuleEvent response) throws MuleException;
+  protected abstract boolean continueRoutingMessageAfter(Event response) throws MuleException;
 }

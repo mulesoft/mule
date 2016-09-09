@@ -10,8 +10,8 @@ import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.toMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterContainer;
 import org.mule.metadata.java.api.JavaTypeLoader;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
@@ -47,8 +47,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
 
   private static final ArgumentResolver<Object> CONFIGURATION_ARGUMENT_RESOLVER = new ConfigurationArgumentResolver();
   private static final ArgumentResolver<Object> CONNECTOR_ARGUMENT_RESOLVER = new ConnectionArgumentResolver();
-  private static final ArgumentResolver<MuleMessage> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
-  private static final ArgumentResolver<MuleEvent> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
+  private static final ArgumentResolver<Message> MESSAGE_ARGUMENT_RESOLVER = new MessageArgumentResolver();
+  private static final ArgumentResolver<Event> EVENT_ARGUMENT_RESOLVER = new EventArgumentResolver();
 
 
   private final Method method;
@@ -90,9 +90,9 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = CONFIGURATION_ARGUMENT_RESOLVER;
       } else if (annotations.containsKey(Connection.class)) {
         argumentResolver = CONNECTOR_ARGUMENT_RESOLVER;
-      } else if (MuleEvent.class.isAssignableFrom(parameterType)) {
+      } else if (Event.class.isAssignableFrom(parameterType)) {
         argumentResolver = EVENT_ARGUMENT_RESOLVER;
-      } else if (MuleMessage.class.isAssignableFrom(parameterType)) {
+      } else if (Message.class.isAssignableFrom(parameterType)) {
         argumentResolver = MESSAGE_ARGUMENT_RESOLVER;
       } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType))) {
         argumentResolver = parameterGroupResolvers.get(parameters[i]);

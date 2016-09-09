@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.queue.DualRandomAccessFileQueueStoreDelegate;
@@ -39,7 +39,7 @@ public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://flowIn", "echo", null);
-    MuleMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals("echo", result.getPayload());
   }

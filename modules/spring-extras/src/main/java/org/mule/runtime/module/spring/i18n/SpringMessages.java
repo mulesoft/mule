@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.module.spring.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class SpringMessages extends MessageFactory {
+public class SpringMessages extends I18nMessageFactory {
 
   private static final SpringMessages factory = new SpringMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("spring");
 
-  public static Message failedToReinitMule() {
+  public static I18nMessage failedToReinitMule() {
     return factory.createMessage(BUNDLE_PATH, 1);
   }
 
-  public static Message beanNotInstanceOfApplicationListener(String name) {
+  public static I18nMessage beanNotInstanceOfApplicationListener(String name) {
     return factory.createMessage(BUNDLE_PATH, 12, name);
   }
 }

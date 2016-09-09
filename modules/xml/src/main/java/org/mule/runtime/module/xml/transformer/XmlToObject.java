@@ -7,7 +7,7 @@
 package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
@@ -40,7 +40,7 @@ public class XmlToObject extends AbstractXStreamTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     Object src = event.getMessage().getPayload();
     Object result;
     if (src instanceof byte[]) {

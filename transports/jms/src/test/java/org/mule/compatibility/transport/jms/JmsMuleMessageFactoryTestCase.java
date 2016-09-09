@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.compatibility.transport.jms.JmsMuleMessageFactory;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import javax.jms.TextMessage;
 
@@ -59,7 +59,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     MuleMessageFactory factory = createMuleMessageFactory();
 
     Object payload = getValidTransportMessage();
-    MuleMessage message = factory.create(payload, encoding);
+    InternalMessage message = factory.create(payload, encoding);
     assertNotNull(message);
     assertEquals(payload, message.getPayload());
     // message factory populates the inbound scope

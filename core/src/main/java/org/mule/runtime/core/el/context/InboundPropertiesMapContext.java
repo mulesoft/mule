@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.Serializable;
@@ -16,10 +16,10 @@ import java.util.Set;
 
 class InboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
-  private MuleEvent event;
+  private Event event;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public InboundPropertiesMapContext(MuleEvent event) {
+  public InboundPropertiesMapContext(Event event) {
     this.event = event;
   }
 

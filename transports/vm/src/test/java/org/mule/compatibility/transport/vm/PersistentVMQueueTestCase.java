@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://receiver", input, null);
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
     String[] payload = (String[]) result.getPayload();
@@ -49,7 +49,7 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://flowReceiver", input, null);
-    MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertNotNull(result.getPayload());
     String[] payload = (String[]) result.getPayload();

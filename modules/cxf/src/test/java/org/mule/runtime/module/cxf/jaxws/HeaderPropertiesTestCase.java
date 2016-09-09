@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
@@ -41,12 +41,12 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase {
     assertNotNull(testComponent);
 
     EventCallback callback = (context, component, muleContext) -> {
-      MuleMessage msg = context.getMessage();
+      InternalMessage msg = context.getMessage();
       assertEquals("BAR", msg.getInboundProperty("FOO"));
     };
     testComponent.setEventCallback(callback);
 
-    MuleMessage result = flowRunner("clientFlow").withPayload("Dan").withOutboundProperty("operation", "greetMe")
+    InternalMessage result = flowRunner("clientFlow").withPayload("Dan").withOutboundProperty("operation", "greetMe")
         .withOutboundProperty("FOO", "BAR").run().getMessage();
 
     assertEquals("Hello Dan Received", result.getPayload());

@@ -15,9 +15,9 @@ import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.service.TransportFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
@@ -44,16 +44,16 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
   }
 
   @Override
-  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+  public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
     event = super.processReplyTo(event, returnMessage, replyTo);
 
     String replyToEndpoint = replyTo.toString();
 
     // Create a new copy of the message so that response MessageProcessors don't end up screwing up the reply
-    returnMessage = MuleMessage.builder(returnMessage).payload(returnMessage.getPayload()).build();
+    returnMessage = InternalMessage.builder(returnMessage).payload(returnMessage.getPayload()).build();
 
     // Create the replyTo event asynchronous
-    MuleEvent replyToEvent = MuleEvent.builder(event).message(returnMessage).build();
+    Event replyToEvent = Event.builder(event).message(returnMessage).build();
 
     // get the endpoint for this url
     OutboundEndpoint endpoint = getEndpoint(event, replyToEndpoint);
@@ -81,7 +81,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  protected synchronized OutboundEndpoint getEndpoint(MuleEvent event, String endpointUri) throws MuleException {
+  protected synchronized OutboundEndpoint getEndpoint(Event event, String endpointUri) throws MuleException {
     try {
       return endpointCache.get(endpointUri);
     } catch (Exception e) {

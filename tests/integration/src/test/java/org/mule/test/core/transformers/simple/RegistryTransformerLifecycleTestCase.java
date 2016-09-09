@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -71,7 +71,7 @@ public class RegistryTransformerLifecycleTestCase extends AbstractIntegrationTes
     Flow flow = new Flow("flow", muleContext);
     TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();
     transformer.setProperty("foo");
-    flow.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
+    flow.setMessageProcessors(Collections.<Processor>singletonList(transformer));
     muleContext.getRegistry().registerFlowConstruct(flow);
     muleContext.dispose();
     assertLifecycle(transformer);

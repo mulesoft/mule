@@ -48,7 +48,7 @@ public class StoredProcedureStreamingTestCase extends AbstractDbIntegrationTestC
     Map<String, Object> payload = runProcedure("streamingInOutParam");
     // Apparently Derby has a bug: when there are no resultset returned, then
     // there is a fake updateCount=0 that is returned. Check how this works in other DB vendors.
-    //assertThat(payload.size(), equalTo(2));
+    // assertThat(payload.size(), equalTo(2));
     // Compares string in to avoid problems when different DB return different integer classes (BigDecimal, integer, etc)
     assertThat("6", equalTo(payload.get("myInt").toString()));
   }

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.transaction.TransactionException;
@@ -64,8 +64,8 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase {
     private int visits = 0;
 
     @Override
-    protected MuleEvent routeException(MuleEvent event, FlowConstruct flow, Throwable t) {
-      MuleEvent result = super.routeException(event, flow, t);
+    protected Event routeException(Event event, FlowConstruct flow, Throwable t) {
+      Event result = super.routeException(event, flow, t);
 
       if (visits++ > 1) {
         failure = "Exception strategy should only be called once";

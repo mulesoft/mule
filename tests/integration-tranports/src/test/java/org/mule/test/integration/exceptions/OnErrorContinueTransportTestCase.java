@@ -11,11 +11,11 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -74,7 +74,7 @@ public class OnErrorContinueTransportTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).responseTimeout(TIMEOUT).build();
-    MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions).getRight();
+    InternalMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions).getRight();
     assertThat(response, IsNull.<Object>notNullValue());
     // compare the structure and values but not the attributes' order
     ObjectMapper mapper = new ObjectMapper();
@@ -86,22 +86,22 @@ public class OnErrorContinueTransportTestCase extends FunctionalTestCase {
   public static final String MESSAGE = "some message";
   public static final String MESSAGE_EXPECTED = "some message consumed successfully";
 
-  public static class LoadNewsProcessor implements MessageProcessor {
+  public static class LoadNewsProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       NewsRequest newsRequest = (NewsRequest) event.getMessage().getPayload();
       NewsResponse newsResponse = new NewsResponse();
       newsResponse.setUserId(newsRequest.getUserId());
       newsResponse.setTitle("News title");
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(newsResponse).build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(newsResponse).build()).build();
     }
   }
 
-  public static class NewsErrorProcessor implements MessageProcessor {
+  public static class NewsErrorProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       ((NewsResponse) event.getMessage().getPayload()).setErrorMessage(ERROR_PROCESSING_NEWS);
       return event;
     }

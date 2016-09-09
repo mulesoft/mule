@@ -9,15 +9,16 @@ package org.mule.runtime.core.transformer;
 import static org.mule.runtime.core.DefaultMessageContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.client.DefaultLocalMuleClient;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
@@ -26,11 +27,11 @@ import java.nio.charset.Charset;
 /**
  * <code>AbstractMessageTransformer</code> is a transformer that has a reference to the current message. This message can be used
  * to obtain properties associated with the current message which are useful to the transform. Note that when part of a transform
- * chain, the MuleMessage payload reflects the pre-transform message state, unless there is no current event for this thread, then
- * the message will be a new DefaultMuleMessage with the src as its payload. Transformers should always work on the src object not
- * the message payload.
+ * chain, the Message payload reflects the pre-transform message state, unless there is no current event for this thread, then the
+ * message will be a new {@link Message} with the src as its payload. Transformers should always work on the src object not the
+ * message payload.
  *
- * @see org.mule.runtime.core.api.MuleMessage
+ * @see org.mule.runtime.core.api.InternalMessage
  */
 
 public abstract class AbstractMessageTransformer extends AbstractTransformer implements MessageTransformer {
@@ -43,9 +44,9 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
    */
   @Override
   public boolean isSourceDataTypeSupported(DataType dataType, boolean exactMatch) {
-    // TODO RM* This is a bit of hack since we could just register MuleMessage as a supportedType, but this has some
+    // TODO RM* This is a bit of hack since we could just register Message as a supportedType, but this has some
     // funny behaviour in certain ObjectToXml transformers
-    return (super.isSourceDataTypeSupported(dataType, exactMatch) || MuleMessage.class.isAssignableFrom(dataType.getType()));
+    return (super.isSourceDataTypeSupported(dataType, exactMatch) || InternalMessage.class.isAssignableFrom(dataType.getType()));
   }
 
   /**
@@ -77,12 +78,12 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   }
 
   @Override
-  public Object transform(Object src, MuleEvent event) throws MessageTransformerException {
+  public Object transform(Object src, Event event) throws MessageTransformerException {
     return transform(src, resolveEncoding(src), event);
   }
 
   @Override
-  public final Object transform(Object src, Charset enc, MuleEvent event) throws MessageTransformerException {
+  public final Object transform(Object src, Charset enc, Event event) throws MessageTransformerException {
     DataType sourceType = DataType.fromType(src.getClass());
     if (!isSourceDataTypeSupported(sourceType)) {
       if (isIgnoreBadInput()) {
@@ -90,7 +91,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
             .debug("Source type is incompatible with this transformer and property 'ignoreBadInput' is set to true, so the transformer chain will continue.");
         return src;
       } else {
-        Message msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(), src.getClass());
+        I18nMessage msg = CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint(getName(), src.getClass());
         /// FIXME
         throw new MessageTransformerException(msg, this);
       }
@@ -100,16 +101,16 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
       logger.debug(String.format("Object before transform: %s", StringMessageUtils.toString(src)));
     }
 
-    MuleMessage message;
-    if (src instanceof MuleMessage) {
-      message = (MuleMessage) src;
+    InternalMessage message;
+    if (src instanceof InternalMessage) {
+      message = (InternalMessage) src;
     }
     // TODO MULE-9342 Clean up transformer vs message transformer confusion
-    else if (src instanceof MuleEvent) {
-      event = (MuleEvent) src;
+    else if (src instanceof Event) {
+      event = (Event) src;
       message = event.getMessage();
     } else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform()) {
-      message = MuleMessage.builder().payload(src).build();
+      message = InternalMessage.builder().payload(src).build();
     } else {
       if (event == null) {
         throw new MessageTransformerException(CoreMessages.noCurrentEventForTransformer(), this);
@@ -122,7 +123,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     if (event == null) {
       DefaultLocalMuleClient.MuleClientFlowConstruct flowConstruct =
           new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext);
-      event = MuleEvent.builder(create(flowConstruct, "AbstractMessageTransformer")).message(message)
+      event = Event.builder(create(flowConstruct, "AbstractMessageTransformer")).message(message)
           .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
     }
     try {
@@ -142,7 +143,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Check if the return class is supported by this transformer
    */
-  protected Object checkReturnClass(Object object, MuleEvent event) throws MessageTransformerException {
+  protected Object checkReturnClass(Object object, Event event) throws MessageTransformerException {
 
     // Null is a valid return type
     if (object == null && isAllowNullReturn()) {
@@ -166,5 +167,5 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
   /**
    * Transform the message
    */
-  public abstract Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException;
+  public abstract Object transformMessage(Event event, Charset outputEncoding) throws TransformerException;
 }

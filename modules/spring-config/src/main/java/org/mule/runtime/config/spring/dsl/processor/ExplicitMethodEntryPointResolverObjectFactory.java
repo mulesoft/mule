@@ -42,7 +42,7 @@ public class ExplicitMethodEntryPointResolverObjectFactory implements ObjectFact
 
   /**
    * @param methodEntryPoints list of methods that may be resolved for execution.
-     */
+   */
   public void setMethodEntryPoints(List<MethodEntryPoint> methodEntryPoints) {
     this.methodEntryPoints = methodEntryPoints;
   }

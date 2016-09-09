@@ -21,14 +21,14 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.simple.SetPayloadMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -46,8 +46,8 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
   private SetPayloadMessageProcessor setPayloadMessageProcessor;
   private MuleContext muleContext;
-  private MuleMessage muleMessage;
-  private MuleEvent muleEvent;
+  private InternalMessage muleMessage;
+  private Event muleEvent;
   private ExpressionLanguage expressionLanguage;
 
   @Before
@@ -59,12 +59,12 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    when(expressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(expressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
-    muleMessage = MuleMessage.builder().payload("").build();
+    muleMessage = InternalMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    muleEvent = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).flow(flow).build();
+    muleEvent = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).flow(flow).build();
   }
 
   @Test
@@ -72,7 +72,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(null);
     setPayloadMessageProcessor.initialise();
 
-    MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
+    Event response = setPayloadMessageProcessor.process(muleEvent);
 
     assertThat(response.getMessage().getPayload(), is(nullValue()));
   }
@@ -84,7 +84,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     when(expressionLanguage.isExpression(PLAIN_TEXT)).thenReturn(false);
 
-    MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
+    Event response = setPayloadMessageProcessor.process(muleEvent);
 
     assertThat(response.getMessage().getPayload(), is(PLAIN_TEXT));
   }
@@ -94,12 +94,12 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(EXPRESSION);
     when(expressionLanguage.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadMessageProcessor.initialise();
-    TypedValue typedValue = new TypedValue(PLAIN_TEXT, DataType.STRING);
+    DefaultTypedValue typedValue = new DefaultTypedValue(PLAIN_TEXT, DataType.STRING);
     when(expressionLanguage.evaluateTyped(EXPRESSION, muleEvent, null)).thenReturn(typedValue);
-    when(expressionLanguage.evaluateTyped(eq(EXPRESSION), eq(muleEvent), any(MuleEvent.Builder.class), eq(null)))
+    when(expressionLanguage.evaluateTyped(eq(EXPRESSION), eq(muleEvent), any(Event.Builder.class), eq(null)))
         .thenReturn(typedValue);
 
-    MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
+    Event response = setPayloadMessageProcessor.process(muleEvent);
 
     assertThat(response.getMessage().getPayload(), is(PLAIN_TEXT));
   }
@@ -109,7 +109,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(null);
     setPayloadMessageProcessor.initialise();
 
-    MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
+    Event response = setPayloadMessageProcessor.process(muleEvent);
 
     assertThat(response.getMessage().getDataType(), like(Object.class, MediaType.ANY, null));
   }
@@ -130,7 +130,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setDataType(DataType.builder().charset(CUSTOM_ENCODING).build());
     setPayloadMessageProcessor.initialise();
 
-    MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
+    Event response = setPayloadMessageProcessor.process(muleEvent);
 
     assertThat(response.getMessage().getDataType(), like(String.class, MediaType.ANY, CUSTOM_ENCODING));
   }
@@ -141,7 +141,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setDataType(DataType.builder().mediaType(MediaType.APPLICATION_XML).build());
     setPayloadMessageProcessor.initialise();
 
-    MuleEvent response = setPayloadMessageProcessor.process(muleEvent);
+    Event response = setPayloadMessageProcessor.process(muleEvent);
 
     assertThat(response.getMessage().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
   }

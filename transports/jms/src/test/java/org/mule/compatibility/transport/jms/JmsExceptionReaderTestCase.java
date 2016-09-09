@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNull;
 import org.mule.compatibility.transport.jms.JmsExceptionReader;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -61,8 +61,8 @@ public class JmsExceptionReaderTestCase extends AbstractMuleTestCase {
     JMSException e = new JMSException("Jms error", "1234");
     e.setLinkedException(new IOException("blah"));
 
-    return new DefaultMuleException(MessageFactory.createStaticMessage("foo"),
-                                    new DefaultMuleException(MessageFactory.createStaticMessage("bar"), e));
+    return new DefaultMuleException(I18nMessageFactory.createStaticMessage("foo"),
+                                    new DefaultMuleException(I18nMessageFactory.createStaticMessage("bar"), e));
   }
 
 }

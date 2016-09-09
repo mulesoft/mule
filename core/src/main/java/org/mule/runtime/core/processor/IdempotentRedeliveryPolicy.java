@@ -7,13 +7,13 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
@@ -135,7 +135,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     boolean exceptionSeen = false;
     boolean tooMany = false;
     AtomicInteger counter = null;
@@ -177,7 +177,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
       }
 
       try {
-        MuleEvent returnEvent = processNext(event);
+        Event returnEvent = processNext(event);
         counter = findCounter(messageId);
         if (counter != null) {
           resetCounter(messageId);
@@ -221,13 +221,13 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     return counter;
   }
 
-  private String getIdForEvent(MuleEvent event) throws Exception {
+  private String getIdForEvent(Event event) throws Exception {
     if (useSecureHash) {
       Object payload = event.getMessage().getPayload();
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       if (payload instanceof InputStream) {
         // We've consumed the stream.
-        event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(bytes).build()).build();
+        event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(bytes).build()).build();
       }
       MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
       byte[] digestedBytes = md.digest(bytes);
@@ -265,7 +265,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
     this.store = new ProvidedObjectStoreWrapper<>(store, internalObjectStoreFactory());
   }
 
-  public void setMessageProcessor(MessageProcessor processor) {
+  public void setMessageProcessor(Processor processor) {
     this.deadLetterQueue = processor;
   }
 }

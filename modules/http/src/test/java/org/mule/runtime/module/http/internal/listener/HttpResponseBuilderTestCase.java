@@ -14,8 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 
 import java.io.ByteArrayInputStream;
@@ -28,14 +28,14 @@ public class HttpResponseBuilderTestCase {
 
   public static final String EXAMPLE_STRING = "exampleString";
   private MuleContext muleContext;
-  private MuleMessage mockMuleMessage;
-  private MuleEvent mockEvent;
+  private InternalMessage mockMuleMessage;
+  private Event mockEvent;
 
   @Before
   public void setUp() {
     muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    mockEvent = mock(MuleEvent.class);
-    mockMuleMessage = mock(MuleMessage.class);
+    mockEvent = mock(Event.class);
+    mockMuleMessage = mock(InternalMessage.class);
   }
 
   @Test
@@ -50,7 +50,7 @@ public class HttpResponseBuilderTestCase {
   }
 
   private void mockMuleMessage(InputStream payload, int contentLength) {
-    mockMuleMessage = MuleMessage.builder().payload(payload).addOutboundProperty(CONTENT_LENGTH, contentLength).build();
+    mockMuleMessage = InternalMessage.builder().payload(payload).addOutboundProperty(CONTENT_LENGTH, contentLength).build();
     when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
   }
 }

@@ -7,11 +7,11 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
@@ -23,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
  * Although the registry is mutable, {@link #isDynamic()} will always return {@code false} since the value associated to a given
  * key is not meant to change.
  * <p/>
- * The registry is accessed through the {@link MuleContext} that is exposed in the {@link MuleEvent} that is passed to the
- * {@link #resolve(MuleEvent)} method
+ * The registry is accessed through the {@link MuleContext} that is exposed in the {@link Event} that is passed to the
+ * {@link #resolve(Event)} method
  *
  * @since 3.7.0
  */
@@ -48,13 +48,13 @@ public class RegistryLookupValueResolver<T> implements ValueResolver<T> {
   /**
    * Returns the registry value associated with {@link #key}
    *
-   * @param event a {@link MuleEvent}
+   * @param event a {@link Event}
    * @return the registry value associated with {@link #key}
    * @throws MuleException if an error occurred fetching the value
    * @throws ConfigurationException if no object is registered under {@link #key}
    */
   @Override
-  public T resolve(MuleEvent event) throws MuleException {
+  public T resolve(Event event) throws MuleException {
     T value = muleContext.getRegistry().get(key);
     if (value == null) {
       throw new ConfigurationException(createStaticMessage(format("Element '%s' is not defined in the Mule Registry", key)));

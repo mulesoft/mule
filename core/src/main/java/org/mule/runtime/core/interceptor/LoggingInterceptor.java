@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.interceptor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
@@ -24,7 +24,7 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor {
   private static Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
   @Override
-  public MuleEvent before(MuleEvent event) {
+  public Event before(Event event) {
     if (logger.isDebugEnabled()) {
       logger.debug("Started event processing for " + flowConstruct.getName());
     }
@@ -33,7 +33,7 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor {
   }
 
   @Override
-  public MuleEvent after(MuleEvent event) {
+  public Event after(Event event) {
     if (logger.isDebugEnabled() && event != null) {
       logger.debug("Finished event processing for " + flowConstruct.getName());
     }
@@ -41,7 +41,7 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor {
   }
 
   @Override
-  public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
+  public Event last(Event event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
     return event;
   }
 }

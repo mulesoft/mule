@@ -12,10 +12,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -47,9 +47,9 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    MuleEvent inEvent = MuleEvent.builder(getTestEvent("")).message(MuleMessage.builder().payload(fruitBowl).build()).build();
+    Event inEvent = Event.builder(getTestEvent("")).message(InternalMessage.builder().payload(fruitBowl).build()).build();
 
-    MuleEvent resultEvent = splitter.process(inEvent);
+    Event resultEvent = splitter.process(inEvent);
 
     assertEquals(3, listener.events.size());
     assertTrue(listener.events.get(0).getMessage().getPayload() instanceof Fruit);
@@ -57,10 +57,10 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     assertTrue(listener.events.get(2).getMessage().getPayload() instanceof Fruit);
 
     assertThat(resultEvent.getMessage().getPayload(), instanceOf(List.class));
-    assertEquals(3, ((List<MuleMessage>) resultEvent.getMessage().getPayload()).size());
-    assertTrue(((List<MuleMessage>) resultEvent.getMessage().getPayload()).get(0).getPayload() instanceof Fruit);
-    assertTrue(((List<MuleMessage>) resultEvent.getMessage().getPayload()).get(1).getPayload() instanceof Fruit);
-    assertTrue(((List<MuleMessage>) resultEvent.getMessage().getPayload()).get(2).getPayload() instanceof Fruit);
+    assertEquals(3, ((List<InternalMessage>) resultEvent.getMessage().getPayload()).size());
+    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload()).get(0).getPayload() instanceof Fruit);
+    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload()).get(1).getPayload() instanceof Fruit);
+    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload()).get(2).getPayload() instanceof Fruit);
   }
 
   @Test
@@ -77,19 +77,19 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    MuleEvent inEvent = MuleEvent.builder(getTestEvent("")).message(MuleMessage.builder().payload(fruitBowl).build()).build();
+    Event inEvent = Event.builder(getTestEvent("")).message(InternalMessage.builder().payload(fruitBowl).build()).build();
 
-    MuleEvent resultEvent = splitter.process(inEvent);
+    Event resultEvent = splitter.process(inEvent);
 
     assertThat(resultEvent, nullValue());
   }
 
-  private static class MultipleEventSensingMessageProcessor implements MessageProcessor {
+  private static class MultipleEventSensingMessageProcessor implements Processor {
 
-    List<MuleEvent> events = new ArrayList<>();
+    List<Event> events = new ArrayList<>();
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       events.add(event);
       return event;
     }
@@ -98,11 +98,11 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
   private static class TestSplitter extends AbstractSplitter {
 
     @Override
-    protected List<MuleEvent> splitMessage(MuleEvent event) {
+    protected List<Event> splitMessage(Event event) {
       FruitBowl bowl = (FruitBowl) event.getMessage().getPayload();
-      List<MuleEvent> parts = new ArrayList<>();
+      List<Event> parts = new ArrayList<>();
       for (Fruit fruit : bowl.getFruit()) {
-        parts.add(MuleEvent.builder(event).message(MuleMessage.builder().payload(fruit).build()).build());
+        parts.add(Event.builder(event).message(InternalMessage.builder().payload(fruit).build()).build());
       }
       return parts;
     }

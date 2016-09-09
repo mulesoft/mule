@@ -20,12 +20,12 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 
-import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.AttributeEvaluator;
@@ -80,7 +80,7 @@ public class MuleEventToHttpRequest {
     this.sendBody = sendBody;
   }
 
-  public HttpRequestBuilder create(MuleEvent event, String resolvedMethod, String resolvedUri) throws MessagingException {
+  public HttpRequestBuilder create(Event event, String resolvedMethod, String resolvedUri) throws MessagingException {
     HttpRequesterRequestBuilder requestBuilder = requester.getRequestBuilder();
     HttpRequestBuilder builder = new HttpRequestBuilder();
 
@@ -129,12 +129,12 @@ public class MuleEventToHttpRequest {
     return CollectionUtils.exists(ignoredProperties, propertyName -> outboundProperty.equalsIgnoreCase((String) propertyName));
   }
 
-  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod)
+  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, Event muleEvent, String resolvedMethod)
       throws MessagingException {
     HttpEntity entity;
 
     if (!StringUtils.isEmpty(requester.getSource()) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getSource()))) {
-      muleEvent = MuleEvent.builder(muleEvent).message(MuleMessage.builder(muleEvent.getMessage())
+      muleEvent = Event.builder(muleEvent).message(InternalMessage.builder(muleEvent.getMessage())
           .payload(muleContext.getExpressionLanguage().evaluate(requester.getSource(), muleEvent, null)).build()).build();
     }
 
@@ -147,7 +147,7 @@ public class MuleEventToHttpRequest {
     return entity;
   }
 
-  private boolean isEmptyBody(MuleEvent event, String method) {
+  private boolean isEmptyBody(Event event, String method) {
     HttpSendBodyMode sendBodyMode = resolveSendBodyMode(event);
 
     boolean emptyBody;
@@ -165,11 +165,11 @@ public class MuleEventToHttpRequest {
     return emptyBody;
   }
 
-  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, MuleEvent muleEvent)
+  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent)
       throws MessagingException {
     Object payload = muleEvent.getMessage().getPayload();
 
-    if (!muleEvent.getMessage().getOutboundAttachmentNames().isEmpty() || payload instanceof MultiPartPayload) {
+    if (!muleEvent.getMessage().getOutboundAttachmentNames().isEmpty() || payload instanceof MultiPartContent) {
       try {
         return createMultiPart(muleEvent.getMessage());
       } catch (IOException e) {
@@ -210,15 +210,15 @@ public class MuleEventToHttpRequest {
     }
   }
 
-  protected MultipartHttpEntity createMultiPart(final MuleMessage msg) throws IOException {
+  protected MultipartHttpEntity createMultiPart(final InternalMessage msg) throws IOException {
     Map<String, DataHandler> attachments = Maps.newHashMap();
 
     for (String outboundAttachmentName : msg.getOutboundAttachmentNames()) {
       attachments.put(outboundAttachmentName, msg.getOutboundAttachment(outboundAttachmentName));
     }
 
-    if (msg.getPayload() instanceof MultiPartPayload) {
-      for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) msg.getPayload()).getParts()) {
+    if (msg.getPayload() instanceof MultiPartContent) {
+      for (org.mule.runtime.api.message.Message part : ((MultiPartContent) msg.getPayload()).getParts()) {
         final String partName = ((PartAttributes) part.getAttributes()).getName();
         attachments.put(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType()));
       }
@@ -228,7 +228,7 @@ public class MuleEventToHttpRequest {
   }
 
 
-  private boolean doStreaming(HttpRequestBuilder requestBuilder, MuleEvent event) throws MessagingException {
+  private boolean doStreaming(HttpRequestBuilder requestBuilder, Event event) throws MessagingException {
     String transferEncodingHeader = requestBuilder.getHeaders().get(TRANSFER_ENCODING);
     String contentLengthHeader = requestBuilder.getHeaders().get(CONTENT_LENGTH);
 
@@ -284,11 +284,11 @@ public class MuleEventToHttpRequest {
     }
   }
 
-  private HttpStreamingType resolveStreamingType(MuleEvent event) {
+  private HttpStreamingType resolveStreamingType(Event event) {
     return HttpStreamingType.valueOf(requestStreamingMode.resolveStringValue(event));
   }
 
-  private HttpSendBodyMode resolveSendBodyMode(MuleEvent event) {
+  private HttpSendBodyMode resolveSendBodyMode(Event event) {
     return HttpSendBodyMode.valueOf(sendBody.resolveStringValue(event));
   }
 }

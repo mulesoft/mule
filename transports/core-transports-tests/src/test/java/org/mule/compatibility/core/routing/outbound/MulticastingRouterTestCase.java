@@ -20,11 +20,11 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.filters.RegExFilter;
 import org.mule.tck.MuleEventCheckAnswer;
@@ -57,15 +57,15 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     EndpointMulticastingRouter router = createObject(EndpointMulticastingRouter.class);
 
-    List<MessageProcessor> endpoints = new ArrayList<>();
+    List<Processor> endpoints = new ArrayList<>();
     endpoints.add(mockendpoint1);
     endpoints.add(mockendpoint2);
     router.setRoutes(endpoints);
 
-    assertTrue(router.isMatch(getTestEvent(TEST_MESSAGE), mock(MuleEvent.Builder.class)));
+    assertTrue(router.isMatch(getTestEvent(TEST_MESSAGE), mock(Event.Builder.class)));
 
-    when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
-    when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
+    when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer());
+    when(mockendpoint2.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer());
   }
 
   @Test
@@ -84,30 +84,30 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     RegExFilter filter = new RegExFilter("(.*) Message");
     filter.setMuleContext(muleContext);
     router.setFilter(filter);
-    List<MessageProcessor> endpoints = new ArrayList<>();
+    List<Processor> endpoints = new ArrayList<>();
     endpoints.add(mockendpoint1);
     endpoints.add(mockendpoint2);
     router.setRoutes(endpoints);
 
     assertEquals(filter, router.getFilter());
 
-    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
 
-    assertTrue(router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
+    assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
 
     Flow flow = getTestFlow();
-    final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
-    MuleEvent event = MuleEvent.builder(context).message(message).flow(flow).build();
+    final EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    Event event = Event.builder(context).message(message).flow(flow).build();
 
-    when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
-    when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
+    when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));
+    when(mockendpoint2.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
     MuleSession session = mock(MuleSession.class);
-    MuleEvent result = router.route(MuleEvent.builder(context).message(message).flow(flow).session(session).build());
+    Event result = router.route(Event.builder(context).message(message).flow(flow).session(session).build());
     assertNotNull(result);
-    MuleMessage resultMessage = result.getMessage();
+    InternalMessage resultMessage = result.getMessage();
     assertNotNull(resultMessage);
-    assertEquals(2, ((List<MuleMessage>) resultMessage.getPayload()).size());
+    assertEquals(2, ((List<InternalMessage>) resultMessage.getPayload()).size());
   }
 
   @Test
@@ -124,24 +124,24 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     EndpointMulticastingRouter router = createObject(EndpointMulticastingRouter.class);
 
-    List<MessageProcessor> endpoints = new ArrayList<>();
+    List<Processor> endpoints = new ArrayList<>();
     endpoints.add(mockendpoint1);
     endpoints.add(mockendpoint2);
     router.setRoutes(endpoints);
 
-    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
 
-    assertTrue(router.isMatch(getTestEvent(message), mock(MuleEvent.Builder.class)));
+    assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
     Flow flow = getTestFlow();
-    final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
-    MuleEvent event = MuleEvent.builder(context).message(message).flow(flow).build();
+    final EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    Event event = Event.builder(context).message(message).flow(flow).build();
 
-    when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer(event));
-    when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(new MuleEventCheckAnswer());
+    when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));
+    when(mockendpoint2.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer());
 
     MuleSession session = mock(MuleSession.class);
 
-    MuleEvent result = router.route(MuleEvent.builder(context).message(message).flow(flow).session(session).build());
+    Event result = router.route(Event.builder(context).message(message).flow(flow).session(session).build());
     assertNotNull(result);
     assertEquals(getPayload(message), getPayload(result.getMessage()));
   }
@@ -161,37 +161,37 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     EndpointMulticastingRouter router = createObject(EndpointMulticastingRouter.class);
 
-    List<MessageProcessor> endpoints = new ArrayList<>();
+    List<Processor> endpoints = new ArrayList<>();
     endpoints.add(mockendpoint1);
     endpoints.add(mockendpoint2);
     router.setRoutes(endpoints);
 
-    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
     Flow flow = getTestFlow();
-    final MessageContext context = create(flow, TEST_CONNECTOR, "MyCustomCorrelationId");
-    final MuleEvent testEvent = MuleEvent.builder(context).message(message).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
+    final EventContext context = create(flow, TEST_CONNECTOR, "MyCustomCorrelationId");
+    final Event testEvent = Event.builder(context).message(message).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
 
-    assertTrue(router.isMatch(testEvent, mock(MuleEvent.Builder.class)));
+    assertTrue(router.isMatch(testEvent, mock(Event.Builder.class)));
 
-    Answer<MuleEvent> answer = invocation -> {
+    Answer<Event> answer = invocation -> {
       Object[] arguments = invocation.getArguments();
       assertEquals(1, arguments.length);
-      assertTrue(arguments[0] instanceof MuleEvent);
+      assertTrue(arguments[0] instanceof Event);
 
-      MuleEvent event = (MuleEvent) arguments[0];
+      Event event = (Event) arguments[0];
       String correlationId = event.getCorrelationId();
       assertThat(correlationId, is("MyCustomCorrelationId"));
 
       return event;
     };
-    when(mockendpoint1.process(any(MuleEvent.class))).thenAnswer(answer);
-    when(mockendpoint2.process(any(MuleEvent.class))).thenAnswer(answer);
+    when(mockendpoint1.process(any(Event.class))).thenAnswer(answer);
+    when(mockendpoint2.process(any(Event.class))).thenAnswer(answer);
 
     MuleSession session = mock(MuleSession.class);
-    router.route(MuleEvent.builder(context).message(message).flow(flow).session(session).build());
+    router.route(Event.builder(context).message(message).flow(flow).session(session).build());
   }
 
-  private String getPayload(MuleMessage message) throws Exception {
+  private String getPayload(InternalMessage message) throws Exception {
     Object payload = message.getPayload();
     if (payload instanceof List) {
       payload = ((List<?>) payload).get(0);

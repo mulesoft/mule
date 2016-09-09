@@ -23,6 +23,7 @@ import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
+
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
@@ -32,7 +33,6 @@ import java.util.concurrent.Executor;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -71,7 +71,7 @@ public class RetrieverConnectionTestCase {
     when(Session.getInstance(anyObject(), anyObject())).thenReturn(session);
 
     store = mock(Store.class);
-    //Mocking protected method.
+    // Mocking protected method.
     doReturn(session).when(store, "getSession");
     doReturn(store).when(session).getStore(anyString());
 
@@ -232,18 +232,18 @@ public class RetrieverConnectionTestCase {
     }
 
     @Override
-    public Message getMessage(int msgnum) throws MessagingException {
+    public javax.mail.Message getMessage(int msgnum) throws MessagingException {
       return null;
     }
 
     @Override
-    public void appendMessages(Message[] msgs) throws MessagingException {
+    public void appendMessages(javax.mail.Message[] msgs) throws MessagingException {
 
     }
 
     @Override
-    public Message[] expunge() throws MessagingException {
-      return new Message[0];
+    public javax.mail.Message[] expunge() throws MessagingException {
+      return new javax.mail.Message[0];
     }
   }
 }

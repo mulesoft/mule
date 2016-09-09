@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.streaming.Consumer;
@@ -38,10 +38,10 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
   }
 
   @Override
-  protected org.mule.runtime.api.message.MuleEvent doProcess(MuleEvent event, OperationContextAdapter operationContext)
+  protected org.mule.runtime.api.message.MuleEvent doProcess(Event event, OperationContextAdapter operationContext)
       throws MuleException {
 
-    MuleEvent resultEvent = (MuleEvent) super.doProcess(event, operationContext);
+    Event resultEvent = (Event) super.doProcess(event, operationContext);
     PagingProvider pagingProvider = resultEvent.getMessage().getPayload();
 
     if (pagingProvider == null) {

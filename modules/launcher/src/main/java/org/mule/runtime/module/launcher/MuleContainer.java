@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.SystemUtils;
@@ -201,7 +201,7 @@ public class MuleContainer {
    * @param e the exception that caused the shutdown
    */
   public void shutdown(Throwable e) throws MuleException {
-    Message msg = CoreMessages.fatalErrorWhileRunning();
+    I18nMessage msg = CoreMessages.fatalErrorWhileRunning();
     MuleException muleException = ExceptionHelper.getRootMuleException(e);
     if (muleException != null) {
       logger.error(muleException.getDetailedMessage());

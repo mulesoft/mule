@@ -6,21 +6,21 @@
  */
 package org.mule.runtime.core.routing.correlation;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.Comparator;
 import java.util.Optional;
 
 /**
- * <code>CorrelationSequenceComparator</code> is a {@link Comparator} for {@link MuleEvent}s using their respective correlation
+ * <code>CorrelationSequenceComparator</code> is a {@link Comparator} for {@link Event}s using their respective correlation
  * sequences.
  */
-public final class CorrelationSequenceComparator implements Comparator<MuleEvent> {
+public final class CorrelationSequenceComparator implements Comparator<Event> {
 
   @Override
-  public int compare(MuleEvent event1, MuleEvent event2) {
-    Optional<Integer> val1 = event1.getCorrelation().getSequence();
-    Optional<Integer> val2 = event2.getCorrelation().getSequence();
+  public int compare(Event event1, Event event2) {
+    Optional<Integer> val1 = event1.getGroupCorrelation().getSequence();
+    Optional<Integer> val2 = event2.getGroupCorrelation().getSequence();
 
     if (val1 == val2) {
       return 0;

@@ -18,8 +18,8 @@ import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
@@ -128,7 +128,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
       try {
         FileUtils.cleanDirectory(this.partitionDirectory);
       } catch (IOException e) {
-        throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear ObjectStore"), e);
+        throw new ObjectStoreException(I18nMessageFactory.createStaticMessage("Could not clear ObjectStore"), e);
       }
 
       realKeyToUUIDIndex.clear();
@@ -250,7 +250,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
       // inside
       // synchronized method
       if (!directory.exists() && !directory.mkdirs()) {
-        Message message = CoreMessages.failedToCreate("object store directory " + directory.getAbsolutePath());
+        I18nMessage message = CoreMessages.failedToCreate("object store directory " + directory.getAbsolutePath());
         throw new MuleRuntimeException(message);
       }
     } catch (Exception e) {
@@ -338,7 +338,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   protected void deleteStoreFile(File file) throws ObjectStoreException {
     if (file.exists()) {
       if (!file.delete()) {
-        Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath() + " failed");
+        I18nMessage message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath() + " failed");
         throw new ObjectStoreException(message);
       }
       realKeyToUUIDIndex.removeValue(file.getName());

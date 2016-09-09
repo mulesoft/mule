@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a
- * {@link MessageProcessor} chain. The default behaviour when the filter is not accepted is to return the request event.
+ * {@link Processor} chain. The default behaviour when the filter is not accepted is to return the request event.
  */
 public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor
     implements NonBlockingSupported {
@@ -34,12 +34,12 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
   /**
    * The <code>MessageProcessor</code> that should be used to handle messages that are not accepted by the filter.
    */
-  protected MessageProcessor unacceptedMessageProcessor;
+  protected Processor unacceptedMessageProcessor;
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     boolean accepted;
-    Builder builder = MuleEvent.builder(event);
+    Builder builder = Event.builder(event);
     try {
       accepted = accept(event, builder);
     } catch (Exception ex) {
@@ -52,9 +52,9 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     }
   }
 
-  protected abstract boolean accept(MuleEvent event, MuleEvent.Builder builder);
+  protected abstract boolean accept(Event event, Event.Builder builder);
 
-  protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException {
+  protected Event handleUnaccepted(Event event) throws MuleException {
     if (unacceptedMessageProcessor != null) {
       return unacceptedMessageProcessor.process(event);
     } else if (throwOnUnaccepted) {
@@ -64,19 +64,19 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     }
   }
 
-  protected MessagingException filterFailureException(MuleEvent event, Exception ex) {
+  protected MessagingException filterFailureException(Event event, Exception ex) {
     return new MessagingException(event, ex, this);
   }
 
-  protected MuleException filterUnacceptedException(MuleEvent event) {
+  protected MuleException filterUnacceptedException(Event event) {
     return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter());
   }
 
-  public MessageProcessor getUnacceptedMessageProcessor() {
+  public Processor getUnacceptedMessageProcessor() {
     return unacceptedMessageProcessor;
   }
 
-  public void setUnacceptedMessageProcessor(MessageProcessor unacceptedMessageProcessor) {
+  public void setUnacceptedMessageProcessor(Processor unacceptedMessageProcessor) {
     this.unacceptedMessageProcessor = unacceptedMessageProcessor;
     if (unacceptedMessageProcessor instanceof FlowConstruct) {
       onUnacceptedFlowConstruct = true;

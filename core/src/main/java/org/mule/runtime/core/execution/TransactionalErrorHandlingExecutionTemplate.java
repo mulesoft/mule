@@ -7,7 +7,7 @@
 package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -24,9 +24,9 @@ import org.mule.runtime.core.transaction.MuleTransactionConfig;
  * by TransactionConfig action resolve transaction if was started by this TransactionTemplate route any exception to exception
  * strategy if it was not already routed to it
  */
-public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTemplate<MuleEvent> {
+public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTemplate<Event> {
 
-  private ExecutionInterceptor<MuleEvent> executionInterceptor;
+  private ExecutionInterceptor<Event> executionInterceptor;
 
   private TransactionalErrorHandlingExecutionTemplate(MuleContext muleContext,
                                                       MessagingExceptionHandler messagingExceptionHandler,
@@ -38,7 +38,7 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
                                                       MessagingExceptionHandler messagingExceptionHandler,
                                                       FlowConstruct flowConstruct, boolean resolveAnyTransaction) {
     final boolean processTransactionOnException = true;
-    ExecutionInterceptor<MuleEvent> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
+    ExecutionInterceptor<Event> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
     tempExecutionInterceptor = new CommitTransactionInterceptor(tempExecutionInterceptor);
     tempExecutionInterceptor = new HandleExceptionInterceptor(tempExecutionInterceptor, messagingExceptionHandler, flowConstruct);
     tempExecutionInterceptor =
@@ -116,7 +116,7 @@ public class TransactionalErrorHandlingExecutionTemplate implements ExecutionTem
 
 
   @Override
-  public MuleEvent execute(ExecutionCallback<MuleEvent> executionCallback) throws Exception {
+  public Event execute(ExecutionCallback<Event> executionCallback) throws Exception {
     return this.executionInterceptor.execute(executionCallback, new ExecutionContext());
   }
 }

@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.construct.Flow;
@@ -58,7 +58,7 @@ public class JmsConcurrentConsumerExecutionTestCase extends FunctionalTestCase {
     }
     Flow flowWithTxConfigured = (Flow) getFlowConstruct("flowWithTxConfigured");
     flowWithTxConfigured.stop();
-    MuleMessage muleMessage = muleClient.request("jms://in", TIMEOUT).getRight().get();
+    InternalMessage muleMessage = muleClient.request("jms://in", TIMEOUT).getRight().get();
     assertThat(muleMessage, IsNull.<Object>notNullValue());
     assertThat(muleClient.request("jms://in", TIMEOUT).getRight().isPresent(), is(false));
   }

@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -34,7 +34,7 @@ public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     flowRunner("all").withPayload(bis).asynchronously().run();
 
-    MuleMessage error = client.request("test://errors", 2000).getRight().get();
+    InternalMessage error = client.request("test://errors", 2000).getRight().get();
     assertRoutingExceptionReceived(error);
   }
 
@@ -45,7 +45,7 @@ public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     flowRunner("first-successful").withPayload(bis).asynchronously().run();
 
-    MuleMessage error = client.request("test://errors2", 2000).getRight().get();
+    InternalMessage error = client.request("test://errors2", 2000).getRight().get();
     assertRoutingExceptionReceived(error);
   }
 
@@ -54,7 +54,7 @@ public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
    *
    * @param message The received message.
    */
-  private void assertRoutingExceptionReceived(MuleMessage message) {
+  private void assertRoutingExceptionReceived(InternalMessage message) {
     assertThat(message, is(notNullValue()));
     Object payload = message.getPayload();
     assertThat(payload, is(notNullValue()));

@@ -9,7 +9,7 @@ package org.mule.test.config.spring.flow;
 import static org.junit.Assert.assertEquals;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.construct.Flow;
@@ -119,7 +119,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
 
   private ProcessingStrategy getAsyncProcessingStrategy(String flowName) throws Exception {
     Flow flow = (Flow) getFlowConstruct(flowName);
-    MessageProcessor processor = flow.getMessageProcessors().get(0);
+    Processor processor = flow.getMessageProcessors().get(0);
     assertEquals(AsyncDelegateMessageProcessor.class, processor.getClass());
     return ((AsyncDelegateMessageProcessor) processor).getProcessingStrategy();
   }
@@ -129,7 +129,7 @@ public class FlowProcessingStrategyConfigTestCase extends AbstractIntegrationTes
     String foo;
 
     @Override
-    public void configureProcessors(List<MessageProcessor> processors,
+    public void configureProcessors(List<Processor> processors,
                                     org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                     MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
       // Nothing to do

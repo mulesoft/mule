@@ -21,7 +21,7 @@ import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.compatibility.core.transport.AbstractConnectorTestCase;
 import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.compatibility.transport.file.FileMessageReceiver;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.FileUtils;
@@ -148,7 +148,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase {
 
   /**
    * If the connector is configured not to do streaming it converts to byte[] so the original input payload is not the same as the
-   * payload in the MuleMessage
+   * payload in the Message
    */
   @Test
   public void testConnectorMessageFactoryNonStreaming() throws Exception {
@@ -156,7 +156,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase {
     ((FileConnector) connector).setStreaming(false);
 
     Object payload = getValidMessage();
-    MuleMessage message = connector.createMuleMessageFactory().create(payload, encoding);
+    InternalMessage message = connector.createMuleMessageFactory().create(payload, encoding);
     assertNotNull(message);
 
     byte[] messagePayload = (byte[]) message.getPayload();

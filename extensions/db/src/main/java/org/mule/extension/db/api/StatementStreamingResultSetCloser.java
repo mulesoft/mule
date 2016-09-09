@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Closes a {@link ResultSet} once it has been processed
+ * 
  * @since 4.0
  */
 public class StatementStreamingResultSetCloser extends AbstractStreamingResultSetCloser {

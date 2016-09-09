@@ -11,7 +11,7 @@ import static java.util.Collections.emptyMap;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mule.runtime.module.ws.functional.SoapFaultCodeMatcher.hasFaultCode;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.ws.consumer.SoapFaultException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -39,7 +39,7 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
   }
 
   protected void assertValidResponse(String flowName, Object payload, Map<String, Serializable> properties) throws Exception {
-    MuleMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
+    InternalMessage response = flowRunner(flowName).withPayload(payload).withInboundProperties(properties).run().getMessage();
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
   }
 

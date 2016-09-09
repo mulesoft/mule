@@ -13,10 +13,10 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +29,7 @@ import org.junit.Test;
 
 public class ForEachSessionVarTestCase extends FunctionalTestCase {
 
-  protected static MuleEvent event;
+  protected static Event event;
   private static final String MY_SESSION_LIST = "mySessionList";
 
   @Override
@@ -59,7 +59,7 @@ public class ForEachSessionVarTestCase extends FunctionalTestCase {
     payload.add("amadeus");
     payload.add("mozart");
 
-    MuleMessage result = flowRunner("counter-config").withPayload(payload).run().getMessage();
+    InternalMessage result = flowRunner("counter-config").withPayload(payload).run().getMessage();
     assertThat(result.getPayload(), instanceOf(Collection.class));
     Collection<?> resultPayload = (Collection<?>) result.getPayload();
     assertThat(resultPayload, hasSize(3));
@@ -83,10 +83,10 @@ public class ForEachSessionVarTestCase extends FunctionalTestCase {
     latch.await(10, TimeUnit.SECONDS);
   }
 
-  public static class EventSaverProcessor implements MessageProcessor {
+  public static class EventSaverProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent receivedEvent) throws MuleException {
+    public Event process(Event receivedEvent) throws MuleException {
       event = receivedEvent;
       return receivedEvent;
     }

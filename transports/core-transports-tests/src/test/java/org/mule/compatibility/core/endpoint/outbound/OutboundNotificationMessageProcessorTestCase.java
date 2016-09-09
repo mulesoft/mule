@@ -17,9 +17,9 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.SensingNullReplyToHandler;
 
 import java.util.concurrent.TimeUnit;
@@ -34,8 +34,8 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
     muleContext.registerListener(listener);
 
     OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, MessageExchangePattern.ONE_WAY, null);
-    MessageProcessor mp = new OutboundNotificationMessageProcessor(endpoint);
-    MuleEvent event = createTestOutboundEvent();
+    Processor mp = new OutboundNotificationMessageProcessor(endpoint);
+    Event event = createTestOutboundEvent();
     mp.process(event);
 
     assertMessageNotification(listener, endpoint, event, MESSAGE_DISPATCH_END);
@@ -47,8 +47,8 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
     muleContext.registerListener(listener);
 
     OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
-    MessageProcessor mp = new OutboundNotificationMessageProcessor(endpoint);
-    MuleEvent event = createTestOutboundEvent();
+    Processor mp = new OutboundNotificationMessageProcessor(endpoint);
+    Event event = createTestOutboundEvent();
     mp.process(event);
 
     assertMessageNotification(listener, endpoint, event, MESSAGE_SEND_END);
@@ -60,21 +60,21 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
     muleContext.registerListener(listener);
 
     OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
-    MessageProcessor mp = new OutboundNotificationMessageProcessor(endpoint);
+    Processor mp = new OutboundNotificationMessageProcessor(endpoint);
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    MuleEvent event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, getTestFlow());
+    Event event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, getTestFlow());
     mp.process(event);
 
     assertMessageNotification(listener, endpoint, event, MESSAGE_SEND_END);
   }
 
   private void assertMessageNotification(TestEndpointMessageNotificationListener listener, OutboundEndpoint endpoint,
-                                         MuleEvent event, int action)
+                                         Event event, int action)
       throws InterruptedException {
     assertThat(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS), is(true));
     assertThat(listener.messageNotification.getAction(), equalTo(action));
     assertThat(listener.messageNotification.getEndpoint(), equalTo(endpoint.getEndpointURI().getUri().toString()));
-    assertThat(listener.messageNotification.getSource(), instanceOf(MuleMessage.class));
+    assertThat(listener.messageNotification.getSource(), instanceOf(InternalMessage.class));
     assertThat(listener.messageNotification.getSource().getPayload(), equalTo(event.getMessage().getPayload()));
   }
 

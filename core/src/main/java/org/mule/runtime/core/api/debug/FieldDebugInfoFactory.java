@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.api.debug;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 import java.util.HashMap;
@@ -35,13 +35,13 @@ public class FieldDebugInfoFactory {
 
   private interface AttributeEvaluatorExecutor {
 
-    Object evaluate(MuleEvent event, AttributeEvaluator attributeEvaluator);
+    Object evaluate(Event event, AttributeEvaluator attributeEvaluator);
   }
 
   private static class BooleanAttributeEvaluatorExecutor implements AttributeEvaluatorExecutor {
 
     @Override
-    public Object evaluate(MuleEvent event, AttributeEvaluator attributeEvaluator) {
+    public Object evaluate(Event event, AttributeEvaluator attributeEvaluator) {
       return attributeEvaluator.resolveBooleanValue(event);
     }
   }
@@ -49,7 +49,7 @@ public class FieldDebugInfoFactory {
   private static class StringAttributeEvaluatorExecutor implements AttributeEvaluatorExecutor {
 
     @Override
-    public Object evaluate(MuleEvent event, AttributeEvaluator attributeEvaluator) {
+    public Object evaluate(Event event, AttributeEvaluator attributeEvaluator) {
       return attributeEvaluator.resolveStringValue(event);
     }
   }
@@ -57,7 +57,7 @@ public class FieldDebugInfoFactory {
   private static class IntegerAttributeEvaluatorExecutor implements AttributeEvaluatorExecutor {
 
     @Override
-    public Object evaluate(MuleEvent event, AttributeEvaluator attributeEvaluator) {
+    public Object evaluate(Event event, AttributeEvaluator attributeEvaluator) {
       return attributeEvaluator.resolveIntegerValue(event);
     }
   }
@@ -65,7 +65,7 @@ public class FieldDebugInfoFactory {
   private static class ObjectAttributeEvaluatorExecutor implements AttributeEvaluatorExecutor {
 
     @Override
-    public Object evaluate(MuleEvent event, AttributeEvaluator attributeEvaluator) {
+    public Object evaluate(Event event, AttributeEvaluator attributeEvaluator) {
       return attributeEvaluator.resolveValue(event);
     }
   }
@@ -94,7 +94,7 @@ public class FieldDebugInfoFactory {
    * @return a {@link SimpleFieldDebugInfo} if the field evaluation is successful, and a {@link ErrorFieldDebugInfo} otherwise
    */
   public static FieldDebugInfo<?> createFieldDebugInfo(String name, Class<?> type, AttributeEvaluator evaluator,
-                                                       MuleEvent event) {
+                                                       Event event) {
     try {
       AttributeEvaluatorExecutor attributeEvaluatorExecutor = attributeEvaluationExecutors.get(type);
       if (attributeEvaluatorExecutor == null) {

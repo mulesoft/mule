@@ -10,9 +10,9 @@ import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
@@ -39,7 +39,7 @@ public class AddAttachmentProcessor extends SimpleMessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     try {
       Object keyValue = nameEvaluator.resolveValue(event);
       if (keyValue == null) {
@@ -54,7 +54,7 @@ public class AddAttachmentProcessor extends SimpleMessageProcessor {
         } else {
           MediaType contentType =
               DataType.builder().mediaType(contentTypeEvaluator.resolveStringValue(event)).build().getMediaType();
-          return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+          return Event.builder(event).message(InternalMessage.builder(event.getMessage())
               .addOutboundAttachment(key, toDataHandler(key, value, contentType)).build()).build();
         }
       }

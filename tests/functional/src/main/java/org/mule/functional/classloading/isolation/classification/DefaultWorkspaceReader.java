@@ -51,7 +51,8 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    * Creates and instance of the workspace reader for the given classPath and workspaceLocationResolver.
    *
    * @param classPath {@link URL}s to find the artifact's {@link URL}
-   * @param workspaceLocationResolver {@link WorkspaceLocationResolver} to retrieve the workspace reference for a given {@link Artifact}
+   * @param workspaceLocationResolver {@link WorkspaceLocationResolver} to retrieve the workspace reference for a given
+   *        {@link Artifact}
    */
   public DefaultWorkspaceReader(List<URL> classPath, WorkspaceLocationResolver workspaceLocationResolver) {
     checkNotNull(classPath, "classPath cannot be null");
@@ -182,9 +183,9 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
   }
 
   /**
-   * Searches the Maven {@link Model} for the {@url https://maven.apache.org/plugins/maven-shade-plugin/}.
-   * maven-shared-plugin would have to be configure in the pom directly and not inherited from a parent pom due to it is
-   * not supported by this implementation.
+   * Searches the Maven {@link Model} for the {@url https://maven.apache.org/plugins/maven-shade-plugin/}. maven-shared-plugin
+   * would have to be configure in the pom directly and not inherited from a parent pom due to it is not supported by this
+   * implementation.
    *
    * @param model Maven {@link Model} to look for the Maven Shade Plugin
    * @return {@link Plugin} model for Maven Shade Plugin if found.

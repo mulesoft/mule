@@ -18,7 +18,7 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.GlobalVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -67,7 +67,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
   protected void doVarDataTypeTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+    Event testEvent = getTestEvent(TEST_MESSAGE);
     testEvent = setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);
 
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
@@ -81,7 +81,7 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
-  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(MuleEvent testEvent,
+  protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(Event testEvent,
                                                                               ParserConfiguration parserConfiguration) {
     final MVELExpressionLanguageContext context = new MVELExpressionLanguageContext(parserConfiguration, muleContext);
     final StaticVariableResolverFactory staticContext = new StaticVariableResolverFactory(parserConfiguration, muleContext);
@@ -91,15 +91,15 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
     final DelegateVariableResolverFactory innerDelegate =
         new DelegateVariableResolverFactory(globalContext,
                                             new VariableVariableResolverFactory(parserConfiguration, muleContext, testEvent,
-                                                                                MuleEvent.builder(testEvent)));
+                                                                                Event.builder(testEvent)));
     final DelegateVariableResolverFactory delegate =
         new DelegateVariableResolverFactory(staticContext, new MessageVariableResolverFactory(parserConfiguration, muleContext,
                                                                                               testEvent,
-                                                                                              MuleEvent.builder(testEvent),
+                                                                                              Event.builder(testEvent),
                                                                                               innerDelegate));
     context.setNextFactory(new CachedMapVariableResolverFactory(Collections.EMPTY_MAP, delegate));
     return context;
   }
 
-  protected abstract MuleEvent setVariable(MuleEvent testEvent, Object propertyValue, DataType expectedDataType);
+  protected abstract Event setVariable(Event testEvent, Object propertyValue, DataType expectedDataType);
 }

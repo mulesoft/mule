@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.request.validator;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -23,6 +23,6 @@ public interface ResponseValidator {
    * @param context the Mule Context for the current application.
    * @throws ResponseValidatorException if the message is not considered valid.
    */
-  void validate(MuleMessage muleMessage, MuleContext context) throws ResponseValidatorException;
+  void validate(Message muleMessage, MuleContext context) throws ResponseValidatorException;
 
 }

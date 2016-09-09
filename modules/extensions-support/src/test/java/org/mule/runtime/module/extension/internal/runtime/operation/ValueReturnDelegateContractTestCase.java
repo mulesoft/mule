@@ -18,11 +18,11 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
@@ -45,7 +45,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   @Mock
   protected OperationContextAdapter operationContext;
 
-  protected MuleEvent event;
+  protected Event event;
 
   @Mock
   protected Attributes attributes;
@@ -56,8 +56,8 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
   public void before() {
     FlowConstruct flow = mock(FlowConstruct.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(org.mule.runtime.core.api.MuleMessage.builder().payload("").attributes(attributes).build()).build();
+    event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+        .message(org.mule.runtime.core.api.InternalMessage.builder().payload("").attributes(attributes).build()).build();
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
   }
@@ -67,7 +67,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     byte[] value = new byte[] {};
     org.mule.runtime.api.message.MuleEvent result = delegate.asReturnValue(value, operationContext);
 
-    MuleMessage message = getOutputMessage(result);
+    Message message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(value)));
     assertThat(message.getDataType().getType().equals(byte[].class), is(true));
@@ -81,7 +81,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     org.mule.runtime.api.message.MuleEvent result =
         delegate.asReturnValue(OperationResult.builder().output(payload).mediaType(mediaType).build(), operationContext);
 
-    MuleMessage message = getOutputMessage(result);
+    Message message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
@@ -95,7 +95,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     org.mule.runtime.api.message.MuleEvent result =
         delegate.asReturnValue(OperationResult.builder().output(payload).build(), operationContext);
 
-    MuleMessage message = getOutputMessage(result);
+    Message message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
@@ -110,7 +110,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     org.mule.runtime.api.message.MuleEvent result =
         delegate.asReturnValue(OperationResult.builder().output(payload).attributes(newAttributes).build(), operationContext);
 
-    MuleMessage message = getOutputMessage(result);
+    Message message = getOutputMessage(result);
 
     assertThat(message.getPayload(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(newAttributes)));
@@ -119,5 +119,5 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
   protected abstract ReturnDelegate createReturnDelegate();
 
-  protected abstract MuleMessage getOutputMessage(org.mule.runtime.api.message.MuleEvent result);
+  protected abstract Message getOutputMessage(org.mule.runtime.api.message.MuleEvent result);
 }

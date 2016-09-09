@@ -14,7 +14,7 @@ import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -58,7 +58,7 @@ public class ExecuteDdlTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void executeDdl() throws Exception {
-    MuleMessage response = flowRunner("executeDdl").run().getMessage();
+    Message response = flowRunner("executeDdl").run().getMessage();
     assertTableCreation(response.getPayload());
   }
 

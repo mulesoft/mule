@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.interceptor;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.CoreMessageContext;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -30,25 +30,25 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
   /**
    * This method is invoked before the event is processed
    */
-  public abstract MuleEvent before(MuleEvent event) throws MuleException;
+  public abstract Event before(Event event) throws MuleException;
 
   /**
    * This method is invoked after the event has been processed, unless an exception was thrown
    */
-  public abstract MuleEvent after(MuleEvent event) throws MuleException;
+  public abstract Event after(Event event) throws MuleException;
 
   /**
    * This method is always invoked after the event has been processed,
    */
-  public abstract MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown)
+  public abstract Event last(Event event, ProcessingTime time, long startTime, boolean exceptionWasThrown)
       throws MuleException;
 
   @Override
-  protected MuleEvent processBlocking(MuleEvent event) throws MuleException {
+  protected Event processBlocking(Event event) throws MuleException {
     long startTime = System.currentTimeMillis();
     ProcessingTime time = ((CoreMessageContext) event.getContext()).getProcessingTime();
     boolean exceptionWasThrown = true;
-    MuleEvent resultEvent = event;
+    Event resultEvent = event;
     try {
       resultEvent = after(processNext(before(resultEvent)));
       exceptionWasThrown = false;
@@ -59,14 +59,14 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
   }
 
   @Override
-  protected MuleEvent processNonBlocking(final MuleEvent event) throws MuleException {
+  protected Event processNonBlocking(final Event event) throws MuleException {
     final long startTime = System.currentTimeMillis();
     final ProcessingTime time = ((CoreMessageContext) event.getContext()).getProcessingTime();
-    MuleEvent responseEvent = event;
+    Event responseEvent = event;
 
     final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
     responseEvent =
-        MuleEvent.builder(event).replyToHandler(new ResponseReplyToHandler(originalReplyToHandler, time, startTime)).build();
+        Event.builder(event).replyToHandler(new ResponseReplyToHandler(originalReplyToHandler, time, startTime)).build();
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(responseEvent);
 
@@ -95,8 +95,8 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractRequestRespons
     }
 
     @Override
-    public MuleEvent processReplyTo(final MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
-      MuleEvent response = event;
+    public Event processReplyTo(final Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
+      Event response = event;
       boolean exceptionWasThrown = true;
       try {
         response = after(event);

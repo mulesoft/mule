@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class HttpMapParam extends HttpParam {
   }
 
   @Override
-  public void resolve(ParameterMap parameterMap, MuleEvent muleEvent, MuleContext muleContext) {
+  public void resolve(ParameterMap parameterMap, Event muleEvent, MuleContext muleContext) {
     Map<Object, Object> paramMap = muleContext.getExpressionLanguage().evaluate(expression, muleEvent, null);
     for (Map.Entry<Object, Object> entry : paramMap.entrySet()) {
       String paramName = entry.getKey().toString();

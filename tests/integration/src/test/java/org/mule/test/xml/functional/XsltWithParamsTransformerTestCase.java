@@ -7,7 +7,7 @@
 package org.mule.test.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -32,7 +32,7 @@ public class XsltWithParamsTransformerTestCase extends AbstractIntegrationTestCa
   public void testTransformWithParameter() throws Exception {
     Transformer trans = muleContext.getRegistry().lookupTransformer("test1");
     assertNotNull(trans);
-    MuleMessage message = MuleMessage.builder().payload("<testing/>").addOutboundProperty("Welcome", "hello").build();
+    InternalMessage message = InternalMessage.builder().payload("<testing/>").addOutboundProperty("Welcome", "hello").build();
     Object result = trans.transform(message);
     assertNotNull(result);
     XMLUnit.setIgnoreWhitespace(true);

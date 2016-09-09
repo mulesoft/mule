@@ -7,46 +7,46 @@
 package org.mule.compatibility.transport.file.i18n;
 
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.io.File;
 
-public class FileMessages extends MessageFactory {
+public class FileMessages extends I18nMessageFactory {
 
   private static final FileMessages factory = new FileMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("file");
 
-  public static Message errorWhileListingFiles() {
+  public static I18nMessage errorWhileListingFiles() {
     return factory.createMessage(BUNDLE_PATH, 1);
   }
 
-  public static Message exceptionWhileProcessing(String name, String string) {
+  public static I18nMessage exceptionWhileProcessing(String name, String string) {
     return factory.createMessage(BUNDLE_PATH, 2, name, string);
   }
 
-  public static Message failedToDeleteFile(File file) {
+  public static I18nMessage failedToDeleteFile(File file) {
     return factory.createMessage(BUNDLE_PATH, 3, file.getAbsolutePath());
   }
 
-  public static Message failedToMoveFile(String from, String to) {
+  public static I18nMessage failedToMoveFile(String from, String to) {
     return factory.createMessage(BUNDLE_PATH, 4, from, to);
   }
 
-  public static Message moveToDirectoryNotWritable() {
+  public static I18nMessage moveToDirectoryNotWritable() {
     return factory.createMessage(BUNDLE_PATH, 5);
   }
 
-  public static Message invalidFileFilter(EndpointURI endpointURI) {
+  public static I18nMessage invalidFileFilter(EndpointURI endpointURI) {
     return factory.createMessage(BUNDLE_PATH, 6, endpointURI);
   }
 
-  public static Message fileDoesNotExist(String string) {
+  public static I18nMessage fileDoesNotExist(String string) {
     return factory.createMessage(BUNDLE_PATH, 7, string);
   }
 
-  public static Message invalidFilter(Object filter) {
+  public static I18nMessage invalidFilter(Object filter) {
     return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
   }
 

@@ -7,8 +7,8 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 
@@ -35,7 +35,7 @@ public class UrlValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(MuleEvent event) {
+  public ValidationResult validate(Event event) {
     try {
       new URL(url);
       return ok();
@@ -45,7 +45,7 @@ public class UrlValidator extends AbstractValidator {
   }
 
   @Override
-  protected Message getDefaultErrorMessage() {
+  protected I18nMessage getDefaultErrorMessage() {
     return getMessages().invalidUrl(url);
   }
 }

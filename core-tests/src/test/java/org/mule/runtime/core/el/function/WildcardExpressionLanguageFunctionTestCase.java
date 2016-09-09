@@ -15,8 +15,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
@@ -42,9 +42,9 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
   protected MVELExpressionLanguageContext context;
   protected WildcardExpressionLanguageFuntion wildcardFunction;
   protected MuleContext muleContext;
-  private MuleEvent event;
-  private MuleEvent.Builder eventBuilder;
-  private MuleMessage message;
+  private Event event;
+  private Event.Builder eventBuilder;
+  private InternalMessage message;
 
   @Before
   public void setup() throws InitialisationException {
@@ -211,17 +211,17 @@ public class WildcardExpressionLanguageFunctionTestCase extends AbstractMuleTest
 
   @SuppressWarnings("unchecked")
   protected void addMessageToContextWithPayload(String payload) throws TransformerException {
-    event = mock(MuleEvent.class);
+    event = mock(Event.class);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    eventBuilder = MuleEvent.builder(event);
-    message = mock(MuleMessage.class);
+    eventBuilder = Event.builder(event);
+    message = mock(InternalMessage.class);
     when(event.getMessage()).thenAnswer(invocation -> message);
-    MuleMessage transformedMessage = mock(MuleMessage.class);
+    InternalMessage transformedMessage = mock(InternalMessage.class);
     when(transformedMessage.getPayload()).thenReturn(payload);
     TransformationService transformationService = mock(TransformationService.class);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+    when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
     context.addFinalVariable("message", new MessageContext(event, eventBuilder, muleContext));
   }
 

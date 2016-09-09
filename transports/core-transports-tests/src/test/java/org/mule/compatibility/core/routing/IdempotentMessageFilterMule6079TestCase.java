@@ -12,8 +12,8 @@ import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populate
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -76,10 +76,10 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
 
     @Override
     public void run() {
-      MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      MuleEvent newEvent = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
+      InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+      Event newEvent = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
           .session(session).build();
-      MuleEvent event = populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);
+      Event event = populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);
 
       try {
         event = idempotentMessageFilter.process(event);

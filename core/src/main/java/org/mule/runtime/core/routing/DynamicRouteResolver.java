@@ -7,8 +7,8 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 
@@ -18,11 +18,11 @@ import java.util.List;
 public interface DynamicRouteResolver {
 
   /**
-   * Return a list of {@link MessageProcessor} to route the message.
+   * Return a list of {@link Processor} to route the message.
    *
    * @param event the event holding the message to route
-   * @return a list of {@link MessageProcessor} to which the message will be routed to
+   * @return a list of {@link Processor} to which the message will be routed to
    * @throws MessagingException
    */
-  List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException;
+  List<Processor> resolveRoutes(Event event) throws MessagingException;
 }

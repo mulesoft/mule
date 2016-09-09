@@ -21,7 +21,7 @@ import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.compatibility.transport.vm.VMConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
@@ -45,7 +45,7 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase {
     Object flow = muleContext.getRegistry().lookupObject("TestComponent3");
 
     assertNotNull(flow);
-    List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
+    List<Processor> messageProcessors = ((Flow) flow).getMessageProcessors();
 
     assertNotNull(messageProcessors);
     assertEquals(2, messageProcessors.size());
@@ -92,7 +92,7 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase {
     Object flow = muleContext.getRegistry().lookupObject("TestComponent4");
 
     assertNotNull(flow);
-    List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
+    List<Processor> messageProcessors = ((Flow) flow).getMessageProcessors();
     assertNotNull(messageProcessors);
 
     ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);
@@ -106,7 +106,7 @@ public class MuleEndpointConfigurationFlowTestCase extends FunctionalTestCase {
     Object flow = muleContext.getRegistry().lookupObject("TestComponent5");
 
     assertNotNull(flow);
-    List<MessageProcessor> messageProcessors = ((Flow) flow).getMessageProcessors();
+    List<Processor> messageProcessors = ((Flow) flow).getMessageProcessors();
     assertNotNull(messageProcessors);
 
     ImmutableEndpoint endpoint = (ImmutableEndpoint) messageProcessors.get(1);

@@ -9,7 +9,7 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.exception.ErrorHandler;
@@ -34,7 +34,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractIntegrationTestCas
     private String logException = "true";
 
     @Override
-    public MuleEvent handleException(MessagingException exception, MuleEvent event) {
+    public Event handleException(MessagingException exception, Event event) {
       return null;
     }
 

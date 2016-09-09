@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
@@ -19,7 +19,7 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
 public class OutboundTxRollbackMessageProcessor extends AbstractInterceptingMessageProcessor {
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     // No point continuing if the service has rolledback the transaction
     if (isTransactionRollback()) {
       return event;

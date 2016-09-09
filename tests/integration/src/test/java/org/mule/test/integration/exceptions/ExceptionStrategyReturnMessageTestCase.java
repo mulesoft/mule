@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
@@ -40,8 +40,8 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
 
   @Test
   public void testReturnPayloadCustomStrategy() throws Exception {
-    MuleEvent event = flowRunner("InputService").withPayload(getTestMuleMessage("Test Message")).run();
-    MuleMessage msg = event.getMessage();
+    Event event = flowRunner("InputService").withPayload(getTestMuleMessage("Test Message")).run();
+    InternalMessage msg = event.getMessage();
 
     assertNotNull(msg);
     assertThat(event.getError().isPresent(), is(true));
@@ -54,9 +54,9 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
   public static class TestExceptionStrategy extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(MessagingException exception, MuleEvent event) {
-      MuleEvent result = super.handleException(exception, event);
-      result = MuleEvent.builder(result).message(MuleMessage.builder(event.getMessage()).payload("Ka-boom!").build()).build();
+    public Event handleException(MessagingException exception, Event event) {
+      Event result = super.handleException(exception, event);
+      result = Event.builder(result).message(InternalMessage.builder(event.getMessage()).payload("Ka-boom!").build()).build();
       exception.setHandled(true);
       return result;
     }

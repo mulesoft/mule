@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.Base64;
 
 import java.nio.charset.Charset;
@@ -47,7 +47,7 @@ public class TransformerEncodingTestCase extends AbstractIntegrationTestCase {
         .withMediaType(MediaType.ANY.withCharset(Charset.forName(charset))).run());
   }
 
-  protected void assertPayload(final MuleEvent muleEvent) throws Exception {
+  protected void assertPayload(final Event muleEvent) throws Exception {
     assertThat(getPayloadAsString(muleEvent.getMessage()), is(PAYLOAD));
   }
 }

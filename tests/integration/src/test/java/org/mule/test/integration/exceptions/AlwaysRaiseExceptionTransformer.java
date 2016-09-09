@@ -7,7 +7,7 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
 import java.nio.charset.Charset;
@@ -16,6 +16,6 @@ public class AlwaysRaiseExceptionTransformer extends AbstractTransformer {
 
   @Override
   protected Object doTransform(Object src, Charset enc) throws TransformerException {
-    throw new TransformerException(MessageFactory.createStaticMessage("Ad hoc message exception"));
+    throw new TransformerException(I18nMessageFactory.createStaticMessage("Ad hoc message exception"));
   }
 }

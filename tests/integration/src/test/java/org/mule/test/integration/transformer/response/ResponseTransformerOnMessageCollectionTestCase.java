@@ -9,7 +9,7 @@ package org.mule.test.integration.transformer.response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class ResponseTransformerOnMessageCollectionTestCase extends AbstractInte
 
   @Test
   public void transformedDataIsNotLost() throws Exception {
-    MuleMessage response = flowRunner("Distributor").withPayload(TEST_MESSAGE).run().getMessage();
+    InternalMessage response = flowRunner("Distributor").withPayload(TEST_MESSAGE).run().getMessage();
 
     assertEquals("foo", response.getPayload());
     assertFalse(response.getPayload() instanceof List);

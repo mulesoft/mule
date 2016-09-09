@@ -14,16 +14,16 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -33,9 +33,9 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
 
   @Test
   public void testAuthenticationHeaderFailure() throws Exception {
-    MuleEvent oldEvent = getCurrentEvent();
+    Event oldEvent = getCurrentEvent();
 
-    MuleEvent event = getTestEvent(MuleMessage.builder().payload("a").addInboundProperty(AUTHORIZATION, "Basic a").build());
+    Event event = getTestEvent(InternalMessage.builder().payload("a").addInboundProperty(AUTHORIZATION, "Basic a").build());
     setCurrentEvent(event);
 
     HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();
@@ -43,13 +43,13 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
     SecurityManager manager = mock(SecurityManager.class);
     filter.setSecurityManager(manager);
 
-    doThrow(new UnauthorisedException(mock(Message.class))).when(manager).authenticate(anyObject());
+    doThrow(new UnauthorisedException(mock(I18nMessage.class))).when(manager).authenticate(anyObject());
 
     try {
       filter.authenticate(event);
       fail("An UnauthorisedException should be thrown");
     } catch (UnauthorisedException e) {
-      //assertThat(e.getEvent().getMessage().getOutboundProperty(WWW_AUTHENTICATE), is("Basic realm="));
+      // assertThat(e.getEvent().getMessage().getOutboundProperty(WWW_AUTHENTICATE), is("Basic realm="));
       verify(manager);
     }
     setCurrentEvent(oldEvent);

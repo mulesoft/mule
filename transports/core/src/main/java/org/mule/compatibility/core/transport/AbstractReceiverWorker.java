@@ -7,16 +7,16 @@
 package org.mule.compatibility.core.transport;
 
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -80,29 +80,29 @@ public abstract class AbstractReceiverWorker implements Work {
    */
   public void processMessages() throws Exception {
     // No need to do error handling. It will be done by inner TransactionTemplate per Message
-    ExecutionTemplate<List<MuleEvent>> executionTemplate =
+    ExecutionTemplate<List<Event>> executionTemplate =
         createTransactionalExecutionTemplate(receiver.getEndpoint().getMuleContext(), endpoint.getTransactionConfig());
 
     // Receive messages and process them in a single transaction
     // Do not enable threading here, but serveral workers
     // may have been started
-    ExecutionCallback<List<MuleEvent>> processingCallback = () -> {
+    ExecutionCallback<List<Event>> processingCallback = () -> {
       final Transaction tx = TransactionCoordination.getInstance().getTransaction();
       if (tx != null) {
         bindTransaction(tx);
       }
-      List<MuleEvent> results = new ArrayList<>(messages.size());
+      List<Event> results = new ArrayList<>(messages.size());
 
       for (final Object payload : messages) {
-        ExecutionTemplate<MuleEvent> perMessageExecutionTemplate =
+        ExecutionTemplate<Event> perMessageExecutionTemplate =
             createMainExecutionTemplate(endpoint.getMuleContext(), receiver.flowConstruct,
                                         receiver.flowConstruct.getExceptionListener());
-        MuleEvent resultEvent;
+        Event resultEvent;
         try {
           resultEvent = perMessageExecutionTemplate.execute(() -> {
             Object preProcessedPayload = preProcessMessage(payload);
             if (preProcessedPayload != null) {
-              MuleCompatibilityMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
+              CompatibilityMessage muleMessage = receiver.createMuleMessage(preProcessedPayload, endpoint.getEncoding());
               muleMessage = preRouteMuleMessage(muleMessage);
               // TODO Move getSessionHandler() to the Connector interface
               SessionHandler handler;
@@ -113,7 +113,7 @@ public abstract class AbstractReceiverWorker implements Work {
               }
               MuleSession session = handler.retrieveSessionInfoFromMessage(muleMessage, endpoint.getMuleContext());
 
-              MuleEvent resultEvent1;
+              Event resultEvent1;
               if (session != null) {
                 resultEvent1 = receiver.routeMessage(muleMessage, session, tx, out);
               } else {
@@ -142,7 +142,7 @@ public abstract class AbstractReceiverWorker implements Work {
     try {
       currentThread().setContextClassLoader(endpoint.getMuleContext().getExecutionClassLoader());
 
-      List<MuleEvent> results = executionTemplate.execute(processingCallback);
+      List<Event> results = executionTemplate.execute(processingCallback);
       handleResults(handleEventResults(results));
     } finally {
       messages.clear();
@@ -151,10 +151,10 @@ public abstract class AbstractReceiverWorker implements Work {
     }
   }
 
-  protected List<Object> handleEventResults(List<MuleEvent> events) throws Exception {
+  protected List<Object> handleEventResults(List<Event> events) throws Exception {
     List<Object> payloads = new ArrayList<>(events.size());
-    for (MuleEvent muleEvent : events) {
-      MuleMessage result = muleEvent == null ? null : muleEvent.getMessage();
+    for (Event muleEvent : events) {
+      InternalMessage result = muleEvent == null ? null : muleEvent.getMessage();
       if (result != null) {
         Object payload = postProcessMessage(result);
         if (payload != null) {
@@ -172,7 +172,7 @@ public abstract class AbstractReceiverWorker implements Work {
    * @param message the next message to be processed
    * @throws Exception
    */
-  protected MuleCompatibilityMessage preRouteMuleMessage(MuleCompatibilityMessage message) throws Exception {
+  protected CompatibilityMessage preRouteMuleMessage(CompatibilityMessage message) throws Exception {
     // no op
     return message;
   }
@@ -218,7 +218,7 @@ public abstract class AbstractReceiverWorker implements Work {
    * @return the message to add to the list of results. If null is returned nothing is added to the list of results
    * @throws Exception
    */
-  protected MuleMessage postProcessMessage(MuleMessage message) throws Exception {
+  protected InternalMessage postProcessMessage(InternalMessage message) throws Exception {
     // no op
     return message;
   }

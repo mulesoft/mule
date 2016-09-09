@@ -12,10 +12,10 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -33,10 +33,10 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
 
   protected MuleContext muleContext;
   protected TestEventBuilder eventBuilder = new TestEventBuilder();
-  private MuleEvent requestEvent;
+  private Event requestEvent;
 
   /**
-   * Prepares the given data to be sent as the payload of the {@link MuleEvent} to the configured flow.
+   * Prepares the given data to be sent as the payload of the {@link Event} to the configured flow.
    *
    * @param payload the payload to use in the message
    * @return this {@link FlowRunner}
@@ -48,7 +48,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares the given data to be sent as the mediaType of the payload of the {@link MuleEvent} to the configured flow.
+   * Prepares the given data to be sent as the mediaType of the payload of the {@link Event} to the configured flow.
    *
    * @param mediaType the mediaType to use in the message
    * @return this {@link FlowRunner}
@@ -60,7 +60,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares the given data to be sent as the attributes of the {@link MuleEvent} to the configured flow.
+   * Prepares the given data to be sent as the attributes of the {@link Event} to the configured flow.
    *
    * @param attributes the message attributes
    * @return this {@link FlowRunner}
@@ -71,8 +71,8 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares a property with the given key and value to be sent as an inbound property of the {@link MuleMessage} to the
-   * configured flow.
+   * Prepares a property with the given key and value to be sent as an inbound property of the {@link Message} to the configured
+   * flow.
    *
    * @param key the key of the inbound property to add
    * @param value the value of the inbound property to add
@@ -85,7 +85,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares the given properties map to be sent as inbound properties of the {@link MuleMessage} to the configured flow.
+   * Prepares the given properties map to be sent as inbound properties of the {@link Message} to the configured flow.
    *
    * @param properties the inbound properties to add
    * @return this {@link FlowRunner}
@@ -97,8 +97,8 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares a property with the given key and value to be sent as an outbound property of the {@link MuleMessage} to the
-   * configured flow.
+   * Prepares a property with the given key and value to be sent as an outbound property of the {@link Message} to the configured
+   * flow.
    *
    * @param key the key of the outbound property to add
    * @param value the value of the outbound property to add
@@ -111,7 +111,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
+   * Prepares an attachment with the given key and value to be sent in the {@link Message} to the configured flow.
    *
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
@@ -124,7 +124,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
+   * Prepares an attachment with the given key and value to be sent in the {@link Message} to the configured flow.
    *
    * @param key the key of the attachment to add
    * @param object the content of the attachment to add
@@ -139,7 +139,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares an attachment with the given key and value to be sent in the {@link MuleMessage} to the configured flow.
+   * Prepares an attachment with the given key and value to be sent in the {@link Message} to the configured flow.
    *
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
@@ -152,8 +152,8 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Prepares a property with the given key and value to be sent as a session property of the {@link MuleMessage} to the
-   * configured flow.
+   * Prepares a property with the given key and value to be sent as a session property of the {@link Message} to the configured
+   * flow.
    *
    * @param key the key of the session property to add
    * @param value the value of the session property to add
@@ -166,7 +166,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link MuleEvent#getCorrelationId()}.
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link Event#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -177,18 +177,18 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
   }
 
   /**
-   * Configures the product event to have the provided {@code correlation}. See {@link MuleEvent#getCorrelation()}.
+   * Configures the product event to have the provided {@code correlation}. See {@link Event#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
    */
-  public R withCorrelation(Correlation correlation) {
+  public R withCorrelation(GroupCorrelation correlation) {
     eventBuilder.withCorrelation(correlation);
 
     return (R) this;
   }
 
   /**
-   * Prepares a flow variable with the given key and value to be set in the {@link MuleMessage} to the configured flow.
+   * Prepares a flow variable with the given key and value to be set in the {@link Message} to the configured flow.
    *
    * @param key the key of the flow variable to put
    * @param value the value of the flow variable to put
@@ -225,7 +225,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
 
 
   /**
-   * Will spy the built {@link MuleMessage} and {@link MuleEvent}. See {@link Mockito#spy(Object) spy}.
+   * Will spy the built {@link Message} and {@link Event}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link FlowRunner}
    */
@@ -244,7 +244,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
     this.muleContext = muleContext;
   }
 
-  protected MuleEvent getOrBuildEvent() {
+  protected Event getOrBuildEvent() {
     if (requestEvent == null) {
       doBuildEvent();
     }
@@ -256,7 +256,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    *
    * @return an event that would be used to go through the flow.
    */
-  public MuleEvent buildEvent() {
+  public Event buildEvent() {
     if (requestEvent == null) {
       doBuildEvent();
       return requestEvent;

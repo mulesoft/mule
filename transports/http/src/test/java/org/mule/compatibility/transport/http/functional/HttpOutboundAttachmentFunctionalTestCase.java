@@ -10,7 +10,7 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -40,7 +40,7 @@ public class HttpOutboundAttachmentFunctionalTestCase extends FunctionalTestCase
 
   private void sendMessageAndAssertResponse(String endpoint) throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage answer = client.send(endpoint, MuleMessage.builder().payload(TEST_MESSAGE).build()).getRight();
+    InternalMessage answer = client.send(endpoint, InternalMessage.builder().payload(TEST_MESSAGE).build()).getRight();
     assertEquals(TEST_MESSAGE, getPayloadAsString(answer));
   }
 }

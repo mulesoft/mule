@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
@@ -34,7 +34,7 @@ public class ClusterizableMessageSourceWrapperTestCase extends AbstractMuleTestC
 
   @Test
   public void delegatesSetListener() {
-    MessageProcessor listener = mock(MessageProcessor.class);
+    Processor listener = mock(Processor.class);
 
     wrapper.setListener(listener);
 

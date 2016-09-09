@@ -14,7 +14,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -42,7 +42,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
 
   @Test
   public void worksPreservingHeaders() throws Exception {
-    MuleEvent response = runFlow("client");
+    Event response = runFlow("client");
     Object payload = response.getMessage().getPayload();
     assertThat(payload, is(instanceOf(ParameterMap.class)));
     assertThat(((ParameterMap) payload).keySet(), hasItem("CustomValue"));

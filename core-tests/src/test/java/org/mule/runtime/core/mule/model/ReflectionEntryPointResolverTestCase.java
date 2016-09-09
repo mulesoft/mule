@@ -8,13 +8,13 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.getTestEventContext;
 
 import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.ReflectionEntryPointResolver;
@@ -42,7 +42,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatch() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new WaterMelon(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new WaterMelon(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -50,7 +50,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatchComplexObject() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     MuleEventContext eventContext = getTestEventContext(new FruitLover("Mmmm"), REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -58,7 +58,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testMethodMatchWithArguments() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     MuleEventContext eventContext = getTestEventContext(new Object[] {new Apple(), new Banana()}, REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     assertTrue(result.getResult() instanceof Fruit[]);
     // test that the correct methd was called
@@ -67,7 +67,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     assertEquals("addAppleAndBanana", result.getMethodCalled());
 
     eventContext = getTestEventContext(new Object[] {new Banana(), new Apple()}, REQUEST_RESPONSE, muleContext);
-    result = resolver.invoke(new FruitBowl(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     assertTrue(result.getResult() instanceof Fruit[]);
     assertTrue(((Fruit[]) result.getResult())[0] instanceof Banana);
@@ -79,7 +79,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
   public void testExplicitMethodMatchSetArrayFail() throws Exception {
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     MuleEventContext eventContext = getTestEventContext(new Fruit[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals("Test should have failed because the arguments were not wrapped properly: ",
                  result.getState(), InvocationResult.State.FAILED);
   }
@@ -89,7 +89,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     MuleEventContext eventContext =
         getTestEventContext(new Object[] {new Fruit[] {new Apple(), new Orange()}}, REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -102,7 +102,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     setCurrentEvent(getTestEvent("Hello"));
     MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), getCurrentEvent());
     InvocationResult result =
-        resolver.invoke(new MultiplePayloadsTestObject(), eventContext, MuleEvent.builder(getCurrentEvent()));
+        resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(getCurrentEvent()));
     assertEquals(result.getState(), InvocationResult.State.FAILED);
   }
 
@@ -112,11 +112,11 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     // This should fail because the Kiwi.bite() method has a void return type, and by default
     // void methods are ignorred
     MuleEventContext eventContext = getTestEventContext(null, REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new Kiwi(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new Kiwi(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.FAILED);
 
     resolver.setAcceptVoidMethods(true);
-    result = resolver.invoke(new Kiwi(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    result = resolver.invoke(new Kiwi(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     assertEquals("bite", result.getMethodCalled());
   }
@@ -131,7 +131,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     Object proxy = e.create();
 
     MuleEventContext context = getTestEventContext("Blah", REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(proxy, context, MuleEvent.builder(context.getEvent()));
+    InvocationResult result = resolver.invoke(proxy, context, Event.builder(context.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 

@@ -15,16 +15,16 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-import org.mule.runtime.api.message.MultiPartPayload;
+import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
+import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -42,7 +42,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   private MultiPartToAttachmentsTransformer mp2a = new MultiPartToAttachmentsTransformer();
 
   private Flow flow;
-  private MessageContext context;
+  private EventContext context;
 
   @Rule
   public ExpectedException expected = ExpectedException.none();
@@ -65,23 +65,23 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   }
 
   @Test
-  public void nonMultiPartPayloadToAttachment() throws Exception {
+  public void nonMultiPartToAttachment() throws Exception {
     expected.expect(MessageTransformerException.class);
-    mp2a.transform("", MuleEvent.builder(context).message(getTestMuleMessage()).flow(flow).build());
+    mp2a.transform("", Event.builder(context).message(getTestMuleMessage()).flow(flow).build());
   }
 
   @Test
   public void multiPartWithBody() throws MessageTransformerException {
-    final MuleMessage attachmentPart = MuleMessage.builder().payload("this is the attachment").mediaType(MediaType.TEXT)
+    final InternalMessage attachmentPart = InternalMessage.builder().payload("this is the attachment").mediaType(MediaType.TEXT)
         .attributes(new PartAttributes("attachment")).build();
 
-    MuleMessage message = MuleMessage.builder()
-        .payload(new DefaultMultiPartPayload(MuleMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
+    InternalMessage message = InternalMessage.builder()
+        .payload(new DefaultMultiPartContent(InternalMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                                              attachmentPart))
         .build();
 
-    final MuleMessage response =
-        (MuleMessage) mp2a.transform(message, MuleEvent.builder(context).message(message).flow(flow).build());
+    final InternalMessage response =
+        (InternalMessage) mp2a.transform(message, Event.builder(context).message(message).flow(flow).build());
 
     assertThat(response.getOutboundAttachmentNames(), hasSize(1));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment"));
@@ -90,15 +90,16 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
   @Test
   public void multiPartWithoutBody() throws MessageTransformerException {
-    final MuleMessage attachment1Part = MuleMessage.builder().payload("this is the attachment1").mediaType(MediaType.TEXT)
+    final InternalMessage attachment1Part = InternalMessage.builder().payload("this is the attachment1").mediaType(MediaType.TEXT)
         .attributes(new PartAttributes("attachment1")).build();
-    final MuleMessage attachment2Part = MuleMessage.builder().payload("this is the attachment2").mediaType(MediaType.TEXT)
+    final InternalMessage attachment2Part = InternalMessage.builder().payload("this is the attachment2").mediaType(MediaType.TEXT)
         .attributes(new PartAttributes("attachment2")).build();
 
-    MuleMessage message = MuleMessage.builder().payload(new DefaultMultiPartPayload(attachment1Part, attachment2Part)).build();
+    InternalMessage message =
+        InternalMessage.builder().payload(new DefaultMultiPartContent(attachment1Part, attachment2Part)).build();
 
-    final MuleMessage response =
-        (MuleMessage) mp2a.transform(message, MuleEvent.builder(context).message(message).flow(flow).build());
+    final InternalMessage response =
+        (InternalMessage) mp2a.transform(message, Event.builder(context).message(message).flow(flow).build());
 
     assertThat(response.getOutboundAttachmentNames(), hasSize(2));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment1"));
@@ -110,30 +111,31 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   public void attachmentsWithPayload() throws MessageTransformerException {
     final DataHandler attDH = mock(DataHandler.class);
     when(attDH.getContentType()).thenReturn(MediaType.TEXT.toRfcString());
-    final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addInboundAttachment("attachment", attDH).build();
+    final InternalMessage message =
+        InternalMessage.builder().payload(TEST_PAYLOAD).addInboundAttachment("attachment", attDH).build();
 
-    final MuleMessage response =
-        (MuleMessage) a2mp.transform(message, MuleEvent.builder(context).message(message).flow(flow).build());
+    final InternalMessage response =
+        (InternalMessage) a2mp.transform(message, Event.builder(context).message(message).flow(flow).build());
 
-    assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
-    assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
-    assertThat(((DefaultMultiPartPayload) response.getPayload()).hasBodyPart(), is(true));
-    assertThat(((MultiPartPayload) response.getPayload()).getPartNames(), hasItem("attachment"));
+    assertThat(response.getPayload(), instanceOf(MultiPartContent.class));
+    assertThat(((MultiPartContent) response.getPayload()).getParts(), hasSize(2));
+    assertThat(((DefaultMultiPartContent) response.getPayload()).hasBodyPart(), is(true));
+    assertThat(((MultiPartContent) response.getPayload()).getPartNames(), hasItem("attachment"));
   }
 
   @Test
   public void attachmentsWithoutPayload() throws MessageTransformerException {
     final DataHandler attDH = mock(DataHandler.class);
     when(attDH.getContentType()).thenReturn(MediaType.TEXT.toRfcString());
-    final MuleMessage message = MuleMessage.builder().nullPayload().addInboundAttachment("attachment", attDH).build();
+    final InternalMessage message = InternalMessage.builder().nullPayload().addInboundAttachment("attachment", attDH).build();
 
-    final MuleMessage response =
-        (MuleMessage) a2mp.transform(message, MuleEvent.builder(context).message(message).flow(flow).build());
+    final InternalMessage response =
+        (InternalMessage) a2mp.transform(message, Event.builder(context).message(message).flow(flow).build());
 
-    assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
-    assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(1));
-    assertThat(((DefaultMultiPartPayload) response.getPayload()).hasBodyPart(), is(false));
-    assertThat(((MultiPartPayload) response.getPayload()).getPartNames(), hasItem("attachment"));
+    assertThat(response.getPayload(), instanceOf(MultiPartContent.class));
+    assertThat(((MultiPartContent) response.getPayload()).getParts(), hasSize(1));
+    assertThat(((DefaultMultiPartContent) response.getPayload()).hasBodyPart(), is(false));
+    assertThat(((MultiPartContent) response.getPayload()).getPartNames(), hasItem("attachment"));
   }
 
 }

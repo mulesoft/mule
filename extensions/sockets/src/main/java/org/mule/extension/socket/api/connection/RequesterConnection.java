@@ -8,14 +8,14 @@ package org.mule.extension.socket.api.connection;
 
 import org.mule.extension.socket.api.SocketOperations;
 import org.mule.extension.socket.api.client.SocketClient;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.Alias;
 
 /**
  * Provides the capability of obtaining a {@link SocketClient} which is aware of the underlying connection and can
  * {@link SocketClient#write(Object)} and {@link SocketClient#read()} to and from the host to which it is connected.
  *
- * The {@link SocketClient} enables the {@link SocketOperations#send(RequesterConnection, Object, String, String, MuleMessage)}
+ * The {@link SocketClient} enables the {@link SocketOperations#send(RequesterConnection, Object, String, String, Message)}
  * operation.
  *
  * @since 4.0

@@ -16,8 +16,8 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.transformer.NoActionTransformer;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.construct.Flow;
@@ -223,7 +223,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
 
     final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(testComponent));
     component.setMuleContext(muleContext);
-    flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+    flow.setMessageProcessors(new ArrayList<Processor>());
     flow.getMessageProcessors().add(component);
     muleContext.getRegistry().registerFlowConstruct(flow);
     return latch;
@@ -243,7 +243,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) {
+    public Object transformMessage(Event event, Charset outputEncoding) {
       assertEquals(expectedPayload, event.getMessage().getDataType().getType());
 
       // If we are streaming, copy/delete shouldn't have happened yet

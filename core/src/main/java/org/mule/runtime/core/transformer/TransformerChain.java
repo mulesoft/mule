@@ -8,8 +8,8 @@ package org.mule.runtime.core.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -52,21 +52,21 @@ public class TransformerChain extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    MuleMessage result = event.getMessage();
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+    InternalMessage result = event.getMessage();
     Object temp = event.getMessage();
     Transformer lastTransformer = null;
     for (Object element : transformers) {
       lastTransformer = (Transformer) element;
       temp = lastTransformer.transform(temp);
-      if (temp instanceof MuleMessage) {
-        result = (MuleMessage) temp;
+      if (temp instanceof InternalMessage) {
+        result = (InternalMessage) temp;
       } else {
-        result = MuleMessage.builder(event.getMessage()).payload(temp).build();
-        event = MuleEvent.builder(event).message(result).build();
+        result = InternalMessage.builder(event.getMessage()).payload(temp).build();
+        event = Event.builder(event).message(result).build();
       }
     }
-    if (lastTransformer != null && MuleMessage.class.isAssignableFrom(lastTransformer.getReturnDataType().getType())) {
+    if (lastTransformer != null && InternalMessage.class.isAssignableFrom(lastTransformer.getReturnDataType().getType())) {
       return result;
     } else {
       return result.getPayload();

@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.common.api;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -121,8 +121,8 @@ public class TreeNode implements Serializable, Iterable {
     /**
      * Obtains a new {@link Builder} instance to be used to create a {@link TreeNode} which references a file
      *
-     * @param message a {@link MuleMessage} which payload is an {@link InputStream} with the file content and a
-     *        {@link FileAttributes} instance as attributes
+     * @param message a {@link Message} which payload is an {@link InputStream} with the file content and a {@link FileAttributes}
+     *        instance as attributes
      * @return a new {@link Builder}
      */
     public static Builder forFile(OperationResult<InputStream, FileAttributes> message) {

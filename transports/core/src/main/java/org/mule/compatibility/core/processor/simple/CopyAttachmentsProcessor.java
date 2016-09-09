@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.core.processor.simple;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
@@ -27,17 +27,17 @@ public class CopyAttachmentsProcessor extends SimpleMessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    final MuleMessage message = event.getMessage();
+  public Event process(Event event) throws MuleException {
+    final InternalMessage message = event.getMessage();
     try {
       if (wildcardAttachmentNameEvaluator.hasWildcards()) {
-        final Builder builder = MuleMessage.builder(message);
+        final Builder builder = InternalMessage.builder(message);
         wildcardAttachmentNameEvaluator.processValues(message.getInboundAttachmentNames(), matchedValue -> builder
             .addOutboundAttachment(matchedValue, message.getInboundAttachment(matchedValue)));
-        return MuleEvent.builder(event).message(builder.build()).build();
+        return Event.builder(event).message(builder.build()).build();
       } else {
         String attachmentName = attachmentNameEvaluator.resolveValue(event).toString();
-        return MuleEvent.builder(event).message(MuleMessage.builder(message)
+        return Event.builder(event).message(InternalMessage.builder(message)
             .addOutboundAttachment(attachmentName, message.getInboundAttachment(attachmentName)).build()).build();
       }
     } catch (Exception e) {

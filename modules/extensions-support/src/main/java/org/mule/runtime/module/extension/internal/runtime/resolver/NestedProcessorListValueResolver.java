@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
 import java.util.List;
@@ -18,25 +18,25 @@ import java.util.List;
 import javax.inject.Inject;
 
 /**
- * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link MuleEvent} in a {@link List} of
+ * An {@link AbstractNestedProcessorValueResolver} which wraps the given {@link Event} in a {@link List} of
  * {@link NestedProcessor}. This resolver returns new instances per every invocation
  *
  * @since 3.7.0
  */
 public class NestedProcessorListValueResolver extends AbstractNestedProcessorValueResolver<List<NestedProcessor>> {
 
-  private List<MessageProcessor> messageProcessors;
+  private List<Processor> messageProcessors;
 
   // TODO MULE-10332: Review MuleContextAware vs @Inject usage
   @Inject
   private MuleContext muleContext;
 
-  public NestedProcessorListValueResolver(List<MessageProcessor> messageProcessors) {
+  public NestedProcessorListValueResolver(List<Processor> messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
   @Override
-  public List<NestedProcessor> resolve(MuleEvent event) throws MuleException {
+  public List<NestedProcessor> resolve(Event event) throws MuleException {
     return messageProcessors.stream().map(mp -> toNestedProcessor(mp, event, muleContext))
         .collect(new ImmutableListCollector<>());
   }

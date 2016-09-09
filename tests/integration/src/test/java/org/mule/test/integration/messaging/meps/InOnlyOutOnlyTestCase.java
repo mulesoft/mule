@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -32,7 +32,7 @@ public class InOnlyOutOnlyTestCase extends AbstractIntegrationTestCase {
     baseRunner.reset();
     baseRunner.withInboundProperty("foo", "bar").run();
 
-    MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("test://received", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertThat(getPayloadAsString(result), is("foo header received"));
 

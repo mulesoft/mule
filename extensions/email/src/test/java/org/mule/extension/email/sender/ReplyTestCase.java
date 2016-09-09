@@ -9,7 +9,6 @@ package org.mule.extension.email.sender;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.Is.isA;
 import static org.mockito.Mockito.when;
@@ -18,22 +17,24 @@ import static org.mule.extension.email.internal.commands.ReplyCommand.NO_EMAIL_F
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.MG_EMAIL;
-import static org.mule.runtime.core.api.MuleMessage.builder;
-import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+import static org.mule.runtime.core.api.InternalMessage.builder;
+import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.CollectionUtils.singletonList;
+
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
 import org.mule.runtime.core.message.PartAttributes;
 
 import javax.activation.DataHandler;
 import javax.mail.Address;
-import javax.mail.Message;
 import javax.mail.Multipart;
 
 import org.junit.Test;
 import org.mockito.internal.matchers.StartsWith;
+
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 
 
 public class ReplyTestCase extends SMTPTestCase {
@@ -49,7 +50,7 @@ public class ReplyTestCase extends SMTPTestCase {
 
     flowRunner(REPLY_EMAIL).withPayload(EMAIL_CONTENT).withAttributes(attributes).run();
 
-    Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
+    javax.mail.Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
     String subject = repliedMessage.getSubject();
     Address[] recipients = repliedMessage.getAllRecipients();
     String inReplyHeaderValue = repliedMessage.getHeader(IN_REPLY_TO_HEADER)[0];
@@ -72,15 +73,15 @@ public class ReplyTestCase extends SMTPTestCase {
     EmailAttributes attributes = getTestAttributes();
     when(attributes.getReplyToAddresses()).thenReturn(singletonList(MG_EMAIL));
 
-    MuleMessage contentPart = builder().payload(EMAIL_CONTENT).attributes(BODY_ATTRIBUTES).build();
-    MuleMessage attachmentPart = builder().payload(EMAIL_JSON_ATTACHMENT_CONTENT)
+    InternalMessage contentPart = builder().payload(EMAIL_CONTENT).attributes(BODY_ATTRIBUTES).build();
+    InternalMessage attachmentPart = builder().payload(EMAIL_JSON_ATTACHMENT_CONTENT)
         .attributes(new PartAttributes("json", "attachment.json", 123, emptyMap())).build();
 
     flowRunner(REPLY_EMAIL_WITH_ATTACHMENTS)
-        .withPayload(new DefaultMultiPartPayload(contentPart, attachmentPart))
+        .withPayload(new DefaultMultiPartContent(contentPart, attachmentPart))
         .withAttributes(attributes).run();
 
-    Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
+    javax.mail.Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
     Multipart content = (Multipart) repliedMessage.getContent();
     assertJsonAttachment(content.getBodyPart(1).getDataHandler());
   }
@@ -94,7 +95,7 @@ public class ReplyTestCase extends SMTPTestCase {
         .withPayload(EMAIL_CONTENT)
         .withAttributes(attributes).run();
 
-    Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
+    javax.mail.Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];
     Multipart content = (Multipart) repliedMessage.getContent();
 
     Object body = content.getBodyPart(0).getContent();

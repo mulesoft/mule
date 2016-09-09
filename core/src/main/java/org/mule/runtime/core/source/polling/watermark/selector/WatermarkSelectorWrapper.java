@@ -10,8 +10,8 @@ package org.mule.runtime.core.source.polling.watermark.selector;
 import static java.lang.String.format;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.source.polling.watermark.WatermarkUtils;
 
@@ -27,14 +27,14 @@ public class WatermarkSelectorWrapper extends WatermarkSelector {
 
   private final String selectorExpression;
   private final WatermarkSelector wrapped;
-  private final MuleEvent muleEvent;
+  private final Event muleEvent;
   private MuleContext muleContext;
 
-  protected WatermarkSelectorWrapper(WatermarkSelector wrapped, String selectorExpression, MuleEvent muleEvent,
+  protected WatermarkSelectorWrapper(WatermarkSelector wrapped, String selectorExpression, Event muleEvent,
                                      MuleContext muleContext) {
     this.selectorExpression = selectorExpression;
     this.wrapped = wrapped;
-    this.muleEvent = MuleEvent.builder(muleEvent).session(new DefaultMuleSession(muleEvent.getSession())).build();
+    this.muleEvent = Event.builder(muleEvent).session(new DefaultMuleSession(muleEvent.getSession())).build();
     this.muleContext = muleContext;
   }
 
@@ -43,8 +43,8 @@ public class WatermarkSelectorWrapper extends WatermarkSelector {
     try {
       Serializable evaluated =
           WatermarkUtils.evaluate(this.selectorExpression,
-                                  MuleEvent.builder(muleEvent)
-                                      .message(MuleMessage.builder(muleEvent.getMessage()).payload(value).build()).build(),
+                                  Event.builder(muleEvent)
+                                      .message(InternalMessage.builder(muleEvent.getMessage()).payload(value).build()).build(),
                                   muleContext);
       this.wrapped.acceptValue(evaluated);
     } catch (NotSerializableException e) {

@@ -16,7 +16,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendsMapAsUrlEncodedBody() throws Exception {
-    MuleEvent event = getTestEvent(getTestMap());
+    Event event = getTestEvent(getTestMap());
 
     runAndAssert(ANY);
   }
@@ -73,7 +73,7 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void convertsUrlEncodedResponseToMap() throws Exception {
-    MuleEvent event = flowRunner("formParam").withPayload(TEST_MESSAGE).run();
+    Event event = flowRunner("formParam").withPayload(TEST_MESSAGE).run();
 
     assertThat(event.getMessage().getPayload(), instanceOf(Map.class));
 

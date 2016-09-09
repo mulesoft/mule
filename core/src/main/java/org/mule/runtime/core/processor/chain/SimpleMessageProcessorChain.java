@@ -7,34 +7,34 @@
 package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 
 public class SimpleMessageProcessorChain extends DefaultMessageProcessorChain {
 
-  public SimpleMessageProcessorChain(List<MessageProcessor> processors) {
+  public SimpleMessageProcessorChain(List<Processor> processors) {
     super(processors);
   }
 
-  public SimpleMessageProcessorChain(MessageProcessor... processors) {
+  public SimpleMessageProcessorChain(Processor... processors) {
     super(processors);
   }
 
-  public SimpleMessageProcessorChain(String name, List<MessageProcessor> processors) {
+  public SimpleMessageProcessorChain(String name, List<Processor> processors) {
     super(name, processors);
   }
 
-  public SimpleMessageProcessorChain(String name, MessageProcessor... processors) {
+  public SimpleMessageProcessorChain(String name, Processor... processors) {
     super(name, processors);
   }
 
   @Override
-  protected MuleEvent doProcess(MuleEvent event) throws MuleException {
+  protected Event doProcess(Event event) throws MuleException {
     for (int i = 0; i < processors.size(); i++) {
-      MessageProcessor processor = processors.get(i);
+      Processor processor = processors.get(i);
       event = messageProcessorExecutionTemplate.execute(processor, event);
       if (event == null) {
         return null;

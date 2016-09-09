@@ -7,7 +7,7 @@
 package org.mule.runtime.core.keygenerator;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.StringUtils;
@@ -28,7 +28,7 @@ public class SHA256MuleEventKeyGenerator implements MuleEventKeyGenerator, MuleC
   private MuleContext muleContext;
 
   @Override
-  public Serializable generateKey(MuleEvent event) throws NotSerializableException {
+  public Serializable generateKey(Event event) throws NotSerializableException {
     try {
       byte[] bytesOfMessage = event.getMessageAsBytes(muleContext);
       MessageDigest md = MessageDigest.getInstance("SHA-256");

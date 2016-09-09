@@ -16,16 +16,15 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
+import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_0;
 import static org.mule.runtime.module.http.internal.domain.HttpProtocol.HTTP_1_1;
-import static org.mule.runtime.module.http.api.HttpListenerConnectionManager.HTTP_LISTENER_CONNECTION_MANAGER;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -56,8 +55,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 @SmallTest
 public class HttpListenerTestCase extends AbstractMuleTestCase {
@@ -89,26 +86,18 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   public void eventCreation() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
     when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
-        .then(new Answer<RequestHandlerManager>() {
-
-          @Override
-          public RequestHandlerManager answer(InvocationOnMock invocation) throws Throwable {
-            requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
-            return null;
-          }
+        .then(invocation -> {
+          requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
+          return null;
         });
     usePath("/");
 
     assertThat(getCurrentEvent(), is(nullValue()));
 
     HttpResponseReadyCallback responseCallback = mock(HttpResponseReadyCallback.class);
-    doAnswer(new Answer<Void>() {
-
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        assertThat(getCurrentEvent(), not(nullValue()));
-        return null;
-      }
+    doAnswer(invocation -> {
+      assertThat(getCurrentEvent(), not(nullValue()));
+      return null;
     }).when(responseCallback).responseReady(any(HttpResponse.class), any(ResponseStatusCallback.class));
 
     HttpRequest request = buildGetRootRequest(HTTP_1_1);
@@ -124,13 +113,9 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   public void eventCreationWithInvalidPath() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
     when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
-        .then(new Answer<RequestHandlerManager>() {
-
-          @Override
-          public RequestHandlerManager answer(InvocationOnMock invocation) throws Throwable {
-            requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
-            return null;
-          }
+        .then(invocation -> {
+          requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
+          return null;
         });
     useInvalidPath("/");
 
@@ -147,13 +132,9 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   public void noHostHeaderOn10Request() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
     when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
-        .then(new Answer<RequestHandlerManager>() {
-
-          @Override
-          public RequestHandlerManager answer(InvocationOnMock invocation) throws Throwable {
-            requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
-            return null;
-          }
+        .then(invocation -> {
+          requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
+          return null;
         });
     usePath("/");
 
@@ -169,13 +150,9 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
   public void noHostHeaderOn11Request() throws Exception {
     final AtomicReference<RequestHandler> requestHandlerRef = new AtomicReference<>();
     when(mockHttpListenerConfig.addRequestHandler(any(ListenerRequestMatcher.class), any(RequestHandler.class)))
-        .then(new Answer<RequestHandlerManager>() {
-
-          @Override
-          public RequestHandlerManager answer(InvocationOnMock invocation) throws Throwable {
-            requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
-            return null;
-          }
+        .then(invocation -> {
+          requestHandlerRef.set((RequestHandler) invocation.getArguments()[1]);
+          return null;
         });
     usePath("/");
 
@@ -248,14 +225,10 @@ public class HttpListenerTestCase extends AbstractMuleTestCase {
     when(mockHttpListenerConfig.getFullListenerPath(anyString())).thenReturn(new ListenerPath(null, listenerPath));
 
     MessageProcessingManager messageProcessingManager = mock(MessageProcessingManager.class);
-    doAnswer(new Answer() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        HttpMessageProcessorTemplate template = (HttpMessageProcessorTemplate) invocation.getArguments()[0];
-        template.sendResponseToClient(null, null);
-        return null;
-      }
+    doAnswer(invocation -> {
+      HttpMessageProcessorTemplate template = (HttpMessageProcessorTemplate) invocation.getArguments()[0];
+      template.sendResponseToClient(null, null);
+      return null;
     }).when(messageProcessingManager).processMessage(any(HttpMessageProcessorTemplate.class), any(MessageProcessContext.class));
 
     when(mockMuleContext.getRegistry().lookupObject(MessageProcessingManager.class)).thenReturn(messageProcessingManager);

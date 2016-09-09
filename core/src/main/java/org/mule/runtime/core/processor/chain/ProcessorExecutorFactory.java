@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.BlockingProcessorExecutor;
@@ -18,11 +18,11 @@ import java.util.List;
 
 /**
  * Creates an appropriate instance of {@link org.mule.runtime.core.processor.BlockingProcessorExecutor} based on the current
- * {@link org.mule.runtime.core.api.MuleEvent} and {@link org.mule.runtime.core.api.construct.FlowConstruct}.
+ * {@link org.mule.runtime.core.api.Event} and {@link org.mule.runtime.core.api.construct.FlowConstruct}.
  */
 public class ProcessorExecutorFactory {
 
-  public ProcessorExecutor createProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
+  public ProcessorExecutor createProcessorExecutor(Event event, List<Processor> processors,
                                                    MessageProcessorExecutionTemplate executionTemplate, boolean copyOnVoidEvent,
                                                    FlowConstruct flowConstruct) {
     if (event.isAllowNonBlocking()) {

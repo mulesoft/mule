@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -53,7 +53,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     String detailedDescription = "detailed description";
     String description = "description";
     ErrorType errorType = mockErrorType;
-    MuleMessage errorMessage = MuleMessage.builder().nullPayload().build();
+    Message errorMessage = Message.builder().nullPayload().build();
     IllegalArgumentException exception = new IllegalArgumentException("some message");
     Error error = builder()
         .errorType(errorType)

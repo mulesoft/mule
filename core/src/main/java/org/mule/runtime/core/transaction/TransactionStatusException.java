@@ -8,7 +8,7 @@ package org.mule.runtime.core.transaction;
 
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class TransactionStatusException extends TransactionException {
 
@@ -20,7 +20,7 @@ public class TransactionStatusException extends TransactionException {
   /**
    * @param message the exception message
    */
-  public TransactionStatusException(Message message) {
+  public TransactionStatusException(I18nMessage message) {
     super(message);
   }
 
@@ -28,7 +28,7 @@ public class TransactionStatusException extends TransactionException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public TransactionStatusException(Message message, Throwable cause) {
+  public TransactionStatusException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

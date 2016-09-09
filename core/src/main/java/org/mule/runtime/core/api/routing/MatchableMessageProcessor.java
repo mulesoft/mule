@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
-public interface MatchableMessageProcessor extends MessageProcessor, Matchable {
+public interface MatchableMessageProcessor extends Processor, Matchable {
 
 }

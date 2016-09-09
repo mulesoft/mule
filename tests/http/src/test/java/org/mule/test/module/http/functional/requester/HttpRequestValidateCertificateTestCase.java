@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.security.GeneralSecurityException;
 
@@ -39,7 +39,7 @@ public class HttpRequestValidateCertificateTestCase extends AbstractHttpRequestT
 
   @Test
   public void acceptsValidCertificate() throws Exception {
-    MuleEvent result = flowRunner("validCertFlow").withPayload(TEST_MESSAGE).run();
+    Event result = flowRunner("validCertFlow").withPayload(TEST_MESSAGE).run();
     assertThat(getPayloadAsString(result.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 }

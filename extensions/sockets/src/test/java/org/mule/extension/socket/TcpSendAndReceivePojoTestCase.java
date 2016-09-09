@@ -8,7 +8,7 @@ package org.mule.extension.socket;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class TcpSendAndReceivePojoTestCase extends ParameterizedProtocolTestCase
 
   @Test
   public void sendAndReceivePojo() throws Exception {
-    MuleMessage message = flowRunner("tcp-send-and-receive").withPayload(testPojo).run().getMessage();
+    Message message = flowRunner("tcp-send-and-receive").withPayload(testPojo).run().getMessage();
 
     TestPojo pojo = (TestPojo) deserializeMessage(message);
     assertEquals(pojo.getAge(), RESPONSE_AGE);

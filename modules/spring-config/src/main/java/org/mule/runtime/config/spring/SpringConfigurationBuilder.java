@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.registry.Registry;
 import org.mule.runtime.core.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -41,7 +41,7 @@ public class SpringConfigurationBuilder extends AbstractConfigurationBuilder {
       if (appContext instanceof ConfigurableApplicationContext) {
         registry = new SpringRegistry((ConfigurableApplicationContext) appContext, parentContext, muleContext);
       } else {
-        throw new ConfigurationException(MessageFactory
+        throw new ConfigurationException(I18nMessageFactory
             .createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));
       }
     } else {

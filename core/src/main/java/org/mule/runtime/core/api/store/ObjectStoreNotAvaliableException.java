@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.store;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * This exception is thrown when the underlying to an {@link ObjectStore}'s system fails.
@@ -17,11 +17,11 @@ public class ObjectStoreNotAvaliableException extends ObjectStoreException {
     super();
   }
 
-  public ObjectStoreNotAvaliableException(Message message, Throwable cause) {
+  public ObjectStoreNotAvaliableException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
-  public ObjectStoreNotAvaliableException(Message message) {
+  public ObjectStoreNotAvaliableException(I18nMessage message) {
     super(message);
   }
 

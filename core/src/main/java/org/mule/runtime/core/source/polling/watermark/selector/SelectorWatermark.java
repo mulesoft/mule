@@ -7,13 +7,13 @@
 
 package org.mule.runtime.core.source.polling.watermark.selector;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;
 import org.mule.runtime.core.source.polling.watermark.Watermark;
 
@@ -41,7 +41,7 @@ public class SelectorWatermark extends Watermark implements Initialisable, MuleC
     try {
       this.muleContext.getExpressionLanguage().validate(this.selectorExpression);
     } catch (InvalidExpressionException e) {
-      throw new InitialisationException(MessageFactory.createStaticMessage(String
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
           .format("selector-expression requires a valid MEL expression. '%s' was found instead", this.selectorExpression)), e,
                                         this);
     }
@@ -52,7 +52,7 @@ public class SelectorWatermark extends Watermark implements Initialisable, MuleC
    * without risk of concurrency issues because watermark only works on synchronous flows
    */
   @Override
-  protected Object getUpdatedValue(MuleEvent event) {
+  protected Object getUpdatedValue(Event event) {
     // interceptor is responsible for returning the selected value
     return null;
   }

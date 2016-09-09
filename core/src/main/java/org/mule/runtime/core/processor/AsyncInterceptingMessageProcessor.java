@@ -7,13 +7,13 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.config.ThreadingProfile;
@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
@@ -34,8 +34,8 @@ import org.mule.runtime.core.work.AbstractMuleEventWork;
 import org.mule.runtime.core.work.MuleWorkManager;
 
 /**
- * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of the next
- * {@link MessageProcessor}. The next {@link MessageProcessor} is therefore be executed in a different thread regardless of the
+ * Processes {@link Event}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of the next
+ * {@link Processor}. The next {@link Processor} is therefore be executed in a different thread regardless of the
  * exchange-pattern configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
@@ -77,19 +77,19 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (next == null) {
       return event;
     } else if (isProcessAsync(event)) {
       processNextAsync(event);
       return VoidMuleEvent.getInstance();
     } else {
-      MuleEvent response = processNext(event);
+      Event response = processNext(event);
       return response;
     }
   }
 
-  protected MuleEvent processNextTimed(MuleEvent event) throws MuleException {
+  protected Event processNextTimed(Event event) throws MuleException {
     if (next == null) {
       return event;
     } else {
@@ -101,18 +101,18 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     }
   }
 
-  protected boolean isProcessAsync(MuleEvent event) throws MuleException {
+  protected boolean isProcessAsync(Event event) throws MuleException {
     if (!canProcessAsync(event)) {
       throw new DefaultMuleException(createStaticMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
     }
     return doThreading && canProcessAsync(event);
   }
 
-  protected boolean canProcessAsync(MuleEvent event) {
+  protected boolean canProcessAsync(Event event) {
     return !(event.isSynchronous() || event.isTransacted() || event.getReplyToHandler() instanceof NonBlockingReplyToHandler);
   }
 
-  protected void processNextAsync(MuleEvent event) throws MuleException {
+  protected void processNextAsync(Event event) throws MuleException {
     try {
       workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event), WorkManager.INDEFINITE, null,
                                                       new AsyncWorkListener(next));
@@ -122,7 +122,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     }
   }
 
-  protected void fireAsyncScheduledNotification(MuleEvent event) {
+  protected void fireAsyncScheduledNotification(Event event) {
     muleContext.getNotificationManager()
         .fireNotification(new AsyncMessageNotification(flowConstruct, event, next, PROCESS_ASYNC_SCHEDULED));
   }
@@ -136,18 +136,18 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
 
   class AsyncMessageProcessorWorker extends AbstractMuleEventWork {
 
-    public AsyncMessageProcessorWorker(MuleEvent event) {
+    public AsyncMessageProcessorWorker(Event event) {
       super(event, true);
     }
 
-    public AsyncMessageProcessorWorker(MuleEvent event, boolean copy) {
+    public AsyncMessageProcessorWorker(Event event, boolean copy) {
       super(event, copy);
     }
 
     @Override
     protected void doRun() {
       MessagingExceptionHandler exceptionHandler = messagingExceptionHandler;
-      ExecutionTemplate<MuleEvent> executionTemplate =
+      ExecutionTemplate<Event> executionTemplate =
           createMainExecutionTemplate(muleContext, flowConstruct, new MuleTransactionConfig(), exceptionHandler);
 
       try {
@@ -174,7 +174,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     }
   }
 
-  protected void firePipelineNotification(MuleEvent event, MessagingException exception) {
+  protected void firePipelineNotification(Event event, MessagingException exception) {
     // Async completed notification uses same event instance as async listener
     muleContext.getNotificationManager()
         .fireNotification(new AsyncMessageNotification(flowConstruct, event, next, PROCESS_ASYNC_COMPLETE, exception));

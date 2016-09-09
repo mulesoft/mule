@@ -13,8 +13,7 @@ import static java.sql.Connection.TRANSACTION_REPEATABLE_READ;
 import static java.sql.Connection.TRANSACTION_SERIALIZABLE;
 
 /**
- * The transaction isolation levels that can be set on
- * the JDBC driver when connecting to the database.
+ * The transaction isolation levels that can be set on the JDBC driver when connecting to the database.
  *
  * @since 4.0
  */

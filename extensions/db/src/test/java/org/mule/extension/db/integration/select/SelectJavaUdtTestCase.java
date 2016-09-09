@@ -17,7 +17,7 @@ import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class SelectJavaUdtTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void returnsMappedObject() throws Exception {
-    MuleMessage response = flowRunner("returnsUDT").run().getMessage();
+    Message response = flowRunner("returnsUDT").run().getMessage();
 
     assertRecords(response.getPayload(),
                   new Record(new Field("REGION_NAME", SOUTHWEST_MANAGER.getRegionName()),

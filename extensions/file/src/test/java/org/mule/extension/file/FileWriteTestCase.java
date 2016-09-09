@@ -17,7 +17,7 @@ import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
 import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.extension.file.common.api.FileWriteMode;
@@ -107,7 +107,7 @@ public class FileWriteTestCase extends FileConnectorTestCase {
     File file = temporaryFolder.newFile();
     FileUtils.writeStringToFile(file, "overwrite me!");
 
-    MuleEvent event = flowRunner("readAndWrite").withFlowVariable("path", file.getAbsolutePath()).run();
+    Event event = flowRunner("readAndWrite").withFlowVariable("path", file.getAbsolutePath()).run();
 
     assertThat(event.getMessageAsString(muleContext), equalTo(HELLO_WORLD));
   }

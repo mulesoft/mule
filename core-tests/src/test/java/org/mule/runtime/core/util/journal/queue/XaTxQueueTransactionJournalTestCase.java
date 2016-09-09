@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.queue.DefaultQueueStore;
 import org.mule.runtime.core.util.xa.MuleXid;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -49,7 +49,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logAddAndRetrieve() throws Exception {
-    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    Event muleEvent = getTestEvent(SOME_VALUE);
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
@@ -60,13 +60,13 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
     assertThat(allEntries.get(TX_ID).size(), is(1));
     XaQueueTxJournalEntry logEntry = allEntries.get(TX_ID).iterator().next();
     assertThat(logEntry.getQueueName(), is(QUEUE_NAME));
-    assertThat(getPayloadAsString(((MuleEvent) logEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(getPayloadAsString(((Event) logEntry.getValue()).getMessage()), is(SOME_VALUE));
     assertThat(logEntry.isAdd(), is(true));
   }
 
   @Test
   public void logAddFirstAndRetrieve() throws Exception {
-    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    Event muleEvent = getTestEvent(SOME_VALUE);
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logAddFirst(TX_ID, mockQueueInfo, muleEvent);
@@ -77,13 +77,13 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
     assertThat(allEntries.get(TX_ID).size(), is(1));
     XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
     assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-    assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(getPayloadAsString(((Event) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
     assertThat(journalEntry.isAddFirst(), is(true));
   }
 
   @Test
   public void logRemoveAndRetrieve() throws Exception {
-    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    Event muleEvent = getTestEvent(SOME_VALUE);
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logRemove(TX_ID, mockQueueInfo, muleEvent);
@@ -94,7 +94,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
     assertThat(allEntries.get(TX_ID).size(), is(1));
     XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
     assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-    assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(getPayloadAsString(((Event) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
     assertThat(journalEntry.isRemove(), is(true));
   }
 
@@ -122,7 +122,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logSeveralAddsThenCommitAndRetrieve() throws Exception {
-    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    Event muleEvent = getTestEvent(SOME_VALUE);
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
@@ -138,7 +138,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logSeveralAddsThenRetrieveAndCommit() throws Exception {
-    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    Event muleEvent = getTestEvent(SOME_VALUE);
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
@@ -154,7 +154,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logSeveralAddsAndRetrieve() throws Exception {
-    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    Event muleEvent = getTestEvent(SOME_VALUE);
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
@@ -168,13 +168,13 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
     assertThat(allEntries.get(TX_ID).size(), is(numberOfOffers));
     XaQueueTxJournalEntry journalEntry = allEntries.get(TX_ID).iterator().next();
     assertThat(journalEntry.getQueueName(), is(QUEUE_NAME));
-    assertThat(getPayloadAsString(((MuleEvent) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
+    assertThat(getPayloadAsString(((Event) journalEntry.getValue()).getMessage()), is(SOME_VALUE));
     assertThat(journalEntry.isAdd(), is(true));
   }
 
   @Test
   public void logAddAndPrepare() throws Exception {
-    MuleEvent muleEvent = getTestEvent(SOME_VALUE);
+    Event muleEvent = getTestEvent(SOME_VALUE);
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);

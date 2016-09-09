@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ConnectorOperationProvider;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -32,7 +32,7 @@ public abstract class AbstractConnectorMessageProcessorProvider
   protected static final int CACHE_SIZE = 1000;
   protected static final int EXPIRATION_TIME_IN_MINUTES = 10;
 
-  protected final LoadingCache<RequestCacheKey, MessageProcessor> cachedMessageProcessors;
+  protected final LoadingCache<RequestCacheKey, Processor> cachedMessageProcessors;
   protected MuleContext muleContext;
 
 
@@ -42,27 +42,27 @@ public abstract class AbstractConnectorMessageProcessorProvider
   public AbstractConnectorMessageProcessorProvider() {
     cachedMessageProcessors =
         CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).expireAfterWrite(EXPIRATION_TIME_IN_MINUTES, TimeUnit.MINUTES)
-            .build(new CacheLoader<RequestCacheKey, MessageProcessor>() {
+            .build(new CacheLoader<RequestCacheKey, Processor>() {
 
               @Override
-              public MessageProcessor load(RequestCacheKey cacheKey) throws MuleException {
+              public Processor load(RequestCacheKey cacheKey) throws MuleException {
                 return buildMessageProcessor(cacheKey);
               }
             });
   }
 
   /**
-   * Builds a {@link MessageProcessor} for the given cache key
+   * Builds a {@link Processor} for the given cache key
    *
    * @param cacheKey cache key defining the message processor to create. Non null.
-   * @return a non null {@link MessageProcessor}
+   * @return a non null {@link Processor}
    */
-  protected abstract MessageProcessor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException;
+  protected abstract Processor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException;
 
 
   @Override
-  public MessageProcessor getMessageProcessor(String url, OperationOptions operationOptions,
-                                              MessageExchangePattern exchangePattern)
+  public Processor getMessageProcessor(String url, OperationOptions operationOptions,
+                                       MessageExchangePattern exchangePattern)
       throws MuleException {
     try {
       return cachedMessageProcessors.get(new RequestCacheKey(url, operationOptions, exchangePattern));

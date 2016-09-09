@@ -15,7 +15,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
@@ -35,7 +35,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase {
   public void testGlobalEndpoint1() throws MuleException {
     ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep1");
 
-    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    List<Processor> processors = endpoint.getMessageProcessors();
     assertNotNull(processors);
     assertEquals(1, processors.size());
     assertTrue(processors.get(0) instanceof TestMessageProcessor);
@@ -50,7 +50,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase {
   public void testGlobalEndpoint2() throws MuleException {
     ImmutableEndpoint endpoint = getEndpointFactory().getInboundEndpoint("ep2");
 
-    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    List<Processor> processors = endpoint.getMessageProcessors();
     assertNotNull(processors);
     assertEquals(2, processors.size());
     assertEquals("1", ((TestMessageProcessor) processors.get(0)).getLabel());
@@ -71,7 +71,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase {
     Flow flow = muleContext.getRegistry().lookupObject("localEndpoints");
     ImmutableEndpoint endpoint = (ImmutableEndpoint) flow.getMessageSource();
 
-    List<MessageProcessor> processors = endpoint.getMessageProcessors();
+    List<Processor> processors = endpoint.getMessageProcessors();
     assertNotNull(processors);
     assertEquals(2, processors.size());
     assertEquals("A", ((TestMessageProcessor) processors.get(0)).getLabel());
@@ -86,7 +86,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase {
     assertEquals("C", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
     assertEquals("D", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
 
-    MessageProcessor mp = ((Flow) muleContext.getRegistry().lookupObject("localEndpoints")).getMessageProcessors().get(0);
+    Processor mp = ((Flow) muleContext.getRegistry().lookupObject("localEndpoints")).getMessageProcessors().get(0);
 
     endpoint = (ImmutableEndpoint) mp;
     processors = endpoint.getMessageProcessors();

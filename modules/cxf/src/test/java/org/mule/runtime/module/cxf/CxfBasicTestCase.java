@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants.Methods;
@@ -60,8 +60,9 @@ public class CxfBasicTestCase extends FunctionalTestCase {
   public void testEchoService() throws Exception {
     MuleClient client = muleContext.getClient();
     InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
-                                     MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
+                                         InternalMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(),
+                                         HTTP_REQUEST_OPTIONS)
         .getRight();
     assertTrue(getPayloadAsString(result).contains("Hello!"));
     String ct = result.getDataType().getMediaType().toRfcString();
@@ -71,8 +72,8 @@ public class CxfBasicTestCase extends FunctionalTestCase {
   @Test
   public void testEchoWsdl() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl",
-                                     MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl",
+                                         InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(result.getPayload());
     XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));

@@ -6,60 +6,60 @@
  */
 package org.mule.runtime.module.xml.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class XmlMessages extends MessageFactory {
+public class XmlMessages extends I18nMessageFactory {
 
   private static final XmlMessages factory = new XmlMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("xml");
 
-  public static Message failedToProcessXPath(String expression) {
+  public static I18nMessage failedToProcessXPath(String expression) {
     return factory.createMessage(BUNDLE_PATH, 1, expression);
   }
 
-  public static Message domTypeNotSupported(Class type) {
+  public static I18nMessage domTypeNotSupported(Class type) {
     return factory.createMessage(BUNDLE_PATH, 2, type);
   }
 
-  public static Message invalidReturnTypeForTransformer(Class resultCls) {
+  public static I18nMessage invalidReturnTypeForTransformer(Class resultCls) {
     return factory.createMessage(BUNDLE_PATH, 3, resultCls.getName());
   }
 
-  public static Message failedToRegisterNamespace(String prefix, String uri) {
+  public static I18nMessage failedToRegisterNamespace(String prefix, String uri) {
     return factory.createMessage(BUNDLE_PATH, 4, prefix, uri);
   }
 
-  public static Message failedToCreateDocumentBuilder() {
+  public static I18nMessage failedToCreateDocumentBuilder() {
     return factory.createMessage(BUNDLE_PATH, 5);
   }
 
-  public static Message streamNotAvailble(String transformerName) {
+  public static I18nMessage streamNotAvailble(String transformerName) {
     return factory.createMessage(BUNDLE_PATH, 6, transformerName);
   }
 
-  public static Message objectNotAvailble(String transformerName) {
+  public static I18nMessage objectNotAvailble(String transformerName) {
     return factory.createMessage(BUNDLE_PATH, 7, transformerName);
   }
 
-  public static Message converterClassDoesNotImplementInterface(Class converter) {
+  public static I18nMessage converterClassDoesNotImplementInterface(Class converter) {
     return factory.createMessage(BUNDLE_PATH, 8, converter);
   }
 
-  public static Message canOnlySetFileOrXslt() {
+  public static I18nMessage canOnlySetFileOrXslt() {
     return factory.createMessage(BUNDLE_PATH, 9);
   }
 
-  public static Message canOnlySetFileOrXQuery() {
+  public static I18nMessage canOnlySetFileOrXQuery() {
     return factory.createMessage(BUNDLE_PATH, 10);
   }
 
-  public static Message xpathResultTypeNotSupported(Class<?> paramType) {
+  public static I18nMessage xpathResultTypeNotSupported(Class<?> paramType) {
     return factory.createMessage(BUNDLE_PATH, 11, paramType);
   }
 
-  public static Message contextPropertyValueIsNull(String propertyKey) {
+  public static I18nMessage contextPropertyValueIsNull(String propertyKey) {
     return factory.createMessage(BUNDLE_PATH, 12, propertyKey);
   }
 

@@ -12,7 +12,7 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -137,7 +137,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   @Parameter
   @Optional
-  private Function<MuleEvent, WeaponType> weaponTypeFunction;
+  private Function<Event, WeaponType> weaponTypeFunction;
 
   @Parameter
   @Optional
@@ -312,7 +312,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
     return literalExpressionWithoutDefault;
   }
 
-  public Function<MuleEvent, WeaponType> getWeaponTypeFunction() {
+  public Function<Event, WeaponType> getWeaponTypeFunction() {
     return weaponTypeFunction;
   }
 

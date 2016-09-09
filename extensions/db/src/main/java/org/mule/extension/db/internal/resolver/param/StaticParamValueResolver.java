@@ -8,7 +8,7 @@
 package org.mule.extension.db.internal.resolver.param;
 
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 public class StaticParamValueResolver implements ParamValueResolver {
 
   @Override
-  public List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams) {
+  public List<QueryParamValue> resolveParams(Event muleEvent, List<QueryParamValue> templateParams) {
     return templateParams;
   }
 }

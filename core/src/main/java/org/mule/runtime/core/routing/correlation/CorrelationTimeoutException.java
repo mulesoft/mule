@@ -7,15 +7,15 @@
 package org.mule.runtime.core.routing.correlation;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class CorrelationTimeoutException extends MuleException {
 
-  public CorrelationTimeoutException(Message message) {
+  public CorrelationTimeoutException(I18nMessage message) {
     super(message);
   }
 
-  public CorrelationTimeoutException(Message message, Throwable cause) {
+  public CorrelationTimeoutException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

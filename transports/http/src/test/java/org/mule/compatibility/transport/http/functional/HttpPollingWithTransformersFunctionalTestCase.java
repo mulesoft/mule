@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -51,7 +51,7 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
     }, "polledUMO");
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("vm://toclient", 50000).getRight().get();
+    InternalMessage result = client.request("vm://toclient", 50000).getRight().get();
     assertNotNull(result.getPayload());
     assertTrue("Callback called", latch.await(1000, TimeUnit.MILLISECONDS));
     assertEquals("/foo toClient-only", getPayloadAsString(result));

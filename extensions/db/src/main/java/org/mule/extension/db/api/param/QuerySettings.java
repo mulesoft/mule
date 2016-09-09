@@ -24,8 +24,8 @@ public class QuerySettings {
 
   private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
   /**
-   * Indicates the minimum amount of time before the JDBC driver attempts to cancel a running statement.
-   * No timeout is used by default.
+   * Indicates the minimum amount of time before the JDBC driver attempts to cancel a running statement. No timeout is used by
+   * default.
    */
   @Parameter
   @Optional(defaultValue = "0")

@@ -6,20 +6,20 @@
  */
 package org.mule.compatibility.core.endpoint.outbound;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OutboundLoggingMessageProcessor implements MessageProcessor {
+public class OutboundLoggingMessageProcessor implements Processor {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (logger.isDebugEnabled()) {
       logger.debug("sending event: " + event);
     }

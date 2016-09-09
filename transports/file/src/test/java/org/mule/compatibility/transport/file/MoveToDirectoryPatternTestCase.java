@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.FileUtils;
 
@@ -38,7 +38,7 @@ public class MoveToDirectoryPatternTestCase extends FunctionalTestCase {
   public void moveToPatternWithDirectory() throws Exception {
     MuleClient client = muleContext.getClient();
     writeTestMessageToInputDirectory();
-    MuleMessage msg = client.request("vm://file.outbox", 3000).getRight().get();
+    InternalMessage msg = client.request("vm://file.outbox", 3000).getRight().get();
     assertNotNull(msg);
     assertEquals(TEST_MESSAGE, msg.getPayload());
   }

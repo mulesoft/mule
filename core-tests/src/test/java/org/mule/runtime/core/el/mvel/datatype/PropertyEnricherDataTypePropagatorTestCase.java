@@ -15,10 +15,10 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -40,13 +40,13 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
-    testEvent = MuleEvent.builder(testEvent).addFlowVariable("foo", "bar").build();
+    Event testEvent = getTestEvent(TEST_MESSAGE);
+    testEvent = Event.builder(testEvent).addVariable("foo", "bar").build();
 
-    final Builder builder = MuleEvent.builder(testEvent);
-    dataTypePropagator.propagate(testEvent, builder, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    final Builder builder = Event.builder(testEvent);
+    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
-    assertThat(builder.build().getFlowVariableDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(builder.build().getVariableDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
   @Test
@@ -57,11 +57,11 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+    Event testEvent = getTestEvent(TEST_MESSAGE);
     testEvent.getSession().setProperty("foo", "bar");
 
-    final Builder builder = MuleEvent.builder(testEvent);
-    dataTypePropagator.propagate(testEvent, builder, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    final Builder builder = Event.builder(testEvent);
+    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
     assertThat(builder.build().getSession().getPropertyDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));
   }

@@ -11,10 +11,10 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -61,21 +61,22 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
   }
 
   private void testHandlingOfFailures(String entryPoint) throws Exception {
-    MuleEvent event = flowRunner(entryPoint).withPayload(getTestMuleMessage()).run();
-    MuleMessage response = event.getMessage();
+    Event event = flowRunner(entryPoint).withPayload(getTestMuleMessage()).run();
+    InternalMessage response = event.getMessage();
     assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(response), is("ok"));
   }
 
-  public static class LockProcessor implements MessageProcessor {
+  public static class LockProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       try {
         if (!latch.await(TIMEOUT, TimeUnit.SECONDS)) {
           RuntimeException exception = new RuntimeException();
-          event = MuleEvent.builder(event)
-              .message(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+          event = Event.builder(event)
+              .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception))
+                  .build())
               .error(createErrorMock(exception)).build();
         }
       } catch (InterruptedException e) {
@@ -85,12 +86,12 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
     }
   }
 
-  public static class UnlockProcessor implements MessageProcessor {
+  public static class UnlockProcessor implements Processor {
 
     AtomicInteger count;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       if (count.decrementAndGet() == 0) {
         latch.release();
       }

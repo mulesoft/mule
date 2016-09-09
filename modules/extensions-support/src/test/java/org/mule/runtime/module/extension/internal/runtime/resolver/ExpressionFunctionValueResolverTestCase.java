@@ -17,7 +17,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -32,7 +32,7 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
   private static final ExpressionFunction INTEGER_EXPRESSION_FUNCTION =
       new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class), muleContext);
 
-  private MuleEvent event;
+  private Event event;
   private MVELExpressionLanguage expressionLanguage;
 
   @Override
@@ -60,23 +60,23 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
 
   @Test
   public void testEvaluateExpressionFunction() throws Exception {
-    Function<MuleEvent, Integer> function = getResolvedFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class));
+    Function<Event, Integer> function = getResolvedFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class));
     assertExpressionFunction(function, 4);
   }
 
   @Test
   public void testEvaluateConstantValueExpressionFunction() throws Exception {
-    Function<MuleEvent, Integer> function = getResolvedFunction("321", toMetadataType(Integer.class));
+    Function<Event, Integer> function = getResolvedFunction("321", toMetadataType(Integer.class));
     assertExpressionFunction(function, 321);
   }
 
-  private void assertExpressionFunction(Function<MuleEvent, Integer> function, Object value) {
+  private void assertExpressionFunction(Function<Event, Integer> function, Object value) {
     assertThat(function, is(not(nullValue())));
     Integer apply = function.apply(event);
     assertThat(apply, is(value));
   }
 
-  public <T> Function<MuleEvent, T> getResolvedFunction(String expression, MetadataType type) throws MuleException {
+  public <T> Function<Event, T> getResolvedFunction(String expression, MetadataType type) throws MuleException {
     return new ExpressionFunctionValueResolver<T>(expression, type, muleContext).resolve(event);
   }
 

@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
@@ -43,7 +43,8 @@ public class StatusCodeMappingsTestCase extends AbstractMuleTestCase {
     assertEquals("401", code);
 
     code = ExceptionHelper.getErrorMapping("blah", DefaultMuleException.class, mockMuleContext);
-    assertEquals(String.valueOf(new DefaultMuleException(MessageFactory.createStaticMessage("test")).getExceptionCode()), code);
+    assertEquals(String.valueOf(new DefaultMuleException(I18nMessageFactory.createStaticMessage("test")).getExceptionCode()),
+                 code);
 
   }
 

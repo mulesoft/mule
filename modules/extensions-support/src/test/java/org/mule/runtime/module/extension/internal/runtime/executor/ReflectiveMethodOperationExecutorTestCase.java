@@ -24,7 +24,7 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
@@ -62,7 +62,7 @@ public class ReflectiveMethodOperationExecutorTestCase extends AbstractMuleTestC
   private static final DataType DATA_TYPE = STRING;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleEvent muleEvent;
+  private Event muleEvent;
 
   @Mock
   private ResolverSetResult parameters;

@@ -13,9 +13,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.construct.Flow;
@@ -46,10 +46,10 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactional() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactional");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -57,7 +57,7 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactionalFailInTheMiddle() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailInTheMiddle");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -69,7 +69,7 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactionalFailAtEnd() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailAtEnd");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -81,13 +81,13 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactionalFailAfterEnd() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailAfterEnd");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     try {
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -95,9 +95,9 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactionalFailInTheMiddleWithCatchExceptionStrategy() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailInTheMiddleWithCatchExceptionStrategy");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
     assertThat(muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().isPresent(), is(false));
     assertThat(message1, notNullValue());
   }
@@ -105,10 +105,10 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactionalFailAtEndWithCatchExceptionStrategy() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailAtEndWithCatchExceptionStrategy");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -117,7 +117,7 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Ignore
   public void testTransactionalWorksWithAnotherResourceType() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalWorksWithAnotherResourceType");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     try {
       flow.process(event);
       fail("DispatchException should be thrown");
@@ -131,11 +131,11 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactionalDoesntFailWithAnotherResourceType() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalDoesntFailWithAnotherResourceType");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message3 = muleContext.getClient().request("vm://out3?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message3 = muleContext.getClient().request("vm://out3?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
     assertThat(message3, notNullValue());
@@ -144,7 +144,7 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testTransactionalWithAnotherResourceTypeAndExceptionAtEnd() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalWithAnotherResourceTypeAndExceptionAtEnd");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -157,10 +157,10 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testNestedTransactional() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactional");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -168,12 +168,12 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testNestedTransactionalFail() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalFail");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     try {
       flow.process(event);
     } catch (Exception e) {
     }
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
     assertThat(muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().isPresent(), is(false));
     assertThat(message1, notNullValue());
   }
@@ -181,10 +181,10 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testNestedTransactionalFailWithCatch() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalFailWithCatch");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -193,10 +193,10 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testNestedTransactionalWithBeginOrJoin() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoin");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }
@@ -204,7 +204,7 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testNestedTransactionalWithBeginOrJoinFail() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFail");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -216,10 +216,10 @@ public class VmSingleTransactionTransactionalElementTestCase extends FunctionalT
   @Test
   public void testNestedTransactionalWithBeginOrJoinFailWithCatch() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFailWithCatch");
-    MuleEvent event = getTestEvent("message", flow);
+    Event event = getTestEvent("message", flow);
     flow.process(event);
-    MuleMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
-    MuleMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message1 = muleContext.getClient().request("vm://out1?connector=vmConnector1", 1000).getRight().get();
+    InternalMessage message2 = muleContext.getClient().request("vm://out2?connector=vmConnector1", 1000).getRight().get();
     assertThat(message1, notNullValue());
     assertThat(message2, notNullValue());
   }

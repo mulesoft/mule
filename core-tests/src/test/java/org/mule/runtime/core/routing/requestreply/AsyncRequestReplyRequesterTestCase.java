@@ -15,10 +15,10 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.processor.LaxAsyncInterceptingMessageProcessor;
@@ -65,9 +65,9 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setListener(target);
     asyncReplyMP.setReplySource(target.getMessageSource());
 
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
 
-    MuleEvent resultEvent = asyncReplyMP.process(event);
+    Event resultEvent = asyncReplyMP.process(event);
 
     // Can't assert same because we copy event when we receive async reply
     assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -83,9 +83,9 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
 
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
 
-    MuleEvent resultEvent = asyncReplyMP.process(event);
+    Event resultEvent = asyncReplyMP.process(event);
 
     // Can't assert same because we copy event for async and also on async reply currently
     assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
@@ -103,7 +103,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
 
-    MuleEvent event = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
+    Event event = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
 
     try {
       asyncReplyMP.process(event);
@@ -132,11 +132,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       }
     };
 
-    final MuleEvent event = getTestEvent(TEST_MESSAGE);
+    final Event event = getTestEvent(TEST_MESSAGE);
 
     final CountDownLatch processingLatch = new CountDownLatch(1);
 
-    MessageProcessor target = mock(MessageProcessor.class);
+    Processor target = mock(Processor.class);
     asyncReplyMP.setListener(target);
 
     MessageSource messageSource = mock(MessageSource.class);
@@ -179,10 +179,10 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
         @Override
         public void run() {
-          MuleEvent event;
+          Event event;
           try {
             event = getTestEvent(TEST_MESSAGE);
-            MuleEvent resultEvent = asyncReplyMP.process(event);
+            Event resultEvent = asyncReplyMP.process(event);
 
             // Can't assert same because we copy event for async currently
             assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));

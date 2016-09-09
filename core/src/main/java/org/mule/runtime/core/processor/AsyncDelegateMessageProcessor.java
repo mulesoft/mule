@@ -7,20 +7,20 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -40,26 +40,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of
- * MessageProcessor delegate configured the next {@link MessageProcessor}. The next {@link MessageProcessor} is therefore be
+ * Processes {@link Event}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of
+ * MessageProcessor delegate configured the next {@link Processor}. The next {@link Processor} is therefore be
  * executed in a different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is
  * present then an exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements MessageProcessor, Initialisable, Startable, Stoppable, NonBlockingSupported {
+    implements Processor, Initialisable, Startable, Stoppable, NonBlockingSupported {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);
 
-  protected MessageProcessor delegate;
+  protected Processor delegate;
 
-  protected List<MessageProcessor> processors;
+  protected List<Processor> processors;
   protected ProcessingStrategy processingStrategy;
   protected String name;
 
-  private MessageProcessor target;
+  private Processor target;
 
-  public AsyncDelegateMessageProcessor(MessageProcessor delegate,
+  public AsyncDelegateMessageProcessor(Processor delegate,
                                        ProcessingStrategy processingStrategy,
                                        String name) {
     this.delegate = delegate;
@@ -108,12 +108,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event.isTransacted()) {
       throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event, this);
     }
 
-    final MuleMessage message = event.getMessage();
+    final InternalMessage message = event.getMessage();
     if (consumablePayloadWarned.compareAndSet(false, true) && message.getDataType().isStreamType()) {
       logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
           " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
@@ -122,7 +122,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     if (target != null) {
       // Clone event, make it async and remove ReplyToHandler
-      MuleEvent newEvent = MuleEvent.builder(event).message(message).flowVariables(emptyMap()).synchronous(false)
+      Event newEvent = Event.builder(event).message(message).variables(emptyMap()).synchronous(false)
           .exchangePattern(ONE_WAY).replyToHandler(null).build();
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(newEvent);
@@ -131,12 +131,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     return VoidMuleEvent.getInstance();
   }
 
-  public void setDelegate(MessageProcessor delegate) {
+  public void setDelegate(Processor delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
+  protected List<Processor> getOwnedMessageProcessors() {
     return Collections.singletonList(target);
   }
 

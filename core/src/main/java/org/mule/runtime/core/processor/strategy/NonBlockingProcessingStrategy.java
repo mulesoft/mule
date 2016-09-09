@@ -9,7 +9,7 @@ package org.mule.runtime.core.processor.strategy;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.work.MuleWorkManager;
 
@@ -29,11 +29,11 @@ public class NonBlockingProcessingStrategy extends AbstractThreadingProfileProce
   }
 
   @Override
-  public void configureProcessors(List<MessageProcessor> processors,
+  public void configureProcessors(List<Processor> processors,
                                   org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                   MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
-    for (MessageProcessor processor : processors) {
-      chainBuilder.chain((MessageProcessor) processor);
+    for (Processor processor : processors) {
+      chainBuilder.chain((Processor) processor);
     }
   }
 

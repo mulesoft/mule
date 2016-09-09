@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This implementation of {@link PagingProvider} takes care of enforcing some basic behaviour of the delegate contract so that
- * users don't have to. Concerns such as logging, auto closing the delegate if the consumer has been fully consumed are
- * addressed here
+ * users don't have to. Concerns such as logging, auto closing the delegate if the consumer has been fully consumed are addressed
+ * here
  *
  * @param <C> connection type expected to handle the operations.
  * @param <T> the type of the elements in the returned pages.

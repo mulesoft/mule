@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.config.ConfigResource;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.AbstractResourceConfigurationBuilder;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,7 +167,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     if (applicationContext instanceof ConfigurableApplicationContext) {
       registry = new SpringRegistry((ConfigurableApplicationContext) applicationContext, parentContext, muleContext);
     } else {
-      throw new ConfigurationException(MessageFactory
+      throw new ConfigurationException(I18nMessageFactory
           .createStaticMessage("Cannot set a parent context if the ApplicationContext does not implement ConfigurableApplicationContext"));
     }
   }

@@ -25,9 +25,9 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.registry.MuleRegistry;
@@ -221,18 +221,18 @@ public final class MuleEndpointTestUtils {
   /**
    * Supply endpoint but no service
    */
-  public static MuleEvent getTestEvent(Object data, InboundEndpoint endpoint, MuleContext context) throws Exception {
+  public static Event getTestEvent(Object data, InboundEndpoint endpoint, MuleContext context) throws Exception {
     return getTestEvent(data, getTestFlow(context), endpoint, context);
   }
 
-  public static MuleEvent getTestEvent(Object data, FlowConstruct flowConstruct, InboundEndpoint endpoint, MuleContext context)
+  public static Event getTestEvent(Object data, FlowConstruct flowConstruct, InboundEndpoint endpoint, MuleContext context)
       throws Exception {
     final MuleSession session = getTestSession(flowConstruct, context);
 
     final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
-    final MuleMessage message = factory.create(data, endpoint.getEncoding());
+    final InternalMessage message = factory.create(data, endpoint.getEncoding());
 
-    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(message)
+    final Event event = Event.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(message)
         .flow(flowConstruct).session(session).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
   }

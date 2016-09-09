@@ -14,7 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.oauth2.AbstractOAuthAuthorizationTestCase;
 import org.mule.runtime.module.oauth2.internal.OAuthConstants;
@@ -63,7 +63,7 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
       throws Exception {
     configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
 
-    final MuleEvent result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
+    final Event result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
     assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
 
     wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
@@ -89,8 +89,8 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
     runFlow(flowName, userId);
   }
 
-  private MuleEvent runFlow(String flowName, String userId) throws Exception {
-    final MuleEvent result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
+  private Event runFlow(String flowName, String userId) throws Exception {
+    final Event result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
     return result;
   }
 

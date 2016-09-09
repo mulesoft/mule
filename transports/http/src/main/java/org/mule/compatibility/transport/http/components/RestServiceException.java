@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http.components;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class RestServiceException extends MuleException {
 
@@ -16,11 +16,11 @@ public class RestServiceException extends MuleException {
    */
   private static final long serialVersionUID = -1026055907767407434L;
 
-  public RestServiceException(Message message) {
+  public RestServiceException(I18nMessage message) {
     super(message);
   }
 
-  public RestServiceException(Message message, Throwable cause) {
+  public RestServiceException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

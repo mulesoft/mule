@@ -9,15 +9,15 @@ package org.mule.compatibility.core.endpoint.inbound;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
  * Publishes a {@link EndpointMessageNotification}'s when a message is received.
  */
-public class InboundNotificationMessageProcessor implements MessageProcessor {
+public class InboundNotificationMessageProcessor implements Processor {
 
   protected InboundEndpoint endpoint;
 
@@ -26,7 +26,7 @@ public class InboundNotificationMessageProcessor implements MessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
     if (connector.isEnableMessageEvents(endpoint.getMuleContext())) {
       connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint, endpoint.getFlowConstruct(),

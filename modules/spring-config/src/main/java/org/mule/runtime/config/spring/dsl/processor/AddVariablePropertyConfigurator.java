@@ -18,8 +18,8 @@ import java.util.Map;
 /**
  * {@link ObjectFactoryCommonConfigurator} for transformers in Mule.
  *
- * The transformer class that will be configured setting the returnType, mimeType,
- * name, encoding and ignoreBadInput configuration.
+ * The transformer class that will be configured setting the returnType, mimeType, name, encoding and ignoreBadInput
+ * configuration.
  *
  * @since 4.0
  */
@@ -29,8 +29,9 @@ public class AddVariablePropertyConfigurator implements ObjectFactoryCommonConfi
    * Configures the common parameters of every transformer.
    *
    * @param propVarSetterInstance the transformar instance
-   * @param parameters the set of parameters configured in the component model according to the {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
-     */
+   * @param parameters the set of parameters configured in the component model according to the
+   *        {@link org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition}
+   */
   @Override
   public void configure(AbstractAddVariablePropertyProcessor propVarSetterInstance, Map<String, Object> parameters) {
     String mimeType = (String) parameters.get("mimeType");

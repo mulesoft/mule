@@ -13,14 +13,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
@@ -56,7 +56,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private EventCorrelatorCallback mockEventCorrelatorCallback;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MessageProcessor mockTimeoutMessageProcessor;
+  private Processor mockTimeoutMessageProcessor;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext mockMuleContext;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
@@ -66,13 +66,13 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private ListableObjectStore mockProcessedGroups;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleMessage mockMessageCollection;
+  private InternalMessage mockMessageCollection;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleEvent mockMuleEvent;
+  private Event mockMuleEvent;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private FlowConstruct mockFlowConstruct;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MessageContext mockExecutionContext;
+  private EventContext mockExecutionContext;
   private PartitionableObjectStore memoryObjectStore = new PartitionedInMemoryObjectStore();
 
   @Before
@@ -171,7 +171,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
     when(mockMuleContext.getRegistry().get(MuleProperties.OBJECT_STORE_MANAGER)).thenReturn(mockObjectStoreManager);
     memoryObjectStore.store(TEST_GROUP_ID, mockEventGroup, "prefix.eventGroups");
     when(mockEventGroup.getGroupId()).thenReturn(TEST_GROUP_ID);
-    when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mock(MuleEvent.class));
+    when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mock(Event.class));
     when(mockFlowConstruct.getName()).thenReturn("flowName");
     return new EventCorrelator(mockEventCorrelatorCallback, mockTimeoutMessageProcessor, mockMuleContext, mockFlowConstruct,
                                memoryObjectStore, "prefix", mockProcessedGroups);

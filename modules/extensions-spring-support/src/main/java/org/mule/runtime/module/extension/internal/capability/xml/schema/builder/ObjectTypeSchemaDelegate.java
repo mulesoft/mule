@@ -179,8 +179,8 @@ final class ObjectTypeSchemaDelegate {
    * will not register the same type twice even if requested to
    *
    * @param type a {@link MetadataType} describing a pojo type
-   * @param baseType     a {@link MetadataType} describing a pojo's base type
-   * @param description  the type's description
+   * @param baseType a {@link MetadataType} describing a pojo's base type
+   * @param description the type's description
    * @return the reference name of the complexType
    */
   private String registerPojoType(MetadataType type, MetadataType baseType, String description) {

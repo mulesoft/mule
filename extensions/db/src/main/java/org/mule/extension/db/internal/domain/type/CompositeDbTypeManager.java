@@ -30,9 +30,8 @@ public class CompositeDbTypeManager implements DbTypeManager {
   @Override
 
   /**
-   * Finds a mapping for a given type ID and name using each composed
-   * {@link DbTypeManager} until a type is found or there are no more
-   * managers to use.
+   * Finds a mapping for a given type ID and name using each composed {@link DbTypeManager} until a type is found or there are no
+   * more managers to use.
    *
    * @param connection connection used to connect to the database if required
    * @param id type ID
@@ -53,8 +52,7 @@ public class CompositeDbTypeManager implements DbTypeManager {
   }
 
   /**
-   * Finds a mapping for a given type name using each composed
-   * {@link DbTypeManager} until a type is found or there are no more
+   * Finds a mapping for a given type name using each composed {@link DbTypeManager} until a type is found or there are no more
    * managers to use.
    *
    * @param connection connection used to connect to the database if required

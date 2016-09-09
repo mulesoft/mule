@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http.components;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Thrown when a static file is requested but not found
@@ -16,7 +16,7 @@ public class ResourceNotFoundException extends MuleException {
 
   private static final long serialVersionUID = -6693780652453067693L;
 
-  public ResourceNotFoundException(Message message) {
+  public ResourceNotFoundException(I18nMessage message) {
     super(message);
   }
 

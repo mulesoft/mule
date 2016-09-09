@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
 import org.mule.runtime.core.util.queue.TransactionalQueueManager;
@@ -38,7 +38,7 @@ public class PersistentRecoverMessageTestCase extends FunctionalTestCase {
     transactionalQueueManager.setQueueConfiguration(TEST_QUEUE_NAME, new DefaultQueueConfiguration(0, true));
     transactionalQueueManager.initialise();
     transactionalQueueManager.start();
-    MuleEvent testEvent = getTestEvent("echo");
+    Event testEvent = getTestEvent("echo");
     transactionalQueueManager.getQueueSession().getQueue(TEST_QUEUE_NAME).put(testEvent.getMessage());
 
     transactionalQueueManager.stop();
@@ -46,7 +46,7 @@ public class PersistentRecoverMessageTestCase extends FunctionalTestCase {
     muleContext.start();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("vm://" + TEST_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://" + TEST_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertEquals(getPayloadAsString(testEvent.getMessage()), result.getPayload());
   }

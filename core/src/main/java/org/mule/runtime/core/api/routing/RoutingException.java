@@ -7,9 +7,9 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>RoutingException</code> is a base class for all routing exceptions. Routing exceptions are only thrown for
@@ -23,34 +23,34 @@ public class RoutingException extends MuleException {
    */
   private static final long serialVersionUID = 2478458847072048645L;
 
-  protected final transient MessageProcessor route;
+  protected final transient Processor route;
 
-  public RoutingException(MessageProcessor route) {
+  public RoutingException(Processor route) {
     super(generateMessage(null, route));
     this.route = route;
   }
 
-  public RoutingException(MessageProcessor route, Throwable cause) {
+  public RoutingException(Processor route, Throwable cause) {
     super(generateMessage(null, route), cause);
     this.route = route;
   }
 
-  public RoutingException(Message message, MessageProcessor route) {
+  public RoutingException(I18nMessage message, Processor route) {
     super(generateMessage(message, route));
     this.route = route;
   }
 
-  public RoutingException(Message message, MessageProcessor route, Throwable cause) {
+  public RoutingException(I18nMessage message, Processor route, Throwable cause) {
     super(generateMessage(message, route), cause);
     this.route = route;
   }
 
-  public MessageProcessor getRoute() {
+  public Processor getRoute() {
     return route;
   }
 
-  private static Message generateMessage(Message message, MessageProcessor target) {
-    Message m = CoreMessages.failedToRouterViaEndpoint(target);
+  private static I18nMessage generateMessage(I18nMessage message, Processor target) {
+    I18nMessage m = CoreMessages.failedToRouterViaEndpoint(target);
     if (message != null) {
       message.setNextMessage(m);
       return message;

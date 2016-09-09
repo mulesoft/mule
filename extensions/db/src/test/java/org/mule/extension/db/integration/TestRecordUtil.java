@@ -19,7 +19,7 @@ import static org.mule.extension.db.integration.model.Planet.VENUS;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
 import org.mule.extension.db.integration.model.XmlField;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.sql.Struct;
@@ -37,7 +37,7 @@ public class TestRecordUtil {
     return new Record[] {getMonguitoRecord(), getEtRecord()};
   }
 
-  public static void assertMessageContains(MuleMessage message, Record... records) {
+  public static void assertMessageContains(Message message, Record... records) {
     assertRecords(message.getPayload(), records);
   }
 

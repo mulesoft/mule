@@ -7,7 +7,7 @@
 package org.mule.extension.http.api.request.authentication;
 
 import org.mule.extension.http.internal.request.HttpRequestBuilder;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 /**
@@ -24,7 +24,7 @@ public interface HttpAuthentication {
    * @param muleEvent The event that is being processed.
    * @param builder The builder that is being used to create the HTTP request.
    */
-  void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException;
+  void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException;
 
   /**
    * Detects if there was an authentication failure in the response. After sending an HTTP request and creating an event with the
@@ -34,6 +34,6 @@ public interface HttpAuthentication {
    * @param firstAttemptResponseEvent The event with the response of the request.
    * @return True if the request should be sent again, false otherwise.
    */
-  boolean shouldRetry(MuleEvent firstAttemptResponseEvent) throws MuleException;
+  boolean shouldRetry(Event firstAttemptResponseEvent) throws MuleException;
 
 }

@@ -12,7 +12,7 @@ import org.mule.extension.ftp.internal.FtpConnector;
 import org.mule.extension.ftp.internal.ftp.ClassicFtpInputStream;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -45,7 +45,7 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
    * {@inheritDoc}
    */
   @Override
-  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
                                                            boolean lock) {
     FtpFileAttributes attributes = getExistingFile(config, filePath);
     if (attributes.isDirectory()) {

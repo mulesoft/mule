@@ -10,7 +10,7 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.processor.AsyncDelegateMessageProcessor;
@@ -31,7 +31,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public Class getObjectType() {
-    return MessageProcessor.class;
+    return Processor.class;
   }
 
   public void setMessageProcessors(List messageProcessors) {
@@ -44,8 +44,8 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
     builder.setName("'async' child chain");
 
     for (Object processor : messageProcessors) {
-      if (processor instanceof MessageProcessor) {
-        builder.chain((MessageProcessor) processor);
+      if (processor instanceof Processor) {
+        builder.chain((Processor) processor);
       } else if (processor instanceof MessageProcessorBuilder) {
         builder.chain((MessageProcessorBuilder) processor);
       } else {

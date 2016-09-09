@@ -7,7 +7,7 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Thrown by the ServerNotification Manager if unrecognised listeners or events are passed to the manager
@@ -22,7 +22,7 @@ public class NotificationException extends MuleException {
   /**
    * @param message the exception message
    */
-  public NotificationException(Message message) {
+  public NotificationException(I18nMessage message) {
     super(message);
   }
 
@@ -30,7 +30,7 @@ public class NotificationException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public NotificationException(Message message, Throwable cause) {
+  public NotificationException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

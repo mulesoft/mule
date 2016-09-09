@@ -17,17 +17,17 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * argument type. Multiple methods with the same name and same number of arguments are not supported currently.
  */
 public class InvokerMessageProcessor extends AbstractAnnotatedObject
-    implements MessageProcessor, Initialisable, MuleContextAware, FlowConstructAware {
+    implements Processor, Initialisable, MuleContextAware, FlowConstructAware {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -131,8 +131,8 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleEvent resultEvent = event;
+  public Event process(Event event) throws MuleException {
+    Event resultEvent = event;
     Object[] args = evaluateArguments(event, arguments);
 
     if (logger.isDebugEnabled()) {
@@ -150,7 +150,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     return resultEvent;
   }
 
-  protected Object[] evaluateArguments(MuleEvent event, List<?> argumentTemplates) throws MessagingException {
+  protected Object[] evaluateArguments(Event event, List<?> argumentTemplates) throws MessagingException {
     int argSize = argumentTemplates != null ? argumentTemplates.size() : 0;
     Object[] args = new Object[argSize];
     try {
@@ -167,7 +167,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
   }
 
   @SuppressWarnings("unchecked")
-  protected Object evaluateExpressionCandidate(Object expressionCandidate, MuleEvent event) throws TransformerException {
+  protected Object evaluateExpressionCandidate(Object expressionCandidate, Event event) throws TransformerException {
     if (expressionCandidate instanceof Collection<?>) {
       Collection<Object> collectionTemplate = (Collection<Object>) expressionCandidate;
       Collection<Object> newCollection = new ArrayList<>();
@@ -203,9 +203,9 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
         arg = expressionLanguage.parse(expression, event, flowConstruct);
       }
 
-      // If expression evaluates to a MuleMessage then use it's payload
-      if (arg instanceof MuleMessage) {
-        arg = ((MuleMessage) arg).getPayload();
+      // If expression evaluates to a Message then use it's payload
+      if (arg instanceof InternalMessage) {
+        arg = ((InternalMessage) arg).getPayload();
       }
       return arg;
     } else {
@@ -239,17 +239,17 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
     this.arguments = arguments;
   }
 
-  protected MuleEvent createResultEvent(MuleEvent event, Object result) throws MuleException {
-    Builder eventBuilder = MuleEvent.builder(event);
-    if (result instanceof MuleMessage) {
-      eventBuilder.message((MuleMessage) result);
+  protected Event createResultEvent(Event event, Object result) throws MuleException {
+    Builder eventBuilder = Event.builder(event);
+    if (result instanceof InternalMessage) {
+      eventBuilder.message((InternalMessage) result);
     } else if (result != null) {
       final TransformerTemplate template = new TransformerTemplate(new TransformerTemplate.OverwitePayloadCallback(result));
       template.setReturnDataType(DataType.builder(DataType.OBJECT).charset(getDefaultEncoding(muleContext)).build());
       eventBuilder
           .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, singletonList(template)));
     } else {
-      eventBuilder.message(MuleMessage.builder().nullPayload().build());
+      eventBuilder.message(InternalMessage.builder().nullPayload().build());
     }
     return eventBuilder.build();
   }

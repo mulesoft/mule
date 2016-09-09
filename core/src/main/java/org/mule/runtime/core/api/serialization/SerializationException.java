@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.serialization;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 /**
  * Exception to signal an error during serialization/deserialization process
@@ -20,18 +20,18 @@ public class SerializationException extends MuleRuntimeException {
   private static final long serialVersionUID = -2550225226351711742L;
 
   public SerializationException(String message, Throwable cause) {
-    this(MessageFactory.createStaticMessage(message), cause);
+    this(I18nMessageFactory.createStaticMessage(message), cause);
   }
 
   public SerializationException(String message) {
-    this(MessageFactory.createStaticMessage(message));
+    this(I18nMessageFactory.createStaticMessage(message));
   }
 
-  public SerializationException(Message message, Throwable cause) {
+  public SerializationException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
-  public SerializationException(Message message) {
+  public SerializationException(I18nMessage message) {
     super(message);
   }
 

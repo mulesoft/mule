@@ -18,8 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * Defines stored procedures for testing purposes. Used by reflection from
- * {@link DerbyTestDatabase}
+ * Defines stored procedures for testing purposes. Used by reflection from {@link DerbyTestDatabase}
  */
 @SuppressWarnings("UnusedDeclaration")
 public class DerbyTestStoredProcedure {

@@ -8,11 +8,11 @@ package org.mule.compatibility.core.endpoint.inbound;
 
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -23,7 +23,7 @@ import org.mule.runtime.core.util.StringUtils;
  * Sets the inbound endpoint uri on as a property of the message using the following key:
  * {@link MuleProperties#MULE_ORIGINATING_ENDPOINT_PROPERTY}.
  */
-public class InboundEndpointPropertyMessageProcessor implements MessageProcessor {
+public class InboundEndpointPropertyMessageProcessor implements Processor {
 
   private InboundEndpoint endpoint;
 
@@ -32,7 +32,7 @@ public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     // If the endpoint has a logical name, use it, otherwise use the URI.
     String inboundEndpoint = endpoint.getName();
 
@@ -40,7 +40,7 @@ public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
       // URI
       inboundEndpoint = endpoint.getEndpointURI().getUri().toString();
     }
-    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+    return Event.builder(event).message(InternalMessage.builder(event.getMessage())
         .addInboundProperty(MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint).build()).build();
   }
 

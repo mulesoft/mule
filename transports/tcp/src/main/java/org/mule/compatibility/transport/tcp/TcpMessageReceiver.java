@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.core.transport.AbstractReceiverResourceWorker;
@@ -344,8 +344,8 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work 
     }
 
     @Override
-    protected MuleCompatibilityMessage preRouteMuleMessage(final MuleCompatibilityMessage message) throws Exception {
-      MuleCompatibilityMessage muleMessage = super.preRouteMuleMessage(message);
+    protected CompatibilityMessage preRouteMuleMessage(final CompatibilityMessage message) throws Exception {
+      CompatibilityMessage muleMessage = super.preRouteMuleMessage(message);
 
       final SocketAddress clientAddress = socket.getRemoteSocketAddress();
       if (clientAddress != null) {

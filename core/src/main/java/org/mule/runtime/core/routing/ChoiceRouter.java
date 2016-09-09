@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
@@ -25,7 +25,7 @@ import java.util.Collections;
 public class ChoiceRouter extends AbstractSelectiveRouter implements NonBlockingMessageProcessor {
 
   @Override
-  protected Collection<MessageProcessor> selectProcessors(MuleEvent event, MuleEvent.Builder builder) {
+  protected Collection<Processor> selectProcessors(Event event, Event.Builder builder) {
     for (MessageProcessorFilterPair mpfp : getConditionalMessageProcessors()) {
       if (mpfp.getFilter().accept(event, builder)) {
         return Collections.singleton(mpfp.getMessageProcessor());

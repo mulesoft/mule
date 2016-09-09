@@ -13,8 +13,8 @@ import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import java.util.Optional;
 
 /**
- * Default implementation of {@link DslResolvingContext} that uses
- * the {@link ExtensionManager} to provide the required {@link ExtensionModel}s
+ * Default implementation of {@link DslResolvingContext} that uses the {@link ExtensionManager} to provide the required
+ * {@link ExtensionModel}s
  *
  * @since 4.0
  */

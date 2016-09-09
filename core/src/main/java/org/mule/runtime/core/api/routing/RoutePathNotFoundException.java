@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>RoutePathNotFoundException</code> is thrown if a routing path for an event cannot be found. This can be caused if there
@@ -20,19 +20,19 @@ public class RoutePathNotFoundException extends RoutingException {
    */
   private static final long serialVersionUID = -8481434966594513066L;
 
-  public RoutePathNotFoundException(MessageProcessor target) {
+  public RoutePathNotFoundException(Processor target) {
     super(target);
   }
 
-  public RoutePathNotFoundException(MessageProcessor target, Throwable cause) {
+  public RoutePathNotFoundException(Processor target, Throwable cause) {
     super(target, cause);
   }
 
-  public RoutePathNotFoundException(Message message, MessageProcessor target) {
+  public RoutePathNotFoundException(I18nMessage message, Processor target) {
     super(message, target);
   }
 
-  public RoutePathNotFoundException(Message message, MessageProcessor target, Throwable cause) {
+  public RoutePathNotFoundException(I18nMessage message, Processor target, Throwable cause) {
     super(message, target, cause);
   }
 }

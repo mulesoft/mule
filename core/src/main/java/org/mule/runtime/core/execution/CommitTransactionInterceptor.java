@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
@@ -19,17 +19,17 @@ import org.mule.runtime.core.transaction.TransactionCoordination;
  * This interceptor must be executed before the error handling interceptor so if there is any failure doing commit, the error
  * handler gets executed.
  */
-class CommitTransactionInterceptor implements ExecutionInterceptor<MuleEvent> {
+class CommitTransactionInterceptor implements ExecutionInterceptor<Event> {
 
-  private final ExecutionInterceptor<MuleEvent> nextInterceptor;
+  private final ExecutionInterceptor<Event> nextInterceptor;
 
-  public CommitTransactionInterceptor(ExecutionInterceptor<MuleEvent> nextInterceptor) {
+  public CommitTransactionInterceptor(ExecutionInterceptor<Event> nextInterceptor) {
     this.nextInterceptor = nextInterceptor;
   }
 
   @Override
-  public MuleEvent execute(ExecutionCallback<MuleEvent> callback, ExecutionContext executionContext) throws Exception {
-    MuleEvent result = nextInterceptor.execute(callback, executionContext);
+  public Event execute(ExecutionCallback<Event> callback, ExecutionContext executionContext) throws Exception {
+    Event result = nextInterceptor.execute(callback, executionContext);
     if (executionContext.needsTransactionResolution()) {
       try {
         TransactionCoordination.getInstance().resolveTransaction();

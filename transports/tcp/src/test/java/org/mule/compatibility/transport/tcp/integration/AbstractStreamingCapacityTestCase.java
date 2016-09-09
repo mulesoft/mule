@@ -14,7 +14,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 
@@ -71,7 +71,7 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
     MuleClient client = muleContext.getClient();
     // dynamically get the endpoint to send to
     client.dispatch(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("testComponent")).getMessageSource())
-        .getAddress(), MuleMessage.builder().payload(stream).build());
+        .getAddress(), InternalMessage.builder().payload(stream).build());
 
     // if we assume 1MB/sec then we need at least...
     long pause = Math.max(size / ONE_MB, 60 * 10) + 10;

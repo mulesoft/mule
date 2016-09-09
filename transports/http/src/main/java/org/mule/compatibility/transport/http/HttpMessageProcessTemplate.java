@@ -30,19 +30,19 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractTransportMessageProcessTemplate;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.EndPhaseTemplate;
@@ -86,12 +86,12 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   @Override
-  public void sendResponseToClient(MuleEvent responseMuleEvent) throws MuleException {
+  public void sendResponseToClient(Event responseMuleEvent) throws MuleException {
     try {
       if (logger.isTraceEnabled()) {
         logger.trace("Sending http response");
       }
-      MuleMessage returnMessage = responseMuleEvent == null ? null : responseMuleEvent.getMessage();
+      InternalMessage returnMessage = responseMuleEvent == null ? null : responseMuleEvent.getMessage();
 
       Object tempResponse;
       if (returnMessage != null) {
@@ -156,7 +156,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
   @Override
   public void sendFailureResponseToClient(MessagingException messagingException) throws MuleException {
-    MuleEvent response = messagingException.getEvent();
+    Event response = messagingException.getEvent();
     MessagingException e = getExceptionForCreatingFailureResponse(messagingException, response);
     String temp = ExceptionHelper.getErrorMapping(getInboundEndpoint().getConnector().getProtocol(),
                                                   messagingException.getCause().getClass(), getMuleContext());
@@ -169,7 +169,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     failureResponseSentToClient = true;
   }
 
-  private MessagingException getExceptionForCreatingFailureResponse(MessagingException messagingException, MuleEvent response) {
+  private MessagingException getExceptionForCreatingFailureResponse(MessagingException messagingException, Event response) {
     MessagingException e = messagingException;
     if (response != null &&
         response.getError().isPresent() &&
@@ -197,7 +197,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   @Override
-  public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException {
+  public Event beforeRouteEvent(Event muleEvent) throws MuleException {
     try {
       sendExpect100(request, muleEvent);
       return muleEvent;
@@ -206,7 +206,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     }
   }
 
-  private void sendExpect100(HttpRequest request, MuleEvent muleEvent) throws MuleException, IOException {
+  private void sendExpect100(HttpRequest request, Event muleEvent) throws MuleException, IOException {
     RequestLine requestLine = request.getRequestLine();
 
     // respond with status code 100, for Expect handshake
@@ -222,8 +222,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
           HttpResponse expected = new HttpResponse();
           expected.setStatusLine(requestLine.getHttpVersion(), SC_CONTINUE);
           expected.setKeepAlive(true);
-          MuleEvent event = MuleEvent.builder(muleEvent.getContext())
-              .message(MuleMessage.builder().payload(expected).build()).flow(getFlowConstruct()).build();
+          Event event = Event.builder(muleEvent.getContext())
+              .message(InternalMessage.builder().payload(expected).build()).flow(getFlowConstruct()).build();
           event = populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
 
           setCurrentEvent(event);
@@ -245,11 +245,11 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   protected HttpResponse transformResponse(Object response) throws MuleException {
-    MuleMessage message;
-    if (response instanceof MuleMessage) {
-      message = (MuleMessage) response;
+    InternalMessage message;
+    if (response instanceof InternalMessage) {
+      message = (InternalMessage) response;
     } else {
-      message = MuleMessage.builder().payload(response).build();
+      message = InternalMessage.builder().payload(response).build();
     }
     // TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
     // class
@@ -259,8 +259,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   @Override
-  protected MuleCompatibilityMessage createMessageFromSource(Object message) throws MuleException {
-    MuleMessage muleMessage = super.createMessageFromSource(message);
+  protected CompatibilityMessage createMessageFromSource(Object message) throws MuleException {
+    InternalMessage muleMessage = super.createMessageFromSource(message);
     MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(muleMessage);
 
     String path = muleMessage.getInboundProperty(HTTP_REQUEST_PROPERTY);
@@ -293,7 +293,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   /**
-   * For a given MuleMessage will set the <code>MULE_REMOTE_CLIENT_ADDRESS</code> property taking into consideration if the header
+   * For a given Message will set the <code>MULE_REMOTE_CLIENT_ADDRESS</code> property taking into consideration if the header
    * <code>X-Forwarded-For</code> is present in the request or not. In case it is, this method will also set the
    * <code>MULE_PROXY_ADDRESS</code> property. If a proxy address is not passed in <code>X-Forwarded-For</code>, the connection
    * address will be set as <code>MULE_PROXY_ADDRESS</code>.
@@ -302,7 +302,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
    * @param original original message
    * @see <a href="https://en.wikipedia.org/wiki/X-Forwarded-For">https://en.wikipedia.org/wiki/X-Forwarded-For</a>
    */
-  protected void processRemoteAddresses(MuleMessage.Builder muleMessageBuilder, MuleMessage original) {
+  protected void processRemoteAddresses(InternalMessage.Builder muleMessageBuilder, InternalMessage original) {
     String xForwardedFor = original.getInboundProperty(HEADER_X_FORWARDED_FOR);
 
     if (StringUtils.isEmpty(xForwardedFor)) {
@@ -385,8 +385,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   protected HttpResponse doBad(RequestLine requestLine) throws MuleException {
-    MuleMessage message = getMessageReceiver().createMuleMessage(null);
-    MuleEvent event = MuleEvent.builder(getMuleEvent().getContext()).message(message).flow(getFlowConstruct()).build();
+    InternalMessage message = getMessageReceiver().createMuleMessage(null);
+    Event event = Event.builder(getMuleEvent().getContext()).message(message).flow(getFlowConstruct()).build();
     event = populateFieldsFromInboundEndpoint(event, getInboundEndpoint());
     setCurrentEvent(event);
     HttpResponse response = new HttpResponse();
@@ -420,12 +420,12 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
   }
 
   private void sendFailureResponseToClient(MessagingException exception, int httpStatus) throws IOException, MuleException {
-    MuleEvent response = exception.getEvent();
-    MuleMessage message = response.getMessage();
+    Event response = exception.getEvent();
+    InternalMessage message = response.getMessage();
     httpStatus = message.getOutboundProperty(HTTP_STATUS_PROPERTY) != null
         ? Integer.valueOf(response.getMessage().getOutboundProperty(HTTP_STATUS_PROPERTY).toString()) : httpStatus;
 
-    message = MuleMessage.builder(response.getMessage())
+    message = InternalMessage.builder(response.getMessage())
         .payload(exception.getMessage())
         .addOutboundProperty(HTTP_STATUS_PROPERTY, httpStatus).build();
     HttpResponse httpResponse = transformResponse(message);

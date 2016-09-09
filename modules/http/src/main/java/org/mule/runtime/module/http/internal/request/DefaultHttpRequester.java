@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
 import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
@@ -16,7 +16,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -194,16 +194,16 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   }
 
   @Override
-  protected MuleEvent processBlocking(final MuleEvent muleEvent) throws MuleException {
+  protected Event processBlocking(final Event muleEvent) throws MuleException {
     return innerProcess(muleEvent, true);
   }
 
   @Override
-  protected void processNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler) throws MuleException {
+  protected void processNonBlocking(final Event muleEvent, final CompletionHandler completionHandler) throws MuleException {
     innerProcessNonBlocking(muleEvent, completionHandler, true);
   }
 
-  protected void innerProcessNonBlocking(final MuleEvent muleEvent, final CompletionHandler completionHandler,
+  protected void innerProcessNonBlocking(final Event muleEvent, final CompletionHandler completionHandler,
                                          final boolean checkRetry)
       throws MuleException {
     final HttpAuthentication authentication = requestConfig.getAuthentication();
@@ -229,7 +229,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                            protected void doOnCompletion(HttpResponse httpResponse) {
                              try {
 
-                               MuleEvent resultEvent =
+                               Event resultEvent =
                                    httpResponseToMuleEvent.convert(muleEvent, httpResponse, httpRequest.getUri());
                                notificationHelper.fireNotification(this, resultEvent, httpRequest.getUri(),
                                                                    flowConstruct, MESSAGE_REQUEST_END);
@@ -253,7 +253,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                              }
                            }
 
-                           private MuleEvent resetMuleEventForNewThread(MuleEvent event) {
+                           private Event resetMuleEventForNewThread(Event event) {
                              // Set RequestContext ThreadLocal in new thread for backwards compatibility
                              setCurrentEvent(event);
                              return event;
@@ -268,7 +268,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     }
   }
 
-  private WorkManager getWorkManager(MuleEvent event) {
+  private WorkManager getWorkManager(Event event) {
     if (flowConstruct instanceof Flow) {
       return ((Flow) flowConstruct).getWorkManager();
     } else {
@@ -276,7 +276,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     }
   }
 
-  private MuleEvent innerProcess(MuleEvent muleEvent, boolean checkRetry) throws MuleException {
+  private Event innerProcess(Event muleEvent, boolean checkRetry) throws MuleException {
     HttpAuthentication authentication = requestConfig.getAuthentication();
     HttpRequest httpRequest = createHttpRequest(muleEvent, authentication);
 
@@ -306,15 +306,15 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     return requestConfig.getHttpClient();
   }
 
-  private void validateResponse(MuleEvent muleEvent) throws ResponseValidatorException {
+  private void validateResponse(Event muleEvent) throws ResponseValidatorException {
     responseValidator.validate(muleEvent);
   }
 
-  private boolean resendRequest(MuleEvent muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException {
+  private boolean resendRequest(Event muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException {
     return retry && authentication != null && authentication.shouldRetry(muleEvent);
   }
 
-  private HttpRequest createHttpRequest(MuleEvent muleEvent, HttpAuthentication authentication) throws MuleException {
+  private HttpRequest createHttpRequest(Event muleEvent, HttpAuthentication authentication) throws MuleException {
     HttpRequestBuilder builder =
         muleEventToHttpRequest.create(muleEvent, method.resolveStringValue(muleEvent), resolveURI(muleEvent));
 
@@ -324,7 +324,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     return builder.build();
   }
 
-  private HttpRequestAuthentication resolveAuthentication(MuleEvent event) {
+  private HttpRequestAuthentication resolveAuthentication(Event event) {
     HttpRequestAuthentication requestAuthentication = null;
 
     if (requestConfig.getAuthentication() instanceof DefaultHttpAuthentication) {
@@ -333,7 +333,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     return requestAuthentication;
   }
 
-  private int resolveResponseTimeout(MuleEvent muleEvent) {
+  private int resolveResponseTimeout(Event muleEvent) {
     if (muleContext.getConfiguration().isDisableTimeouts()) {
       return WAIT_FOR_EVER;
     } else {
@@ -342,7 +342,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     }
   }
 
-  private String resolveURI(MuleEvent muleEvent) throws MessagingException {
+  private String resolveURI(Event muleEvent) throws MessagingException {
     if (url.getRawValue() != null) {
       return url.resolveStringValue(muleEvent);
     } else {
@@ -360,7 +360,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   }
 
 
-  private String replaceUriParams(String path, MuleEvent event) {
+  private String replaceUriParams(String path, Event event) {
     if (requestBuilder == null) {
       return path;
     } else {
@@ -389,7 +389,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
 
   }
 
-  private void consumePayload(final MuleEvent event) {
+  private void consumePayload(final Event event) {
     if (event.getMessage().getPayload() instanceof InputStream) {
       try {
         event.getMessageAsBytes(muleContext);
@@ -510,7 +510,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   }
 
   @Override
-  public List<FieldDebugInfo<?>> getDebugInfo(final MuleEvent event) {
+  public List<FieldDebugInfo<?>> getDebugInfo(final Event event) {
     final List<FieldDebugInfo<?>> fields = new ArrayList<>();
     fields.add(createFieldDebugInfo(URI_DEBUG, String.class, () -> resolveURI(event)));
     fields.add(createFieldDebugInfo(METHOD_DEBUG, String.class, method, event));
@@ -526,7 +526,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     return fields;
   }
 
-  private List<FieldDebugInfo<?>> getQueryParamsDebugInfo(MuleEvent event) {
+  private List<FieldDebugInfo<?>> getQueryParamsDebugInfo(Event event) {
     final ParameterMap queryParams = requestBuilder.getQueryParams(event, muleContext);
     List<FieldDebugInfo<?>> params = new ArrayList<>();
     for (String paramName : queryParams.keySet()) {
@@ -541,7 +541,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
     return params;
   }
 
-  private FieldDebugInfo getSecurityFieldDebugInfo(MuleEvent event) {
+  private FieldDebugInfo getSecurityFieldDebugInfo(Event event) {
     FieldDebugInfo securityFieldDebugInfo;
 
     try {

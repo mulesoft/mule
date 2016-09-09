@@ -21,7 +21,7 @@ import static org.mule.runtime.module.http.api.requester.HttpStreamingType.ALWAY
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.client.SimpleOptionsBuilder;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -54,7 +54,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
   @Test
   public void sameConfigReturnsSameInstanceUsingGenericOptions() throws Exception {
-    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+    final Processor messageProcessor = httpConnectorMessageProcessorProvider
         .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
     assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(),
                                                                          REQUEST_RESPONSE),
@@ -63,7 +63,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
   @Test
   public void sameConfigReturnsSameInstanceUsingDifferentGenericOptions() throws Exception {
-    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+    final Processor messageProcessor = httpConnectorMessageProcessorProvider
         .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
     assertThat(httpConnectorMessageProcessorProvider
         .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().responseTimeout(1000).build(), REQUEST_RESPONSE),
@@ -72,7 +72,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
   @Test
   public void sameConfigReturnsSameInstanceUsingDifferentHttpOptions() throws Exception {
-    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+    final Processor messageProcessor = httpConnectorMessageProcessorProvider
         .getMessageProcessor(PATH_URL, newOptions().requestStreamingMode(ALWAYS).build(), REQUEST_RESPONSE);
     assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().disableParseResponse().build(),
                                                                          REQUEST_RESPONSE),
@@ -101,7 +101,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
   }
 
   private void assertSameConfigReturnsSameInstance(HttpRequestOptions requestOptions) throws Exception {
-    final MessageProcessor messageProcessor =
+    final Processor messageProcessor =
         httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE);
     assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, requestOptions, REQUEST_RESPONSE),
                is(messageProcessor));
@@ -109,7 +109,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
   @Test
   public void differentPathReturnsDifferentOperations() throws Exception {
-    final MessageProcessor messageProcessor =
+    final Processor messageProcessor =
         httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
     assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(ANOTHER_PATH, newOptions().build(), ONE_WAY),
                not(is(messageProcessor)));
@@ -117,7 +117,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
   @Test
   public void differentExchangePatternsReturnsDifferentOperations() throws Exception {
-    final MessageProcessor messageProcessor =
+    final Processor messageProcessor =
         httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), ONE_WAY);
     assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, newOptions().build(), REQUEST_RESPONSE),
                not(is(messageProcessor)));
@@ -125,7 +125,7 @@ public class HttpConnectorMessageProcessorProviderTestCase extends AbstractMuleT
 
   @Test
   public void disposeInvalidatesCache() throws Exception {
-    final MessageProcessor messageProcessor = httpConnectorMessageProcessorProvider
+    final Processor messageProcessor = httpConnectorMessageProcessorProvider
         .getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(), REQUEST_RESPONSE);
     httpConnectorMessageProcessorProvider.dispose();
     assertThat(httpConnectorMessageProcessorProvider.getMessageProcessor(PATH_URL, SimpleOptionsBuilder.newOptions().build(),

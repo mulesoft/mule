@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -44,7 +44,7 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
     when(transformer2.isSourceDataTypeSupported(any(DataType.class))).thenReturn(true);
     when(transformer2.getReturnDataType()).thenReturn(DataType.OBJECT);
 
-    MuleMessage message = MuleMessage.builder().payload("").build();
+    InternalMessage message = InternalMessage.builder().payload("").build();
     message = transformationService.applyTransformers(message, null, transformer1, transformer2);
 
     assertEquals("foo", message.getPayload());

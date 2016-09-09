@@ -15,9 +15,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -101,12 +101,12 @@ public class HttpListenerResponseStreamingExceptionStrategyTestCase extends Abst
     assertExceptionStrategyNotExecuted(httpResponse);
   }
 
-  public static class TrackPassageMessageProcessor implements MessageProcessor {
+  public static class TrackPassageMessageProcessor implements Processor {
 
     public static boolean passed = false;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       passed = true;
       return event;
     }

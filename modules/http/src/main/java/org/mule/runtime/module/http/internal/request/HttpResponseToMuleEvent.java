@@ -21,9 +21,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -68,8 +68,8 @@ public class HttpResponseToMuleEvent {
     this.parseResponse = parseResponse;
   }
 
-  public MuleEvent convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException {
-    MuleEvent.Builder eventBuilder = MuleEvent.builder(muleEvent);
+  public Event convert(Event muleEvent, HttpResponse response, String uri) throws MessagingException {
+    Event.Builder eventBuilder = Event.builder(muleEvent);
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
     DataType dataType = muleEvent.getMessage().getDataType();
     if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType())) {
@@ -95,7 +95,7 @@ public class HttpResponseToMuleEvent {
     }
 
     final Builder builder =
-        MuleMessage.builder().payload(muleEvent.getMessage().getPayload()).inboundProperties(inboundProperties);
+        InternalMessage.builder().payload(muleEvent.getMessage().getPayload()).inboundProperties(inboundProperties);
 
     if (StringUtils.isEmpty(responseContentType)) {
       builder.mediaType(muleEvent.getMessage().getDataType().getMediaType());
@@ -142,9 +142,9 @@ public class HttpResponseToMuleEvent {
    * Stores the response payload (body of the HTTP response) in the Mule message according to the "target" property. If empty, it
    * will be stored in the payload. If not, it will use the target expression to enrich the message with the body of the response.
    */
-  private void setResponsePayload(Object payload, MuleEvent muleEvent, MuleEvent.Builder eventBuilder) {
+  private void setResponsePayload(Object payload, Event muleEvent, Event.Builder eventBuilder) {
     if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget())) {
-      eventBuilder.message(MuleMessage.builder(muleEvent.getMessage()).payload(payload)
+      eventBuilder.message(InternalMessage.builder(muleEvent.getMessage()).payload(payload)
           .mediaType(muleEvent.getMessage().getDataType().getMediaType()).build());
     } else {
       muleContext.getExpressionLanguage().enrich(requester.getTarget(), muleEvent, eventBuilder, null, payload);

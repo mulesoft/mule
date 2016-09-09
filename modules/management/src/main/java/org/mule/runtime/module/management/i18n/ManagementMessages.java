@@ -6,28 +6,28 @@
  */
 package org.mule.runtime.module.management.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class ManagementMessages extends MessageFactory {
+public class ManagementMessages extends I18nMessageFactory {
 
   private static final ManagementMessages factory = new ManagementMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("management");
 
-  public static Message createOrLocateShouldBeSet() {
+  public static I18nMessage createOrLocateShouldBeSet() {
     return factory.createMessage(BUNDLE_PATH, 1);
   }
 
-  public static Message cannotLocateOrCreateServer() {
+  public static I18nMessage cannotLocateOrCreateServer() {
     return factory.createMessage(BUNDLE_PATH, 2);
   }
 
-  public static Message noMBeanServerAvailable() {
+  public static I18nMessage noMBeanServerAvailable() {
     return factory.createMessage(BUNDLE_PATH, 3);
   }
 
-  public static Message forceGC(long[] heapSizes) {
+  public static I18nMessage forceGC(long[] heapSizes) {
     return factory.createMessage(BUNDLE_PATH, 4, String.valueOf(heapSizes[0]), String.valueOf(heapSizes[1]));
   }
 

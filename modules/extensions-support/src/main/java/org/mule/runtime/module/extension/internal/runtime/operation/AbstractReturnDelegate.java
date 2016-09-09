@@ -11,7 +11,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENCODING_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIME_TYPE_PARAMETER_NAME;
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -24,7 +24,7 @@ import java.util.Optional;
 /**
  * Base class for {@link ReturnDelegate} implementations.
  * <p/>
- * Contains the logic for taking an operation's output value and turn it into a {@link MuleMessage} which not only contains the
+ * Contains the logic for taking an operation's output value and turn it into a {@link Message} which not only contains the
  * updated payload but also the proper {@link DataType} and attributes.
  *
  * @since 4.0
@@ -42,14 +42,14 @@ abstract class AbstractReturnDelegate implements ReturnDelegate {
     this.muleContext = muleContext;
   }
 
-  protected MuleMessage toMessage(Object value, OperationContextAdapter operationContext) {
+  protected Message toMessage(Object value, OperationContextAdapter operationContext) {
     MediaType mediaType = resolveMediaType(value, operationContext);
     if (value instanceof OperationResult) {
       OperationResult operationResult = (OperationResult) value;
-      return MuleMessage.builder().payload(operationResult.getOutput()).mediaType(mediaType)
+      return Message.builder().payload(operationResult.getOutput()).mediaType(mediaType)
           .attributes((Attributes) operationResult.getAttributes().orElse(NULL_ATTRIBUTES)).build();
     } else {
-      return MuleMessage.builder().payload(value).mediaType(mediaType).attributes(NULL_ATTRIBUTES).build();
+      return Message.builder().payload(value).mediaType(mediaType).attributes(NULL_ATTRIBUTES).build();
     }
   }
 

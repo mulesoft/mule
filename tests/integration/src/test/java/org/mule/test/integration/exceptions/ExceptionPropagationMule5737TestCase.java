@@ -12,8 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
@@ -25,9 +25,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Assert that flows do not propagate exceptions via runFlow or use of flow-ref. Also
- * assert that a sub-flow/processor-chain does not handle it's own exception but they are rather handled by
- * calling flow.
+ * Assert that flows do not propagate exceptions via runFlow or use of flow-ref. Also assert that a sub-flow/processor-chain does
+ * not handle it's own exception but they are rather handled by calling flow.
  */
 public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTestCase {
 
@@ -94,11 +93,11 @@ public class ExceptionPropagationMule5737TestCase extends AbstractIntegrationTes
     boolean caught;
 
     @Override
-    public MuleEvent handleException(MessagingException e, MuleEvent event) {
+    public Event handleException(MessagingException e, Event event) {
       caught = true;
-      MuleEvent resultEvent = super.handleException(e, event);
+      Event resultEvent = super.handleException(e, event);
       e.setHandled(true);
-      return MuleEvent.builder(resultEvent).message(MuleMessage.builder(resultEvent.getMessage()).exceptionPayload(null).build())
+      return Event.builder(resultEvent).message(InternalMessage.builder(resultEvent.getMessage()).exceptionPayload(null).build())
           .error(null).build();
     }
 

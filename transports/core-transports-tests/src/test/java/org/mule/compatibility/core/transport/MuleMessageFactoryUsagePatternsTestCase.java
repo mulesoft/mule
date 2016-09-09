@@ -14,9 +14,9 @@ import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -105,12 +105,12 @@ public class MuleMessageFactoryUsagePatternsTestCase extends AbstractMuleContext
     }
 
     @Override
-    protected void doDispatch(MuleEvent event) throws Exception {
+    protected void doDispatch(Event event) throws Exception {
       throw new UnsupportedOperationException("doDispatch");
     }
 
     @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception {
+    protected InternalMessage doSend(Event event) throws Exception {
       throw new UnsupportedOperationException("doSend");
     }
   }
@@ -138,12 +138,12 @@ public class MuleMessageFactoryUsagePatternsTestCase extends AbstractMuleContext
     }
 
     @Override
-    protected void doDispatch(MuleEvent event) throws Exception {
+    protected void doDispatch(Event event) throws Exception {
       throw new UnsupportedOperationException("doDispatch");
     }
 
     @Override
-    protected MuleMessage doSend(MuleEvent event) throws Exception {
+    protected InternalMessage doSend(Event event) throws Exception {
       throw new UnsupportedOperationException("doSend");
     }
   }

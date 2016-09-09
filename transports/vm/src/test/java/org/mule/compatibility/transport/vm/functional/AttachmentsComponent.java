@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.vm.functional;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
@@ -27,7 +27,7 @@ public class AttachmentsComponent implements Callable, MuleContextAware {
 
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
-    MuleMessage msg = eventContext.getMessage();
+    InternalMessage msg = eventContext.getMessage();
     if (msg.getInboundAttachmentNames().size() == 2) {
       throw new IllegalArgumentException("There shuold be 2 attachments");
     }
@@ -45,7 +45,7 @@ public class AttachmentsComponent implements Callable, MuleContextAware {
     }
     // Lets return an image
     FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/test.gif").getAbsoluteFile());
-    return MuleMessage.builder().payload("here is one for you!").addOutboundAttachment("mule", new DataHandler(ds)).build();
+    return InternalMessage.builder().payload("here is one for you!").addOutboundAttachment("mule", new DataHandler(ds)).build();
   }
 
   @Override

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
 import static org.mule.tck.MuleTestUtils.spyInjector;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.module.extension.internal.runtime.DefaultOperationContext;
@@ -43,7 +43,7 @@ abstract class AbstractConfigurationProviderTestCase<T> extends AbstractMuleCont
   protected DefaultOperationContext operationContext;
 
   @Mock
-  protected MuleEvent event;
+  protected Event event;
 
   protected TestTimeSupplier timeSupplier = new TestTimeSupplier(System.currentTimeMillis());
   protected LifecycleAwareConfigurationProvider provider;

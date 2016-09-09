@@ -25,21 +25,21 @@ public interface MuleEventContext {
    * 
    * @return the message payload for this event
    */
-  MuleMessage getMessage();
+  InternalMessage getMessage();
 
   /**
    * Returns the event
    *
    * @return the event
    */
-  MuleEvent getEvent();
+  Event getEvent();
 
   /**
    * Sets the event for this context.
    * 
    * @param event
    */
-  void setEvent(MuleEvent event);
+  void setEvent(Event event);
 
   /**
    * Returns the message transformed into its recognised or expected format. The transformer used is the one configured on the

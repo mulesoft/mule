@@ -15,17 +15,17 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAG
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -247,13 +247,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     final String originalSourceFileName = file.getName();
     final String originalSourceDirectory = file.getParent();
 
-    // This isn't nice but is needed as MuleMessage is required to resolve
+    // This isn't nice but is needed as Message is required to resolve
     // destination file name
-    MuleMessage fileParserMessasge =
-        MuleMessage.builder().nullPayload().addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
+    InternalMessage fileParserMessasge =
+        InternalMessage.builder().nullPayload().addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
             .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory).build();
 
-    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
+    final Event event = Event.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
         .message(fileParserMessasge).flow(flowConstruct).build();
 
     final File sourceFile;
@@ -308,8 +308,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
     messageBuilder.addOutboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory);
     messageBuilder.addOutboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
 
-    ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
-    final MuleCompatibilityMessage finalMessage = messageBuilder.build();
+    ExecutionTemplate<Event> executionTemplate = createExecutionTemplate();
+    final CompatibilityMessage finalMessage = messageBuilder.build();
     final Object originalPayload = finalMessage.getPayload();
 
 
@@ -366,8 +366,8 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
 
   private void processWithoutStreaming(String originalSourceFile, final String originalSourceFileName,
                                        final String originalSourceDirectory, final File sourceFile, final File destinationFile,
-                                       ExecutionTemplate<MuleEvent> executionTemplate,
-                                       final MuleCompatibilityMessage finalMessage)
+                                       ExecutionTemplate<Event> executionTemplate,
+                                       final CompatibilityMessage finalMessage)
       throws DefaultMuleException {
     try {
       executionTemplate.execute(() -> {
@@ -390,14 +390,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
   }
 
   private void processWithStreaming(final File sourceFile, final ReceiverFileInputStream originalPayload,
-                                    ExecutionTemplate<MuleEvent> executionTemplate, final MuleMessage finalMessage) {
+                                    ExecutionTemplate<Event> executionTemplate, final InternalMessage finalMessage) {
     try {
       final AtomicBoolean exceptionWasThrown = new AtomicBoolean(false);
       executionTemplate.execute(() -> {
         try {
           // If we are streaming no need to move/delete now, that will be done when
           // stream is closed
-          routeMessage((MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder(finalMessage)
+          routeMessage((CompatibilityMessage) new MuleCompatibilityMessageBuilder(finalMessage)
               .addOutboundProperty(PROPERTY_FILENAME, sourceFile.getName()).build());
         } catch (Exception e) {
           // ES will try to close stream but FileMessageReceiver is the one that must close it.
@@ -450,7 +450,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
   }
 
   private void moveAndDelete(final File sourceFile, File destinationFile, String originalSourceFileName,
-                             String originalSourceDirectory, MuleCompatibilityMessage message)
+                             String originalSourceDirectory, CompatibilityMessage message)
       throws MuleException {
     // If we are moving the file to a read directory, move it there now and
     // hand over a reference to the
@@ -466,16 +466,16 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
       }
 
       // create new Message for destinationFile
-      message = (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder(createMuleMessage(destinationFile,
-                                                                                                 endpoint.getEncoding()))
-                                                                                                     .addInboundProperty(PROPERTY_FILENAME,
-                                                                                                                         destinationFile
-                                                                                                                             .getName())
-                                                                                                     .addInboundProperty(PROPERTY_ORIGINAL_FILENAME,
-                                                                                                                         originalSourceFileName)
-                                                                                                     .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY,
-                                                                                                                         originalSourceDirectory)
-                                                                                                     .build();
+      message = (CompatibilityMessage) new MuleCompatibilityMessageBuilder(createMuleMessage(destinationFile,
+                                                                                             endpoint.getEncoding()))
+                                                                                                 .addInboundProperty(PROPERTY_FILENAME,
+                                                                                                                     destinationFile
+                                                                                                                         .getName())
+                                                                                                 .addInboundProperty(PROPERTY_ORIGINAL_FILENAME,
+                                                                                                                     originalSourceFileName)
+                                                                                                 .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY,
+                                                                                                                     originalSourceDirectory)
+                                                                                                 .build();
     }
 
     // finally deliver the file message

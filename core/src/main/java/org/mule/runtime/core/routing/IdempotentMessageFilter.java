@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -78,15 +78,15 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   }
 
   @Override
-  protected MuleEvent processNext(MuleEvent event) throws MuleException {
+  protected Event processNext(Event event) throws MuleException {
     return super.processNext(event);
   }
 
-  protected String getValueForEvent(MuleEvent event) throws MessagingException {
+  protected String getValueForEvent(Event event) throws MessagingException {
     return flowConstruct.getMuleContext().getExpressionLanguage().parse(valueExpression, event, flowConstruct);
   }
 
-  protected String getIdForEvent(MuleEvent event) throws MuleException {
+  protected String getIdForEvent(Event event) throws MuleException {
     return flowConstruct.getMuleContext().getExpressionLanguage().parse(idExpression, event, flowConstruct);
   }
 
@@ -107,7 +107,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
   }
 
   @Override
-  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  protected boolean accept(Event event, Event.Builder builder) {
     if (event != null && isNewMessage(event)) {
       try {
         String id = getIdForEvent(event);
@@ -133,7 +133,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     }
   }
 
-  protected boolean isNewMessage(MuleEvent event) {
+  protected boolean isNewMessage(Event event) {
     try {
       String id = this.getIdForEvent(event);
       if (store == null) {

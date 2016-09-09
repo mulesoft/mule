@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.component.simple.EchoComponent;
 import org.mule.runtime.core.construct.Flow;
@@ -57,7 +57,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
     Flow flow = new Flow("testFlow", muleContext);
     componentListener = new ComponentListener();
     component = new DefaultJavaComponent(new SingletonObjectFactory(EchoComponent.class));
-    flow.setMessageProcessors(Collections.<MessageProcessor>singletonList(component));
+    flow.setMessageProcessors(Collections.<Processor>singletonList(component));
     muleContext.getRegistry().registerFlowConstruct(flow);
 
     if (!muleContext.isStarted()) {
@@ -104,7 +104,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleConte
     public void onNotification(ServerNotification notification) {
       this.notification = notification;
       assertEquals(ComponentMessageNotification.class, notification.getClass());
-      assertTrue(notification.getSource() instanceof MuleMessage);
+      assertTrue(notification.getSource() instanceof InternalMessage);
       assertNotNull(((ComponentMessageNotification) notification).getServiceName());
 
       if (notification.getAction() == ComponentMessageNotification.COMPONENT_PRE_INVOKE) {

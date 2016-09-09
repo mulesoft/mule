@@ -7,14 +7,14 @@
 
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 
 /**
- * If no routes generated exeption then it returns a new {@link MuleEvent} under the rules of {@link DefaultRouterResultsHandler}
- * (you can change this behaviour by overriding {@link #aggregateWithoutFailedRoutes(AggregationContext)}. Otherwise, a
+ * If no routes generated exeption then it returns a new {@link Event} under the rules of {@link DefaultRouterResultsHandler} (you
+ * can change this behaviour by overriding {@link #aggregateWithoutFailedRoutes(AggregationContext)}. Otherwise, a
  * {@link CompositeRoutingException} is thrown (override {@link #aggregateWithFailedRoutes(AggregationContext) to customize}
  * 
  * @since 3.5.0
@@ -24,7 +24,7 @@ public class CollectAllAggregationStrategy implements AggregationStrategy {
   private RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
 
   @Override
-  public MuleEvent aggregate(AggregationContext context) throws MuleException {
+  public Event aggregate(AggregationContext context) throws MuleException {
     if (context.collectEventsWithExceptions().isEmpty()) {
       return this.aggregateWithoutFailedRoutes(context);
     } else {
@@ -32,11 +32,11 @@ public class CollectAllAggregationStrategy implements AggregationStrategy {
     }
   }
 
-  protected MuleEvent aggregateWithoutFailedRoutes(AggregationContext context) throws MuleException {
+  protected Event aggregateWithoutFailedRoutes(AggregationContext context) throws MuleException {
     return this.resultsHandler.aggregateResults(context.getEvents(), context.getOriginalEvent());
   }
 
-  protected MuleEvent aggregateWithFailedRoutes(AggregationContext context) throws MuleException {
+  protected Event aggregateWithFailedRoutes(AggregationContext context) throws MuleException {
     throw new CompositeRoutingException(context.collectRouteExceptions());
   }
 

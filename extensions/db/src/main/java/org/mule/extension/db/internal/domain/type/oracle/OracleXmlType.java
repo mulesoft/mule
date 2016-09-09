@@ -60,7 +60,7 @@ public class OracleXmlType extends StructuredDbType {
    * @param xml A String object containing the XML content
    * @return an new {@link #ORACLE_XMLTYPE_CLASS} with the XML passed
    * @throws Exception if there is a problem while creating the {@link #ORACLE_XMLTYPE_CLASS} object
-   *   ({@link #ORACLE_XMLTYPE_CLASS} class is not found in the classpath, connection is closed, etc)
+   *         ({@link #ORACLE_XMLTYPE_CLASS} class is not found in the classpath, connection is closed, etc)
    */
   public static Object createXmlType(Connection connection, String xml) throws Exception {
     return createXmlType(connection, xml, String.class);
@@ -73,7 +73,7 @@ public class OracleXmlType extends StructuredDbType {
    * @param xml A Stream object containing the XML content
    * @return an new {@link #ORACLE_XMLTYPE_CLASS} with the XML passed
    * @throws Exception if there is a problem while creating the {@link #ORACLE_XMLTYPE_CLASS} object
-   *   ({@link #ORACLE_XMLTYPE_CLASS} class is not found in the classpath, connection is closed, etc)
+   *         ({@link #ORACLE_XMLTYPE_CLASS} class is not found in the classpath, connection is closed, etc)
    */
   public static Object createXmlType(Connection connection, InputStream xml) throws Exception {
     return createXmlType(connection, xml, InputStream.class);

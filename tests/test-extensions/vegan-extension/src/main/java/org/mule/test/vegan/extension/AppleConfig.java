@@ -8,7 +8,7 @@ package org.mule.test.vegan.extension;
 
 
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -30,7 +30,7 @@ public class AppleConfig {
 
   @Parameter
   @Optional
-  private Function<MuleEvent, Map<String, String>> parameterizedFunction;
+  private Function<Event, Map<String, String>> parameterizedFunction;
 
   public VeganCookBook getCookBook() {
     return cookBook;

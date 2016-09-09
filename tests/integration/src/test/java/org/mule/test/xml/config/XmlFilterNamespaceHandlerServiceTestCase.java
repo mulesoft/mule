@@ -8,7 +8,7 @@ package org.mule.test.xml.config;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
@@ -29,7 +29,7 @@ public class XmlFilterNamespaceHandlerServiceTestCase extends AbstractIntegratio
   public void testIsXmlFilter() throws Exception {
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("test for xml");
 
-    List<MessageProcessor> processors = flow.getMessageProcessors();
+    List<Processor> processors = flow.getMessageProcessors();
 
     assertEquals(2, processors.size());
     assertEquals(IsXmlFilter.class, ((MessageFilter) processors.get(0)).getFilter().getClass());

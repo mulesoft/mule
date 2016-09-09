@@ -10,16 +10,16 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
  * Verify that the inbound mime type is acceptable by this endpoint.
  */
-public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageProcessor {
+public class InboundEndpointMimeTypeCheckingMessageProcessor implements Processor {
 
   private InboundEndpoint endpoint;
 
@@ -28,14 +28,14 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MessagingException {
+  public Event process(Event event) throws MessagingException {
     MediaType endpointMimeType = endpoint.getMimeType();
     if (endpointMimeType != null) {
-      MuleMessage message = event.getMessage();
+      InternalMessage message = event.getMessage();
       final DataType dataType = message.getDataType();
       if (DataType.OBJECT.getMediaType().matches(dataType.getMediaType())) {
         event =
-            MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).mediaType(endpointMimeType).build()).build();
+            Event.builder(event).message(InternalMessage.builder(event.getMessage()).mediaType(endpointMimeType).build()).build();
       } else {
         if (!dataType.getMediaType().matches(endpointMimeType)) {
           throw new MessagingException(CoreMessages.unexpectedMIMEType(dataType.getMediaType().toRfcString(),

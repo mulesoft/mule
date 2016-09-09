@@ -9,10 +9,9 @@ package org.mule.runtime.module.pgp;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -28,7 +27,7 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
   public void testEncrypt() throws Exception {
     String msg = "Test Message";
 
-    MuleEvent event = getTestEvent(msg, getTestFlow("orange", Orange.class));
+    Event event = getTestEvent(msg, getTestFlow("orange", Orange.class));
     setCurrentEvent(event);
 
     EncryptionTransformer etrans = new EncryptionTransformer();

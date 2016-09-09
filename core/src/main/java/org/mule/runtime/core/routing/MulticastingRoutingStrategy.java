@@ -8,10 +8,10 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * Routing strategy that will route a message through a set of {@link MessageProcessor} and return an aggregation of the results.
+ * Routing strategy that will route a message through a set of {@link Processor} and return an aggregation of the results.
  *
  */
 public class MulticastingRoutingStrategy extends AbstractRoutingStrategy {
@@ -43,21 +43,21 @@ public class MulticastingRoutingStrategy extends AbstractRoutingStrategy {
   }
 
   @Override
-  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MuleException {
-    MuleMessage message = event.getMessage();
+  public Event route(Event event, List<Processor> messageProcessors) throws MuleException {
+    InternalMessage message = event.getMessage();
 
     if (messageProcessors == null || messageProcessors.size() == 0) {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
     }
 
-    List<MuleEvent> results = new ArrayList<>(messageProcessors.size());
+    List<Event> results = new ArrayList<>(messageProcessors.size());
 
     validateMessageIsNotConsumable(event, message);
 
     try {
       for (int i = 0; i < messageProcessors.size(); i++) {
-        MessageProcessor mp = messageProcessors.get(i);
-        MuleEvent result = sendRequest(event, message, mp, true);
+        Processor mp = messageProcessors.get(i);
+        Event result = sendRequest(event, message, mp, true);
         if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
           results.add(result);
         }

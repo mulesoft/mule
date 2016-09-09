@@ -17,7 +17,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
@@ -50,7 +50,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
                                  Charset endpointEncoding, String endpointBuilderName, MuleContext muleContext,
                                  RetryPolicyTemplate retryPolicyTemplate, AbstractRedeliveryPolicy redeliveryPolicy,
                                  String responsePropertiesList, EndpointMessageProcessorChainFactory messageProcessorsFactory,
-                                 List<MessageProcessor> messageProcessors, List<MessageProcessor> responseMessageProcessors,
+                                 List<Processor> messageProcessors, List<Processor> responseMessageProcessors,
                                  boolean disableTransportTransformer, MediaType endpointMimeType) {
     super(connector, endpointUri, name, properties, transactionConfig, deleteUnacceptedMessage, messageExchangePattern,
           responseTimeout, initialState, endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate, null,
@@ -60,7 +60,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
       logger.warn("Ignoring redelivery policy set on outbound endpoint " + endpointUri);
     }
     responseProperties = new ArrayList<>();
-    // Propagate the Correlation-related properties from the previous message by default (see EE-1613).
+    // Propagate the GroupCorrelation-related properties from the previous message by default (see EE-1613).
     responseProperties.add(MULE_SESSION_PROPERTY);
     // Add any additional properties specified by the user.
     String[] props = StringUtils.splitAndTrim(responsePropertiesList, ",");
@@ -80,8 +80,8 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleEvent result = getMessageProcessorChain(flowConstruct).process(event);
+  public Event process(Event event) throws MuleException {
+    Event result = getMessageProcessorChain(flowConstruct).process(event);
     // A filter in a one-way outbound endpoint (sync or async) should not filter the flow.
     if (!getExchangePattern().hasResponse()) {
       return VoidMuleEvent.getInstance();
@@ -91,9 +91,9 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
   }
 
   @Override
-  protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException {
+  protected Processor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException {
     EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-    MessageProcessor chain = factory
+    Processor chain = factory
         .createOutboundMessageProcessorChain(this, ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
 
     if (chain instanceof MuleContextAware) {

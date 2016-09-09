@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.transformer;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
 import java.util.List;
@@ -30,13 +30,13 @@ public class TransformerException extends MuleException {
   /**
    * @param message the exception message
    */
-  public TransformerException(Message message, Transformer transformer) {
+  public TransformerException(I18nMessage message, Transformer transformer) {
     super(message);
     this.transformer = transformer;
     addInfo(TRANSFORMER, transformer.toString());
   }
 
-  public TransformerException(Message message, List<Transformer> transformers) {
+  public TransformerException(I18nMessage message, List<Transformer> transformers) {
     super(message);
     this.transformer = TransformerUtils.firstOrNull(transformers);
     addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
@@ -46,13 +46,13 @@ public class TransformerException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public TransformerException(Message message, Transformer transformer, Throwable cause) {
+  public TransformerException(I18nMessage message, Transformer transformer, Throwable cause) {
     super(message, cause);
     this.transformer = transformer;
     addInfo(TRANSFORMER, transformer.toString());
   }
 
-  public TransformerException(Message message, List<Transformer> transformers, Throwable cause) {
+  public TransformerException(I18nMessage message, List<Transformer> transformers, Throwable cause) {
     super(message, cause);
     this.transformer = TransformerUtils.firstOrNull(transformers);
     addInfo(TRANSFORMER, TransformerUtils.toString(transformers));
@@ -74,14 +74,14 @@ public class TransformerException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public TransformerException(Message message, Throwable cause) {
+  public TransformerException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
   /**
    * @param message the exception message
    */
-  public TransformerException(Message message) {
+  public TransformerException(I18nMessage message) {
     super(message);
   }
 

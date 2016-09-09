@@ -9,11 +9,11 @@ package org.mule.runtime.core.interceptor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.interceptor.Interceptor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.component.AbstractComponent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.management.stats.ProcessingTime;
@@ -48,7 +48,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    MuleEvent result = component.process(getTestEvent(""));
+    Event result = component.process(getTestEvent(""));
 
     assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
@@ -66,7 +66,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    MuleEvent result = component.process(getTestEvent(""));
+    Event result = component.process(getTestEvent(""));
 
     assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
@@ -84,7 +84,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    MuleEvent result = component.process(getTestEvent(""));
+    Event result = component.process(getTestEvent(""));
 
     assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
@@ -104,7 +104,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    MuleEvent result = component.process(getTestEvent(""));
+    Event result = component.process(getTestEvent(""));
 
     assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString(muleContext));
   }
@@ -127,7 +127,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    MuleEvent result = component.process(getTestEvent(""));
+    Event result = component.process(getTestEvent(""));
 
     assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE + INTERCEPTOR_ONE + BEFORE
         + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE + COMPONENT + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER
@@ -144,9 +144,9 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public MuleEvent after(MuleEvent event) {
+    public Event after(Event event) {
       try {
-        event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+        event = Event.builder(event).message(InternalMessage.builder(event.getMessage())
             .payload(getPayloadAsString(event.getMessage()) + name + AFTER).build()).build();
       } catch (Exception e) {
         fail(e.getMessage());
@@ -155,9 +155,9 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public MuleEvent before(MuleEvent event) {
+    public Event before(Event event) {
       try {
-        event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+        event = Event.builder(event).message(InternalMessage.builder(event.getMessage())
             .payload(getPayloadAsString(event.getMessage()) + name + BEFORE).build()).build();
       } catch (Exception e) {
         fail(e.getMessage());
@@ -166,7 +166,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
+    public Event last(Event event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
       return event;
     }
   }
@@ -174,7 +174,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   protected Flow createUninitializedFlow() throws Exception {
     TestComponent component = new TestComponent();
     Flow flow = new Flow("name", muleContext);
-    flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+    flow.setMessageProcessors(new ArrayList<Processor>());
     flow.getMessageProcessors().add(component);
     return flow;
   }
@@ -182,7 +182,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
   class TestComponent extends AbstractComponent {
 
     @Override
-    protected Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+    protected Object doInvoke(Event event, Event.Builder eventBuilder) throws Exception {
       return event.getMessageAsString(muleContext) + COMPONENT;
     }
   }

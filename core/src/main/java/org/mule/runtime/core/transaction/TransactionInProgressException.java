@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transaction;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <p>
@@ -22,7 +22,7 @@ public class TransactionInProgressException extends TransactionStatusException {
   /**
    * @param message the exception message
    */
-  public TransactionInProgressException(Message message) {
+  public TransactionInProgressException(I18nMessage message) {
     super(message);
   }
 
@@ -30,7 +30,7 @@ public class TransactionInProgressException extends TransactionStatusException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public TransactionInProgressException(Message message, Throwable cause) {
+  public TransactionInProgressException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

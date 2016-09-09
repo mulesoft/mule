@@ -7,10 +7,10 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
@@ -35,7 +35,7 @@ public interface UntilSuccessfulConfiguration {
   /**
    * @return an ObjectStore to store until successful internal data. Always returns a not null value.
    */
-  ListableObjectStore<MuleEvent> getObjectStore();
+  ListableObjectStore<Event> getObjectStore();
 
   /**
    * @return ExpressionFilter to determine if the message was processed successfully or not. Always returns a not null value.
@@ -45,7 +45,7 @@ public interface UntilSuccessfulConfiguration {
   /**
    * @return the route to which the message should be routed to. Always returns a not null value.
    */
-  MessageProcessor getRoute();
+  Processor getRoute();
 
   /**
    * @return the MuleContext within the until-successful router was defined. Always returns a not null value.
@@ -75,10 +75,10 @@ public interface UntilSuccessfulConfiguration {
   /**
    * @return the route to which the message must be sent if the processing fails.
    */
-  MessageProcessor getDlqMP();
+  Processor getDlqMP();
 
   /**
    * @return the until sucessful router instance.
    */
-  MessageProcessor getRouter();
+  Processor getRouter();
 }

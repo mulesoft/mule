@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Provides a way to statically resolve {@link DbType} using a predefined
- * set of types.
+ * Provides a way to statically resolve {@link DbType} using a predefined set of types.
  */
 public class StaticDbTypeManager implements DbTypeManager {
 

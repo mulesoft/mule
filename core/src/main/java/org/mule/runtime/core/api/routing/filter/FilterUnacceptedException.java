@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.routing.filter;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 
 public class FilterUnacceptedException extends MuleException {
@@ -17,23 +17,23 @@ public class FilterUnacceptedException extends MuleException {
 
   private transient Filter filter;
 
-  public FilterUnacceptedException(Message message, Filter filter) {
+  public FilterUnacceptedException(I18nMessage message, Filter filter) {
     super(message);
     this.filter = filter;
     addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
   }
 
-  public FilterUnacceptedException(Message message, Filter filter, Throwable cause) {
+  public FilterUnacceptedException(I18nMessage message, Filter filter, Throwable cause) {
     super(message, cause);
     this.filter = filter;
     addInfo("Filter", String.format("%s (%s)", filter.toString(), LocationExecutionContextProvider.getDocName(filter)));
   }
 
-  public FilterUnacceptedException(Message message, Throwable cause) {
+  public FilterUnacceptedException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
-  public FilterUnacceptedException(Message message) {
+  public FilterUnacceptedException(I18nMessage message) {
     super(message);
   }
 

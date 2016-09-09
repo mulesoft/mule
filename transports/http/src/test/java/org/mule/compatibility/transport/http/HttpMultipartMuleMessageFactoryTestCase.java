@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -62,7 +62,7 @@ public class HttpMultipartMuleMessageFactoryTestCase extends AbstractMuleMessage
     HttpMuleMessageFactory factory = (HttpMuleMessageFactory) createMuleMessageFactory();
     factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
     HttpRequest request = createMultiPartHttpRequest(MULTIPART_MESSAGE);
-    MuleMessage message = factory.create(request, encoding);
+    InternalMessage message = factory.create(request, encoding);
     assertNotNull(message);
     assertTrue(message.getPayload() instanceof InputStream);
   }
@@ -72,7 +72,7 @@ public class HttpMultipartMuleMessageFactoryTestCase extends AbstractMuleMessage
     HttpMuleMessageFactory factory = (HttpMuleMessageFactory) createMuleMessageFactory();
     factory.setExchangePattern(MessageExchangePattern.ONE_WAY);
     HttpRequest request = createMultiPartHttpRequest(MULTIPART_MESSAGE_NO_PAYLOAD);
-    MuleMessage message = factory.create(request, encoding);
+    InternalMessage message = factory.create(request, encoding);
     assertNotNull(message);
     assertThat(message.getPayload(), is(nullValue()));
   }

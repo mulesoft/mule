@@ -16,7 +16,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -26,7 +26,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.exception.ErrorHandler;
@@ -41,7 +41,7 @@ import java.util.Map;
 public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundEndpoint {
 
   private static final long serialVersionUID = -4752772777414636142L;
-  private MessageProcessor listener;
+  private Processor listener;
   private FlowConstruct flowConstruct;
   private ExceptionListener exceptionListener;
 
@@ -51,7 +51,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                                 Charset endpointEncoding, String endpointBuilderName, MuleContext muleContext,
                                 RetryPolicyTemplate retryPolicyTemplate, AbstractRedeliveryPolicy redeliveryPolicy,
                                 EndpointMessageProcessorChainFactory messageProcessorsFactory,
-                                List<MessageProcessor> messageProcessors, List<MessageProcessor> responseMessageProcessors,
+                                List<Processor> messageProcessors, List<Processor> responseMessageProcessors,
                                 boolean disableTransportTransformer, MediaType mimeType) {
     super(connector, endpointUri, name, properties, transactionConfig, deleteUnacceptedMessage, messageExchangePattern,
           responseTimeout, initialState, endpointEncoding, endpointBuilderName, muleContext, retryPolicyTemplate,
@@ -60,7 +60,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
   }
 
   @Override
-  public MuleMessage request(long timeout) throws Exception {
+  public InternalMessage request(long timeout) throws Exception {
     if (getConnector() != null) {
       return getConnector().request(this, timeout);
     } else {
@@ -71,7 +71,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
   }
 
   @Override
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     this.listener = listener;
   }
 
@@ -104,9 +104,9 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
   }
 
   @Override
-  public MessageProcessor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException {
+  public Processor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException {
     EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-    MessageProcessor processorChain = factory.createInboundMessageProcessorChain(this, flowConstruct, listener);
+    Processor processorChain = factory.createInboundMessageProcessorChain(this, flowConstruct, listener);
     if (processorChain instanceof MuleContextAware) {
       ((MuleContextAware) processorChain).setMuleContext(getMuleContext());
     }
@@ -150,7 +150,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
 
   @Override
   public AbstractRedeliveryPolicy getRedeliveryPolicy() {
-    //No need to return a redelivery policy since this is managed when processing the DSL
+    // No need to return a redelivery policy since this is managed when processing the DSL
     return null;
   }
 

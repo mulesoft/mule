@@ -19,7 +19,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.test.module.http.functional.matcher.ParamMapMatcher.isEqual;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
 import org.mule.runtime.module.http.internal.ParameterMap;
@@ -71,7 +71,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
     final Response response = Request.Post(getListenerUrl())
         .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE), new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE))
         .execute();
-    final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
+    final InternalMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
     assertThat(receivedMessage.getPayload(), instanceOf(ParameterMap.class));
     ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
     assertThat(payloadAsMap.size(), is(2));
@@ -100,7 +100,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
         .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE), new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE_1),
                   new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE_2))
         .execute();
-    final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
+    final InternalMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
     assertThat(receivedMessage.getPayload(), instanceOf(ParameterMap.class));
     ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
     assertThat(payloadAsMap.size(), is(2));
@@ -155,7 +155,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
   }
 
   private void assertNullPayloadAndEmptyResponse(Response response) throws Exception {
-    final MuleMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
+    final InternalMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
     assertThat(receivedMessage.getPayload(), is(nullValue()));
 
     final HttpResponse httpResponse = response.returnResponse();

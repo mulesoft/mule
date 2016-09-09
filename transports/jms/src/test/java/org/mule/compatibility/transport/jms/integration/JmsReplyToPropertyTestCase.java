@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase {
     client.dispatch("in", DEFAULT_INPUT_MESSAGE, props);
 
     // Check that the property is still on the outbound message
-    MuleMessage output = client.request("out", 2000).getRight().get();
+    InternalMessage output = client.request("out", 2000).getRight().get();
     assertNotNull(output);
     final Object o = output.getOutboundProperty("JMSReplyTo");
     assertTrue(o.toString().contains("middle"));

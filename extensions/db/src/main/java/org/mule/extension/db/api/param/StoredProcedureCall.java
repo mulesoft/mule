@@ -27,11 +27,9 @@ import java.util.Map;
 public class StoredProcedureCall extends ParameterizedStatementDefinition<StoredProcedureCall> {
 
   /**
-   * A {@link Map} which keys are the name of a parameter to be set on
-   * the JDBC prepared statement which is both input and output.
+   * A {@link Map} which keys are the name of a parameter to be set on the JDBC prepared statement which is both input and output.
    * <p>
-   * Each parameter should be referenced in the sql
-   * text using a semicolon prefix (E.g: {@code where id = :myParamName)}).
+   * Each parameter should be referenced in the sql text using a semicolon prefix (E.g: {@code where id = :myParamName)}).
    * <p>
    * The map's values will contain the actual assignation for each parameter.
    */
@@ -49,8 +47,7 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
   @DisplayName("Output Parameters")
   private List<OutputParameter> outputParameters = new LinkedList<>();
   /**
-   * A reference to a globally defined call
-   * to be used as a template
+   * A reference to a globally defined call to be used as a template
    */
   @Parameter
   @Optional

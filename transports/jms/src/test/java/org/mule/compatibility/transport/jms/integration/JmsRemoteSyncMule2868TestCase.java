@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.jms.integration;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
   @Test
   public void testMule2868() throws MuleException {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in", "test", null).getRight();
+    InternalMessage response = muleClient.send("vm://in", "test", null).getRight();
     assertEquals("test Received", response.getPayload());
   }
 }

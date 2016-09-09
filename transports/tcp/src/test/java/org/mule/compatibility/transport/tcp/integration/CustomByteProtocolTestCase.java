@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.tcp.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -37,11 +37,11 @@ public class CustomByteProtocolTestCase extends FunctionalTestCase {
     NonSerializableMessageObject message = new NonSerializableMessageObject(1, "Hello", true);
 
     for (int i = 0; i < messages; i++) {
-      client.dispatch("vm://in", MuleMessage.builder().payload(message).build());
+      client.dispatch("vm://in", InternalMessage.builder().payload(message).build());
     }
 
     for (int i = 0; i < messages; i++) {
-      MuleMessage msg = client.request("vm://out", 30000).getRight().get();
+      InternalMessage msg = client.request("vm://out", 30000).getRight().get();
       assertTrue(msg.getPayload() instanceof NonSerializableMessageObject);
       NonSerializableMessageObject received = (NonSerializableMessageObject) msg.getPayload();
       assertEquals("Hello", received.s);

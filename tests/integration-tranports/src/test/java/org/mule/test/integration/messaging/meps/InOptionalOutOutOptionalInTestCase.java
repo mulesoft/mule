@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.Serializable;
@@ -36,7 +36,7 @@ public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase {
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send("inboundEndpoint", "some data", null).getRight();
+    InternalMessage result = client.send("inboundEndpoint", "some data", null).getRight();
     assertNotNull(result);
     assertThat(result.getPayload(), is(nullValue()));
     // TODO Even though the component returns a null the remoteSync is honoured.

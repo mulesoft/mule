@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>CreateException</code> is thrown when creating an object inside Mule wasn't possible due to inconsistent internal state
@@ -21,7 +21,7 @@ public class CreateException extends LifecycleException {
    * @param message the exception message
    * @param component the component that failed during a lifecycle method call
    */
-  public CreateException(Message message, Object component) {
+  public CreateException(I18nMessage message, Object component) {
     super(message, component);
   }
 
@@ -30,7 +30,7 @@ public class CreateException extends LifecycleException {
    * @param cause the exception that cause this exception to be thrown
    * @param component the component that failed during a lifecycle method call
    */
-  public CreateException(Message message, Throwable cause, Object component) {
+  public CreateException(I18nMessage message, Throwable cause, Object component) {
     super(message, cause, component);
   }
 

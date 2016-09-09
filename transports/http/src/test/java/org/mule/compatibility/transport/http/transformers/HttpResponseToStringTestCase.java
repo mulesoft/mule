@@ -12,7 +12,7 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.ResponseWriter;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.apache.commons.httpclient.Header;
@@ -41,7 +41,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleContextEndpointTes
     _resp = new HttpResponse();
     _resp.setStatusLine(new HttpVersion(1, 1), 200);
     _resp.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, HttpConstants.DEFAULT_CONTENT_TYPE));
-    _resp.setBody(MuleMessage.builder().payload(_body).build(), muleContext);
+    _resp.setBody(InternalMessage.builder().payload(_body).build(), muleContext);
   }
 
   /**

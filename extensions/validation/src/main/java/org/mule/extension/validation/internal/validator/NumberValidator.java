@@ -9,8 +9,8 @@ package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
 import org.mule.extension.validation.api.NumberType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 
@@ -51,7 +51,7 @@ public class NumberValidator extends AbstractValidator {
 
   private NumberType numberType;
 
-  private Message errorMessage;
+  private I18nMessage errorMessage;
 
   public NumberValidator(String value, Locale locale, String pattern, Number minValue, Number maxValue, NumberType numberType,
                          ValidationContext validationContext) {
@@ -65,7 +65,7 @@ public class NumberValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(MuleEvent event) {
+  public ValidationResult validate(Event event) {
     Comparable<Number> newValue = (Comparable<Number>) numberType.toNumber(value, pattern, locale);
 
 
@@ -92,7 +92,7 @@ public class NumberValidator extends AbstractValidator {
   }
 
   @Override
-  protected Message getDefaultErrorMessage() {
+  protected I18nMessage getDefaultErrorMessage() {
     return errorMessage;
   }
 }

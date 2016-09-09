@@ -11,8 +11,8 @@ import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageRouter;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Collections;
@@ -35,11 +35,12 @@ public class CompositeRoutingException extends MuleException {
 
   /**
    * Constructs a new {@link CompositeRoutingException}
-   *  @param message message describing the failure
+   * 
+   * @param message message describing the failure
    * @param exceptions a {@link Map} in which the key is an {@link Integer} describing the index of the route that generated the
    *        error and the value is the {@link Throwable} itself
    */
-  public CompositeRoutingException(Message message, Map<Integer, Throwable> exceptions) {
+  public CompositeRoutingException(I18nMessage message, Map<Integer, Throwable> exceptions) {
     super(message);
     this.exceptions = Collections.unmodifiableMap(exceptions);
   }
@@ -83,7 +84,7 @@ public class CompositeRoutingException extends MuleException {
     return builder.toString();
   }
 
-  private static Message buildExceptionMessage(Map<Integer, Throwable> exceptions) {
+  private static I18nMessage buildExceptionMessage(Map<Integer, Throwable> exceptions) {
     StringBuilder builder = new StringBuilder();
     for (Integer route : exceptions.keySet()) {
       Throwable routeException = exceptions.get(route);
@@ -92,7 +93,7 @@ public class CompositeRoutingException extends MuleException {
     }
 
     builder.insert(0, MESSAGE_TITLE);
-    return MessageFactory.createStaticMessage(builder.toString());
+    return I18nMessageFactory.createStaticMessage(builder.toString());
   }
 
 }

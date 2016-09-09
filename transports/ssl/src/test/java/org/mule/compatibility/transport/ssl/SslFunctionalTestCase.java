@@ -14,7 +14,7 @@ import org.mule.functional.functional.CounterCallback;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -41,7 +41,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("sendEndpoint", TEST_MESSAGE, null).getRight();
+    InternalMessage result = client.send("sendEndpoint", TEST_MESSAGE, null).getRight();
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
   }
 
@@ -50,7 +50,7 @@ public class SslFunctionalTestCase extends FunctionalTestCase {
   public void testSendMany() throws Exception {
     MuleClient client = muleContext.getClient();
     for (int i = 0; i < NUM_MESSAGES; ++i) {
-      MuleMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null).getRight();
+      InternalMessage result = client.send("sendManyEndpoint", TEST_MESSAGE, null).getRight();
       assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
     }
 

@@ -16,7 +16,7 @@ import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.FutureMessageResult;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.TimeoutException;
@@ -35,7 +35,7 @@ public class SocketTimeoutTestCase extends FunctionalTestCase {
   public void socketReadWriteResponseTimeout() throws Exception {
     final MuleClient client = new MuleClient(muleContext);
     FutureMessageResult result = client.sendAsync("vm://inboundTest1", "something", null);
-    MuleMessage message = null;
+    InternalMessage message = null;
     try {
       message = result.getResult(1000).getRight();
     } catch (TimeoutException e) {
@@ -48,7 +48,7 @@ public class SocketTimeoutTestCase extends FunctionalTestCase {
   public void socketConnectionResponseTimeout() throws Exception {
     final MuleClient client = new MuleClient(muleContext);
     FutureMessageResult result = client.sendAsync("vm://inboundTest2", "something", null);
-    MuleMessage message = null;
+    InternalMessage message = null;
     try {
       message = result.getResult(1000).getRight();
     } catch (TimeoutException e) {

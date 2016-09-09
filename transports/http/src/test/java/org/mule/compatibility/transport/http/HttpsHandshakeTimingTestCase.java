@@ -15,8 +15,8 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.compatibility.transport.ssl.MockSslSocket;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.construct.Flow;
@@ -50,7 +50,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
         messageReceiver.createMessageProcessTemplate(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(),
                                                                               (HttpConnector) messageReceiver.getConnector()));
 
-    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
     messageProcessTemplate.beforeRouteEvent(getTestEvent(message));
   }
 
@@ -66,10 +66,10 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
 
     invokeHandshakeCompleted(serverConnection, socket);
 
-    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).build();
+    InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
     messageContext.acquireMessage();
     serverConnection.readRequest();
-    MuleEvent muleEvent = messageContext.beforeRouteEvent(getTestEvent(message));
+    Event muleEvent = messageContext.beforeRouteEvent(getTestEvent(message));
     assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
     assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.PEER_CERTIFICATES));
   }

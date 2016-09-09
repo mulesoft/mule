@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.EXPECTATION_FAILED;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.module.http.functional.AbstractHttpExpectHeaderServerTestCase;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class HttpRequestExpectHeaderTestCase extends AbstractHttpExpectHeaderSer
 
     // Set a payload that will fail when consumed. As the server rejects the request after processing
     // the header, the client should not send the body.
-    MuleEvent response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream() {
+    Event response = flowRunner(REQUEST_FLOW_NAME).withPayload(new InputStream() {
 
       @Override
       public int read() throws IOException {

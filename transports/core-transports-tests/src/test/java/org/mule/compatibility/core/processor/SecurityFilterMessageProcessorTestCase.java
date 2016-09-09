@@ -11,12 +11,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
@@ -34,8 +33,8 @@ public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProce
     TestListener listner = new TestListener();
     mp.setListener(listner);
 
-    MuleEvent inEvent = createTestInboundEvent(endpoint);
-    MuleEvent resultEvent = mp.process(inEvent);
+    Event inEvent = createTestInboundEvent(endpoint);
+    Event resultEvent = mp.process(inEvent);
     assertNotNull(listner.sensedEvent);
     assertSame(inEvent, listner.sensedEvent);
     assertEquals(inEvent, resultEvent);
@@ -51,7 +50,7 @@ public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProce
     TestListener listner = new TestListener();
     mp.setListener(listner);
 
-    MuleEvent inEvent = createTestInboundEvent(endpoint);
+    Event inEvent = createTestInboundEvent(endpoint);
 
     // Need event in RequestContext :-(
     setCurrentEvent(inEvent);

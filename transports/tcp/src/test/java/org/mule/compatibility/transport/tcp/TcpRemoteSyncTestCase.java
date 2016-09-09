@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -48,9 +48,9 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase {
 
     // must notify the client to wait for a response from the server
     props.put(MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
-    MuleMessage reply =
+    InternalMessage reply =
         client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Echo1")).getMessageSource()).getAddress(),
-                    MuleMessage.builder().payload(message).inboundProperties(props).build())
+                    InternalMessage.builder().payload(message).inboundProperties(props).build())
             .getRight();
 
     assertNotNull(reply);
@@ -66,9 +66,9 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase {
     // must notify the client to wait for a response from the server
     props.put(MULE_REMOTE_SYNC_PROPERTY, Boolean.TRUE);
 
-    MuleMessage reply =
+    InternalMessage reply =
         client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("Echo2")).getMessageSource()).getAddress(),
-                    MuleMessage.builder().payload(message).inboundProperties(props).build())
+                    InternalMessage.builder().payload(message).inboundProperties(props).build())
             .getRight();
 
     assertNotNull(reply);

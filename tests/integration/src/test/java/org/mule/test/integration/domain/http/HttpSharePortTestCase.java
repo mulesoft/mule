@@ -11,7 +11,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -43,15 +43,15 @@ public class HttpSharePortTestCase extends DomainFunctionalTestCase {
 
   @Test
   public void bothServicesBindCorrectly() throws Exception {
-    MuleMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient()
+    InternalMessage helloWorldServiceResponse = getMuleContextForApp(HELLO_WORLD_SERVICE_APP).getClient()
         .send(format("%s://localhost:%d/service/helloWorld", endpointScheme.getValue(), dynamicPort.getNumber()),
-              MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
+              InternalMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
         .getRight();
     assertThat(getPayloadAsString(helloWorldServiceResponse, getMuleContextForApp(HELLO_WORLD_SERVICE_APP)), is("hello world"));
 
-    MuleMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient()
+    InternalMessage helloMuleServiceResponse = getMuleContextForApp(HELLO_MULE_SERVICE_APP).getClient()
         .send(format("%s://localhost:%d/service/helloMule", endpointScheme.getValue(), dynamicPort.getNumber()),
-              MuleMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
+              InternalMessage.builder().payload("test-data").build(), getOptionsBuilder().build())
         .getRight();
     assertThat(getPayloadAsString(helloMuleServiceResponse, getMuleContextForApp(HELLO_MULE_SERVICE_APP)), is("hello mule"));
   }

@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.equalTo;
 import org.mule.compatibility.core.endpoint.AbstractEndpoint;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 
@@ -43,7 +43,7 @@ public class DomainEndpointCreationTestCase extends DomainFunctionalTestCase {
     final MessageSource messageSource = flow.getMessageSource();
     assertThat(((AbstractEndpoint) messageSource).getMuleContext(), equalTo(appContext));
 
-    final MessageProcessor messageProcessor = flow.getMessageProcessors().get(0);
+    final Processor messageProcessor = flow.getMessageProcessors().get(0);
     assertThat(((AbstractEndpoint) messageProcessor).getMuleContext(), equalTo(appContext));
   }
 }

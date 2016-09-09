@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.jms.integration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class JmsQueueWithTransactionTestCase extends AbstractJmsFunctionalTestCa
     MuleClient client = muleContext.getClient();
     client.send("vm://in", getTestMuleMessage(DEFAULT_INPUT_MESSAGE));
 
-    MuleMessage response = client.request("vm://out", getTimeout()).getRight().get();
+    InternalMessage response = client.request("vm://out", getTimeout()).getRight().get();
     assertNotNull(response);
     assertEquals(DEFAULT_INPUT_MESSAGE, getPayloadAsString(response));
   }

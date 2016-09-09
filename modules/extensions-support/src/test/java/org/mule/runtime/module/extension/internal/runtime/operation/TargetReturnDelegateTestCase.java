@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.After;
@@ -34,8 +34,8 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
   }
 
   @Override
-  protected MuleMessage getOutputMessage(org.mule.runtime.api.message.MuleEvent result) {
-    MuleMessage message = result.getFlowVariable(TARGET);
+  protected Message getOutputMessage(org.mule.runtime.api.message.MuleEvent result) {
+    Message message = result.getVariable(TARGET);
 
     assertThat(message, is(notNullValue()));
     return message;

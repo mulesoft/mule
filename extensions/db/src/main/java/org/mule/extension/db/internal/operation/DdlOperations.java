@@ -32,9 +32,9 @@ public class DdlOperations extends BaseDbOperations {
   /**
    * Enables execution of DDL queries against a database.
    *
-   * @param sql        The text of the SQL query to be executed
-   * @param settings   Parameters to configure the query
-   * @param connector  the acting connector
+   * @param sql The text of the SQL query to be executed
+   * @param settings Parameters to configure the query
+   * @param connector the acting connector
    * @param connection the acting connection
    * @return the number of affected rows
    */

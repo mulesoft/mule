@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.metadata;
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.metadata.ComponentId;
 import org.mule.runtime.api.metadata.EntityMetadataProvider;
 import org.mule.runtime.api.metadata.MetadataCache;

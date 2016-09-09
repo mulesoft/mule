@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -42,8 +42,8 @@ public class FlowUseCaseProcessingStrategyTestCase extends FunctionalTestCase {
   public void testHTTPStatusCodeExceptionSyncStrategy() throws MuleException {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions = newOptions().disableStatusCodeValidation().build();
-    MuleMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(),
-                                        MuleMessage.builder().nullPayload().build(), httpRequestOptions)
+    InternalMessage exception = client.send("http://localhost:" + dynamicPort.getNumber(),
+                                            InternalMessage.builder().nullPayload().build(), httpRequestOptions)
         .getRight();
     assertThat(exception.getInboundProperty("http.status", 0), is(500));
   }

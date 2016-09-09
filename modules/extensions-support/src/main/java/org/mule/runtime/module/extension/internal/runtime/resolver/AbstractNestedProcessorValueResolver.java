@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.processor.chain.NestedProcessorChain;
 import org.mule.runtime.core.util.ObjectNameHelper;
@@ -28,12 +28,12 @@ abstract class AbstractNestedProcessorValueResolver<T> implements ValueResolver<
   /**
    * Creates and registers a {@link NestedProcessor} that wraps the given {@code messageProcessor}
    * 
-   * @param messageProcessor a {@link MessageProcessor}
-   * @param event a {@link MuleEvent}
+   * @param messageProcessor a {@link Processor}
+   * @param event a {@link Event}
    * @param muleContext the Mule node.
    * @return a {@link NestedProcessor}
    */
-  protected NestedProcessor toNestedProcessor(MessageProcessor messageProcessor, MuleEvent event, MuleContext muleContext) {
+  protected NestedProcessor toNestedProcessor(Processor messageProcessor, Event event, MuleContext muleContext) {
     try {
       muleContext.getRegistry().registerObject(new ObjectNameHelper(muleContext).getUniqueName(""), messageProcessor);
     } catch (RegistrationException e) {

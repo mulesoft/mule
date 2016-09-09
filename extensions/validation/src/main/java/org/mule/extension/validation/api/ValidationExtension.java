@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation.api;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.validation.internal.CommonValidationOperations;
 import org.mule.extension.validation.internal.CustomValidatorOperation;
 import org.mule.extension.validation.internal.DefaultExceptionFactory;

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -45,13 +45,13 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void dynamicBulkInsert() throws Exception {
-    MuleMessage response = flowRunner("bulkInsert").withPayload(values()).run().getMessage();
+    Message response = flowRunner("bulkInsert").withPayload(values()).run().getMessage();
     assertBulkInsert(response.getPayload());
   }
 
   @Test
   public void bulkInsertWithOverriddenType() throws Exception {
-    MuleMessage response = flowRunner("bulkInsertWithOverriddenType").withPayload(values()).run().getMessage();
+    Message response = flowRunner("bulkInsertWithOverriddenType").withPayload(values()).run().getMessage();
     assertBulkInsert(response.getPayload());
   }
 

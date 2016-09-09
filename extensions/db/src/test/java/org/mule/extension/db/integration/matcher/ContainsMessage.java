@@ -7,7 +7,7 @@
 
 package org.mule.extension.db.integration.matcher;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-public class ContainsMessage extends TypeSafeMatcher<List<MuleMessage>> {
+public class ContainsMessage extends TypeSafeMatcher<List<Message>> {
 
   private final String key;
   private final Object value;
@@ -28,8 +28,8 @@ public class ContainsMessage extends TypeSafeMatcher<List<MuleMessage>> {
   }
 
   @Override
-  public boolean matchesSafely(List<MuleMessage> messages) {
-    for (MuleMessage message : messages) {
+  public boolean matchesSafely(List<Message> messages) {
+    for (Message message : messages) {
       if (message.getPayload() instanceof Map) {
         if (((Map) message.getPayload()).get(key).equals(value)) {
           return true;
@@ -44,7 +44,7 @@ public class ContainsMessage extends TypeSafeMatcher<List<MuleMessage>> {
   }
 
   @Factory
-  public static Matcher<List<MuleMessage>> mapPayloadWith(String key, Object value) {
+  public static Matcher<List<Message>> mapPayloadWith(String key, Object value) {
     return new ContainsMessage(key, value);
   }
 

@@ -9,7 +9,7 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class ManySendsMule1758TestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testSingleSend() throws Exception {
-    MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
+    InternalMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
     assertNotNull("Response is null", response);
     assertEquals("Polo", response.getPayload());
   }
@@ -34,7 +34,7 @@ public class ManySendsMule1758TestCase extends AbstractIntegrationTestCase {
     long then = System.currentTimeMillis();
     for (int i = 0; i < NUM_MESSAGES; ++i) {
       logger.debug("Message " + i);
-      MuleMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
+      InternalMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
       assertNotNull("Response is null", response);
       assertEquals("Polo", response.getPayload());
     }

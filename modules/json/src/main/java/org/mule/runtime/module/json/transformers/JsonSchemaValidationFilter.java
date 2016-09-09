@@ -9,8 +9,8 @@ package org.mule.runtime.module.json.transformers;
 import static org.mule.runtime.module.xml.filters.SchemaValidationFilter.DEFAULT_SCHEMA_LANGUAGE;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;
@@ -48,12 +48,12 @@ public class JsonSchemaValidationFilter implements JsonSchemaFilter {
   private Map<String, Boolean> validatorFeatures;
 
   @Override
-  public boolean accept(MuleMessage msg, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage msg, Event.Builder builder) {
     return delegate.accept(msg, builder);
   }
 
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     return delegate.accept(event, builder);
   }
 

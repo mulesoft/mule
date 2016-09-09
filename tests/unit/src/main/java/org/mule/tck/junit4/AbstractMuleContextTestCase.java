@@ -14,9 +14,9 @@ import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
@@ -291,42 +291,42 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with a test payload
+   * @return creates a new {@link org.mule.runtime.core.api.InternalMessage} with a test payload
    */
   @Deprecated
-  protected MuleMessage getTestMuleMessage() {
+  protected InternalMessage getTestMuleMessage() {
     return getTestMuleMessage(TEST_PAYLOAD);
   }
 
   /**
    * @param message
-   * @return creates a new {@link org.mule.runtime.core.api.MuleMessage} with message as payload
+   * @return creates a new {@link org.mule.runtime.core.api.InternalMessage} with message as payload
    */
   @Deprecated
-  protected MuleMessage getTestMuleMessage(Object message) {
-    return MuleMessage.builder().payload(message).build();
+  protected InternalMessage getTestMuleMessage(Object message) {
+    return InternalMessage.builder().payload(message).build();
   }
 
-  public static MuleEvent getTestEvent(Object data, FlowConstruct service) throws Exception {
+  public static Event getTestEvent(Object data, FlowConstruct service) throws Exception {
     return MuleTestUtils.getTestEvent(data, service, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
   }
 
-  public static MuleEvent getTestEvent(Object data, MuleContext muleContext) throws Exception {
+  public static Event getTestEvent(Object data, MuleContext muleContext) throws Exception {
     return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
   }
 
-  public static MuleEvent getTestEvent(MuleMessage data) throws Exception {
+  public static Event getTestEvent(InternalMessage data) throws Exception {
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(data)
+    return Event.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(data)
         .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(MuleTestUtils.getTestSession(flowConstruct, muleContext))
         .build();
   }
 
-  public static MuleEvent getTestEvent(Object data) throws Exception {
+  public static Event getTestEvent(Object data) throws Exception {
     return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
   }
 
-  public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep) throws Exception {
+  public static Event getTestEvent(Object data, MessageExchangePattern mep) throws Exception {
     return MuleTestUtils.getTestEvent(data, mep, muleContext);
   }
 
@@ -410,7 +410,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return new SensingNullMessageProcessor();
   }
 
-  public TriggerableMessageSource getTriggerableMessageSource(MessageProcessor listener) {
+  public TriggerableMessageSource getTriggerableMessageSource(Processor listener) {
     return new TriggerableMessageSource(listener);
   }
 
@@ -439,10 +439,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @param message message to get payload from
    * @return String representation of the message payload
    * @throws Exception if there is an unexpected error obtaining the payload representation
-   * @deprecated use {@link #getPayloadAsString(org.mule.runtime.api.message.MuleMessage)} instead
+   * @deprecated use {@link #getPayloadAsString(org.mule.runtime.api.message.Message)} instead
    */
   @Deprecated
-  protected String getPayloadAsString(MuleMessage message) throws Exception {
+  protected String getPayloadAsString(InternalMessage message) throws Exception {
     return (String) getPayload(message, DataType.STRING);
   }
 
@@ -453,8 +453,8 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return String representation of the message payload
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected String getPayloadAsString(org.mule.runtime.api.message.MuleMessage message) throws Exception {
-    return getPayloadAsString((MuleMessage) message);
+  protected String getPayloadAsString(org.mule.runtime.api.message.Message message) throws Exception {
+    return getPayloadAsString((InternalMessage) message);
   }
 
   /**
@@ -464,7 +464,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return byte[] representation of the message payload
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected byte[] getPayloadAsBytes(MuleMessage message) throws Exception {
+  protected byte[] getPayloadAsBytes(InternalMessage message) throws Exception {
     return (byte[]) getPayload(message, DataType.BYTE_ARRAY);
   }
 
@@ -476,7 +476,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return representation of the message payload of the required dataType
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected Object getPayload(MuleMessage message, DataType dataType) throws Exception {
+  protected Object getPayload(InternalMessage message, DataType dataType) throws Exception {
     return muleContext.getTransformationService().transform(message, dataType).getPayload();
   }
 
@@ -488,7 +488,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * @return representation of the message payload of the required class
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
-  protected <T> T getPayload(MuleMessage message, Class<T> clazz) throws Exception {
+  protected <T> T getPayload(InternalMessage message, Class<T> clazz) throws Exception {
     return (T) getPayload(message, DataType.fromType(clazz));
   }
 }

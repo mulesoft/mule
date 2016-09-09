@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -48,16 +48,16 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase {
 
   @Test
   public void proxyRPCBodyPayload() throws Exception {
-    MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body",
-                                                        getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS)
+    InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/body",
+                                                            getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
   }
 
   @Test
   public void proxyRPCBodyEnvelope() throws Exception {
-    MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope",
-                                                        getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS)
+    InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPortProxy.getNumber() + "/envelope",
+                                                            getTestMuleMessage(getAllRequest), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertTrue(XMLUnit.compareXML(getAllResponse, getPayloadAsString(response)).identical());
   }

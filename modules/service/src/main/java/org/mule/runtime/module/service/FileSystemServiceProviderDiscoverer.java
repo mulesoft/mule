@@ -9,7 +9,7 @@ package org.mule.runtime.module.service;
 
 import static java.lang.String.format;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.instanciateClass;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.FileUtils.unzip;

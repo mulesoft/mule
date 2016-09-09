@@ -12,9 +12,9 @@ import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -77,7 +77,7 @@ public class FileMessageRequester extends AbstractMessageRequester {
    * @throws Exception
    */
   @Override
-  protected MuleMessage doRequest(long timeout) throws Exception {
+  protected InternalMessage doRequest(long timeout) throws Exception {
     File file = FileUtils.newFile(endpoint.getEndpointURI().getAddress());
     File result = null;
 
@@ -137,7 +137,7 @@ public class FileMessageRequester extends AbstractMessageRequester {
           destinationFile = FileUtils.newFile(movDir, destinationFileName);
         }
 
-        MuleMessage returnMessage = null;
+        InternalMessage returnMessage = null;
         Charset encoding = endpoint.getEncoding();
         try {
           if (fileConnector.isStreaming()) {
@@ -154,7 +154,7 @@ public class FileMessageRequester extends AbstractMessageRequester {
           return null;
         }
 
-        returnMessage = MuleMessage.builder(returnMessage)
+        returnMessage = InternalMessage.builder(returnMessage)
             .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
             .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory).build();
 
@@ -171,10 +171,10 @@ public class FileMessageRequester extends AbstractMessageRequester {
   }
 
   protected String formatUsingFilenameParser(String originalFileName, String originalDirectory, String pattern) {
-    // This isn't nice but is needed as MuleMessage is required to resolve
+    // This isn't nice but is needed as Message is required to resolve
     // destination file name
-    MuleMessage fileParserMessasge =
-        MuleMessage.builder().nullPayload().addInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName)
+    InternalMessage fileParserMessasge =
+        InternalMessage.builder().nullPayload().addInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalFileName)
             .addInboundProperty(FileConnector.PROPERTY_ORIGINAL_DIRECTORY, originalDirectory).build();
 
     FlowConstruct flowConstruct = new FlowConstruct() {
@@ -204,7 +204,7 @@ public class FileMessageRequester extends AbstractMessageRequester {
         return null;
       }
     };
-    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
+    final Event event = Event.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
         .message(fileParserMessasge).flow(flowConstruct).build();
 
     return fileConnector.getFilenameParser().getFilename(event, pattern);

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>EndpointException</code> is an abstract exception extended by endpoint specific exceptions.
@@ -25,7 +25,7 @@ public class EndpointException extends MuleException {
   /**
    * @param message the exception message
    */
-  public EndpointException(Message message) {
+  public EndpointException(I18nMessage message) {
     super(message);
   }
 
@@ -33,7 +33,7 @@ public class EndpointException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public EndpointException(Message message, Throwable cause) {
+  public EndpointException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

@@ -14,7 +14,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.endpoint.LegacyImmutableEndpoint;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -139,9 +139,9 @@ public interface ImmutableEndpoint extends Serializable, NamedObject, LegacyImmu
 
   EndpointMessageProcessorChainFactory getMessageProcessorsFactory();
 
-  List<MessageProcessor> getMessageProcessors();
+  List<Processor> getMessageProcessors();
 
-  List<MessageProcessor> getResponseMessageProcessors();
+  List<Processor> getResponseMessageProcessors();
 
   MessageExchangePattern getExchangePattern();
 

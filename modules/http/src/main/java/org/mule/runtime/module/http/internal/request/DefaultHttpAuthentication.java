@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal.request;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -91,7 +91,7 @@ public class DefaultHttpAuthentication implements HttpAuthentication, MuleContex
     this.muleContext = muleContext;
   }
 
-  public HttpRequestAuthentication resolveRequestAuthentication(MuleEvent event) {
+  public HttpRequestAuthentication resolveRequestAuthentication(Event event) {
     HttpRequestAuthentication authentication = new HttpRequestAuthentication(type);
     authentication.setUsername(username.resolveStringValue(event));
     authentication.setPassword(password.resolveStringValue(event));
@@ -102,12 +102,12 @@ public class DefaultHttpAuthentication implements HttpAuthentication, MuleContex
   }
 
   @Override
-  public void authenticate(MuleEvent muleEvent, HttpRequestBuilder requestBuilder) {
+  public void authenticate(Event muleEvent, HttpRequestBuilder requestBuilder) {
 
   }
 
   @Override
-  public boolean shouldRetry(MuleEvent firstAttemptResponseEvent) {
+  public boolean shouldRetry(Event firstAttemptResponseEvent) {
     return false;
   }
 

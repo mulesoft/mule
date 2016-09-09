@@ -10,7 +10,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
@@ -64,35 +64,35 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase {
     return lookupHeisenberg(key, getHeisenbergEvent());
   }
 
-  protected HeisenbergExtension lookupHeisenberg(String key, MuleEvent event) throws Exception {
+  protected HeisenbergExtension lookupHeisenberg(String key, Event event) throws Exception {
     return getConfigurationFromRegistry(key, event, muleContext);
   }
 
-  protected MuleEvent getHeisenbergEvent() throws Exception {
+  protected Event getHeisenbergEvent() throws Exception {
     WEAPON.setMicrogramsPerKilo(10L);
-    MuleEvent event = MuleEvent.builder(getTestEvent(""))
-        .addFlowVariable("lidia", LIDIA)
-        .addFlowVariable("myName", HeisenbergExtension.HEISENBERG)
-        .addFlowVariable("age", HeisenbergExtension.AGE)
-        .addFlowVariable("microgramsPerKilo", MICROGRAMS_PER_KILO)
-        .addFlowVariable("steviaCoffeShop", STEVIA_COFFE_SHOP)
-        .addFlowVariable("pollosHermanos", POLLOS_HERMANOS)
-        .addFlowVariable("gustavoFring", GUSTAVO_FRING)
-        .addFlowVariable("krazy8", KRAZY_8)
-        .addFlowVariable("jesses", JESSE_S)
-        .addFlowVariable("methylamine", METHYLAMINE_QUANTITY)
-        .addFlowVariable("pseudoephedrine", PSEUDOEPHEDRINE_QUANTITY)
-        .addFlowVariable("p2p", P2P_QUANTITY)
-        .addFlowVariable("hank", HANK)
-        .addFlowVariable("money", MONEY)
-        .addFlowVariable("skyler", SKYLER)
-        .addFlowVariable("saul", SAUL)
-        .addFlowVariable("whiteAddress", WHITE_ADDRESS)
-        .addFlowVariable("shoppingMall", SHOPPING_MALL)
-        .addFlowVariable("initialHealth", INITIAL_HEALTH)
-        .addFlowVariable("finalHealth", FINAL_HEALTH)
-        .addFlowVariable("weaponType", FIRE_WEAPON)
-        .addFlowVariable("weapon", WEAPON)
+    Event event = Event.builder(getTestEvent(""))
+        .addVariable("lidia", LIDIA)
+        .addVariable("myName", HeisenbergExtension.HEISENBERG)
+        .addVariable("age", HeisenbergExtension.AGE)
+        .addVariable("microgramsPerKilo", MICROGRAMS_PER_KILO)
+        .addVariable("steviaCoffeShop", STEVIA_COFFE_SHOP)
+        .addVariable("pollosHermanos", POLLOS_HERMANOS)
+        .addVariable("gustavoFring", GUSTAVO_FRING)
+        .addVariable("krazy8", KRAZY_8)
+        .addVariable("jesses", JESSE_S)
+        .addVariable("methylamine", METHYLAMINE_QUANTITY)
+        .addVariable("pseudoephedrine", PSEUDOEPHEDRINE_QUANTITY)
+        .addVariable("p2p", P2P_QUANTITY)
+        .addVariable("hank", HANK)
+        .addVariable("money", MONEY)
+        .addVariable("skyler", SKYLER)
+        .addVariable("saul", SAUL)
+        .addVariable("whiteAddress", WHITE_ADDRESS)
+        .addVariable("shoppingMall", SHOPPING_MALL)
+        .addVariable("initialHealth", INITIAL_HEALTH)
+        .addVariable("finalHealth", FINAL_HEALTH)
+        .addVariable("weaponType", FIRE_WEAPON)
+        .addVariable("weapon", WEAPON)
         .build();
 
     return event;

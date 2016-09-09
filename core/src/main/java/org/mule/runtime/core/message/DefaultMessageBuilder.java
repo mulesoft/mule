@@ -11,7 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.util.ObjectUtils.getByte;
@@ -26,21 +26,19 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.CollectionBuilder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
-import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.DataInputStream;
@@ -60,9 +58,10 @@ import javax.activation.DataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessage.PayloadBuilder, MuleMessage.CollectionBuilder {
+public class DefaultMessageBuilder
+    implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultMuleMessageBuilder.class);
+  private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
 
   private Object payload;
   private DataType dataType;
@@ -70,18 +69,18 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
   private ExceptionPayload exceptionPayload;
 
-  private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
-  private Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
+  private Map<String, DefaultTypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
+  private Map<String, DefaultTypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
   private Map<String, DataHandler> inboundAttachments = new HashMap<>();
   private Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-  public DefaultMuleMessageBuilder() {}
+  public DefaultMessageBuilder() {}
 
-  public DefaultMuleMessageBuilder(MuleMessage message) {
-    this((org.mule.runtime.api.message.MuleMessage) message);
+  public DefaultMessageBuilder(InternalMessage message) {
+    this((org.mule.runtime.api.message.Message) message);
   }
 
-  private void copyMessageAttributes(MuleMessage message) {
+  private void copyMessageAttributes(InternalMessage message) {
     this.exceptionPayload = message.getExceptionPayload();
     message.getInboundPropertyNames().forEach(key -> {
       if (message.getInboundPropertyDataType(key) != null) {
@@ -101,31 +100,31 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
     message.getOutboundAttachmentNames().forEach(name -> addOutboundAttachment(name, message.getOutboundAttachment(name)));
   }
 
-  public DefaultMuleMessageBuilder(org.mule.runtime.api.message.MuleMessage message) {
+  public DefaultMessageBuilder(org.mule.runtime.api.message.Message message) {
     requireNonNull(message);
     this.payload = message.getPayload();
     this.dataType = message.getDataType();
     this.attributes = message.getAttributes();
 
-    if (message instanceof MuleMessage) {
-      copyMessageAttributes((MuleMessage) message);
+    if (message instanceof InternalMessage) {
+      copyMessageAttributes((InternalMessage) message);
     }
   }
 
   @Override
-  public MuleMessage.Builder nullPayload() {
+  public InternalMessage.Builder nullPayload() {
     this.payload = null;
     return this;
   }
 
   @Override
-  public MuleMessage.Builder payload(Object payload) {
+  public InternalMessage.Builder payload(Object payload) {
     this.payload = payload;
     return this;
   }
 
   @Override
-  public MuleMessage.CollectionBuilder streamPayload(Iterator payload, Class<?> clazz) {
+  public InternalMessage.CollectionBuilder streamPayload(Iterator payload, Class<?> clazz) {
     requireNonNull(payload);
     this.payload = payload;
     this.dataType = DataType.builder().streamType(payload.getClass()).itemType(clazz).build();
@@ -133,7 +132,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   }
 
   @Override
-  public MuleMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz) {
+  public InternalMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz) {
     requireNonNull(payload);
     this.payload = payload;
     this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
@@ -141,7 +140,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   }
 
   @Override
-  public MuleMessage.CollectionBuilder collectionPayload(Object[] payload) {
+  public InternalMessage.CollectionBuilder collectionPayload(Object[] payload) {
     requireNonNull(payload);
     return collectionPayload(asList(payload), payload.getClass().getComponentType());
   }
@@ -158,97 +157,99 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   }
 
   @Override
-  public MuleMessage.Builder mediaType(MediaType mediaType) {
+  public InternalMessage.Builder mediaType(MediaType mediaType) {
     this.dataType = DataType.builder().mediaType(mediaType).build();
     return this;
   }
 
   @Override
-  public MuleMessage.Builder attributes(Attributes attributes) {
+  public InternalMessage.Builder attributes(Attributes attributes) {
     this.attributes = attributes;
     return this;
   }
 
   @Override
-  public MuleMessage.Builder exceptionPayload(ExceptionPayload exceptionPayload) {
+  public InternalMessage.Builder exceptionPayload(ExceptionPayload exceptionPayload) {
     this.exceptionPayload = exceptionPayload;
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addInboundProperty(String key, Serializable value) {
-    inboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
+  public InternalMessage.Builder addInboundProperty(String key, Serializable value) {
+    inboundProperties.put(key, new DefaultTypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addInboundProperty(String key, Serializable value, MediaType mediaType) {
-    inboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+  public InternalMessage.Builder addInboundProperty(String key, Serializable value, MediaType mediaType) {
+    inboundProperties.put(key,
+                          new DefaultTypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addInboundProperty(String key, Serializable value, DataType dataType) {
-    inboundProperties.put(key, new TypedValue(value, dataType));
+  public InternalMessage.Builder addInboundProperty(String key, Serializable value, DataType dataType) {
+    inboundProperties.put(key, new DefaultTypedValue(value, dataType));
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addOutboundProperty(String key, Serializable value) {
-    outboundProperties.put(key, new TypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
+  public InternalMessage.Builder addOutboundProperty(String key, Serializable value) {
+    outboundProperties.put(key, new DefaultTypedValue(value, value != null ? DataType.fromObject(value) : DataType.OBJECT));
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
-    outboundProperties.put(key, new TypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
+  public InternalMessage.Builder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
+    outboundProperties.put(key,
+                           new DefaultTypedValue(value, DataType.builder().type(value.getClass()).mediaType(mediaType).build()));
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addOutboundProperty(String key, Serializable value, DataType dataType) {
-    outboundProperties.put(key, new TypedValue(value, dataType));
+  public InternalMessage.Builder addOutboundProperty(String key, Serializable value, DataType dataType) {
+    outboundProperties.put(key, new DefaultTypedValue(value, dataType));
     return this;
   }
 
   @Override
-  public MuleMessage.Builder removeInboundProperty(String key) {
+  public InternalMessage.Builder removeInboundProperty(String key) {
     inboundProperties.remove(key);
     return this;
   }
 
   @Override
-  public MuleMessage.Builder removeOutboundProperty(String key) {
+  public InternalMessage.Builder removeOutboundProperty(String key) {
     outboundProperties.remove(key);
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addInboundAttachment(String key, DataHandler value) {
+  public InternalMessage.Builder addInboundAttachment(String key, DataHandler value) {
     inboundAttachments.put(key, value);
     return this;
   }
 
   @Override
-  public MuleMessage.Builder addOutboundAttachment(String key, DataHandler value) {
+  public InternalMessage.Builder addOutboundAttachment(String key, DataHandler value) {
     outboundAttachments.put(key, value);
     return this;
   }
 
   @Override
-  public MuleMessage.Builder removeInboundAttachment(String key) {
+  public InternalMessage.Builder removeInboundAttachment(String key) {
     inboundAttachments.remove(key);
     return this;
   }
 
   @Override
-  public MuleMessage.Builder removeOutboundAttachment(String key) {
+  public InternalMessage.Builder removeOutboundAttachment(String key) {
     outboundAttachments.remove(key);
     return this;
   }
 
   @Override
-  public MuleMessage.Builder inboundProperties(Map<String, Serializable> inboundProperties) {
+  public InternalMessage.Builder inboundProperties(Map<String, Serializable> inboundProperties) {
     requireNonNull(inboundProperties);
     this.inboundProperties.clear();
     inboundProperties.forEach((s, serializable) -> addInboundProperty(s, serializable));
@@ -256,7 +257,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   }
 
   @Override
-  public MuleMessage.Builder outboundProperties(Map<String, Serializable> outboundProperties) {
+  public InternalMessage.Builder outboundProperties(Map<String, Serializable> outboundProperties) {
     requireNonNull(outboundProperties);
     this.outboundProperties.clear();
     outboundProperties.forEach((s, serializable) -> addOutboundProperty(s, serializable));
@@ -264,22 +265,22 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   }
 
   @Override
-  public MuleMessage.Builder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
+  public InternalMessage.Builder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
     requireNonNull(inboundAttachments);
     this.inboundAttachments = new HashMap<>(inboundAttachments);
     return this;
   }
 
   @Override
-  public MuleMessage.Builder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
+  public InternalMessage.Builder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
     requireNonNull(outbundAttachments);
     this.outboundAttachments = new HashMap<>(outbundAttachments);
     return this;
   }
 
   @Override
-  public MuleMessage build() {
-    return new MuleMessageImplementation(new TypedValue(payload, resolveDataType()), attributes,
+  public InternalMessage build() {
+    return new MuleMessageImplementation(new DefaultTypedValue(payload, resolveDataType()), attributes,
                                          inboundProperties, outboundProperties, inboundAttachments,
                                          outboundAttachments, exceptionPayload);
   }
@@ -293,9 +294,9 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
   }
 
   /**
-   * <code>DefaultMuleMessage</code> is a wrapper that contains a payload and properties associated with the payload.
+   * <code>MuleMessageImplementation</code> is a wrapper that contains a payload and properties associated with the payload.
    */
-  public static class MuleMessageImplementation implements MuleMessage, DeserializationPostInitialisable {
+  public static class MuleMessageImplementation implements InternalMessage, DeserializationPostInitialisable {
 
     private static final String NOT_SET = "<not set>";
 
@@ -317,15 +318,15 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
      */
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-    private transient TypedValue typedValue;
+    private transient DefaultTypedValue typedValue;
     private Attributes attributes;
 
-    private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
-    private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
+    private Map<String, DefaultTypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
+    private Map<String, DefaultTypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
 
-    private MuleMessageImplementation(TypedValue typedValue, Attributes attributes,
-                                      Map<String, TypedValue<Serializable>> inboundProperties,
-                                      Map<String, TypedValue<Serializable>> outboundProperties,
+    private MuleMessageImplementation(DefaultTypedValue typedValue, Attributes attributes,
+                                      Map<String, DefaultTypedValue<Serializable>> inboundProperties,
+                                      Map<String, DefaultTypedValue<Serializable>> outboundProperties,
                                       Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
                                       ExceptionPayload exceptionPayload) {
       this.typedValue = typedValue;
@@ -387,11 +388,13 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
       return unmodifiableSet(outboundAttachments.keySet());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object getPayload() {
+      return getValue();
+    }
+
+    @Override
+    public Object getValue() {
       return typedValue.getValue();
     }
 
@@ -501,7 +504,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
     private void readObject(ObjectInputStream in) throws Exception {
       in.defaultReadObject();
-      typedValue = new TypedValue(deserializeValue(in), (DataType) in.readObject());
+      typedValue = new DefaultTypedValue(deserializeValue(in), (DataType) in.readObject());
       inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
       outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
     }
@@ -543,7 +546,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
     @Override
     public <T extends Serializable> T getInboundProperty(String name, T defaultValue) {
-      return getValueOrDefault((TypedValue<T>) inboundMap.get(name), defaultValue);
+      return getValueOrDefault((DefaultTypedValue<T>) inboundMap.get(name), defaultValue);
     }
 
     @Override
@@ -553,7 +556,7 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
     @Override
     public <T extends Serializable> T getOutboundProperty(String name, T defaultValue) {
-      return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
+      return getValueOrDefault((DefaultTypedValue<T>) outboundMap.get(name), defaultValue);
     }
 
     @Override
@@ -568,17 +571,17 @@ public class DefaultMuleMessageBuilder implements MuleMessage.Builder, MuleMessa
 
     @Override
     public DataType getInboundPropertyDataType(String name) {
-      TypedValue typedValue = inboundMap.get(name);
+      DefaultTypedValue typedValue = inboundMap.get(name);
       return typedValue == null ? null : typedValue.getDataType();
     }
 
     @Override
     public DataType getOutboundPropertyDataType(String name) {
-      TypedValue typedValue = outboundMap.get(name);
+      DefaultTypedValue typedValue = outboundMap.get(name);
       return typedValue == null ? null : typedValue.getDataType();
     }
 
-    private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue) {
+    private <T extends Serializable> T getValueOrDefault(DefaultTypedValue<T> typedValue, T defaultValue) {
       if (typedValue == null) {
         return defaultValue;
       }

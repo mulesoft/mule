@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation.api;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleException;
 
 /**
@@ -23,7 +23,8 @@ public class ValidationException extends MuleException {
 
   /**
    * Creates a new instance for the given {@code validationResult}
-   *  @param validationResult a failing {@link ValidationResult}
+   * 
+   * @param validationResult a failing {@link ValidationResult}
    *
    */
   public ValidationException(ValidationResult validationResult) {

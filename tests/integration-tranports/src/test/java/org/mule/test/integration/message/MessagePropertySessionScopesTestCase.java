@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class MessagePropertySessionScopesTestCase extends FunctionalTestCase {
   @Test
   public void testSessionProperty() throws Exception {
 
-    MuleMessage response = flowRunner("InService1").withPayload("Hello World").run().getMessage();
+    InternalMessage response = flowRunner("InService1").withPayload("Hello World").run().getMessage();
     assertNotNull(response);
     String payload = getPayloadAsString(response);
     assertNotNull(payload);
@@ -37,7 +37,7 @@ public class MessagePropertySessionScopesTestCase extends FunctionalTestCase {
   @Ignore
   @Test
   public void testInvocationProperty() throws Exception {
-    MuleMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
+    InternalMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
     // scope = "invocation" should not propagate the property on to the next service
     assertThat(response.getPayload(), is(nullValue()));
   }

@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Callable;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import org.slf4j.Logger;
@@ -72,7 +72,7 @@ public class NoTransformFunctionalTestComponent implements Callable, MuleContext
         .fireNotification(new FunctionalTestNotification(context, replyMessage, FunctionalTestNotification.EVENT_RECEIVED));
 
     if (throwException) {
-      throw new DefaultMuleException(MessageFactory.createStaticMessage("Functional Test Service Exception"));
+      throw new DefaultMuleException(I18nMessageFactory.createStaticMessage("Functional Test Service Exception"));
     }
 
     return replyMessage;

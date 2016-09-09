@@ -20,7 +20,7 @@ import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -35,8 +35,8 @@ import java.util.stream.Stream;
 
 /**
  * The output metadata only depends on whether
- * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} should await a
- * response or not. If no response is needed, the operation metadata should behave like a void operation.
+ * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, Message)} should await a response or
+ * not. If no response is needed, the operation metadata should behave like a void operation.
  */
 public class SocketMetadataResolver
     implements MetadataOutputResolver<String>, MetadataAttributesResolver<String>, MetadataKeysResolver {

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.util.ObjectUtils;
 
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class NullMessageProcessor implements MessageProcessorChain {
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return event;
   }
 
@@ -27,7 +27,7 @@ public class NullMessageProcessor implements MessageProcessorChain {
     return ObjectUtils.toString(this);
   }
 
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return Collections.emptyList();
   }
 

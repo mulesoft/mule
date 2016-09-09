@@ -16,12 +16,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -57,11 +57,11 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
 
   private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
   private ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, Answers.RETURNS_DEEP_STUBS.get());
-  private MessageProcessor mockFailingMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private MessageProcessor mockWaitingMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private MessageProcessor mockDlqMessageProcessor = mock(MessageProcessor.class, Answers.RETURNS_DEEP_STUBS.get());
-  private MuleMessage message = mock(MuleMessage.class, Answers.RETURNS_DEEP_STUBS.get());
-  private MuleEvent event = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
+  private Processor mockFailingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
+  private Processor mockWaitingMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
+  private Processor mockDlqMessageProcessor = mock(Processor.class, Answers.RETURNS_DEEP_STUBS.get());
+  private InternalMessage message = mock(InternalMessage.class, Answers.RETURNS_DEEP_STUBS.get());
+  private Event event = mock(Event.class, Answers.RETURNS_DEEP_STUBS.get());
   private Latch waitLatch = new Latch();
   private CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
@@ -69,14 +69,14 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   @Before
   @SuppressWarnings("rawtypes")
   public void setUpTest() throws MuleException {
-    when(mockFailingMessageProcessor.process(any(MuleEvent.class))).thenThrow(new RuntimeException("failing"));
-    when(mockWaitingMessageProcessor.process(event)).thenAnswer(new Answer<MuleEvent>() {
+    when(mockFailingMessageProcessor.process(any(Event.class))).thenThrow(new RuntimeException("failing"));
+    when(mockWaitingMessageProcessor.process(event)).thenAnswer(new Answer<Event>() {
 
       @Override
-      public MuleEvent answer(InvocationOnMock invocationOnMock) throws Throwable {
+      public Event answer(InvocationOnMock invocationOnMock) throws Throwable {
         waitingMessageProcessorExecutionLatch.countDown();
         waitLatch.await(2000, TimeUnit.MILLISECONDS);
-        return mockFailingMessageProcessor.process((MuleEvent) invocationOnMock.getArguments()[0]);
+        return mockFailingMessageProcessor.process((Event) invocationOnMock.getArguments()[0]);
       }
     });
     MuleLockFactory muleLockFactory = new MuleLockFactory();
@@ -112,7 +112,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleTestCase {
   public void messageDigestFailure() throws Exception {
     when(message.getPayload()).thenReturn(new Object());
     irp.initialise();
-    MuleEvent process = irp.process(event);
+    Event process = irp.process(event);
     Assert.assertNull(process);
   }
 

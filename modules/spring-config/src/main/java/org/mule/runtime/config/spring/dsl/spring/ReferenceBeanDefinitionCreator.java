@@ -12,7 +12,7 @@ import static org.mule.runtime.config.spring.dsl.model.ApplicationModel.TRANSFOR
 import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
 import org.mule.runtime.config.spring.dsl.processor.ObjectTypeVisitor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.QueueStore;
 
 import com.google.common.collect.ImmutableMap;
@@ -50,7 +50,7 @@ public class ReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
       .build();
 
   private Consumer<CreateBeanDefinitionRequest> getProcessorConsumer() {
-    return getFixedConsumer(MessageProcessor.class);
+    return getFixedConsumer(Processor.class);
   }
 
   private Consumer<CreateBeanDefinitionRequest> getQueueStoreConsumer() {

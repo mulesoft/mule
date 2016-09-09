@@ -16,7 +16,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Transport;
 
@@ -31,16 +30,16 @@ public final class SendCommand {
    * Send an email message. The message will be sent to all recipient {@code toAddresses}, {@code ccAddresses},
    * {@code bccAddresses} specified in the message.
    *
-   * @param connection     the connection associated to the operation.
-   * @param content        the text content of the email.
-   * @param subject        the subject of the email.
-   * @param toAddresses    the "to" (primary) addresses to deliver the email.
-   * @param fromAddress    the person(s) that are sending the email.
+   * @param connection the connection associated to the operation.
+   * @param content the text content of the email.
+   * @param subject the subject of the email.
+   * @param toAddresses the "to" (primary) addresses to deliver the email.
+   * @param fromAddress the person(s) that are sending the email.
    * @param defaultCharset the default charset of the email message to be used if the {@param content} don't specify it.
-   * @param ccAddresses    the carbon copy addresses to deliver the email.
-   * @param bccAddresses   the blind carbon copy addresses to deliver the email.
-   * @param headers        a map of custom headers that are bounded with the email.
-   * @param attachments    the attachments that are bounded in the content of the email.
+   * @param ccAddresses the carbon copy addresses to deliver the email.
+   * @param bccAddresses the blind carbon copy addresses to deliver the email.
+   * @param headers a map of custom headers that are bounded with the email.
+   * @param attachments the attachments that are bounded in the content of the email.
    */
   public void send(SenderConnection connection,
                    EmailContent content,
@@ -53,7 +52,7 @@ public final class SendCommand {
                    Map<String, String> headers,
                    List<EmailAttachment> attachments) {
     try {
-      Message message = MessageBuilder.newMessage(connection.getSession())
+      javax.mail.Message message = MessageBuilder.newMessage(connection.getSession())
           .withSentDate(Calendar.getInstance().getTime())
           .fromAddresses(fromAddress)
           .to(toAddresses)

@@ -11,8 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -29,8 +29,8 @@ import org.junit.Test;
 public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpointTestCase {
 
   private ExpressionFilenameParser parser;
-  private MuleMessage message;
-  private MuleEvent event;
+  private InternalMessage message;
+  private Event event;
 
   @Override
   protected void doSetUp() throws Exception {
@@ -45,9 +45,9 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
     inboundProperties.put(FileConnector.PROPERTY_ORIGINAL_FILENAME, "originalName");
     inboundProperties.put(FileConnector.PROPERTY_FILENAME, "newName");
     message =
-        MuleMessage.builder().payload("hello").inboundProperties(inboundProperties).addOutboundProperty("foo", "bar").build();
+        InternalMessage.builder().payload("hello").inboundProperties(inboundProperties).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build();
+    event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build();
   }
 
   @Test

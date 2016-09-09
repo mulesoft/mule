@@ -6,7 +6,7 @@
  */
 package org.mule.extension.validation.api;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 /**
  * A factory for {@link Exception}s which represents a validations which failed. Methods in this class should always be invoked
@@ -23,11 +23,11 @@ public interface ExceptionFactory {
    *
    * @param result a {@link ValidationResult} which contains information about an error
    * @param exceptionClass the {@link Class} of the exception to be created
-   * @param event the {@link MuleEvent} on which validation failed
+   * @param event the {@link Event} on which validation failed
    * @param <T> the type of the exception to be created
    * @return an {@link Exception} if type {@code T}
    */
-  <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, MuleEvent event);
+  <T extends Exception> T createException(ValidationResult result, Class<T> exceptionClass, Event event);
 
   /**
    * Creates an exception of the given {@code exceptionClassName} which represents the given {@code result}.
@@ -37,8 +37,8 @@ public interface ExceptionFactory {
    *
    * @param result a {@link ValidationResult} which contains information about an error
    * @param exceptionClassName the name of the exception {@link Class} to be thrown
-   * @param event the {@link MuleEvent} on which validation failed
+   * @param event the {@link Event} on which validation failed
    * @return a {@link Exception} of type {@code exceptionClassName}
    */
-  Exception createException(ValidationResult result, String exceptionClassName, MuleEvent event);
+  Exception createException(ValidationResult result, String exceptionClassName, Event event);
 }

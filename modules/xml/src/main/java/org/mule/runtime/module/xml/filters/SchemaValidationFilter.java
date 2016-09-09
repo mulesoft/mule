@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.xml.filters;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -58,7 +58,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
   private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
@@ -69,7 +69,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
    * @return Whether the message passes schema validation.
    */
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     Source source;
     try {
       source = loadSource(event.getMessage());
@@ -113,7 +113,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
       return false;
     } finally {
       if (result != null && result.getNode() != null) {
-        builder.message(MuleMessage.builder(event.getMessage()).payload(result.getNode()).build());
+        builder.message(InternalMessage.builder(event.getMessage()).payload(result.getNode()).build());
       }
     }
 
@@ -158,7 +158,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
    * @param msg Encompassing message
    * @return The source
    */
-  protected Source loadSource(MuleMessage msg) throws Exception {
+  protected Source loadSource(InternalMessage msg) throws Exception {
     Object payload = msg.getPayload();
     if (returnResult) {
       // Validation requires that a DOM goes in for a DOM to go out

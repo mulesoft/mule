@@ -7,9 +7,9 @@
 package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.http.api.listener.HttpListener;
 import org.mule.runtime.module.http.api.listener.HttpListenerBuilder;
@@ -40,7 +40,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
    * @param currentEvent the event at the moment of the failure.
    * @param resourceOwnerId the resource owner id to update
    */
-  public void refreshToken(final MuleEvent currentEvent, String resourceOwnerId) throws MuleException {
+  public void refreshToken(final Event currentEvent, String resourceOwnerId) throws MuleException {
     if (logger.isDebugEnabled()) {
       logger.debug("Executing refresh token for user " + resourceOwnerId);
     }
@@ -69,7 +69,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
    * @param currentEvent the event at the moment of the failure.
    * @param resourceOwnerOAuthContext user oauth context object.
    */
-  protected abstract void doRefreshToken(final MuleEvent currentEvent, final ResourceOwnerOAuthContext resourceOwnerOAuthContext)
+  protected abstract void doRefreshToken(final Event currentEvent, final ResourceOwnerOAuthContext resourceOwnerOAuthContext)
       throws MuleException;
 
   private void waitUntilLockGetsReleased(ResourceOwnerOAuthContext resourceOwnerOAuthContext) {
@@ -113,6 +113,6 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
     }
   }
 
-  protected abstract MessageProcessor createRedirectUrlProcessor();
+  protected abstract Processor createRedirectUrlProcessor();
 
 }

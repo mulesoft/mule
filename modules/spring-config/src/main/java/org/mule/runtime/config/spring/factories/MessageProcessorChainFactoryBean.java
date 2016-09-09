@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -25,7 +25,7 @@ public class MessageProcessorChainFactoryBean implements FactoryBean, MuleContex
 
   @Override
   public Class getObjectType() {
-    return MessageProcessor.class;
+    return Processor.class;
   }
 
   public void setMessageProcessors(List processors) {
@@ -36,8 +36,8 @@ public class MessageProcessorChainFactoryBean implements FactoryBean, MuleContex
   public Object getObject() throws Exception {
     MessageProcessorChainBuilder builder = getBuilderInstance();
     for (Object processor : processors) {
-      if (processor instanceof MessageProcessor) {
-        builder.chain((MessageProcessor) processor);
+      if (processor instanceof Processor) {
+        builder.chain((Processor) processor);
       } else if (processor instanceof MessageProcessorBuilder) {
         builder.chain((MessageProcessorBuilder) processor);
       } else {

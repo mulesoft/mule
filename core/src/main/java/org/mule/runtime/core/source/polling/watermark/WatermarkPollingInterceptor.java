@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -32,7 +32,7 @@ public class WatermarkPollingInterceptor extends MessageProcessorPollingIntercep
    * Watermark source preprocessing puts the watermark value into a flow variable
    */
   @Override
-  public MuleEvent prepareSourceEvent(MuleEvent event) throws MuleException {
+  public Event prepareSourceEvent(Event event) throws MuleException {
     return this.watermark.putInto(event);
   }
 
@@ -40,20 +40,20 @@ public class WatermarkPollingInterceptor extends MessageProcessorPollingIntercep
    * Watermark route preparation carries the value from the source event to the flow event
    */
   @Override
-  public MuleEvent prepareRouting(MuleEvent sourceEvent, MuleEvent event) throws ConfigurationException {
+  public Event prepareRouting(Event sourceEvent, Event event) throws ConfigurationException {
     if (!event.isSynchronous()) {
       throw new ConfigurationException(CoreMessages.watermarkRequiresSynchronousProcessing());
     }
 
     String variableName = this.watermark.resolveVariable(event);
-    return MuleEvent.builder(event).addFlowVariable(variableName, sourceEvent.getFlowVariable(variableName)).build();
+    return Event.builder(event).addVariable(variableName, sourceEvent.getVariable(variableName)).build();
   }
 
   /**
    * Watermark post processing saves the flow variable to the object store
    */
   @Override
-  public void postProcessRouting(MuleEvent event) throws ObjectStoreException {
+  public void postProcessRouting(Event event) throws ObjectStoreException {
     this.watermark.updateFrom(event);
   }
 

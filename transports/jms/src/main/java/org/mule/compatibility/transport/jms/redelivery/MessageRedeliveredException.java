@@ -11,21 +11,21 @@ import static org.mule.compatibility.transport.jms.i18n.JmsMessages.tooManyRedel
 import static org.mule.runtime.core.DefaultMessageContext.create;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 public class MessageRedeliveredException extends org.mule.compatibility.core.api.exception.EndpointMessageRedeliveredException {
 
   public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint,
-                                     FlowConstruct flow, MuleMessage muleMessage) {
+                                     FlowConstruct flow, InternalMessage muleMessage) {
     super(messageId, redeliveryCount, maxRedelivery, endpoint, buildEvent(endpoint, flow, muleMessage),
           tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint));
   }
 
-  protected static MuleEvent buildEvent(InboundEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage) {
-    final MuleEvent event =
-        MuleEvent.builder(create(flow, "MessageRedeliveredException")).message(muleMessage).flow(flow).build();
+  protected static Event buildEvent(InboundEndpoint endpoint, FlowConstruct flow, InternalMessage muleMessage) {
+    final Event event =
+        Event.builder(create(flow, "MessageRedeliveredException")).message(muleMessage).flow(flow).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
   }
 

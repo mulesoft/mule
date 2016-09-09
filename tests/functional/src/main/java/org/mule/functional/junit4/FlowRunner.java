@@ -13,7 +13,7 @@ import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -36,7 +36,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
 
   private String flowName;
 
-  private ExecutionTemplate<MuleEvent> txExecutionTemplate = callback -> callback.process();
+  private ExecutionTemplate<Event> txExecutionTemplate = callback -> callback.process();
 
   private ReplyToHandler replyToHandler;
 
@@ -80,7 +80,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     eventBuilder.withReplyToHandler(replyToHandler);
 
     responseEventTransformer = input -> {
-      MuleEvent responseEvent = (MuleEvent) input;
+      Event responseEvent = (Event) input;
       SensingNullReplyToHandler nullSensingReplyToHandler = (SensingNullReplyToHandler) replyToHandler;
       try {
         return getNonBlockingResponse(nullSensingReplyToHandler, responseEvent);
@@ -92,7 +92,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
     return this;
   }
 
-  protected MuleEvent getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, MuleEvent result) throws Exception {
+  protected Event getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, Event result) throws Exception {
     if (NonBlockingVoidMuleEvent.getInstance() == result) {
       if (!replyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
         throw new RuntimeException("No Non-Blocking Response");
@@ -116,7 +116,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  public MuleEvent run() throws Exception {
+  public Event run() throws Exception {
     return runAndVerify(flowName);
   }
 
@@ -129,7 +129,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  public MuleEvent runNoVerify() throws Exception {
+  public Event runNoVerify() throws Exception {
     return runAndVerify(new String[] {});
   }
 
@@ -144,14 +144,14 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  public MuleEvent runAndVerify(String... flowNamesToVerify) throws Exception {
+  public Event runAndVerify(String... flowNamesToVerify) throws Exception {
     Flow flow = (Flow) getFlowConstruct();
-    MuleEvent responseEvent = txExecutionTemplate.execute(() -> flow.process(getOrBuildEvent()));
+    Event responseEvent = txExecutionTemplate.execute(() -> flow.process(getOrBuildEvent()));
     for (String flowNameToVerify : flowNamesToVerify) {
       FlowAssert.verify(flowNameToVerify);
     }
 
-    return (MuleEvent) responseEventTransformer.transform(responseEvent);
+    return (Event) responseEventTransformer.transform(responseEvent);
   }
 
   /**

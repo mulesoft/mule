@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
@@ -46,7 +46,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         + "<xop:Include xmlns:xop=\"http://www.w3.org/2004/08/xop/include\" href=\"cid:testAttachmentId\"/>"
         + "</attachment></ns:uploadAttachment>", TEST_FILE_ATTACHMENT);
 
-    MuleEvent event = flowRunner("clientUploadAttachment").withPayload(request)
+    Event event = flowRunner("clientUploadAttachment").withPayload(request)
         .withOutboundAttachment("testAttachmentId", buildDataHandler(TEST_FILE_ATTACHMENT)).run();
 
     String expected = "<ns2:uploadAttachmentResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">"
@@ -60,7 +60,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
     String request = String.format("<ns:downloadAttachment xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">"
         + "<fileName>%s</fileName></ns:downloadAttachment>", TEST_FILE_ATTACHMENT);
 
-    MuleEvent event = flowRunner("clientDownloadAttachment").withPayload(request).run();
+    Event event = flowRunner("clientDownloadAttachment").withPayload(request).run();
     assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
   }
 
@@ -70,7 +70,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
         + "<xop:Include xmlns:xop=\"http://www.w3.org/2004/08/xop/include\" href=\"cid:testAttachmentId\"/>"
         + "</attachment></ns:echoAttachment>";
 
-    MuleEvent event = flowRunner("clientEchoAttachment").withPayload(request)
+    Event event = flowRunner("clientEchoAttachment").withPayload(request)
         .withOutboundAttachment("testAttachmentId", buildDataHandler(TEST_FILE_ATTACHMENT)).run();
 
     assertAttachmentInResponse(event.getMessage(), TEST_FILE_ATTACHMENT);
@@ -81,13 +81,13 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
     return new DataHandler(new FileDataSource(file));
   }
 
-  private void assertAttachmentInResponse(MuleMessage message, String fileName) throws Exception {
-    final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload();
+  private void assertAttachmentInResponse(InternalMessage message, String fileName) throws Exception {
+    final MultiPartContent multiPartPayload = (MultiPartContent) message.getPayload();
     assertThat(multiPartPayload.getParts(), hasSize(1));
 
     String attachmentId = extractAttachmentId(getPayloadAsString(message));
 
-    final org.mule.runtime.api.message.MuleMessage part = multiPartPayload.getPart(attachmentId);
+    final org.mule.runtime.api.message.Message part = multiPartPayload.getPart(attachmentId);
 
     assertNotNull(part.getPayload());
 

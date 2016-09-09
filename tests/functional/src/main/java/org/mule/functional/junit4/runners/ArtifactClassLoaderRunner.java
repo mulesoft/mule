@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
  * {@link AetherClassPathClassifier} for more details about this. In order to allow the classification to resolve Maven artifact
  * from the local Maven repository, if the default location is not used {@code $USER_HOME/.m2/repository}, the following system
  * property has to be to the local Maven repository location when running a test from IDE:
+ * 
  * <pre>
  * System.getProperty("localRepository")
  * </pre>
@@ -193,7 +194,8 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   }
 
   /**
-   * Gets the {@link List} of {@link String}s of Maven artifacts to be excluded due to they are going to be added later as boot package.
+   * Gets the {@link List} of {@link String}s of Maven artifacts to be excluded due to they are going to be added later as boot
+   * package.
    *
    * @param excludedProperties {@link Properties }that has the list of extra boot packages definitions
    * @return a {@link List} of {@link String}s with the excluded artifacts

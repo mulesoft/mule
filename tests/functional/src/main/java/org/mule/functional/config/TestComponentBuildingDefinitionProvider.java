@@ -24,7 +24,7 @@ import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition;
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.processor.TestNonBlockingProcessor;
 
 import java.util.ArrayList;
@@ -70,14 +70,14 @@ public class TestComponentBuildingDefinitionProvider implements ComponentBuildin
 
     componentBuildingDefinitions.add(baseComponentDefinition.copy()
         .withIdentifier("component")
-        .withTypeDefinition(fromType(MessageProcessor.class))
+        .withTypeDefinition(fromType(Processor.class))
         .withObjectFactoryType(FunctionalComponentObjectFactory.class)
         .build());
 
     componentBuildingDefinitions.add(baseComponentDefinition.copy()
         .withIdentifier("web-service-component")
         .withObjectFactoryType(TestFunctionalComponentObjectFactory.class)
-        .withTypeDefinition(fromType(MessageProcessor.class))
+        .withTypeDefinition(fromType(Processor.class))
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.copy()

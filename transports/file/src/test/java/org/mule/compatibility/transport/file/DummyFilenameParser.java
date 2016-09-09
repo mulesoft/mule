@@ -8,12 +8,12 @@ package org.mule.compatibility.transport.file;
 
 import org.mule.compatibility.transport.file.FilenameParser;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 public class DummyFilenameParser implements FilenameParser {
 
   @Override
-  public String getFilename(MuleEvent event, String pattern) {
+  public String getFilename(Event event, String pattern) {
     return null;
   }
 

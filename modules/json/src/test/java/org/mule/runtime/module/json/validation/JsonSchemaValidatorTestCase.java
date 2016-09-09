@@ -21,7 +21,7 @@ import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoo
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.toStream;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -151,7 +151,7 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+    public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
       return value;
     }
 

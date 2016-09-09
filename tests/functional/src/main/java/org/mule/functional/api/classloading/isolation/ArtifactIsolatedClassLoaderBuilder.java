@@ -126,8 +126,8 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * Sets the {@link List} of {@link String}s containing the extra boot packages defined to be appended to the container in
    * addition to the pre-defined ones.
    * 
-   * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the container in
-   *         addition to the pre-defined ones.
+   * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the
+   *        container in addition to the pre-defined ones.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExtraBootPackages(List<String> extraBootPackages) {

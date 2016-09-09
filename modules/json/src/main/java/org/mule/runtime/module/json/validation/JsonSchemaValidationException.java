@@ -7,7 +7,7 @@
 package org.mule.runtime.module.json.validation;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 /**
  * Exception to signal that a given json did not pass validation against a json schema
@@ -22,12 +22,12 @@ public class JsonSchemaValidationException extends MuleException {
   private final String invalidJson;
 
   public JsonSchemaValidationException(String validationError, String invalidJson) {
-    super(MessageFactory.createStaticMessage(validationError));
+    super(I18nMessageFactory.createStaticMessage(validationError));
     this.invalidJson = invalidJson;
   }
 
   public JsonSchemaValidationException(String validationError, String invalidJson, Exception exception) {
-    super(MessageFactory.createStaticMessage(validationError), exception);
+    super(I18nMessageFactory.createStaticMessage(validationError), exception);
     this.invalidJson = invalidJson;
   }
 

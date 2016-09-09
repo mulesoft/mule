@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 /**
@@ -26,7 +26,7 @@ public class StaticValueResolver<T> implements ValueResolver<T> {
    * {@inheritDoc}
    */
   @Override
-  public T resolve(MuleEvent event) throws MuleException {
+  public T resolve(Event event) throws MuleException {
     return value;
   }
 

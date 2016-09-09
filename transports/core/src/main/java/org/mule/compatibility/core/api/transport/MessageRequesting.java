@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.api.transport;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 /**
  * Defines generic methods for receiving events. The exact behaviour of the action is defined by the implementing class.
@@ -26,9 +26,9 @@ public interface MessageRequesting {
    *
    * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
    *        data available. If no data becomes available before the timeout elapses, null will be returned
-   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was avaialable
+   * @return the result of the request wrapped in a Message object. Null will be returned if no data was avaialable
    * @throws Exception if the call to the underlying protocal causes an exception
    */
-  MuleMessage request(long timeout) throws Exception;
+  InternalMessage request(long timeout) throws Exception;
 
 }

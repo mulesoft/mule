@@ -8,16 +8,15 @@ package org.mule.runtime.core.routing.outbound;
 
 import static java.util.Collections.emptySet;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.routing.AbstractSplitter;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
@@ -28,9 +27,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Base implementation of a {@link MuleMessage} splitter, that converts its payload in a {@link MessageSequence}, and process each
- * element of it. Implementations must implement {@link #splitMessageIntoSequence(MuleEvent)} and determine how the message is
- * split.
+ * Base implementation of a {@link Message} splitter, that converts its payload in a {@link MessageSequence}, and process each
+ * element of it. Implementations must implement {@link #splitMessageIntoSequence(Event)} and determine how the message is split.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www .eaipatterns.com/Sequencer.html</a>
  * 
@@ -46,11 +44,11 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
   protected String counterVariableName;
 
   @Override
-  public final MuleEvent process(MuleEvent event) throws MuleException {
+  public final Event process(Event event) throws MuleException {
     if (isSplitRequired(event)) {
       MessageSequence<?> seq = splitMessageIntoSequence(event);
       if (!seq.isEmpty()) {
-        MuleEvent aggregatedResults = resultsHandler.aggregateResults(processParts(seq, event), event);
+        Event aggregatedResults = resultsHandler.aggregateResults(processParts(seq, event), event);
         if (aggregatedResults instanceof VoidMuleEvent) {
           return null;
         } else {
@@ -65,7 +63,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     }
   }
 
-  protected boolean isSplitRequired(MuleEvent event) {
+  protected boolean isSplitRequired(Event event) {
     return true;
   }
 
@@ -76,31 +74,31 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
    * @return a sequence of elements
    * @throws MuleException
    */
-  protected abstract MessageSequence<?> splitMessageIntoSequence(MuleEvent event) throws MuleException;
+  protected abstract MessageSequence<?> splitMessageIntoSequence(Event event) throws MuleException;
 
-  protected List<MuleEvent> processParts(MessageSequence<?> seq, MuleEvent originalEvent) throws MuleException {
-    List<MuleEvent> resultEvents = new ArrayList<>();
+  protected List<Event> processParts(MessageSequence<?> seq, Event originalEvent) throws MuleException {
+    List<Event> resultEvents = new ArrayList<>();
     int correlationSequence = 0;
     MessageSequence<?> messageSequence = seq;
     if (batchSize > 1) {
       messageSequence = new PartitionedMessageSequence(seq, batchSize);
     }
     Integer count = messageSequence.size();
-    MuleEvent lastResult = null;
+    Event lastResult = null;
     for (; messageSequence.hasNext();) {
       correlationSequence++;
 
-      final Builder builder = MuleEvent.builder(originalEvent);
+      final Builder builder = Event.builder(originalEvent);
 
       propagateFlowVars(lastResult, builder);
       if (counterVariableName != null) {
-        builder.addFlowVariable(counterVariableName, correlationSequence);
+        builder.addVariable(counterVariableName, correlationSequence);
       }
 
-      builder.correlation(new Correlation(count, correlationSequence));
+      builder.groupCorrelation(new GroupCorrelation(count, correlationSequence));
       initEventBuilder(messageSequence.next(), originalEvent, builder, resolvePropagatedFlowVars(lastResult));
-      final MuleEvent event = builder.build();
-      MuleEvent resultEvent = processNext(event);
+      final Event event = builder.build();
+      Event resultEvent = processNext(event);
       if (resultEvent != null && !VoidMuleEvent.getInstance().equals(resultEvent)) {
         resultEvents.add(resultEvent);
         lastResult = resultEvent;
@@ -112,30 +110,30 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     return resultEvents;
   }
 
-  protected Set<String> resolvePropagatedFlowVars(MuleEvent lastResult) {
+  protected Set<String> resolvePropagatedFlowVars(Event lastResult) {
     return emptySet();
   }
 
-  protected void propagateFlowVars(MuleEvent previousResult, final Builder builder) {
+  protected void propagateFlowVars(Event previousResult, final Builder builder) {
     // Nothing to do
   }
 
-  private void initEventBuilder(Object payload, MuleEvent originalEvent, Builder builder, Set<String> flowVarsFromLastResult) {
+  private void initEventBuilder(Object payload, Event originalEvent, Builder builder, Set<String> flowVarsFromLastResult) {
     if (payload instanceof EventBuilderConfigurer) {
       ((EventBuilderConfigurer) payload).configure(builder);
-    } else if (payload instanceof MuleEvent) {
-      final MuleEvent payloadAsEvent = (MuleEvent) payload;
+    } else if (payload instanceof Event) {
+      final Event payloadAsEvent = (Event) payload;
       builder.message(payloadAsEvent.getMessage());
-      for (String flowVarName : payloadAsEvent.getFlowVariableNames()) {
+      for (String flowVarName : payloadAsEvent.getVariableNames()) {
         if (!flowVarsFromLastResult.contains(flowVarName)) {
-          builder.addFlowVariable(flowVarName, payloadAsEvent.getFlowVariable(flowVarName),
-                                  payloadAsEvent.getFlowVariableDataType(flowVarName));
+          builder.addVariable(flowVarName, payloadAsEvent.getVariable(flowVarName),
+                              payloadAsEvent.getVariableDataType(flowVarName));
         }
       }
-    } else if (payload instanceof MuleMessage) {
-      builder.message((MuleMessage) payload);
+    } else if (payload instanceof InternalMessage) {
+      builder.message((InternalMessage) payload);
     } else {
-      builder.message(MuleMessage.builder(originalEvent.getMessage()).payload(payload).build());
+      builder.message(InternalMessage.builder(originalEvent.getMessage()).payload(payload).build());
     }
   }
 

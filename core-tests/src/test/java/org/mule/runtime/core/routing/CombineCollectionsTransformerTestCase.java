@@ -9,8 +9,8 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -33,17 +33,17 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
   @Test
   public void testMuleMessageCollectionMerge() throws Exception {
-    MuleEvent event = getTestEvent("hello");
+    Event event = getTestEvent("hello");
 
     List list = new ArrayList<>();
-    list.add(MuleMessage.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
-    list.add(MuleMessage.builder().payload("4").build());
-    list.add(MuleMessage.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
-    MuleMessage collection = MuleMessage.builder().collectionPayload(list, MuleMessage.class).build();
+    list.add(InternalMessage.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
+    list.add(InternalMessage.builder().payload("4").build());
+    list.add(InternalMessage.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
+    InternalMessage collection = InternalMessage.builder().collectionPayload(list, InternalMessage.class).build();
 
-    event = MuleEvent.builder(event).message(collection).build();
+    event = Event.builder(event).message(collection).build();
 
-    MuleEvent response = merger.process(event);
+    Event response = merger.process(event);
 
     assertTrue(response.getMessage().getPayload() instanceof List);
     assertEquals(7, ((List) response.getMessage().getPayload()).size());
@@ -51,15 +51,15 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
   @Test
   public void testMuleMessageMerge() throws Exception {
-    MuleEvent event = getTestEvent("hello");
+    Event event = getTestEvent("hello");
 
     List<Object> payload = new ArrayList<>();
     payload.add(Arrays.asList("1", "2", "3"));
     payload.add("4");
     payload.add(Arrays.asList("5", "6", "7"));
-    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(payload).build()).build();
+    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(payload).build()).build();
 
-    MuleEvent response = merger.process(event);
+    Event response = merger.process(event);
 
     assertTrue(response.getMessage().getPayload() instanceof List);
     assertEquals(7, ((List) response.getMessage().getPayload()).size());

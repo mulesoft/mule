@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.tck.SensingNullReplyToHandler;
@@ -36,9 +36,9 @@ public class ExceptionHandlingReplyToHandlerDecoratorTestCase extends AbstractMu
   @Mock
   private FlowConstruct flow;
   @Mock
-  private MuleEvent sourceEvent;
+  private Event sourceEvent;
   @Mock
-  private MuleEvent handledEvent;
+  private Event handledEvent;
 
   @Test
   public void handleException() {

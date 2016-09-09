@@ -10,8 +10,8 @@ package org.mule.runtime.core.source.polling.watermark.selector;
 import static java.lang.String.format;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -58,7 +58,7 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
    */
   @SuppressWarnings("unchecked")
   @Override
-  public MuleEvent prepareRouting(MuleEvent sourceEvent, MuleEvent event) throws ConfigurationException {
+  public Event prepareRouting(Event sourceEvent, Event event) throws ConfigurationException {
     event = super.prepareRouting(sourceEvent, event);
     Object payload = event.getMessage().getPayload();
     final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector, this.selectorExpression, event, muleContext);
@@ -70,7 +70,7 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
         selector.acceptValue(object);
       }
     } else if (payload instanceof Iterator) {
-      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+      event = Event.builder(event).message(InternalMessage.builder(event.getMessage())
           .payload(new SelectorIteratorProxy<>((Iterator<Object>) payload, selector)).build()).build();
     } else {
       throw new ConfigurationException(CoreMessages
@@ -82,7 +82,7 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
   }
 
   @Override
-  public void postProcessRouting(MuleEvent event) throws ObjectStoreException {
+  public void postProcessRouting(Event event) throws ObjectStoreException {
     this.watermark.updateWith(event, (Serializable) this.selector.getSelectedValue());
   }
 

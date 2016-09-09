@@ -9,11 +9,11 @@ package org.mule.runtime.core.api.processor;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * Builds {@link MessageProcessor} instances.
+ * Builds {@link Processor} instances.
  * 
  * @since 3.0
  */
 public interface MessageProcessorBuilder {
 
-  MessageProcessor build() throws MuleException;
+  Processor build() throws MuleException;
 }
