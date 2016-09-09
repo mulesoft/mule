@@ -80,7 +80,7 @@ These two files prevent any problems regarding cryptography. If not present, dow
 
 ### Maven
 
-1. Download the Maven distribution from the [Maven web site](http://maven.apache.org/download.cgi), then unpack it to a convenient folder on your local drive. 
+1. Download the Maven distribution from the [Maven web site](http://maven.apache.org/download.cgi), then unpack it to a convenient folder on your local drive. Mule requires Maven version >= 3.3.1. 
 2. Create an environment variable called `M2_HOME`, then set it to the folder into which you unpacked Maven. 
 3. Update the `PATH` environment variable to include the path to Maven binaries. 
     - Windows: add the following line to the `PATH` variable: `%M2_HOME%/bin` 
