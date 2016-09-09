@@ -375,7 +375,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param flow
      * @return the builder instance
-     * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
+     * @deprecated TODO MULE-10013 remove this
      */
     @Deprecated
     Builder flow(FlowConstruct flow);
