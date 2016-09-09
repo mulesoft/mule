@@ -150,7 +150,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * Retrieves the service for the current event
    * 
    * @return the service for the event
-   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
+   * @deprecated TODO MULE-10013 remove this
    */
   @Deprecated
   FlowConstruct getFlowConstruct();
