@@ -140,7 +140,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .collect(toList());
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
-                     "order to resolve the graph): {}", directDependencies);
+        "order to resolve the graph): {}", directDependencies);
 
 
     Set<Dependency> managedDependencies = directDependencies.stream()
@@ -155,7 +155,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .collect(toSet());
 
     logger.debug("Collected managed dependencies from direct provided dependencies to be used for resolving container "
-                     + "dependency graph: {}", managedDependencies);
+        + "dependency graph: {}", managedDependencies);
 
     List<String> excludedFilterPattern = newArrayList(context.getProvidedExclusions());
     excludedFilterPattern.addAll(context.getExcludedArtifacts());
