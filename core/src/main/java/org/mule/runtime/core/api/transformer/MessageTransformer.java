@@ -21,10 +21,10 @@ public interface MessageTransformer extends Transformer {
    * @param src the data to transform
    * @param event the event currently being processed
    * @return the transformed data
-   * @throws TransformerMessagingException if a error occurs transforming the data or if the expected returnClass isn't the same
+   * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same
    *         as the transformed data
    */
-  Object transform(Object src, MuleEvent event) throws TransformerMessagingException;
+  Object transform(Object src, MuleEvent event) throws MessageTransformerException;
 
   /**
    * Thransforms the supplied data and returns the result
@@ -34,8 +34,8 @@ public interface MessageTransformer extends Transformer {
    *        so you only need to use this method if yo wish to customize the encoding
    * @param event the event currently being processed
    * @return the transformed data
-   * @throws TransformerMessagingException if a error occurs transforming the data or if the expected returnClass isn't the same
+   * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same
    *         as the transformed data
    */
-  Object transform(Object src, Charset encoding, MuleEvent event) throws TransformerMessagingException;
+  Object transform(Object src, Charset encoding, MuleEvent event) throws MessageTransformerException;
 }

@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.exception.MessagingException;
@@ -44,12 +45,12 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
   }
 
   @Test(expected = RoutePathNotFoundException.class)
-  public void testNullMessageProcessors() throws MessagingException {
+  public void testNullMessageProcessors() throws MuleException {
     roundRobinRoutingStrategy.route(mock(MuleEvent.class), null);
   }
 
   @Test(expected = RoutePathNotFoundException.class)
-  public void testEmptyMessageProcessors() throws MessagingException {
+  public void testEmptyMessageProcessors() throws MuleException {
     roundRobinRoutingStrategy.route(mock(MuleEvent.class), Collections.EMPTY_LIST);
   }
 
@@ -75,8 +76,8 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
     try {
       roundRobinRoutingStrategy.route(eventToRoute, messageProcessors);
       fail("Exception was expected");
-    } catch (MessagingException me) {
-      assertEquals(EXCEPTION_MESSAGE, me.getCause().getMessage());
+    } catch (RoutingFailedException fe) {
+      assertEquals(EXCEPTION_MESSAGE, fe.getCause().getMessage());
     }
     assertEquals(LETTER_B, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
     assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));

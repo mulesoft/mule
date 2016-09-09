@@ -7,10 +7,9 @@
 package org.mule.runtime.core.config;
 
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-
-import org.mule.runtime.core.exception.ErrorTypeRepository;
 
 import javax.xml.namespace.QName;
 
@@ -56,7 +55,7 @@ public class ComponentIdentifier {
       namespace = values[0];
       identifier = values[1];
     } else {
-      namespace = ErrorTypeRepository.CORE_NAMESPACE_NAME;
+      namespace = CORE_NAMESPACE_NAME;
       identifier = values[0];
     }
     return new ComponentIdentifier.Builder().withNamespace(namespace).withName(identifier).build();

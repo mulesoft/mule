@@ -107,7 +107,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
 
         Exception cause = new Exception(String.format("Http call returned a status of: %1d %1s", httpMethod.getStatusCode(),
                                                       httpMethod.getStatusText()));
-        throw new DispatchException(event, getEndpoint(), cause);
+        throw new DispatchException(getEndpoint(), cause);
       } else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START) {
         if (logger.isInfoEnabled()) {
           logger.info("Received a redirect response code: " + httpMethod.getStatusCode() + " " + httpMethod.getStatusText());
@@ -132,9 +132,9 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
       return httpMethod;
     } catch (IOException e) {
       // TODO employ dispatcher reconnection strategy at this point
-      throw new DispatchException(event, getEndpoint(), e);
+      throw new DispatchException(getEndpoint(), e);
     } catch (Exception e) {
-      throw new DispatchException(event, getEndpoint(), e);
+      throw new DispatchException(getEndpoint(), e);
     }
 
   }
@@ -246,7 +246,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
       DefaultExceptionPayload ep = null;
 
       if (returnException(event, httpMethod)) {
-        DispatchException exception = new DispatchException(event, getEndpoint(),
+        DispatchException exception = new DispatchException(getEndpoint(),
                                                             new HttpResponseException(httpMethod.getStatusText(),
                                                                                       httpMethod.getStatusCode()));
         ep = new DefaultExceptionPayload(exception);
@@ -254,7 +254,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
         try {
           return handleRedirect(httpMethod, event);
         } catch (Exception e) {
-          DispatchException exception = new DispatchException(event, getEndpoint(), e);
+          DispatchException exception = new DispatchException(getEndpoint(), e);
           ep = new DefaultExceptionPayload(exception);
           return getResponseFromMethod(httpMethod, ep);
         }
@@ -266,7 +266,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
       if (e instanceof DispatchException) {
         throw (DispatchException) e;
       }
-      throw new DispatchException(event, getEndpoint(), e);
+      throw new DispatchException(getEndpoint(), e);
     } finally {
       if (releaseConn) {
         httpMethod.releaseConnection();

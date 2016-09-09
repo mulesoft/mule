@@ -11,12 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -94,7 +92,7 @@ public class OutboundRouterTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event) throws MessagingException {
+    protected MuleEvent route(MuleEvent event) throws MuleException {
       return null;
     }
   }

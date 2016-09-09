@@ -183,13 +183,13 @@ public class RestServiceWrapper extends AbstractComponent {
                                                                                  .payload(requestBody).build());
 
     if (clientResponse.isLeft()) {
-      handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl), event, this));
+      handleException(new RestServiceException(CoreMessages.failedToInvokeRestService(tempUrl)));
     }
 
     MuleEvent result = MuleEvent.builder(event.getContext()).message(clientResponse.getRight()).flow(flowConstruct).build();
     Builder builder = MuleEvent.builder(result);
     if (isErrorPayload(result, builder)) {
-      handleException(new RestServiceException(failedToInvokeRestService(tempUrl), event, this));
+      handleException(new RestServiceException(failedToInvokeRestService(tempUrl)));
     }
 
     return builder.build().getMessage();

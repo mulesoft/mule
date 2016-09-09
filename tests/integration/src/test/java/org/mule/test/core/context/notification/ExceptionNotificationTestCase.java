@@ -6,6 +6,7 @@
  */
 package org.mule.test.core.context.notification;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNull;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.component.ComponentException;
@@ -28,7 +29,7 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase 
   @Override
   public void doTest() throws Exception {
     ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-    expectedException.expect(ComponentException.class);
+    expectedException.expectCause(instanceOf(ComponentException.class));
     MuleMessage result = flowRunner("the-service").withPayload(getTestMuleMessage()).run().getMessage();
     // processing is async, give time for the exception notificator to run
     exceptionListener.waitUntilAllNotificationsAreReceived();

@@ -14,10 +14,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.runtime.api.message.Error;
-import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
@@ -29,6 +27,7 @@ import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.util.store.AbstractPartitionedObjectStore;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,11 +36,16 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
 public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   private final String configFile;
 
@@ -118,10 +122,11 @@ public class UntilSuccessfulTestCase extends AbstractIntegrationTestCase {
     }
   }
 
-  @Test(expected = RoutingException.class)
+  @Test
   public void executeSynchronously() throws Exception {
     final String payload = RandomStringUtils.randomAlphanumeric(20);
-    throw flowRunner("synchronous").withPayload(payload).runExpectingException();
+    expectedException.expectCause(instanceOf(RoutingException.class));
+    flowRunner("synchronous").withPayload(payload).run();
   }
 
   @Test

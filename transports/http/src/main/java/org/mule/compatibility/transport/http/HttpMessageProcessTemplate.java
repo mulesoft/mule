@@ -141,7 +141,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
       try {
         httpServerConnection.writeResponse(response, getThrottlingHeaders());
       } catch (Exception e) {
-        throw new ResponseDispatchException(responseMuleEvent, e);
+        throw new ResponseDispatchException(e);
       }
       if (logger.isTraceEnabled()) {
         logger.trace("HTTP response sent successfully");
@@ -159,7 +159,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     MuleEvent response = messagingException.getEvent();
     MessagingException e = getExceptionForCreatingFailureResponse(messagingException, response);
     String temp = ExceptionHelper.getErrorMapping(getInboundEndpoint().getConnector().getProtocol(),
-                                                  messagingException.getClass(), getMuleContext());
+                                                  messagingException.getCause().getClass(), getMuleContext());
     int httpStatus = Integer.valueOf(temp);
     try {
       sendFailureResponseToClient(e, httpStatus);

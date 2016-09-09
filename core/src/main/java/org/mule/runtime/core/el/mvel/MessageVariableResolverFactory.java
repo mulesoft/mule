@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.context.SessionVariableMapContext;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Map;
 
@@ -74,9 +75,11 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
                                                                       null);
       } else if (EXCEPTION.equals(name)) {
         if (event.getError().isPresent()) {
-          return new MuleImmutableVariableResolver<>(EXCEPTION, event.getError().get().getException(), null);
+          Throwable exception = event.getError().get().getException();
+          return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
         } else if (event.getMessage().getExceptionPayload() != null) {
-          return new MuleImmutableVariableResolver<>(EXCEPTION, event.getMessage().getExceptionPayload().getException(), null);
+          Throwable exception = event.getMessage().getExceptionPayload().getException();
+          return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
         } else {
           return new MuleImmutableVariableResolver<MuleMessage>(EXCEPTION, null, null);
         }
@@ -89,6 +92,14 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
       }
     }
     return super.getNextFactoryVariableResolver(name);
+  }
+
+  private MessagingException wrapIfNecessary(MuleEvent event, Throwable exception) {
+    if (exception instanceof MessagingException) {
+      return (MessagingException) exception;
+    } else {
+      return new MessagingException(event, exception);
+    }
   }
 
 }

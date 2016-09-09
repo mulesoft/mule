@@ -6,23 +6,30 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.Matchers.instanceOf;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.test.AbstractIntegrationTestCase;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class ExceptionStrategyFilterMule5342TestCase extends AbstractIntegrationTestCase {
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   protected String getConfigFile() {
     return "org/mule/test/integration/exceptions/exception-strategy-filter-mule-5342.xml";
   }
 
-  @Test(expected = FilterUnacceptedException.class)
+  @Test
   public void exceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception {
+    expectedException.expectCause(instanceOf(FilterUnacceptedException.class));
     flowRunner("filter").withPayload(TEST_MESSAGE).run();
   }
 

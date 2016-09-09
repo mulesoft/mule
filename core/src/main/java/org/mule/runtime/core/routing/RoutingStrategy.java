@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 
 import java.util.List;
@@ -25,5 +25,5 @@ public interface RoutingStrategy {
    * @param messageProcessors
    * @return
    */
-  MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MessagingException;
+  MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MuleException;
 }

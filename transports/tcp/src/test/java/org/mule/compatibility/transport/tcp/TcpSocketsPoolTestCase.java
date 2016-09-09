@@ -6,16 +6,17 @@
  */
 package org.mule.compatibility.transport.tcp;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
-import org.mule.compatibility.transport.tcp.TcpConnector;
-import org.mule.compatibility.transport.tcp.TcpProtocol;
+import static org.mule.compatibility.transport.tcp.TcpConnector.DEFAULT_WAIT_TIMEOUT;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.ResponseOutputStream;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -42,23 +43,23 @@ public class TcpSocketsPoolTestCase extends FunctionalTestCase {
   @Test
   public void testExceptionInSendReleasesSocket() throws Exception {
     TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("connectorWithException");
-    assertNotNull(tcpConnector);
+    assertThat(tcpConnector, notNullValue());
     MuleClient client = muleContext.getClient();
     try {
       client.send("clientWithExceptionEndpoint", TEST_MESSAGE, null);
       fail("Dispatch exception was expected");
-    } catch (DispatchException e) {
-      // Expected exception
+    } catch (MessagingException e) {
+      assertThat(e.getCause(), instanceOf(DispatchException.class));
     }
-    assertEquals(0, tcpConnector.getSocketsPoolNumActive());
+    assertThat(tcpConnector.getSocketsPoolNumActive(), equalTo(0));
   }
 
   @Test
   public void testSocketsPoolSettings() throws Exception {
     TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("connectorWithException");
-    assertEquals(8, tcpConnector.getSocketsPoolMaxActive());
-    assertEquals(1, tcpConnector.getSocketsPoolMaxIdle());
-    assertEquals(3000, tcpConnector.getSocketsPoolMaxWait());
+    assertThat(tcpConnector.getSocketsPoolMaxActive(), equalTo(8));
+    assertThat(tcpConnector.getSocketsPoolMaxIdle(), equalTo(1));
+    assertThat(tcpConnector.getSocketsPoolMaxWait(), equalTo(3000L));
   }
 
   @Test
@@ -66,9 +67,9 @@ public class TcpSocketsPoolTestCase extends FunctionalTestCase {
     TcpConnector tcpConnector = (TcpConnector) muleContext.getRegistry().lookupObject("tcpConnector");
     int maxActive = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsActive();
     int maxIdle = tcpConnector.getDispatcherThreadingProfile().getMaxThreadsIdle();
-    assertEquals(maxActive, tcpConnector.getSocketsPoolMaxActive());
-    assertEquals(maxIdle, tcpConnector.getSocketsPoolMaxIdle());
-    assertEquals(TcpConnector.DEFAULT_WAIT_TIMEOUT, tcpConnector.getSocketMaxWait());
+    assertThat(tcpConnector.getSocketsPoolMaxActive(), equalTo(maxActive));
+    assertThat(tcpConnector.getSocketsPoolMaxIdle(), equalTo(maxIdle));
+    assertThat(tcpConnector.getSocketMaxWait(), equalTo(DEFAULT_WAIT_TIMEOUT));
   }
 
   public static class MockTcpProtocol implements TcpProtocol {

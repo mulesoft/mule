@@ -8,11 +8,10 @@ package org.mule.runtime.core.routing.requestreply;
 
 import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
+import static org.mule.runtime.core.config.i18n.CoreMessages.responseTimedOutWaitingForId;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
 import static org.mule.runtime.core.message.Correlation.NOT_SET;
-
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -30,8 +29,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.ObjectStoreManager;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.RoutingNotification;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessorBase;
 import org.mule.runtime.core.routing.EventProcessingThread;
 import org.mule.runtime.core.util.ObjectUtils;
@@ -174,7 +173,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     processNext(event);
   }
 
-  protected MuleEvent receiveAsyncReply(MuleEvent event) throws MessagingException {
+  protected MuleEvent receiveAsyncReply(MuleEvent event) throws MuleException {
     String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
     System.out.println("receiveAsyncReply: " + asyncReplyCorrelationId);
     Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
@@ -228,9 +227,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       if (failOnTimeout) {
         muleContext.fireNotification(new RoutingNotification(event.getMessage(), null, RoutingNotification.ASYNC_REPLY_TIMEOUT));
 
-        throw new ResponseTimeoutException(CoreMessages.responseTimedOutWaitingForId((int) timeout,
-                                                                                     asyncReplyCorrelationId),
-                                           event, null);
+        throw new ResponseTimeoutException(responseTimedOutWaitingForId((int) timeout, asyncReplyCorrelationId), null);
       } else {
         return null;
       }

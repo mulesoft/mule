@@ -12,15 +12,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -110,7 +111,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientWithSOAPFault() throws Exception {
-    expectedException.expectCause(instanceOf(Fault.class));
+    expectedException.expectCause(hasCause(instanceOf(Fault.class)));
     flowRunner("FlowWithClientAndSOAPFault").withPayload(getTestMuleMessage("hello")).run().getMessage();
   }
 

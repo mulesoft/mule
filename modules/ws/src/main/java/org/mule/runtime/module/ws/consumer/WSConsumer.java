@@ -13,7 +13,6 @@ import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -185,15 +184,14 @@ public class WSConsumer
       protected MuleEvent processNext(MuleEvent event) throws MuleException {
         try {
           return super.processNext(event);
-        } catch (DispatchException e) {
+        } catch (MessagingException e) {
           /*
            * When a Soap Fault is returned in the response, CXF raises a SoapFault exception. We need to wrap the information of
            * this exception into a new exception of the WS consumer module
            */
 
-          if (e.getCause() instanceof SoapFault) {
-            SoapFault soapFault = (SoapFault) e.getCause();
-
+          if (e.getCause() instanceof DispatchException && e.getCause().getCause() instanceof SoapFault) {
+            SoapFault soapFault = (SoapFault) e.getCause().getCause();
             event = MuleEvent.builder(e.getEvent()).message(MuleMessage.builder(e.getEvent().getMessage())
                 .payload(soapFault.getDetail() != null ? soapFault.getDetail() : null).build()).build();
 

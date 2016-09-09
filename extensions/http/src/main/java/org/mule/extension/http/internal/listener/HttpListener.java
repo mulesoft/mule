@@ -13,7 +13,6 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
@@ -22,15 +21,16 @@ import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
@@ -221,16 +221,20 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                 public void onFailure(Exception exception) {
                   // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
                   MessagingException messagingException = (MessagingException) exception;
+                  Throwable actualException =
+                      messagingException instanceof SecurityException ? messagingException : messagingException.getCause();
                   String exceptionStatusCode =
-                      ExceptionHelper.getTransportErrorMapping(HTTP.getScheme(), messagingException.getClass(), muleContext);
+                      ExceptionHelper.getTransportErrorMapping(HTTP.getScheme(), actualException.getClass(),
+                                                               muleContext);
                   Integer statusCodeFromException = exceptionStatusCode != null ? Integer.valueOf(exceptionStatusCode) : 500;
                   final HttpResponseBuilder failureResponseBuilder = new HttpResponseBuilder()
                       .setStatusCode(statusCodeFromException)
-                      .setReasonPhrase(messagingException.getMessage());
+                      .setReasonPhrase(actualException.getMessage());
                   addThrottlingHeaders(failureResponseBuilder);
+                  MuleEvent event = messagingException.getEvent();
                   MuleEvent exceptionEvent = MuleEvent
-                      .builder(messagingException.getEvent()).message(org.mule.runtime.core.api.MuleMessage
-                          .builder(messagingException.getEvent().getMessage()).payload(messagingException.getMessage()).build())
+                      .builder(event).message(org.mule.runtime.core.api.MuleMessage
+                          .builder(event.getMessage()).payload(actualException.getMessage()).build())
                       .build();
 
                   HttpResponse response;

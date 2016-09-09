@@ -6,26 +6,26 @@
  */
 package org.mule.runtime.module.cxf.wssec;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   @Override
   protected String getConfigFile() {
@@ -44,8 +44,10 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase {
   @Test
   public void testFailAuthentication() throws Exception {
     ClientPasswordCallback.setPassword("secret");
-    expectedException.expectCause(instanceOf(SOAPFaultException.class));
-    expectedException.expectMessage("Security exception occurred invoking web service");
-    flowRunner("cxfClient").withPayload("UnknownPasswordEncoding").run().getMessage();
+    Exception e = flowRunner("cxfClient").withPayload("UnknownPasswordEncoding").runExpectingException();
+
+    assertThat(e, is(instanceOf(MessagingException.class)));
+    assertThat(e.getCause(), is(instanceOf(SOAPFaultException.class)));
+    assertThat(e.getMessage(), containsString("Security exception occurred invoking web service"));
   }
 }

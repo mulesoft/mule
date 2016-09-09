@@ -4,23 +4,26 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.compatibility.transport.http.components;
+package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
-public class RestServiceException extends MuleException {
+/**
+ * Exception through by routing strategies when routing fails
+ */
+public class RoutingFailedException extends MuleException {
 
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = -1026055907767407434L;
-
-  public RestServiceException(Message message) {
+  public RoutingFailedException(Message message) {
     super(message);
   }
 
-  public RestServiceException(Message message, Throwable cause) {
+  public RoutingFailedException(Message message, Throwable cause) {
     super(message, cause);
   }
+
+  public RoutingFailedException(Throwable cause) {
+    super(cause);
+  }
+
 }

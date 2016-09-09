@@ -24,22 +24,22 @@ public class AggregationException extends RoutingException {
   private EventGroup eventGroup = null;
 
   public AggregationException(EventGroup eventGroup, MessageProcessor endpoint) {
-    super(eventGroup.getMessageCollectionEvent(), endpoint);
+    super(endpoint);
     this.eventGroup = eventGroup;
   }
 
   public AggregationException(EventGroup eventGroup, MessageProcessor endpoint, Throwable cause) {
-    super(eventGroup.getMessageCollectionEvent(), endpoint, cause);
+    super(endpoint, cause);
     this.eventGroup = eventGroup;
   }
 
   public AggregationException(Message message, EventGroup eventGroup, MessageProcessor endpoint) {
-    super(message, eventGroup.getMessageCollectionEvent(), endpoint);
+    super(message, endpoint);
     this.eventGroup = eventGroup;
   }
 
   public AggregationException(Message message, EventGroup eventGroup, MessageProcessor endpoint, Throwable cause) {
-    super(message, eventGroup.getMessageCollectionEvent(), endpoint, cause);
+    super(message, endpoint, cause);
     this.eventGroup = eventGroup;
   }
 

@@ -54,7 +54,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
     MuleMessage message = event.getMessage();
 
     if (routes == null || routes.size() == 0) {
-      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
+      throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
     }
 
     MessageProcessor ep = getRoute(0, event);
@@ -64,7 +64,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
     } catch (RoutingException e) {
       throw e;
     } catch (MuleException e) {
-      throw new CouldNotRouteOutboundMessageException(event, ep, e);
+      throw new CouldNotRouteOutboundMessageException(ep, e);
     }
     return result;
   }

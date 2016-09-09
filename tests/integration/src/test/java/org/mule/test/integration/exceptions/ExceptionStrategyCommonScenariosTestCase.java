@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -18,6 +19,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -58,7 +60,8 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractIntegratio
   public void testPreservePayloadExceptionStrategy() throws Exception {
     try {
       flowRunner("PreservePayloadExceptionStrategy").withPayload(MESSAGE_TO_SEND).run();
-    } catch (ComponentException e) {
+    } catch (MessagingException e) {
+      assertThat(e.getCause(), CoreMatchers.is(instanceOf(ComponentException.class)));
       assertThat(e.getEvent().getMessage(), notNullValue());
       assertThat(getPayloadAsString(e.getEvent().getMessage()), is(MESSAGE_MODIFIED));
     }

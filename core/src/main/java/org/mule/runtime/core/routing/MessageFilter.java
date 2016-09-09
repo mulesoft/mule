@@ -97,7 +97,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 
   @Override
   protected MuleException filterUnacceptedException(MuleEvent event) {
-    return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter, this);
+    return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);
   }
 
   public Filter getFilter() {

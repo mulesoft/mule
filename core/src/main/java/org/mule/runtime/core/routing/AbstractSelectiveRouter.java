@@ -179,7 +179,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
     throw new RoutePathNotFoundException(MessageFactory
         .createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-                                         event, this);
+                                         this);
   }
 
   /**

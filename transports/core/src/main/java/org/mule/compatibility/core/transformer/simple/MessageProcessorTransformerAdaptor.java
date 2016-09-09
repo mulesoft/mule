@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
@@ -42,7 +42,7 @@ public class MessageProcessorTransformerAdaptor extends AbstractMessageTransform
       try {
         return messageProcessor.process(event);
       } catch (Exception e) {
-        throw new TransformerMessagingException(event, this, e);
+        throw new MessageTransformerException(this, e);
       }
     }
     return event;

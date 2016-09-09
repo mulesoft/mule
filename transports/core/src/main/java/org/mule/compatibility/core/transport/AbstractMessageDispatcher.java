@@ -92,7 +92,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     } catch (MuleException muleException) {
       throw muleException;
     } catch (Exception e) {
-      throw new DispatchException(event, getEndpoint(), e);
+      throw new DispatchException(getEndpoint(), e);
     }
   }
 

@@ -10,14 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
+import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.context.notification.SecurityNotification;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.TimeUnit;
 
@@ -38,13 +37,7 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testPollingHttpConnectorSentCredentials() throws Exception {
     final Latch latch = new Latch();
-    muleContext.registerListener(new SecurityNotificationListener<SecurityNotification>() {
-
-      @Override
-      public void onNotification(SecurityNotification notification) {
-        latch.countDown();
-      }
-    });
+    muleContext.registerListener((SecurityNotificationListener<SecurityNotification>) notification -> latch.countDown());
 
     MuleClient client = muleContext.getClient();
     MuleMessage result = client.request("test://toclient", 5000).getRight().get();

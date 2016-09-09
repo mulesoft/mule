@@ -7,11 +7,12 @@
 package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation;
+import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_COMPLETE;
 import static org.mule.runtime.core.context.notification.AsyncMessageNotification.PROCESS_ASYNC_SCHEDULED;
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createMainExecutionTemplate;
-
 import org.mule.runtime.core.VoidMuleEvent;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
@@ -25,7 +26,6 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
@@ -101,14 +101,14 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     }
   }
 
-  protected boolean isProcessAsync(MuleEvent event) throws MessagingException {
+  protected boolean isProcessAsync(MuleEvent event) throws MuleException {
     if (!canProcessAsync(event)) {
-      throw new MessagingException(CoreMessages.createStaticMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE), event, this);
+      throw new DefaultMuleException(createStaticMessage(SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE));
     }
     return doThreading && canProcessAsync(event);
   }
 
-  protected boolean canProcessAsync(MuleEvent event) throws MessagingException {
+  protected boolean canProcessAsync(MuleEvent event) {
     return !(event.isSynchronous() || event.isTransacted() || event.getReplyToHandler() instanceof NonBlockingReplyToHandler);
   }
 

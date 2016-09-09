@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.oauth2.internal.authorizationcode.functional;
 
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import org.mule.runtime.module.http.internal.request.ResponseValidatorException;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 
@@ -37,7 +39,7 @@ public class AuthorizationCodeRefreshTokenConfigTestCase extends AbstractAuthori
    */
   @Test
   public void afterFailureWithRefreshTokenNotIssuedThrowAuthenticationException() throws Exception {
-    expectedException.expect(ResponseValidatorException.class);
+    expectedException.expectCause(is(instanceOf(ResponseValidatorException.class)));
     executeRefreshTokenUsingOldRefreshTokenOnTokenCallAndRevokedByUsers("testFlow", SINGLE_TENANT_OAUTH_CONFIG,
                                                                         ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID, 403,
                                                                         400);

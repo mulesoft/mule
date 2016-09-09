@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -137,15 +136,14 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testExceptionTypeFilter() {
-    ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
+    ExpressionFilter filter = new ExpressionFilter("exception.getCause() is java.lang.Exception");
     filter.setMuleContext(muleContext);
 
     MuleMessage m = MuleMessage.builder().payload("test").build();
-    assertTrue(!filter.accept(m, mock(MuleEvent.Builder.class)));
     m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
     assertTrue(filter.accept(m, mock(MuleEvent.Builder.class)));
 
-    filter = new ExpressionFilter("exception is java.io.IOException");
+    filter = new ExpressionFilter("exception.getCause() is java.io.IOException");
     filter.setMuleContext(muleContext);
     assertTrue(!filter.accept(m, mock(MuleEvent.Builder.class)));
     m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();
@@ -154,15 +152,14 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testExceptionTypeFilterEL() {
-    ExpressionFilter filter = new ExpressionFilter("exception is java.lang.Exception");
+    ExpressionFilter filter = new ExpressionFilter("exception.getCause() is java.lang.Exception");
     filter.setMuleContext(muleContext);
 
     MuleMessage m = MuleMessage.builder().payload("test").build();
-    assertTrue(!filter.accept(m, mock(MuleEvent.Builder.class)));
     m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IllegalArgumentException("test"))).build();
     assertTrue(filter.accept(m, mock(MuleEvent.Builder.class)));
 
-    filter = new ExpressionFilter("exception is java.io.IOException");
+    filter = new ExpressionFilter("exception.getCause() is java.io.IOException");
     filter.setMuleContext(muleContext);
     assertTrue(!filter.accept(m, mock(MuleEvent.Builder.class)));
     m = MuleMessage.builder(m).exceptionPayload(new DefaultExceptionPayload(new IOException("test"))).build();

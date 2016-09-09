@@ -96,7 +96,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   }
 
   @Override
-  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MessagingException {
+  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MuleException {
     try {
       final MuleEvent event1 = event;
       final Serializable eventStoreKey = storeEvent(event1, flow);

@@ -35,7 +35,7 @@ public abstract class AbstractJaasFunctionalTestCase extends FunctionalTestCase 
     MessagingException exception =
         flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
             .withPayload(TEST_PAYLOAD).runExpectingException();
-    assertThat(exception, instanceOf(UnauthorisedException.class));
+    assertThat(exception.getCause(), instanceOf(UnauthorisedException.class));
   }
 
   public static class SecurityHeader {

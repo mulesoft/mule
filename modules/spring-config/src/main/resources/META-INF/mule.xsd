@@ -1744,6 +1744,34 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
+                    <xsd:enumeration value="SECURITY">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's a security error.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="ROUTING">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's an error executing a router.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="CONNECTIVITY">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Occurs when there's a connection error.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="RETRY_EXHAUSTED">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specialization of CONNECTIVITY error, that occurs when all reconnection attempts have failed.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:enumeration>
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:union>

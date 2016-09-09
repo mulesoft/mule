@@ -87,7 +87,7 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
 
       return this.resultEvent;
     } else {
-      throw new ResponseTimeoutException(MessageFactory.createStaticMessage("Processing did not completed in time"), this.event,
+      throw new ResponseTimeoutException(MessageFactory.createStaticMessage("Processing did not completed in time"),
                                          this.messageProcessor);
     }
   }

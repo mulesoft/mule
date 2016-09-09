@@ -31,12 +31,12 @@ public class ExpressionRecipientList extends AbstractRecipientList {
   protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
     String expr = getFullExpression();
     if (!muleContext.getExpressionLanguage().isValid(expr)) {
-      throw new CouldNotRouteOutboundMessageException(CoreMessages.expressionInvalidForProperty("expression", expr), event, null);
+      throw new CouldNotRouteOutboundMessageException(CoreMessages.expressionInvalidForProperty("expression", expr), null);
     }
 
     Object msgRecipients = muleContext.getExpressionLanguage().evaluate(expr, event, flowConstruct);
     if (msgRecipients == null) {
-      throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), event, null);
+      throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), null);
     } else if (msgRecipients instanceof String) {
       Object[] recipients = StringUtils.splitAndTrim(msgRecipients.toString(), " ,;:");
       return Arrays.asList(recipients);
@@ -46,7 +46,7 @@ public class ExpressionRecipientList extends AbstractRecipientList {
       logger.error("Recipients on message are neither String nor List but: " + msgRecipients.getClass());
       throw new CouldNotRouteOutboundMessageException(CoreMessages
           .propertyIsNotSupportedType(getFullExpression(), new Class[] {String.class, List.class}, msgRecipients.getClass()),
-                                                      event, null);
+                                                      null);
     }
   }
 

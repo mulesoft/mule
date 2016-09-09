@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.core.routing;
 
+import static org.mule.runtime.core.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -56,10 +57,10 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
     MuleEvent result;
     try {
       result = sendRequestEvent(routedEvent, message, route, awaitResponse);
-    } catch (MessagingException me) {
+    } catch (MuleException me) {
       throw me;
     } catch (Exception e) {
-      throw new RoutingException(routedEvent, null, e);
+      throw new RoutingException(null, e);
     }
 
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
@@ -81,7 +82,7 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
   private MuleEvent sendRequestEvent(MuleEvent routedEvent, MuleMessage message, MessageProcessor route, boolean awaitResponse)
       throws MuleException {
     if (route == null) {
-      throw new DispatchException(CoreMessages.objectIsNull("route"), routedEvent, null);
+      throw new DispatchException(CoreMessages.objectIsNull("route"), null);
     }
 
     return route.process(createEventToRoute(routedEvent, message, route));
@@ -105,16 +106,16 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
    *
    * @param event
    * @param message
-   * @throws MessagingException
+   * @throws MuleException if the payload is consumable
    */
-  public static void validateMessageIsNotConsumable(MuleEvent event, MuleMessage message) throws MessagingException {
+  public static void validateMessageIsNotConsumable(MuleEvent event, MuleMessage message) throws MuleException {
     if (message.getDataType().isStreamType()) {
-      throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getDataType().getType().getName()), event);
+      throw new DefaultMuleException(cannotCopyStreamPayload(message.getDataType().getType().getName()));
     }
   }
 
-  public static MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MessagingException {
-    assertNonConsumableMessage(event, message);
+  public static MuleMessage cloneMessage(MuleMessage message) throws MuleException {
+    assertNonConsumableMessage(message);
     return message;
   }
 
@@ -122,13 +123,11 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
    * Asserts that the {@link MuleMessage} in the {@link MuleEvent} doesn't carry a consumable payload. This method is useful for
    * routers which need to clone the message before dispatching the message to multiple routes.
    *
-   * @param event The {@link MuleEvent}.
-   * @param event The {@link MuleMessage} whose payload is to be verified.
-   * @throws MessagingException If the payload of the message is consumable.
+   * @throws MuleException If the payload of the message is consumable.
    */
-  protected static void assertNonConsumableMessage(MuleEvent event, MuleMessage message) throws MessagingException {
+  protected static void assertNonConsumableMessage(MuleMessage message) throws MuleException {
     if (message.getDataType().isStreamType()) {
-      throw new MessagingException(CoreMessages.cannotCopyStreamPayload(message.getDataType().getType().getName()), event);
+      throw new DefaultMuleException(cannotCopyStreamPayload(message.getDataType().getType().getName()));
     }
   }
 }

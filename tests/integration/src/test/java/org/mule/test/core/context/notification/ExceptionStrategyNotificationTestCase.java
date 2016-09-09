@@ -6,6 +6,7 @@
  */
 package org.mule.test.core.context.notification;
 
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
@@ -31,7 +32,7 @@ public class ExceptionStrategyNotificationTestCase extends AbstractNotificationT
   public void doTest() throws Exception {
     assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
     assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
-    expectedException.expect(ComponentException.class);
+    expectedException.expectCause(instanceOf(ComponentException.class));
     assertNotNull(flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run());
     assertNotNull(flowRunner("default-es").withPayload(TEST_PAYLOAD).run());
   }

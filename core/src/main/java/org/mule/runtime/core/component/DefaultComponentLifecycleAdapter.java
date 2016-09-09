@@ -271,7 +271,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter {
     Object result;
     try {
       if (componentObject == null) {
-        throw new ComponentException(createStaticMessage("componentObject is null"), event, component);
+        throw new ComponentException(createStaticMessage("componentObject is null"), component);
       }
       // Use the overriding entrypoint resolver if one is set
       if (component.getEntryPointResolverSet() != null) {
@@ -280,7 +280,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter {
         result = entryPointResolver.invoke(componentObject, eventContext, eventBuilder);
       }
     } catch (Exception e) {
-      throw new ComponentException(createStaticMessage("%s: %s", e.getClass().getName(), e.getMessage()), event, component, e);
+      throw new ComponentException(createStaticMessage("%s: %s", e.getClass().getName(), e.getMessage()), component, e);
     }
 
     return result;

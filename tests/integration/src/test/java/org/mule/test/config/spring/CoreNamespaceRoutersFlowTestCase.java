@@ -9,12 +9,10 @@ package org.mule.test.config.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
@@ -102,7 +100,7 @@ public class CoreNamespaceRoutersFlowTestCase extends AbstractIntegrationTestCas
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event) throws MessagingException {
+    protected MuleEvent route(MuleEvent event) throws MuleException {
       return event;
     }
   }

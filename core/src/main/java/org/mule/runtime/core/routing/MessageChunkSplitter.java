@@ -45,7 +45,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
     try {
       data = event.getMessageAsBytes(muleContext);
     } catch (Exception e) {
-      throw new RoutingException(CoreMessages.failedToReadPayload(), event, next, e);
+      throw new RoutingException(CoreMessages.failedToReadPayload(), next, e);
     }
 
     MuleMessage message = event.getMessage();

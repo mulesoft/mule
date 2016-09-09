@@ -6,12 +6,15 @@
  */
 package org.mule.compatibility.transport.tcp.issues;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -34,7 +37,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
 
     // Request using loopback address at endpoint listening at 127.0.0.1 should get an appropiate response.
     result = client.send(getTransportName() + "://127.0.0.1:" + dynamicPort1.getNumber(), TEST_MESSAGE, null).getRight();
-    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+    assertThat(getPayloadAsString(result), is(TEST_MESSAGE + " Received"));
   }
 
   @Test
@@ -44,7 +47,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
 
     // Request using localhost address at endpoint listening at localhost should get an appropiate response.
     result = client.send(getTransportName() + "://localhost:" + dynamicPort2.getNumber(), TEST_MESSAGE, null).getRight();
-    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+    assertThat(getPayloadAsString(result), is(TEST_MESSAGE + " Received"));
   }
 
   @Test
@@ -54,7 +57,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
 
     // Request using loopback address at endpoint listening at all addresses should get an appropiate response.
     result = client.send(getTransportName() + "://127.0.0.1:" + dynamicPort3.getNumber(), TEST_MESSAGE, null).getRight();
-    assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+    assertThat(getPayloadAsString(result), is(TEST_MESSAGE + " Received"));
   }
 
   @Test
@@ -69,9 +72,9 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
         result = client.send(getTransportName() + "://" + inetAddress.getHostAddress() + ":" + dynamicPort1.getNumber(),
                              TEST_MESSAGE, null)
             .getRight();
-        assertNull(result);
-      } catch (DispatchException ex) {
-        ex.printStackTrace();
+        assertThat(result, nullValue());
+      } catch (MessagingException ex) {
+        assertThat(ex, hasCause(instanceOf(DispatchException.class)));
       }
     }
   }
@@ -89,7 +92,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
       result = client.send(getTransportName() + "://" + inetAddress.getHostAddress() + ":" + dynamicPort3.getNumber(),
                            getTestMuleMessage(TEST_MESSAGE))
           .getRight();
-      assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(result));
+      assertThat(getPayloadAsString(result), is(TEST_MESSAGE + " Received"));
     }
   }
 }

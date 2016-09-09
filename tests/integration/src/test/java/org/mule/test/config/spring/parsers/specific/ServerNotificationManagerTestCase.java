@@ -9,12 +9,8 @@ package org.mule.test.config.spring.parsers.specific;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
@@ -196,10 +192,7 @@ public class ServerNotificationManagerTestCase extends AbstractIntegrationTestCa
   protected static class TestSecurityEvent extends SecurityNotification {
 
     public TestSecurityEvent(MuleContext muleContext) throws Exception {
-      super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
-                                      MuleEvent.builder(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR))
-                                          .message(MuleMessage.builder().nullPayload().build()).exchangePattern(REQUEST_RESPONSE)
-                                          .flow(getTestFlow()).session(getTestSession(null, muleContext)).build()),
+      super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy")),
             0);
     }
 

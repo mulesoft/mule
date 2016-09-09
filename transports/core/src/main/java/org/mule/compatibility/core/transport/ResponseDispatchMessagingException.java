@@ -6,38 +6,24 @@
  */
 package org.mule.compatibility.core.transport;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.Message;
 
 /**
  *
  */
-class ResponseDispatchMessagingException extends MessagingException {
+class ResponseDispatchMessagingException extends MuleException {
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event) {
-    super(message, event);
+  ResponseDispatchMessagingException(Message message) {
+    super(message);
   }
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event, MessageProcessor failingMessageProcessor) {
-    super(message, event, failingMessageProcessor);
+  ResponseDispatchMessagingException(Message message, Throwable cause) {
+    super(message, cause);
   }
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event, Throwable cause) {
-    super(message, event, cause);
+  ResponseDispatchMessagingException(Throwable cause) {
+    super(cause);
   }
 
-  ResponseDispatchMessagingException(Message message, MuleEvent event, Throwable cause,
-                                     MessageProcessor failingMessageProcessor) {
-    super(message, event, cause, failingMessageProcessor);
-  }
-
-  ResponseDispatchMessagingException(MuleEvent event, Throwable cause) {
-    super(event, cause);
-  }
-
-  ResponseDispatchMessagingException(MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
-    super(event, cause, failingMessageProcessor);
-  }
 }

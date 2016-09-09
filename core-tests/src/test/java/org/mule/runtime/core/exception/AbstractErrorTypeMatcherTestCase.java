@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.EXPRESSION_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.TRANSFORMATION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.exception.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

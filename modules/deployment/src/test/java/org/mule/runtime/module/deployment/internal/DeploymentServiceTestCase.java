@@ -66,9 +66,9 @@ import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
-import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -1564,9 +1564,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     try {
       executeApplicationFlow("main");
       fail("Expected to fail as there should be a missing class");
-    } catch (ComponentException e) {
-      assertThat(e.getCause(), instanceOf(NoClassDefFoundError.class));
-      assertThat(e.getCause().getMessage(), containsString("org/foo/EchoTest"));
+    } catch (MessagingException e) {
+      assertThat(e.getCause().getCause(), instanceOf(NoClassDefFoundError.class));
+      assertThat(e.getCause().getCause().getMessage(), containsString("org/foo/EchoTest"));
     }
   }
 

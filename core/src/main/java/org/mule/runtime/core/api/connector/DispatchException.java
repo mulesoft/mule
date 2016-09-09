@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.api.connector;
 
-import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.config.i18n.Message;
@@ -21,19 +20,19 @@ public class DispatchException extends RoutingException {
    */
   private static final long serialVersionUID = -8204621943732496606L;
 
-  public DispatchException(MuleEvent event, MessageProcessor target) {
-    super(event, target);
+  public DispatchException(MessageProcessor target) {
+    super(target);
   }
 
-  public DispatchException(MuleEvent event, MessageProcessor target, Throwable cause) {
-    super(event, target, cause);
+  public DispatchException(MessageProcessor target, Throwable cause) {
+    super(target, cause);
   }
 
-  public DispatchException(Message message, MuleEvent event, MessageProcessor target) {
-    super(message, event, target);
+  public DispatchException(Message message, MessageProcessor target) {
+    super(message, target);
   }
 
-  public DispatchException(Message message, MuleEvent event, MessageProcessor target, Throwable cause) {
-    super(message, event, target, cause);
+  public DispatchException(Message message, MessageProcessor target, Throwable cause) {
+    super(message, target, cause);
   }
 }

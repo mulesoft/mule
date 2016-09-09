@@ -10,12 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -90,7 +88,7 @@ public class OutboundRouterTestCase extends AbstractMuleContextEndpointTestCase 
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event) throws MessagingException {
+    protected MuleEvent route(MuleEvent event) throws MuleException {
       return null;
     }
   }

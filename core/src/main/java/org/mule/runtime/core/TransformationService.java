@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerUtils;
 
@@ -208,7 +208,7 @@ public class TransformationService {
   }
 
   private MuleMessage transformMessage(final MuleMessage message, final MuleEvent event, final Transformer transformer)
-      throws TransformerMessagingException, TransformerException {
+      throws MessageTransformerException, TransformerException {
     Object result;
 
     if (transformer instanceof MessageTransformer) {

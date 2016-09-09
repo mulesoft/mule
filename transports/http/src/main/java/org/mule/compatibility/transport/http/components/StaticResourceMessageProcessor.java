@@ -118,7 +118,7 @@ public class StaticResourceMessageProcessor implements MessageProcessor, Initial
           .build();
       resultEvent = MuleEvent.builder(event).message(message).build();
     } catch (IOException e) {
-      throw new ResourceNotFoundException(fileNotFound(resourceBase + path), event, this);
+      throw new ResourceNotFoundException(fileNotFound(resourceBase + path));
     } finally {
       IOUtils.closeQuietly(in);
     }

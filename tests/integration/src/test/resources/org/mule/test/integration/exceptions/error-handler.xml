@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-    <flow name="matchesCorrectExceptionStrategyUsingExceptionType">
+    <flow name="matchesHandlerUsingWhen">
         <test:component/>
         <error-handler>
             <on-error-continue when="#[exception.causedBy(java.lang.IllegalArgumentException)]">
@@ -45,6 +45,33 @@
             </on-error-continue>
             <on-error-continue when="#[exception.causeMatches('*') &amp;&amp; !exception.causedBy(java.lang.ArithmeticException) &amp;&amp; !exception.causedBy(org.mule.runtime.core.api.registry.ResolverException)]">
                 <append-string-transformer message=" catch-9"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
+    <flow name="matchesHandlerUsingType">
+        <custom-processor class="org.mule.test.integration.exceptions.ErrorHandlerTestCase$ThrowExceptionProcessor"/>
+        <error-handler>
+            <on-error-continue type="TRANSFORMATION">
+                <append-string-transformer message=" transformation"/>
+            </on-error-continue>
+            <on-error-continue type="REDELIVERY_EXHAUSTED">
+                <append-string-transformer message=" redelivery"/>
+            </on-error-continue>
+            <on-error-continue type="EXPRESSION">
+                <append-string-transformer message=" expression"/>
+            </on-error-continue>
+            <on-error-continue type="CONNECTIVITY">
+                <append-string-transformer message=" connectivity"/>
+            </on-error-continue>
+            <on-error-continue type="ROUTING">
+                <append-string-transformer message=" routing"/>
+            </on-error-continue>
+            <on-error-continue type="SECURITY">
+                <append-string-transformer message=" security"/>
+            </on-error-continue>
+            <on-error-continue type="ANY">
+                <append-string-transformer message=" any"/>
             </on-error-continue>
         </error-handler>
     </flow>

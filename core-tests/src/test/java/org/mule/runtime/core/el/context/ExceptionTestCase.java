@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.el.context;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMessageContext;
 import org.mule.runtime.core.api.MuleEvent;
@@ -40,7 +41,10 @@ public class ExceptionTestCase extends AbstractELTestCase {
     RuntimeException rte = new RuntimeException();
     when(mockError.getException()).thenReturn(rte);
     event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).build()).build();
-    assertEquals(rte, evaluate("exception", event));
+    Object exception = evaluate("exception", event);
+
+    assertThat(exception, is(instanceOf(MessagingException.class)));
+    assertThat(((MessagingException) exception).getCause(), is(rte));
   }
 
   @Test

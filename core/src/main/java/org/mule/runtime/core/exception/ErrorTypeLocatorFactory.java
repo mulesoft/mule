@@ -6,15 +6,23 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.core.exception.ErrorTypeRepository.CORE_NAMESPACE_NAME;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.EXPRESSION_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.TRANSFORMATION_ERROR_IDENTIFIER;
-import static org.mule.runtime.core.exception.ErrorTypeRepository.UNKNOWN_ERROR_IDENTIFIER;
-
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.CONNECTIVITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.EXPRESSION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.REDELIVERY_EXHAUSTED;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_EXHAUSTED;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
+import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.UNKNOWN;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
-import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.core.api.routing.RoutingException;
+import org.mule.runtime.core.api.security.SecurityException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+
+import java.io.IOException;
 
 /**
  * Factory for {@link ErrorTypeLocator}.
@@ -32,18 +40,16 @@ public class ErrorTypeLocatorFactory {
   public static ErrorTypeLocator createDefaultErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
     return ErrorTypeLocator.builder(errorTypeRepository)
         .defaultExceptionMapper(ExceptionMapper.builder()
-            .addExceptionMapping(TransformerMessagingException.class,
-                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
-                                     .withNamespace(CORE_NAMESPACE_NAME).withName(TRANSFORMATION_ERROR_IDENTIFIER).build()))
-            .addExceptionMapping(ExpressionRuntimeException.class,
-                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
-                                     .withNamespace(CORE_NAMESPACE_NAME).withName(EXPRESSION_ERROR_IDENTIFIER).build()))
-            .addExceptionMapping(MessageRedeliveredException.class,
-                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
-                                     .withNamespace(CORE_NAMESPACE_NAME).withName(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build()))
-            .addExceptionMapping(Exception.class,
-                                 errorTypeRepository.lookupErrorType(new ComponentIdentifier.Builder()
-                                     .withNamespace(CORE_NAMESPACE_NAME).withName(UNKNOWN_ERROR_IDENTIFIER).build()))
+            .addExceptionMapping(MessageTransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION))
+            .addExceptionMapping(TransformerException.class, errorTypeRepository.lookupErrorType(TRANSFORMATION))
+            .addExceptionMapping(ExpressionRuntimeException.class, errorTypeRepository.lookupErrorType(EXPRESSION))
+            .addExceptionMapping(RoutingException.class, errorTypeRepository.lookupErrorType(ROUTING))
+            .addExceptionMapping(ConnectionException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY))
+            .addExceptionMapping(RetryPolicyExhaustedException.class, errorTypeRepository.lookupErrorType(RETRY_EXHAUSTED))
+            .addExceptionMapping(IOException.class, errorTypeRepository.lookupErrorType(CONNECTIVITY))
+            .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY))
+            .addExceptionMapping(MessageRedeliveredException.class, errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED))
+            .addExceptionMapping(Exception.class, errorTypeRepository.lookupErrorType(UNKNOWN))
             .build())
         .build();
   }

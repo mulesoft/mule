@@ -8,12 +8,10 @@ package org.mule.runtime.module.ws.consumer;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.TransformerMessagingException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.util.Map;
 
@@ -61,10 +59,9 @@ public class InputSoapHeadersInterceptor extends AbstractSoapInterceptor {
           transformer =
               muleContext.getRegistry().lookupTransformer(DataType.fromObject(value), DataType.fromType(Document.class));
         } catch (TransformerException e) {
-          MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-          throw new Fault(new TransformerMessagingException(CoreMessages
-              .createStaticMessage("Cannot find transformer to convert outbound property %s to XML", outboundProperty), event,
-                                                            transformer, e.getCause()));
+          throw new Fault(new MessageTransformerException(CoreMessages
+              .createStaticMessage("Cannot find transformer to convert outbound property %s to XML", outboundProperty),
+                                                          transformer, e.getCause()));
         }
 
         try {
@@ -75,11 +72,9 @@ public class InputSoapHeadersInterceptor extends AbstractSoapInterceptor {
 
           message.getHeaders().add(new SoapHeader(qname, document.getDocumentElement()));
         } catch (TransformerException e) {
-          MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-
-          throw new Fault(new TransformerMessagingException(CoreMessages
-              .createStaticMessage("Outbound property %s contains an invalid XML string", outboundProperty), event, transformer,
-                                                            e.getCause()));
+          throw new Fault(new MessageTransformerException(CoreMessages
+              .createStaticMessage("Outbound property %s contains an invalid XML string", outboundProperty), transformer,
+                                                          e.getCause()));
         }
       }
     }
