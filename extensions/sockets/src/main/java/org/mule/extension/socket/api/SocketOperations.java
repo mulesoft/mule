@@ -6,6 +6,7 @@
  */
 package org.mule.extension.socket.api;
 
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.extension.socket.api.client.SocketClient;
 import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
@@ -22,8 +23,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.io.IOException;
-
-import static org.mule.runtime.extension.api.annotation.param.Optional.DefaultValues.PAYLOAD;
 
 /**
  * Basic set of operations for socket extension
