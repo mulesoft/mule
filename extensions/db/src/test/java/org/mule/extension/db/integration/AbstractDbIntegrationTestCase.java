@@ -23,7 +23,6 @@ import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.extension.db.integration.model.derbyutil.DerbyTestStoredProcedure;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
@@ -58,8 +57,7 @@ import org.junit.Before;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
-@ArtifactClassLoaderRunnerConfig(
-    exportClasses = {DbConnectionProvider.class, DerbyTestStoredProcedure.class})
+@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {DbConnectionProvider.class})
 public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
   private final String dataSourceConfigResource;

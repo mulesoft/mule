@@ -17,7 +17,7 @@ import java.util.List;
 import org.junit.Ignore;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10257")
+@Ignore("MULE-10511")
 public class StoredProcedureReturningResultsetsTestCase extends AbstractStoredProcedureReturningStreamingResultsetsTestCase {
 
   public StoredProcedureReturningResultsetsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {

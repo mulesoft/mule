@@ -11,9 +11,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -44,6 +44,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 //TODO: MULE-9702 Remove once the tests are migrated.
+@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets"},
+    providedInclusions = "org.mule.modules:mule-module-sockets")
 public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase {
 
   @Rule

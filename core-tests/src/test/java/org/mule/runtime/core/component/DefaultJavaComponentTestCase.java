@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.lifecycle.LifecycleTrackerComponent;
+import org.mule.test.core.lifecycle.LifecycleTrackerComponent;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Orange;

@@ -19,7 +19,7 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 import org.mule.runtime.core.config.i18n.Message;
 
-@ArtifactClassLoaderRunnerConfig(exportClasses = {ValidationMessages.class})
+@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {ValidationMessages.class})
 abstract class ValidationTestCase extends MuleArtifactFunctionalTestCase {
 
   static final String VALID_URL = "http://localhost:8080";

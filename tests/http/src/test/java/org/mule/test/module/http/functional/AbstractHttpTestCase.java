@@ -11,7 +11,9 @@ import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 
-@ArtifactClassLoaderRunnerConfig(exportClasses = {HttpRequesterProvider.class, HttpRequesterConfig.class})
+@ArtifactClassLoaderRunnerConfig(exportPluginClasses = {HttpRequesterProvider.class, HttpRequesterConfig.class},
+    plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},
+    providedInclusions = "org.mule.modules:mule-module-sockets")
 public abstract class AbstractHttpTestCase extends MuleArtifactFunctionalTestCase {
 
   protected static final int DEFAULT_TIMEOUT = 1000;

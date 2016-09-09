@@ -7,8 +7,6 @@
 
 package org.mule.functional.junit4.runners;
 
-import org.mule.runtime.extension.api.annotation.Extension;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -19,14 +17,13 @@ import java.lang.annotation.Target;
  * Specifies a configuration needed by {@link ArtifactClassLoaderRunner} in order to run the tests in the module.
  * <p/>
  * Be aware that this annotation will be loaded for the whole module being tested, it is not supported to have different annotated
- * values for different test classes due to in order to improve the performance for building the {@link ClassLoader} it is created
- * the first time only and used to run several tests.
+ * values for different test classes due to in order to improve the performance a {@link ClassLoader} is created only the first
+ * time and used to run several tests.
  * <p/>
  * A best practice is to have a base abstract class for your module tests that extends
  * {@link org.mule.functional.junit4.ArtifactFunctionalTestCase} or
- * {@link org.mule.functional.junit4.MuleArtifactFunctionalTestCase} for mule internal tests, and defines if needed anything
- * related to the configuration with this annotation that will be applied to all the tests that are being executed for the same
- * module.
+ * {@link org.mule.functional.junit4.MuleArtifactFunctionalTestCase} for mule internal tests, to define the isolation runner
+ * configuration using {@code this} annotation that applies to all the tests that are being executed for the same module.
  * <p/>
  * The concept of module of execution is being backed by a JVM where a JVM is created for running the whole test of the module, in
  * case of maven either IDEs.
@@ -39,31 +36,45 @@ import java.lang.annotation.Target;
 public @interface ArtifactClassLoaderRunnerConfig {
 
   /**
-   * In case if a particular test needs to add extra boot packages to append to the ones already defined in the
-   * {@code excluded.properties}, it will have to define it here by using this annotation method.
+   * Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the rootArtifact. In format
+   * {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   * <p/>
+   * {@link #plugins()} Maven artifacts if declared will be considered to be excluded from being added as {@code provided} due to
+   * they are going to be added to its class loaders.
    *
-   * @return a comma separated list of packages to be added as PARENT_ONLY for the container class loader, default (and required)
-   *         packages is empty.
-   *         <p/>
-   *         A default list of extra boot packages is always added to the container class loader, it is defined by the
-   *         {@code excluded.properties} file.
+   * @return Maven artifacts to be excluded {@code provided} scope direct dependencies of the rootArtifact. In format
+   *         {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
    */
-  String extraBootPackages() default "";
+  String[] providedExclusions() default {};
 
   /**
-   * The discovery process will look for classes in classpath annotated with {@link Extension}. This is required due to the scan
-   * process for annotated classes in the whole classpath takes time if it has to go over the whole set of classes.
+   * Maven artifacts to be  included from the {@code provided} scope direct dependencies of the rootArtifact. In format
+   * {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
    * <p/>
-   * If the test doesn't set a base package it will fail to create the {@link ArtifactClassLoaderRunner}.
-   * <p/>
-   * As best practices modules should define in an abstract base test class this value to be inherited to all the tests for the
-   * module.
+   * This artifacts have to be declared as {@code provided} scope in rootArtifact direct dependencies and no matter if they were
+   * excluded or not from {@link #providedExclusions()} and {@link #plugins()}. Meaning that the same artifact could ended up
+   * being added to the container class loader and as plugin.
    *
-   * @return {@link String} to define the base package to be used when discovering for extensions in order to create for each
-   *         extension a plugin {@link ClassLoader}. If no extension are discovered plugin class loaders will not be created.
+   * @return Maven artifacts to be explicitly included from the {@code provided} scope direct dependencies of the rootArtifact. In
+   *         format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
    */
-  // TODO: MULE-10081 - Add support for scanning multiple base packages when discovering extensions
-  String extensionBasePackage() default "";
+  String[] providedInclusions() default {};
+
+  /**
+   * Plugins in the format of {@code <groupId>:<artifactId>} to be loaded and registered to Mule Container during the execution of
+   * the test. {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} will be created for each plugin.
+   * <p/>
+   * If the current artifact being tested is a plugin it would need to be declared here the groupId and artifactId, its
+   * {@code /target/classes/} folder and Maven {@code compile} dependencies will be used to build the
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}.
+   * <p/>
+   * Otherwise any plugin artifact declared on this list should be declared as Maven dependency with scope {@code provided}, the
+   * version of the plugin to be resolved will be the one defined in the Maven dependency.
+   * <p/>
+   *
+   * @return array of {@link String} to define plugins in order to create for each a plugin {@link ClassLoader}
+   */
+  String[] plugins() default {};
 
   /**
    * <b>WARNING: do not use this if you want to have a pure isolated test case.</b>
@@ -77,23 +88,31 @@ public @interface ArtifactClassLoaderRunnerConfig {
    * <p/>
    * {@link Class}es defined here will be also visible for all the tests in the module due to the {@link ClassLoader} is created
    * one per module when running tests.
+   * <p/>
+   * Only {@link Class}es from the plugin code would be exposed, it is not possible to export a {@link Class} that belongs to a
+   * third-party library.
    *
    * @return array of {@link Class} for those classes that has to be exposed for the test. By default is empty.
    */
-  Class[] exportClasses() default {};
+  Class[] exportPluginClasses() default {};
 
   /**
-   * List of groupId:artifactId:type to define the exclusions of artifacts that shouldn't be added to the application
-   * {@link ClassLoader}. Default exclusion is already defined in {@code excluded.properties} file and by using this annotation
-   * the ones defined here will be appended to those defined in file.
+   * Maven artifacts to be excluded from the {@code test} scope direct dependencies of the rootArtifact. In format
+   * {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
    *
-   * @return a comma separated list of groupId:artifactId:type (it does support wildcards org.mule:*:* or *:mule-core:* but only
-   *         starts with for partial matching org.mule*:*:*) that would be used in order to exclude artifacts that should not be
-   *         added to the application class loader neither the extension/plugin class loaders due to they will be already exposed
-   *         through the container.
+   * @return Maven artifacts to be excluded from the {@code test} scope direct dependencies of the rootArtifact. In format
+   *         {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
    */
-  // TODO: MULE-10083 - Improve how ArtifactClassLoaderRunner classifies the classpath for selecting which artifacts are already
-  // bundled within the container
-  String exclusions() default "";
+  String[] testExclusions() default {};
+
+
+  /**
+   * Maven artifacts to be included from the {@code test} scope direct dependencies of the rootArtifact. In format
+   * {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   *
+   * @return Maven artifacts to be included from the {@code test} scope direct dependencies of the rootArtifact. In format
+   *         {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   */
+  String[] testInclusions() default {};
 
 }

@@ -29,6 +29,7 @@ import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
+import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 
 import java.io.File;
@@ -95,9 +96,9 @@ public class ExtensionsTestInfrastructureDiscoverer {
    * @throws IllegalStateException if no extensions can be described
    * @return a {@link List} of the resources generated for the given describers or annotated classes
    */
-  public RuntimeExtensionModel discoverExtension(Class<?> annotatedClass) {
+  public RuntimeExtensionModel discoverExtension(Class<?> annotatedClass, VersionResolver versionResolver) {
     RuntimeExtensionModel model =
-        loadExtensionModel(new AnnotationsBasedDescriber(annotatedClass, new StaticVersionResolver(getProductVersion())));
+        loadExtensionModel(new AnnotationsBasedDescriber(annotatedClass, versionResolver));
     extensionManager.registerExtension(model);
 
     return model;

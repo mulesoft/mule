@@ -28,16 +28,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.github.ferstl</groupId>
-                <artifactId>depgraph-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>depgraph-dependencies-graph</id>
-                        <phase>process-resources</phase>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -52,14 +42,12 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-http-ext</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
-            <!--TODO(gfernandes) change this as compile whenever support for sharing extension classes or extending extensions is supported -->
-            <!-- as provided it will also be included in container, in addition to the extension being registered too. This way
-             http extension will work due to there is no support yet for sharing code between extensions -->
             <scope>provided</scope>
         </dependency>
         <dependency>

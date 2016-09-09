@@ -32,7 +32,8 @@ public class ArtifactUrlClassification {
    * @param applicationUrls list of {@link URL} that define the artifacts that would be loaded with the application
    *        {@link ClassLoader}
    */
-  public ArtifactUrlClassification(List<URL> containerUrls, List<PluginUrlClassification> pluginClassificationsUrls,
+  public ArtifactUrlClassification(List<URL> containerUrls,
+                                   List<PluginUrlClassification> pluginClassificationsUrls,
                                    List<URL> applicationUrls) {
     this.containerUrls = containerUrls;
     this.pluginClassificationsUrls = pluginClassificationsUrls;

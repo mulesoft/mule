@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_C
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
+import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
@@ -37,6 +38,8 @@ import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -45,7 +48,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -74,13 +76,13 @@ public class IsolatedClassLoaderFactory {
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
    *
-   * @param extraBootPackages {@link Set} of {@link String}s of extra boot packages to be appended to the container
+   * @param extraBootPackages {@link List} of {@link String}s of extra boot packages to be appended to the container
    *        {@link ClassLoader}
    * @param artifactUrlClassification the {@link ArtifactUrlClassification} that defines the different {@link URL}s for each
    *        {@link ClassLoader}
    * @return a {@link ArtifactClassLoaderHolder} that would be used to run the test
    */
-  public ArtifactClassLoaderHolder createArtifactClassLoader(Set<String> extraBootPackages,
+  public ArtifactClassLoaderHolder createArtifactClassLoader(List<String> extraBootPackages,
                                                              ArtifactUrlClassification artifactUrlClassification) {
     final TestContainerClassLoaderFactory testContainerClassLoaderFactory =
         new TestContainerClassLoaderFactory(extraBootPackages, artifactUrlClassification.getContainerUrls().toArray(new URL[0]));
@@ -158,17 +160,41 @@ public class IsolatedClassLoaderFactory {
    */
   protected ArtifactClassLoader createContainerArtifactClassLoader(TestContainerClassLoaderFactory testContainerClassLoaderFactory,
                                                                    ArtifactUrlClassification artifactUrlClassification) {
-    logClassLoaderUrls("CONTAINER", artifactUrlClassification.getContainerUrls());
-    MuleArtifactClassLoader launcherArtifact =
-        new MuleArtifactClassLoader(new ArtifactDescriptor("launcher"), new URL[0],
-                                    IsolatedClassLoaderFactory.class.getClassLoader(),
-                                    new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
+    MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader(artifactUrlClassification);
     final List<MuleModule> muleModules = Collections.<MuleModule>emptyList();
     ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
         .create(testContainerClassLoaderFactory.getBootPackages(), muleModules);
 
+    logClassLoaderUrls("CONTAINER", artifactUrlClassification.getContainerUrls());
     return testContainerClassLoaderFactory
         .createContainerClassLoader(new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher));
+  }
+
+  /**
+   * Creates the launcher application class loader to delegate from container class loader.
+   * It adds the {@link URL}s discovered for the container class loader and boot/launcher class loader that are not already
+   * present. This is needed due to while resolving the container class loader artifacts could be discovered that are not present
+   * in classpath due to they are not defined as dependencies.
+   *
+   * @param artifactUrlClassification
+   * @return an {@link ArtifactClassLoader} for the launcher, parent of container
+   */
+  protected MuleArtifactClassLoader createLauncherArtifactClassLoader(ArtifactUrlClassification artifactUrlClassification) {
+    ClassLoader launcherClassLoader = IsolatedClassLoaderFactory.class.getClassLoader();
+
+    Method method = findMethod(launcherClassLoader.getClass(), "addURL", URL.class);
+    method.setAccessible(true);
+
+    try {
+      for (URL url : artifactUrlClassification.getContainerUrls()) {
+        method.invoke(launcherClassLoader, url);
+      }
+    } catch (IllegalAccessException | InvocationTargetException e) {
+      throw new RuntimeException("Error while appending URLs to launcher class loader", e);
+    }
+
+    return new MuleArtifactClassLoader(new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
+                                       new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
   }
 
   private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification,
@@ -245,8 +271,8 @@ public class IsolatedClassLoaderFactory {
   private void logClassLoadingTrace(String message) {
     if (isVerboseClassLoading()) {
       logger.info(message);
-    } else if (logger.isTraceEnabled()) {
-      logger.trace(message);
+    } else {
+      logger.debug(message);
     }
   }
 

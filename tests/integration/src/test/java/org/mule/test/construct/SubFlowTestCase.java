@@ -8,8 +8,8 @@ package org.mule.test.construct;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor.FLOW_CONSRUCT_PROPERTY;
-import static org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY;
+import static org.mule.test.core.lifecycle.LifecycleTrackerProcessor.FLOW_CONSRUCT_PROPERTY;
+import static org.mule.test.core.lifecycle.LifecycleTrackerProcessor.LIFECYCLE_TRACKER_PROCESSOR_PROPERTY;
 
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.test.AbstractIntegrationTestCase;

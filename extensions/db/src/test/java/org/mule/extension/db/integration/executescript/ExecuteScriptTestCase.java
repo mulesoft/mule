@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -49,7 +48,6 @@ public class ExecuteScriptTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
-  @Ignore("MULE-9867")
   public void executeScriptFromFile() throws Exception {
     MuleMessage response = flowRunner("executeScriptFromFile").run().getMessage();
     assertBulkModeResult(response.getPayload());

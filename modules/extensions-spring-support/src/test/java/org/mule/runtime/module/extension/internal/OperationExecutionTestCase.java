@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.CarWash;

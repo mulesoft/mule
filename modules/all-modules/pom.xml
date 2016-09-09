@@ -15,6 +15,12 @@
     </description>
 
     <dependencies>
+        <!-- TODO(gfernandes) MULE-10509 migrate http to depend on sockets extension -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sockets</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>

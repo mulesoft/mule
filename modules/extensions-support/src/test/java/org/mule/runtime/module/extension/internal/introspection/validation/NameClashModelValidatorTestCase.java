@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 import static java.util.Arrays.asList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getParameter;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;

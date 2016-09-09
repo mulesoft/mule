@@ -43,11 +43,11 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
    * Factory class that extends the default way to create a container {@link ArtifactClassLoader} in order to support the
    * differences when running applications in standalone container vs junit.
    *
-   * @param extraBootPackages {@link Set} of {@link String}s extra boot packages that need to be appended to the container (junit
+   * @param extraBootPackages {@link List} of {@link String}s extra boot packages that need to be appended to the container (junit
    *        for instance)
    * @param urls {@link URL}s that were classified to be added to the container {@link ClassLoader}
    */
-  public TestContainerClassLoaderFactory(final Set<String> extraBootPackages, final URL[] urls) {
+  public TestContainerClassLoaderFactory(final List<String> extraBootPackages, final URL[] urls) {
     this.extraBootPackages = ImmutableSet.<String>builder().addAll(super.getBootPackages()).addAll(extraBootPackages)
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     this.urls = urls;

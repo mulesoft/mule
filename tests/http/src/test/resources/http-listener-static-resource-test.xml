@@ -9,7 +9,7 @@
         http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
     <tls:context name="tlsContext">
-        <tls:key-store path="serverKeystore" password="mulepassword" keyPassword="mulepassword"/>
+        <tls:key-store path="tls/serverKeystore" password="mulepassword" keyPassword="mulepassword"/>
     </tls:context>
 
     <httpn:listener-config name="listenerConfigPort1">
