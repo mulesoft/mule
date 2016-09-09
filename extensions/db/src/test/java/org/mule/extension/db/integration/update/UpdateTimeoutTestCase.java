@@ -9,9 +9,6 @@ package org.mule.extension.db.integration.update;
 import org.mule.extension.db.integration.AbstractQueryTimeoutTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 
-import org.junit.Ignore;
-
-@Ignore("MULE-10257")
 public class UpdateTimeoutTestCase extends AbstractQueryTimeoutTestCase {
 
   public UpdateTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {

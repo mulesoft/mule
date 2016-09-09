@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.math.BigDecimal;

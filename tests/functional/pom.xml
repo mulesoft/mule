@@ -92,6 +92,18 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-api</artifactId>
+            <version>${aetherVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+            <version>${aetherVersion}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>

@@ -15,6 +15,12 @@
     </description>
 
     <dependencies>
+        <!-- TODO(gfernandes) added due to HTTP extension needs to access the Sockets extension API, remove this once MULE-9867 is fixed  -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sockets</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>

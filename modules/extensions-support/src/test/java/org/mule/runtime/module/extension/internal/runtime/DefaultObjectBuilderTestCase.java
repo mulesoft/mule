@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.model.ExtendedPersonalInfo;

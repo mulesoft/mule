@@ -71,7 +71,7 @@
     <!-- Child flows/sub-flows -->
 
     <processor-chain name="chain">
-        <custom-processor class="org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor"/>
+        <custom-processor class="org.mule.test.core.lifecycle.LifecycleTrackerProcessor"/>
         <append-string-transformer message="x"/>
         <append-string-transformer message="y"/>
         <append-string-transformer message="z"/>
@@ -79,17 +79,17 @@
     </processor-chain>
 
     <processor-chain name="chain-singleton">
-        <custom-processor class="org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor"/>
+        <custom-processor class="org.mule.test.core.lifecycle.LifecycleTrackerProcessor"/>
         <append-string-transformer message="x"/>
         <append-string-transformer message="y"/>
         <append-string-transformer message="z"/>
         <component>
-            <singleton-object class="org.mule.runtime.core.lifecycle.LifecycleTrackerCheckComponent"/>
+            <singleton-object class="org.mule.test.core.lifecycle.LifecycleTrackerCheckComponent"/>
         </component>
     </processor-chain>
 
     <sub-flow name="sub-flow">
-        <custom-processor class="org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor"/>
+        <custom-processor class="org.mule.test.core.lifecycle.LifecycleTrackerProcessor"/>
         <append-string-transformer message="x"/>
         <append-string-transformer message="y"/>
         <append-string-transformer message="z"/>
@@ -97,7 +97,7 @@
     </sub-flow>
 
     <flow name="childFlow">
-        <custom-processor class="org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor"/>
+        <custom-processor class="org.mule.test.core.lifecycle.LifecycleTrackerProcessor"/>
         <append-string-transformer message="x"/>
         <append-string-transformer message="y"/>
         <append-string-transformer message="z"/>
@@ -105,12 +105,12 @@
     </flow>
 
     <sub-flow name="sub-flow-singleton">
-        <custom-processor class="org.mule.runtime.core.lifecycle.LifecycleTrackerProcessor"/>
+        <custom-processor class="org.mule.test.core.lifecycle.LifecycleTrackerProcessor"/>
         <append-string-transformer message="x"/>
         <append-string-transformer message="y"/>
         <append-string-transformer message="z"/>
         <component>
-            <singleton-object class="org.mule.runtime.core.lifecycle.LifecycleTrackerCheckComponent"/>
+            <singleton-object class="org.mule.test.core.lifecycle.LifecycleTrackerCheckComponent"/>
         </component>
     </sub-flow>
 

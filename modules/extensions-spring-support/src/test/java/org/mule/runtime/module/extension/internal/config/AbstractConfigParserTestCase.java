@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config;
 
-import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;

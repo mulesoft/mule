@@ -79,9 +79,11 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
         ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
         extensionManager.registerExtension(extensionManifest, classLoader);
       } else {
-        LOGGER.debug(
-                     "Discarding plugin artifact class loader with artifactName '{}' due to it doesn't have an extension descriptor",
-                     artifactName);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(
+                       "Discarding plugin artifact class loader with artifactName '{}' due to it doesn't have an extension descriptor",
+                       artifactName);
+        }
       }
     }
   }

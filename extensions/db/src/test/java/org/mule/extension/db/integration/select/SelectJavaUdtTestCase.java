@@ -22,11 +22,9 @@ import org.mule.runtime.api.message.MuleMessage;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10257")
 public class SelectJavaUdtTestCase extends AbstractDbIntegrationTestCase {
 
   public SelectJavaUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {

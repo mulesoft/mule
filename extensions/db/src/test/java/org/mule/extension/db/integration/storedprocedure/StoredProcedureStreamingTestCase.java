@@ -21,7 +21,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10257")
+@Ignore("MULE-10213")
 public class StoredProcedureStreamingTestCase extends AbstractDbIntegrationTestCase {
 
   public StoredProcedureStreamingTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {

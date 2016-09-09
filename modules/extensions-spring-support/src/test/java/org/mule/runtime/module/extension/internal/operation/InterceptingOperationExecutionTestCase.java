@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleEvent;

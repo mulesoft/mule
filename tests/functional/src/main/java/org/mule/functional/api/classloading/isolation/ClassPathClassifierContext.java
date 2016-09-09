@@ -7,20 +7,16 @@
 
 package org.mule.functional.api.classloading.isolation;
 
-import static org.mule.functional.classloading.isolation.utils.RunnerModuleUtils.getExcludedProperties;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
-import org.mule.functional.classloading.isolation.maven.MavenArtifactMatcherPredicate;
-
-import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
-import java.util.function.Predicate;
 
+import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,78 +28,96 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassPathClassifierContext {
 
-  public static final int GROUP_ID_ARTIFACT_ID_TYPE_PATTERN_CHUNKS = 3;
-  public static final String EXCLUDED_MODULES = "excluded.modules";
-
-  private final File rootArtifactClassesFolder;
-  private final File rootArtifactTestClassesFolder;
-  private final List<URL> classPathURLs;
-  private final DependenciesGraph dependenciesGraph;
-  private final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping;
-  private final Predicate<MavenArtifact> exclusions;
-  private final Set<String> extraBootPackages;
-  private final List<String> extensionBasePackages;
-  private final Set<Class> exportClasses;
-
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  private final Artifact rootArtifact;
+  private final List<URL> classPathURLs;
+
+  private final List<String> providedExclusions = newArrayList();
+  private final List<String> providedInclusions = newArrayList();
+  private final List<String> testExclusions = newArrayList();
+  private final List<String> testInclusions = newArrayList();
+
+  private final List<String> extraBootPackages = newArrayList();
+
+  private final List<String> pluginCoordinates = newArrayList();
+  private final List<Class> exportPluginClasses = newArrayList();
+  private final List<String> excludedArtifacts = newArrayList();
+  private boolean extensionMetadataGenerationEnabled = false;
+  private File pluginResourcesFolder;
 
   /**
    * Creates a context used for doing the classification of the class path.
    *
-   * @param rootArtifactClassesFolder {@link File} to the target/classes of the current artifact being classified. Not null.
-   * @param rootArtifactTestClassesFolder {@link File} to the target/test-classes of the current artifact being classified. Not
-   *        null.
+   * @param rootArtifact {@link Artifact} to the root artifact being classified. Not null.
+   * @param pluginResourcesFolder {@link File} where resources for classification will be created.
    * @param classPathURLs the whole set of {@link URL}s that were loaded by IDE/Maven Surefire plugin when running the test. Not
-   *        null.
-   * @param dependenciesGraph the maven dependencies graph for the artifact that the test belongs to. Not null.
-   * @param mavenMultiModuleArtifactMapping a mapper to get multi-module folder for artifactIds. Not null.
-   * @param exclusionsList {@link List} of {@link String}'s to be used during classification for excluded packages.
-   * @param extraBootPackagesList {@link List} of {@link String}'s packages to be added as boot packages to the container.
-   * @param extensionBasePackages {@link List} of {@link String}'s base packages to be used for discovering extensions.
-   * @param exportClasses {@link Set} of {@link Class} to be exported in addition to the ones already exported by the plugin, for
-   *        testing purposes only.
+   * @param excludedArtifacts Maven artifacts to be excluded from artifact class loaders created here due to they are going to be
+   *        added as boot packages. In format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   * @param extraBootPackages {@link List} of {@link String}s containing the extra boot packages defined to be appended to the
+   *        container in addition to the pre-defined ones.
+   * @param providedExclusions Maven artifacts to be excluded from the provided scope direct dependencies of rootArtifact. In
+   *        format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   * @param providedInclusions Maven artifacts to be excluded from the provided scope direct dependencies of rootArtifact. In
+   *        format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   * @param testExclusions {@link List} of Maven coordinates to be excluded from application class loader.
+   * @param testInclusions {@link List} of Maven coordinates to be included in application class loader.
+   * @param pluginCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to create plugin
+   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s
+   * @param exportPluginClasses {@link List} of {@link Class} to be exported in addition to the ones already exported by the
+   *        plugin, for testing purposes only.
+   * @param extensionMetadataGenerationEnabled if while building the a plugin
+   *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} for an
+   *        {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    * @throws IOException if an error happened while reading
    *         {@link org.mule.functional.classloading.isolation.utils.RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
    */
-  public ClassPathClassifierContext(final File rootArtifactClassesFolder, final File rootArtifactTestClassesFolder,
-                                    final List<URL> classPathURLs, final DependenciesGraph dependenciesGraph,
-                                    final MavenMultiModuleArtifactMapping mavenMultiModuleArtifactMapping,
-                                    final List<String> exclusionsList, final List<String> extraBootPackagesList,
-                                    final List<String> extensionBasePackages, final Set<Class> exportClasses)
+  public ClassPathClassifierContext(final Artifact rootArtifact,
+                                    final File pluginResourcesFolder,
+                                    final List<URL> classPathURLs,
+                                    final List<String> excludedArtifacts,
+                                    final List<String> extraBootPackages,
+                                    final List<String> providedExclusions,
+                                    final List<String> providedInclusions,
+                                    final List<String> testExclusions,
+                                    final List<String> testInclusions,
+                                    final List<String> pluginCoordinates,
+                                    final List<Class> exportPluginClasses,
+                                    final boolean extensionMetadataGenerationEnabled)
       throws IOException {
-    checkNotNull(rootArtifactClassesFolder, "rootArtifactClassesFolder cannot be null");
-    checkNotNull(rootArtifactTestClassesFolder, "rootArtifactTestClassesFolder cannot be null");
+    checkNotNull(rootArtifact, "rootArtifact cannot be null");
     checkNotNull(classPathURLs, "classPathURLs cannot be null");
-    checkNotNull(dependenciesGraph, "dependenciesGraph cannot be null");
-    checkNotNull(mavenMultiModuleArtifactMapping, "mavenMultiModuleArtifactMapping cannot be null");
 
-    this.rootArtifactClassesFolder = rootArtifactClassesFolder;
-    this.rootArtifactTestClassesFolder = rootArtifactTestClassesFolder;
+    this.rootArtifact = rootArtifact;
+    this.pluginResourcesFolder = pluginResourcesFolder;
     this.classPathURLs = classPathURLs;
-    this.dependenciesGraph = dependenciesGraph;
-    this.mavenMultiModuleArtifactMapping = mavenMultiModuleArtifactMapping;
 
-    Properties excludedProperties = getExcludedProperties();
-    this.exclusions = createExclusionsPredicate(exclusionsList, excludedProperties);
-    this.extraBootPackages = getExtraBootPackages(extraBootPackagesList, excludedProperties);
+    this.excludedArtifacts.addAll(excludedArtifacts);
+    this.extraBootPackages.addAll(extraBootPackages);
 
-    this.extensionBasePackages = extensionBasePackages;
+    this.providedExclusions.addAll(providedExclusions);
+    this.providedInclusions.addAll(providedInclusions);
 
-    this.exportClasses = exportClasses;
+    this.testExclusions.addAll(testExclusions);
+    this.testInclusions.addAll(testInclusions);
+
+    this.pluginCoordinates.addAll(pluginCoordinates);
+    this.exportPluginClasses.addAll(exportPluginClasses);
+    this.extensionMetadataGenerationEnabled = extensionMetadataGenerationEnabled;
   }
 
   /**
-   * @return a {@link File} to the classes of the current artifact being tested.
+   * @return a {@link Artifact} to the current (root) artifact being tested.
    */
-  public File getRootArtifactClassesFolder() {
-    return rootArtifactClassesFolder;
+  public Artifact getRootArtifact() {
+    return rootArtifact;
   }
 
   /**
-   * @return a {@link File} to the test classes of the current artifact being tested.
+   * @return {@link File} where resources for classification will be created.
    */
-  public File getRootArtifactTestClassesFolder() {
-    return rootArtifactTestClassesFolder;
+  public File getPluginResourcesFolder() {
+    return pluginResourcesFolder;
   }
 
   /**
@@ -114,128 +128,86 @@ public class ClassPathClassifierContext {
   }
 
   /**
-   * @return a {@link DependenciesGraph} for the given artifact tested.
+   * @return Maven artifacts to be excluded from the {@code provided} scope direct dependencies of the rootArtifact. In format
+   *         {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
    */
-  public DependenciesGraph getDependencyGraph() {
-    return dependenciesGraph;
+  public List<String> getProvidedExclusions() {
+    return this.providedExclusions;
   }
 
   /**
-   * @return {@link MavenMultiModuleArtifactMapping} mapper for artifactIds and multi-module folders.
+   * @return Maven artifacts to be explicitly included from the {@code provided} scope direct dependencies of the rootArtifact. In
+   *         format {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
    */
-  public MavenMultiModuleArtifactMapping getMavenMultiModuleArtifactMapping() {
-    return mavenMultiModuleArtifactMapping;
+  public List<String> getProvidedInclusions() {
+    return this.providedInclusions;
   }
 
   /**
-   * @return {@link Predicate} to be used to exclude artifacts from being added to application {@link ClassLoader} due to they are
-   *         going to be in container {@link ClassLoader}.
+   * @return Maven artifacts to be excluded from artifact class loaders created here due to they are going to be added as boot
+   *         packages. In format {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
    */
-  public Predicate<MavenArtifact> getExclusions() {
-    return exclusions;
+  public List<String> getExcludedArtifacts() {
+    return this.excludedArtifacts;
   }
 
   /**
-   * @return {@link Set} of {@link String}s containing the extra boot packages defined to be appended to the container in addition
-   *         to the pre-defined ones.
+   * Artifacts to be excluded from being added to application {@link ClassLoader} due to they are going to be in container
+   * {@link ClassLoader}.
+   * 
+   * @return {@link Set} of Maven coordinates in the format:
+   * 
+   *         <pre>
+   *         {@code <groupId>:<artifactId>:[[<extension>]:<version>]}.
+   *         </pre>
    */
-  public Set<String> getExtraBootPackages() {
-    return extraBootPackages;
+  public List<String> getTestExclusions() {
+    return this.testExclusions;
   }
 
   /**
-   * @return a {@link List} of base packages to be used for discovering extensions in classpath.
+   * Artifacts to be included from being added to application {@link ClassLoader}.
+   *
+   * @return {@link Set} of Maven coordinates in the format:
+   *
+   *         <pre>
+   *         {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
+   *         </pre>
    */
-  public List<String> getExtensionBasePackages() {
-    return extensionBasePackages;
+  public List<String> getTestInclusions() {
+    return this.testInclusions;
   }
 
   /**
-   * @return {@link Set} of {@link Class}es that are going to be exported in addition to the ones already exported by extensions.
+   * @return {@link List} of {@link String}s containing the extra boot packages defined to be appended to the container in
+   *         addition to the pre-defined ones.
+   */
+  public List<String> getExtraBootPackages() {
+    return this.extraBootPackages;
+  }
+
+  /**
+   * @return {@link List} of {@link Class}es that are going to be exported in addition to the ones already exported by plugins.
    *         For testing purposes only.
    */
-  public Set<Class> getExportClasses() {
-    return exportClasses;
+  public List<Class> getExportPluginClasses() {
+    return this.exportPluginClasses;
   }
 
   /**
-   * The list of exclusion GroutId/ArtifactId/Type to be excluded from application/plugin class loaders due to these are supposed
-   * to be exposed by the container.
-   * <p/>
-   * It defined by the file {@link org.mule.functional.classloading.isolation.utils.RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE}
-   * and can be changed by having this file in the module that is tested or appended to the default excluded
-   * groutId/artifactId/type with the ones provided to this context.
-   *
-   * @param exclusionsList {@link List} of {@link String}'s, each entry is a coma separated list of patterns to parse and generate
-   *        exclusions for.
-   * @param excludedProperties {@link Properties} that has the list of excluded modules
-   * @return a {@link Predicate} to be used in order to excluded maven artifacts from application/plugin class loaders.
+   * @return {@link List} of plugins as {@code [groupId]:[artifactId]} format for creates plugin
+   *         {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    */
-  private Predicate<MavenArtifact> createExclusionsPredicate(final List<String> exclusionsList, Properties excludedProperties) {
-    Predicate<MavenArtifact> exclusionPredicate = null;
-    String excludedModules = excludedProperties.getProperty(EXCLUDED_MODULES);
-    if (excludedModules != null) {
-      for (String exclusion : excludedModules.split(",")) {
-        exclusionPredicate = createPredicate(exclusionPredicate, exclusion);
-      }
-    } else {
-      logger.warn(EXCLUDED_MODULES
-          + " found but there is no list of modules defined to be excluded, this could be the reason why the test may fail later due to JUnit classes are not found");
-    }
-    for (String exclusionsToBeAppended : exclusionsList) {
-      if (exclusionsToBeAppended != null && exclusionsToBeAppended.length() > 0) {
-        exclusionPredicate = createPredicate(exclusionPredicate, exclusionsToBeAppended);
-      }
-    }
-
-    // If no exclusion is defined the predicate should always return false to any artifact due to none is excluded
-    return exclusionPredicate == null ? x -> false : exclusionPredicate;
+  public List<String> getPluginCoordinates() {
+    return this.pluginCoordinates;
   }
 
   /**
-   * Creates the predicate or adds a new one to the given one by splitting the exclusions patterns.
-   *
-   * @param exclusionPredicate the current exclusion predicate to compose with an OR operation (if not null).
-   * @param exclusion value to be parse and generate exclusions for.
-   * @return a new {@link Predicate} with the exclusions.
+   * @return {@code true} if while building the a plugin {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   *         for an {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
    */
-  private Predicate<MavenArtifact> createPredicate(final Predicate<MavenArtifact> exclusionPredicate, final String exclusion) {
-    Predicate<MavenArtifact> predicate = exclusionPredicate;
-    String[] exclusionSplit = exclusion.split(":");
-    if (exclusionSplit.length != GROUP_ID_ARTIFACT_ID_TYPE_PATTERN_CHUNKS) {
-      throw new IllegalArgumentException("Exclusion pattern should have the format groupId:artifactId:type");
-    }
-    Predicate<MavenArtifact> artifactExclusion =
-        new MavenArtifactMatcherPredicate(exclusionSplit[0], exclusionSplit[1], exclusionSplit[2]);
-    if (predicate == null) {
-      predicate = artifactExclusion;
-    } else {
-      predicate = predicate.or(artifactExclusion);
-    }
-    return predicate;
-  }
-
-  /**
-   * Gets the {@link Set} of {@link String}s of packages to be added to the container {@link ClassLoader} in addition to the ones
-   * already pre-defined by the mule container.
-   *
-   * @param excludedProperties {@link Properties }that has the list of extra boot packages definitions
-   * @return a {@link Set} of {@link String}s with the extra boot packages to be appended
-   */
-  private Set<String> getExtraBootPackages(final List<String> extraBootPackagesList, final Properties excludedProperties) {
-    Set<String> packages = Sets.newHashSet();
-    packages.addAll(extraBootPackagesList);
-
-    String excludedExtraBootPackages = excludedProperties.getProperty("extraBoot.packages");
-    if (excludedExtraBootPackages != null) {
-      for (String extraBootPackage : excludedExtraBootPackages.split(",")) {
-        packages.add(extraBootPackage);
-      }
-    } else {
-      logger.warn(EXCLUDED_MODULES
-          + " found but there is no list of extra boot packages defined to be added to container, this could be the reason why the test may fail later due to JUnit classes are not found");
-    }
-    return packages;
+  public boolean isExtensionMetadataGenerationEnabled() {
+    return extensionMetadataGenerationEnabled;
   }
 
 }

@@ -8,7 +8,6 @@
 package org.mule.functional.api.classloading.isolation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import com.google.common.collect.Lists;
 
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassPathUrlProvider {
 
+  public static final String CLASSPATH_SEPARATOR = ":";
   protected final transient Logger logger = LoggerFactory.getLogger(this.getClass());
   private final List<URL> urls;
 
@@ -38,7 +38,7 @@ public class ClassPathUrlProvider {
    * Creates an instance of the provider that uses system properties to get the classpath {@link URL}s.
    */
   public ClassPathUrlProvider() {
-    this.urls = new ArrayList<>();
+    this(new ArrayList<>());
   }
 
 
@@ -49,18 +49,20 @@ public class ClassPathUrlProvider {
    */
   public ClassPathUrlProvider(List<URL> urls) {
     checkNotNull(urls, "urls cannot be null");
-    checkArgument(urls.size() > 0, "urls cannot be empty");
 
-    this.urls = urls;
+    this.urls = readUrlsFromSystemProperties();
+    this.urls.addAll(urls);
   }
 
   /**
-   * @return Gets the urls from the {@code java.class.path} and {@code sun.boot.class.path} system properties
+   * @return Gets the urls from the {@code sun.boot.class.path} and {@code java.class.path} and {@code surefire.test.class.path}
+   *         system properties.
    */
-  public List<URL> getURLs() {
+  private List<URL> readUrlsFromSystemProperties() {
     final Set<URL> urls = new LinkedHashSet<>();
     addUrlsFromSystemProperty(urls, "java.class.path");
     addUrlsFromSystemProperty(urls, "sun.boot.class.path");
+    addUrlsFromSystemProperty(urls, "surefire.test.class.path");
 
     if (logger.isDebugEnabled()) {
       StringBuilder builder = new StringBuilder("ClassPath:");
@@ -68,17 +70,22 @@ public class ClassPathUrlProvider {
       logger.debug(builder.toString());
     }
 
-    urls.addAll(this.urls);
-
     return Lists.newArrayList(urls);
   }
 
+  public List<URL> getURLs() {
+    return this.urls;
+  }
+
   protected void addUrlsFromSystemProperty(final Collection<URL> urls, final String propertyName) {
-    for (String file : System.getProperty(propertyName).split(":")) {
-      try {
-        urls.add(new File(file).toURI().toURL());
-      } catch (MalformedURLException e) {
-        throw new IllegalArgumentException("Cannot create a URL from file path: " + file, e);
+    String property = System.getProperty(propertyName);
+    if (property != null) {
+      for (String file : property.split(CLASSPATH_SEPARATOR)) {
+        try {
+          urls.add(new File(file).toURI().toURL());
+        } catch (MalformedURLException e) {
+          throw new IllegalArgumentException("Cannot create a URL from file path: " + file, e);
+        }
       }
     }
   }

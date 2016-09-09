@@ -9,7 +9,7 @@ package org.mule.extension.ftp;
 import static org.mockito.Mockito.when;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
-import org.mule.extension.file.common.FilePredicateBuilderContractTestCase;
+import org.mule.test.extension.file.common.FilePredicateBuilderContractTestCase;
 
 import java.time.LocalDateTime;
 

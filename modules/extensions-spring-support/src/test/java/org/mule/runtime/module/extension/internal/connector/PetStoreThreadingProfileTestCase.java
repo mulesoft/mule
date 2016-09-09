@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
 

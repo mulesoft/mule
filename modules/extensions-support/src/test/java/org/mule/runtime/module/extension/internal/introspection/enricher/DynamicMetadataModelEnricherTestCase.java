@@ -12,8 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.core.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.checkIsPresent;
 import static org.mule.runtime.module.extension.internal.introspection.enricher.EnricherTestUtils.getDeclaration;
-import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
-import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;

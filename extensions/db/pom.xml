@@ -100,7 +100,7 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>${derbyVersion}</version>
-            <!-- TODO: MULE-10258 scope should be <scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
 
         <dependency>

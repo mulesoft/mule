@@ -18,11 +18,9 @@ import org.mule.runtime.api.message.MuleMessage;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10257")
 public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase {
 
   public SelectStoredProcedureTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {

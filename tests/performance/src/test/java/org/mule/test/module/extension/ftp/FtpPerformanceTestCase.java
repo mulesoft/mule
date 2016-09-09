@@ -9,11 +9,10 @@ package org.mule.test.module.extension.ftp;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.infrastructure.client.ftp.FTPTestClient;
 import org.mule.test.infrastructure.process.rules.FtpServer;
+import org.mule.test.module.extension.AbstractIsolatedPerformanceTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +23,7 @@ import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class FtpPerformanceTestCase extends MuleArtifactFunctionalTestCase {
+public class FtpPerformanceTestCase extends AbstractIsolatedPerformanceTestCase {
 
   private static final String DEFAULT_FTP_HOST = "localhost";
   private static final String FTP_SERVER_BASE_DIR = "target/ftpserver";

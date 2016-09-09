@@ -13,10 +13,8 @@ import org.mule.extension.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10257")
 public class StoredProcedureParameterizedUpdateTestCase extends AbstractStoredProcedureParameterizedUpdateTestCase {
 
   public StoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
