@@ -36,7 +36,7 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
 {
 
     @Override
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (isNonBlocking(event))
         {
