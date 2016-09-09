@@ -64,7 +64,7 @@ public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAll
      * @throws org.mule.api.routing.RoutingException
      *          if there is a failure while processing this message.
      */
-    public final MuleEvent process(MuleEvent event) throws RoutingException
+    public MuleEvent process(MuleEvent event) throws RoutingException
     {
         RouterStatistics stats = getRouterStatistics();
         if(stats !=null && stats.isEnabled())

@@ -50,7 +50,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
     protected String counterVariableName;
 
     @Override
-    public final MuleEvent process(MuleEvent event) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (isSplitRequired(event))
         {
