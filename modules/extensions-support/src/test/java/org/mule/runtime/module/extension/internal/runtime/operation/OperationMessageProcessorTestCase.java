@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -13,26 +14,32 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
+import static org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor.INVALID_TARGET_MESSAGE;
 import static org.mule.runtime.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.tck.size.SmallTest;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -40,6 +47,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
 public class OperationMessageProcessorTestCase extends AbstractOperationMessageProcessorTestCase {
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Override
   protected OperationMessageProcessor createOperationMessageProcessor() {
@@ -177,6 +187,45 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     MuleMessage message = messageProcessor.process(event).getFlowVariable(TARGET_VAR);
     assertThat(message, is(notNullValue()));
     assertThat(message.getPayload(), is(sameInstance(value)));
+  }
+
+  @Test
+  public void operationWithExpressionInTargetParameter() throws Exception {
+
+    String flowName = "flowName";
+    expectedException.expect(IllegalOperationException.class);
+    expectedException.expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), "an expression"));
+
+    target = "#[someExpression]";
+    messageProcessor = createOperationMessageProcessor();
+
+    when(context.getExpressionLanguage()).thenReturn(new MVELExpressionLanguage(context));
+    FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    when(flowConstruct.getName()).thenReturn(flowName);
+
+    messageProcessor.setFlowConstruct(flowConstruct);
+    messageProcessor.setMuleContext(context);
+    messageProcessor.initialise();
+  }
+
+  @Test
+  public void operationWithFlowvarsPrefixInTargetParameter() throws Exception {
+
+    String flowName = "flowName";
+    expectedException.expect(IllegalOperationException.class);
+    expectedException
+        .expectMessage(format(INVALID_TARGET_MESSAGE, flowName, operationModel.getName(), format("the '%s' prefix", FLOW_VARS)));
+
+    target = format("flowVars.%s", TARGET_VAR);
+    messageProcessor = createOperationMessageProcessor();
+
+    when(context.getExpressionLanguage()).thenReturn(new MVELExpressionLanguage(context));
+    FlowConstruct flowConstruct = mock(FlowConstruct.class);
+    when(flowConstruct.getName()).thenReturn(flowName);
+
+    messageProcessor.setFlowConstruct(flowConstruct);
+    messageProcessor.setMuleContext(context);
+    messageProcessor.initialise();
   }
 
   @Test
