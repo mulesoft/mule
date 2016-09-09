@@ -15,7 +15,7 @@
     </description>
 
     <dependencies>
-        <!-- TODO(gfernandes) added due to HTTP extension needs to access the Sockets extension API, remove this once MULE-9867 is fixed  -->
+        <!-- TODO(gfernandes) MULE-10509 migrate http to depend on sockets extension -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-sockets</artifactId>

@@ -259,9 +259,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
    */
   private Artifact getRootArtifact(File rootArtifactClassesFolder) {
     File pomFile = new File(rootArtifactClassesFolder.getParentFile().getParentFile(), POM_XML);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Reading rootArtifact from pom file: {}", pomFile);
-    }
+    logger.debug("Reading rootArtifact from pom file: {}", pomFile);
     Model model = MavenModelFactory.createMavenProject(pomFile);
 
     return new DefaultArtifact(model.getGroupId() != null ? model.getGroupId() : model.getParent().getGroupId(),

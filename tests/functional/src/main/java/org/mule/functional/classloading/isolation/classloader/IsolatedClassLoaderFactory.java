@@ -203,17 +203,13 @@ public class IsolatedClassLoaderFactory {
     Collection<String> exportedResourcesProperty;
     URL manifestUrl = pluginCL.findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
     if (manifestUrl != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Plugin '{}' has extension descriptor therefore it will be handled as an extension",
-                     pluginUrlClassification.getName());
-      }
+      logger.debug("Plugin '{}' has extension descriptor therefore it will be handled as an extension",
+                   pluginUrlClassification.getName());
       ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
       exportedPackagesProperty = extensionManifest.getExportedPackages();
       exportedResourcesProperty = extensionManifest.getExportedResources();
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Plugin '{}' will be handled as standard plugin, it is not an extension", pluginUrlClassification.getName());
-      }
+      logger.debug("Plugin '{}' will be handled as standard plugin, it is not an extension", pluginUrlClassification.getName());
       ClassLoader pluginArtifactClassLoaderToDiscoverModules =
           new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null);
       List<MuleModule> modules =
@@ -275,7 +271,7 @@ public class IsolatedClassLoaderFactory {
   private void logClassLoadingTrace(String message) {
     if (isVerboseClassLoading()) {
       logger.info(message);
-    } else if (logger.isDebugEnabled()) {
+    } else {
       logger.debug(message);
     }
   }

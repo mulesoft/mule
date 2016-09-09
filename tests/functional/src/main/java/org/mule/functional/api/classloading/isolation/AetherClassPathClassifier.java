@@ -100,9 +100,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   @Override
   public ArtifactUrlClassification classify(ClassPathClassifierContext context) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Building class loaders for rootArtifact: {}", context.getRootArtifact());
-    }
+    logger.debug("Building class loaders for rootArtifact: {}", context.getRootArtifact());
 
     List<Dependency> directDependencies;
     try {
@@ -141,10 +139,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
-          "order to resolve the graph): {}", directDependencies);
-    }
+    logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
+                     "order to resolve the graph): {}", directDependencies);
 
 
     Set<Dependency> managedDependencies = directDependencies.stream()
@@ -158,10 +154,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .flatMap(l -> l.stream())
         .collect(toSet());
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Collected managed dependencies from direct provided dependencies to be used for resolving container "
-          + "dependency graph: {}", managedDependencies);
-    }
+    logger.debug("Collected managed dependencies from direct provided dependencies to be used for resolving container "
+                     + "dependency graph: {}", managedDependencies);
 
     List<String> excludedFilterPattern = newArrayList(context.getProvidedExclusions());
     excludedFilterPattern.addAll(context.getExcludedArtifacts());
@@ -171,13 +165,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .collect(toList()));
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Resolving dependencies for container using exclusion filter patterns: {}", excludedFilterPattern);
-    }
+    logger.debug("Resolving dependencies for container using exclusion filter patterns: {}", excludedFilterPattern);
     if (!context.getProvidedInclusions().isEmpty()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Resolving dependencies for container using inclusion filter patterns: {}", context.getProvidedInclusions());
-      }
+      logger.debug("Resolving dependencies for container using inclusion filter patterns: {}", context.getProvidedInclusions());
     }
 
     final DependencyFilter dependencyFilter = orFilter(new PatternInclusionsDependencyFilter(context.getProvidedInclusions()),
@@ -230,14 +220,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .map(pluginCoords -> createPluginArtifact(pluginCoords, rootArtifact, directDependencies))
         .collect(toList());
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("{} plugins defined to be classified", pluginsArtifacts.size());
-    }
+    logger.debug("{} plugins defined to be classified", pluginsArtifacts.size());
 
     if (isExtensionPlugin(rootArtifact)) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("rootArtifact '{}' identified as Extension plugin", rootArtifact);
-      }
+      logger.debug("rootArtifact '{}' identified as Extension plugin", rootArtifact);
       pluginUrlClassifications.add(buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator));
 
       pluginsArtifacts = pluginsArtifacts.stream()
@@ -315,14 +301,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     String pluginVersion;
 
     if (rootArtifact.getGroupId().equals(pluginGroupId) && rootArtifact.getArtifactId().equals(pluginArtifactId)) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("'{}' declared as plugin, resolving version from pom file", rootArtifact);
-      }
+      logger.debug("'{}' declared as plugin, resolving version from pom file", rootArtifact);
       pluginVersion = rootArtifact.getVersion();
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Resolving version for '{}' from direct dependencies", pluginCoords);
-      }
+      logger.debug("Resolving version for '{}' from direct dependencies", pluginCoords);
       Optional<Dependency> pluginDependencyOp = directDependencies.isEmpty() ? Optional.<Dependency>empty()
           : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(pluginGroupId)
               && dependency.getArtifact().getArtifactId().equals(pluginArtifactId)).findFirst();
@@ -336,9 +318,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     final DefaultArtifact artifact = new DefaultArtifact(pluginGroupId, pluginArtifactId, JAR_EXTENSION, pluginVersion);
-    if (logger.isDebugEnabled()) {
-      logger.debug("'{}' plugin coordinates resolved to: '{}'", pluginCoords, artifact);
-    }
+    logger.debug("'{}' plugin coordinates resolved to: '{}'", pluginCoords, artifact);
     return artifact;
   }
 
@@ -367,15 +347,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private List<URL> buildApplicationUrlClassification(ClassPathClassifierContext context,
                                                       List<Dependency> directDependencies,
                                                       List<PluginUrlClassification> pluginUrlClassifications) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Building application classification");
-    }
+    logger.debug("Building application classification");
     Artifact rootArtifact = context.getRootArtifact();
 
     DependencyFilter dependencyFilter = new PatternInclusionsDependencyFilter(context.getTestInclusions());
-    if (logger.isDebugEnabled()) {
-      logger.debug("Using filter for dependency graph to include: '{}'", context.getTestInclusions());
-    }
+    logger.debug("Using filter for dependency graph to include: '{}'", context.getTestInclusions());
 
     boolean isRootArtifactPlugin = !pluginUrlClassifications.isEmpty()
         && pluginUrlClassifications.stream().filter(p -> {
@@ -399,9 +375,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                     rootArtifact);
       }
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("RootArtifact is a plugin or it doesn't have a target/classes folder (it is the case of a test artifact)");
-      }
+      logger.debug("RootArtifact is a plugin or it doesn't have a target/classes folder (it is the case of a test artifact)");
       exclusionsPatterns.add(rootArtifact.getGroupId() + MAVEN_COORDINATES_SEPARATOR + rootArtifact.getArtifactId() +
           MAVEN_COORDINATES_SEPARATOR + "*" + MAVEN_COORDINATES_SEPARATOR + rootArtifact.getVersion());
     }
@@ -418,15 +392,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         })
         .collect(toList());
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("OR exclude: {}", context.getExcludedArtifacts());
-    }
+    logger.debug("OR exclude: {}", context.getExcludedArtifacts());
     exclusionsPatterns.addAll(context.getExcludedArtifacts());
 
     if (!context.getTestExclusions().isEmpty()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("OR exclude application specific artifacts: {}", context.getTestExclusions());
-      }
+      logger.debug("OR exclude application specific artifacts: {}", context.getTestExclusions());
       exclusionsPatterns.addAll(context.getTestExclusions());
     }
 
@@ -435,10 +405,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       managedDependencies.addAll(directDependencies.stream()
           .filter(directDependency -> !directDependency.getScope().equals(TEST))
           .collect(toList()));
-      if (logger.isDebugEnabled()) {
-        logger.debug("Resolving dependency graph for '{}' scope direct dependencies: {} and managed dependencies {}",
-                     TEST, directDependencies, managedDependencies);
-      }
+      logger.debug("Resolving dependency graph for '{}' scope direct dependencies: {} and managed dependencies {}",
+                   TEST, directDependencies, managedDependencies);
 
       final Dependency rootTestDependency = new Dependency(new DefaultArtifact(rootArtifact.getGroupId(),
                                                                                rootArtifact.getArtifactId(), TESTS_CLASSIFIER,
@@ -494,9 +462,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param classpathURLs {@link URL}s already provided in class path by IDE or Maven
    */
   private void resolveSnapshotVersionsToTimestampedFromClassPath(List<URL> resolvedURLs, List<URL> classpathURLs) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Checking if resolved SNAPSHOT URLs had a timestamped version already included in class path URLs");
-    }
+    logger.debug("Checking if resolved SNAPSHOT URLs had a timestamped version already included in class path URLs");
     Map<File, List<URL>> classpathFolders = groupArtifactUrlsByFolder(classpathURLs);
 
     FileFilter snapshotFileFilter = new WildcardFileFilter(SNAPSHOT_WILCARD_FILE_FILTER);
@@ -506,19 +472,15 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       File artifactResolvedFile = new File(urlResolved.getFile());
       if (snapshotFileFilter.accept(artifactResolvedFile)) {
         File artifactResolvedFileParentFile = artifactResolvedFile.getParentFile();
-        if (logger.isDebugEnabled()) {
-          logger.debug("Checking if resolved SNAPSHOT artifact: '{}' has a timestamped version already in class path",
-                       artifactResolvedFile);
-        }
+        logger.debug("Checking if resolved SNAPSHOT artifact: '{}' has a timestamped version already in class path",
+                     artifactResolvedFile);
         URL urlFromClassPath = null;
         if (classpathFolders.containsKey(artifactResolvedFileParentFile)) {
           urlFromClassPath = findArtifactUrlFromClassPath(classpathFolders, artifactResolvedFile);
         }
 
         if (urlFromClassPath != null) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
-          }
+          logger.debug("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
           listIterator.set(urlFromClassPath);
         } else {
           throw new IllegalSourceException(artifactResolvedFile
@@ -571,9 +533,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private URL findArtifactUrlFromClassPath(Map<File, List<URL>> classpathFolders, File artifactResolvedFile) {
     List<URL> urls = classpathFolders.get(artifactResolvedFile.getParentFile());
-    if (logger.isDebugEnabled()) {
-      logger.debug("URLs found for '{}' in class path are: {}", artifactResolvedFile, urls);
-    }
+    logger.debug("URLs found for '{}' in class path are: {}", artifactResolvedFile, urls);
     if (urls.size() == 1) {
       return urls.get(0);
     }

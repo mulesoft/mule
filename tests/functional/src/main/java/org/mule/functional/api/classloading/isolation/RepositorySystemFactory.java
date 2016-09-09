@@ -28,8 +28,6 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.spi.connector.RepositoryConnectorFactory;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Factory to create a {@link RepositorySystem} from Eclipse Aether to work in {@code offline} mode and resolve dependencies
@@ -47,8 +45,6 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public class RepositorySystemFactory {
-
-  protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   /**
    * Creates an instance of the {@link RepositorySystemFactory} to collect Maven dependencies.

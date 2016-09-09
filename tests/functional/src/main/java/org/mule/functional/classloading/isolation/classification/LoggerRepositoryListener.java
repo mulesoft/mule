@@ -24,121 +24,87 @@ public class LoggerRepositoryListener extends AbstractRepositoryListener {
 
   @Override
   public void artifactDeployed(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Deployed {} to {}", event.getArtifact(), event.getRepository());
-    }
+    logger.trace("Deployed {} to {}", event.getArtifact(), event.getRepository());
   }
 
   @Override
   public void artifactDeploying(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Deploying {} to {}", event.getArtifact(), event.getRepository());
-    }
+    logger.trace("Deploying {} to {}", event.getArtifact(), event.getRepository());
   }
 
   @Override
   public void artifactDescriptorInvalid(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Invalid artifact descriptor for {}: {}", event.getArtifact(), event.getException().getMessage());
-    }
+    logger.trace("Invalid artifact descriptor for {}: {}", event.getArtifact(), event.getException().getMessage());
   }
 
   @Override
   public void artifactDescriptorMissing(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Missing artifact descriptor for {}", event.getArtifact());
-    }
+    logger.trace("Missing artifact descriptor for {}", event.getArtifact());
   }
 
   @Override
   public void artifactInstalled(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Installed {} to {}", event.getArtifact(), event.getFile());
-    }
+    logger.trace("Installed {} to {}", event.getArtifact(), event.getFile());
   }
 
   @Override
   public void artifactInstalling(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Installing {} to {}", event.getArtifact(), event.getFile());
-    }
+    logger.trace("Installing {} to {}", event.getArtifact(), event.getFile());
   }
 
   @Override
   public void artifactResolved(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Resolved artifact {} from {}", event.getArtifact(), event.getRepository());
-    }
+    logger.trace("Resolved artifact {} from {}", event.getArtifact(), event.getRepository());
   }
 
   @Override
   public void artifactDownloading(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Downloading artifact {} from {}", event.getArtifact(), event.getRepository());
-    }
+    logger.trace("Downloading artifact {} from {}", event.getArtifact(), event.getRepository());
   }
 
   @Override
   public void artifactDownloaded(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Downloaded artifact {} from {}", event.getArtifact(), event.getRepository());
-    }
+    logger.trace("Downloaded artifact {} from {}", event.getArtifact(), event.getRepository());
   }
 
   @Override
   public void artifactResolving(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Resolving artifact {}", event.getArtifact());
-    }
+    logger.trace("Resolving artifact {}", event.getArtifact());
   }
 
   @Override
   public void metadataDeployed(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Deployed {} to {}", event.getMetadata(), event.getRepository());
-    }
+    logger.trace("Deployed {} to {}", event.getMetadata(), event.getRepository());
   }
 
   @Override
   public void metadataDeploying(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Deploying {} to {}", event.getMetadata(), event.getRepository());
-    }
+    logger.trace("Deploying {} to {}", event.getMetadata(), event.getRepository());
   }
 
   @Override
   public void metadataInstalled(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Installed {} to {}", event.getMetadata(), event.getFile());
-    }
+    logger.trace("Installed {} to {}", event.getMetadata(), event.getFile());
   }
 
   @Override
   public void metadataInstalling(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Installing {} to {}", event.getMetadata(), event.getFile());
-    }
+    logger.trace("Installing {} to {}", event.getMetadata(), event.getFile());
   }
 
   @Override
   public void metadataInvalid(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Invalid metadata {}", event.getMetadata());
-    }
+    logger.trace("Invalid metadata {}", event.getMetadata());
   }
 
   @Override
   public void metadataResolved(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Resolved metadata {} from {}", event.getMetadata(), event.getRepository());
-    }
+    logger.trace("Resolved metadata {} from {}", event.getMetadata(), event.getRepository());
   }
 
   @Override
   public void metadataResolving(RepositoryEvent event) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("Resolving metadata {} from {}", event.getMetadata(), event.getRepository());
-    }
+    logger.trace("Resolving metadata {} from {}", event.getMetadata(), event.getRepository());
   }
 
 }

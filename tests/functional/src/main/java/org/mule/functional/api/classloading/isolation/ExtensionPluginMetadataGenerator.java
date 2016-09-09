@@ -51,7 +51,7 @@ public class ExtensionPluginMetadataGenerator {
   private List<File> extensionsResourcesFolders = newArrayList();
 
   /**
-   * Creates a instance that will generated metadata for extensions on the baseResourcesFolder
+   * Creates an instance that will generated metadata for extensions on the baseResourcesFolder
    *
    * @param baseResourcesFolder {@link File} folder to write resources generated for each extension
    */
@@ -156,7 +156,7 @@ public class ExtensionPluginMetadataGenerator {
    * <p/>
    * These files are going to be generated for each extension registered here.
    */
-  //TODO (gfernandes) Check with AMarra how to generate only the DSL resources for one extension only (at least the files)
+  //TODO (gfernandes) MULE-10513 Check with AMarra how to generate only the DSL resources for one extension only
   public void generateDslResources() {
     extensionsResourcesFolders.stream()
         .forEach(resourcesFolder -> extensionsInfrastructure.generateDslResources(resourcesFolder));

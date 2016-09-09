@@ -17,8 +17,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;
+import static org.mule.runtime.core.util.StringMessageUtils.getBoilerPlate;
 import org.mule.functional.api.classloading.isolation.WorkspaceLocationResolver;
-import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -78,19 +78,15 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
     checkNotNull(rootArtifactClassesFolder, "rootArtifactClassesFolder cannot be null");
 
     File rootArtifactFolder = rootArtifactClassesFolder.getParentFile().getParentFile();
-    if (logger.isDebugEnabled()) {
-      logger.debug("Discovering workspace artifacts locations from '{}'", rootArtifactFolder);
-    }
+    logger.debug("Discovering workspace artifacts locations from '{}'", rootArtifactFolder);
     if (!containsMavenProject(rootArtifactFolder)) {
       logger.warn("Couldn't find any workspace reference for artifacts due to '{}' is not a Maven project", rootArtifactFolder);
     }
 
     String rootProjectDirectoryProperty = getProperty(MAVEN_MULTI_MODULE_PROJECT_DIRECTORY);
     if (isNotBlank(rootProjectDirectoryProperty)) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Using Maven System.property['{}']='{}' to find out project root directory for discovering poms",
-                     MAVEN_MULTI_MODULE_PROJECT_DIRECTORY, rootProjectDirectoryProperty);
-      }
+      logger.debug("Using Maven System.property['{}']='{}' to find out project root directory for discovering poms",
+                   MAVEN_MULTI_MODULE_PROJECT_DIRECTORY, rootProjectDirectoryProperty);
       discoverMavenReactorProjects(rootProjectDirectoryProperty, classPath,
                                    rootArtifactClassesFolder.getParentFile().getParentFile());
     } else {
@@ -103,7 +99,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
     List<String> messages = newArrayList("Workspace:");
     messages.add(" ");
     messages.addAll(filePathByArtifactId.keySet());
-    logger.debug(StringMessageUtils.getBoilerPlate(newArrayList(messages), '*', DEFAULT_MESSAGE_WIDTH));
+    logger.debug(getBoilerPlate(newArrayList(messages), '*', DEFAULT_MESSAGE_WIDTH));
   }
 
   /**
@@ -117,9 +113,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
   private void discoverMavenReactorProjects(String rootProjectDirectoryProperty, List<URL> classPath,
                                             File rootArtifactClassesFolder) {
     Path rootProjectDirectory = get(rootProjectDirectoryProperty);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Defined rootProjectDirectory='{}'", rootProjectDirectory);
-    }
+    logger.debug("Defined rootProjectDirectory='{}'", rootProjectDirectory);
 
     File currentDir = rootArtifactClassesFolder;
     File lastMavenProjectDir = currentDir;
@@ -128,9 +122,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
       currentDir = currentDir.getParentFile();
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Top folder found, parent pom found at: '{}'", lastMavenProjectDir);
-    }
+    logger.debug("Top folder found, parent pom found at: '{}'", lastMavenProjectDir);
     try {
       walkFileTree(lastMavenProjectDir.toPath(), new MavenDiscovererFileVisitor(classPath));
     } catch (IOException e) {
@@ -154,9 +146,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
     List<File> mavenProjects = classPaths.stream()
         .filter(path -> containsMavenProject(path.getParent().getParent().toFile()))
         .map(path -> path.getParent().getParent().toFile()).collect(toList());
-    if (logger.isDebugEnabled()) {
-      logger.debug("Filtered from class path Maven projects: {}", mavenProjects);
-    }
+    logger.debug("Filtered from class path Maven projects: {}", mavenProjects);
     mavenProjects.stream().forEach(file -> resolvedArtifact(readMavenPomFile(getPomFile(file)).getArtifactId(), file.toPath()));
   }
 
@@ -243,9 +233,7 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
       if (isPomFile(file.toFile())) {
         Model model = readMavenPomFile(file.toFile());
         Path location = file.getParent();
-        if (logger.isDebugEnabled()) {
-          logger.debug("Checking if location {} is already present in class path", location);
-        }
+        logger.debug("Checking if location {} is already present in class path", location);
         if (this.classPath.contains(location)) {
           resolvedArtifact(model.getArtifactId(), location);
         }
