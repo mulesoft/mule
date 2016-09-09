@@ -177,13 +177,13 @@
 # /lib/opt
 #
 /mule-standalone-${productVersion}/lib/opt
-/mule-standalone-${productVersion}/lib/opt/aether-api-1.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/aether-connector-basic-1.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/aether-impl-1.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/aether-spi-1.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/aether-transport-file-1.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/aether-transport-http-1.1.0.jar
-/mule-standalone-${productVersion}/lib/opt/aether-util-1.1.0.jar
+/mule-standalone-${productVersion}/lib/opt/aether-api-1.0.2.v20150114.jar
+/mule-standalone-${productVersion}/lib/opt/aether-connector-basic-1.0.2.v20150114.jar
+/mule-standalone-${productVersion}/lib/opt/aether-impl-1.0.2.v20150114.jar
+/mule-standalone-${productVersion}/lib/opt/aether-spi-1.0.2.v20150114.jar
+/mule-standalone-${productVersion}/lib/opt/aether-transport-file-1.0.2.v20150114.jar
+/mule-standalone-${productVersion}/lib/opt/aether-transport-http-1.0.2.v20150114.jar
+/mule-standalone-${productVersion}/lib/opt/aether-util-1.0.2.v20150114.jar
 /mule-standalone-${productVersion}/lib/opt/ant-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/ant-launcher-1.7.0.jar
 /mule-standalone-${productVersion}/lib/opt/antlr-runtime-3.5.jar
@@ -249,8 +249,8 @@
 /mule-standalone-${productVersion}/lib/opt/guava-18.0.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-core-1.3.jar
 /mule-standalone-${productVersion}/lib/opt/hamcrest-library-1.3.jar
-/mule-standalone-${productVersion}/lib/opt/httpclient-4.3.5.jar
-/mule-standalone-${productVersion}/lib/opt/httpcore-4.3.2.jar
+/mule-standalone-${productVersion}/lib/opt/httpclient-4.2.6.jar
+/mule-standalone-${productVersion}/lib/opt/httpcore-4.2.5.jar
 /mule-standalone-${productVersion}/lib/opt/invokebinder-1.2.jar
 /mule-standalone-${productVersion}/lib/opt/isorelax-20030108.jar
 /mule-standalone-${productVersion}/lib/opt/jackson-annotations-2.4.0.jar
