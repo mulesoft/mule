@@ -8,6 +8,7 @@ package org.mule.extension.email.api;
 
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT_PLAIN;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -29,7 +30,7 @@ public class EmailContent {
    * Text body of the message content
    */
   @Parameter
-  @Optional(defaultValue = "#[payload]")
+  @Optional(defaultValue = PAYLOAD)
   @Placement(order = 1)
   @Text
   private String body;

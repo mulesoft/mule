@@ -6,6 +6,7 @@
  */
 package org.mule.extension.socket.api;
 
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.extension.socket.api.client.SocketClient;
 import org.mule.extension.socket.api.config.RequesterConfig;
 import org.mule.extension.socket.api.connection.RequesterConnection;
@@ -45,7 +46,7 @@ public class SocketOperations {
    */
   @MetadataScope(outputResolver = SocketMetadataResolver.class, keysResolver = SocketMetadataResolver.class)
   public OperationResult<?, ?> send(@Connection RequesterConnection connection, @UseConfig RequesterConfig config,
-                                    @Optional(defaultValue = "#[payload]") @XmlHints(allowReferences = false) Object content,
+                                    @Optional(defaultValue = PAYLOAD) @XmlHints(allowReferences = false) Object content,
                                     @Optional @Summary("Encoding to use when the data to serialize is of String type") String outputEncoding,
                                     @MetadataKeyId String hasResponse, MuleMessage muleMessage)
       throws ConnectionException, IOException {

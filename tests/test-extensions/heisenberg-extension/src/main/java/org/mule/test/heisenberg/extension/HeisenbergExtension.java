@@ -6,10 +6,6 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static org.mule.runtime.extension.api.Category.SELECT;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
@@ -54,6 +50,12 @@ import java.util.Set;
 import java.util.function.Function;
 
 import javax.inject.Inject;
+
+import static org.mule.runtime.extension.api.Category.SELECT;
+import static org.mule.runtime.extension.api.annotation.param.Optional.DefaultValues.PAYLOAD;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, description = HeisenbergExtension.EXTENSION_DESCRIPTION, category = SELECT,
     minMuleVersion = "4.1")
@@ -181,7 +183,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   private String firstEndevour;
 
   @Parameter
-  @Optional(defaultValue = "#[payload]")
+  @Optional(defaultValue = PAYLOAD)
   @Expression(LITERAL)
   private String literalExpressionWithDefault;
 
