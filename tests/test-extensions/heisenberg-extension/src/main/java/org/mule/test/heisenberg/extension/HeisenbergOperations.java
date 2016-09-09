@@ -7,9 +7,8 @@
 package org.mule.test.heisenberg.extension;
 
 import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
-import static org.mule.runtime.extension.api.annotation.param.Optional.DefaultValues.PAYLOAD;
-
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleEvent;
