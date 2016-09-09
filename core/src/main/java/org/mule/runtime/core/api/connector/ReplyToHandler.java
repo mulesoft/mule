@@ -6,22 +6,25 @@
  */
 package org.mule.runtime.core.api.connector;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleEvent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.exception.MessagingException;
 
 /**
  * <code>ReplyToHandler</code> is used to handle routing where a replyTo endpointUri is set on the message
+ * 
+ * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API. Move to
+ *             compatibility module afterwards.
  */
-
+@Deprecated
 public interface ReplyToHandler {
 
   MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException;
 
   /**
    * Processes replyTo in the case an exception occurred. Not all implementations will implement this if for example they should
-   * only send a reply message in the sucess case.
+   * only send a reply message in the success case.
    *
    * @param exception the exception thrown by processing
    * @param replyTo name of the channel that exception message should be sent if relevant

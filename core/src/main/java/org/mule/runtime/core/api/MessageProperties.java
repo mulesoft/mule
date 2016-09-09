@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.core.api;
 
+import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 
 import java.io.Serializable;
 import java.util.Set;
 
 /**
- * Use to obtain message proprties defined in two scopes, inbound and outbound.
+ * Use to obtain message properties defined in two scopes, inbound and outbound.
+ *
+ * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
  */
+@Deprecated
 public interface MessageProperties {
 
   /**
