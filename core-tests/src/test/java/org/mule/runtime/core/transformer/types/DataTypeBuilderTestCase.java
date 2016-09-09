@@ -12,18 +12,23 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.util.IOUtils.toByteArray;
+
 import org.mule.runtime.api.message.MuleMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.SimpleDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -132,12 +137,42 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Ignore("MULE-10452: re-enable once the cache is restored or remove it if not needed anymore")
   public void cachedInstances() {
     final DataTypeParamsBuilder builder1 = DataType.builder().type(String.class);
     final DataTypeParamsBuilder builder2 = DataType.builder().type(String.class);
 
     assertThat(builder1, equalTo(builder2));
     assertThat(builder1.build(), sameInstance(builder2.build()));
+  }
+
+  @Test
+  public void cacheClean() throws InterruptedException, ClassNotFoundException {
+    ClassLoader custom = new ClassLoader(this.getClass().getClassLoader()) {
+
+      @Override
+      public Class<?> loadClass(String name) throws ClassNotFoundException {
+        if (MuleMessage.class.getName().equals(name)) {
+          byte[] classBytes;
+          try {
+            classBytes = toByteArray(this.getClass().getResourceAsStream("/org/mule/runtime/api/message/MuleMessage.class"));
+            return this.defineClass(null, classBytes, 0, classBytes.length);
+          } catch (Exception e) {
+            return super.loadClass(name);
+          }
+        } else {
+          return super.loadClass(name);
+        }
+      }
+    };
+
+    PhantomReference<ClassLoader> clRef = new PhantomReference<>(custom, new ReferenceQueue<>());
+    DataType.builder().type(custom.loadClass(MuleMessage.class.getName())).build();
+    custom = null;
+
+    new PollingProber().check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(clRef.isEnqueued(), is(true));
+      return true;
+    }, "A hard reference is being mantained to the type of the DataType."));
   }
 }
