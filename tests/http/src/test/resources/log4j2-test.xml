@@ -21,9 +21,6 @@
         <AsyncLogger name="org.mule" level="WARN"/>
         <AsyncLogger name="com.mulesoft" level="WARN"/>
 
-        <AsyncLogger name="org.mule.functional.classloading.isolation" level="DEBUG"/>
-        <AsyncLogger name="org.mule.functional.api.classloading.isolation" level="DEBUG"/>
-
         <AsyncRoot level="INFO">
             <AppenderRef ref="Console"/>
         </AsyncRoot>
