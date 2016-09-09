@@ -78,7 +78,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * 
    * @param outputType The requested output type.
    * @param muleContext the Mule node.
-   * @return the message transformed into it's recognised or expected format.
+   * @return the message transformed into it's recognized or expected format.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
    * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
@@ -92,7 +92,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * 
    * @param outputType The requested output type.
    * @param muleContext the Mule node.
-   * @return the message transformed into it's recognised or expected format.
+   * @return the message transformed into it's recognized or expected format.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
    * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
@@ -101,12 +101,12 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   Object transformMessage(DataType outputType, MuleContext muleContext) throws TransformerException;
 
   /**
-   * Returns the message transformed into it's recognised or expected format and then into a String. The transformer used is the
+   * Returns the message transformed into it's recognized or expected format and then into a String. The transformer used is the
    * one configured on the endpoint through which this event was received. If necessary this will use the encoding set on the
    * event.
    * 
    * @param muleContext the Mule node.
-   * @return the message transformed into it's recognised or expected format as a Strings.
+   * @return the message transformed into it's recognized or expected format as a Strings.
    * @throws TransformerException if a failure occurs in the transformer
    * @see org.mule.runtime.core.api.transformer.Transformer
    * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
@@ -150,7 +150,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * Retrieves the service for the current event
    * 
    * @return the service for the event
-   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
+   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
    */
   @Deprecated
   FlowConstruct getFlowConstruct();
@@ -191,7 +191,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   /**
    * Return the destination (if any) that will be passed to the reply-to handler.
    * 
-   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
+   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
    */
   @Deprecated
   Object getReplyToDestination();
@@ -215,7 +215,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * Indicates if the current event allows non-blocking execution and IO.
    *
    * @return true if non-blocking execution and IO is allowed. False otherwise.
-   * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
+   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
    */
   @Deprecated
   boolean isAllowNonBlocking();
@@ -293,7 +293,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * Add a flow variable.
      *
      * @param key the key of the flow variable to add.
-     * @param value the value of the flow varibale to add.
+     * @param value the value of the flow variable to add.
      * @param mediaType the flow variable media this
      * @return the builder instance
      */
@@ -357,7 +357,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param replyToHandler
      * @return the builder instance
-     * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
+     * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
      */
     @Deprecated
     Builder replyToHandler(ReplyToHandler replyToHandler);
@@ -366,7 +366,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param replyToDestination
      * @return the builder instance
-     * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
+     * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
      */
     @Deprecated
     Builder replyToDestination(Object replyToDestination);
@@ -375,7 +375,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
      * 
      * @param flow
      * @return the builder instance
-     * @deprecated TODO MULE-9731 Migrate 3.7 ReplyToHandler centric non-blocking support to use new non-blocking API
+     * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
      */
     @Deprecated
     Builder flow(FlowConstruct flow);

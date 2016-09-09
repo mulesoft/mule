@@ -59,7 +59,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
 
   /**
    * If an error occurred during the processing of this message this will return a ErrorPayload that contains the root exception
-   * and Mule error code, plus any other releated info
+   * and Mule error code, plus any other related info
    *
    * @return The exception payload (if any) attached to this message
    */

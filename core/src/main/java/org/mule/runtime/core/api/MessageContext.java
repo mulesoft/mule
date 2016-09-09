@@ -9,9 +9,9 @@ package org.mule.runtime.core.api;
 import java.time.OffsetTime;
 
 /**
- * Context representing a message that is recieved by a Mule Runtime via a connector source.  This context is immutable and
- * maintained during all execution orignating from a given source message and all instances of {@link MuleEvent} created as part
- * of the processing of the source message will maintain a reference to this instance.  Wherever a Flow references another Flow
+ * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
+ * maintained during all execution originating from a given source message and all instances of {@link MuleEvent} created as part
+ * of the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow
  * this {@link MessageContext} will be maintained, while whenever there is a connector boundary a new instance will be created by
  * the receiving source.
  *
@@ -31,7 +31,7 @@ public interface MessageContext {
   /**
    * The correlation ID is used to correlate messages between different flows and systems.
    * <p>
-   * If the connector that recieves the source message supports the concept of a correlation ID then the connector should create
+   * If the connector that receives the source message supports the concept of a correlation ID then the connector should create
    * an instance of {@link MessageContext} using this value. If on the other hand, no correlation ID is received by the source
    * connector then a time-based UUID, also available via {@link #getId()} is used.
    *
