@@ -45,11 +45,15 @@ public interface MessageContext {
   OffsetTime getReceivedTime();
 
   /**
+   * TODO MULE-10517 Review this
+   * 
    * @return the name of the flow that processes events of this context.
    */
   String getOriginatingFlowName();
 
   /**
+   * TODO MULE-10517 Review this
+   * 
    * @return the name of the connector that generated the message for the first event of this context.
    */
   String getOriginatingConnectorName();
