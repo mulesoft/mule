@@ -22,18 +22,21 @@ public class PluginUrlClassification {
   private final List<URL> urls;
   private final String name;
   private final List<Class> exportClasses;
+  private final List<PluginUrlClassification> pluginDependencies;
 
   /**
    * Creates an instance of the classification.
-   *
-   * @param name a {@link String} representing the name of the plugin
+   *  @param name a {@link String} representing the name of the plugin
    * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}
    * @param exportClasses list of {@link Class}es that would be used for exporting as extra classes to the plugin
+   * @param pluginDependencies list of {@link PluginUrlClassification} plugin dependencies name for this plugin classified
    */
-  public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses) {
+  public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses,
+                                 List<PluginUrlClassification> pluginDependencies) {
     this.name = name;
     this.urls = urls;
     this.exportClasses = exportClasses;
+    this.pluginDependencies = pluginDependencies;
   }
 
   public List<URL> getUrls() {
@@ -47,4 +50,9 @@ public class PluginUrlClassification {
   public List<Class> getExportClasses() {
     return exportClasses;
   }
+
+  public List<PluginUrlClassification> getPluginDependencies() {
+    return pluginDependencies;
+  }
+
 }

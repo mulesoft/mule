@@ -7,19 +7,21 @@
 
 package org.mule.functional.classloading.isolation.classloader;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
-import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.MuleModule;
+import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -38,6 +40,7 @@ import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -48,6 +51,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -68,6 +72,8 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public class IsolatedClassLoaderFactory {
+
+  private static final String PLUGIN_PROPERTIES = "plugin.properties";
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
@@ -209,16 +215,22 @@ public class IsolatedClassLoaderFactory {
       exportedPackagesProperty = extensionManifest.getExportedPackages();
       exportedResourcesProperty = extensionManifest.getExportedResources();
     } else {
-      logger.debug("Plugin '{}' will be handled as standard plugin, it is not an extension", pluginUrlClassification.getName());
-      ClassLoader pluginArtifactClassLoaderToDiscoverModules =
+      logger.debug("Plugin '{}' will be handled as standard plugin", pluginUrlClassification.getName());
+      ClassLoader pluginArtifactClassLoader =
           new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null);
-      List<MuleModule> modules =
-          withContextClassLoader(pluginArtifactClassLoaderToDiscoverModules,
-                                 () -> new ClasspathModuleDiscoverer(pluginArtifactClassLoaderToDiscoverModules).discover());
-      MuleModule module = validatePluginModule(pluginUrlClassification.getName(), modules);
-
-      exportedPackagesProperty = module.getExportedPackages();
-      exportedResourcesProperty = module.getExportedPackages();
+      URL pluginPropertiesUrl = pluginArtifactClassLoader.getResource(PLUGIN_PROPERTIES);
+      if (pluginPropertiesUrl == null) {
+        throw new IllegalStateException(PLUGIN_PROPERTIES + " couldn't be found for plugin: " +
+            pluginUrlClassification.getName());
+      }
+      Properties pluginProperties;
+      try {
+        pluginProperties = PropertiesUtils.loadProperties(pluginPropertiesUrl);
+      } catch (IOException e) {
+        throw new RuntimeException("Error while reading plugin properties: " + pluginPropertiesUrl);
+      }
+      exportedPackagesProperty = newArrayList(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY));
+      exportedResourcesProperty = newArrayList(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY));
     }
     String exportedPackages = exportedPackagesProperty.stream().collect(Collectors.joining(", "));
     final String exportedResources = exportedResourcesProperty.stream().collect(Collectors.joining(", "));
@@ -281,25 +293,6 @@ public class IsolatedClassLoaderFactory {
    */
   private Boolean isVerboseClassLoading() {
     return valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));
-  }
-
-  /**
-   * Validates that only one module should be discovered. A plugin cannot have inside another plugin that holds a
-   * {@code mule-module.properties} for the time being.
-   *
-   * @param pluginName the plugin name
-   * @param discoveredModules {@link MuleModule} discovered
-   * @return the first Module from the list due to there should be only one module.
-   */
-  private MuleModule validatePluginModule(String pluginName, List<MuleModule> discoveredModules) {
-    if (discoveredModules.size() == 0) {
-      throw new IllegalStateException(pluginName
-          + " doesn't have in its classpath a mule-module.properties to define what packages and resources should expose");
-    }
-    if (discoveredModules.size() > 1) {
-      throw new IllegalStateException(pluginName + " has more than one mule-module.properties, composing plugins is not allowed");
-    }
-    return discoveredModules.get(0);
   }
 
 }

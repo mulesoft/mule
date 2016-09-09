@@ -61,16 +61,16 @@ public @interface ArtifactClassLoaderRunnerConfig {
   String[] providedInclusions() default {};
 
   /**
-   * Plugins in the format of {@code <groupId>:<artifactId>} to be loaded and registered to Mule Container during the execution of
-   * the test. {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} will be created for each plugin.
+   * Plugins in the format of {@code <groupId>:<artifactId>} to be loaded and registered to Mule Container during the
+   * execution of the test. {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} will be created for each
+   * plugin.
    * <p/>
-   * If the current artifact being tested is a plugin it would need to be declared here the groupId and artifactId, its
+   * If the current artifact being tested is a plugin it would not need to be declared here the groupId and artifactId, its
    * {@code /target/classes/} folder and Maven {@code compile} dependencies will be used to build the
    * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}.
    * <p/>
    * Otherwise any plugin artifact declared on this list should be declared as Maven dependency with scope {@code provided}, the
    * version of the plugin to be resolved will be the one defined in the Maven dependency.
-   * <p/>
    *
    * @return array of {@link String} to define plugins in order to create for each a plugin {@link ClassLoader}
    */
