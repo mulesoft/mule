@@ -10,9 +10,9 @@ package org.mule.runtime.core.processor.simple;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.InternalMessage.Builder;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
@@ -33,7 +33,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
     if (dataType == null) {
       final DefaultTypedValue typedValue = resolveTypedValue(event, eventBuilder);
-      builder.payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType());
+      builder.payload(typedValue.getContent()).mediaType(typedValue.getDataType().getMediaType());
     } else {
       Object value = resolveValue(event);
       final DataTypeParamsBuilder dataTypeBuilder =

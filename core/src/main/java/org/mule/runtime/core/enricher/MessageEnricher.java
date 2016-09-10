@@ -10,17 +10,17 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImpleme
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.MessageProcessors;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
@@ -78,8 +78,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
     DefaultTypedValue typedValue = expressionLanguage.evaluateTyped(sourceExpressionArg, enrichmentEvent, flowConstruct);
 
-    if (typedValue.getValue() instanceof InternalMessage) {
-      InternalMessage muleMessage = (InternalMessage) typedValue.getValue();
+    if (typedValue.getContent() instanceof InternalMessage) {
+      InternalMessage muleMessage = (InternalMessage) typedValue.getContent();
       typedValue = new DefaultTypedValue(muleMessage.getPayload(), muleMessage.getDataType());
     }
 
@@ -89,7 +89,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
       return eventBuilder.build();
     } else {
       return Event.builder(currentEvent).message(InternalMessage.builder(currentEvent.getMessage())
-          .payload(typedValue.getValue()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
+          .payload(typedValue.getContent()).mediaType(typedValue.getDataType().getMediaType()).build()).build();
     }
   }
 

@@ -18,9 +18,9 @@ import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.mvel2.util.CompilerTools;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -183,7 +183,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
                      DefaultTypedValue typedValue) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
-    evaluate(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
+    evaluate(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getContent()));
 
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
 

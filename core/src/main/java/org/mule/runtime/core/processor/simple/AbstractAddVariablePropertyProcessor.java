@@ -11,8 +11,8 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.AttributeEvaluator;
@@ -49,7 +49,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
       final Builder builder = Event.builder(event);
       DefaultTypedValue<T> typedValue = valueEvaluator.resolveTypedValue(event, builder);
       event = builder.build();
-      if (typedValue.getValue() == null) {
+      if (typedValue.getContent() == null) {
         if (logger.isDebugEnabled()) {
           logger.debug(MessageFormat.format(
                                             "Variable with key \"{0}\", not found on message using \"{1}\". Since the value was marked optional, nothing was set on the message for this variable",
@@ -57,7 +57,7 @@ public abstract class AbstractAddVariablePropertyProcessor<T> extends SimpleMess
         }
         return removeProperty(event, key);
       } else {
-        return addProperty(event, key, typedValue.getValue(), DataType.builder().type(typedValue.getValue().getClass())
+        return addProperty(event, key, typedValue.getContent(), DataType.builder().type(typedValue.getContent().getClass())
             .mediaType(getReturnDataType().getMediaType()).charset(resolveEncoding(typedValue)).build());
       }
     }

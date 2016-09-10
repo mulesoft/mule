@@ -424,7 +424,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
     DefaultTypedValue typedValue = evaluateTyped("payload", event);
 
-    assertThat((String) typedValue.getValue(), equalTo(TEST_MESSAGE));
+    assertThat((String) typedValue.getContent(), equalTo(TEST_MESSAGE));
     assertThat(typedValue.getDataType(), like(String.class, JSON, UTF_16));
   }
 

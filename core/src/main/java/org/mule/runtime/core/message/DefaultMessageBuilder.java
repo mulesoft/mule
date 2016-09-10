@@ -11,6 +11,8 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
+import static org.mule.runtime.core.config.i18n.CoreMessages.noTransformerFoundForMessage;
+import static org.mule.runtime.core.config.i18n.CoreMessages.objectNotOfCorrectType;
 import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
@@ -23,17 +25,18 @@ import static org.mule.runtime.core.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.util.ObjectUtils.getString;
 
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.InternalMessage.CollectionBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveMapWrapper;
@@ -63,14 +66,14 @@ public class DefaultMessageBuilder
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
 
-  private Object payload;
+  private Object content;
   private DataType dataType;
   private Attributes attributes = NULL_ATTRIBUTES;
 
   private ExceptionPayload exceptionPayload;
 
-  private Map<String, DefaultTypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
-  private Map<String, DefaultTypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
+  private Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
+  private Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>(HashMap.class);
   private Map<String, DataHandler> inboundAttachments = new HashMap<>();
   private Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
@@ -100,9 +103,9 @@ public class DefaultMessageBuilder
     message.getOutboundAttachmentNames().forEach(name -> addOutboundAttachment(name, message.getOutboundAttachment(name)));
   }
 
-  public DefaultMessageBuilder(org.mule.runtime.api.message.Message message) {
+  public DefaultMessageBuilder(Message message) {
     requireNonNull(message);
-    this.payload = message.getPayload();
+    this.content = message.getContent();
     this.dataType = message.getDataType();
     this.attributes = message.getAttributes();
 
@@ -113,20 +116,20 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage.Builder nullPayload() {
-    this.payload = null;
+    this.content = null;
     return this;
   }
 
   @Override
   public InternalMessage.Builder payload(Object payload) {
-    this.payload = payload;
+    this.content = payload;
     return this;
   }
 
   @Override
   public InternalMessage.CollectionBuilder streamPayload(Iterator payload, Class<?> clazz) {
     requireNonNull(payload);
-    this.payload = payload;
+    this.content = payload;
     this.dataType = DataType.builder().streamType(payload.getClass()).itemType(clazz).build();
     return this;
   }
@@ -134,7 +137,7 @@ public class DefaultMessageBuilder
   @Override
   public InternalMessage.CollectionBuilder collectionPayload(Collection payload, Class<?> clazz) {
     requireNonNull(payload);
-    this.payload = payload;
+    this.content = payload;
     this.dataType = DataType.builder().collectionType(payload.getClass()).itemType(clazz).build();
     return this;
   }
@@ -280,16 +283,16 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage build() {
-    return new MuleMessageImplementation(new DefaultTypedValue(payload, resolveDataType()), attributes,
+    return new MuleMessageImplementation(new DefaultTypedValue(content, resolveDataType()), attributes,
                                          inboundProperties, outboundProperties, inboundAttachments,
                                          outboundAttachments, exceptionPayload);
   }
 
   private DataType resolveDataType() {
     if (dataType == null) {
-      return DataType.fromObject(payload);
+      return DataType.fromObject(content);
     } else {
-      return DataType.builder(dataType).fromObject(payload).build();
+      return DataType.builder(dataType).fromObject(content).build();
     }
   }
 
@@ -318,18 +321,18 @@ public class DefaultMessageBuilder
      */
     private transient Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
-    private transient DefaultTypedValue typedValue;
+    private transient TypedValue payload;
     private Attributes attributes;
 
-    private Map<String, DefaultTypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
-    private Map<String, DefaultTypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
+    private Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
+    private Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
 
-    private MuleMessageImplementation(DefaultTypedValue typedValue, Attributes attributes,
-                                      Map<String, DefaultTypedValue<Serializable>> inboundProperties,
-                                      Map<String, DefaultTypedValue<Serializable>> outboundProperties,
+    private MuleMessageImplementation(TypedValue payload, Attributes attributes,
+                                      Map<String, TypedValue<Serializable>> inboundProperties,
+                                      Map<String, TypedValue<Serializable>> outboundProperties,
                                       Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
                                       ExceptionPayload exceptionPayload) {
-      this.typedValue = typedValue;
+      this.payload = payload;
       this.attributes = attributes;
       this.inboundMap.putAll(inboundProperties);
       this.outboundMap.putAll(outboundProperties);
@@ -389,13 +392,13 @@ public class DefaultMessageBuilder
     }
 
     @Override
-    public Object getPayload() {
-      return getValue();
+    public Object getContent() {
+      return payload.getContent();
     }
 
     @Override
-    public Object getValue() {
-      return typedValue.getValue();
+    public Object getPayload() {
+      return getContent();
     }
 
     public static class SerializedDataHandler implements Serializable {
@@ -417,7 +420,7 @@ public class DefaultMessageBuilder
               DataType source = DataType.fromObject(theContent);
               Transformer transformer = muleContext.getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY);
               if (transformer == null) {
-                throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, DataType.BYTE_ARRAY));
+                throw new TransformerException(noTransformerFoundForMessage(source, DataType.BYTE_ARRAY));
               }
               contents = transformer.transform(theContent);
             } catch (TransformerException ex) {
@@ -462,10 +465,10 @@ public class DefaultMessageBuilder
     }
 
     protected void serializeValue(ObjectOutputStream out) throws Exception {
-      if (typedValue.getValue() instanceof Serializable) {
+      if (payload.getContent() instanceof Serializable) {
         out.writeBoolean(true);
-        out.writeObject(typedValue.getValue());
-        out.writeObject(typedValue.getDataType());
+        out.writeObject(payload.getContent());
+        out.writeObject(payload.getDataType());
       } else {
         out.writeBoolean(false);
         // TODO MULE-10013 remove this logic from here
@@ -504,7 +507,7 @@ public class DefaultMessageBuilder
 
     private void readObject(ObjectInputStream in) throws Exception {
       in.defaultReadObject();
-      typedValue = new DefaultTypedValue(deserializeValue(in), (DataType) in.readObject());
+      payload = new DefaultTypedValue(deserializeValue(in), (DataType) in.readObject());
       inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
       outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
     }
@@ -536,7 +539,7 @@ public class DefaultMessageBuilder
 
     @Override
     public DataType getDataType() {
-      return typedValue.getDataType();
+      return payload.getDataType();
     }
 
     @Override
@@ -571,21 +574,21 @@ public class DefaultMessageBuilder
 
     @Override
     public DataType getInboundPropertyDataType(String name) {
-      DefaultTypedValue typedValue = inboundMap.get(name);
+      TypedValue typedValue = inboundMap.get(name);
       return typedValue == null ? null : typedValue.getDataType();
     }
 
     @Override
     public DataType getOutboundPropertyDataType(String name) {
-      DefaultTypedValue typedValue = outboundMap.get(name);
+      TypedValue typedValue = outboundMap.get(name);
       return typedValue == null ? null : typedValue.getDataType();
     }
 
-    private <T extends Serializable> T getValueOrDefault(DefaultTypedValue<T> typedValue, T defaultValue) {
+    private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue) {
       if (typedValue == null) {
         return defaultValue;
       }
-      T value = typedValue.getValue();
+      T value = typedValue.getContent();
       // Note that we need to keep the (redundant) casts in here because the compiler compiler complains
       // about primitive types being cast to a generic type
       if (defaultValue == null) {
@@ -614,8 +617,7 @@ public class DefaultMessageBuilder
         else if (defaultValue.getClass().isAssignableFrom(value.getClass())) {
           return value;
         } else {
-          throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(value.getClass(), defaultValue.getClass())
-              .getMessage());
+          throw new IllegalArgumentException(objectNotOfCorrectType(value.getClass(), defaultValue.getClass()).getMessage());
         }
       }
     }

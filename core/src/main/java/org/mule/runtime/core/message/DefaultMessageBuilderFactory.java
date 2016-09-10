@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.message;
 
-import org.mule.runtime.api.message.AbstractMuleMessageBuilderFactory;
+import org.mule.runtime.api.message.AbstractMessageBuilderFactory;
 import org.mule.runtime.core.api.InternalMessage;
 
 /**
  *
  */
-public class DefaultMessageBuilderFactory extends AbstractMuleMessageBuilderFactory {
+public class DefaultMessageBuilderFactory extends AbstractMessageBuilderFactory {
 
   private static DefaultMessageBuilderFactory INSTANCE = new DefaultMessageBuilderFactory();
 
