@@ -37,7 +37,7 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -242,7 +242,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected Event configureEvent() throws Exception {
     when(message.getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
     when(message.getPayload()).thenReturn(TEST_PAYLOAD);
-    Event event = Event.builder(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
+    Event event = Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
     return event;
   }
 

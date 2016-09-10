@@ -26,7 +26,7 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -503,7 +503,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
             .build();
     builder.chain(getAppendingMP("1"),
                   (Processor) event -> nested
-                      .process(Event.builder(DefaultMessageContext.create(mockFlow, TEST_CONNECTOR))
+                      .process(Event.builder(DefaultEventContext.create(mockFlow, TEST_CONNECTOR))
                           .message(event.getMessage()).exchangePattern(REQUEST_RESPONSE).flow(mockFlow).build()),
                   getAppendingMP("2"));
     assertEquals("01ab2", process(builder.build(), getTestEventUsingFlow("0")).getMessage().getPayload());

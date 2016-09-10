@@ -23,7 +23,7 @@ import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -166,7 +166,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     QueueKey key = new QueueKey(QUEUE_NAME, id);
     InternalMessage msg = InternalMessage.builder().payload("Hello").build();
     Flow flow = getTestFlow();
-    Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(msg).exchangePattern(ONE_WAY)
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(msg).exchangePattern(ONE_WAY)
         .flow(flow).build();
 
     ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);

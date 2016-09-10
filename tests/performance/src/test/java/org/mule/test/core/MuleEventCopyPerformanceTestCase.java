@@ -8,7 +8,7 @@ package org.mule.test.core;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.InternalMessage;
@@ -152,7 +152,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    final Event.Builder builder = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message)
+    final Event.Builder builder = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
         .exchangePattern(ONE_WAY).flow(flow);
     for (int i = 1; i <= numProperties; i++) {
       builder.addVariable("FlOwVaRiAbLeKeY" + i, "val");

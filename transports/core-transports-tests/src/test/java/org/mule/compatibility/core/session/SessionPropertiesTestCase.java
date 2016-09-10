@@ -18,7 +18,7 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -44,7 +44,7 @@ public class SessionPropertiesTestCase extends AbstractMuleContextTestCase {
   @Before
   public void before() throws Exception {
     flow = getTestFlow();
-    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
   }
 
   /**

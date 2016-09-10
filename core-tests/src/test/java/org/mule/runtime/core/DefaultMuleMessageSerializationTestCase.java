@@ -49,7 +49,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         InternalMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
     assertTrue(deserializedMessage.getPayload() instanceof byte[]);
@@ -61,7 +61,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final InternalMessage message = InternalMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    setCurrentEvent(Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
     assertEquals(byte[].class, deserializedMessage.getDataType().getType());

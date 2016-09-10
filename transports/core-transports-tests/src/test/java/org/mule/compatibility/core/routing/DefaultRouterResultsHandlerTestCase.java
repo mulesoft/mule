@@ -23,7 +23,7 @@ import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populate
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -62,7 +62,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
 
   }
 

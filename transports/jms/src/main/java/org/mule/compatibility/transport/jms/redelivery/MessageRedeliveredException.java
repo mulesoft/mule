@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.jms.redelivery;
 
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.compatibility.transport.jms.i18n.JmsMessages.tooManyRedeliveries;
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.Event;

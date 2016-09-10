@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -69,7 +69,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
   }
 
   private Event createEvent() throws Exception {
-    return Event.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR))
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload("").build()).flow(flowConstruct).error(mockError).build();
   }
 }

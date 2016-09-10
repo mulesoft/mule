@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -97,7 +97,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     when(mockUntilSuccessfulConfiguration.getAckExpression()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getMaxRetries()).thenReturn(DEFAULT_RETRIES);
     final InternalMessage mockMessage = InternalMessage.builder().payload("").build();
-    event = Event.builder(DefaultMessageContext.create(mockFlow, TEST_CONNECTOR)).message(mockMessage).build();
+    event = Event.builder(DefaultEventContext.create(mockFlow, TEST_CONNECTOR)).message(mockMessage).build();
     when(mockUntilSuccessfulConfiguration.getThreadingProfile().createPool(anyString())).thenReturn(mockPool);
     when(mockUntilSuccessfulConfiguration.createScheduledRetriesPool(anyString())).thenReturn(mockScheduledPool);
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(objectStore);

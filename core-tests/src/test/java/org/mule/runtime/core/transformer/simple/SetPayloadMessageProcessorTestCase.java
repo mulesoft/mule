@@ -19,7 +19,7 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -64,7 +64,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     muleMessage = InternalMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    muleEvent = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).flow(flow).build();
+    muleEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(muleMessage).flow(flow).build();
   }
 
   @Test

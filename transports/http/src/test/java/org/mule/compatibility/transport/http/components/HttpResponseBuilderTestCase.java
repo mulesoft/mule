@@ -24,7 +24,7 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -92,7 +92,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     when(mockEvent.getError()).thenReturn(empty());
     final Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    EventContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
     when(mockEvent.getContext()).thenReturn(executionContext);
     mockExpressionLanguage = mock(ExpressionLanguage.class);
     when(muleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);

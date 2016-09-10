@@ -12,7 +12,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImpleme
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -71,7 +71,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
     for (int i = 0; i < getParallelThreadCount(); ++i) {
       new Thread(() -> {
         try {
-          setCurrentEvent(Event.builder(DefaultMessageContext.create(testFlow, TEST_CONNECTOR))
+          setCurrentEvent(Event.builder(DefaultEventContext.create(testFlow, TEST_CONNECTOR))
               .message(InternalMessage.builder().payload("test").build()).exchangePattern(REQUEST_RESPONSE).flow(testFlow)
               .session(getTestSession(testFlow, muleContext)).build());
         } catch (Exception e1) {

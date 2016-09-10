@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
 import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -55,7 +55,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     mp2a.initialise();
 
     flow = getTestFlow();
-    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
   }
 
   @After

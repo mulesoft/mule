@@ -13,7 +13,7 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -298,7 +298,7 @@ public class TestEventBuilder {
     }
     final InternalMessage muleMessage = messageBuilder.build();
 
-    Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
         .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(flowVariables)
         .exchangePattern(exchangePattern).flow(flow).replyToHandler(replyToHandler).transacted(transacted).build();
 

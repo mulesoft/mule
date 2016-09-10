@@ -25,7 +25,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImpleme
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -299,7 +299,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    return Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(TEST_MESSAGE).build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(flow).build();
   }

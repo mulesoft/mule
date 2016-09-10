@@ -8,7 +8,7 @@ package org.mule.runtime.core;
 
 import static java.time.OffsetTime.now;
 
-import org.mule.runtime.core.api.CoreMessageContext;
+import org.mule.runtime.core.api.CoreEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -25,7 +25,7 @@ import java.time.OffsetTime;
  *
  * @since 4.0
  */
-public final class DefaultMessageContext implements CoreMessageContext, Serializable {
+public final class DefaultEventContext implements CoreEventContext, Serializable {
 
   private static final long serialVersionUID = -3664490832964509653L;
 
@@ -47,7 +47,7 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
    * @param correlationId See {@link EventContext#getCorrelationId()}.
    */
   public static EventContext create(FlowConstruct flow, String connectorName, String correlationId) {
-    return new DefaultMessageContext(flow, connectorName, correlationId);
+    return new DefaultEventContext(flow, connectorName, correlationId);
   }
 
   private final String id;
@@ -110,7 +110,7 @@ public final class DefaultMessageContext implements CoreMessageContext, Serializ
    * @param correlationId the correlation id that was set by the {@link MessageSource} for the first {@link Event} of this
    *        context, if available.
    */
-  private DefaultMessageContext(FlowConstruct flow, String connectorName, String correlationId) {
+  private DefaultEventContext(FlowConstruct flow, String connectorName, String correlationId) {
     this.id = flow.getMuleContext().getUniqueIdString();
     this.serverId = flow.getMuleContext().getId();
     this.flowName = flow.getName();

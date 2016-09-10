@@ -22,7 +22,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.FutureMessageResult;
@@ -432,7 +432,7 @@ public class MuleClient implements Disposable {
           .addOutboundProperty(MULE_USER_PROPERTY, createHeader(user.getUsername(), user.getPassword())).build();
     }
     MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-    return Event.builder(DefaultMessageContext.create(flowConstruct, "MuleClient")).message(message)
+    return Event.builder(DefaultEventContext.create(flowConstruct, "MuleClient")).message(message)
         .exchangePattern(exchangePattern).flow(flowConstruct).build();
   }
 

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
@@ -47,7 +47,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleContextEndpoin
     message =
         InternalMessage.builder().payload("hello").inboundProperties(inboundProperties).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build();
+    event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build();
   }
 
   @Test

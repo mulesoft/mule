@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.transport;
 
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;

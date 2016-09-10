@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -40,7 +40,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     testObject = InternalMessage.builder().payload("test").outboundProperties(props).build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(testObject).flow(flow)
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(testObject).flow(flow)
         .session(MuleTestUtils.getTestSession(muleContext)).build());
   }
 

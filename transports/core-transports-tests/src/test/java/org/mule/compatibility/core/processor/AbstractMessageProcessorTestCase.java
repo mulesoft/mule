@@ -20,7 +20,7 @@ import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -126,7 +126,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
   protected Event createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
     Flow flow = getTestFlow();
-    final Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build()).flow(flow)
         .session(getTestSession(null, muleContext)).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
@@ -202,7 +202,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     if (exceptionListener != null) {
       flow.setExceptionListener(exceptionListener);
     }
-    final Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build()).flow(flow)
         .session(getTestSession(null, muleContext)).build();
     return populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(REQUEST_RESPONSE));
@@ -328,7 +328,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
 
   protected Event getNonBlockingTestEventUsingFlow(Object payload, ReplyToHandler replyToHandler, Flow flow)
       throws Exception {
-    return Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(payload).build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(replyToHandler).flow(flow).build();
   }

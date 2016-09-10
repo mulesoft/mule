@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -44,7 +44,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     ir.setStore(new InMemoryObjectStore<String>());
     ir.setMuleContext(muleContext);
 
-    final EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
 
     InternalMessage okMessage = InternalMessage.builder().payload("OK").build();
     Event event = Event.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();

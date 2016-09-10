@@ -19,7 +19,7 @@ import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
@@ -253,7 +253,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
         InternalMessage.builder().nullPayload().addInboundProperty(PROPERTY_ORIGINAL_FILENAME, originalSourceFileName)
             .addInboundProperty(PROPERTY_ORIGINAL_DIRECTORY, originalSourceDirectory).build();
 
-    final Event event = Event.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, endpoint.getAddress()))
         .message(fileParserMessasge).flow(flowConstruct).build();
 
     final File sourceFile;

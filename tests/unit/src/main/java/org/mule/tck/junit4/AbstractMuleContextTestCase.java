@@ -10,7 +10,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
@@ -317,7 +317,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static Event getTestEvent(InternalMessage data) throws Exception {
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(data)
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(data)
         .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(MuleTestUtils.getTestSession(flowConstruct, muleContext))
         .build();
   }

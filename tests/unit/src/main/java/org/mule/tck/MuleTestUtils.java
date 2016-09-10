@@ -12,7 +12,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImpleme
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -81,7 +81,7 @@ public final class MuleTestUtils {
                                    MessageExchangePattern mep,
                                    MuleContext context)
       throws Exception {
-    return Event.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR))
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(data).build()).exchangePattern(mep).flow(flowConstruct)
         .session(getTestSession(flowConstruct, context)).build();
   }

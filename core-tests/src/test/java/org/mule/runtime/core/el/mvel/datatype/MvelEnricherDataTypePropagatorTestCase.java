@@ -16,7 +16,7 @@ import static org.mule.mvel2.MVEL.compileExpression;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -40,7 +40,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
   @Before
   public void before() throws Exception {
-    event = Event.builder(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR)).build();
+    event = Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR)).build();
   }
 
   @Test

@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -37,7 +37,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testSetExceptionPayloadAcrossThreads() throws InterruptedException {
-    Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload("").build()).build();
     runThread(event, false);
     runThread(event, true);
@@ -45,7 +45,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testFailureWithoutThreadSafeEvent() throws InterruptedException {
-    Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload("").build()).build();
     runThread(event, false);
     runThread(event, true);

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.message.Message;

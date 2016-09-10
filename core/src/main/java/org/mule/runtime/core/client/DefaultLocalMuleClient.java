@@ -8,7 +8,7 @@ package org.mule.runtime.core.client;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.client.SimpleOptionsBuilder.newOptions;

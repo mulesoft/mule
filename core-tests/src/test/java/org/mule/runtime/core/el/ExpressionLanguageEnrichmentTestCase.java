@@ -15,7 +15,7 @@ import static org.mockito.Matchers.contains;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
@@ -93,7 +93,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @Test
   public void enrichFlowVariable() throws Exception {
     Flow flow = new Flow("flow", muleContext);
-    Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).flow(flow).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("flowVars['foo']", event, eventBuilder, flowConstruct, "bar");
@@ -104,7 +104,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @Test
   public void enrichSessionVariable() throws Exception {
     Flow flow = new Flow("flow", muleContext);
-    Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).flow(flow).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("sessionVars['foo']", event, eventBuilder, flowConstruct, "bar");

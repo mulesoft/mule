@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -74,7 +74,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
     CopyPropertiesProcessor copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
     muleMessage =
         InternalMessage.builder(muleMessage).addInboundProperty(INBOUND_PROPERTY_KEY, PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
-    Event muleEvent = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
+    Event muleEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
     final InternalMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getOutboundProperty(INBOUND_PROPERTY_KEY), is(PROPERTY_VALUE));
@@ -84,7 +84,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
   @Test
   public void testCopyNonExistentProperty() throws MuleException {
     CopyPropertiesProcessor copyPropertiesTransformer = createCopyPropertiesTransformer(INBOUND_PROPERTY_KEY);
-    Event muleEvent = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
+    Event muleEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
     final InternalMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getInboundPropertyNames(), hasSize(0));
@@ -97,7 +97,7 @@ public class CopyPropertiesProcessorTestCase extends AbstractMuleTestCase {
     muleMessage = InternalMessage.builder(muleMessage).addInboundProperty("MULE_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
         .addInboundProperty("MULE_GROUP_ID", PROPERTY_VALUE, PROPERTY_DATA_TYPE)
         .addInboundProperty("SomeVar", PROPERTY_VALUE, PROPERTY_DATA_TYPE).build();
-    Event muleEvent = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
+    Event muleEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(muleMessage).build();
     final InternalMessage transformed = copyPropertiesTransformer.process(muleEvent).getMessage();
 
     assertThat(transformed.getOutboundProperty("SomeVar"), is(nullValue()));

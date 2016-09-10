@@ -52,7 +52,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   @Before
   public void before() throws Exception {
     flow = getTestFlow();
-    messageContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    messageContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
     muleEvent = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
   }
 

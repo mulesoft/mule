@@ -50,8 +50,8 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
     when(muleContext.getUniqueIdString()).thenReturn(MSG_EXEC_CTX_ID);
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
-    executionContextWithCorrelation = DefaultMessageContext.create(flow, TEST_CONNECTOR, CORRELATION_ID);
+    executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    executionContextWithCorrelation = DefaultEventContext.create(flow, TEST_CONNECTOR, CORRELATION_ID);
   }
 
   @Test

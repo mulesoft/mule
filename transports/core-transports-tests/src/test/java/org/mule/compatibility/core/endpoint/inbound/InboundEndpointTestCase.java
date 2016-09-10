@@ -37,7 +37,7 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.compatibility.core.transformer.simple.InboundAppendTransformer;
 import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
@@ -345,14 +345,14 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
 
   protected Event createTestRequestEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
-    final Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
+    final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
         .session(getTestSession(null, muleContext)).build();
     return populateFieldsFromInboundEndpoint(event, ep);
   }
 
   protected Event createTestResponseEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
-    final Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(RESPONSE_MESSAGE).build()).flow(flow)
         .session(getTestSession(null, muleContext))
         .build();

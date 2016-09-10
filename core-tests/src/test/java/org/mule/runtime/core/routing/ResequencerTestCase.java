@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -47,7 +47,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
     InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
     InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
@@ -81,7 +81,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
     router.setFlowConstruct(flow);
     router.initialise();
 
-    EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
     InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
     InternalMessage message2 = InternalMessage.builder().payload("test event B").build();

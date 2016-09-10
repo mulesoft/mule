@@ -20,7 +20,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -59,7 +59,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
         .thenAnswer(inv -> (InternalMessage) inv.getArguments()[0]);
 
     flow = getTestFlow();
-    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
   }
 
   @Test

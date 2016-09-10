@@ -11,7 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -77,7 +77,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     @Override
     public void run() {
       InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      Event newEvent = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
+      Event newEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
           .session(session).build();
       Event event = populateFieldsFromInboundEndpoint(newEvent, inboundEndpoint);
 

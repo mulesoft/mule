@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -54,7 +54,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
 
-    context = DefaultMessageContext.create(flow, "test");
+    context = DefaultEventContext.create(flow, "test");
   }
 
   @Test

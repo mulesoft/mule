@@ -8,7 +8,7 @@ package org.mule.test.core.el.mvel;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
@@ -110,7 +110,7 @@ public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCa
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
+    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(payload).build()).exchangePattern(ONE_WAY).flow(flow).build();
   }
 

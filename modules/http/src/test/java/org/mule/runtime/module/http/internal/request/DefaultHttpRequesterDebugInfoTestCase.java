@@ -33,7 +33,7 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
@@ -99,7 +99,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
 
     message = InternalMessage.builder().payload(TEST_MESSAGE).build();
     Flow flow = getTestFlow();
-    event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message)
+    event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
         .exchangePattern(REQUEST_RESPONSE).flow(flow).build();
   }
 

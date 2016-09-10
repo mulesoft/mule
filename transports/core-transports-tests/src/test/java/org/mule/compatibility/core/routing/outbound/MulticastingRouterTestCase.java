@@ -14,12 +14,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -96,7 +96,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
 
     Flow flow = getTestFlow();
-    final EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
     Event event = Event.builder(context).message(message).flow(flow).build();
 
     when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));
@@ -133,7 +133,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
     Flow flow = getTestFlow();
-    final EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
     Event event = Event.builder(context).message(message).flow(flow).build();
 
     when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));

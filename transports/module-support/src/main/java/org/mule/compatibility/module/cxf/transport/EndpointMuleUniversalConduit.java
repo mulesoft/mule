@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.H
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -138,7 +138,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
             return null;
           }
         };
-        event = Event.builder(event == null ? DefaultMessageContext.create(flowConstruct, "EndpointMuleUniversalConduit")
+        event = Event.builder(event == null ? DefaultEventContext.create(flowConstruct, "EndpointMuleUniversalConduit")
             : event.getContext()).message(muleMsg).exchangePattern(ep.getExchangePattern()).flow(flowConstruct).build();
       } catch (Exception e) {
         throw new Fault(e);

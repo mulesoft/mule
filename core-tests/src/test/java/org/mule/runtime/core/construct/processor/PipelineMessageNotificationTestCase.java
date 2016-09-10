@@ -21,7 +21,7 @@ import static org.mule.runtime.core.context.notification.PipelineMessageNotifica
 import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -94,7 +94,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
     pipeline = new TestPipeline(pipelineName, muleContext);
     when(muleContext.getTransformationService()).thenReturn(new TransformationService(muleContext));
 
-    context = DefaultMessageContext.create(pipeline, TEST_CONNECTOR);
+    context = DefaultEventContext.create(pipeline, TEST_CONNECTOR);
   }
 
   @Test

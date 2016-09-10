@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -82,7 +82,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.setFlowConstruct(flow);
     when(mockMuleContext.getStreamCloserService()).thenReturn(mockStreamCloserService);
 
-    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
     muleEvent = Event.builder(context).message(muleMessage).flow(flow).build();
   }
 

@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
@@ -72,7 +72,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
     @Override
     public void run() {
       InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-      Event event = Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
+      Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow)
           .session(session).build();
 
       try {

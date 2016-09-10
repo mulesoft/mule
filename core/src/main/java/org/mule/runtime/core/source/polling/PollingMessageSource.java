@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedNull;

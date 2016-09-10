@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -74,7 +74,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     when(mockEndpoint.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer());
     MuleSession session = mock(MuleSession.class);
     Flow flow = getTestFlow();
-    router.route(Event.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow)
+    router.route(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow)
         .session(session).build());
 
     // Test with transform
@@ -114,7 +114,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
 
     InternalMessage message = InternalMessage.builder().payload("test event").build();
     Flow flow = getTestFlow();
-    final EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
     Event event = Event.builder(context).message(message).flow(flow).build();
     when(mockEndpoint.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));
 
@@ -144,7 +144,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     m.put("barValue", "bar");
     InternalMessage message = InternalMessage.builder().payload("test event").outboundProperties(m).build();
     Flow flow = getTestFlow();
-    final EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
     Event event = Event.builder(context).message(message).flow(flow).build();
 
     assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));

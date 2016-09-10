@@ -22,7 +22,7 @@ import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -232,7 +232,7 @@ public final class MuleEndpointTestUtils {
     final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
     final InternalMessage message = factory.create(data, endpoint.getEncoding());
 
-    final Event event = Event.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR)).message(message)
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(message)
         .flow(flowConstruct).session(session).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
   }

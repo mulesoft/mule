@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.file;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.file.i18n.FileMessages;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -204,7 +204,7 @@ public class FileMessageRequester extends AbstractMessageRequester {
         return null;
       }
     };
-    final Event event = Event.builder(DefaultMessageContext.create(flowConstruct, endpoint.getAddress()))
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, endpoint.getAddress()))
         .message(fileParserMessasge).flow(flowConstruct).build();
 
     return fileConnector.getFilenameParser().getFilename(event, pattern);

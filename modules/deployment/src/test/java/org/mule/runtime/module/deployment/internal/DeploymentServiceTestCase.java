@@ -57,7 +57,7 @@ import static org.mule.runtime.module.deployment.internal.application.TestApplic
 import static org.mule.runtime.module.deployment.internal.descriptor.PropertiesDescriptorParser.PROPERTY_DOMAIN;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -3202,7 +3202,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
         (Flow) deploymentService.getApplications().get(0).getMuleContext().getRegistry().lookupFlowConstruct(flowName);
     InternalMessage muleMessage = InternalMessage.builder().payload(TEST_MESSAGE).build();
 
-    mainFlow.process(Event.builder(DefaultMessageContext.create(mainFlow, TEST_CONNECTOR))
+    mainFlow.process(Event.builder(DefaultEventContext.create(mainFlow, TEST_CONNECTOR))
         .message(muleMessage)
         .exchangePattern(REQUEST_RESPONSE).flow(mainFlow).build());
   }

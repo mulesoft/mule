@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
 import org.mule.mvel2.optimizers.OptimizerFactory;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
@@ -49,7 +49,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setupMessageContext() throws Exception {
-    context = DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flowConstruct, TEST_CONNECTOR);
   }
 
   @Before

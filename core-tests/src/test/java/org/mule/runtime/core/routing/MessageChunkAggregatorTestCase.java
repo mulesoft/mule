@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -43,7 +43,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
     InternalMessage message2 = InternalMessage.of("test event B");
     InternalMessage message3 = InternalMessage.of("test event C");
 
-    EventContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
     Event event1 = Event.builder(context).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(getTestFlow())
         .session(session).build();

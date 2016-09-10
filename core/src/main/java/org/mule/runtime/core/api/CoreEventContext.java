@@ -15,7 +15,7 @@ import org.mule.runtime.core.management.stats.ProcessingTime;
  *
  * @since 4.0
  */
-public interface CoreMessageContext extends EventContext {
+public interface CoreEventContext extends EventContext {
 
   /**
    * @returns information about the times spent processing the events for this context (so far).
