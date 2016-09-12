@@ -9,12 +9,14 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static org.apache.commons.lang.StringUtils.capitalize;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_SOURCE_TYPE;
+import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_REDELIVERY_POLICY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TYPE_SUFFIX;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import javax.xml.namespace.QName;
@@ -27,9 +29,11 @@ import javax.xml.namespace.QName;
 class SourceSchemaDelegate {
 
   private final SchemaBuilder builder;
+  private final ObjectFactory objectFactory;
 
-  public SourceSchemaDelegate(SchemaBuilder builder) {
+  public SourceSchemaDelegate(SchemaBuilder builder, ObjectFactory objectFactory) {
     this.builder = builder;
+    this.objectFactory = objectFactory;
   }
 
   public void registerMessageSource(SourceModel sourceModel, DslElementSyntax dslSyntax) {
@@ -58,5 +62,11 @@ class SourceSchemaDelegate {
     }
 
     builder.addRetryPolicy(sequence);
+    addMessageRedeliveryPolicy(sequence);
+  }
+
+  private void addMessageRedeliveryPolicy(ExplicitGroup sequence) {
+    TopLevelElement redeliveryPolicy = builder.createRefElement(MULE_ABSTRACT_REDELIVERY_POLICY, false);
+    sequence.getParticle().add(objectFactory.createElement(redeliveryPolicy));
   }
 }
