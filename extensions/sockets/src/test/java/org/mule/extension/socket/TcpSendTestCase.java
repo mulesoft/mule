@@ -6,7 +6,7 @@
  */
 package org.mule.extension.socket;
 
-import org.mule.test.runner.RunnerDelegateTo;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;

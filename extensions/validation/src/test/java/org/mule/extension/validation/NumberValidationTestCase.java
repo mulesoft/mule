@@ -8,7 +8,7 @@ package org.mule.extension.validation;
 
 import org.mule.extension.validation.api.NumberType;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.test.runner.RunnerDelegateTo;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;

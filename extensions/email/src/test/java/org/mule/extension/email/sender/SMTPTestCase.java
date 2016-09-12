@@ -20,8 +20,8 @@ import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.extension.email.api.EmailAttributes;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
 import java.io.InputStream;
