@@ -5,14 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.functional.classloading.isolation.classloader;
+package org.mule.functional.api.classloading.isolation;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -51,18 +50,20 @@ public class PluginResourcesResolver {
    * Resolves for the given {@link PluginUrlClassification} the resources exported.
    *
    * @param pluginUrlClassification {@link PluginUrlClassification} to be resolved
-   * @return {@link PluginResourcedClassification} with the resources resolved
+   * @return {@link PluginUrlClassification} with the resources resolved
    */
-  public PluginResourcedClassification resolvePluginResources(PluginUrlClassification pluginUrlClassification) {
+  public PluginUrlClassification resolvePluginResourcesFor(PluginUrlClassification pluginUrlClassification) {
+    Set<String> exportPackages;
+    Set<String> exportResources;
+
     URLClassLoader pluginCL = new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null);
     URL manifestUrl = pluginCL.findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
     if (manifestUrl != null) {
       logger.debug("Plugin '{}' has extension descriptor therefore it will be handled as an extension",
                    pluginUrlClassification.getName());
       ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-      Set<String> exportPackages = newHashSet(extensionManifest.getExportedPackages());
-      Set<String> exportResources = newHashSet(extensionManifest.getExportedResources());
-      return new PluginResourcedClassification(pluginUrlClassification, exportPackages, exportResources);
+      exportPackages = newHashSet(extensionManifest.getExportedPackages());
+      exportResources = newHashSet(extensionManifest.getExportedResources());
     } else {
       logger.debug("Plugin '{}' will be handled as standard plugin", pluginUrlClassification.getName());
       ClassLoader pluginArtifactClassLoader =
@@ -78,10 +79,14 @@ public class PluginResourcesResolver {
       } catch (IOException e) {
         throw new RuntimeException("Error while reading plugin properties: " + pluginPropertiesUrl);
       }
-      Set<String> exportPackages = newHashSet(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY));
-      Set<String> exportResources = newHashSet(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY));
-      return new PluginResourcedClassification(pluginUrlClassification, exportPackages, exportResources);
+      exportPackages = newHashSet(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY));
+      exportResources = newHashSet(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY));
     }
+
+    return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
+                                       pluginUrlClassification.getExportClasses(),
+                                       pluginUrlClassification.getPluginDependencies(), exportPackages, exportResources);
+
   }
 
 }

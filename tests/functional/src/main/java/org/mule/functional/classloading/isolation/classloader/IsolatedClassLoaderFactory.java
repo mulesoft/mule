@@ -33,7 +33,6 @@ import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
-import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -65,8 +64,6 @@ public class IsolatedClassLoaderFactory {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
-  private DefaultExtensionManager extensionManager = new DefaultExtensionManager();
-  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver(extensionManager);
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
@@ -193,10 +190,8 @@ public class IsolatedClassLoaderFactory {
   }
 
   private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification) {
-    final PluginResourcedClassification pluginResourcedClassification =
-        pluginResourcesResolver.resolvePluginResources(pluginUrlClassification);
-    String exportedPackages = pluginResourcedClassification.getExportedPackages().stream().collect(joining(", "));
-    final String exportedResources = pluginResourcedClassification.getExportedResources().stream().collect(joining(", "));
+    String exportedPackages = pluginUrlClassification.getExportedPackages().stream().collect(joining(", "));
+    final String exportedResources = pluginUrlClassification.getExportedResources().stream().collect(joining(", "));
     ArtifactClassLoaderFilter artifactClassLoaderFilter =
         classLoaderFilterFactory.create(exportedPackages, exportedResources);
 

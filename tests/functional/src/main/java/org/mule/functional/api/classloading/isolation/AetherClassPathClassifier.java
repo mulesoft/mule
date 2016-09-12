@@ -21,6 +21,7 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import org.mule.functional.classloading.isolation.classification.PatternInclusionsDependencyFilter;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 
 import java.io.File;
@@ -80,6 +81,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private DependencyResolver dependencyResolver;
+  private DefaultExtensionManager extensionManager = new DefaultExtensionManager();
+  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver(extensionManager);
 
   /**
    * Creates an instance of the classifier.
@@ -209,8 +212,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private List<PluginUrlClassification> buildPluginUrlClassifications(ClassPathClassifierContext context,
                                                                       List<Dependency> directDependencies) {
-    List<PluginUrlClassification> pluginUrlClassifications = newArrayList();
-    Map<Artifact, PluginUrlClassification> pluginsClassified = newHashMap();
+    Map<Artifact, PluginClassificationNode> pluginsClassified = newHashMap();
 
     ExtensionPluginMetadataGenerator extensionPluginMetadataGenerator =
         new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
@@ -225,8 +227,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     if (isMulePlugin(rootArtifact)) {
       logger.debug("rootArtifact '{}' identified as Mule plugin", rootArtifact);
-      pluginUrlClassifications.add(buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator,
-                                                                pluginsClassified));
+      buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, pluginsClassified);
 
       pluginsArtifacts = pluginsArtifacts.stream()
           .filter(pluginArtifact -> !(rootArtifact.getGroupId().equals(pluginArtifact.getGroupId())
@@ -235,12 +236,27 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     pluginsArtifacts.stream()
-        .map(pluginArtifact -> buildPluginUrlClassification(pluginArtifact, context, extensionPluginMetadataGenerator,
-                                                            pluginsClassified))
-        .forEach(pluginUrlClassifications::add);
+        .forEach(pluginArtifact -> buildPluginUrlClassification(pluginArtifact, context, extensionPluginMetadataGenerator,
+                                                                pluginsClassified));
 
     extensionPluginMetadataGenerator.generateDslResources();
-    return newArrayList(pluginsClassified.values());
+
+    return toPluginUrlClassification(pluginsClassified.values());
+  }
+
+  /**
+   * Transforms the {@link PluginClassificationNode} to {@link PluginUrlClassification}.
+   *
+   * @param classificationNodes the fat object classified that needs to be transformed
+   * @return {@link PluginUrlClassification}
+   */
+  private List<PluginUrlClassification> toPluginUrlClassification(Collection<PluginClassificationNode> classificationNodes) {
+    return classificationNodes.stream()
+        .map(node -> pluginResourcesResolver.resolvePluginResourcesFor(
+            new PluginUrlClassification(node.getName(), node.getUrls(), node.getExportClasses(),
+                                                 node.getPluginDependencies().stream()
+                                                     .map(dependency -> dependency.getName()).collect(toList()))))
+        .collect(toList());
   }
 
   private boolean isMulePlugin(Artifact artifact) {
@@ -250,17 +266,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Classifies a plugin {@link Artifact}. {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE} dependencies will be
    * resolved for building the {@link URL}'s for the class loader. For {@link Extension} annotated classes it will also generate
-   * its metadata.
+   * its metadata. Once classified the node is added to {@link Map} of pluginsClassified.
    *
    * @param pluginArtifact {@link Artifact} that represents the plugin to be classified
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
    * @param extensionPluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
    * @param pluginsClassified {@link Map} that contains already classified plugins
-   * @return {@link PluginUrlClassification} for the plugin
    */
-  private PluginUrlClassification buildPluginUrlClassification(Artifact pluginArtifact, ClassPathClassifierContext context,
+  private void buildPluginUrlClassification(Artifact pluginArtifact, ClassPathClassifierContext context,
                                                                ExtensionPluginMetadataGenerator extensionPluginGenerator,
-                                                               Map<Artifact, PluginUrlClassification> pluginsClassified) {
+                                                               Map<Artifact, PluginClassificationNode> pluginsClassified) {
     List<URL> urls;
     try {
       List<Dependency> managedDependencies = dependencyResolver.readArtifactDescriptor(pluginArtifact).getManagedDependencies();
@@ -275,7 +290,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     Class extensionClass = extensionPluginGenerator.scanForExtensionAnnotatedClasses(pluginArtifact, urls);
-    List<PluginUrlClassification> pluginDependencies = newArrayList();
+    List<PluginClassificationNode> pluginDependencies = newArrayList();
     if (extensionClass != null) {
       logger.debug("Plugin '{}' has been discovered as Extension", pluginArtifact);
       if (context.isExtensionMetadataGenerationEnabled()) {
@@ -305,21 +320,18 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     pluginArtifactDependencies.stream()
         .map(artifact -> {
           if (!pluginsClassified.containsKey(artifact)) {
-            PluginUrlClassification pluginUrlClassification =
-                buildPluginUrlClassification(artifact, context, extensionPluginGenerator, pluginsClassified);
-            pluginsClassified.put(artifact, pluginUrlClassification);
+            buildPluginUrlClassification(artifact, context, extensionPluginGenerator, pluginsClassified);
           }
           return pluginsClassified.get(artifact);
         })
         .forEach(pluginDependencies::add);
 
     // TODO(gfernandes): MULE-10484 How could I check if exported classes belong to this plugin?
-    PluginUrlClassification pluginUrlClassification = new PluginUrlClassification(toClassifierLessId(pluginArtifact),
+    PluginClassificationNode pluginUrlClassification = new PluginClassificationNode(toClassifierLessId(pluginArtifact),
                                                                                   urls,
                                                                                   newArrayList(context.getExportPluginClasses()),
                                                                                   pluginDependencies);
     pluginsClassified.put(pluginArtifact, pluginUrlClassification);
-    return pluginUrlClassification;
   }
 
   private String toClassifierLessId(Artifact pluginArtifact) {
