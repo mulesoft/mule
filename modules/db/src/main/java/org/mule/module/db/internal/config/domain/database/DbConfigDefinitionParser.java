@@ -13,6 +13,7 @@ import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.module.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.module.db.internal.domain.type.DbType;
 import org.mule.module.db.internal.domain.type.ResolvedDbType;
+import org.mule.module.db.internal.domain.type.StructuredDbType;
 
 import java.sql.Connection;
 import java.sql.Types;
@@ -97,6 +98,10 @@ public class DbConfigDefinitionParser extends MuleOrphanDefinitionParser
                 if (id == Types.ARRAY)
                 {
                     customDbTypes.add(new ArrayResolvedDbType(id, name));
+                }
+                else if (id == Types.STRUCT)
+                {
+                    customDbTypes.add(new StructuredDbType(id, name));
                 }
                 else
                 {
