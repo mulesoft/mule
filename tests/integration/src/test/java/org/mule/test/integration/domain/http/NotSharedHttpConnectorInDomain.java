@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -40,7 +40,7 @@ public class NotSharedHttpConnectorInDomain extends DomainFunctionalTestCase {
   public void sendMessageToNotSharedConnectorInDomain() throws Exception {
     String url = format("http://localhost:%d/test", dynamicPort.getNumber());
     MuleContext muleContext = getMuleContextForApp(APP);
-    muleContext.getClient().send(url, MuleMessage.builder().payload("").build());
+    muleContext.getClient().send(url, InternalMessage.builder().payload("").build());
 
     assertThat(muleContext.getClient().request("test://in", 5000), is(notNullValue()));
   }

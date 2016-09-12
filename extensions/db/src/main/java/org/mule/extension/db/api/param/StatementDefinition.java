@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.db.api.param.DbNameConstants.SQL_QUERY_TEXT;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 
 /**
@@ -50,10 +50,8 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
   protected QuerySettings settings = new QuerySettings();
 
   /**
-   * Allows to optionally specify the type of one or more of the parameters
-   * in the query. If provided, you're not even required to reference
-   * all of the parameters, but you cannot reference a parameter not
-   * present in the input values
+   * Allows to optionally specify the type of one or more of the parameters in the query. If provided, you're not even required to
+   * reference all of the parameters, but you cannot reference a parameter not present in the input values
    */
   @Parameter
   @Optional
@@ -61,22 +59,19 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
   private List<ParameterType> parameterTypes = new LinkedList<>();
 
   /**
-   * Returns a globally defined definition this instance
-   * points to. Can be {@code null}.
+   * Returns a globally defined definition this instance points to. Can be {@code null}.
+   * 
    * @return Another definition of the same type or {@code null}
    */
   public abstract T getTemplate();
 
   /**
-   * Returns an instance of the same class which state
-   * has been derived from the state of the {@link #getTemplate()}
-   * and the state of {@code this} instance.
+   * Returns an instance of the same class which state has been derived from the state of the {@link #getTemplate()} and the state
+   * of {@code this} instance.
    *
-   * If {@link #getTemplate()} is {@code null} then {@code this}
-   * instance is returned.
+   * If {@link #getTemplate()} is {@code null} then {@code this} instance is returned.
    *
-   * This method is recursive in the sense that the template can
-   * point to another template itself.
+   * This method is recursive in the sense that the template can point to another template itself.
    */
   public T resolveFromTemplate() {
     T template = getTemplate();
@@ -99,6 +94,7 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
 
   /**
    * Returns a shallow copy of {@code this} instance.
+   * 
    * @return
    */
   protected T copy() {
@@ -118,6 +114,7 @@ public abstract class StatementDefinition<T extends StatementDefinition> {
 
   /**
    * Returns the type for a given parameter
+   * 
    * @param paramName the parameter's name
    * @return an optional {@link ParameterType}
    */

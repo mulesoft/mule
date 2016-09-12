@@ -12,7 +12,7 @@ import static java.util.Optional.of;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.util.generics.GenericsUtils.getCollectionType;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
@@ -170,8 +170,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
   }
 
   /**
-   * Sets the given type for the {@link DefaultCollectionDataType} to be built. See
-   * {@link DefaultCollectionDataType#getType()}.
+   * Sets the given type for the {@link DefaultCollectionDataType} to be built. See {@link DefaultCollectionDataType#getType()}.
    * 
    * @param collectionType the java collection type to set.
    * @return this builder.
@@ -387,7 +386,7 @@ public class DefaultDataTypeBuilder implements DataTypeBuilder, DataTypeBuilder.
 
   private static void addToConsumableClasses(String className) {
     try {
-      consumableClasses.add(ClassUtils.loadClass(className, MuleMessage.class));
+      consumableClasses.add(ClassUtils.loadClass(className, Message.class));
     } catch (ClassNotFoundException e) {
       // ignore
     }

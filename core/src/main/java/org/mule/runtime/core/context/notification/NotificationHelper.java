@@ -7,8 +7,8 @@
 package org.mule.runtime.core.context.notification;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
@@ -22,11 +22,10 @@ import com.google.common.cache.LoadingCache;
 /**
  * Simple class to fire notifications of a specified type over a {@link ServerNotificationHandler}.
  *
- * When the notification is to be sent on the context of the processing of a {@link MuleEvent} (meaning, the method used to fire
- * the notification takes a {@link MuleEvent} argument), then this instance will delegate into a {@link ServerNotificationHandler}
- * that corresponds to the {@link MuleContext} of that event. When the notification does not relate to a particular
- * {@link MuleEvent} (for example, connection/reconnection/disconnection events), then a {@link #defaultNotificationHandler} will
- * be used
+ * When the notification is to be sent on the context of the processing of a {@link Event} (meaning, the method used to fire the
+ * notification takes a {@link Event} argument), then this instance will delegate into a {@link ServerNotificationHandler} that
+ * corresponds to the {@link MuleContext} of that event. When the notification does not relate to a particular {@link Event} (for
+ * example, connection/reconnection/disconnection events), then a {@link #defaultNotificationHandler} will be used
  */
 public class NotificationHelper {
 
@@ -49,7 +48,7 @@ public class NotificationHelper {
    * Creates a new {@link NotificationHelper} that emits instances of {@code notificationClass} class.
    *
    * @param defaultNotificationHandler The {@link ServerNotificationHandler} to be used on notifications which don't relate to a
-   *        {@link MuleEvent}
+   *        {@link Event}
    * @param notificationClass The {@link Class} of the notifications to be fired by this helper
    * @param dynamicNotifications If {@code true}, notifications will be fired directly to a {@link ServerNotificationHandler}
    *        responsible to decide to emit it or not. If {@code false} the notification will be checked to be enable or not at
@@ -64,8 +63,8 @@ public class NotificationHelper {
 
   /**
    * Checks if the {@link #defaultNotificationHandler} is enabled to fire instances of {@link #notificationClass}. Use this method
-   * when planning to fire a notification that is not related to a {@link MuleEvent} (connect/disconnect/etc). Otherwise, use
-   * {@link #isNotificationEnabled(MuleEvent)} instead
+   * when planning to fire a notification that is not related to a {@link Event} (connect/disconnect/etc). Otherwise, use
+   * {@link #isNotificationEnabled(Event)} instead
    *
    * @return {@code true} if {@link #defaultNotificationHandler} is enabled for {@link #notificationClass}
    */
@@ -89,20 +88,20 @@ public class NotificationHelper {
    * to the given {@code event}
    *
    * @param source
-   * @param event a {@link org.mule.runtime.core.api.MuleEvent}
+   * @param event a {@link org.mule.runtime.core.api.Event}
    * @param uri the uri of the firing endpoint
    * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} that generated the notification
    * @param action the action code for the notification
    */
-  public void fireNotification(Object source, MuleEvent event, String uri, FlowConstruct flowConstruct, int action) {
+  public void fireNotification(Object source, Event event, String uri, FlowConstruct flowConstruct, int action) {
     doFireNotification(getNotificationHandler(flowConstruct.getMuleContext()), source, event.getMessage(), uri, flowConstruct,
                        action);
   }
 
   /**
    * Fires the given {@code notification} using the {@link #defaultNotificationHandler}. Use this method when the
-   * {@code notification} is not related to any {@link MuleEvent} (for example, connect/disconnect/etc). Otherwise, use
-   * {@link #fireNotification(ServerNotification, MuleEvent)} instead
+   * {@code notification} is not related to any {@link Event} (for example, connect/disconnect/etc). Otherwise, use
+   * {@link #fireNotification(ServerNotification, Event)} instead
    *
    * @param notification a {@link ServerNotification}
    */
@@ -120,7 +119,7 @@ public class NotificationHelper {
     getNotificationHandler(muleContext).fireNotification(notification);
   }
 
-  private void doFireNotification(ServerNotificationHandler serverNotificationHandler, Object source, MuleMessage message,
+  private void doFireNotification(ServerNotificationHandler serverNotificationHandler, Object source, InternalMessage message,
                                   String uri, FlowConstruct flowConstruct, int action) {
     try {
       if (serverNotificationHandler.isNotificationEnabled(notificationClass)) {

@@ -24,7 +24,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.cxf.testmodels.AsyncService;
@@ -69,8 +69,8 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testServerWithEcho() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(resString.indexOf("<test xmlns=\"http://foo\"> foo </test>") != -1);
@@ -82,8 +82,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "<soap:Body> <foo xmlns=\"http://foo\"></foo>" + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxy",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
 
@@ -107,13 +107,13 @@ public class ProxyTestCase extends FunctionalTestCase {
 
   public void doTestProxyValidation(String url) throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send(url, MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS).getRight();
+    InternalMessage result = client.send(url, InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS).getRight();
     String resString = getPayloadAsString(result);
     assertTrue(resString.indexOf("Schema validation error on message") != -1);
 
     String valid = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" + "<soap:Body> "
         + "<echo xmlns=\"http://www.muleumo.org\">" + "  <echo>test</echo>" + "</echo>" + "</soap:Body>" + "</soap:Envelope>";
-    result = client.send(url, MuleMessage.builder().payload(valid).build(), HTTP_REQUEST_OPTIONS).getRight();
+    result = client.send(url, InternalMessage.builder().payload(valid).build(), HTTP_REQUEST_OPTIONS).getRight();
     resString = getPayloadAsString(result);
     assertTrue(resString.contains("<echoResponse xmlns=\"http://www.muleumo.org\">"));
   }
@@ -128,8 +128,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
@@ -146,8 +146,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl2",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithWsdl2",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
@@ -160,8 +160,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithTransform",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/proxyWithTransform",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     System.out.println(resString);
@@ -175,8 +175,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-databinding-proxy",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-databinding-proxy",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(resString.indexOf("greetMeResponse") != -1);
@@ -189,8 +189,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-proxy",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/greeter-proxy",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
 
@@ -207,8 +207,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/transform-proxy",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/transform-proxy",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(resString.indexOf("greetMeResponse") != -1);
@@ -222,7 +222,7 @@ public class ProxyTestCase extends FunctionalTestCase {
     String expectedString = "<test xmlns=\"http://foo\"";
 
     // wsdl has soap action as empty string
-    MuleMessage result = executeSoapCall(msg, "", path);
+    InternalMessage result = executeSoapCall(msg, "", path);
     assertResultContains(result, expectedString);
 
     result = executeSoapCall(msg, null, path);
@@ -234,7 +234,7 @@ public class ProxyTestCase extends FunctionalTestCase {
     String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
     // wsdl has soap action as empty string so being anything else is not allowed
-    MuleMessage result = executeSoapCall(msg, "echo", "/services/routeBasedOnNoSoapAction");
+    InternalMessage result = executeSoapCall(msg, "echo", "/services/routeBasedOnNoSoapAction");
     assertResultIsFault(result);
   }
 
@@ -245,7 +245,7 @@ public class ProxyTestCase extends FunctionalTestCase {
             + "<soapenv:Header/>" + "  <soapenv:Body>" + "    <new:parameter1>hello world</new:parameter1>" + "  </soapenv:Body>"
             + "</soapenv:Envelope>";
 
-    MuleMessage result = executeSoapCall(msg, "EchoOperation1", "/services/routeBasedOnSoapAction");
+    InternalMessage result = executeSoapCall(msg, "EchoOperation1", "/services/routeBasedOnSoapAction");
     assertResultContains(result, "<new:parameter1");
   }
 
@@ -256,7 +256,7 @@ public class ProxyTestCase extends FunctionalTestCase {
             + "<soapenv:Header/>" + "  <soapenv:Body>" + "    <new:parameter1>hello world</new:parameter1>" + "  </soapenv:Body>"
             + "</soapenv:Envelope>";
 
-    MuleMessage result = executeSoapCall(msg, "NonSpecifiedOperation", "/services/routeBasedOnSoapAction");
+    InternalMessage result = executeSoapCall(msg, "NonSpecifiedOperation", "/services/routeBasedOnSoapAction");
     assertResultIsFault(result);
   }
 
@@ -267,7 +267,7 @@ public class ProxyTestCase extends FunctionalTestCase {
     String path = "/services/routeBasedOnNoSoapActionNoWsdl";
     String expectedString = "<test xmlns=\"http://foo\"";
 
-    MuleMessage result = executeSoapCall(msg, "", path);
+    InternalMessage result = executeSoapCall(msg, "", path);
     assertResultContains(result, expectedString);
 
     result = executeSoapCall(msg, null, path);
@@ -293,11 +293,11 @@ public class ProxyTestCase extends FunctionalTestCase {
         "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:new=\"http://new.webservice.namespace\">"
             + "<soapenv:Header/>" + "  <soapenv:Body>" + "    <new:parameter1>hello world</new:parameter1>" + "  </soapenv:Body>"
             + "</soapenv:Envelope>";
-    MuleMessage result = executeSoapCall(msg, "EchoOperation1", path);
+    InternalMessage result = executeSoapCall(msg, "EchoOperation1", path);
     assertResultContains(result, "<new:parameter1");
   }
 
-  private MuleMessage executeSoapCall(String msg, String soapAction, String path) throws MuleException {
+  private InternalMessage executeSoapCall(String msg, String soapAction, String path) throws MuleException {
     Map<String, Serializable> props = new HashMap<>();
     if (soapAction != null) {
       props.put("SOAPAction", soapAction);
@@ -305,18 +305,18 @@ public class ProxyTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     return client.send("http://localhost:" + dynamicPort.getNumber() + path,
-                       MuleMessage.builder().payload(msg).outboundProperties(props).build(), HTTP_REQUEST_OPTIONS)
+                       InternalMessage.builder().payload(msg).outboundProperties(props).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
   }
 
-  private void assertResultContains(MuleMessage result, String expectedString) throws Exception {
+  private void assertResultContains(InternalMessage result, String expectedString) throws Exception {
     String resString = getPayloadAsString(result);
     System.out.println(resString);
     assertTrue("message didn't contain the test string: " + expectedString + " but was: " + resString,
                resString.indexOf(expectedString) != -1);
   }
 
-  private void assertResultIsFault(MuleMessage result) throws Exception {
+  private void assertResultIsFault(InternalMessage result) throws Exception {
     String resString = getPayloadAsString(result);
     assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
                 String.valueOf(OK.getStatusCode()).equals(result.getOutboundProperty("http.status")));
@@ -326,10 +326,10 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testOneWaySendWithSoapAction() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
-                                     MuleMessage.builder().payload(prepareOneWayTestMessage())
-                                         .outboundProperties(prepareOneWayWithSoapActionTestProperties()).build(),
-                                     HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
+                                         InternalMessage.builder().payload(prepareOneWayTestMessage())
+                                             .outboundProperties(prepareOneWayWithSoapActionTestProperties()).build(),
+                                         HTTP_REQUEST_OPTIONS)
         .getRight();
     assertEquals("", getPayloadAsString(result));
 
@@ -341,7 +341,7 @@ public class ProxyTestCase extends FunctionalTestCase {
   public void testOneWayDispatchWithSoapAction() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction", MuleMessage.builder()
+    client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction", InternalMessage.builder()
         .payload(prepareOneWayTestMessage()).outboundProperties(prepareOneWayWithSoapActionTestProperties()).build(),
                     HTTP_REQUEST_OPTIONS);
 
@@ -352,10 +352,10 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testOneWaySendWithSoapActionSpoofing() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
-                                     MuleMessage.builder().payload(prepareOneWayTestMessage())
-                                         .outboundProperties(prepareOneWaySpoofingTestProperties()).build(),
-                                     HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction",
+                                         InternalMessage.builder().payload(prepareOneWayTestMessage())
+                                             .outboundProperties(prepareOneWaySpoofingTestProperties()).build(),
+                                         HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(result);
 
@@ -367,7 +367,7 @@ public class ProxyTestCase extends FunctionalTestCase {
   public void testOneWayDispatchWithSoapActionSpoofing() throws Exception {
     MuleClient client = muleContext.getClient();
     client.dispatch(
-                    "http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction", MuleMessage.builder()
+                    "http://localhost:" + dynamicPort.getNumber() + "/services/onewayWithSoapAction", InternalMessage.builder()
                         .payload(prepareOneWayTestMessage()).outboundProperties(prepareOneWaySpoofingTestProperties()).build(),
                     HTTP_REQUEST_OPTIONS);
 
@@ -378,10 +378,10 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testOneWaySendUnknownSoapAction() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
-                                     MuleMessage.builder().payload(prepareOneWayTestMessage())
-                                         .outboundProperties(prepareOneWayWithSoapActionTestProperties()).build(),
-                                     HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway",
+                                         InternalMessage.builder().payload(prepareOneWayTestMessage())
+                                             .outboundProperties(prepareOneWayWithSoapActionTestProperties()).build(),
+                                         HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(result);
 
@@ -392,7 +392,7 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testOneWayDispatchUnknownSoapAction() throws Exception {
     MuleClient client = muleContext.getClient();
-    client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/oneway", MuleMessage.builder()
+    client.dispatch("http://localhost:" + dynamicPort.getNumber() + "/services/oneway", InternalMessage.builder()
         .payload(prepareOneWayTestMessage()).outboundProperties(prepareOneWayWithSoapActionTestProperties()).build(),
                     HTTP_REQUEST_OPTIONS);
 
@@ -403,9 +403,10 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testOneWaySend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway", MuleMessage.builder()
-        .payload(prepareOneWayTestMessage()).outboundProperties(prepareOneWayTestProperties()).build(), HTTP_REQUEST_OPTIONS)
-        .getRight();
+    InternalMessage result =
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/services/oneway", InternalMessage.builder()
+            .payload(prepareOneWayTestMessage()).outboundProperties(prepareOneWayTestProperties()).build(), HTTP_REQUEST_OPTIONS)
+            .getRight();
     assertNotNull(result);
 
     AsyncService component = (AsyncService) getComponent("asyncService");
@@ -416,7 +417,7 @@ public class ProxyTestCase extends FunctionalTestCase {
   public void testOneWayDispatch() throws Exception {
     MuleClient client = muleContext.getClient();
     client.dispatch(
-                    "http://localhost:" + dynamicPort.getNumber() + "/services/oneway", MuleMessage.builder()
+                    "http://localhost:" + dynamicPort.getNumber() + "/services/oneway", InternalMessage.builder()
                         .payload(prepareOneWayTestMessage()).outboundProperties(prepareOneWayTestProperties()).build(),
                     HTTP_REQUEST_OPTIONS);
 
@@ -432,8 +433,8 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testProxyWithCommentInRequest() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-proxy",
-                                     MuleMessage.builder().payload(msgWithComment).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-proxy",
+                                         InternalMessage.builder().payload(msgWithComment).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(resString.contains(doGoogleSearch));
@@ -447,8 +448,8 @@ public class ProxyTestCase extends FunctionalTestCase {
   @Test
   public void testProxyEnvelopeWithXsltTransformation() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-xslt-proxy",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/envelope-xslt-proxy",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertTrue(getPayloadAsString(result).contains(msg));
   }
@@ -466,8 +467,8 @@ public class ProxyTestCase extends FunctionalTestCase {
             + "</sup:invoke>\n" + "</soapenv:Body>\n" + "</soapenv:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService",
-                                     MuleMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService",
+                                         InternalMessage.builder().payload(msg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(result);
     assertThat(unescapeXml(getPayloadAsString(result)), containsString(servicePayload));
@@ -482,8 +483,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "<soap:Body><greetMe xmlns=\"http://apache.org/hello_world_fault/types\"><requestType>Dan</requestType></greetMe>"
         + "</soap:Body>" + "</soap:Envelope>";
 
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyFault",
-                                     MuleMessage.builder().payload(proxyFaultMsg).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyFault",
+                                         InternalMessage.builder().payload(proxyFaultMsg).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(resString.contains("ERROR"));
@@ -497,8 +498,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyJms",
-                                     MuleMessage.builder().payload(payload).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyJms",
+                                         InternalMessage.builder().payload(payload).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is(payload));
@@ -512,8 +513,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWay",
-                                     MuleMessage.builder().payload(payload).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWay",
+                                         InternalMessage.builder().payload(payload).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertThat(result, is(notNullValue()));
     assertThat(result.getInboundProperty(HTTP_STATUS_PROPERTY), is(ACCEPTED.getStatusCode()));
@@ -528,8 +529,8 @@ public class ProxyTestCase extends FunctionalTestCase {
         + "</soap:Body>" + "</soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWayFault",
-                                     MuleMessage.builder().payload(payload).build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyOneWayFault",
+                                         InternalMessage.builder().payload(payload).build(), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), containsString("ERROR"));

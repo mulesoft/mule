@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.source.polling;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 /**
@@ -26,7 +26,7 @@ public abstract class MessageProcessorPollingInterceptor {
    * @param event The event that is about to be sent
    * @return The event that should be sent. Must not be null
    */
-  public MuleEvent prepareSourceEvent(MuleEvent event) throws MuleException {
+  public Event prepareSourceEvent(Event event) throws MuleException {
     return event;
   }
 
@@ -41,7 +41,7 @@ public abstract class MessageProcessorPollingInterceptor {
    *
    * @return The event that should be sent to the rest of the flow. Must not be null
    */
-  public MuleEvent prepareRouting(MuleEvent sourceEvent, MuleEvent event) throws MuleException {
+  public Event prepareRouting(Event sourceEvent, Event event) throws MuleException {
     return event;
   }
 
@@ -55,7 +55,7 @@ public abstract class MessageProcessorPollingInterceptor {
    * 
    * @param event The event that was routed to the rest of the flow
    */
-  public void postProcessRouting(MuleEvent event) throws MuleException {
+  public void postProcessRouting(Event event) throws MuleException {
     // No-op
   }
 }

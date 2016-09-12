@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.transport.tcp.protocols;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 
 import java.io.ByteArrayInputStream;
@@ -30,10 +30,10 @@ class MuleMessageWorker {
 
   public byte[] doWrite() throws IOException {
     // TODO fix the api here so there is no need to use the RequestContext
-    MuleMessage msg = getCurrentEvent().getMessage();
+    InternalMessage msg = getCurrentEvent().getMessage();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
-      wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(null));
+      wireFormat.write(baos, msg, msg.getPayload().getDataType().getMediaType().getCharset().orElse(null));
     } catch (MuleException e) {
       throw new IOException(e.getDetailedMessage());
     }

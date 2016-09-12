@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
@@ -68,9 +68,9 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
 
     assertQueueIsEmpty("test://component.out");
 
-    MuleMessage message = client.request("test://error.queue", 2000).getRight().get();
+    InternalMessage message = client.request("test://error.queue", 2000).getRight().get();
     assertNotNull(message);
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     assertTrue(payload instanceof ExceptionMessage);
 
     assertNotificationsArrived();

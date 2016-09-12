@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -33,21 +33,21 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  protected MuleEvent doRoute(MuleEvent event, FlowConstruct flow) throws MuleException {
+  protected Event doRoute(Event event, FlowConstruct flow) throws MuleException {
     Exception lastExecutionException = null;
-    MuleEvent retryEvent = copyEventForRetry(event);
+    Event retryEvent = copyEventForRetry(event);
     try {
       for (int i = 0; i <= getUntilSuccessfulConfiguration().getMaxRetries(); i++) {
         try {
-          MuleEvent successEvent = processResponseThroughAckResponseExpression(processEvent(retryEvent));
-          MuleEvent finalEvent;
+          Event successEvent = processResponseThroughAckResponseExpression(processEvent(retryEvent));
+          Event finalEvent;
           if (successEvent instanceof VoidMuleEvent) {
             // continue processing with the original event
             finalEvent = event;
           } else {
-            Builder builder = MuleEvent.builder(event).message(successEvent.getMessage());
-            for (String flowVar : successEvent.getFlowVariableNames()) {
-              builder.addFlowVariable(flowVar, successEvent.getFlowVariable(flowVar));
+            Builder builder = Event.builder(event).message(successEvent.getMessage());
+            for (String flowVar : successEvent.getVariableNames()) {
+              builder.addVariable(flowVar, successEvent.getVariable(flowVar));
             }
             finalEvent = builder.build();
           }
@@ -71,8 +71,8 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
     }
   }
 
-  private MuleEvent copyEventForRetry(MuleEvent event) {
-    MuleEvent copy = MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
+  private Event copyEventForRetry(Event event) {
+    Event copy = Event.builder(event).session(new DefaultMuleSession(event.getSession())).build();
     setCurrentEvent(copy);
     return copy;
   }
@@ -97,7 +97,7 @@ public class SynchronousUntilSuccessfulProcessingStrategy extends AbstractUntilS
   }
 
   @Override
-  protected void ensureSerializable(MuleMessage message) throws NotSerializableException {
+  protected void ensureSerializable(InternalMessage message) throws NotSerializableException {
     // Message is not required to be Serializable because it is kept in memory
   }
 

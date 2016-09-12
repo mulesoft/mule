@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOIN_IF_POSSIBLE;
@@ -15,8 +15,8 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.springframework.util.ReflectionUtils.setField;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
@@ -170,7 +170,7 @@ public class MuleExtensionUtils {
     return getDefaultValue(object.getAnnotation(Optional.class));
   }
 
-  public static MuleEvent getInitialiserEvent(MuleContext muleContext) {
+  public static Event getInitialiserEvent(MuleContext muleContext) {
     FlowConstruct flowConstruct = new FlowConstruct() {
       // TODO MULE-9076: This is only needed because the muleContext is get from the given flow.
 
@@ -199,7 +199,7 @@ public class MuleExtensionUtils {
         return null;
       }
     };
-    return MuleEvent.builder(create(flowConstruct, "InitializerEvent")).message(MuleMessage.builder().nullPayload().build())
+    return Event.builder(create(flowConstruct, "InitializerEvent")).message(InternalMessage.builder().nullPayload().build())
         .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).build();
   }
 

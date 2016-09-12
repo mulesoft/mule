@@ -10,12 +10,12 @@ package org.mule.runtime.core.work;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.concurrent.CountDownLatch;
@@ -23,8 +23,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of {@link AbstractMuleEventWork} that executes a {@link MessageProcessor} using this work's event. Instances of
- * this class can be used in a "fire and forget" fashion or the {@link #getResult(long, TimeUnit)} method can be used to wait for
+ * Implementation of {@link AbstractMuleEventWork} that executes a {@link Processor} using this work's event. Instances of this
+ * class can be used in a "fire and forget" fashion or the {@link #getResult(long, TimeUnit)} method can be used to wait for
  * background processing to finish. For cases when used in this latter manner, this class provides semmantics similar to
  * {@link Future#get(long, TimeUnit)} but with some differences around exception handling, cancellation, etc (see
  * {@link #getResult(long, TimeUnit)}).
@@ -35,11 +35,11 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
 
   private MessageProcessorExecutionTemplate messageProcessorExecutionTemplate;
   private final CountDownLatch latch = new CountDownLatch(1);
-  private final MessageProcessor messageProcessor;
-  private MuleEvent resultEvent;
+  private final Processor messageProcessor;
+  private Event resultEvent;
   private MuleException exception;
 
-  public ProcessingMuleEventWork(MessageProcessor messageProcessor, MuleEvent muleEvent, MuleContext muleContext,
+  public ProcessingMuleEventWork(Processor messageProcessor, Event muleEvent, MuleContext muleContext,
                                  FlowConstruct flowConstruct) {
     super(muleEvent);
     messageProcessorExecutionTemplate = createExecutionTemplate();
@@ -49,9 +49,9 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
   }
 
   /**
-   * Invokes {@link MessageProcessor#process(MuleEvent)} using {@link #messageProcessor and AbstractMuleEventWork#event}. if
-   * processing is sucessful the result is stored in {@link #resultEvent} or if it throws exception, it will be stored in
-   * {@link #exception} Storing the result/exception allows {@link #getResult(long, TimeUnit)} to return the values
+   * Invokes {@link Processor#process(Event)} using {@link #messageProcessor and AbstractMuleEventWork#event}. if processing is
+   * sucessful the result is stored in {@link #resultEvent} or if it throws exception, it will be stored in {@link #exception}
+   * Storing the result/exception allows {@link #getResult(long, TimeUnit)} to return the values
    */
   @Override
   protected void doRun() {
@@ -71,14 +71,14 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
    * 
    * @param timeout time to wait before throwing {@link ResponseTimeoutException}
    * @param timeUnit the unit for the timeout
-   * @return a {@link MuleEvent} once that {@link #doRun()} finished successfuly
+   * @return a {@link Event} once that {@link #doRun()} finished successfuly
    * @throws InterruptedException if the calling thread is interrupted
    * @throws ResponseTimeoutException if the calling thread waiting time has exceeded the timeout and {@link #doRun()} hasn't yet
    *         finished
    * @throws MuleException if {@link #doRun()} finished with exception. In that case, the value captured in {@link #exception} is
    *         thrown
    */
-  public MuleEvent getResult(long timeout, TimeUnit timeUnit)
+  public Event getResult(long timeout, TimeUnit timeUnit)
       throws InterruptedException, ResponseTimeoutException, MuleException {
     if (this.latch.await(timeout, timeUnit)) {
       if (this.exception != null) {
@@ -87,7 +87,7 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
 
       return this.resultEvent;
     } else {
-      throw new ResponseTimeoutException(MessageFactory.createStaticMessage("Processing did not completed in time"),
+      throw new ResponseTimeoutException(I18nMessageFactory.createStaticMessage("Processing did not completed in time"),
                                          this.messageProcessor);
     }
   }

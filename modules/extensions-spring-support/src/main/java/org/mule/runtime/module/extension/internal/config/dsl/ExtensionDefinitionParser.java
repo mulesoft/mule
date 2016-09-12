@@ -19,7 +19,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
@@ -45,12 +45,12 @@ import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinition.Builde
 import org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair;
 import org.mule.runtime.config.spring.dsl.api.TypeConverter;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.TemplateParser;
@@ -147,8 +147,8 @@ public abstract class ExtensionDefinitionParser {
    * Creates a new instance
    *
    * @param baseDefinitionBuilder a {@link Builder} used as a prototype to generate new defitintions
-   * @param dslSyntaxResolver     a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
-   * @param parsingContext        the {@link ExtensionParsingContext} in which {@code this} parser operates
+   * @param dslSyntaxResolver a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
+   * @param parsingContext the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
   protected ExtensionDefinitionParser(Builder baseDefinitionBuilder, DslSyntaxResolver dslSyntaxResolver,
                                       ExtensionParsingContext parsingContext, MuleContext muleContext) {
@@ -267,7 +267,7 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param parameter      a {@link ParameterModel}
+   * @param parameter a {@link ParameterModel}
    * @param dictionaryType a {@link DictionaryType}
    */
   protected void parseMapParameters(ParameterModel parameter, DictionaryType dictionaryType, DslElementSyntax paramDsl) {
@@ -278,12 +278,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param key               the key that the parsed value should have on the parsed parameter's map
-   * @param name              the parameter's name
-   * @param dictionaryType    the parameter's {@link DictionaryType}
-   * @param defaultValue      the parameter's default value
+   * @param key the key that the parsed value should have on the parsed parameter's map
+   * @param name the parameter's name
+   * @param dictionaryType the parameter's {@link DictionaryType}
+   * @param defaultValue the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required          whether the parameter is required
+   * @param required whether the parameter is required
    */
   protected void parseMapParameters(String key, String name, DictionaryType dictionaryType, Object defaultValue,
                                     ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl) {
@@ -372,12 +372,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ArrayType}
    *
-   * @param key               the key that the parsed value should have on the parsed parameter's map
-   * @param name              the parameter's name
-   * @param arrayType         the parameter's {@link ArrayType}
-   * @param defaultValue      the parameter's default value
+   * @param key the key that the parsed value should have on the parsed parameter's map
+   * @param name the parameter's name
+   * @param arrayType the parameter's {@link ArrayType}
+   * @param defaultValue the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required          whether the parameter is required
+   * @param required whether the parameter is required
    */
   protected void parseCollectionParameter(String key, String name, ArrayType arrayType, Object defaultValue,
                                           ExpressionSupport expressionSupport, boolean required, DslElementSyntax parameterDsl) {
@@ -541,12 +541,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for parsing the given {@code parameterModel} as an element attribute
    *
-   * @param key               the key that the parsed value should have on the parsed parameter's map
-   * @param name              the parameter's name
-   * @param type              the parameter's type
-   * @param defaultValue      the parameter's default value
+   * @param key the key that the parsed value should have on the parsed parameter's map
+   * @param name the parameter's name
+   * @param type the parameter's type
+   * @param defaultValue the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required          whether the parameter is required or not
+   * @param required whether the parameter is required or not
    * @return an {@link AttributeDefinition.Builder}
    */
   protected AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
@@ -580,12 +580,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ObjectType}
    *
-   * @param key               the key that the parsed value should have on the parsed parameter's map
-   * @param name              the parameter's name
-   * @param type              an {@link ObjectType}
-   * @param defaultValue      the parameter's default value
+   * @param key the key that the parsed value should have on the parsed parameter's map
+   * @param name the parameter's name
+   * @param type an {@link ObjectType}
+   * @param defaultValue the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required          whether the parameter is required or not
+   * @param required whether the parameter is required or not
    */
   protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue,
                                       ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences,
@@ -647,7 +647,7 @@ public abstract class ExtensionDefinitionParser {
 
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(processorElementName)
         .withTypeDefinition(fromType(NestedProcessorValueResolver.class))
-        .withConstructorParameterDefinition(fromChildConfiguration(MessageProcessor.class).build()).build());
+        .withConstructorParameterDefinition(fromChildConfiguration(Processor.class).build()).build());
   }
 
   private void parseNestedProcessorList(ParameterModel parameterModel) {
@@ -657,7 +657,7 @@ public abstract class ExtensionDefinitionParser {
 
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(processorElementName)
         .withTypeDefinition(fromType(NestedProcessorListValueResolver.class))
-        .withConstructorParameterDefinition(fromChildCollectionConfiguration(MessageProcessor.class).build())
+        .withConstructorParameterDefinition(fromChildCollectionConfiguration(Processor.class).build())
         .build());
 
   }
@@ -678,7 +678,7 @@ public abstract class ExtensionDefinitionParser {
 
     final String genericClassName = generics.get().getGenericTypes().get(0);
     try {
-      return MuleEvent.class.isAssignableFrom(ClassUtils.getClass(genericClassName));
+      return Event.class.isAssignableFrom(ClassUtils.getClass(genericClassName));
     } catch (ClassNotFoundException e) {
       throw new MuleRuntimeException(createStaticMessage("Could not load class " + genericClassName), e);
     }

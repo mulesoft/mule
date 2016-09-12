@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.component;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
@@ -19,6 +19,6 @@ public interface LifecycleAdapter extends Lifecycle {
 
   boolean isDisposed();
 
-  Object invoke(MuleEvent message, MuleEvent.Builder eventBuilder) throws MuleException;
+  Object invoke(Event message, Event.Builder eventBuilder) throws MuleException;
 
 }

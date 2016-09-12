@@ -37,10 +37,10 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -118,10 +118,10 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock
   protected ResolverSetResult parameters;
 
-  protected MuleEvent event;
+  protected Event event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  protected MuleMessage message;
+  protected InternalMessage message;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected MuleContext context;
@@ -169,7 +169,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(operationModel.getName()).thenReturn(getClass().getName());
     when(operationModel.getOutput())
-        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(String.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(String.class), false, emptySet()));
     when(operationModel.getExecutor()).thenReturn(operationExecutorFactory);
     when(operationModel.getModelProperty(MetadataKeyIdModelProperty.class)).thenReturn(
                                                                                        of(new MetadataKeyIdModelProperty(ExtensionsTypeLoaderFactory
@@ -239,10 +239,10 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     messageProcessor = setUpOperationMessageProcessor();
   }
 
-  protected MuleEvent configureEvent() throws Exception {
-    when(message.getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
-    when(message.getPayload()).thenReturn(TEST_PAYLOAD);
-    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
+  protected Event configureEvent() throws Exception {
+    when(message.getPayload().getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
+    when(message.getPayload().getValue()).thenReturn(TEST_PAYLOAD);
+    Event event = Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
     return event;
   }
 

@@ -11,7 +11,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
@@ -67,11 +67,11 @@ public final class ConfigurationInstanceFactory<T> {
    * {@link ImplicitConnectionProviderFactory} to construct an implicit {@link ConnectionProvider}.
    *
    * @param name the name of the configuration to return
-   * @param event the current {@link MuleEvent}
+   * @param event the current {@link Event}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance createConfiguration(String name, MuleEvent event, MuleContext muleContext)
+  public ConfigurationInstance createConfiguration(String name, Event event, MuleContext muleContext)
       throws MuleException {
     ValueResolver<ConnectionProvider> providerResolver;
     if (requiresConnection) {
@@ -91,12 +91,12 @@ public final class ConfigurationInstanceFactory<T> {
    * configuration will use to obtain connections. If the connection does not need such a concept you can provide a {@code null}
    *
    * @param name the name of the configuration to return
-   * @param event the current {@link MuleEvent}
+   * @param event the current {@link Event}
    * @param connectionProviderResolver a {@link ValueResolver} to provide the {@link ConnectionProvider} or {@code null}
    * @return a {@link ConfigurationInstance}
    * @throws MuleException if an error is encountered
    */
-  public ConfigurationInstance createConfiguration(String name, MuleEvent event,
+  public ConfigurationInstance createConfiguration(String name, Event event,
                                                    ValueResolver<ConnectionProvider> connectionProviderResolver)
       throws MuleException {
     Optional<ConnectionProvider> connectionProvider = Optional.ofNullable(connectionProviderResolver.resolve(event));
@@ -130,7 +130,7 @@ public final class ConfigurationInstanceFactory<T> {
     return config;
   }
 
-  private T createConfigurationInstance(String name, MuleEvent event) throws MuleException {
+  private T createConfigurationInstance(String name, Event event) throws MuleException {
     T config = configurationObjectBuilder.build(event);
     injectConfigName(configurationModel, config, name);
 

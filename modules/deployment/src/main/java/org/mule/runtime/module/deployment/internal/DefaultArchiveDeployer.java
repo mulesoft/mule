@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.deployment.api.DeploymentException;
@@ -154,7 +154,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
       }
 
       final String msg = "Failed to deploy from URL: " + artifactAchivedUrl;
-      throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
     }
   }
 
@@ -248,7 +248,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw (DeploymentException) t;
       } else {
         msg = "Failed to deploy artifact: " + addedApp;
-        throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+        throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
       }
     }
 
@@ -280,7 +280,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
         throw (DeploymentException) t;
       } else {
         msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-        throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+        throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
       }
     }
   }
@@ -395,7 +395,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
           throw (DeploymentException) t;
         }
         String msg = "Failed to deploy artifact: " + artifact.getArtifactName();
-        throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+        throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
       } finally {
         deploymentListener.onDeploymentFailure(artifact.getArtifactName(), t);
       }

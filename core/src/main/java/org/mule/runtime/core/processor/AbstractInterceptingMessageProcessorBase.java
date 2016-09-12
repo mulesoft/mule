@@ -9,13 +9,13 @@ package org.mule.runtime.core.processor;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * of setNext and holds the next message processor as an attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase extends AbstractAnnotatedObject
-    implements MessageProcessor, MuleContextAware, FlowConstructAware, MessageProcessorContainer {
+    implements Processor, MuleContextAware, FlowConstructAware, MessageProcessorContainer {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,17 +53,17 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
     }
   }
 
-  public final MessageProcessor getListener() {
+  public final Processor getListener() {
     return next;
   }
 
-  public void setListener(MessageProcessor next) {
+  public void setListener(Processor next) {
     this.next = next;
   }
 
-  protected MessageProcessor next;
+  protected Processor next;
 
-  protected MuleEvent processNext(MuleEvent event) throws MuleException {
+  protected Event processNext(Event event) throws MuleException {
     if (next == null) {
       return event;
     } else if (event == null) {
@@ -90,7 +90,7 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
     return ObjectUtils.toString(this);
   }
 
-  protected boolean isEventValid(MuleEvent event) {
+  protected boolean isEventValid(Event event) {
     return event != null && !(event instanceof VoidMuleEvent);
   }
 

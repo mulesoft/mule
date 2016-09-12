@@ -12,10 +12,10 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
@@ -31,9 +31,9 @@ public final class EndpointMulticastingRouter extends MulticastingRouter {
   private static final Logger logger = LoggerFactory.getLogger(MulticastingRouter.class);
 
   @Override
-  protected MessageProcessor getTemplateRoute(int index, MuleEvent event) throws CouldNotRouteOutboundMessageException {
-    MuleMessage message = event.getMessage();
-    MessageProcessor mp = routes.get(index);
+  protected Processor getTemplateRoute(int index, Event event) throws CouldNotRouteOutboundMessageException {
+    InternalMessage message = event.getMessage();
+    Processor mp = routes.get(index);
     if (!(mp instanceof ImmutableEndpoint)) {
       return routes.get(index);
     }

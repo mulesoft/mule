@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.jms.redelivery;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 import java.util.Collections;
@@ -83,11 +83,11 @@ public class CountingRedeliveryHandler extends AbstractRedeliveryHandler {
       }
 
       if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST) {
-        MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
+        InternalMessage msg = createMuleMessage(message, endpoint.getMuleContext());
         throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
       }
     } else if (redeliveryCount > connectorRedelivery) {
-      MuleMessage msg = createMuleMessage(message, endpoint.getMuleContext());
+      InternalMessage msg = createMuleMessage(message, endpoint.getMuleContext());
       throw new MessageRedeliveredException(id, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
     } else {
       messages.put(id, redeliveryCount);

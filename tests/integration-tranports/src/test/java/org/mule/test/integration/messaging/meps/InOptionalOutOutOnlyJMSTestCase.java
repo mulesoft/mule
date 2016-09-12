@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -58,9 +58,9 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase {
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send("inboundEndpoint", "some data", null).getRight();
+    InternalMessage result = client.send("inboundEndpoint", "some data", null).getRight();
     assertNotNull(result);
-    assertThat(result.getPayload(), is(nullValue()));
+    assertThat(result.getPayload().getValue(), is(nullValue()));
 
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "bar");
@@ -76,6 +76,6 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase {
 
     assertNotNull(result);
 
-    assertEquals("foo header received", result.getPayload());
+    assertEquals("foo header received", result.getPayload().getValue());
   }
 }

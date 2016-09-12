@@ -8,14 +8,14 @@ package org.mule.shutdown;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -44,12 +44,12 @@ public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
   @Rule
   public HeapDumpOnFailure heapDumpOnFailure = new HeapDumpOnFailure();
 
-  private static final Set<PhantomReference<MuleEvent>> requestContextRefs = new HashSet<>();
+  private static final Set<PhantomReference<Event>> requestContextRefs = new HashSet<>();
 
-  public static class RetrieveRequestContext implements MessageProcessor {
+  public static class RetrieveRequestContext implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       requestContextRefs.add(new PhantomReference<>(getCurrentEvent(), new ReferenceQueue<>()));
       return event;
     }
@@ -111,7 +111,7 @@ public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
     final MuleContext muleContextForApp = getMuleContextForApp("app-with-flows");
 
     muleContextForApp.getClient().dispatch("jms://in?connector=sharedJmsConnector",
-                                           MuleMessage.builder().payload("payload").build());
+                                           InternalMessage.builder().payload("payload").build());
     muleContextForApp.getClient().request("jms://out?connector=sharedJmsConnector", MESSAGE_TIMEOUT);
 
     muleContextForApp.dispose();
@@ -125,7 +125,7 @@ public class ShutdownAppInDomainTestCase extends DomainFunctionalTestCase {
       @Override
       protected boolean test() throws Exception {
         System.gc();
-        for (PhantomReference<MuleEvent> phantomReference : requestContextRefs) {
+        for (PhantomReference<Event> phantomReference : requestContextRefs) {
           assertThat(phantomReference.isEnqueued(), is(true));
         }
         return true;

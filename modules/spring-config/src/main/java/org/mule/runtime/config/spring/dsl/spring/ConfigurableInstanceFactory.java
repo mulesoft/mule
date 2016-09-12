@@ -13,9 +13,9 @@ import java.util.Map;
 /**
  * Factory for the instances created by the {@link ConfigurableObjectFactory}.
  * <p>
- * Implementations of this interfaces must be injected into {@link ConfigurableObjectFactory} by
- * using a {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder#fromFixedValue(Object)}
- * when declaring the {@link ComponentBuildingDefinition}.
+ * Implementations of this interfaces must be injected into {@link ConfigurableObjectFactory} by using a
+ * {@link org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder#fromFixedValue(Object)} when declaring the
+ * {@link ComponentBuildingDefinition}.
  *
  * @param <T> type of the object to be created
  * @since 4.0

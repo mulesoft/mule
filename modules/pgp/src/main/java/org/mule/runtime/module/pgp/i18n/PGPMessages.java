@@ -6,40 +6,40 @@
  */
 package org.mule.runtime.module.pgp.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class PGPMessages extends MessageFactory {
+public class PGPMessages extends I18nMessageFactory {
 
   private static final PGPMessages factory = new PGPMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("pgp");
 
-  public static Message noPublicKeyForUser(String userId) {
+  public static I18nMessage noPublicKeyForUser(String userId) {
     return factory.createMessage(BUNDLE_PATH, 1, userId);
   }
 
-  public static Message noSignedMessageFound() {
+  public static I18nMessage noSignedMessageFound() {
     return factory.createMessage(BUNDLE_PATH, 2);
   }
 
-  public static Message invalidSignature() {
+  public static I18nMessage invalidSignature() {
     return factory.createMessage(BUNDLE_PATH, 3);
   }
 
-  public static Message errorVerifySignature() {
+  public static I18nMessage errorVerifySignature() {
     return factory.createMessage(BUNDLE_PATH, 4);
   }
 
-  public static Message encryptionStrategyNotSet() {
+  public static I18nMessage encryptionStrategyNotSet() {
     return factory.createMessage(BUNDLE_PATH, 5);
   }
 
-  public static Message pgpPublicKeyExpired() {
+  public static I18nMessage pgpPublicKeyExpired() {
     return factory.createMessage(BUNDLE_PATH, 6);
   }
 
-  public static Message noSecretKeyFoundButAvailable(String availableKeys) {
+  public static I18nMessage noSecretKeyFoundButAvailable(String availableKeys) {
     return factory.createMessage(BUNDLE_PATH, 7, availableKeys);
   }
 

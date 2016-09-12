@@ -7,8 +7,8 @@
 package org.mule.runtime.module.pgp.filters;
 
 import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.security.AbstractOperationSecurityFilter;
 import org.mule.runtime.module.pgp.LiteralMessage;
-import org.mule.runtime.module.pgp.Message;
+import org.mule.runtime.module.pgp.PgpMessage;
 import org.mule.runtime.module.pgp.MessageFactory;
 import org.mule.runtime.module.pgp.PGPAuthentication;
 import org.mule.runtime.module.pgp.PGPKeyRing;
@@ -35,9 +35,9 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
   private PGPKeyRing keyManager;
 
   @Override
-  protected MuleEvent authenticateInbound(MuleEvent event)
+  protected Event authenticateInbound(Event event)
       throws UnauthorisedException, UnknownAuthenticationTypeException {
-    MuleMessage message = event.getMessage();
+    InternalMessage message = event.getMessage();
 
     String userId = (String) getCredentialsAccessor().getCredentials(event);
 
@@ -85,12 +85,12 @@ public class PGPSecurityFilter extends AbstractOperationSecurityFilter {
     }
   }
 
-  private Message decodeMsgRaw(byte[] raw) throws Exception {
+  private PgpMessage decodeMsgRaw(byte[] raw) throws Exception {
     return MessageFactory.getMessage(raw);
   }
 
   private String getUnencryptedMessageWithoutSignature(PGPAuthentication auth) throws Exception {
-    Message msg = (Message) auth.getCredentials();
+    PgpMessage msg = (PgpMessage) auth.getCredentials();
 
     if (msg instanceof SignedMessage) {
       msg = ((SignedMessage) msg).getContents();

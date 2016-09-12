@@ -8,7 +8,7 @@ package org.mule.test.config.spring;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -98,7 +98,7 @@ public class DummyMuleContextAware implements MuleContextAware, Transformer {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return null;
   }
 }

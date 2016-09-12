@@ -13,7 +13,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.r
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.config.ImmutableThreadingProfile;
@@ -193,7 +193,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleContextEndpo
     }
 
     @Override
-    protected void doDispatch(MuleEvent event) throws Exception {
+    protected void doDispatch(Event event) throws Exception {
       new Exception().printStackTrace();
       super.doDispatch(event);
       latch.countDown();

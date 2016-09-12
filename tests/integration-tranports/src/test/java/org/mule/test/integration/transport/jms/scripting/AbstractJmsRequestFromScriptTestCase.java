@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -38,7 +38,7 @@ public abstract class AbstractJmsRequestFromScriptTestCase extends FunctionalTes
     muleClient.send("vm://startBatch", TEST_MESSAGE, null);
 
     // Checks that the batch has processed the two messages without error
-    MuleMessage message = muleClient.request("jms://status.queue?connector=jmsConnector", 5000).getRight().get();
+    InternalMessage message = muleClient.request("jms://status.queue?connector=jmsConnector", 5000).getRight().get();
     assertNotNull(message);
     assertEquals("messagemessage", getPayloadAsString(message));
   }

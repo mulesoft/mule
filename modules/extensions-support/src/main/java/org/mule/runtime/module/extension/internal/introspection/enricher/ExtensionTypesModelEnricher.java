@@ -28,8 +28,7 @@ import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalk
 import java.util.Collection;
 
 /**
- * Navigates all the components of the extension and automatically
- * declares all complex types.
+ * Navigates all the components of the extension and automatically declares all complex types.
  *
  * @since 4.0
  */

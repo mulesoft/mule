@@ -10,9 +10,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -39,7 +39,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testEventSerialization() throws Exception {
-    MuleEvent event = getTestEvent("payload");
+    Event event = getTestEvent("payload");
     setCurrentEvent(event);
 
     Transformer transformer = createSerializableToByteArrayTransformer();
@@ -48,7 +48,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
     trans.setMuleContext(muleContext);
-    MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
+    Event deserialized = (Event) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -67,7 +67,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testEventSerializationRestart() throws Exception {
     // Create and register artifacts
-    MuleEvent event = createEventToSerialize();
+    Event event = createEventToSerialize();
     muleContext.start();
 
     // Serialize
@@ -85,7 +85,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     createAndRegisterTransformersEndpointBuilderService();
 
     // Deserialize
-    MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
+    Event deserialized = (Event) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -94,7 +94,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     assertNotNull(deserialized.getSession());
   }
 
-  private MuleEvent createEventToSerialize() throws Exception {
+  private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleService");
     return getTestEvent(TEST_PAYLOAD);
@@ -107,12 +107,12 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    MuleEvent testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
+    Event testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
 
-    assertArrayEquals((byte[]) testEvent.getMessage().getPayload(), payload.toString().getBytes());
+    assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
   }
 
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {
@@ -135,42 +135,42 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFlowVarNamesAddImmutable() throws Exception {
-    MuleEvent event = getTestEvent("whatever");
-    event = MuleEvent.builder(event).addFlowVariable("test", "val").build();
-    event.getFlowVariableNames().add("other");
+    Event event = getTestEvent("whatever");
+    event = Event.builder(event).addVariable("test", "val").build();
+    event.getVariableNames().add("other");
   }
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
-    MuleEvent event = getTestEvent("whatever");
-    event = MuleEvent.builder(event).addFlowVariable("test", "val").build();
-    event.getFlowVariableNames().remove("test");
-    assertNull(event.getFlowVariable("test"));
+    Event event = getTestEvent("whatever");
+    event = Event.builder(event).addVariable("test", "val").build();
+    event.getVariableNames().remove("test");
+    assertNull(event.getVariable("test"));
   }
 
   @Test
   public void testFlowVarsNotShared() throws Exception {
-    MuleEvent event = getTestEvent("whatever");
-    event = MuleEvent.builder(event).addFlowVariable("foo", "bar").build();
+    Event event = getTestEvent("whatever");
+    event = Event.builder(event).addVariable("foo", "bar").build();
 
-    MuleEvent copy = MuleEvent.builder(event).build();
+    Event copy = Event.builder(event).build();
 
-    copy = MuleEvent.builder(copy).addFlowVariable("foo", "bar2").build();
+    copy = Event.builder(copy).addVariable("foo", "bar2").build();
 
-    assertEquals("bar", event.getFlowVariable("foo"));
+    assertEquals("bar", event.getVariable("foo"));
 
-    assertEquals("bar2", copy.getFlowVariable("foo"));
+    assertEquals("bar2", copy.getVariable("foo"));
   }
 
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarNonexistent() throws Exception {
-    MuleEvent event = getTestEvent("whatever");
-    event.getFlowVariable("foo");
+    Event event = getTestEvent("whatever");
+    event.getVariable("foo");
   }
 
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarDataTypeNonexistent() throws Exception {
-    MuleEvent event = getTestEvent("whatever");
-    event.getFlowVariableDataType("foo");
+    Event event = getTestEvent("whatever");
+    event.getVariableDataType("foo");
   }
 
   private static class TestEventTransformer extends AbstractTransformer {

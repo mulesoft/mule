@@ -9,7 +9,7 @@ package org.mule.test.integration.routing.outbound;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -42,17 +42,17 @@ public class MulticastAsyncWithTransformersTestCase extends AbstractIntegrationT
 
     MuleClient client = muleContext.getClient();
     // We have to wait a lot longer here since groovy takes an age to compile the first time
-    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add(result.getPayload());
+    results.add(result.getPayload().getValue());
 
     result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add(result.getPayload());
+    results.add(result.getPayload().getValue());
 
     result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add(result.getPayload());
+    results.add(result.getPayload().getValue());
 
     assertTrue(results.contains(apple));
     assertTrue(results.contains(banana));

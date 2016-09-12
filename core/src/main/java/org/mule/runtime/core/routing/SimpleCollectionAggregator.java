@@ -10,10 +10,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 
+import java.util.Collection;
+
 /**
- * This router will return all aggregated events as a {@link org.mule.runtime.core.api.MuleMessageCollection}. This allows the
- * service itself to act upon the events rather that the user having to write a custom aggregator. This may feel more natural for
- * some users. <b>EIP Reference:</b>
+ * This router will return all aggregated events as a {@link Collection}. This allows the service itself to act upon the events
+ * rather that the user having to write a custom aggregator. This may feel more natural for some users. <b>EIP Reference:</b>
  * <a href="http://www.eaipatterns.com/Aggregator.html" >http://www.eaipatterns.com/Aggregator.html</a>
  */
 public class SimpleCollectionAggregator extends AbstractAggregator {

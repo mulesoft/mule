@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.scripting.transformer;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -43,9 +43,9 @@ public class ScriptTransformer extends AbstractMessageTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     Bindings bindings = script.getScriptEngine().createBindings();
-    script.populateBindings(bindings, event, MuleEvent.builder(event));
+    script.populateBindings(bindings, event, Event.builder(event));
     try {
       return script.runScript(bindings);
     } catch (ScriptException e) {

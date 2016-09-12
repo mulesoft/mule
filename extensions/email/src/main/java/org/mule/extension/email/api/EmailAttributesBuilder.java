@@ -28,7 +28,6 @@ import java.util.Map;
 
 import javax.mail.Address;
 import javax.mail.Flags;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
@@ -66,7 +65,7 @@ public final class EmailAttributesBuilder {
    * @param msg the {@link Message} to extract attributes from.
    * @return a new {@link EmailAttributes} instance.
    */
-  public static EmailAttributes fromMessage(Message msg) {
+  public static EmailAttributes fromMessage(javax.mail.Message msg) {
     try {
       Flags flags = msg.getFlags();
 

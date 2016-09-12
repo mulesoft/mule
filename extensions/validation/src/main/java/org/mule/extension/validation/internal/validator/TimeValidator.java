@@ -7,8 +7,8 @@
 package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 
@@ -25,7 +25,7 @@ public class TimeValidator extends AbstractValidator {
   private final String time;
   private final String locale;
   private final String pattern;
-  private Message errorMessage;
+  private I18nMessage errorMessage;
 
   public TimeValidator(String time, String locale, String pattern, ValidationContext validationContext) {
     super(validationContext);
@@ -35,7 +35,7 @@ public class TimeValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(MuleEvent event) {
+  public ValidationResult validate(Event event) {
     org.apache.commons.validator.routines.TimeValidator validator =
         org.apache.commons.validator.routines.TimeValidator.getInstance();
     Locale locale = new Locale(this.locale);
@@ -55,7 +55,7 @@ public class TimeValidator extends AbstractValidator {
   }
 
   @Override
-  protected Message getDefaultErrorMessage() {
+  protected I18nMessage getDefaultErrorMessage() {
     return errorMessage;
   }
 }

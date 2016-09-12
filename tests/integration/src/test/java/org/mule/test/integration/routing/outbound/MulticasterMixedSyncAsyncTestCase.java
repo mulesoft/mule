@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.List;
@@ -30,12 +30,13 @@ public class MulticasterMixedSyncAsyncTestCase extends AbstractIntegrationTestCa
   public void testMixedMulticast() throws Exception {
     Apple apple = new Apple();
 
-    MuleMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
+    InternalMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
+    assertTrue(result.getPayload().getValue() instanceof List);
     List<Apple> results =
-        ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (Apple) msg.getPayload()).collect(toList());
+        ((List<InternalMessage>) result.getPayload().getValue()).stream().map(msg -> (Apple) msg.getPayload().getValue())
+            .collect(toList());
     assertEquals(2, results.size());
 
     FlowAssert.verify();

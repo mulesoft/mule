@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.PartAttributes;
@@ -255,28 +255,28 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
   }
 
   /**
-   * Transforms an Object into a {@link MuleMessage} to be used in a {@link MultiPartPayload}.
+   * Transforms an Object into a {@link Message} to be used in a {@link MultiPartContent}.
    *
    * @param name the name of the attachment being handled
    * @param object the attachment to be handled
    * @param contentType the Content-Type of the attachment that is being handled
-   * @return a {@link MuleMessage} of the corresponding attachment
+   * @return a {@link Message} of the corresponding attachment
    * @throws IOException if the transformation fails.
    */
-  public static MuleMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException {
+  public static InternalMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException {
     final Builder builder;
 
     if (object instanceof File) {
-      builder = MuleMessage.builder().payload(new FileInputStream((File) object));
+      builder = InternalMessage.builder().payload(new FileInputStream((File) object));
     } else if (object instanceof URL) {
-      builder = MuleMessage.builder().payload(((URL) object).openStream());
+      builder = InternalMessage.builder().payload(((URL) object).openStream());
     } else if (object instanceof String) {
-      builder = MuleMessage.builder().payload(object);
+      builder = InternalMessage.builder().payload(object);
       if (contentType == null || MediaType.ANY.matches(contentType)) {
         builder.mediaType(MediaType.TEXT);
       }
     } else {
-      builder = MuleMessage.builder().payload(object);
+      builder = InternalMessage.builder().payload(object);
     }
 
     if (contentType != null && !MediaType.ANY.matches(contentType)) {

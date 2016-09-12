@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
@@ -39,7 +39,7 @@ public class HttpOperations {
    * @param headersFlowVar Reference to the flow variable name used for the headersRef attribute of the error-response-builder.
    * @throws MuleException if unauthenticated.
    */
-  public void basicSecurityFilter(String realm, @Optional String securityProviders, MuleEvent event,
+  public void basicSecurityFilter(String realm, @Optional String securityProviders, Event event,
                                   @Optional(
                                       defaultValue = "statusCode") @DisplayName("Status Code - Flow Var Ref") String statusCodeFlowVar,
                                   @Optional(
@@ -55,7 +55,7 @@ public class HttpOperations {
    *
    * @return the resource defined by the path of an HTTP request
    */
-  public OperationResult<?, ?> loadStaticResource(@ParameterGroup StaticResourceLoader resourceLoader, MuleEvent event)
+  public OperationResult<?, ?> loadStaticResource(@ParameterGroup StaticResourceLoader resourceLoader, Event event)
       throws ResourceNotFoundException, InitialisationException {
     return OperationResult.builder(resourceLoader.load(event)).build();
   }

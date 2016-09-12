@@ -12,10 +12,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.store.ObjectStoreException;
@@ -53,12 +53,14 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     flowRunner("SplitterFlow").withPayload(PAYLOAD).asynchronously().run();
-    MuleMessage msg = client.request("test://collectionCreated", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msg = client.request("test://collectionCreated", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
-    assertTrue(msg.getPayload() instanceof List);
+    assertTrue(msg.getPayload().getValue() instanceof List);
 
     List<byte[]> chunks =
-        ((List<MuleMessage>) msg.getPayload()).stream().map(muleMessage -> (byte[]) muleMessage.getPayload()).collect(toList());
+        ((List<InternalMessage>) msg.getPayload().getValue()).stream()
+            .map(muleMessage -> (byte[]) muleMessage.getPayload().getValue())
+            .collect(toList());
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     for (byte[] chunk : chunks) {
       baos.write(chunk);
@@ -71,17 +73,17 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
   public void testCustomAggregator() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("SplitterFlow2").withPayload(PAYLOAD).asynchronously().run();
-    MuleMessage msg = client.request("test://collectionCreated2", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msg = client.request("test://collectionCreated2", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
-    assertNotNull(msg.getPayload());
-    assertTrue(msg.getPayload() instanceof List);
+    assertNotNull(msg.getPayload().getValue());
+    assertTrue(msg.getPayload().getValue() instanceof List);
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    for (Object obj : (List<?>) msg.getPayload()) {
-      assertTrue(obj instanceof MuleEvent);
-      MuleEvent event = (MuleEvent) obj;
-      assertTrue(event.getMessage().getPayload() instanceof byte[]);
-      baos.write((byte[]) event.getMessage().getPayload());
+    for (Object obj : (List<?>) msg.getPayload().getValue()) {
+      assertTrue(obj instanceof Event);
+      Event event = (Event) obj;
+      assertTrue(event.getMessage().getPayload().getValue() instanceof byte[]);
+      baos.write((byte[]) event.getMessage().getPayload().getValue());
     }
     String aggregated = baos.toString();
     assertEquals(PAYLOAD, aggregated);
@@ -102,25 +104,25 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
     }
 
     @Override
-    public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
-      List<MuleEvent> eventList = new ArrayList<>();
-      Iterator<MuleEvent> iter = null;
+    public Event aggregateEvents(EventGroup events) throws AggregationException {
+      List<Event> eventList = new ArrayList<>();
+      Iterator<Event> iter = null;
       FlowConstruct fc = null;
-      MessageContext executionContext = null;
+      EventContext executionContext = null;
       try {
         iter = events.iterator(true);
       } catch (ObjectStoreException e) {
         throw new AggregationException(events, null, e);
       }
       while (iter.hasNext()) {
-        MuleEvent event = iter.next();
+        Event event = iter.next();
         eventList.add(event);
         executionContext = event.getContext();
         // TODO MULE-10302 delegate this to the builder.
         fc = event.getFlowConstruct();
       }
 
-      return MuleEvent.builder(executionContext).message(MuleMessage.builder().payload(eventList).build())
+      return Event.builder(executionContext).message(InternalMessage.builder().payload(eventList).build())
           .exchangePattern(ONE_WAY).flow(fc).build();
     }
   }

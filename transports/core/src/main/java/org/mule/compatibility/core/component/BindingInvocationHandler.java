@@ -6,13 +6,13 @@
  */
 package org.mule.compatibility.core.component;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -57,7 +57,7 @@ public class BindingInvocationHandler implements InvocationHandler {
       return toString();
     }
 
-    MuleMessage message = createMuleMessage(args);
+    InternalMessage message = createMuleMessage(args);
 
     InterfaceBinding router = routers.get(method.getName());
     if (router == null) {
@@ -68,12 +68,12 @@ public class BindingInvocationHandler implements InvocationHandler {
       throw new IllegalArgumentException(TransportCoreMessages.cannotFindBindingForMethod(method.getName()).toString());
     }
 
-    MuleEvent currentEvent = getCurrentEvent();
-    MuleEvent replyEvent = router.process(MuleEvent.builder(currentEvent).message(message).build());
+    Event currentEvent = getCurrentEvent();
+    Event replyEvent = router.process(Event.builder(currentEvent).message(message).build());
 
     if (replyEvent != null && !VoidMuleEvent.getInstance().equals(replyEvent)
         && replyEvent.getMessage() != null) {
-      MuleMessage reply = replyEvent.getMessage();
+      InternalMessage reply = replyEvent.getMessage();
       if (replyEvent.getError().isPresent()) {
         throw findDeclaredMethodException(method, replyEvent.getError().get().getException());
       } else {
@@ -84,13 +84,13 @@ public class BindingInvocationHandler implements InvocationHandler {
     }
   }
 
-  private MuleMessage createMuleMessage(Object[] args) {
+  private InternalMessage createMuleMessage(Object[] args) {
     if (args == null) {
-      return MuleMessage.builder().nullPayload().build();
+      return InternalMessage.builder().nullPayload().build();
     } else if (args.length == 1) {
-      return MuleMessage.builder().payload(args[0]).build();
+      return InternalMessage.builder().payload(args[0]).build();
     } else {
-      return MuleMessage.builder().payload(args).build();
+      return InternalMessage.builder().payload(args).build();
     }
   }
 
@@ -114,13 +114,14 @@ public class BindingInvocationHandler implements InvocationHandler {
     return throwable;
   }
 
-  private Object determineReply(MuleMessage reply, Method bindingMethod) {
-    if (MuleMessage.class.isAssignableFrom(bindingMethod.getReturnType())) {
+  private Object determineReply(InternalMessage reply, Method bindingMethod) {
+    if (InternalMessage.class.isAssignableFrom(bindingMethod.getReturnType())) {
       return reply;
-    } else if (reply.getPayload() == null && !bindingMethod.getReturnType().isInstance(reply.getPayload())) {
+    } else if (reply.getPayload().getValue() == null
+        && !bindingMethod.getReturnType().isInstance(reply.getPayload().getValue())) {
       return null;
     } else {
-      return reply.getPayload();
+      return reply.getPayload().getValue();
     }
   }
 

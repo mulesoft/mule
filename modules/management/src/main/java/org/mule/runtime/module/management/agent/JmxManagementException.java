@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.management.agent;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.module.management.ManagementException;
 
 import javax.management.ObjectName;
@@ -26,7 +26,7 @@ public class JmxManagementException extends ManagementException {
   /**
    * @param message the exception message
    */
-  public JmxManagementException(Message message) {
+  public JmxManagementException(I18nMessage message) {
     super(message);
   }
 
@@ -34,14 +34,14 @@ public class JmxManagementException extends ManagementException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public JmxManagementException(Message message, Throwable cause) {
+  public JmxManagementException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
   /**
    * @param message the exception message
    */
-  public JmxManagementException(Message message, ObjectName objectName) {
+  public JmxManagementException(I18nMessage message, ObjectName objectName) {
     super(message);
     this.objectName = objectName;
   }
@@ -50,7 +50,7 @@ public class JmxManagementException extends ManagementException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public JmxManagementException(Message message, ObjectName objectName, Throwable cause) {
+  public JmxManagementException(I18nMessage message, ObjectName objectName, Throwable cause) {
     super(message, cause);
     this.objectName = objectName;
 

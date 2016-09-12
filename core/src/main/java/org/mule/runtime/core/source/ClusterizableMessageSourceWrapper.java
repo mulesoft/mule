@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.lifecycle.PrimaryNodeLifecycleNotificationListener;
@@ -53,7 +53,7 @@ public class ClusterizableMessageSourceWrapper implements MessageSource, Lifecyc
   }
 
   @Override
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     messageSource.setListener(listener);
   }
 

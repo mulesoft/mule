@@ -10,8 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -32,13 +32,13 @@ public class ConsumableFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testRejectsConsumablePayload() throws Exception {
     InputStream is = new ByteArrayInputStream("TEST".getBytes());
-    MuleMessage message = MuleMessage.builder().payload(is).build();
-    assertThat("Should reject consumable payload", filter.accept(message, mock(MuleEvent.Builder.class)), is(false));
+    InternalMessage message = InternalMessage.builder().payload(is).build();
+    assertThat("Should reject consumable payload", filter.accept(message, mock(Event.Builder.class)), is(false));
   }
 
   @Test
   public void testAcceptsNonConsumablePayload() throws Exception {
-    MuleMessage message = MuleMessage.builder().payload("TEST").build();
-    assertThat("Should accept non consumable payload", filter.accept(message, mock(MuleEvent.Builder.class)), is(true));
+    InternalMessage message = InternalMessage.builder().payload("TEST").build();
+    assertThat("Should accept non consumable payload", filter.accept(message, mock(Event.Builder.class)), is(true));
   }
 }

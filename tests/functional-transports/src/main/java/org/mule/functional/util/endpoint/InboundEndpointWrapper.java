@@ -16,9 +16,9 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -121,12 +121,12 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint {
   }
 
   @Override
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return delegate.getMessageProcessors();
   }
 
   @Override
-  public List<MessageProcessor> getResponseMessageProcessors() {
+  public List<Processor> getResponseMessageProcessors() {
     return delegate.getResponseMessageProcessors();
   }
 
@@ -181,12 +181,12 @@ public abstract class InboundEndpointWrapper implements InboundEndpoint {
   }
 
   @Override
-  public MuleMessage request(long timeout) throws Exception {
+  public InternalMessage request(long timeout) throws Exception {
     return delegate.request(timeout);
   }
 
   @Override
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     delegate.setListener(listener);
   }
 

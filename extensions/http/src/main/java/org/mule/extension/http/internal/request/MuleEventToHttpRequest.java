@@ -23,9 +23,9 @@ import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 
 /**
- * Component that transforms a {@link MuleEvent} to a {@link HttpRequest}.
+ * Component that transforms a {@link Event} to a {@link HttpRequest}.
  *
  * @since 4.0
  */
@@ -85,7 +85,7 @@ public class MuleEventToHttpRequest {
   /**
    * Creates an {@HttpRequest}.
    *
-   * @param event The {@link MuleEvent} that should be used to set the {@link HttpRequest} content.
+   * @param event The {@link Event} that should be used to set the {@link HttpRequest} content.
    * @param requestBuilder The generic {@link HttpRequesterRequestBuilder} from the request component that should be used to
    *        create the {@link HttpRequest}.
    * @param authentication The {@link HttpAuthentication} that should be used to create the {@link HttpRequest}.
@@ -93,7 +93,7 @@ public class MuleEventToHttpRequest {
    * @return an {@HttpRequest} configured based on the parameters.
    * @throws MuleException if the request creation fails.
    */
-  public HttpRequest create(MuleEvent event, HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication,
+  public HttpRequest create(Event event, HttpRequesterRequestBuilder requestBuilder, HttpAuthentication authentication,
                             MuleContext muleContext)
       throws MuleException {
     HttpRequestBuilder builder = new HttpRequestBuilder();
@@ -104,7 +104,7 @@ public class MuleEventToHttpRequest {
     builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
 
     if (!builder.getHeaders().containsKey(CONTENT_TYPE)) {
-      DataType dataType = event.getMessage().getDataType();
+      DataType dataType = event.getMessage().getPayload().getDataType();
       if (!MediaType.ANY.matches(dataType.getMediaType())) {
         builder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
       }
@@ -141,7 +141,7 @@ public class MuleEventToHttpRequest {
     return parameterMap;
   }
 
-  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, MuleEvent muleEvent, String resolvedMethod,
+  private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, Event muleEvent, String resolvedMethod,
                                          Map<String, DataHandler> parts, MuleContext muleContext)
       throws MessagingException {
     HttpEntity entity;
@@ -149,7 +149,7 @@ public class MuleEventToHttpRequest {
     if (!StringUtils.isEmpty(this.source) && !(DEFAULT_PAYLOAD_EXPRESSION.equals(this.source))) {
       Object newPayload = this.source;
       muleEvent =
-          MuleEvent.builder(muleEvent).message(MuleMessage.builder(muleEvent.getMessage()).payload(newPayload).build()).build();
+          Event.builder(muleEvent).message(InternalMessage.builder(muleEvent.getMessage()).payload(newPayload).build()).build();
     }
 
     if (isEmptyBody(muleEvent, resolvedMethod, parts)) {
@@ -161,11 +161,11 @@ public class MuleEventToHttpRequest {
     return entity;
   }
 
-  private boolean isEmptyBody(MuleEvent event, String method, Map<String, DataHandler> parts) {
+  private boolean isEmptyBody(Event event, String method, Map<String, DataHandler> parts) {
     boolean emptyBody;
 
     // TODO MULE-9986 Use multi-part payload
-    if (event.getMessage().getPayload() == null && parts.isEmpty()) {
+    if (event.getMessage().getPayload().getValue() == null && parts.isEmpty()) {
       emptyBody = true;
     } else {
       emptyBody = DEFAULT_EMPTY_BODY_METHODS.contains(method);
@@ -178,10 +178,10 @@ public class MuleEventToHttpRequest {
     return emptyBody;
   }
 
-  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, MuleEvent muleEvent,
+  private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent,
                                                     Map<String, DataHandler> parts, MuleContext muleContext)
       throws MessagingException {
-    Object payload = muleEvent.getMessage().getPayload();
+    Object payload = muleEvent.getMessage().getPayload().getValue();
 
     if (!parts.isEmpty()) {
       try {
@@ -208,8 +208,8 @@ public class MuleEventToHttpRequest {
 
       if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.startsWith(APPLICATION_JAVA)) {
-        if (muleEvent.getMessage().getPayload() instanceof Map) {
-          String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset()
+        if (muleEvent.getMessage().getPayload().getValue() instanceof Map) {
+          String body = HttpParser.encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
               .orElse(getDefaultEncoding(muleContext)), (Map) payload);
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());
@@ -224,11 +224,11 @@ public class MuleEventToHttpRequest {
     }
   }
 
-  private boolean doStreaming(HttpRequestBuilder requestBuilder, MuleEvent event) throws MessagingException {
+  private boolean doStreaming(HttpRequestBuilder requestBuilder, Event event) throws MessagingException {
     String transferEncodingHeader = requestBuilder.getHeaders().get(TRANSFER_ENCODING);
     String contentLengthHeader = requestBuilder.getHeaders().get(CONTENT_LENGTH);
 
-    Object payload = event.getMessage().getPayload();
+    Object payload = event.getMessage().getPayload().getValue();
 
     if (streamingMode == HttpStreamingType.AUTO) {
       if (contentLengthHeader != null) {

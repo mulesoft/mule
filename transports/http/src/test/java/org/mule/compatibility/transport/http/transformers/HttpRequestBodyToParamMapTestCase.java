@@ -20,12 +20,12 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -50,43 +50,43 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
   @Mock
   private TransformationService transformationService;
   private Flow flow;
-  private MessageContext context;
+  private EventContext context;
 
   @Before
   public void setup() throws Exception {
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.transform(any(MuleMessage.class), any(DataType.class)))
-        .thenAnswer(inv -> (MuleMessage) inv.getArguments()[0]);
+    when(transformationService.transform(any(InternalMessage.class), any(DataType.class)))
+        .thenAnswer(inv -> (InternalMessage) inv.getArguments()[0]);
 
     flow = getTestFlow();
-    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
   }
 
   @Test
   public void validGet() throws Exception {
-    MuleMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
-    verifyTransformation(transform(MuleEvent.builder(context).message(msg).flow(flow).build()));
+    InternalMessage msg = createMessage(METHOD_GET, DEFAULT_CONTENT_TYPE);
+    verifyTransformation(transform(Event.builder(context).message(msg).flow(flow).build()));
   }
 
   @Test
   public void validPost() throws Exception {
-    MuleMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
-    verifyTransformation(transform(MuleEvent.builder(context).message(msg).flow(flow).build()));
+    InternalMessage msg = createMessage(METHOD_POST, FORM_URLENCODED_CONTENT_TYPE);
+    verifyTransformation(transform(Event.builder(context).message(msg).flow(flow).build()));
   }
 
   @Test
   public void validPut() throws Exception {
-    MuleMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
-    verifyTransformation(transform(MuleEvent.builder(context).message(msg).flow(flow).build()));
+    InternalMessage msg = createMessage(METHOD_PUT, FORM_URLENCODED_CONTENT_TYPE);
+    verifyTransformation(transform(Event.builder(context).message(msg).flow(flow).build()));
   }
 
   @Test(expected = TransformerException.class)
   public void invalidContentType() throws Exception {
-    MuleMessage msg = createMessage(METHOD_POST, "application/json");
-    transform(MuleEvent.builder(context).message(msg).flow(flow).build());
+    InternalMessage msg = createMessage(METHOD_POST, "application/json");
+    transform(Event.builder(context).message(msg).flow(flow).build());
   }
 
-  private Object transform(MuleEvent event) throws TransformerException {
+  private Object transform(Event event) throws TransformerException {
     HttpRequestBodyToParamMap transformer = new HttpRequestBodyToParamMap();
     transformer.setMuleContext(muleContext);
     return transformer.transformMessage(event, UTF_8);
@@ -100,7 +100,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
     assertThat(map.get("key2"), is("value2"));
   }
 
-  private MuleMessage createMessage(String method, String contentType) {
+  private InternalMessage createMessage(String method, String contentType) {
     Map<String, Serializable> inboundProperties = new HashMap<>();
     inboundProperties.put("http.method", method);
 
@@ -108,7 +108,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
     if ("GET".equals(method)) {
       payload = "http://localhost/?" + payload;
     }
-    return MuleMessage.builder().payload(payload).inboundProperties(inboundProperties).mediaType(MediaType.parse(contentType))
+    return InternalMessage.builder().payload(payload).inboundProperties(inboundProperties).mediaType(MediaType.parse(contentType))
         .build();
   }
 

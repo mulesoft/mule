@@ -8,7 +8,7 @@
 package org.mule.runtime.core.source.polling.watermark;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStore;
@@ -73,7 +73,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
     this.defaultExpression = defaultExpression;
   }
 
-  protected String resolveVariable(MuleEvent event) {
+  protected String resolveVariable(Event event) {
     try {
       return WatermarkUtils.evaluate(variable, event, muleContext).toString();
     } catch (NotSerializableException e) {
@@ -85,7 +85,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
    * Retrieves the watermark value from the underlying peristent store and enriches the event.If there is no value stored, a
    * default expression will be used to create a new one.
    */
-  public MuleEvent putInto(MuleEvent event) throws ObjectStoreException {
+  public Event putInto(Event event) throws ObjectStoreException {
     String resolvedVariable = resolveVariable(event);
     Serializable watermarkValue = null;
 
@@ -100,14 +100,14 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
       }
     }
     if (watermarkValue != null) {
-      return MuleEvent.builder(event).addFlowVariable(resolvedVariable, watermarkValue).build();
+      return Event.builder(event).addVariable(resolvedVariable, watermarkValue).build();
     } else {
       logger.warn(CoreMessages.nullWatermark().getMessage());
       return event;
     }
   }
 
-  public final void updateWith(MuleEvent event, Serializable newValue) throws ObjectStoreException {
+  public final void updateWith(Event event, Serializable newValue) throws ObjectStoreException {
     if (!this.validateNewWatermarkValue(newValue)) {
       return;
     }
@@ -128,7 +128,7 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
    *
    * @param event The event containing the watermark as a flow variable
    */
-  public final void updateFrom(MuleEvent event) throws ObjectStoreException {
+  public final void updateFrom(Event event) throws ObjectStoreException {
     try {
       Object watermarkValue = this.getUpdatedValue(event);
 
@@ -148,10 +148,10 @@ public abstract class Watermark extends MessageProcessorPollingOverride implemen
    * This method is executed once the flow containing the poll has been executed. This method must return the watermark's new
    * value
    * 
-   * @param event the {@link MuleEvent} that was returned by the owning flow
+   * @param event the {@link Event} that was returned by the owning flow
    * @return the new watermark value
    */
-  protected abstract Object getUpdatedValue(MuleEvent event);
+  protected abstract Object getUpdatedValue(Event event);
 
   private boolean validateNewWatermarkValue(Object value) {
     if (value == null) {

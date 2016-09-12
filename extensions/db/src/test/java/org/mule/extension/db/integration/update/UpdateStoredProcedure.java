@@ -10,13 +10,15 @@ import static org.junit.Assume.assumeThat;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
+
+import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -51,9 +53,9 @@ public class UpdateStoredProcedure extends AbstractDbIntegrationTestCase {
 
   @Test
   public void testRequestResponse() throws Exception {
-    MuleMessage response = flowRunner("updateStoredProcedure").run().getMessage();
+    Message response = flowRunner("updateStoredProcedure").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), testDatabase instanceof DerbyTestDatabase ? 0 : 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), testDatabase instanceof DerbyTestDatabase ? 0 : 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
   }

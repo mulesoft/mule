@@ -23,12 +23,12 @@ import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populate
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -52,7 +52,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
   protected MuleSession session = mock(MuleSession.class);
   protected InboundEndpoint endpoint = mock(InboundEndpoint.class);
   protected Flow flow = mock(Flow.class);
-  private MessageContext context;
+  private EventContext context;
 
   @Before
   public void setupMocks() throws Exception {
@@ -62,37 +62,37 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     when(flow.getProcessingStrategy()).thenReturn(new SynchronousProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
     when(muleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
-    context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    context = DefaultEventContext.create(flow, TEST_CONNECTOR);
 
   }
 
   @Test
   public void aggregateNoEvent() {
-    MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent>singletonList(null), mock(MuleEvent.class));
+    Event result = resultsHandler.aggregateResults(Collections.<Event>singletonList(null), mock(Event.class));
     assertNull(result);
   }
 
   @Test
   public void aggregateSingleEvent() {
 
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key1", "value1").build();
+    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
     event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
     event1.getSession().setProperty("key", "value");
 
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(flow).addFlowVariable("key2", "value2").build();
+    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    Event event2 = Event.builder(context).message(message2).flow(flow).addVariable("key2", "value2").build();
     event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
     event2.getSession().setProperty("key", "valueNEW");
     event2.getSession().setProperty("key1", "value1");
 
-    MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent>singletonList(event2), event1);
+    Event result = resultsHandler.aggregateResults(Collections.<Event>singletonList(event2), event1);
     assertSame(event2, result);
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getFlowVariableNames(), not(contains("key1")));
-    assertEquals("value2", result.getFlowVariable("key2"));
+    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertEquals("value2", result.getVariable("key2"));
 
     assertEquals("valueNEW", result.getSession().getProperty("key"));
     assertEquals("value1", result.getSession().getProperty("key1"));
@@ -102,20 +102,20 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
   @Test
   public void aggregateMultipleEvents() throws Exception {
     DataType simpleDateType1 = DataType.builder().type(String.class).mediaType("text/plain").build();
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-    MuleEvent event1 =
-        MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key1", "value1", simpleDateType1).build();
+    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
+    Event event1 =
+        Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1", simpleDateType1).build();
     event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
     MuleSession session = event1.getSession();
 
-    MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(flow).session(session)
-        .addFlowVariable("key2", "value2", simpleDateType1).build();
+    Event event2 = Event.builder(context).message(message2).flow(flow).session(session)
+        .addVariable("key2", "value2", simpleDateType1).build();
     event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
 
-    MuleEvent event3 = MuleEvent.builder(context).message(message3).flow(flow).session(session)
-        .addFlowVariable("key3", "value3", simpleDateType1).build();
+    Event event3 = Event.builder(context).message(message3).flow(flow).session(session)
+        .addVariable("key3", "value3", simpleDateType1).build();
     event3 = populateFieldsFromInboundEndpoint(event3, endpoint);
 
     event1.getSession().setProperty("key", "value");
@@ -124,23 +124,23 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
     event3.getSession().setProperty("KEY2", "value2NEW");
     event3.getSession().setProperty("key3", "value3");
 
-    List<MuleEvent> events = new ArrayList<>();
+    List<Event> events = new ArrayList<>();
     events.add(event2);
     events.add(event3);
 
-    MuleEvent result = resultsHandler.aggregateResults(events, event1);
+    Event result = resultsHandler.aggregateResults(events, event1);
     assertNotNull(result);
-    assertEquals(2, ((List<MuleMessage>) result.getMessage().getPayload()).size());
-    assertTrue(result.getMessage().getPayload() instanceof List<?>);
-    assertEquals(message2, ((List<MuleMessage>) result.getMessage().getPayload()).get(0));
-    assertEquals(message3, ((List<MuleMessage>) result.getMessage().getPayload()).get(1));
+    assertEquals(2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).size());
+    assertTrue(result.getMessage().getPayload().getValue() instanceof List<?>);
+    assertEquals(message2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(0));
+    assertEquals(message3, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(1));
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
-    assertEquals("value1", result.getFlowVariable("key1"));
-    assertTrue(simpleDateType1.equals(result.getFlowVariableDataType("key1")));
-    assertThat(result.getFlowVariableNames(), not(contains("key2")));
-    assertThat(result.getFlowVariableNames(), not(contains("key3")));
+    assertEquals("value1", result.getVariable("key1"));
+    assertTrue(simpleDateType1.equals(result.getVariableDataType("key1")));
+    assertThat(result.getVariableNames(), not(contains("key2")));
+    assertThat(result.getVariableNames(), not(contains("key3")));
 
     // Root id
     assertEquals(event1.getCorrelationId(), result.getCorrelationId());
@@ -154,92 +154,92 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleContextEndp
 
   @Test
   public void aggregateMultipleEventsAllButOneNull() {
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key", "value").build();
+    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key", "value").build();
     event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
 
-    MuleEvent event2 = MuleEvent.builder(context).message(message2).flow(flow).addFlowVariable("key2", "value2").build();
+    Event event2 = Event.builder(context).message(message2).flow(flow).addVariable("key2", "value2").build();
     event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
-    List<MuleEvent> events = new ArrayList<>();
+    List<Event> events = new ArrayList<>();
     events.add(null);
     events.add(event2);
 
-    MuleEvent result = resultsHandler.aggregateResults(events, event1);
+    Event result = resultsHandler.aggregateResults(events, event1);
     assertSame(event2, result);
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getFlowVariableNames(), not(contains("key1")));
-    assertEquals("value2", result.getFlowVariable("key2"));
+    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertEquals("value2", result.getVariable("key2"));
   }
 
   @Test
   public void aggregateSingleMuleMessageCollection() {
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key1", "value1").build();
+    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
     event1 = populateFieldsFromInboundEndpoint(event1, endpoint);
 
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
 
-    List<MuleMessage> list = new ArrayList<>();
+    List<InternalMessage> list = new ArrayList<>();
     list.add(message2);
     list.add(message3);
-    MuleMessage messageCollection = MuleMessage.builder().payload(list).build();
-    MuleEvent event2 = MuleEvent.builder(context).message(messageCollection).flow(flow).addFlowVariable("key2", "value2").build();
+    InternalMessage messageCollection = InternalMessage.builder().payload(list).build();
+    Event event2 = Event.builder(context).message(messageCollection).flow(flow).addVariable("key2", "value2").build();
     event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
 
-    MuleEvent result = resultsHandler.aggregateResults(Collections.<MuleEvent>singletonList(event2), event1);
+    Event result = resultsHandler.aggregateResults(Collections.<Event>singletonList(event2), event1);
     assertSame(event2, result);
 
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
-    assertThat(result.getFlowVariableNames(), not(contains("key1")));
-    assertEquals("value2", result.getFlowVariable("key2"));
+    assertThat(result.getVariableNames(), not(contains("key1")));
+    assertEquals("value2", result.getVariable("key2"));
   }
 
   @Test
   public void aggregateMultipleMuleMessageCollections() {
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleEvent event1 = MuleEvent.builder(context).message(message1).flow(flow).addFlowVariable("key1", "value1").build();
+    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    Event event1 = Event.builder(context).message(message1).flow(flow).addVariable("key1", "value1").build();
 
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-    MuleMessage message4 = MuleMessage.builder().payload("test event D").build();
-    MuleMessage message5 = MuleMessage.builder().payload("test event E").build();
+    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
+    InternalMessage message4 = InternalMessage.builder().payload("test event D").build();
+    InternalMessage message5 = InternalMessage.builder().payload("test event E").build();
 
-    List<MuleMessage> list = new ArrayList<>();
+    List<InternalMessage> list = new ArrayList<>();
     list.add(message2);
     list.add(message3);
-    MuleMessage messageCollection = MuleMessage.builder().payload(list).build();
-    MuleEvent event2 = MuleEvent.builder(context).message(messageCollection).flow(flow).addFlowVariable("key2", "value2").build();
+    InternalMessage messageCollection = InternalMessage.builder().payload(list).build();
+    Event event2 = Event.builder(context).message(messageCollection).flow(flow).addVariable("key2", "value2").build();
     event2 = populateFieldsFromInboundEndpoint(event2, endpoint);
 
-    List<MuleMessage> list2 = new ArrayList<>();
+    List<InternalMessage> list2 = new ArrayList<>();
     list.add(message4);
     list.add(message5);
-    MuleMessage messageCollection2 = MuleMessage.builder().payload(list2).build();
-    MuleEvent event3 =
-        MuleEvent.builder(context).message(messageCollection2).flow(flow).addFlowVariable("key3", "value3").build();
+    InternalMessage messageCollection2 = InternalMessage.builder().payload(list2).build();
+    Event event3 =
+        Event.builder(context).message(messageCollection2).flow(flow).addVariable("key3", "value3").build();
     event3 = populateFieldsFromInboundEndpoint(event3, endpoint);
 
-    List<MuleEvent> events = new ArrayList<>();
+    List<Event> events = new ArrayList<>();
     events.add(event2);
     events.add(event3);
 
-    MuleEvent result = resultsHandler.aggregateResults(events, event1);
+    Event result = resultsHandler.aggregateResults(events, event1);
     assertNotNull(result);
-    assertEquals(2, ((List<MuleMessage>) result.getMessage().getPayload()).size());
-    assertTrue(result.getMessage().getPayload() instanceof List<?>);
-    assertEquals(messageCollection, ((List<MuleMessage>) result.getMessage().getPayload()).get(0));
-    assertEquals(messageCollection2, ((List<MuleMessage>) result.getMessage().getPayload()).get(1));
+    assertEquals(2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).size());
+    assertTrue(result.getMessage().getPayload().getValue() instanceof List<?>);
+    assertEquals(messageCollection, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(0));
+    assertEquals(messageCollection2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(1));
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
-    assertThat(result.getFlowVariable("key1"), equalTo("value1"));
-    assertThat(result.getFlowVariableNames(), not(contains("key2")));
-    assertThat(result.getFlowVariableNames(), not(contains("key3")));
+    assertThat(result.getVariable("key1"), equalTo("value1"));
+    assertThat(result.getVariableNames(), not(contains("key2")));
+    assertThat(result.getVariableNames(), not(contains("key3")));
 
     // Root id
     assertEquals(event1.getCorrelationId(), result.getCorrelationId());

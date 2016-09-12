@@ -7,7 +7,7 @@
 package org.mule.runtime.module.xml.transformer;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -127,7 +127,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     try {
       XQPreparedExpression transformer = null;
       try {
@@ -135,7 +135,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
         bindParameters(transformer, event);
 
-        bindDocument(event.getMessage().getPayload(), transformer);
+        bindDocument(event.getMessage().getPayload().getValue(), transformer);
         XQResultSequence result = transformer.executeQuery();
         // No support for return Arrays yet
         List<Object> results = new ArrayList<>();
@@ -197,7 +197,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     }
   }
 
-  protected void bindParameters(XQPreparedExpression transformer, MuleEvent event) throws XQException, TransformerException {
+  protected void bindParameters(XQPreparedExpression transformer, Event event) throws XQException, TransformerException {
     // set transformation parameters
     if (contextProperties != null) {
       for (Map.Entry<String, Object> parameter : contextProperties.entrySet()) {
@@ -407,7 +407,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
    * @return the object to be set as the parameter value
    * @throws TransformerException
    */
-  protected Object evaluateTransformParameter(String name, Object value, MuleEvent event) throws TransformerException {
+  protected Object evaluateTransformParameter(String name, Object value, Event event) throws TransformerException {
     if (value instanceof String) {
       return muleContext.getExpressionLanguage().evaluate(value.toString(), event, null);
     }

@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -26,15 +26,15 @@ public class InOptionalOutOutOnlyTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testExchange() throws Exception {
     FlowRunner baseRunner = flowRunner("In-Optional-Out_Out-Only-Service").withPayload("some data");
-    MuleMessage result = baseRunner.run().getMessage();
+    InternalMessage result = baseRunner.run().getMessage();
 
     assertNotNull(result);
-    assertThat(result.getPayload(), is(nullValue()));
+    assertThat(result.getPayload().getValue(), is(nullValue()));
 
     baseRunner.reset();
     result = baseRunner.withInboundProperty("foo", "bar").run().getMessage();
 
     assertNotNull(result);
-    assertThat(result.getPayload(), is("foo header received"));
+    assertThat(result.getPayload().getValue(), is("foo header received"));
   }
 }

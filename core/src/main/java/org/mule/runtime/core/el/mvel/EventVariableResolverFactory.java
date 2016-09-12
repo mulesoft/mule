@@ -12,7 +12,7 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 public class EventVariableResolverFactory extends MessageVariableResolverFactory {
@@ -22,8 +22,8 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
   private final String FLOW = "flow";
   private FlowConstruct flowConstruct;
 
-  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
-                                      MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct) {
+  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, Event event,
+                                      Event.Builder eventBuilder, FlowConstruct flowConstruct) {
     super(parserConfiguration, muleContext, event, eventBuilder);
     this.flowConstruct = flowConstruct;
   }
@@ -34,8 +34,8 @@ public class EventVariableResolverFactory extends MessageVariableResolverFactory
    * 
    * @param next
    */
-  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, MuleEvent event,
-                                      MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct, VariableResolverFactory next) {
+  public EventVariableResolverFactory(ParserConfiguration parserConfiguration, MuleContext muleContext, Event event,
+                                      Event.Builder eventBuilder, FlowConstruct flowConstruct, VariableResolverFactory next) {
     this(parserConfiguration, muleContext, event, eventBuilder, flowConstruct);
     setNextFactory(next);
   }

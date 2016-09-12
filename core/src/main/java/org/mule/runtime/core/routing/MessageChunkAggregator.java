@@ -7,9 +7,9 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
@@ -47,23 +47,23 @@ public class MessageChunkAggregator extends AbstractAggregator {
        *         group is removed and passed to the exception handler for this componenet
        */
       @Override
-      public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
-        MuleEvent[] collectedEvents;
+      public Event aggregateEvents(EventGroup events) throws AggregationException {
+        Event[] collectedEvents;
         try {
           collectedEvents = events.toArray(false);
         } catch (ObjectStoreException e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         }
-        MuleEvent firstEvent = collectedEvents[0];
+        Event firstEvent = collectedEvents[0];
         Arrays.sort(collectedEvents, eventComparator);
         ByteArrayOutputStream baos = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
 
         try {
-          for (MuleEvent event : collectedEvents) {
+          for (Event event : collectedEvents) {
             baos.write(event.getMessageAsBytes(muleContext));
           }
 
-          final Builder builder = MuleMessage.builder(firstEvent.getMessage());
+          final Builder builder = InternalMessage.builder(firstEvent.getMessage());
 
           // try to deserialize message, since ChunkingRouter might have serialized the object...
           try {
@@ -72,7 +72,7 @@ public class MessageChunkAggregator extends AbstractAggregator {
             builder.payload(baos.toByteArray());
           }
 
-          return MuleEvent.builder(firstEvent).message(builder.build()).session(getMergedSession(events.toArray())).build();
+          return Event.builder(firstEvent).message(builder.build()).session(getMergedSession(events.toArray())).build();
         } catch (Exception e) {
           throw new AggregationException(events, MessageChunkAggregator.this, e);
         } finally {

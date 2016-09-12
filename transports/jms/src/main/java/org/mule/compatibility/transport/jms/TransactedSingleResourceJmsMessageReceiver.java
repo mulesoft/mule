@@ -10,12 +10,12 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.connector.EndpointConnectException;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -182,15 +182,15 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
   }
 
   public void processMessages(final Message message, final MessageReceiver receiver) throws Exception {
-    ExecutionTemplate<MuleEvent> executionTemplate = createExecutionTemplate();
+    ExecutionTemplate<Event> executionTemplate = createExecutionTemplate();
 
     final Charset encoding = endpoint.getEncoding();
 
     if (receiveMessagesInTransaction) {
-      ExecutionCallback<MuleEvent> processingCallback = new MessageProcessingCallback<MuleEvent>(message) {
+      ExecutionCallback<Event> processingCallback = new MessageProcessingCallback<Event>(message) {
 
         @Override
-        public MuleEvent process() throws Exception {
+        public Event process() throws Exception {
           // Get Transaction & Bind MuleSession
           Transaction tx = TransactionCoordination.getInstance().getTransaction();
           if (tx != null) {
@@ -220,13 +220,13 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             redeliveryHandler.handleRedelivery(message, receiver.getEndpoint(), receiver.getFlowConstruct());
           }
 
-          MuleCompatibilityMessage messageToRoute = createMuleMessage(message, encoding);
+          CompatibilityMessage messageToRoute = createMuleMessage(message, encoding);
           return routeMessage(messageToRoute);
         }
       };
       executionTemplate.execute(processingCallback);
     } else {
-      MuleCompatibilityMessage messageToRoute = createMuleMessage(message, encoding);
+      CompatibilityMessage messageToRoute = createMuleMessage(message, encoding);
       routeMessage(messageToRoute);
     }
   }

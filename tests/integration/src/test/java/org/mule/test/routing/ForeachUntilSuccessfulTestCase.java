@@ -10,7 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import org.junit.Test;
 
@@ -23,14 +23,14 @@ public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase {
 
   @Test
   public void flowVariableSyncNoForeach() throws Exception {
-    MuleEvent event = runAndAssert("flowVarSyncNoForEach", 3);
-    assertThat(event.getFlowVariable("until"), is(3));
+    Event event = runAndAssert("flowVarSyncNoForEach", 3);
+    assertThat(event.getVariable("until"), is(3));
   }
 
   @Test
   public void flowVariablesSyncArePropagated() throws Exception {
-    MuleEvent event = runAndAssert("flowVarSync");
-    assertThat(event.getFlowVariable("until"), is(3));
+    Event event = runAndAssert("flowVarSync");
+    assertThat(event.getVariable("until"), is(3));
   }
 
   @Test
@@ -38,14 +38,14 @@ public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase {
     runAndAssert("flowVarAsync");
   }
 
-  private MuleEvent runAndAssert(String flowName) throws Exception {
+  private Event runAndAssert(String flowName) throws Exception {
     return runAndAssert(flowName, newArrayList(1, 2, 3));
   }
 
-  private MuleEvent runAndAssert(String flowName, Object payload) throws Exception {
-    MuleEvent event = flowRunner(flowName).withPayload(payload).run();
-    assertThat(event.getFlowVariable("count"), is(6));
-    assertThat(event.getFlowVariable("current"), is(3));
+  private Event runAndAssert(String flowName, Object payload) throws Exception {
+    Event event = flowRunner(flowName).withPayload(payload).run();
+    assertThat(event.getVariable("count"), is(6));
+    assertThat(event.getVariable("current"), is(3));
     return event;
   }
 }

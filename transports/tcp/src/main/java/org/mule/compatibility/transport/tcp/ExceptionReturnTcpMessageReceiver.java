@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.tcp;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -58,8 +58,8 @@ public class ExceptionReturnTcpMessageReceiver extends TcpMessageReceiver {
       try {
         logger.warn("Failed to read message: " + readingException);
 
-        MuleMessage msg =
-            MuleMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(readingException)).build();
+        InternalMessage msg =
+            InternalMessage.builder().nullPayload().exceptionPayload(new DefaultExceptionPayload(readingException)).build();
         List msgList = new ArrayList(1);
         msgList.add(msg);
 

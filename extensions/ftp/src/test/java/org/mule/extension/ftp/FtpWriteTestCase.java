@@ -19,7 +19,7 @@ import static org.mule.extension.file.common.api.FileWriteMode.CREATE_NEW;
 import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
 
 import org.mule.extension.FtpTestHarness;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.extension.file.common.api.FileWriteMode;
 
 import java.io.InputStream;
@@ -114,7 +114,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
     testHarness.write(filePath, "overwrite me!");
 
-    MuleEvent event = flowRunner("readAndWrite").withFlowVariable("path", filePath).run();
+    Event event = flowRunner("readAndWrite").withFlowVariable("path", filePath).run();
 
     assertThat(event.getMessageAsString(muleContext), equalTo(HELLO_WORLD));
   }
@@ -142,7 +142,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
     doWrite("write", filename, HELLO_WORLD, CREATE_NEW, false, customEncoding);
     InputStream content =
-        (InputStream) readPath(Paths.get(testHarness.getWorkingDirectory()).resolve(filename).toString()).getPayload();
+        (InputStream) readPath(Paths.get(testHarness.getWorkingDirectory()).resolve(filename).toString()).getPayload().getValue();
 
     assertThat(Arrays.equals(toByteArray(content), HELLO_WORLD.getBytes(customEncoding)), is(true));
   }

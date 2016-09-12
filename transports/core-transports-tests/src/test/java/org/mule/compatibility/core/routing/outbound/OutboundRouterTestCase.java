@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.outbound.AbstractOutboundRouter;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -35,7 +35,7 @@ public class OutboundRouterTestCase extends AbstractMuleContextEndpointTestCase 
 
   @Test
   public void testSetGoodEndpoints() throws Exception {
-    List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+    List<Processor> list = new ArrayList<Processor>();
     list.add(getTestOutboundEndpoint("test"));
     list.add(getTestOutboundEndpoint("test"));
     AbstractOutboundRouter router = new DummyOutboundRouter();
@@ -83,12 +83,12 @@ public class OutboundRouterTestCase extends AbstractMuleContextEndpointTestCase 
   private static class DummyOutboundRouter extends AbstractOutboundRouter {
 
     @Override
-    public boolean isMatch(MuleEvent event, MuleEvent.Builder builder) throws MuleException {
+    public boolean isMatch(Event event, Event.Builder builder) throws MuleException {
       return false;
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event) throws MuleException {
+    protected Event route(Event event) throws MuleException {
       return null;
     }
   }

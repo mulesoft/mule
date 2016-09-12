@@ -11,8 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
@@ -54,12 +54,12 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
     argument.setMuleContext(muleContext);
     transformer.addArgument(argument);
 
-    MuleEvent event = getTestEvent("Test");
+    Event event = getTestEvent("Test");
     Object result = transformer.transformMessage(event, null);
-    assertTrue(result instanceof MuleMessage);
-    MuleMessage transformedMessage = (MuleMessage) result;
+    assertTrue(result instanceof InternalMessage);
+    InternalMessage transformedMessage = (InternalMessage) result;
 
-    assertEquals("Test", transformedMessage.getPayload());
+    assertEquals("Test", transformedMessage.getPayload().getValue());
 
   }
 

@@ -9,7 +9,7 @@ package org.mule.runtime.module.oauth2.internal;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import org.slf4j.Logger;
 
@@ -31,8 +31,8 @@ public class MuleEventLogger {
    * 
    * @param muleEvent event to log.
    */
-  public void logContent(MuleEvent muleEvent) {
-    logger.error("Message content type is " + muleEvent.getMessage().getDataType().getType());
+  public void logContent(Event muleEvent) {
+    logger.error("Message content type is " + muleEvent.getMessage().getPayload().getDataType().getType());
     logger.error("Message content is " + muleEvent.getMessage());
     try {
       String payloadAsString = muleContext.getTransformationService().getPayloadForLogging(muleEvent.getMessage());

@@ -9,9 +9,9 @@ package org.mule.runtime.core.util;
 import static java.util.Collections.synchronizedSet;
 
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
 
@@ -31,27 +31,27 @@ public class NotificationUtils {
 
   public interface PathResolver {
 
-    String resolvePath(MessageProcessor processor);
+    String resolvePath(Processor processor);
   }
 
   public static class FlowMap implements PathResolver {
 
-    private Map<MessageProcessor, String> flowMap = new ConcurrentHashMap<MessageProcessor, String>();
+    private Map<Processor, String> flowMap = new ConcurrentHashMap<>();
     // This set allows for dynamic containers to not be analyzed more than once. Dynamic containers cannot be removed because as a
     // container it also must have a path.
-    private Set<MessageProcessor> resolvedDynamicContainers = synchronizedSet(new HashSet<MessageProcessor>());
+    private Set<Processor> resolvedDynamicContainers = synchronizedSet(new HashSet<Processor>());
 
-    public FlowMap(Map<MessageProcessor, String> paths) {
+    public FlowMap(Map<Processor, String> paths) {
       flowMap.putAll(paths);
     }
 
     @Override
-    public String resolvePath(MessageProcessor processor) {
+    public String resolvePath(Processor processor) {
       String path = flowMap.get(processor);
       if (path != null) {
         return path;
       } else {
-        for (Entry<MessageProcessor, String> flowMapEntries : flowMap.entrySet()) {
+        for (Entry<Processor, String> flowMapEntries : flowMap.entrySet()) {
           if (flowMapEntries.getKey() instanceof DynamicMessageProcessorContainer
               && !resolvedDynamicContainers.contains(flowMapEntries.getKey())) {
             FlowMap resolvedInnerPaths = ((DynamicMessageProcessorContainer) flowMapEntries.getKey()).buildInnerPaths();
@@ -69,19 +69,19 @@ public class NotificationUtils {
       return flowMap.values();
     }
 
-    public Map<MessageProcessor, String> getFlowMap() {
+    public Map<Processor, String> getFlowMap() {
       return flowMap;
     }
   }
 
   private NotificationUtils() {}
 
-  public static void addMessageProcessorPathElements(List<MessageProcessor> processors,
+  public static void addMessageProcessorPathElements(List<Processor> processors,
                                                      MessageProcessorPathElement parentElement) {
     if (processors == null) {
       return;
     }
-    for (MessageProcessor mp : processors) {
+    for (Processor mp : processors) {
       if (!(mp instanceof InternalMessageProcessor)) {
 
         MessageProcessorPathElement messageProcessorPathElement;
@@ -106,7 +106,7 @@ public class NotificationUtils {
    * @return a resolver for the elements corresponding to <b>element</b>.
    */
   public static FlowMap buildPathResolver(MessageProcessorPathElement element) {
-    return new FlowMap(buildPaths(element, new LinkedHashMap<MessageProcessor, String>()));
+    return new FlowMap(buildPaths(element, new LinkedHashMap<Processor, String>()));
   }
 
   /**
@@ -115,12 +115,12 @@ public class NotificationUtils {
    * @return the element paths corresponding to <b>element</b>.
    */
   @Deprecated
-  public static Map<MessageProcessor, String> buildPaths(MessageProcessorPathElement element) {
-    return buildPaths(element, new LinkedHashMap<MessageProcessor, String>());
+  public static Map<Processor, String> buildPaths(MessageProcessorPathElement element) {
+    return buildPaths(element, new LinkedHashMap<Processor, String>());
   }
 
-  private static Map<MessageProcessor, String> buildPaths(MessageProcessorPathElement element,
-                                                          Map<MessageProcessor, String> elements) {
+  private static Map<Processor, String> buildPaths(MessageProcessorPathElement element,
+                                                   Map<Processor, String> elements) {
     if (element.getMessageProcessor() != null) {
       elements.put(element.getMessageProcessor(), element.getPath());
     }

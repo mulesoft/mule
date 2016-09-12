@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.source;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -27,7 +27,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
   protected SensingNullMessageProcessor listener;
   protected SensingNullMessageProcessor listener2;
   protected StartableCompositeMessageSource compositeSource;
-  protected MuleEvent testEvent;
+  protected Event testEvent;
   protected NullMessageSource source;
 
   @Override
@@ -145,15 +145,15 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
 
   protected class NullMessageSource implements MessageSource, Startable, Stoppable {
 
-    MuleEvent event;
-    MessageProcessor listener;
+    Event event;
+    Processor listener;
     boolean started = false;
 
-    public NullMessageSource(MuleEvent event) {
+    public NullMessageSource(Event event) {
       this.event = event;
     }
 
-    public void setListener(MessageProcessor listener) {
+    public void setListener(Processor listener) {
       this.listener = listener;
     }
 

@@ -8,15 +8,15 @@ package org.mule.runtime.core.processor;
 
 import static java.lang.String.format;
 import static java.util.ServiceLoader.load;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Wraps the invocation of the next {@link org.mule.runtime.core.api.processor.MessageProcessor} with a transaction. If the
+ * Wraps the invocation of the next {@link org.mule.runtime.core.api.processor.Processor} with a transaction. If the
  * {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
  * {@code org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
  *
@@ -44,7 +44,7 @@ public class BlockMessageProcessor extends TransactionalInterceptingMessageProce
   private MessageProcessorChain delegate;
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return delegate.process(event);
   }
 
@@ -58,8 +58,8 @@ public class BlockMessageProcessor extends TransactionalInterceptingMessageProce
     transactionConfig.setFactory(getTransactionFactory());
     builder.chain(txProcessor);
     for (Object processor : messageProcessors) {
-      if (processor instanceof MessageProcessor) {
-        builder.chain((MessageProcessor) processor);
+      if (processor instanceof Processor) {
+        builder.chain((Processor) processor);
       } else if (processor instanceof MessageProcessorBuilder) {
         builder.chain((MessageProcessorBuilder) processor);
       } else {

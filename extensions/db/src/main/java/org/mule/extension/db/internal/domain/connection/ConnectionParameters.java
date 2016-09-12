@@ -22,8 +22,8 @@ import javax.sql.DataSource;
 public class ConnectionParameters {
 
   /**
-   * Reference to a JDBC DataSource object. This object is typically created using Spring.
-   * When using XA transactions, an XADataSource object must be provided.
+   * Reference to a JDBC DataSource object. This object is typically created using Spring. When using XA transactions, an
+   * XADataSource object must be provided.
    */
   @Parameter
   @Optional

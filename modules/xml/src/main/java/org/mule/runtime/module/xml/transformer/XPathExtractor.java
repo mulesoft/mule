@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.module.xml.util.NamespaceManager;
 import org.mule.runtime.module.xml.util.XMLUtils;
@@ -64,7 +64,7 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
 
     if (expression == null) {
       throw new InitialisationException(
-                                        MessageFactory
+                                        I18nMessageFactory
                                             .createStaticMessage("An expression must be supplied to the StandardXPathExtractor"),
                                         this);
     }
@@ -84,7 +84,7 @@ public class XPathExtractor extends AbstractTransformer implements MuleContextAw
 
   @Override
   public Object doTransform(Object src, Charset encoding) throws TransformerException {
-    MuleEvent event = getCurrentEvent();
+    Event event = getCurrentEvent();
     try {
       return xpathEvaluator.evaluate(expression, XMLUtils.toDOMNode(src, event), resultType, event);
     } catch (Exception e) {

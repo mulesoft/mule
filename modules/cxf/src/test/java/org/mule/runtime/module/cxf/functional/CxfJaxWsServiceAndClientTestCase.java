@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -45,7 +45,7 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase {
     String url = "http://localhost:" + port.getNumber() + "/hello";
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS).getRight();
+    InternalMessage result = client.send(url, getTestMuleMessage(REQUEST_PAYLOAD), HTTP_REQUEST_OPTIONS).getRight();
 
     assertEquals(RESPONSE_PAYLOAD, getPayloadAsString(result));
   }

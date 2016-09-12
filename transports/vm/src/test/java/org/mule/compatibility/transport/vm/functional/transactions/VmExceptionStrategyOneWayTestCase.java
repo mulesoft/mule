@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -54,13 +54,13 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithInboundEndpointException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in1", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
     assertThat(outboundComponentReached, is(false));
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
   }
@@ -68,13 +68,13 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithInboundEndpointResponseException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in2", ORIGINAL_MESSAGE, null).getRight();
     // TODO PLG - ES - fix this, DLQ call fails since tx was resolved already
     /*
      * if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) { fail("dead letter queue must be reached"); }
      */
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
     if (!outboundComponentLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
@@ -85,13 +85,13 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithComponentException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in3", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
     assertThat(outboundComponentReached, is(false));
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
   }
@@ -99,13 +99,13 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
   @Test
   public void testDeadLetterQueueWithOutboundEndpointException() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null).getRight();
+    InternalMessage response = muleClient.send("vm://in4", ORIGINAL_MESSAGE, null).getRight();
     if (!deadLetterQueueLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
       fail("dead letter queue must be reached");
     }
     assertThat(outboundComponentReached, is(false));
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
   }
@@ -123,10 +123,10 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
       deadLetterQueueLatch.release();
-      MuleMessage message = eventContext.getMessage();
+      InternalMessage message = eventContext.getMessage();
       assertThat(message, notNullValue());
       assertThat(message.getExceptionPayload(), nullValue());
-      assertThat(message.getPayload(), instanceOf(ExceptionMessage.class));
+      assertThat(message.getPayload().getValue(), instanceOf(ExceptionMessage.class));
       return eventContext.getMessage();
     }
   }

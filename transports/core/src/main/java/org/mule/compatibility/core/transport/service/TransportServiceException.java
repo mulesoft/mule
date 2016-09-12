@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport.service;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>TransportServiceException</code> is thrown if a ProviderServicedescriptor has a service error set. This is usually
@@ -24,7 +24,7 @@ public class TransportServiceException extends TransportFactoryException {
   /**
    * @param message the exception message
    */
-  public TransportServiceException(Message message) {
+  public TransportServiceException(I18nMessage message) {
     super(message);
   }
 
@@ -32,7 +32,7 @@ public class TransportServiceException extends TransportFactoryException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public TransportServiceException(Message message, Throwable cause) {
+  public TransportServiceException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

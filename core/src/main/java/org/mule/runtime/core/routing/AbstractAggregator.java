@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -146,8 +146,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   protected abstract EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext);
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleEvent result = eventCorrelator.process(event);
+  public Event process(Event event) throws MuleException {
+    Event result = eventCorrelator.process(event);
     if (result == null || VoidMuleEvent.getInstance().equals(result)) {
       return result;
     }
@@ -187,7 +187,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         new ProvidedObjectStoreWrapper<>(processedGroupsObjectStore, internalProcessedGroupsObjectStoreFactory());
   }
 
-  public void setEventGroupsObjectStore(PartitionableObjectStore<MuleEvent> eventGroupsObjectStore) {
+  public void setEventGroupsObjectStore(PartitionableObjectStore<Event> eventGroupsObjectStore) {
     this.eventGroupsObjectStore =
         new ProvidedPartitionableObjectStoreWrapper<>(eventGroupsObjectStore, internalEventsGroupsObjectStoreFactory());
   }

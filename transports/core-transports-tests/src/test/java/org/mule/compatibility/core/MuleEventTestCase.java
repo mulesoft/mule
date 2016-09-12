@@ -8,12 +8,12 @@ package org.mule.compatibility.core;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -46,7 +46,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, null,
                                                       new PayloadTypeFilter(Object.class), null, null);
 
-    MuleEvent event = getTestEvent("payload", endpoint);
+    Event event = getTestEvent("payload", endpoint);
     setCurrentEvent(event);
 
     Transformer transformer = createSerializableToByteArrayTransformer();
@@ -55,7 +55,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
     trans.setMuleContext(muleContext);
-    MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
+    Event deserialized = (Event) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -74,7 +74,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
   @Test
   public void testEventSerializationRestart() throws Exception {
     // Create and register artifacts
-    MuleEvent event = createEventToSerialize();
+    Event event = createEventToSerialize();
     muleContext.start();
 
     // Serialize
@@ -92,7 +92,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     createAndRegisterTransformersEndpointBuilderService();
 
     // Deserialize
-    MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
+    Event deserialized = (Event) trans.transform(serialized);
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
@@ -101,7 +101,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     assertNotNull(deserialized.getSession());
   }
 
-  private MuleEvent createEventToSerialize() throws Exception {
+  private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
     InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
                                                                        MuleEndpointTestUtils
@@ -118,12 +118,12 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    MuleEvent testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
+    Event testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
 
-    assertArrayEquals((byte[]) testEvent.getMessage().getPayload(), payload.toString().getBytes());
+    assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
   }
 
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {

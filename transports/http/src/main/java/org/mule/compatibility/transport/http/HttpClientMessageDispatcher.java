@@ -15,9 +15,9 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -95,7 +95,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
   }
 
   @Override
-  protected void doDispatch(MuleEvent event) throws Exception {
+  protected void doDispatch(Event event) throws Exception {
     HttpMethod httpMethod = getMethod(event);
     httpConnector.setupClientAuthorization(event, httpMethod, client, endpoint);
 
@@ -118,7 +118,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     }
   }
 
-  protected HttpMethod execute(MuleEvent event, HttpMethod httpMethod) throws Exception {
+  protected HttpMethod execute(Event event, HttpMethod httpMethod) throws Exception {
     // TODO set connection timeout buffer etc
     try {
       URI uri = endpoint.getEndpointURI().getUri();
@@ -139,7 +139,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
 
   }
 
-  private void processMuleSession(MuleEvent event, HttpMethod httpMethod) {
+  private void processMuleSession(Event event, HttpMethod httpMethod) {
     String muleSession = event.getMessage().getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY);
 
     if (muleSession != null) {
@@ -147,8 +147,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     }
   }
 
-  protected void processCookies(MuleEvent event) {
-    MuleMessage msg = event.getMessage();
+  protected void processCookies(Event event) {
+    InternalMessage msg = event.getMessage();
 
     Serializable cookiesProperty = msg.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
     String cookieSpecProperty = (String) msg.getInboundProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
@@ -163,12 +163,12 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     processCookies(cookiesProperty, cookieSpecProperty, event);
   }
 
-  private void processCookies(Object cookieObject, String policy, MuleEvent event) {
+  private void processCookies(Object cookieObject, String policy, Event event) {
     URI uri = this.getEndpoint().getEndpointURI().getUri();
     CookieHelper.addCookiesToClient(this.client, cookieObject, policy, event, uri, muleContext);
   }
 
-  protected HttpMethod getMethod(MuleEvent event) throws TransformerException {
+  protected HttpMethod getMethod(Event event) throws TransformerException {
     // Configure timeout. This is done here because MuleEvent.getTimeout() takes
     // precedence and is not available before send/dispatch.
     // Given that dispatchers are borrowed from a thread pool mutating client
@@ -176,10 +176,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
 
     event = setPropertyFromEndpoint(event, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
-    MuleMessage msg = event.getMessage();
+    InternalMessage msg = event.getMessage();
 
     HttpMethod httpMethod;
-    Object body = event.getMessage().getPayload();
+    Object body = event.getMessage().getPayload().getValue();
 
     if (body instanceof HttpMethod) {
       httpMethod = (HttpMethod) body;
@@ -197,27 +197,29 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     return httpMethod;
   }
 
-  protected MuleEvent setPropertyFromEndpoint(MuleEvent event, String prop) {
+  protected Event setPropertyFromEndpoint(Event event, String prop) {
     Serializable o = event.getMessage().getOutboundProperty(prop);
     if (o == null) {
       o = endpoint.getProperty(prop);
       if (o != null) {
-        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addOutboundProperty(prop, o).build())
+        return Event.builder(event).message(InternalMessage.builder(event.getMessage()).addOutboundProperty(prop, o).build())
             .build();
       }
     }
     return event;
   }
 
-  protected HttpMethod createEntityMethod(MuleEvent event, Object body, EntityEnclosingMethod postMethod)
+  protected HttpMethod createEntityMethod(Event event, Object body, EntityEnclosingMethod postMethod)
       throws TransformerException {
     HttpMethod httpMethod;
     if (body instanceof String) {
       httpMethod = (HttpMethod) sendTransformer.transform(body.toString());
     } else if (body instanceof byte[]) {
       byte[] buffer = (byte[]) event.transformMessage(DataType.BYTE_ARRAY, muleContext);
-      postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getMessage().getDataType().getMediaType().getCharset()
-          .get().name()));
+      postMethod
+          .setRequestEntity(new ByteArrayRequestEntity(buffer,
+                                                       event.getMessage().getPayload().getDataType().getMediaType().getCharset()
+                                                           .get().name()));
       httpMethod = postMethod;
     } else {
       if (!(body instanceof OutputHandler)) {
@@ -234,7 +236,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
   }
 
   @Override
-  protected MuleMessage doSend(MuleEvent event) throws Exception {
+  protected InternalMessage doSend(Event event) throws Exception {
     HttpMethod httpMethod = getMethod(event);
     httpConnector.setupClientAuthorization(event, httpMethod, client, endpoint);
 
@@ -274,7 +276,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     }
   }
 
-  protected MuleMessage handleRedirect(HttpMethod method, MuleEvent event)
+  protected InternalMessage handleRedirect(HttpMethod method, Event event)
       throws HttpResponseException, MuleException, IOException {
     String followRedirects = (String) endpoint.getProperty("followRedirects");
     if (followRedirects == null || "false".equalsIgnoreCase(followRedirects)) {
@@ -290,7 +292,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     }
     OutboundEndpoint out =
         new EndpointURIEndpointBuilder(locationHeader.getValue(), getEndpoint().getMuleContext()).buildOutboundEndpoint();
-    MuleEvent result = out.process(event);
+    Event result = out.process(event);
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
       return result.getMessage();
     } else {
@@ -298,14 +300,14 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     }
   }
 
-  protected MuleMessage getResponseFromMethod(HttpMethod httpMethod, ExceptionPayload ep) throws IOException, MuleException {
-    MuleMessage message = createMuleMessage(httpMethod);
+  protected InternalMessage getResponseFromMethod(HttpMethod httpMethod, ExceptionPayload ep) throws IOException, MuleException {
+    InternalMessage message = createMuleMessage(httpMethod);
 
     if (logger.isDebugEnabled()) {
       logger.debug("Http response is: " + message.getOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
 
-    return MuleMessage.builder(message).exceptionPayload(ep).build();
+    return InternalMessage.builder(message).exceptionPayload(ep).build();
   }
 
   /**
@@ -317,7 +319,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
    *
    * @return if an exception should be thrown
    */
-  protected boolean returnException(MuleEvent event, HttpMethod httpMethod) {
+  protected boolean returnException(Event event, HttpMethod httpMethod) {
     String disableCheck = event.getMessage().getOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK);
 
     boolean throwException;

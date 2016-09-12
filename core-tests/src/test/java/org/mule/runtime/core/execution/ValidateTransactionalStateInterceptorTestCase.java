@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -54,7 +54,7 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
       new HashMap<Boolean, Map<MuleTransactionConfig, Boolean>>();
   private boolean hasTransactionInContext;
   private TransactionConfig transactionConfig;
-  private MuleEvent mockMuleEvent = Mockito.mock(MuleEvent.class);
+  private Event mockMuleEvent = Mockito.mock(Event.class);
   private Transaction mockTransaction = Mockito.mock(Transaction.class);
 
   @Parameterized.Parameters
@@ -105,17 +105,17 @@ public class ValidateTransactionalStateInterceptorTestCase extends AbstractMuleT
   public void testTransactionalState() throws Exception {
     boolean shouldThrowException = resultMap.get(hasTransactionInContext).get(transactionConfig);
     Exception thrownException = null;
-    MuleEvent result = null;
+    Event result = null;
     if (hasTransactionInContext) {
       TransactionCoordination.getInstance().bindTransaction(mockTransaction);
     }
-    ValidateTransactionalStateInterceptor<MuleEvent> interceptor =
-        new ValidateTransactionalStateInterceptor<MuleEvent>(new ExecuteCallbackInterceptor<MuleEvent>(), transactionConfig);
+    ValidateTransactionalStateInterceptor<Event> interceptor =
+        new ValidateTransactionalStateInterceptor<Event>(new ExecuteCallbackInterceptor<Event>(), transactionConfig);
     try {
-      result = interceptor.execute(new ExecutionCallback<MuleEvent>() {
+      result = interceptor.execute(new ExecutionCallback<Event>() {
 
         @Override
-        public MuleEvent process() throws Exception {
+        public Event process() throws Exception {
           return mockMuleEvent;
         }
       }, new ExecutionContext());

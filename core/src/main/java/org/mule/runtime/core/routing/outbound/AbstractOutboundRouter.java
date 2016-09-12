@@ -12,9 +12,9 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -58,7 +58,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
    */
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
-  protected List<MessageProcessor> routes = new CopyOnWriteArrayList<>();
+  protected List<Processor> routes = new CopyOnWriteArrayList<>();
 
   protected TransactionConfig transactionConfig;
 
@@ -72,10 +72,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   private MessageProcessorExecutionTemplate notificationTemplate = createNotificationExecutionTemplate();
 
   @Override
-  public MuleEvent process(final MuleEvent event) throws MuleException {
-    ExecutionTemplate<MuleEvent> executionTemplate =
+  public Event process(final Event event) throws MuleException {
+    ExecutionTemplate<Event> executionTemplate =
         TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, getTransactionConfig());
-    ExecutionCallback<MuleEvent> processingCallback = () -> {
+    ExecutionCallback<Event> processingCallback = () -> {
       try {
         return route(event);
       } catch (RoutingException e1) {
@@ -93,12 +93,12 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
   }
 
-  protected abstract MuleEvent route(MuleEvent event) throws MuleException;
+  protected abstract Event route(Event event) throws MuleException;
 
-  protected final MuleEvent sendRequest(final MuleEvent originalEvent, final MuleEvent eventToRoute, final MessageProcessor route,
-                                        boolean awaitResponse)
+  protected final Event sendRequest(final Event originalEvent, final Event eventToRoute, final Processor route,
+                                    boolean awaitResponse)
       throws MuleException {
-    MuleEvent result;
+    Event result;
     try {
       result = sendRequestEvent(originalEvent, eventToRoute, route, awaitResponse);
     } catch (MessagingException me) {
@@ -114,7 +114,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     }
 
     if (result != null && !VoidMuleEvent.getInstance().equals(result)) {
-      MuleMessage resultMessage = result.getMessage();
+      InternalMessage resultMessage = result.getMessage();
       if (logger.isTraceEnabled()) {
         if (resultMessage != null) {
           try {
@@ -131,7 +131,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   }
 
   @Override
-  public List<MessageProcessor> getRoutes() {
+  public List<Processor> getRoutes() {
     return routes;
   }
 
@@ -140,19 +140,19 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
    */
   // TODO Use spring factory bean
   @Deprecated
-  public void setMessageProcessors(List<MessageProcessor> routes) throws MuleException {
+  public void setMessageProcessors(List<Processor> routes) throws MuleException {
     setRoutes(routes);
   }
 
-  public void setRoutes(List<MessageProcessor> routes) throws MuleException {
+  public void setRoutes(List<Processor> routes) throws MuleException {
     this.routes.clear();
-    for (MessageProcessor route : routes) {
+    for (Processor route : routes) {
       addRoute(route);
     }
   }
 
   @Override
-  public synchronized void addRoute(MessageProcessor route) throws MuleException {
+  public synchronized void addRoute(Processor route) throws MuleException {
     if (initialised.get()) {
       if (route instanceof MuleContextAware) {
         ((MuleContextAware) route).setMuleContext(muleContext);
@@ -173,7 +173,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   }
 
   @Override
-  public synchronized void removeRoute(MessageProcessor route) throws MuleException {
+  public synchronized void removeRoute(Processor route) throws MuleException {
     if (started.get()) {
       if (route instanceof Stoppable) {
         ((Stoppable) route).stop();
@@ -212,8 +212,8 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   /**
    * Send message event to destination.
    */
-  protected MuleEvent sendRequestEvent(MuleEvent originalEvent, MuleEvent eventToRoute, MessageProcessor route,
-                                       boolean awaitResponse)
+  protected Event sendRequestEvent(Event originalEvent, Event eventToRoute, Processor route,
+                                   boolean awaitResponse)
       throws MuleException {
     if (route == null) {
       throw new DispatchException(CoreMessages.objectIsNull("connector operation"), null);
@@ -221,7 +221,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     return doProcessRoute(route, eventToRoute);
   }
 
-  protected MuleEvent doProcessRoute(MessageProcessor route, MuleEvent event) throws MuleException, MessagingException {
+  protected Event doProcessRoute(Processor route, Event event) throws MuleException, MessagingException {
     if (route instanceof MessageProcessorChain) {
       return route.process(event);
     } else {
@@ -232,18 +232,18 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   /**
    * Create a new event to be routed to the target MP
    */
-  protected MuleEvent createEventToRoute(MuleEvent routedEvent, MuleMessage message) {
-    return MuleEvent.builder(routedEvent).message(message).synchronous(true).build();
+  protected Event createEventToRoute(Event routedEvent, InternalMessage message) {
+    return Event.builder(routedEvent).message(message).synchronous(true).build();
   }
 
   /**
-   * Creates a fresh copy of a {@link MuleMessage} ensuring that the payload can be cloned (i.e. is not consumable).
+   * Creates a fresh copy of a {@link Message} ensuring that the payload can be cloned (i.e. is not consumable).
    *
-   * @param event The {@link MuleEvent} to clone the message from.
-   * @return The fresh copy of the {@link MuleMessage}.
+   * @param event The {@link Event} to clone the message from.
+   * @return The fresh copy of the {@link Message}.
    * @throws MessagingException If the message can't be cloned because it carries a consumable payload.
    */
-  protected MuleMessage cloneMessage(MuleEvent event, MuleMessage message) throws MuleException {
+  protected InternalMessage cloneMessage(Event event, InternalMessage message) throws MuleException {
     return AbstractRoutingStrategy.cloneMessage(message);
   }
 
@@ -259,7 +259,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   public void dispose() {
     synchronized (routes) {
       super.dispose();
-      routes = Collections.<MessageProcessor>emptyList();
+      routes = Collections.<Processor>emptyList();
       initialised.set(false);
     }
   }
@@ -295,7 +295,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
+  protected List<Processor> getOwnedMessageProcessors() {
     return routes;
   }
 

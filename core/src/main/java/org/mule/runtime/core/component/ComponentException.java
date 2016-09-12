@@ -9,7 +9,7 @@ package org.mule.runtime.core.component;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>ComponentException</code> should be thrown when some action on a component fails, such as starting or stopping
@@ -24,12 +24,12 @@ public class ComponentException extends MuleException {
 
   private final transient Component component;
 
-  public ComponentException(Message message, Component component) {
+  public ComponentException(I18nMessage message, Component component) {
     super(generateMessage(message, component));
     this.component = component;
   }
 
-  public ComponentException(Message message, Component component, Throwable cause) {
+  public ComponentException(I18nMessage message, Component component, Throwable cause) {
     super(generateMessage(message, component), cause);
     this.component = component;
   }
@@ -44,12 +44,12 @@ public class ComponentException extends MuleException {
   }
 
   @Override
-  protected void setMessage(Message message) {
+  protected void setMessage(I18nMessage message) {
     super.setMessage(message.getMessage());
   }
 
-  private static Message generateMessage(Message previousMessage, Component component) {
-    Message returnMessage = CoreMessages.componentCausedErrorIs(component);
+  private static I18nMessage generateMessage(I18nMessage previousMessage, Component component) {
+    I18nMessage returnMessage = CoreMessages.componentCausedErrorIs(component);
     if (previousMessage != null) {
       previousMessage.setNextMessage(returnMessage);
       return previousMessage;

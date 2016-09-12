@@ -9,7 +9,7 @@ package org.mule.compatibility.core.connector;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.AbstractTransportMessageHandler;
 import org.mule.runtime.core.api.connector.Connectable;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.connector.ConnectException;
 
 import javax.resource.spi.work.Work;
@@ -27,11 +27,11 @@ public class EndpointConnectException extends ConnectException {
   /** Serial version */
   private static final long serialVersionUID = -7802483584780922653L;
 
-  public EndpointConnectException(Message message, Connectable failed) {
+  public EndpointConnectException(I18nMessage message, Connectable failed) {
     super(message, resolveFailed(failed));
   }
 
-  public EndpointConnectException(Message message, Throwable cause, Connectable failed) {
+  public EndpointConnectException(I18nMessage message, Throwable cause, Connectable failed) {
     super(message, cause, resolveFailed(failed));
   }
 

@@ -12,7 +12,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -40,10 +40,10 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEchoHolder() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("TEST").build();
+    InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClient", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClient", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     assertNotNull(received);
     Object[] payload = deserializeResponse(received);
@@ -56,10 +56,10 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientProxyEchoHolder() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("TEST").build();
+    InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClientProxy", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echoClientProxy", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     assertNotNull(received);
     Object[] payload = deserializeResponse(received);
@@ -71,10 +71,10 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEcho2Holder() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("TEST").build();
+    InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2Client", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2Client", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     assertNotNull(received);
     Object[] payload = deserializeResponse(received);
@@ -86,10 +86,10 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientProxyEcho2Holder() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("TEST").build();
+    InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2ClientProxy", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo2ClientProxy", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     assertNotNull(received);
     Object[] payload = deserializeResponse(received);
@@ -100,10 +100,10 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEcho3Holder() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("TEST").build();
+    InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3Client", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3Client", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     assertNotNull(received);
     Object[] payload = deserializeResponse(received);
@@ -114,10 +114,10 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientProxyEcho3Holder() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("TEST").build();
+    InternalMessage request = InternalMessage.builder().payload("TEST").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3ClientProxy", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo3ClientProxy", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     assertNotNull(received);
     Object[] payload = deserializeResponse(received);
@@ -130,8 +130,8 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
     return ((SensingNullRequestResponseMessageProcessor) muleContext.getRegistry().lookupObject(instanceBeanName));
   }
 
-  private static <T> T deserializeResponse(MuleMessage received) throws Exception {
-    ObjectInputStream objectInputStream = new ObjectInputStream((InputStream) received.getPayload());
+  private static <T> T deserializeResponse(InternalMessage received) throws Exception {
+    ObjectInputStream objectInputStream = new ObjectInputStream((InputStream) received.getPayload().getValue());
     Object objectPayload = objectInputStream.readObject();
     return (T) objectPayload;
   }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>RecoverableException</code> can be thrown during initialisation to indicate that the error occurred is not fatal and a
@@ -19,7 +19,7 @@ public class RecoverableException extends InitialisationException {
   private static final long serialVersionUID = -5799024626172482665L;
 
   /** @param message the exception message */
-  public RecoverableException(Message message, Initialisable object) {
+  public RecoverableException(I18nMessage message, Initialisable object) {
     super(message, object);
   }
 
@@ -27,7 +27,7 @@ public class RecoverableException extends InitialisationException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public RecoverableException(Message message, Initialisable object, Throwable cause) {
+  public RecoverableException(I18nMessage message, Initialisable object, Throwable cause) {
     super(message, cause, object);
   }
 

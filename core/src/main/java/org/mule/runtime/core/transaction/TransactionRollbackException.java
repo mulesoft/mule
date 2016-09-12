@@ -8,7 +8,7 @@ package org.mule.runtime.core.transaction;
 
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class TransactionRollbackException extends TransactionException {
 
@@ -20,7 +20,7 @@ public class TransactionRollbackException extends TransactionException {
   /**
    * @param message the exception message
    */
-  public TransactionRollbackException(Message message) {
+  public TransactionRollbackException(I18nMessage message) {
     super(message);
   }
 
@@ -28,7 +28,7 @@ public class TransactionRollbackException extends TransactionException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public TransactionRollbackException(Message message, Throwable cause) {
+  public TransactionRollbackException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

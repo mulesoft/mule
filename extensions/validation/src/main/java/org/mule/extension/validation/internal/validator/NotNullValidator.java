@@ -9,8 +9,8 @@ package org.mule.extension.validation.internal.validator;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * An {@link AbstractValidator} which verifies that a {@link #value} is not {@code null}
@@ -27,12 +27,12 @@ public class NotNullValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(MuleEvent event) {
+  public ValidationResult validate(Event event) {
     return value != null ? ok() : fail();
   }
 
   @Override
-  protected Message getDefaultErrorMessage() {
+  protected I18nMessage getDefaultErrorMessage() {
     return getMessages().valueIsNull();
   }
 }

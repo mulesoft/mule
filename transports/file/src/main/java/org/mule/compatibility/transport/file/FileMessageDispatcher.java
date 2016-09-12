@@ -15,9 +15,9 @@ import org.mule.compatibility.transport.file.i18n.FileMessages;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.FileUtils;
@@ -47,16 +47,16 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher implements 
   }
 
   @Override
-  protected void doDispatch(MuleEvent event) throws Exception {
+  protected void doDispatch(Event event) throws Exception {
     FileOutputStream fos = (FileOutputStream) connector.getOutputStream(getEndpoint(), event);
     try {
-      MuleMessage.Builder messageBuilder = MuleMessage.builder(event.getMessage());
+      InternalMessage.Builder messageBuilder = InternalMessage.builder(event.getMessage());
       if (event.getMessage().getOutboundProperty(PROPERTY_FILENAME) == null) {
         messageBuilder.addOutboundProperty(PROPERTY_FILENAME, event.getMessage().getOutboundProperty(PROPERTY_FILENAME, EMPTY));
       }
-      event = MuleEvent.builder(event).message(messageBuilder.build()).build();
+      event = Event.builder(event).message(messageBuilder.build()).build();
 
-      Object data = event.getMessage().getPayload();
+      Object data = event.getMessage().getPayload().getValue();
       if (data instanceof byte[]) {
         fos.write((byte[]) data);
       } else if (data instanceof String) {
@@ -125,9 +125,9 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher implements 
   }
 
   @Override
-  protected MuleMessage doSend(MuleEvent event) throws Exception {
+  protected InternalMessage doSend(Event event) throws Exception {
     doDispatch(event);
-    return MuleMessage.builder().nullPayload().build();
+    return InternalMessage.builder().nullPayload().build();
   }
 
   @Override

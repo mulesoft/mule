@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.AuthenticationFilter;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
@@ -43,13 +43,13 @@ public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilte
   }
 
   @Override
-  public MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  public Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     return authenticate(event);
   }
 
   @Override
-  public abstract MuleEvent authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+  public abstract Event authenticate(Event event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
 }

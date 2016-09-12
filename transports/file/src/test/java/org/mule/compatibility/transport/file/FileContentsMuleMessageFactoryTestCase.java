@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.transport.file.FileContentsMuleMessageFactory;
 import org.mule.compatibility.transport.file.ReceiverFileInputStream;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.FileWriter;
@@ -46,7 +46,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
     MuleMessageFactory factory = createMuleMessageFactory();
 
     Object payload = getValidTransportMessage();
-    MuleMessage message = factory.create(payload, encoding);
+    InternalMessage message = factory.create(payload, encoding);
     assertNotNull(message);
     assertPayload(message);
   }
@@ -58,7 +58,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
     InputStream stream = null;
     try {
       stream = new ReceiverFileInputStream(tempFile, false, null);
-      MuleMessage message = factory.create(stream, encoding);
+      InternalMessage message = factory.create(stream, encoding);
       assertNotNull(message);
 
       // delete the file before accessing the payload to make sure it was properly converted
@@ -70,9 +70,9 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
     }
   }
 
-  private void assertPayload(MuleMessage message) {
+  private void assertPayload(InternalMessage message) {
     byte[] expected = TEST_MESSAGE.getBytes();
-    byte[] result = (byte[]) message.getPayload();
+    byte[] result = (byte[]) message.getPayload().getValue();
     assertTrue(Arrays.equals(expected, result));
   }
 }

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -54,7 +54,7 @@ public class SslCertificatesTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     for (int i = 0; i < numberOfMessages; ++i) {
       String msg = TEST_MESSAGE + i;
-      MuleMessage result = client.send("in", msg, null).getRight();
+      InternalMessage result = client.send("in", msg, null).getRight();
       assertEquals(msg + " Received", getPayloadAsString(result));
     }
 

@@ -7,17 +7,17 @@
 package org.mule.compatibility.core.endpoint.inbound;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InboundLoggingMessageProcessor implements MessageProcessor {
+public class InboundLoggingMessageProcessor implements Processor {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
   protected InboundEndpoint endpoint;
@@ -27,15 +27,15 @@ public class InboundLoggingMessageProcessor implements MessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleMessage message = event.getMessage();
+  public Event process(Event event) throws MuleException {
+    InternalMessage message = event.getMessage();
     if (logger.isDebugEnabled()) {
       logger.debug("Message Received on: " + endpoint.getEndpointURI());
     }
     if (logger.isTraceEnabled()) {
       try {
         logger.trace("Message Payload: \n"
-            + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false));
+            + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload().getValue()), 200, false));
         logger.trace("Message detail: \n" + StringMessageUtils.headersToString(message));
       } catch (Exception e) {
         // ignore

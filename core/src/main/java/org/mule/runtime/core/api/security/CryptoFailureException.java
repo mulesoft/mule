@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.security;
 import org.mule.runtime.core.api.EncryptionStrategy;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>CryptoFailureException</code> is a generic exception thrown by an CryptoStrategy if encryption or decryption fails. The
@@ -26,14 +26,14 @@ public class CryptoFailureException extends MuleException {
 
   private transient EncryptionStrategy encryptionStrategy;
 
-  public CryptoFailureException(Message message, EncryptionStrategy strategy) {
+  public CryptoFailureException(I18nMessage message, EncryptionStrategy strategy) {
     super(message);
     String s = (strategy == null ? "null" : strategy.toString());
     addInfo("Encryption", s);
     this.encryptionStrategy = strategy;
   }
 
-  public CryptoFailureException(Message message, EncryptionStrategy strategy, Throwable cause) {
+  public CryptoFailureException(I18nMessage message, EncryptionStrategy strategy, Throwable cause) {
     super(message, cause);
     String s = (strategy == null ? "null" : strategy.toString());
     addInfo("Encryption", s);

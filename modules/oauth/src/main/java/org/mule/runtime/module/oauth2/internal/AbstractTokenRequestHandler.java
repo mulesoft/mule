@@ -12,9 +12,9 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
@@ -61,9 +61,9 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware {
         .tlsContextFactory(tlsContextFactory).build();
   }
 
-  protected MuleEvent invokeTokenUrl(final MuleEvent event) throws MuleException, TokenUrlResponseException {
-    final MuleMessage message = muleContext.getClient().send(tokenUrl, event.getMessage(), httpRequestOptions).getRight();
-    MuleEvent response = MuleEvent.builder(event).message(message).build();
+  protected Event invokeTokenUrl(final Event event) throws MuleException, TokenUrlResponseException {
+    final InternalMessage message = muleContext.getClient().send(tokenUrl, event.getMessage(), httpRequestOptions).getRight();
+    Event response = Event.builder(event).message(message).build();
     if (message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY) >= BAD_REQUEST.getStatusCode()) {
       throw new TokenUrlResponseException(response);
     }
@@ -76,13 +76,13 @@ public abstract class AbstractTokenRequestHandler implements MuleContextAware {
 
   protected class TokenUrlResponseException extends Exception {
 
-    private MuleEvent tokenUrlResponse;
+    private Event tokenUrlResponse;
 
-    public TokenUrlResponseException(final MuleEvent tokenUrlResponse) {
+    public TokenUrlResponseException(final Event tokenUrlResponse) {
       this.tokenUrlResponse = tokenUrlResponse;
     }
 
-    public MuleEvent getTokenUrlResponse() {
+    public Event getTokenUrlResponse() {
       return tokenUrlResponse;
     }
   }

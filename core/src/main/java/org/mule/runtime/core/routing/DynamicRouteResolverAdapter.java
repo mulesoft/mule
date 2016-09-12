@@ -7,8 +7,8 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.UUID;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteReso
   }
 
   @Override
-  public String getRouteIdentifier(MuleEvent event) throws MessagingException {
+  public String getRouteIdentifier(Event event) throws MessagingException {
 
     if (dynamicRouteResolver instanceof IdentifiableDynamicRouteResolver) {
       return ((IdentifiableDynamicRouteResolver) dynamicRouteResolver).getRouteIdentifier(event);
@@ -38,7 +38,7 @@ public class DynamicRouteResolverAdapter implements IdentifiableDynamicRouteReso
   }
 
   @Override
-  public List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException {
+  public List<Processor> resolveRoutes(Event event) throws MessagingException {
     return dynamicRouteResolver.resolveRoutes(event);
   }
 }

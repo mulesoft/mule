@@ -19,8 +19,8 @@ import org.springframework.beans.factory.support.ManagedList;
 /**
  * {@link BeanDefinitionCreator} for elements interceptor-stack.
  *
- * We need a custom bena definition creator since the same element is used for
- * defining an interceptor stack and referencing an interceptor stack.
+ * We need a custom bena definition creator since the same element is used for defining an interceptor stack and referencing an
+ * interceptor stack.
  *
  * @since 4.0
  */

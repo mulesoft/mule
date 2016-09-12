@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.util.store.PartitionedInMemoryObjectStore;
@@ -37,9 +37,9 @@ public class CollectionAggregatorRouterCustomStoreTestCase extends AbstractInteg
 
     flowRunner("splitter").withPayload(list).run();
 
-    MuleMessage request = client.request("test://out", 10000).getRight().get();
+    InternalMessage request = client.request("test://out", 10000).getRight().get();
     assertNotNull(request);
-    assertEquals(list.size(), ((List) request.getPayload()).size());
+    assertEquals(list.size(), ((List) request.getPayload().getValue()).size());
 
     assertThat(CustomPartitionableObjectStore.askedForKey, not(nullValue()));
     assertThat(CustomPartitionableObjectStore.askedForPartition, not(nullValue()));

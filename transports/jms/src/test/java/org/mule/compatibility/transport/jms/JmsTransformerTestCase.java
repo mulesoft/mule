@@ -10,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -31,7 +31,7 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase {
     // The purpose is to test whether custom JMS message properties survive
     // transformations when their name begins with "JMS" (MULE-1120).
 
-    // First we need a JMS message wrapped into a MuleMessage. This turned out to
+    // First we need a JMS message wrapped into a Message. This turned out to
     // be trickier than expected (ha ha) since mocking a Message depends on the
     // specific calls made to the mocked class.
     TextMessage textMessage = mock(TextMessage.class);
@@ -47,22 +47,22 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase {
     when(textMessage.getJMSType()).thenReturn(null);
     when(textMessage.getObjectProperty("JMS_CUSTOM_PROPERTY")).thenReturn("customValue");
 
-    MuleMessage msg =
-        MuleMessage.builder().payload(textMessage).addOutboundProperty("JMS_CUSTOM_PROPERTY", "customValue").build();
+    InternalMessage msg =
+        InternalMessage.builder().payload(textMessage).addOutboundProperty("JMS_CUSTOM_PROPERTY", "customValue").build();
 
     // The AbstractJMSTransformer will only apply JMS properties to the
     // underlying message when a "current event" is available, so we need to set
     // one.
     assertNotNull("The test hasn't been configured properly, no muleContext available", muleContext);
-    setCurrentEvent(MuleEvent.builder(MuleTestUtils.getTestEvent("previous", muleContext)).message(msg).build());
+    setCurrentEvent(Event.builder(MuleTestUtils.getTestEvent("previous", muleContext)).message(msg).build());
 
     // The transformer we are going to use is ObjectToJMSMessage, which will
     // return the same (but mockingly modified!) JMS message that is used as
     // input.
     ObjectToJMSMessage transformer = createObject(ObjectToJMSMessage.class);
-    Message transformed = (Message) transformer.transform(msg.getPayload());
+    Message transformed = (Message) transformer.transform(msg.getPayload().getValue());
 
-    // Finally we can assert that the setProperty done to the MuleMessage actually
+    // Finally we can assert that the setProperty done to the Message actually
     // made it through to the wrapped JMS Message. Yay!
     assertEquals("customValue", transformed.getObjectProperty("JMS_CUSTOM_PROPERTY"));
   }

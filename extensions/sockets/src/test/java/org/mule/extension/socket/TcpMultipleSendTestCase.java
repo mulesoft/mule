@@ -27,7 +27,8 @@ public class TcpMultipleSendTestCase extends ParameterizedProtocolTestCase {
   public void multipleSendString() throws Exception {
     // TODO repeat this test with different messages and test that they arrive in the same order
     for (int i = 0; i < REPETITIONS; i++) {
-      InputStream payload = (InputStream) flowRunner("tcp-send").withPayload(TEST_STRING).run().getMessage().getPayload();
+      InputStream payload =
+          (InputStream) flowRunner("tcp-send").withPayload(TEST_STRING).run().getMessage().getPayload().getValue();
 
       assertEquals(RESPONSE_TEST_STRING, IOUtils.toString(payload));
     }

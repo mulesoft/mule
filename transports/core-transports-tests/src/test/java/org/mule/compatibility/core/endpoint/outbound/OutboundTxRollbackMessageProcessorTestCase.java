@@ -12,7 +12,7 @@ import static org.junit.Assert.assertSame;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.endpoint.outbound.OutboundTxRollbackMessageProcessor;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -29,7 +29,7 @@ public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageP
     TestListener listener = new TestListener();
     mp.setListener(listener);
 
-    MuleEvent event = createTestOutboundEvent();
+    Event event = createTestOutboundEvent();
     mp.process(event);
 
     assertSame(event, listener.sensedEvent);
@@ -46,8 +46,8 @@ public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageP
       TransactionCoordination.getInstance().bindTransaction(tx);
       tx.setRollbackOnly();
 
-      MuleEvent event = createTestOutboundEvent();
-      MuleEvent result = mp.process(event);
+      Event event = createTestOutboundEvent();
+      Event result = mp.process(event);
 
       assertNull(listener.sensedEvent);
       assertSame(result, event);

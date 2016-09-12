@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.file;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.util.TemplateParser;
@@ -64,7 +64,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
   }
 
   @Override
-  public String getFilename(MuleEvent event, String expression) {
+  public String getFilename(Event event, String expression) {
     if (expression == null) {
       expression = DEFAULT_EXPRESSION;
     }
@@ -76,7 +76,7 @@ public class ExpressionFilenameParser implements FilenameParser, MuleContextAwar
     }
   }
 
-  protected String getFilename(final MuleEvent event, String expression, TemplateParser parser) {
+  protected String getFilename(final Event event, String expression, TemplateParser parser) {
     return parser.parse((TemplateCallback) token -> muleContext.getExpressionLanguage().evaluate(token, event, null), expression);
   }
 

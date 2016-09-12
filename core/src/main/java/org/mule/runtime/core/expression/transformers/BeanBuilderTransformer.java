@@ -7,7 +7,7 @@
 package org.mule.runtime.core.expression.transformers;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -69,7 +69,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     Object bean;
     try {
       bean = getBeanFactory().getInstance(muleContext);

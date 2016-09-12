@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
@@ -20,12 +20,12 @@ import java.util.List;
 public class SynchronousProcessingStrategy implements ProcessingStrategy {
 
   @Override
-  public void configureProcessors(List<MessageProcessor> processors,
+  public void configureProcessors(List<Processor> processors,
                                   org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                   MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
     for (Object processor : processors) {
-      if (processor instanceof MessageProcessor) {
-        chainBuilder.chain((MessageProcessor) processor);
+      if (processor instanceof Processor) {
+        chainBuilder.chain((Processor) processor);
       } else if (processor instanceof MessageProcessorBuilder) {
         chainBuilder.chain((MessageProcessorBuilder) processor);
       } else {

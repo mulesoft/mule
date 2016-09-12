@@ -8,11 +8,11 @@ package org.mule.runtime.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
@@ -32,10 +32,10 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
   @Test
   public void testSerializablePayload() throws Exception {
-    final MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
-    MuleMessage deserializedMessage = serializationRoundtrip(message);
+    final InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
+    InternalMessage deserializedMessage = serializationRoundtrip(message);
 
-    assertEquals(TEST_MESSAGE, deserializedMessage.getPayload());
+    assertEquals(TEST_MESSAGE, deserializedMessage.getPayload().getValue());
     assertEquals("bar", deserializedMessage.getOutboundProperty("foo"));
   }
 
@@ -45,31 +45,32 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     // will be used during Serialization
     muleContext.getRegistry().registerTransformer(new NonSerializableToByteArray());
 
-    final MuleMessage message = MuleMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
+    final InternalMessage message =
+        InternalMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
-    MuleMessage deserializedMessage = serializationRoundtrip(message);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
+    InternalMessage deserializedMessage = serializationRoundtrip(message);
 
-    assertTrue(deserializedMessage.getPayload() instanceof byte[]);
+    assertTrue(deserializedMessage.getPayload().getValue() instanceof byte[]);
     assertEquals(INNER_TEST_MESSAGE, getPayloadAsString(deserializedMessage));
   }
 
   @Test
   public void testStreamPayloadSerialization() throws Exception {
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-    final MuleMessage message = MuleMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
+    final InternalMessage message = InternalMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
     Flow flow = getTestFlow();
-    setCurrentEvent(MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
-    MuleMessage deserializedMessage = serializationRoundtrip(message);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
+    InternalMessage deserializedMessage = serializationRoundtrip(message);
 
-    assertEquals(byte[].class, deserializedMessage.getDataType().getType());
-    byte[] payload = (byte[]) deserializedMessage.getPayload();
+    assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());
+    byte[] payload = (byte[]) deserializedMessage.getPayload().getValue();
     assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
   }
 
-  private MuleMessage serializationRoundtrip(MuleMessage message) throws Exception {
-    return (MuleMessage) SerializationUtils.deserialize(SerializationUtils.serialize(message));
+  private InternalMessage serializationRoundtrip(InternalMessage message) throws Exception {
+    return (InternalMessage) SerializationUtils.deserialize(SerializationUtils.serialize(message));
   }
 
   static class NonSerializable {

@@ -102,12 +102,11 @@ public class MetadataDbTypeManager implements DbTypeManager {
   }
 
   /**
-   * According to documentation STRUCT and DISTINCT types with name different than "STRUCT" and "DISTINCT" should
-   * be considered user defined types: http://docs.oracle.com/javase/7/docs/api/java/sql/DatabaseMetaData.html#getTypeInfo()
-   * Note: documentation says nothing about ARRAY types with a different name than ARRAY, but postgres returns two
-   * different user defined types for each defined table, one with the name of the table and type STRUCT, and another
-   * one with the name of the table prefixed by an underscore and type ARRAY.
-   * We assume that ARRAY is behaving the same as STRUCT and DISTINCT in this aspect.
+   * According to documentation STRUCT and DISTINCT types with name different than "STRUCT" and "DISTINCT" should be considered
+   * user defined types: http://docs.oracle.com/javase/7/docs/api/java/sql/DatabaseMetaData.html#getTypeInfo() Note: documentation
+   * says nothing about ARRAY types with a different name than ARRAY, but postgres returns two different user defined types for
+   * each defined table, one with the name of the table and type STRUCT, and another one with the name of the table prefixed by an
+   * underscore and type ARRAY. We assume that ARRAY is behaving the same as STRUCT and DISTINCT in this aspect.
    */
   private boolean isUserDefinedType(DbType dbType) {
     return isTypeDerivedFrom(dbType, STRUCT.getDbType()) ||

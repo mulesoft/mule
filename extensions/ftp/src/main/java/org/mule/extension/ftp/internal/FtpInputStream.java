@@ -6,7 +6,7 @@
  */
 package org.mule.extension.ftp.internal;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;

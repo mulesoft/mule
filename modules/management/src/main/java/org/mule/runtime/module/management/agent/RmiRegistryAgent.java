@@ -9,7 +9,7 @@ package org.mule.runtime.module.management.agent;
 import org.mule.runtime.core.AbstractAgent;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.net.URI;
@@ -53,7 +53,7 @@ public class RmiRegistryAgent extends AbstractAgent {
 
   public void start() throws MuleException {
     if (serverUri == null) {
-      throw new InitialisationException(MessageFactory
+      throw new InitialisationException(I18nMessageFactory
           .createStaticMessage("serverUri has not been set, this agent has not been initialized properly."), this);
     }
 

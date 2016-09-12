@@ -12,7 +12,7 @@ import static org.mule.functional.functional.FlowAssert.verify;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -74,7 +74,7 @@ public class HttpListenerValidateCertificateTestCase extends AbstractHttpTestCas
   }
 
   private String sendRequest(String url, String payload) throws Exception {
-    MuleMessage response = muleContext.getClient()
+    InternalMessage response = muleContext.getClient()
         .send(url, getTestMuleMessage(payload), newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).build())
         .getRight();
     return getPayloadAsString(response);

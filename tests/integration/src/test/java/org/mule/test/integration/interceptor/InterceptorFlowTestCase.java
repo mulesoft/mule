@@ -9,7 +9,7 @@ package org.mule.test.integration.interceptor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -20,9 +20,9 @@ public class InterceptorFlowTestCase extends AbstractIntegrationTestCase {
   public void testDefaultJavaComponentShortcut() throws Exception {
     flowRunner("interceptorFlow").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("test://out", 3000).getRight().get();
+    InternalMessage message = client.request("test://out", 3000).getRight().get();
     assertNotNull(message);
-    String payload = (String) message.getPayload();
+    String payload = (String) message.getPayload().getValue();
     assertNotNull(payload);
     // note that there is an exclamation mark on the end that was added by the interceptor
     assertEquals(TEST_PAYLOAD + "!", payload);

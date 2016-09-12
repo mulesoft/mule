@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
@@ -40,7 +40,7 @@ public class HttpListenerTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Test
   public void acceptsInvalidCertificateIfInsecure() throws Exception {
-    final MuleEvent res = flowRunner("testRequestToInsecure").withPayload(TEST_PAYLOAD).run();
+    final Event res = flowRunner("testRequestToInsecure").withPayload(TEST_PAYLOAD).run();
     assertThat(res.getMessageAsString(muleContext), is(TEST_PAYLOAD));
   }
 

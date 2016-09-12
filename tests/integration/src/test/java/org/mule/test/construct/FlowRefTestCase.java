@@ -15,14 +15,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -62,7 +62,7 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void twoFlowRefsToSubFlow() throws Exception {
-    final MuleEvent muleEvent = flowRunner("flow1").withPayload("0").run();
+    final Event muleEvent = flowRunner("flow1").withPayload("0").run();
     assertThat(getPayloadAsString(muleEvent.getMessage()), is("012xyzabc312xyzabc3"));
   }
 
@@ -74,13 +74,13 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
                  flowRunner("flow2").withPayload("0").withFlowVariable("letter", "B").run().getMessageAsString(muleContext));
   }
 
-  public static class ProcessorPathAssertingProcessor implements MessageProcessor, FlowConstructAware {
+  public static class ProcessorPathAssertingProcessor implements Processor, FlowConstructAware {
 
     private static List<String> traversedProcessorPaths = new ArrayList<>();
     private FlowConstruct flowConstruct;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       traversedProcessorPaths
           .add(((Flow) muleContext.getRegistry().lookupFlowConstruct(flowConstruct.getName())).getProcessorPath(this));
       return event;
@@ -135,10 +135,11 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void dynamicFlowRefWithScatterGather() throws Exception {
-    List<MuleMessage> messageList =
-        (List<MuleMessage>) flowRunner("flow2").withPayload("0").withFlowVariable("letter", "SG").run().getMessage().getPayload();
+    List<InternalMessage> messageList =
+        (List<InternalMessage>) flowRunner("flow2").withPayload("0").withFlowVariable("letter", "SG").run().getMessage()
+            .getPayload().getValue();
 
-    List payloads = messageList.stream().map(MuleMessage::getPayload).collect(toList());
+    List payloads = messageList.stream().map(msg -> msg.getPayload().getValue()).collect(toList());
     assertEquals("0A", payloads.get(0));
     assertEquals("0B", payloads.get(1));
   }

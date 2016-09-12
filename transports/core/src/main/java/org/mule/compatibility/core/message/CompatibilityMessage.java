@@ -8,9 +8,10 @@ package org.mule.compatibility.core.message;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.message.GroupCorrelation;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -18,17 +19,17 @@ import java.util.Set;
 import javax.activation.DataHandler;
 
 /**
- * Adds functionality that was available in {@link MuleMessage} in Mule 3.
+ * Adds functionality that was available in {@link Message} in Mule 3.
  *
  * @since 4.0
  */
-public class MuleCompatibilityMessage implements MuleMessage {
+public class CompatibilityMessage implements InternalMessage {
 
-  private MuleMessage inner;
+  private InternalMessage inner;
   private String correlationId;
-  private Correlation correlation;
+  private GroupCorrelation correlation;
 
-  public MuleCompatibilityMessage(MuleMessage inner, Correlation correlation, String correlationId) {
+  public CompatibilityMessage(InternalMessage inner, GroupCorrelation correlation, String correlationId) {
     this.inner = inner;
     this.correlation = correlation;
     this.correlationId = correlationId;
@@ -37,11 +38,6 @@ public class MuleCompatibilityMessage implements MuleMessage {
   @Override
   public Attributes getAttributes() {
     return inner.getAttributes();
-  }
-
-  @Override
-  public DataType getDataType() {
-    return inner.getDataType();
   }
 
   @Override
@@ -110,11 +106,11 @@ public class MuleCompatibilityMessage implements MuleMessage {
   }
 
   @Override
-  public <T> T getPayload() {
+  public TypedValue getPayload() {
     return inner.getPayload();
   }
 
-  public Correlation getCorrelation() {
+  public GroupCorrelation getCorrelation() {
     return correlation;
   }
 
@@ -131,7 +127,7 @@ public class MuleCompatibilityMessage implements MuleMessage {
       return false;
     }
 
-    MuleCompatibilityMessage that = (MuleCompatibilityMessage) o;
+    CompatibilityMessage that = (CompatibilityMessage) o;
 
     if (!this.inner.equals(that.inner)) {
       return false;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.FilenameUtils;
 import org.mule.runtime.module.deployment.api.DeploymentException;
@@ -53,7 +53,7 @@ public class ArtifactArchiveInstaller {
 
     final String baseName = FilenameUtils.getBaseName(artifactUrl.toString());
     if (baseName.contains("%20")) {
-      throw new DeploymentInitException(MessageFactory
+      throw new DeploymentInitException(I18nMessageFactory
           .createStaticMessage("Mule artifact name may not contain spaces: " + baseName));
     }
 
@@ -87,7 +87,7 @@ public class ArtifactArchiveInstaller {
     } catch (Throwable t) {
       errorEncountered = true;
       final String msg = "Failed to install artifact from URL: " + artifactUrl;
-      throw new DeploymentInitException(MessageFactory.createStaticMessage(msg), t);
+      throw new DeploymentInitException(I18nMessageFactory.createStaticMessage(msg), t);
     } finally {
       // delete an artifact dir, as it's broken
       if (errorEncountered && artifactDir != null && artifactDir.exists()) {
@@ -118,7 +118,7 @@ public class ArtifactArchiveInstaller {
       }
 
       final String msg = String.format("Failed to undeployArtifact artifact [%s]", artifactName);
-      throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+      throw new DeploymentException(I18nMessageFactory.createStaticMessage(msg), t);
     }
   }
 

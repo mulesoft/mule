@@ -13,8 +13,8 @@ import java.sql.SQLException;
 import org.hamcrest.Description;
 
 /**
- * Checks whether or not a dataSource supports to have multiple ResultSet
- * objects returned from a CallableStatement object simultaneously.
+ * Checks whether or not a dataSource supports to have multiple ResultSet objects returned from a CallableStatement object
+ * simultaneously.
  */
 public class SupportMultipleOpenResults extends AbstractDataSourceFeatureMatcher {
 

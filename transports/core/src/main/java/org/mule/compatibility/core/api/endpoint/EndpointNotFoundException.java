@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>EndpointNotFoundException</code> is thrown when an endpoint name or protocol is specified but a matching endpoint is not
@@ -30,7 +30,7 @@ public class EndpointNotFoundException extends EndpointException {
   /**
    * @param message the exception message
    */
-  public EndpointNotFoundException(Message message) {
+  public EndpointNotFoundException(I18nMessage message) {
     super(message);
   }
 
@@ -38,7 +38,7 @@ public class EndpointNotFoundException extends EndpointException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public EndpointNotFoundException(Message message, Throwable cause) {
+  public EndpointNotFoundException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

@@ -171,10 +171,10 @@ public class IsolatedClassLoaderFactory {
   }
 
   /**
-   * Creates the launcher application class loader to delegate from container class loader.
-   * It adds the {@link URL}s discovered for the container class loader and boot/launcher class loader that are not already
-   * present. This is needed due to while resolving the container class loader artifacts could be discovered that are not present
-   * in classpath due to they are not defined as dependencies.
+   * Creates the launcher application class loader to delegate from container class loader. It adds the {@link URL}s discovered
+   * for the container class loader and boot/launcher class loader that are not already present. This is needed due to while
+   * resolving the container class loader artifacts could be discovered that are not present in classpath due to they are not
+   * defined as dependencies.
    *
    * @param artifactUrlClassification
    * @return an {@link ArtifactClassLoader} for the launcher, parent of container

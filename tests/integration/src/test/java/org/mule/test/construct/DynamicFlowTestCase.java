@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.simple.ParseTemplateTransformer;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
@@ -50,8 +50,8 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void addPreMessageProccesor() throws Exception {
-    MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
-    MuleMessage result = muleEvent.getMessage();
+    Event muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+    InternalMessage result = muleEvent.getMessage();
     assertEquals("source->(static)", getPayloadAsString(result));
 
     Flow flow = getFlow("dynamicFlow");
@@ -72,8 +72,8 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     Flow flow = getFlow("dynamicFlow");
     String pipelineId = flow.dynamicPipeline(null).injectBefore(new StringAppendTransformer("(pre)"))
         .injectAfter(new StringAppendTransformer("(post)")).resetAndUpdate();
-    MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
-    MuleMessage result = muleEvent.getMessage();
+    Event muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+    InternalMessage result = muleEvent.getMessage();
     assertEquals("source->(pre)(static)(post)", getPayloadAsString(result));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("(pre)"))
@@ -86,7 +86,7 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
   @Test
   public void dynamicComponent() throws Exception {
     // invocation #1
-    MuleMessage result = flowRunner("dynamicComponentFlow").withPayload("source->").run().getMessage();
+    InternalMessage result = flowRunner("dynamicComponentFlow").withPayload("source->").run().getMessage();
     assertEquals("source->(static)", getPayloadAsString(result));
 
     // invocation #2
@@ -100,8 +100,8 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void exceptionOnInjectedMessageProcessor() throws Exception {
-    List<MessageProcessor> preList = new ArrayList<>();
-    List<MessageProcessor> postList = new ArrayList<>();
+    List<Processor> preList = new ArrayList<>();
+    List<Processor> postList = new ArrayList<>();
 
     Flow flow = getFlow("exceptionFlow");
     preList.add(new StringAppendTransformer("(pre)"));
@@ -110,7 +110,7 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     });
     postList.add(new StringAppendTransformer("(post)"));
     flow.dynamicPipeline(null).injectBefore(preList).injectAfter(postList).resetAndUpdate();
-    MuleMessage result = flowRunner("exceptionFlow").withPayload("source->").run().getMessage();
+    InternalMessage result = flowRunner("exceptionFlow").withPayload("source->").run().getMessage();
     assertEquals("source->(pre)(handled)", getPayloadAsString(result));
   }
 
@@ -127,18 +127,18 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     String proposedId = "ID";
     Flow flow = getFlow("dynamicFlow");
     try {
-      MessageProcessor invalidProcessor = new ParseTemplateTransformer();
+      Processor invalidProcessor = new ParseTemplateTransformer();
       flow.dynamicPipeline(proposedId).injectBefore(invalidProcessor).resetAndUpdate();
     } catch (MuleException e) {
-      //Expected failure
+      // Expected failure
     }
 
     flow.dynamicPipeline(proposedId).injectBefore(new StringAppendTransformer("(pre)"))
         .injectAfter(new StringAppendTransformer("(post)"))
         .resetAndUpdate();
 
-    //    MuleMessage result = client.send("vm://dynamic", "source->", null);
-    MuleMessage result = flowRunner("dynamicFlow").withPayload("source->").run().getMessage();
+    // Message result = client.send("vm://dynamic", "source->", null);
+    InternalMessage result = flowRunner("dynamicFlow").withPayload("source->").run().getMessage();
     assertEquals("source->(pre)(static)(post)", getPayloadAsString(result));
   }
 
@@ -149,8 +149,8 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     Flow flow = getFlow("dynamicFlow");
     LifecycleMessageProcessor lifecycleMessageProcessor = new LifecycleMessageProcessor();
     String pipelineId = flow.dynamicPipeline(null).injectBefore(lifecycleMessageProcessor).resetAndUpdate();
-    MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
-    MuleMessage result = muleEvent.getMessage();
+    Event muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+    InternalMessage result = muleEvent.getMessage();
     assertEquals("source->(pre)(static)", getPayloadAsString(result));
     assertEquals(expected.append("ISP").toString(), lifecycleMessageProcessor.getSteps());
 
@@ -173,8 +173,8 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     Flow flow = getFlow("dynamicFlow");
     UberAwareMessageProcessor awareMessageProcessor = new UberAwareMessageProcessor();
     flow.dynamicPipeline(null).injectBefore(awareMessageProcessor).resetAndUpdate();
-    final MuleEvent muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
-    MuleMessage result = muleEvent.getMessage();
+    final Event muleEvent = flowRunner("dynamicFlow").withPayload("source->").run();
+    InternalMessage result = muleEvent.getMessage();
     assertEquals("source->(pre)(static)", getPayloadAsString(result));
     assertNotNull(awareMessageProcessor.getFlowConstruct());
     assertNotNull(awareMessageProcessor.getMuleContext());
@@ -211,7 +211,7 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
 
   }
 
-  private static class LifecycleMessageProcessor implements MessageProcessor, Lifecycle {
+  private static class LifecycleMessageProcessor implements Processor, Lifecycle {
 
     private StringBuffer steps = new StringBuffer();
 
@@ -226,9 +226,10 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       steps.append("P");
-      return MuleEvent.builder(event).message(MuleMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build())
+      return Event.builder(event)
+          .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue() + "(pre)").build())
           .build();
     }
 
@@ -247,14 +248,15 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     }
   }
 
-  private static class UberAwareMessageProcessor implements MessageProcessor, MuleContextAware, FlowConstructAware {
+  private static class UberAwareMessageProcessor implements Processor, MuleContextAware, FlowConstructAware {
 
     private FlowConstruct flowConstruct;
     private MuleContext muleContext;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      return MuleEvent.builder(event).message(MuleMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build())
+    public Event process(Event event) throws MuleException {
+      return Event.builder(event)
+          .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue() + "(pre)").build())
           .build();
     }
 

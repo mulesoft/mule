@@ -6,7 +6,7 @@
  */
 package org.mule.test.vegan.extension;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
@@ -59,8 +59,8 @@ public class InterceptingBananaOperations {
     }
 
     @Override
-    public void onSuccess(MuleMessage resultMessage) {
-      if (resultMessage.getPayload() instanceof Banana) {
+    public void onSuccess(Message resultMessage) {
+      if (resultMessage.getPayload().getValue() instanceof Banana) {
         config.onBanana();
       } else {
         config.onNotBanana();

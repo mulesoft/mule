@@ -59,7 +59,7 @@ public class FileWriterVisitor implements FileContentVisitor {
 
   @Override
   public void visit(OutputHandler handler) throws Exception {
-    handler.write((org.mule.runtime.core.api.MuleEvent) event, outputStream);
+    handler.write((org.mule.runtime.core.api.Event) event, outputStream);
   }
 
   @Override

@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.TRA
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isTransactional;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
@@ -44,7 +44,7 @@ public class DefaultOperationContext implements OperationContextAdapter {
   private final Map<String, Object> parameters;
   private final Map<String, Object> variables = new HashMap<>();
   private final RuntimeOperationModel operationModel;
-  private final MuleEvent event;
+  private final Event event;
   private final MuleContext muleContext;
   private Optional<TransactionConfig> transactionConfig = null;
   private Supplier<Optional<TransactionConfig>> transactionConfigSupplier;
@@ -55,13 +55,13 @@ public class DefaultOperationContext implements OperationContextAdapter {
    * @param configuration the {@link ConfigurationInstance} that the operation will use
    * @param parameters the parameters that the operation will use
    * @param operationModel a {@link RuntimeOperationModel} for the operation being executed
-   * @param event the current {@link MuleEvent}
+   * @param event the current {@link Event}
    */
   public DefaultOperationContext(ExtensionModel extensionModel,
                                  Optional<ConfigurationInstance> configuration,
                                  ResolverSetResult parameters,
                                  RuntimeOperationModel operationModel,
-                                 MuleEvent event,
+                                 Event event,
                                  MuleContext muleContext) {
 
     this.extensionModel = extensionModel;
@@ -160,7 +160,7 @@ public class DefaultOperationContext implements OperationContextAdapter {
    * {@inheritDoc}
    */
   @Override
-  public MuleEvent getEvent() {
+  public Event getEvent() {
     return event;
   }
 

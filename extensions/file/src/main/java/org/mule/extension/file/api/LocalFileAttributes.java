@@ -6,7 +6,7 @@
  */
 package org.mule.extension.file.api;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.extension.file.common.api.AbstractFileAttributes;
 import org.mule.extension.file.common.api.FileAttributes;

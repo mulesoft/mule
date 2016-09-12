@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.el.context;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.util.Set;
@@ -15,10 +15,10 @@ import javax.activation.DataHandler;
 
 public class InboundAttachmentMapContext extends AbstractMapContext<DataHandler> {
 
-  private MuleEvent event;
+  private Event event;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public InboundAttachmentMapContext(MuleEvent event) {
+  public InboundAttachmentMapContext(Event event) {
     this.event = event;
   }
 

@@ -11,9 +11,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -32,12 +32,12 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
     roundRobinRoutingStrategy = new RoundRobinRoutingStrategy(muleContext, new IdentifiableDynamicRouteResolver() {
 
       @Override
-      public String getRouteIdentifier(MuleEvent event) throws MessagingException {
-        return event.getFlowVariable(ID_PROPERTY_NAME);
+      public String getRouteIdentifier(Event event) throws MessagingException {
+        return event.getVariable(ID_PROPERTY_NAME);
       }
 
       @Override
-      public List<MessageProcessor> resolveRoutes(MuleEvent event) throws MessagingException {
+      public List<Processor> resolveRoutes(Event event) throws MessagingException {
         return null;
       }
     });
@@ -46,19 +46,19 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
 
   @Test(expected = RoutePathNotFoundException.class)
   public void testNullMessageProcessors() throws MuleException {
-    roundRobinRoutingStrategy.route(mock(MuleEvent.class), null);
+    roundRobinRoutingStrategy.route(mock(Event.class), null);
   }
 
   @Test(expected = RoutePathNotFoundException.class)
   public void testEmptyMessageProcessors() throws MuleException {
-    roundRobinRoutingStrategy.route(mock(MuleEvent.class), Collections.EMPTY_LIST);
+    roundRobinRoutingStrategy.route(mock(Event.class), Collections.EMPTY_LIST);
   }
 
   @Test
   public void testRoute() throws Exception {
-    List<MessageProcessor> messageProcessors = getMessageProcessorsList();
-    MuleEvent eventToRouteId1 = getEventWithId(ID_1);
-    MuleEvent eventToRouteId2 = getEventWithId(ID_2);
+    List<Processor> messageProcessors = getMessageProcessorsList();
+    Event eventToRouteId1 = getEventWithId(ID_1);
+    Event eventToRouteId2 = getEventWithId(ID_2);
     assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage()));
     assertEquals(LETTER_B, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId1, messageProcessors).getMessage()));
     assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRouteId2, messageProcessors).getMessage()));
@@ -70,8 +70,8 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
 
   @Test
   public void testRouteWithFailingMessageProcessor() throws Exception {
-    List<MessageProcessor> messageProcessors = getMessageProcessorsListWithFailingMessageProcessor();
-    MuleEvent eventToRoute = getEventWithId(ID_1);
+    List<Processor> messageProcessors = getMessageProcessorsListWithFailingMessageProcessor();
+    Event eventToRoute = getEventWithId(ID_1);
     assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
     try {
       roundRobinRoutingStrategy.route(eventToRoute, messageProcessors);
@@ -85,8 +85,8 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
 
   @Test
   public void testNullIdentifier() throws Exception {
-    List<MessageProcessor> messageProcessors = getMessageProcessorsList();
-    MuleEvent eventToRoute = getEventWithId(null);
+    List<Processor> messageProcessors = getMessageProcessorsList();
+    Event eventToRoute = getEventWithId(null);
     assertEquals(LETTER_A, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
     assertEquals(LETTER_B, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));
     assertEquals(LETTER_C, getPayloadAsString(roundRobinRoutingStrategy.route(eventToRoute, messageProcessors).getMessage()));

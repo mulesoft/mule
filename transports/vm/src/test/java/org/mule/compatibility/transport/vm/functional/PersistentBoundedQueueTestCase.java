@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.HashSet;
@@ -58,7 +58,7 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase {
   }
 
   private void pollOutQueue(MuleClient client, Set<String> results) throws Exception {
-    MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     results.add(getPayloadAsString(result));
   }

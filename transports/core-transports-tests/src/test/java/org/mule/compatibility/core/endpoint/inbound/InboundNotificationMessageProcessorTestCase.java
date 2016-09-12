@@ -13,9 +13,9 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,14 +29,15 @@ public class InboundNotificationMessageProcessorTestCase extends AbstractMessage
     muleContext.registerListener(listener);
 
     InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
-    MessageProcessor mp = new InboundNotificationMessageProcessor(endpoint);
-    MuleEvent event = createTestInboundEvent(endpoint);
+    Processor mp = new InboundNotificationMessageProcessor(endpoint);
+    Event event = createTestInboundEvent(endpoint);
     mp.process(event);
 
     assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     assertEquals(EndpointMessageNotification.MESSAGE_RECEIVED, listener.messageNotification.getAction());
     assertEquals(endpoint.getEndpointURI().getUri().toString(), listener.messageNotification.getEndpoint());
-    assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
-    assertThat(listener.messageNotification.getSource().getPayload(), equalTo(event.getMessage().getPayload()));
+    assertTrue(listener.messageNotification.getSource() instanceof InternalMessage);
+    assertThat(listener.messageNotification.getSource().getPayload().getValue(),
+               equalTo(event.getMessage().getPayload().getValue()));
   }
 }

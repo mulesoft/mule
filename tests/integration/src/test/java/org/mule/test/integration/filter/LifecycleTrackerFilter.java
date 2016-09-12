@@ -7,9 +7,9 @@
 package org.mule.test.integration.filter;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
@@ -57,7 +57,7 @@ public class LifecycleTrackerFilter implements Filter, Lifecycle, MuleContextAwa
   }
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     // TODO Auto-generated method stub
     return false;
   }

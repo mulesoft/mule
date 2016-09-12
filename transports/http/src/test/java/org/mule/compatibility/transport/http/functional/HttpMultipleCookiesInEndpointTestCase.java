@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -30,9 +30,9 @@ public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase {
   @Test
   public void testThatThe2CookiesAreSentAndReceivedByTheComponent() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("vm://in", "HELLO", null).getRight();
+    InternalMessage response = client.send("vm://in", "HELLO", null).getRight();
     assertNotNull(response);
-    assertNotNull(response.getPayload());
+    assertNotNull(response.getPayload().getValue());
     assertEquals("Both Cookies Found!", getPayloadAsString(response));
   }
 }

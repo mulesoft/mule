@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Test;
 
@@ -35,8 +35,8 @@ public class DomainTransformerRegistrationTestCase extends DomainFunctionalTestC
 
   @Test
   public void registerTransformerOnce() throws Exception {
-    final MuleMessage response =
+    final InternalMessage response =
         new FlowRunner(getMuleContextForApp(APP1), "main").withPayload(TRUE.toString()).run().getMessage();
-    assertThat(response.getPayload(), instanceOf(Boolean.class));
+    assertThat(response.getPayload().getValue(), instanceOf(Boolean.class));
   }
 }

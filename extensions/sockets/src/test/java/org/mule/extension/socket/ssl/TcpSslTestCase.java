@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import org.mule.extension.socket.SocketExtensionTestCase;
 import org.mule.extension.socket.api.SocketAttributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -33,13 +33,13 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
 
   @Test
   public void sendAndReceiveOverSSLConfiguredGlobally() throws Exception {
-    MuleMessage muleMessage = sendStringAndAssertResponse("ssl-send-and-receive-global-tls");
+    Message muleMessage = sendStringAndAssertResponse("ssl-send-and-receive-global-tls");
     assertClientAutenticathed((SocketAttributes) muleMessage.getAttributes());
   }
 
   @Test
   public void sendAndReceiveOverSSL() throws Exception {
-    MuleMessage muleMessage = sendStringAndAssertResponse("ssl-send-and-receive");
+    Message muleMessage = sendStringAndAssertResponse("ssl-send-and-receive");
     // trust-store not configured for listenerTlsContext
     assertClientNotAutenticathed((SocketAttributes) muleMessage.getAttributes());
 
@@ -47,7 +47,7 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
 
   @Test
   public void multipleSendAndReceiveOverSSLConfiguredGlobally() throws Exception {
-    MuleMessage message;
+    Message message;
     for (int i = 0; i < REPETITIONS; i++) {
       message = sendStringAndAssertResponse("ssl-send-and-receive-global-tls");
       assertClientAutenticathed((SocketAttributes) message.getAttributes());
@@ -55,10 +55,10 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
     }
   }
 
-  private MuleMessage sendStringAndAssertResponse(String flowName) throws Exception {
-    org.mule.runtime.core.api.MuleMessage muleMessage = flowRunner(flowName).withPayload(TEST_STRING).run().getMessage();
+  private Message sendStringAndAssertResponse(String flowName) throws Exception {
+    org.mule.runtime.core.api.InternalMessage muleMessage = flowRunner(flowName).withPayload(TEST_STRING).run().getMessage();
 
-    InputStream inputStream = (InputStream) muleMessage.getPayload();
+    InputStream inputStream = (InputStream) muleMessage.getPayload().getValue();
 
     String response = IOUtils.toString(inputStream);
     assertThat(RESPONSE_TEST_STRING, is(response));

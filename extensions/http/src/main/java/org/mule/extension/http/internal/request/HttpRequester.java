@@ -19,10 +19,10 @@ import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.validator.ResponseValidator;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component capable of performing an HTTP request given a {@link MuleEvent}.
+ * Component capable of performing an HTTP request given a {@link Event}.
  *
  * @since 4.0
  */
@@ -73,8 +73,8 @@ public class HttpRequester {
         new NotificationHelper(config.getMuleContext().getNotificationManager(), ConnectorMessageNotification.class, false);
   }
 
-  public MuleMessage doRequest(MuleEvent muleEvent, HttpClient client, HttpRequesterRequestBuilder requestBuilder,
-                               boolean checkRetry, MuleContext muleContext, FlowConstruct flowConstruct)
+  public Message doRequest(Event muleEvent, HttpClient client, HttpRequesterRequestBuilder requestBuilder,
+                           boolean checkRetry, MuleContext muleContext, FlowConstruct flowConstruct)
       throws MuleException {
     HttpRequest httpRequest = eventToHttpRequest.create(muleEvent, requestBuilder, authentication, muleContext);
 
@@ -88,11 +88,11 @@ public class HttpRequester {
     }
 
     HttpResponseToMuleMessage httpResponseToMuleMessage = new HttpResponseToMuleMessage(config, parseResponse, muleContext);
-    MuleMessage responseMessage = httpResponseToMuleMessage.convert(muleEvent, response, httpRequest.getUri());
+    Message responseMessage = httpResponseToMuleMessage.convert(muleEvent, response, httpRequest.getUri());
 
     // Create a new muleEvent based on the old and the response so that the auth can use it
-    MuleEvent responseEvent =
-        MuleEvent.builder(muleEvent).message(org.mule.runtime.core.api.MuleMessage.builder(responseMessage).build())
+    Event responseEvent =
+        Event.builder(muleEvent).message(org.mule.runtime.core.api.InternalMessage.builder(responseMessage).build())
             .synchronous(muleEvent.isSynchronous()).build();
     if (resendRequest(responseEvent, checkRetry, authentication)) {
       consumePayload(responseEvent, muleContext);
@@ -103,12 +103,12 @@ public class HttpRequester {
     return responseMessage;
   }
 
-  private boolean resendRequest(MuleEvent muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException {
+  private boolean resendRequest(Event muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException {
     return retry && authentication != null && authentication.shouldRetry(muleEvent);
   }
 
-  private void consumePayload(final MuleEvent event, MuleContext muleContext) {
-    if (event.getMessage().getPayload() instanceof InputStream) {
+  private void consumePayload(final Event event, MuleContext muleContext) {
+    if (event.getMessage().getPayload().getValue() instanceof InputStream) {
       try {
         event.getMessageAsBytes(muleContext);
       } catch (Exception e) {

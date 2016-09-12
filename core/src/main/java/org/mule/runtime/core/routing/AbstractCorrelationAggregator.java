@@ -7,13 +7,13 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 
 /**
  * <code>AbstractCorrelationAggregatingMessageProcessor</code> uses the CorrelationID and CorrelationGroupSize properties of the
- * {@link org.mule.runtime.core.api.MuleMessage} to manage message groups.
+ * {@link org.mule.runtime.core.api.InternalMessage} to manage message groups.
  */
 public abstract class AbstractCorrelationAggregator extends AbstractAggregator {
 
@@ -22,7 +22,7 @@ public abstract class AbstractCorrelationAggregator extends AbstractAggregator {
     return new DelegateCorrelatorCallback(muleContext);
   }
 
-  protected abstract MuleEvent aggregateEvents(EventGroup events) throws AggregationException;
+  protected abstract Event aggregateEvents(EventGroup events) throws AggregationException;
 
   private class DelegateCorrelatorCallback extends CollectionCorrelatorCallback {
 
@@ -31,7 +31,7 @@ public abstract class AbstractCorrelationAggregator extends AbstractAggregator {
     }
 
     @Override
-    public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
+    public Event aggregateEvents(EventGroup events) throws AggregationException {
       return AbstractCorrelationAggregator.this.aggregateEvents(events);
     }
   }

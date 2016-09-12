@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -35,7 +35,7 @@ public class Mule5415TestCase extends FunctionalTestCase {
   public void testFirstRequestDoesntFail() throws Exception {
     MuleClient client = muleContext.getClient();
     client.send(String.format("http://localhost:%s?param1=1&param2=3", port1.getNumber()),
-                MuleMessage.builder().payload("message").mediaType(APPLICATION_X_WWW_FORM_URLENCODED).build(),
+                InternalMessage.builder().payload("message").mediaType(APPLICATION_X_WWW_FORM_URLENCODED).build(),
                 newOptions().method(POST.name()).build())
         .getRight();
   }

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 /**
@@ -26,7 +26,7 @@ public interface RequestResponseFlowProcessingPhaseTemplate extends FlowProcessi
    *         the response using the underlying transport or connector then the exception to throw must be a
    *         {@link ResponseDispatchException}.
    */
-  void sendResponseToClient(MuleEvent muleEvent) throws MuleException;
+  void sendResponseToClient(Event muleEvent) throws MuleException;
 
   /**
    * @param messagingException exception thrown during the flow execution.

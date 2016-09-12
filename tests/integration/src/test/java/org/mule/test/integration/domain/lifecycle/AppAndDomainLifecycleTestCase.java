@@ -13,7 +13,7 @@ import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -42,12 +42,12 @@ public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase {
       secondAppContext = secondApp.setApplicationResources(new String[] {"domain/http/http-hello-world-app.xml"})
           .setDomainContext(domainContext).build();
       firstAppContext.stop();
-      MuleMessage response =
+      InternalMessage response =
           secondAppContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/service/helloWorld",
-                                            MuleMessage.builder().payload("test").build())
+                                            InternalMessage.builder().payload("test").build())
               .getRight();
       assertThat(response, notNullValue());
-      assertThat(secondAppContext.getTransformationService().transform(response, DataType.STRING).getPayload(),
+      assertThat(secondAppContext.getTransformationService().transform(response, DataType.STRING).getPayload().getValue(),
                  is("hello world"));
       assertThat((domainContext.getRegistry().<DefaultHttpListenerConfig>get("sharedListenerConfig")).isStarted(), is(true));
     } finally {

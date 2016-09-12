@@ -8,7 +8,7 @@ package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.LinkedList;
 
@@ -23,12 +23,12 @@ public class SimpleMessageProcessorChainBuilder extends DefaultMessageProcessorC
   }
 
   @Override
-  protected DefaultMessageProcessorChain createInnerChain(LinkedList<MessageProcessor> tempList) {
+  protected DefaultMessageProcessorChain createInnerChain(LinkedList<Processor> tempList) {
     return new SimpleMessageProcessorChain(tempList);
   }
 
   @Override
-  protected DefaultMessageProcessorChain createOuterChain(LinkedList<MessageProcessor> tempList) {
+  protected DefaultMessageProcessorChain createOuterChain(LinkedList<Processor> tempList) {
     return new SimpleMessageProcessorChain(tempList);
   }
 

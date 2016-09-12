@@ -7,8 +7,8 @@
 package org.mule.test.integration.routing;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.routing.AbstractAggregator;
@@ -26,12 +26,12 @@ public class TestAggregator extends AbstractAggregator {
     return new CollectionCorrelatorCallback(muleContext, storePrefix) {
 
       @Override
-      public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
+      public Event aggregateEvents(EventGroup events) throws AggregationException {
         StringBuilder buffer = new StringBuilder(128);
 
         try {
-          for (Iterator<MuleEvent> iterator = events.iterator(); iterator.hasNext();) {
-            MuleEvent event = iterator.next();
+          for (Iterator<Event> iterator = events.iterator(); iterator.hasNext();) {
+            Event event = iterator.next();
             try {
               buffer.append(event.transformMessageToString(muleContext));
             } catch (TransformerException e) {
@@ -43,8 +43,8 @@ public class TestAggregator extends AbstractAggregator {
         }
 
         logger.debug("event payload is: " + buffer.toString());
-        return MuleEvent.builder(events.getMessageCollectionEvent())
-            .message(MuleMessage.builder().payload(buffer.toString()).build()).build();
+        return Event.builder(events.getMessageCollectionEvent())
+            .message(InternalMessage.builder().payload(buffer.toString()).build()).build();
       }
     };
   }

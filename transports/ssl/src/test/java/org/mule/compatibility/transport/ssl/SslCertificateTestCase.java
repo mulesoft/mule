@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -53,7 +53,7 @@ public class SslCertificateTestCase extends FunctionalTestCase {
     for (int i = 0; i < n; ++i) {
       callback.clear();
       String msg = TEST_MESSAGE + n;
-      MuleMessage result = client.send("in", msg, null).getRight();
+      InternalMessage result = client.send("in", msg, null).getRight();
       assertTrue(callback.isCalled());
       assertNotNull("Null certificates", callback.getCertificates());
       assertEquals(msg + " Received", getPayloadAsString(result));

@@ -9,13 +9,13 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -171,7 +171,7 @@ public final class DefaultExtensionManager
       return provider.get().get(muleEvent);
     }
 
-    createImplicitConfiguration(extensionModel, (MuleEvent) muleEvent);
+    createImplicitConfiguration(extensionModel, (Event) muleEvent);
     return getConfiguration(extensionModel, muleEvent);
   }
 
@@ -202,7 +202,7 @@ public final class DefaultExtensionManager
     return extensionRegistry.getConfigurationProvider(configurationProviderName);
   }
 
-  private void createImplicitConfiguration(ExtensionModel extensionModel, MuleEvent muleEvent) {
+  private void createImplicitConfiguration(ExtensionModel extensionModel, Event muleEvent) {
     synchronized (extensionModel) {
       // check that another thread didn't beat us to create the instance
       if (extensionRegistry.getConfigurationProviders(extensionModel).isEmpty()) {

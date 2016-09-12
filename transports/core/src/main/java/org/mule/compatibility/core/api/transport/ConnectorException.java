@@ -8,7 +8,7 @@ package org.mule.compatibility.core.api.transport;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>ConnectorException</code> Is thrown in the context of a Connector, usually some sort of transport level error where the
@@ -34,7 +34,7 @@ public class ConnectorException extends MuleException {
    * @param message the exception message
    * @param connector where the exception occurred or is being thrown
    */
-  public ConnectorException(Message message, Connector connector) {
+  public ConnectorException(I18nMessage message, Connector connector) {
     super(generateMessage(message, connector));
     this.connector = connector;
   }
@@ -44,13 +44,13 @@ public class ConnectorException extends MuleException {
    * @param connector where the exception occurred or is being thrown
    * @param cause the exception that cause this exception to be thrown
    */
-  public ConnectorException(Message message, Connector connector, Throwable cause) {
+  public ConnectorException(I18nMessage message, Connector connector, Throwable cause) {
     super(generateMessage(message, connector), cause);
     this.connector = connector;
   }
 
-  private static Message generateMessage(Message message, Connector connector) {
-    Message m = TransportCoreMessages.connectorCausedError(connector);
+  private static I18nMessage generateMessage(I18nMessage message, Connector connector) {
+    I18nMessage m = TransportCoreMessages.connectorCausedError(connector);
     if (message != null) {
       message.setNextMessage(m);
     }

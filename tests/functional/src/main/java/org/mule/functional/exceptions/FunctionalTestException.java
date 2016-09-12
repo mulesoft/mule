@@ -7,7 +7,7 @@
 package org.mule.functional.exceptions;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 public class FunctionalTestException extends MuleException {
 
@@ -18,6 +18,6 @@ public class FunctionalTestException extends MuleException {
   }
 
   public FunctionalTestException(String exceptionText) {
-    super(MessageFactory.createStaticMessage(exceptionText));
+    super(I18nMessageFactory.createStaticMessage(exceptionText));
   }
 }

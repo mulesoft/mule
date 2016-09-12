@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 /**
@@ -22,7 +22,7 @@ public interface UntilSuccessfulProcessingStrategy {
    * @return the return event from the until-successful execution.
    * @throws MessagingException exception thrown during until-successful execution.
    */
-  MuleEvent route(final MuleEvent event, FlowConstruct flowConstruct) throws MuleException;
+  Event route(final Event event, FlowConstruct flowConstruct) throws MuleException;
 
   /**
    * @param untilSuccessfulConfiguration until successful configuration.

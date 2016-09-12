@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Test;
 
@@ -28,10 +28,10 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractInteg
 
   @Test
   public void testMatch() throws Exception {
-    MuleMessage message = flowRunner("test").withPayload(getMatchMessage()).run().getMessage();
+    InternalMessage message = flowRunner("test").withPayload(getMatchMessage()).run().getMessage();
 
     assertNotNull(message);
-    assertThat(message.getPayload(), is("match"));
+    assertThat(message.getPayload().getValue(), is("match"));
   }
 
   @Test

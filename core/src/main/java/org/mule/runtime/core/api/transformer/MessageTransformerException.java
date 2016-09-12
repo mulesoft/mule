@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.transformer;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * An exception that occurred while transforming a message, thrown by {@link MessageTransformer}s.
@@ -18,12 +18,12 @@ public class MessageTransformerException extends MuleException {
 
   private transient Transformer transformer;
 
-  public MessageTransformerException(Message message, Transformer transformer) {
+  public MessageTransformerException(I18nMessage message, Transformer transformer) {
     super(message);
     this.transformer = transformer;
   }
 
-  public MessageTransformerException(Message message, Transformer transformer, Throwable cause) {
+  public MessageTransformerException(I18nMessage message, Transformer transformer, Throwable cause) {
     super(message, cause);
     this.transformer = transformer;
   }

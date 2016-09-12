@@ -13,7 +13,7 @@ import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.HashSet;
@@ -40,10 +40,10 @@ public class JmsTransactionalCachingTestCase extends FunctionalTestCase {
   public void cachesSession() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null).getRight();
+    InternalMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null).getRight();
     assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
     response = client.send("vm://testInput", TEST_MESSAGE_2, null).getRight();
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     response = client.send("vm://testInput", TEST_MESSAGE_3, null).getRight();
     assertThat(TEST_MESSAGE_3, equalTo(getPayloadAsString(response)));
 

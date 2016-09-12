@@ -7,16 +7,16 @@
 
 package org.mule.extension.db.internal.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class DbMessages extends MessageFactory {
+public class DbMessages extends I18nMessageFactory {
 
   private static final DbMessages factory = new DbMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("db");
 
-  public static Message transactionSetAutoCommitFailed() {
+  public static I18nMessage transactionSetAutoCommitFailed() {
     return factory.createMessage(BUNDLE_PATH, 1);
   }
 }

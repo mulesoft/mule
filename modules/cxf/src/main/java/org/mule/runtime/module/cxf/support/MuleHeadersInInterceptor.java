@@ -12,10 +12,9 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_I
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.util.Set;
@@ -80,9 +79,9 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor {
     }
 
 
-    MuleEvent reqEvent = ((MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT));
+    Event reqEvent = ((Event) message.getExchange().get(CxfConstants.MULE_EVENT));
 
-    MuleMessage.Builder builder = MuleMessage.builder(reqEvent.getMessage());
+    InternalMessage.Builder builder = InternalMessage.builder(reqEvent.getMessage());
 
     // Copy correlation headers nto message
     String replyTo = (String) message.get(MULE_REPLY_TO_PROPERTY);
@@ -94,9 +93,9 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor {
     String corGroupSize = (String) message.get(MULE_CORRELATION_GROUP_SIZE_PROPERTY);
     String corSeq = (String) message.get(MULE_CORRELATION_SEQUENCE_PROPERTY);
 
-    reqEvent = MuleEvent.builder(reqEvent).message(builder.build())
-        .correlation(new Correlation(!corGroupSize.isEmpty() ? parseInt(corGroupSize) : null,
-                                     !corSeq.isEmpty() ? parseInt(corSeq) : null))
+    reqEvent = Event.builder(reqEvent).message(builder.build())
+        .groupCorrelation(new GroupCorrelation(!corGroupSize.isEmpty() ? parseInt(corGroupSize) : null,
+                                               !corSeq.isEmpty() ? parseInt(corSeq) : null))
         .correlationId(corId)
         .build();
 

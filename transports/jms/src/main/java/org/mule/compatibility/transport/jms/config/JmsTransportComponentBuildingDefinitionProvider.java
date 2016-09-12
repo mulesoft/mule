@@ -13,7 +13,7 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleReferenceParameter;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromConfigurationAttribute;
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.compatibility.config.spring.TransportComponentBuildingDefinitionProvider;
 import org.mule.compatibility.transport.jms.JmsClientAcknowledgeTransactionFactory;

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport.service;
 
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 /**
  * <code>TransportServiceNotFoundException</code> is thorown if no matching service endpoint descriptor is found for the connector
@@ -25,7 +25,7 @@ public class TransportServiceNotFoundException extends TransportFactoryException
    * @param location the path of the service
    */
   public TransportServiceNotFoundException(String location) {
-    super(MessageFactory.createStaticMessage(location));
+    super(I18nMessageFactory.createStaticMessage(location));
   }
 
   /**
@@ -33,6 +33,6 @@ public class TransportServiceNotFoundException extends TransportFactoryException
    * @param cause the exception that cause this exception to be thrown
    */
   public TransportServiceNotFoundException(String location, Throwable cause) {
-    super(MessageFactory.createStaticMessage(location), cause);
+    super(I18nMessageFactory.createStaticMessage(location), cause);
   }
 }

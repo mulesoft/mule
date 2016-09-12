@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.config.ExceptionHelper;
@@ -39,7 +39,7 @@ public class CustomSecurityFilterTestCase extends AbstractIntegrationTestCase {
     props.put("username", "ross");
     props.put("pass", "ross");
 
-    MuleEvent event = flowRunner("test").withPayload("hi").withInboundProperties(props).run();
+    Event event = flowRunner("test").withPayload("hi").withInboundProperties(props).run();
 
     assertThat(event.getError().isPresent(), is(false));
 

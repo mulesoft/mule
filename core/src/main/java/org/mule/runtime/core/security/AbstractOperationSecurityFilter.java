@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
@@ -22,20 +22,20 @@ import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 public abstract class AbstractOperationSecurityFilter extends AbstractAuthenticationFilter {
 
   @Override
-  public MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  public Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     return super.doFilter(event);
   }
 
   @Override
-  public MuleEvent authenticate(MuleEvent event)
+  public Event authenticate(Event event)
       throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     // TODO - See MULE-9307 - define proper way to identify if the component should do inbound or outbound authentication
     return authenticateInbound(event);
   }
 
-  protected abstract MuleEvent authenticateInbound(MuleEvent event) throws SecurityException, CryptoFailureException,
+  protected abstract Event authenticateInbound(Event event) throws SecurityException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
 
 }

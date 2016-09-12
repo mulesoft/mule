@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.custommonkey.xmlunit.XMLAssert;
@@ -88,11 +88,11 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
 
   protected Object request(String endpoint, Class<?> clazz) throws MuleException {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request(endpoint, TIMEOUT).getRight().get();
+    InternalMessage message = client.request(endpoint, TIMEOUT).getRight().get();
     assertNotNull(message);
-    assertNotNull(message.getPayload());
-    assertThat(message.getPayload(), instanceOf(clazz));
-    return message.getPayload();
+    assertNotNull(message.getPayload().getValue());
+    assertThat(message.getPayload().getValue(), instanceOf(clazz));
+    return message.getPayload().getValue();
   }
 
   public static class Parent {

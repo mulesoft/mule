@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>CouldNotRouteOutboundMessageException</code> thrown if Mule fails to route the current outbound event.
@@ -20,19 +20,19 @@ public class CouldNotRouteOutboundMessageException extends RoutingException {
    */
   private static final long serialVersionUID = 4609966704030524483L;
 
-  public CouldNotRouteOutboundMessageException(MessageProcessor target) {
+  public CouldNotRouteOutboundMessageException(Processor target) {
     super(target);
   }
 
-  public CouldNotRouteOutboundMessageException(MessageProcessor target, Throwable cause) {
+  public CouldNotRouteOutboundMessageException(Processor target, Throwable cause) {
     super(target, cause);
   }
 
-  public CouldNotRouteOutboundMessageException(Message message, MessageProcessor target) {
+  public CouldNotRouteOutboundMessageException(I18nMessage message, Processor target) {
     super(message, target);
   }
 
-  public CouldNotRouteOutboundMessageException(Message message, MessageProcessor target, Throwable cause) {
+  public CouldNotRouteOutboundMessageException(I18nMessage message, Processor target, Throwable cause) {
     super(message, target, cause);
   }
 }

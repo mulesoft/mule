@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor.simple;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.AttributeEvaluator;
@@ -31,9 +31,9 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (wildcardAttributeEvaluator.hasWildcards()) {
-      AtomicReference<MuleEvent> resultEvent = new AtomicReference<>(event);
+      AtomicReference<Event> resultEvent = new AtomicReference<>(event);
       wildcardAttributeEvaluator.processValues(getPropertyNames(event), matchedValue -> {
         if (logger.isDebugEnabled()) {
           logger.debug(String.format("Removing property: '%s' from scope: '%s'", matchedValue, getScopeName()));
@@ -52,9 +52,9 @@ public abstract class AbstractRemoveVariablePropertyProcessor extends SimpleMess
     }
   }
 
-  protected abstract Set<String> getPropertyNames(MuleEvent event);
+  protected abstract Set<String> getPropertyNames(Event event);
 
-  protected abstract MuleEvent removeProperty(MuleEvent event, String propertyName);
+  protected abstract Event removeProperty(Event event, String propertyName);
 
   @Override
   public Object clone() throws CloneNotSupportedException {

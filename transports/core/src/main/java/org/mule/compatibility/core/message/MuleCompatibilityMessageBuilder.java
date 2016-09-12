@@ -6,16 +6,16 @@
  */
 package org.mule.compatibility.core.message;
 
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.message.Correlation;
-import org.mule.runtime.core.message.DefaultMuleMessageBuilder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.message.DefaultMessageBuilder;
+import org.mule.runtime.core.message.GroupCorrelation;
 
 /**
- * Adds functionality that was available in {@link MuleMessage} in Mule 3.
+ * Adds functionality that was available in {@link Message} in Mule 3.
  *
  * @since 4.0
  */
-public class MuleCompatibilityMessageBuilder extends DefaultMuleMessageBuilder {
+public class MuleCompatibilityMessageBuilder extends DefaultMessageBuilder {
 
   private String correlationId;
   private Integer correlationSequence;
@@ -25,19 +25,20 @@ public class MuleCompatibilityMessageBuilder extends DefaultMuleMessageBuilder {
     super();
   }
 
-  public MuleCompatibilityMessageBuilder(org.mule.runtime.api.message.MuleMessage message) {
+  public MuleCompatibilityMessageBuilder(org.mule.runtime.api.message.Message message) {
     super(message);
 
-    if (message instanceof MuleCompatibilityMessage) {
-      correlationId = ((MuleCompatibilityMessage) message).getCorrelationId();
-      correlationSequence = ((MuleCompatibilityMessage) message).getCorrelation().getSequence().orElse(null);
-      correlationGroupSize = ((MuleCompatibilityMessage) message).getCorrelation().getGroupSize().orElse(null);
+    if (message instanceof CompatibilityMessage) {
+      correlationId = ((CompatibilityMessage) message).getCorrelationId();
+      correlationSequence = ((CompatibilityMessage) message).getCorrelation().getSequence().orElse(null);
+      correlationGroupSize = ((CompatibilityMessage) message).getCorrelation().getGroupSize().orElse(null);
     }
   }
 
   @Override
-  public MuleCompatibilityMessage build() {
-    return new MuleCompatibilityMessage(super.build(), new Correlation(correlationGroupSize, correlationSequence), correlationId);
+  public CompatibilityMessage build() {
+    return new CompatibilityMessage(super.build(), new GroupCorrelation(correlationGroupSize, correlationSequence),
+                                    correlationId);
   }
 
   public MuleCompatibilityMessageBuilder correlationId(String correlationId) {

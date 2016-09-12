@@ -21,7 +21,7 @@ public class PartialReadComponent implements Callable, MuleContextAware {
   @Override
   public Object onCall(MuleEventContext eventContext) throws Exception {
     InputStream stream = (InputStream) muleContext.getTransformationService()
-        .transform(eventContext.getMessage(), DataType.INPUT_STREAM).getPayload();
+        .transform(eventContext.getMessage(), DataType.INPUT_STREAM).getPayload().getValue();
     stream.read();
     return "Hello";
   }

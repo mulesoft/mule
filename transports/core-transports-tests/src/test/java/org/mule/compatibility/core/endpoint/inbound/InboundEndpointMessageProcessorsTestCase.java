@@ -11,11 +11,11 @@ import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populate
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
@@ -30,9 +30,9 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
   private static final String TEST_MESSAGE = "test";
 
   private InboundEndpoint endpoint;
-  private MuleMessage inMessage;
-  private MuleEvent requestEvent;
-  private MuleEvent result;
+  private InternalMessage inMessage;
+  private Event requestEvent;
+  private Event result;
 
   @Override
   protected void doSetUp() throws Exception {
@@ -46,28 +46,28 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
   public void testProcessors() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
-    MessageProcessor mpChain = builder.build();
+    Processor mpChain = builder.build();
 
     result = mpChain.process(requestEvent);
-    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload().getValue());
   }
 
   @Test
   public void testNoProcessors() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
-    MessageProcessor mpChain = builder.build();
+    Processor mpChain = builder.build();
 
     result = mpChain.process(requestEvent);
-    assertEquals(TEST_MESSAGE, result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE, result.getMessage().getPayload().getValue());
   }
 
-  protected MuleMessage createTestRequestMessage() {
-    return MuleMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build();
+  protected InternalMessage createTestRequestMessage() {
+    return InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build();
   }
 
-  protected MuleEvent createTestRequestEvent(InboundEndpoint endpoint) throws Exception {
+  protected Event createTestRequestEvent(InboundEndpoint endpoint) throws Exception {
     Flow flow = getTestFlow();
-    final MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
+    final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
         .session(getTestSession(null, muleContext)).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
   }

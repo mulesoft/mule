@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.module.extension.internal.runtime.ObjectBuilder;
@@ -71,12 +71,12 @@ public class ResolverSet implements ValueResolver<ResolverSetResult> {
   /**
    * Evaluates all the added {@link ValueResolver}s and returns the results into a {@link ResolverSetResult}
    *
-   * @param event a not {@code null} {@link MuleEvent}
+   * @param event a not {@code null} {@link Event}
    * @return a {@link ResolverSetResult}
    * @throws Exception
    */
   @Override
-  public ResolverSetResult resolve(MuleEvent event) throws MuleException {
+  public ResolverSetResult resolve(Event event) throws MuleException {
     ResolverSetResult.Builder builder = ResolverSetResult.newBuilder();
     for (Map.Entry<String, ValueResolver> entry : resolvers.entrySet()) {
       builder.add(entry.getKey(), resolveValue(entry.getValue(), event));
@@ -85,7 +85,7 @@ public class ResolverSet implements ValueResolver<ResolverSetResult> {
     return builder.build();
   }
 
-  private Object resolveValue(ValueResolver<?> resolver, MuleEvent event) throws MuleException {
+  private Object resolveValue(ValueResolver<?> resolver, Event event) throws MuleException {
     Object value = resolver.resolve(event);
     if (value instanceof ValueResolver) {
       return resolveValue((ValueResolver<?>) value, event);

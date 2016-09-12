@@ -15,9 +15,9 @@ import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.chain.ProcessorExecutorFactory;
 
@@ -39,12 +39,12 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   private int responseCount = 1;
   private boolean responseSameThread = true;
 
-  private MessageProcessor next;
+  private Processor next;
   private Thread requestThread;
   private Thread responseThread;
   private CountDownLatch responseLatch;
   private int responseInvocationCount = 0;
-  private MuleEvent responseEvent;
+  private Event responseEvent;
   private boolean responseResult = true;
 
   @Override
@@ -56,17 +56,17 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event == null) {
       return null;
     }
 
     if (event.isAllowNonBlocking() && event.getReplyToHandler() != null) {
       final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-      event = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
+      event = Event.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
         @Override
-        public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+        public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
           return originalReplyToHandler.processReplyTo(processResponse(event), null, null);
         }
 
@@ -76,7 +76,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
         }
       }).build();
     }
-    MuleEvent result = processNext(processRequest(event));
+    Event result = processNext(processRequest(event));
     if (!(result instanceof NonBlockingVoidMuleEvent)) {
       return processResponse(result);
     } else {
@@ -84,12 +84,12 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     }
   }
 
-  public MuleEvent processRequest(MuleEvent event) throws MuleException {
+  public Event processRequest(Event event) throws MuleException {
     requestThread = Thread.currentThread();
     return super.process(event);
   }
 
-  public MuleEvent processResponse(MuleEvent event) throws MuleException {
+  public Event processResponse(Event event) throws MuleException {
     if (event == null || VoidMuleEvent.getInstance().equals(event)) {
       return event;
     }
@@ -101,7 +101,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
     return event;
   }
 
-  private MuleEvent processNext(MuleEvent event) throws MuleException {
+  private Event processNext(Event event) throws MuleException {
     if (event != null || event instanceof VoidMuleEvent) {
       return new ProcessorExecutorFactory()
           .createProcessorExecutor(event, singletonList(next), createExceptionTransformerExecutionTemplate(), false,
@@ -139,7 +139,7 @@ public class ResponseAssertionMessageProcessor extends AssertionMessageProcessor
   }
 
   @Override
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     this.next = listener;
   }
 

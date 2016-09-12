@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -40,7 +40,7 @@ public class ResolverSetTestCase extends AbstractMuleTestCase {
   private Map<ParameterModel, ValueResolver> mapping;
 
   @Mock
-  private MuleEvent event;
+  private Event event;
 
   @Mock
   private MuleContext muleContext;

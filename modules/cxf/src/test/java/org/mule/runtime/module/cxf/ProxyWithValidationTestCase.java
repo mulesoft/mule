@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -36,8 +36,8 @@ public class ProxyWithValidationTestCase extends FunctionalTestCase {
 
   @Test
   public void acceptsRequestWithCData() throws Exception {
-    MuleMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo",
-                                                        getTestMuleMessage(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS)
+    InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo",
+                                                            getTestMuleMessage(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS)
         .getRight();
 
     assertTrue(getPayloadAsString(response).contains("bla"));

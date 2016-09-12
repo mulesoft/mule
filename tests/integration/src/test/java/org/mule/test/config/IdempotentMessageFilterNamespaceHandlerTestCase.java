@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ObjectStore;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
@@ -103,10 +103,10 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends AbstractInt
     assertTrue(flow instanceof Flow);
 
     final Flow simpleFlow = (Flow) flow;
-    final List<MessageProcessor> processors = simpleFlow.getMessageProcessors();
+    final List<Processor> processors = simpleFlow.getMessageProcessors();
     assertEquals(1, processors.size());
 
-    final MessageProcessor firstMP = processors.get(0);
+    final Processor firstMP = processors.get(0);
     assertEquals(IdempotentMessageFilter.class, firstMP.getClass());
 
     return (IdempotentMessageFilter) firstMP;

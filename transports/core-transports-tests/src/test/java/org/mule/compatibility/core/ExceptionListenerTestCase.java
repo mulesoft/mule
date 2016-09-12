@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.AbstractExceptionListener;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -35,7 +35,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testSetGoodEndpointsTransport() throws Exception {
-    List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+    List<Processor> list = new ArrayList<Processor>();
     list.add(Mockito.mock(OutboundEndpoint.class));
     list.add(Mockito.mock(OutboundEndpoint.class));
 

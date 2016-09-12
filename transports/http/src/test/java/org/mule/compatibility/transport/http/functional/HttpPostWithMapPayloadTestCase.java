@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.functional;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -38,8 +38,8 @@ public class HttpPostWithMapPayloadTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://testInput", mapPayload, null);
 
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
-    assertEquals(mapPayload, response.getPayload());
+    InternalMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
+    assertEquals(mapPayload, response.getPayload().getValue());
   }
 
 }

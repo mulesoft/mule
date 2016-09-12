@@ -9,7 +9,7 @@ package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.MESSAGE_PAYLOAD;
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PAYLOAD;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;
 
@@ -19,9 +19,9 @@ import org.mule.mvel2.ast.ASTNode;
 public class PayloadExpressionDataTypeResolver extends AbstractExpressionDataTypeResolver {
 
   @Override
-  protected DataType getDataType(MuleEvent event, ASTNode node) {
+  protected DataType getDataType(Event event, ASTNode node) {
     if (node.isIdentifier() && (PAYLOAD.equals(node.getName()) || MESSAGE_PAYLOAD.equals(node.getName()))) {
-      return event.getMessage().getDataType();
+      return event.getMessage().getPayload().getDataType();
     } else {
       return null;
     }

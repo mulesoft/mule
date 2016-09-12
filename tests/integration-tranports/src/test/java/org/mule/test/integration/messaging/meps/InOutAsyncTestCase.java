@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -29,10 +29,10 @@ public class InOutAsyncTestCase extends FunctionalTestCase {
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage result = client.send("inboundEndpoint",
-                                     MuleMessage.builder().payload("some data")
-                                         // Almost any endpoint can be used here
-                                         .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://client-reply").build())
+    InternalMessage result = client.send("inboundEndpoint",
+                                         InternalMessage.builder().payload("some data")
+                                             // Almost any endpoint can be used here
+                                             .addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://client-reply").build())
         .getRight();
     assertNotNull(result);
     assertEquals("got it!", getPayloadAsString(result));

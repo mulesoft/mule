@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.pgp;
 
-public class LiteralMessage implements Message {
+public class LiteralMessage implements PgpMessage {
 
   private byte[] raw;
 

@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer.compression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.compression.GZipCompression;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer {
         }
       }
     } catch (IOException e) {
-      throw new TransformerException(MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
+      throw new TransformerException(I18nMessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
     }
   }
 }

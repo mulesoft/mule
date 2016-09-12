@@ -10,7 +10,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.errorInvokingMessag
 import static org.mule.runtime.core.execution.TransactionalErrorHandlingExecutionTemplate.createScopeExecutionTemplate;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -26,9 +26,9 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 /**
- * Wraps the invocation of the next {@link org.mule.runtime.core.api.processor.MessageProcessor} with a transaction. If the
+ * Wraps the invocation of the next {@link org.mule.runtime.core.api.processor.Processor} with a transaction. If the
  * {@link org.mule.runtime.core.api.transaction.TransactionConfig} is null then no transaction is used and the next
- * {@link org.mule.runtime.core.api.processor.MessageProcessor} is invoked directly.
+ * {@link org.mule.runtime.core.api.processor.Processor} is invoked directly.
  */
 public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle {
 
@@ -36,13 +36,13 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
   protected MuleTransactionConfig transactionConfig;
 
   @Override
-  public MuleEvent process(final MuleEvent event) throws MuleException {
+  public Event process(final Event event) throws MuleException {
     if (next == null) {
       return event;
     } else {
-      ExecutionTemplate<MuleEvent> executionTemplate =
+      ExecutionTemplate<Event> executionTemplate =
           createScopeExecutionTemplate(muleContext, flowConstruct, transactionConfig, exceptionListener);
-      ExecutionCallback<MuleEvent> processingCallback = () -> processNext(event);
+      ExecutionCallback<Event> processingCallback = () -> processNext(event);
 
       try {
         return executionTemplate.execute(processingCallback);

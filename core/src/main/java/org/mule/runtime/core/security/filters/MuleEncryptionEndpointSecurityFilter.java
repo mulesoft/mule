@@ -8,7 +8,7 @@ package org.mule.runtime.core.security.filters;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.Credentials;
@@ -38,7 +38,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractOperationSecur
   }
 
   @Override
-  protected MuleEvent authenticateInbound(MuleEvent event) throws SecurityException, SecurityProviderNotFoundException,
+  protected Event authenticateInbound(Event event) throws SecurityException, SecurityProviderNotFoundException,
       CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     String userHeader = (String) getCredentialsAccessor().getCredentials(event);
     if (userHeader == null) {

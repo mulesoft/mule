@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.routing.filters.logic;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.ObjectFilter;
 
@@ -32,7 +32,7 @@ public class OrFilter extends AbstractFilterCollection {
   }
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     for (Filter filter : getFilters()) {
       if (filter.accept(message, builder)) {
         return true;

@@ -13,7 +13,7 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGI
 
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.File;
 import java.io.InputStream;
@@ -22,8 +22,8 @@ import java.nio.charset.Charset;
 import javax.activation.MimetypesFileTypeMap;
 
 /**
- * <code>FileMuleMessageFactory</code> creates a new {@link MuleMessage} with a {@link File} or {@link InputStream} payload. Users
- * can obtain the filename and directory in the properties using <code>FileConnector.PROPERTY_FILENAME</code> and
+ * <code>FileMuleMessageFactory</code> creates a new {@link Message} with a {@link File} or {@link InputStream} payload. Users can
+ * obtain the filename and directory in the properties using <code>FileConnector.PROPERTY_FILENAME</code> and
  * <code>FileConnector.PROPERTY_DIRECTORY</code>.
  */
 public class FileMuleMessageFactory extends AbstractMuleMessageFactory {
@@ -66,7 +66,7 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory {
     return file;
   }
 
-  protected void setPropertiesFromFile(MuleMessage.Builder messageBuilder, File file) {
+  protected void setPropertiesFromFile(InternalMessage.Builder messageBuilder, File file) {
     messageBuilder.addInboundProperty(PROPERTY_ORIGINAL_FILENAME, file.getName());
     messageBuilder.addInboundProperty(PROPERTY_DIRECTORY, file.getParent());
     messageBuilder.addInboundProperty(PROPERTY_FILE_SIZE, file.length());

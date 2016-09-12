@@ -9,7 +9,7 @@ package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
 
   @Test
   public void payloadIsIgnoredOperationNoParams() throws Exception {
-    MuleEvent event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
+    Event event = flowRunner("noParams").withPayload(TEST_MESSAGE).run();
     String expectedResponse = "<ns:noParamsResponse xmlns:ns=\"http://consumer.ws.module.runtime.mule.org/\">"
         + "<text>TEST</text></ns:noParamsResponse>";
     assertXMLEqual(expectedResponse, getPayloadAsString(event.getMessage()));
@@ -31,7 +31,7 @@ public class NoParamsFunctionalTestCase extends AbstractWSConsumerFunctionalTest
   @Test
   public void payloadIsIgnoredOperationNoParamsWithHeaders() throws Exception {
     String header = "<header xmlns=\"http://consumer.ws.module.runtime.mule.org/\">HEADER_VALUE</header>";
-    MuleEvent event =
+    Event event =
         flowRunner("noParamsWithHeader").withPayload(TEST_MESSAGE).withOutboundProperty("soap.header", header).run();
 
     String expectedResponse = "<ns2:noParamsWithHeaderResponse xmlns:ns2=\"http://consumer.ws.module.runtime.mule.org/\">"

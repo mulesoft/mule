@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.http;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 
 import java.io.IOException;
@@ -17,9 +17,9 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 public class StreamPayloadRequestEntity implements RequestEntity {
 
   private OutputHandler outputHandler;
-  private MuleEvent event;
+  private Event event;
 
-  public StreamPayloadRequestEntity(OutputHandler outputHandler, MuleEvent event) {
+  public StreamPayloadRequestEntity(OutputHandler outputHandler, Event event) {
     this.outputHandler = outputHandler;
     this.event = event;
   }

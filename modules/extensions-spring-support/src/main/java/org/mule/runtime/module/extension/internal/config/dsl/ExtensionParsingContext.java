@@ -55,11 +55,11 @@ public class ExtensionParsingContext {
   }
 
   /**
-   * Returns a {@link List} with all the declared {@link MetadataType} subtypes
-   * for the indicated {@link MetadataType} {@code type}.
+   * Returns a {@link List} with all the declared {@link MetadataType} subtypes for the indicated {@link MetadataType}
+   * {@code type}.
    * <p>
-   * Lookup will be performed first by {@link TypeIdAnnotation typeId},
-   * defaulting to {@link MetadataType type} comparison if no {@link TypeIdAnnotation typeId} was found
+   * Lookup will be performed first by {@link TypeIdAnnotation typeId}, defaulting to {@link MetadataType type} comparison if no
+   * {@link TypeIdAnnotation typeId} was found
    *
    * @param type the {@link MetadataType} for which to retrieve its declared subTypes
    * @return a {@link List} with all the declared subtypes for the indicated {@link MetadataType}

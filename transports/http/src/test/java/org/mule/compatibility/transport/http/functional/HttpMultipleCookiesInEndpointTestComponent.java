@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.http.functional;
 
 import org.mule.compatibility.transport.http.CookieHelper;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.io.Serializable;
@@ -25,7 +25,7 @@ public class HttpMultipleCookiesInEndpointTestComponent implements Callable {
   public Object onCall(MuleEventContext muleEventContext) throws Exception {
     String response = "NO COOKIE FOUND!";
 
-    MuleMessage message = muleEventContext.getMessage();
+    InternalMessage message = muleEventContext.getMessage();
     Serializable cookiesProperty = message.getInboundProperty("cookies");
 
     logger.info("****************** Got cookies property: " + cookiesProperty.getClass().getName());

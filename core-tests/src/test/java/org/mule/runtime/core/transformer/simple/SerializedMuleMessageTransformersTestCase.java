@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
@@ -29,7 +29,7 @@ import org.junit.Ignore;
 
 public class SerializedMuleMessageTransformersTestCase extends AbstractTransformerTestCase {
 
-  private MuleMessage testObject = null;
+  private InternalMessage testObject = null;
 
   @Override
   protected void doSetUp() throws Exception {
@@ -37,10 +37,10 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     props.put("object", new Apple());
     props.put("number", 1);
     props.put("string", "hello");
-    testObject = MuleMessage.builder().payload("test").outboundProperties(props).build();
+    testObject = InternalMessage.builder().payload("test").outboundProperties(props).build();
 
     Flow flow = getTestFlow();
-    setCurrentEvent(MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(testObject).flow(flow)
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(testObject).flow(flow)
         .session(MuleTestUtils.getTestSession(muleContext)).build());
   }
 
@@ -111,9 +111,9 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     if (src == null || result == null) {
       return false;
     }
-    if (src instanceof MuleMessage && result instanceof MuleMessage) {
-      MuleMessage sourceMuleMessage = (MuleMessage) src;
-      MuleMessage resultMuleMessage = (MuleMessage) result;
+    if (src instanceof InternalMessage && result instanceof InternalMessage) {
+      InternalMessage sourceMuleMessage = (InternalMessage) src;
+      InternalMessage resultMuleMessage = (InternalMessage) result;
 
       boolean payloadsAreEqual = comparePayloads(sourceMuleMessage, resultMuleMessage);
       boolean objectPropertiesAreEqual = compareObjectProperties(sourceMuleMessage, resultMuleMessage);
@@ -126,25 +126,25 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
     }
   }
 
-  private boolean comparePayloads(MuleMessage src, MuleMessage result) {
-    Object sourcePayload = src.getPayload();
-    Object resultPayload = result.getPayload();
+  private boolean comparePayloads(InternalMessage src, InternalMessage result) {
+    Object sourcePayload = src.getPayload().getValue();
+    Object resultPayload = result.getPayload().getValue();
     return sourcePayload.equals(resultPayload);
   }
 
-  private boolean compareObjectProperties(MuleMessage src, MuleMessage result) {
+  private boolean compareObjectProperties(InternalMessage src, InternalMessage result) {
     Object sourceObjectProperty = src.getOutboundProperty("object");
     Object resultObjectProperty = result.getOutboundProperty("object");
     return sourceObjectProperty.equals(resultObjectProperty);
   }
 
-  private boolean compareStringProperties(MuleMessage src, MuleMessage result) {
+  private boolean compareStringProperties(InternalMessage src, InternalMessage result) {
     Object sourceStringProperty = src.getOutboundProperty("string");
     Object resultStringProperty = result.getOutboundProperty("string");
     return sourceStringProperty.equals(resultStringProperty);
   }
 
-  private boolean compareIntProperties(MuleMessage src, MuleMessage result) {
+  private boolean compareIntProperties(InternalMessage src, InternalMessage result) {
     int sourceIntProperty = src.getOutboundProperty("number", -1);
     int resultIntProperty = result.getOutboundProperty("number", -2);
     return (sourceIntProperty == resultIntProperty);

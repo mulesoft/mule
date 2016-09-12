@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.core.api.Event;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -64,9 +64,9 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
   }
 
   private void testWithPath(String path) throws Exception {
-    MuleEvent response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
+    Event response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
     Serializable attributes = response.getMessage().getAttributes();
     assertThat(attributes, instanceOf(HttpResponseAttributes.class));
-    assertThat(((MultiPartPayload) response.getMessage().getPayload()).getParts(), hasSize(1));
+    assertThat(((MultiPartContent) response.getMessage().getPayload().getValue()).getParts(), hasSize(1));
   }
 }

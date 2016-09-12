@@ -16,9 +16,9 @@ import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.transport.jms.i18n.JmsMessages;
 import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.util.StringMessageUtils;
@@ -58,7 +58,7 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
   }
 
   @Override
-  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+  public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
     Destination replyToDestination = null;
     MessageProducer replyToProducer = null;
     Session session = null;
@@ -81,7 +81,7 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
 
       returnMessage =
           muleContext.getTransformationService().applyTransformers(returnMessage, null, defaultTransportTransformers);
-      Object payload = returnMessage.getPayload();
+      Object payload = returnMessage.getPayload().getValue();
 
       if (replyToDestination instanceof Topic && replyToDestination instanceof Queue
           && jmsConnector.getJmsSupport() instanceof Jms102bSupport) {
@@ -107,7 +107,7 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
       replyToProducer = jmsConnector.getJmsSupport().createProducer(session, replyToDestination, topic);
 
       // QoS support
-      MuleMessage eventMsg = event.getMessage();
+      InternalMessage eventMsg = event.getMessage();
       String ttlString = (String) eventMsg.getOutboundProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
       String priorityString = (String) eventMsg.getOutboundProperty(JmsConstants.PRIORITY_PROPERTY);
       String persistentDeliveryString = (String) eventMsg.getOutboundProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
@@ -149,12 +149,12 @@ public class JmsReplyToHandler extends EndpointReplyToHandler {
     }
   }
 
-  protected void processMessage(Message replyToMessage, MuleEvent event) throws JMSException {
+  protected void processMessage(Message replyToMessage, Event event) throws JMSException {
     replyToMessage.setJMSReplyTo(null);
 
     // If JMS correlation ID exists in the incoming message - use it for the outbound message;
     // otherwise use JMS Message ID
-    MuleMessage eventMsg = event.getMessage();
+    InternalMessage eventMsg = event.getMessage();
     String jmsCorrelationId = eventMsg.getInboundProperty("JMSCorrelationID");
     if (jmsCorrelationId == null) {
       jmsCorrelationId = eventMsg.getInboundProperty("JMSMessageID");

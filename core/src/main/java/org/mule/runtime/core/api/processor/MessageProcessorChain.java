@@ -13,8 +13,8 @@ import java.util.List;
 /**
  *
  */
-public interface MessageProcessorChain extends MessageProcessor, NamedObject {
+public interface MessageProcessorChain extends Processor, NamedObject {
 
-  List<MessageProcessor> getMessageProcessors();
+  List<Processor> getMessageProcessors();
 
 }

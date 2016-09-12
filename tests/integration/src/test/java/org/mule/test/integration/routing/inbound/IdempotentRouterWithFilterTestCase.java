@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -33,11 +33,11 @@ public class IdempotentRouterWithFilterTestCase extends AbstractIntegrationTestC
   public void testWithValidData() throws Exception {
     flowRunner("IdempotentPlaceHolder").withPayload("Mule is the best!").asynchronously().run();
     MuleClient myClient = muleContext.getClient();
-    MuleMessage response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(response);
-    assertNotNull(response.getPayload());
-    assertThat(response.getPayload(), is("Mule is the best!"));
+    assertNotNull(response.getPayload().getValue());
+    assertThat(response.getPayload().getValue(), is("Mule is the best!"));
   }
 
   /**

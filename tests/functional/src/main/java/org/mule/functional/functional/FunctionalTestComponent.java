@@ -6,15 +6,15 @@
  */
 package org.mule.functional.functional;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -134,7 +134,7 @@ public class FunctionalTestComponent
 
   private Object getMessageFromContext(MuleEventContext context) throws MuleException {
     if (isDoInboundTransform()) {
-      Object o = context.getMessage().getPayload();
+      Object o = context.getMessage().getPayload().getValue();
       if (getAppendString() != null && !(o instanceof String)) {
         o = context.transformMessageToString(muleContext);
       }
@@ -142,7 +142,7 @@ public class FunctionalTestComponent
     } else if (getAppendString() != null) {
       return context.getMessageAsString(muleContext);
     } else {
-      return context.getMessage().getPayload();
+      return context.getMessage().getPayload().getValue();
     }
   }
 
@@ -197,7 +197,7 @@ public class FunctionalTestComponent
    * @param event the current event
    * @return a concatenated string of the current payload and the appendString
    */
-  protected String append(String contents, MuleEvent event) {
+  protected String append(String contents, Event event) {
     return contents + muleContext.getExpressionLanguage().parse(appendString, event, flowConstruct);
   }
 
@@ -224,12 +224,12 @@ public class FunctionalTestComponent
       logger.info(msg);
     }
 
-    final MuleMessage message = context.getMessage();
+    final InternalMessage message = context.getMessage();
     if (isLogMessageDetails() && logger.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
 
       sb.append("Full Message payload: ").append(SystemUtils.LINE_SEPARATOR);
-      sb.append(message.getPayload().toString()).append(SystemUtils.LINE_SEPARATOR);
+      sb.append(message.getPayload().getValue().toString()).append(SystemUtils.LINE_SEPARATOR);
       sb.append(StringMessageUtils.headersToString(message));
       logger.info(sb.toString());
     }

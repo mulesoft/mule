@@ -8,7 +8,7 @@ package org.mule.test.module.http.functional.listener;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -57,8 +57,8 @@ public class HttpListenerParseRequestTestCase extends AbstractHttpTestCase {
   }
 
   private void assertMessageContains(Class type) throws Exception {
-    final MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(message.getPayload(), instanceOf(type));
+    final InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    assertThat(message.getPayload().getValue(), instanceOf(type));
   }
 
   private String getUrl(String path, int port) {

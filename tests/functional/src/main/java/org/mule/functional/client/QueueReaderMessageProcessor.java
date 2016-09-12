@@ -9,15 +9,15 @@ package org.mule.functional.client;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.StringUtils;
 
 /**
- * Reads {@link MuleEvent} from a test connector's queue.
+ * Reads {@link Event} from a test connector's queue.
  */
-public class QueueReaderMessageProcessor implements MessageProcessor {
+public class QueueReaderMessageProcessor implements Processor {
 
   private final MuleContext muleContext;
   private final String queueName;
@@ -43,7 +43,7 @@ public class QueueReaderMessageProcessor implements MessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     TestConnectorConfig connectorConfig = muleContext.getRegistry().lookupObject(TestConnectorConfig.DEFAULT_CONFIG_ID);
 
     if (timeout == null) {

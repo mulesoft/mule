@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.interceptor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 /**
@@ -20,23 +20,23 @@ public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor {
     super();
   }
 
-  public ProcessingTimeInterceptor(MessageProcessor next) {
+  public ProcessingTimeInterceptor(Processor next) {
     setListener(next);
   }
 
   @Override
-  public MuleEvent before(MuleEvent event) throws MuleException {
+  public Event before(Event event) throws MuleException {
     return event;
   }
 
   @Override
-  public MuleEvent after(MuleEvent event) throws MuleException {
+  public Event after(Event event) throws MuleException {
     return event;
   }
 
 
   @Override
-  public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
+  public Event last(Event event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException {
     if (time != null) {
       time.addFlowExecutionBranchTime(startTime);
     }

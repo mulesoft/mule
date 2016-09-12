@@ -7,7 +7,7 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.emptyMap;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,48 +19,48 @@ import java.util.Set;
  */
 public class FlowVariableMapContext extends AbstractMapContext<Object> {
 
-  private MuleEvent event;
-  private MuleEvent.Builder eventBuider;
+  private Event event;
+  private Event.Builder eventBuider;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public FlowVariableMapContext(MuleEvent event, MuleEvent.Builder eventBuider) {
+  public FlowVariableMapContext(Event event, Event.Builder eventBuider) {
     this.event = event;
     this.eventBuider = eventBuider;
   }
 
   @Override
   public Object doGet(String key) {
-    return event.getFlowVariable(key);
+    return event.getVariable(key);
   }
 
   @Override
   public void doPut(String key, Object value) {
-    eventBuider.addFlowVariable(key, value);
+    eventBuider.addVariable(key, value);
     event = eventBuider.build();
   }
 
   @Override
   public void doRemove(String key) {
-    eventBuider.removeFlowVariable(key);
+    eventBuider.removeVariable(key);
     event = eventBuider.build();
   }
 
   @Override
   public Set<String> keySet() {
-    return event.getFlowVariableNames();
+    return event.getVariableNames();
   }
 
   @Override
   public void clear() {
-    eventBuider.flowVariables(emptyMap());
+    eventBuider.variables(emptyMap());
     event = eventBuider.build();
   }
 
   @Override
   public String toString() {
     Map<String, Object> map = new HashMap<String, Object>();
-    for (String key : event.getFlowVariableNames()) {
-      Object value = event.getFlowVariable(key);
+    for (String key : event.getVariableNames()) {
+      Object value = event.getVariable(key);
       map.put(key, value);
     }
     return map.toString();

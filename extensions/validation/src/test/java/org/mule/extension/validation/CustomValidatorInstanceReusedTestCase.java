@@ -9,7 +9,7 @@ package org.mule.extension.validation;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 
@@ -43,7 +43,7 @@ public class CustomValidatorInstanceReusedTestCase extends ValidationTestCase {
   public static class TestValidator implements Validator {
 
     @Override
-    public ValidationResult validate(MuleEvent event) {
+    public ValidationResult validate(Event event) {
       executedValidators.add(this);
       return ok();
     }

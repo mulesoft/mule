@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.api.routing;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>ResponseTimeoutException</code> is thrown when a response is not received in a given timeout in the Response Router.
@@ -20,11 +20,11 @@ public class ResponseTimeoutException extends RoutingException {
    */
   private static final long serialVersionUID = 6882278747922113240L;
 
-  public ResponseTimeoutException(Message message, MessageProcessor target) {
+  public ResponseTimeoutException(I18nMessage message, Processor target) {
     super(message, target);
   }
 
-  public ResponseTimeoutException(Message message, MessageProcessor target, Throwable cause) {
+  public ResponseTimeoutException(I18nMessage message, Processor target, Throwable cause) {
     super(message, target, cause);
   }
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.xml.transformer;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.xml.util.XMLUtils;
@@ -32,8 +32,8 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
   private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset encoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+  public Object transformMessage(Event event, Charset encoding) throws TransformerException {
+    Object src = event.getMessage().getPayload().getValue();
     try {
       Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
       if (sourceDoc == null) {

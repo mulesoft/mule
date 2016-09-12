@@ -8,7 +8,7 @@ package org.mule.extension.ftp.internal.sftp.connection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.extension.ftp.internal.sftp.command.SftpCopyCommand;

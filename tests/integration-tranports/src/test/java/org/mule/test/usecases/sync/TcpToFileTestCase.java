@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class TcpToFileTestCase extends FunctionalTestCase {
 
     client.send("tcp://localhost:4444", payload, null);
 
-    MuleMessage msg = client.request("file://temp/tests/mule", 10000).getRight().get();
+    InternalMessage msg = client.request("file://temp/tests/mule", 10000).getRight().get();
     assertNotNull(msg);
     assertEquals(payload, getPayloadAsString(msg));
   }

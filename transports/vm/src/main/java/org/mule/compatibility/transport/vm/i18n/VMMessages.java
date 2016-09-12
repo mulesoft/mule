@@ -7,20 +7,20 @@
 package org.mule.compatibility.transport.vm.i18n;
 
 import org.mule.compatibility.transport.vm.VMConnector;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class VMMessages extends MessageFactory {
+public class VMMessages extends I18nMessageFactory {
 
   private static final VMMessages factory = new VMMessages();
 
   private static final String BUNDLE_PATH = getBundlePath(VMConnector.VM);
 
-  public static Message noReceiverForEndpoint(String name, Object uri) {
+  public static I18nMessage noReceiverForEndpoint(String name, Object uri) {
     return factory.createMessage(BUNDLE_PATH, 1, name, uri);
   }
 
-  public static Message queueIsFull(String queueName, int maxCapacity) {
+  public static I18nMessage queueIsFull(String queueName, int maxCapacity) {
     return factory.createMessage(BUNDLE_PATH, 2, queueName, maxCapacity);
   }
 }

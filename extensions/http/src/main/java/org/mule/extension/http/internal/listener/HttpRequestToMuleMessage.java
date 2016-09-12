@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.internal.multipart.HttpPartDataSource
 import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMediaType;
 
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.IOUtils;
@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component that transforms an HTTP request to a proper {@link MuleMessage}.
+ * Component that transforms an HTTP request to a proper {@link Message}.
  *
  * @since 4.0
  */
@@ -41,8 +41,8 @@ public class HttpRequestToMuleMessage {
 
   private static Logger logger = LoggerFactory.getLogger(HttpRequestToMuleMessage.class);
 
-  public static MuleMessage transform(final HttpRequestContext requestContext, final MuleContext muleContext,
-                                      Boolean parseRequest, ListenerPath listenerPath)
+  public static Message transform(final HttpRequestContext requestContext, final MuleContext muleContext,
+                                  Boolean parseRequest, ListenerPath listenerPath)
       throws HttpRequestParsingException {
     final HttpRequest request = requestContext.getRequest();
 
@@ -84,7 +84,7 @@ public class HttpRequestToMuleMessage {
 
     HttpRequestAttributes attributes =
         new HttpRequestAttributesBuilder().setRequestContext(requestContext).setListenerPath(listenerPath).build();
-    return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
+    return Message.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
   }
 
 }

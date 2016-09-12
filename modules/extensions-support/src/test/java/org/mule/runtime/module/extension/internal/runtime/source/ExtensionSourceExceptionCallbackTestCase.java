@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -27,7 +27,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ExtensionSourceExceptionCallbackTestCase extends AbstractMuleTestCase {
 
   @Mock
-  private MuleEvent event;
+  private Event event;
 
   @Mock
   private ResponseCompletionCallback responseCallback;

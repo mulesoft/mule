@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.xml.functional.AbstractXmlFunctionalTestCase;
 import org.mule.test.xml.functional.XmlTransformerFunctionalTestCase;
@@ -84,12 +84,12 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
   protected Object request(String endpoint, Class<?> clazz) throws MuleException {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage message = client.request(endpoint, TIMEOUT * 2).getRight().get();
+    InternalMessage message = client.request(endpoint, TIMEOUT * 2).getRight().get();
     assertNotNull(message);
-    assertNotNull(message.getPayload());
+    assertNotNull(message.getPayload().getValue());
 
-    assertThat(message.getPayload(), instanceOf(clazz));
-    return message.getPayload();
+    assertThat(message.getPayload().getValue(), instanceOf(clazz));
+    return message.getPayload().getValue();
   }
 
   public static class Parent {

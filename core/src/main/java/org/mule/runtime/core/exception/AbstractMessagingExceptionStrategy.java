@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.core.exception;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -43,7 +43,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
   }
 
   @Override
-  public MuleEvent handleException(MessagingException ex, MuleEvent event) {
+  public Event handleException(MessagingException ex, Event event) {
     try {
       muleContext.getNotificationManager()
           .fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_START));
@@ -55,27 +55,27 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
       // Throwable t = ExceptionHelper.getRootException(ex);
 
       logException(ex, event);
-      MuleEvent handledEvent = doHandleException(ex, event);
+      Event handledEvent = doHandleException(ex, event);
       if (!(handledEvent instanceof VoidMuleEvent)) {
         event = handledEvent;
       }
 
       ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
       if (getCurrentEvent() != null) {
-        MuleEvent currentEvent = getCurrentEvent();
-        currentEvent = MuleEvent.builder(currentEvent)
-            .message(MuleMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
+        Event currentEvent = getCurrentEvent();
+        currentEvent = Event.builder(currentEvent)
+            .message(InternalMessage.builder(currentEvent.getMessage()).exceptionPayload(exceptionPayload).build()).build();
         setCurrentEvent(currentEvent);
       }
 
-      return MuleEvent.builder(event)
-          .message(MuleMessage.builder(event.getMessage()).nullPayload().exceptionPayload(exceptionPayload).build()).build();
+      return Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage()).nullPayload().exceptionPayload(exceptionPayload).build()).build();
     } finally {
       muleContext.getNotificationManager().fireNotification(new ExceptionStrategyNotification(event, flowConstruct, PROCESS_END));
     }
   }
 
-  protected MuleEvent doHandleException(Exception ex, MuleEvent event) {
+  protected Event doHandleException(Exception ex, Event event) {
     FlowConstructStatistics statistics = flowConstruct.getStatistics();
     if (statistics != null && statistics.isEnabled()) {
       statistics.incExecutionError();
@@ -84,7 +84,7 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     // Left this here for backwards-compatibility, remove in the next major version.
     defaultHandler(ex);
 
-    MuleEvent result;
+    Event result;
 
     if (isRollback(ex)) {
       logger.debug("Rolling back transaction");

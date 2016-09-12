@@ -10,7 +10,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.Collections;
 
@@ -81,9 +81,9 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder {
     setRetryPolicyTemplate(source.getRetryPolicyTemplate());
     setExchangePattern(source.getExchangePattern());
     setMuleContext(source.getMuleContext());
-    setMessageProcessors(source.getMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList()
+    setMessageProcessors(source.getMessageProcessors().isEmpty() ? Collections.<Processor>emptyList()
         : source.getMessageProcessors());
-    setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<MessageProcessor>emptyList()
+    setResponseMessageProcessors(source.getResponseMessageProcessors().isEmpty() ? Collections.<Processor>emptyList()
         : source.getResponseMessageProcessors());
     setDisableTransportTransformer(source.isDisableTransportTransformer());
     setMimeType(source.getMimeType() != null ? source.getMimeType().toRfcString() : null);

@@ -13,11 +13,11 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -87,11 +87,11 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).responseTimeout(TIMEOUT).build();
-    MuleMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions).getRight();
+    InternalMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions).getRight();
     assertResponse(response);
   }
 
-  private void assertResponse(MuleMessage response) throws Exception {
+  private void assertResponse(InternalMessage response) throws Exception {
     assertThat(response, IsNull.<Object>notNullValue());
     // compare the structure and values but not the attributes' order
     ObjectMapper mapper = new ObjectMapper();
@@ -105,35 +105,36 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testCatchWithComponent() throws Exception {
-    MuleMessage result = flowRunner("catchWithComponent").withPayload(MESSAGE).run().getMessage();
+    InternalMessage result = flowRunner("catchWithComponent").withPayload(MESSAGE).run().getMessage();
     assertThat(result, IsNull.<Object>notNullValue());
     assertThat(getPayloadAsString(result), Is.is(MESSAGE + " Caught"));
   }
 
   @Test
   public void testFullyDefinedCatchExceptionStrategyWithComponent() throws Exception {
-    MuleMessage result = flowRunner("fullyDefinedCatchExceptionStrategyWithComponent").withPayload(MESSAGE).run().getMessage();
+    InternalMessage result =
+        flowRunner("fullyDefinedCatchExceptionStrategyWithComponent").withPayload(MESSAGE).run().getMessage();
     assertThat(result, IsNull.<Object>notNullValue());
     assertThat(getPayloadAsString(result), Is.is(MESSAGE + " apt1 apt2 groovified"));
   }
 
   @Test
   public void onErrorTypeMatch() throws Exception {
-    MuleMessage result = flowRunner("onErrorTypeMatch").withPayload(MESSAGE).run().getMessage();
+    InternalMessage result = flowRunner("onErrorTypeMatch").withPayload(MESSAGE).run().getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2"));
   }
 
   @Test
   public void onErrorTypeMatchAny() throws Exception {
-    MuleMessage result = flowRunner("onErrorTypeMatchAny").withPayload(MESSAGE).run().getMessage();
+    InternalMessage result = flowRunner("onErrorTypeMatchAny").withPayload(MESSAGE).run().getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is(MESSAGE + " apt1 apt2"));
   }
 
   @Test
   public void onErrorTypeMatchSeveral() throws Exception {
-    MuleMessage result = flowRunner("onErrorTypeMatchSeveral").withPayload(true).run().getMessage();
+    InternalMessage result = flowRunner("onErrorTypeMatchSeveral").withPayload(true).run().getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is("true apt1 apt2"));
 
@@ -142,23 +143,23 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
     assertThat(getPayloadAsString(result), is("false apt1 apt2"));
   }
 
-  public static class LoadNewsProcessor extends AbstractAnnotatedObject implements MessageProcessor {
+  public static class LoadNewsProcessor extends AbstractAnnotatedObject implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      NewsRequest newsRequest = (NewsRequest) event.getMessage().getPayload();
+    public Event process(Event event) throws MuleException {
+      NewsRequest newsRequest = (NewsRequest) event.getMessage().getPayload().getValue();
       NewsResponse newsResponse = new NewsResponse();
       newsResponse.setUserId(newsRequest.getUserId());
       newsResponse.setTitle("News title");
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(newsResponse).build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(newsResponse).build()).build();
     }
   }
 
-  public static class NewsErrorProcessor extends AbstractAnnotatedObject implements MessageProcessor {
+  public static class NewsErrorProcessor extends AbstractAnnotatedObject implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      ((NewsResponse) event.getMessage().getPayload()).setErrorMessage(ERROR_PROCESSING_NEWS);
+    public Event process(Event event) throws MuleException {
+      ((NewsResponse) event.getMessage().getPayload().getValue()).setErrorMessage(ERROR_PROCESSING_NEWS);
       return event;
     }
   }

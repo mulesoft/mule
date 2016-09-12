@@ -12,10 +12,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.construct.Flow;
@@ -43,7 +43,8 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
   @Test
   public void sessionPropertyAfterSplitterAndAggregator() throws MuleException {
     final MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", TEST_MESSAGE, null).getRight();
+    InternalMessage response =
+        client.send("http://localhost:" + dynamicPort1.getNumber() + "/test", TEST_MESSAGE, null).getRight();
     assertNotNull(response);
   }
 
@@ -55,11 +56,11 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
     for (int i = 0; i < numberOfElements; i++) {
       inputData.add(String.valueOf(i));
     }
-    MuleEvent responseEvent = flow.process(getTestEvent(inputData));
+    Event responseEvent = flow.process(getTestEvent(inputData));
     assertThat(((List<String>) responseEvent.getSession().<List>getProperty("recordsToUpdate")).size(), is(numberOfElements));
   }
 
-  private void assertNotNull(MuleMessage response) {
+  private void assertNotNull(InternalMessage response) {
     Assert.assertNotNull(response);
   }
 

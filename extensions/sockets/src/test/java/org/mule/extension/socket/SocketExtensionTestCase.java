@@ -11,9 +11,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
+
 import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.ValueHolder;
@@ -48,7 +49,7 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
    */
   protected static final int REPETITIONS = 3;
 
-  protected static List<MuleMessage> receivedMessages;
+  protected static List<Message> receivedMessages;
 
 
   protected static final String NAME = "Messi";
@@ -63,8 +64,8 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
   @Rule
   public ExpectedException expectedException = none();
 
-  protected void assertPojo(MuleMessage message, TestPojo expectedContent) throws Exception {
-    if (message.getPayload() == null) {
+  protected void assertPojo(Message message, TestPojo expectedContent) throws Exception {
+    if (message.getPayload().getValue() == null) {
       fail("Null payload");
     }
 
@@ -97,7 +98,7 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
 
     @SuppressWarnings("unused")
     public Object onCall(MessageContext messageContext) throws Exception {
-      MuleMessage message = MuleMessage.builder().payload(messageContext.getPayload())
+      Message message = Message.builder().payload(messageContext.getPayload())
           .mediaType(messageContext.getDataType().getMediaType()).attributes(messageContext.getAttributes()).build();
       receivedMessages.add(message);
 
@@ -105,18 +106,18 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
     }
   }
 
-  protected void assertEvent(MuleMessage message, Object expectedContent) throws Exception {
-    String payload = IOUtils.toString((InputStream) message.getPayload());
+  protected void assertEvent(Message message, Object expectedContent) throws Exception {
+    String payload = IOUtils.toString((InputStream) message.getPayload().getValue());
     assertEquals(expectedContent, payload);
   }
 
-  protected Object deserializeMessage(MuleMessage message) throws Exception {
-    return muleContext.getObjectSerializer().deserialize(IOUtils.toByteArray((InputStream) message.getPayload()));
+  protected Object deserializeMessage(Message message) throws Exception {
+    return muleContext.getObjectSerializer().deserialize(IOUtils.toByteArray((InputStream) message.getPayload().getValue()));
   }
 
-  protected MuleMessage receiveConnection() {
+  protected Message receiveConnection() {
     PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-    ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
+    ValueHolder<Message> messageHolder = new ValueHolder<>();
     prober.check(new JUnitLambdaProbe(() -> {
       if (!receivedMessages.isEmpty()) {
         messageHolder.set(receivedMessages.remove(0));
@@ -142,12 +143,12 @@ public abstract class SocketExtensionTestCase extends MuleArtifactFunctionalTest
     assertByteArray(receiveConnection(), testByteArray);
   }
 
-  protected void assertByteArray(MuleMessage message, byte[] testByteArray) throws IOException {
+  protected void assertByteArray(Message message, byte[] testByteArray) throws IOException {
     ByteArrayInputStream expectedByteArray = new ByteArrayInputStream(testByteArray);
     DataInputStream expectedData = new DataInputStream(expectedByteArray);
 
     // received byte array
-    byte[] bytesReceived = IOUtils.toByteArray((InputStream) message.getPayload());
+    byte[] bytesReceived = IOUtils.toByteArray((InputStream) message.getPayload().getValue());
 
     ByteArrayInputStream bytesIn = new ByteArrayInputStream(bytesReceived);
     DataInputStream dataIn = new DataInputStream(bytesIn);

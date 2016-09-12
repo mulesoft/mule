@@ -18,9 +18,9 @@ import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.jms.i18n.JmsMessages;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -71,7 +71,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected void doDispatch(MuleEvent event) throws Exception {
+  protected void doDispatch(Event event) throws Exception {
     if (connector.getConnection() == null) {
       throw new IllegalStateException("No JMS Connection");
     }
@@ -92,8 +92,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return disableTemporaryDestinations;
   }
 
-  private MuleMessage dispatchMessage(MuleEvent event, boolean doSend,
-                                      final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
+  private InternalMessage dispatchMessage(Event event, boolean doSend,
+                                          final CompletionHandler<InternalMessage, Exception, Void> completionHandler)
       throws Exception {
     if (logger.isDebugEnabled()) {
       logger.debug("dispatching on endpoint: " + endpoint.getEndpointURI() + ". MuleEvent id is: " + event
@@ -101,7 +101,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
 
     final Message jmsMessage = getJmsMessagePayload(event);
-    final MuleMessage muleRequestMessage = event.getMessage();
+    final InternalMessage muleRequestMessage = event.getMessage();
 
     boolean transacted = isTransacted();
     final boolean useReplyToDestination = isUseReplyToDestination(event, doSend, transacted);
@@ -190,16 +190,17 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
   }
 
-  private MuleMessage internalSend(MessageProducer producer, Message jmsMessage, boolean topic, long ttl, int priority,
-                                   boolean persistent)
+  private InternalMessage internalSend(MessageProducer producer, Message jmsMessage, boolean topic, long ttl, int priority,
+                                       boolean persistent)
       throws Exception {
     connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
     return returnOriginalMessageAsReply ? createMuleMessage(jmsMessage) : null;
   }
 
-  private MuleMessage internalBlockingSendAndAwait(MessageConsumer consumer, MessageProducer producer, Destination replyTo,
-                                                   Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent,
-                                                   int timeout)
+  private InternalMessage internalBlockingSendAndAwait(MessageConsumer consumer, MessageProducer producer, Destination replyTo,
+                                                       Message jmsMessage, boolean topic, long ttl, int priority,
+                                                       boolean persistent,
+                                                       int timeout)
       throws Exception {
     // need to register a listener for a topic
     Latch latch = new Latch();
@@ -218,9 +219,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return createResponseMuleMessage(listener.getMessage(), replyTo);
   }
 
-  private MuleMessage internalBlockingSendAndReceive(MessageProducer producer, MessageConsumer consumer, Destination replyTo,
-                                                     Message jmsMessage, boolean topic, long ttl, int priority,
-                                                     boolean persistent, int timeout)
+  private InternalMessage internalBlockingSendAndReceive(MessageProducer producer, MessageConsumer consumer, Destination replyTo,
+                                                         Message jmsMessage, boolean topic, long ttl, int priority,
+                                                         boolean persistent, int timeout)
       throws Exception {
     connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
 
@@ -236,7 +237,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
                                                  final MessageConsumer consumer, final Destination replyTo, Message jmsMessage,
                                                  boolean topic, long ttl, int priority, boolean persistent,
                                                  final boolean transacted, int timeout,
-                                                 final CompletionHandler<MuleMessage, Exception, Void> completionHandler)
+                                                 final CompletionHandler<InternalMessage, Exception, Void> completionHandler)
       throws JMSException {
     final TimerTask closeConsumerTask = new TimerTask() {
 
@@ -292,8 +293,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return connector.getJmsSupport().createProducer(session, dest, topic);
   }
 
-  private Message getJmsMessagePayload(MuleEvent event) throws DispatchException {
-    Object message = event.getMessage().getPayload();
+  private Message getJmsMessagePayload(Event event) throws DispatchException {
+    Object message = event.getMessage().getPayload().getValue();
     if (!(message instanceof Message)) {
       throw new DispatchException(JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()),
                                   getEndpoint());
@@ -301,7 +302,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return (Message) message;
   }
 
-  private boolean isUseReplyToDestination(MuleEvent event, boolean doSend, boolean transacted) {
+  private boolean isUseReplyToDestination(Event event, boolean doSend, boolean transacted) {
     return returnResponse(event, doSend) && !transacted;
   }
 
@@ -334,7 +335,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     }
   }
 
-  private MuleMessage createResponseMuleMessage(Message result, Destination replyTo) throws Exception {
+  private InternalMessage createResponseMuleMessage(Message result, Destination replyTo) throws Exception {
     if (result == null) {
       logger.debug("No message was returned via replyTo destination " + replyTo);
       return createNullMuleMessage();
@@ -349,7 +350,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
    *
    * @param event the current MuleEvent
    */
-  protected String resolveJmsCorrelationId(MuleEvent event) throws JMSException {
+  protected String resolveJmsCorrelationId(Event event) throws JMSException {
     return resolveMuleCorrelationId(event);
   }
 
@@ -359,23 +360,23 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
    *
    * @param event the current MuleEvent
    */
-  private String resolveMuleCorrelationId(MuleEvent event) throws JMSException {
+  private String resolveMuleCorrelationId(Event event) throws JMSException {
     return event.getCorrelationId();
   }
 
-  protected MuleMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception {
+  protected InternalMessage createMessageWithJmsMessagePayload(Message jmsMessage) throws Exception {
     Object payload = JmsMessageUtils.toObject(jmsMessage, connector.getSpecification(), endpoint.getEncoding());
-    return MuleMessage.builder(createMuleMessage(jmsMessage)).payload(payload).build();
+    return InternalMessage.builder(createMuleMessage(jmsMessage)).payload(payload).build();
   }
 
   /**
    * This method is called before the current message is transformed. It can be used to do any message body or header processing
    * before the transformer is called.
    *
-   * @param message the current MuleMessage Being processed
+   * @param message the current Message Being processed
    * @throws Exception
    */
-  protected MuleMessage preTransformMessage(MuleMessage message) throws Exception {
+  protected InternalMessage preTransformMessage(InternalMessage message) throws Exception {
     return message;
   }
 
@@ -385,12 +386,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected MuleMessage doSend(MuleEvent event) throws Exception {
+  protected InternalMessage doSend(Event event) throws Exception {
     return dispatchMessage(event, true, null);
   }
 
   @Override
-  protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception, Void> completionHandler) {
+  protected void doSendNonBlocking(Event event, CompletionHandler<InternalMessage, Exception, Void> completionHandler) {
     try {
       dispatchMessage(event, true, completionHandler);
     } catch (Exception e) {
@@ -411,7 +412,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
    * @throws JMSException if the JmsMessage cannot be written to, this should not happen because the JMSMessage passed in will
    *         always be newly created
    */
-  protected void processMessage(Message msg, MuleEvent event) throws JMSException {
+  protected void processMessage(Message msg, Event event) throws JMSException {
     // template Method
   }
 
@@ -424,11 +425,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
    * @throws JMSException if the JmsMessage cannot be written to, this should not happen because the JMSMessage passed in will
    *         always be newly created
    */
-  protected boolean isHandleReplyTo(Message msg, MuleEvent event) throws JMSException {
+  protected boolean isHandleReplyTo(Message msg, Event event) throws JMSException {
     return connector.supportsProperty(JmsConstants.JMS_REPLY_TO);
   }
 
-  protected MessageConsumer createReplyToConsumer(Message jmsMessage, MuleEvent event, Session session, Destination replyTo,
+  protected MessageConsumer createReplyToConsumer(Message jmsMessage, Event event, Session session, Destination replyTo,
                                                   boolean topic)
       throws JMSException {
     String selector = null;
@@ -444,13 +445,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
 
     // We need to set the durableName and Selector if using topics
     if (topic) {
-      String tempDurable = event.getFlowVariable(JmsConstants.DURABLE_PROPERTY);
+      String tempDurable = event.getVariable(JmsConstants.DURABLE_PROPERTY);
       boolean durable = connector.isDurable();
       if (tempDurable != null) {
         durable = Boolean.valueOf(tempDurable);
       }
       // Get the durable subscriber name if there is one
-      durableName = (String) event.getFlowVariable(JmsConstants.DURABLE_NAME_PROPERTY);
+      durableName = (String) event.getVariable(JmsConstants.DURABLE_NAME_PROPERTY);
       if (durableName == null && durable && topic) {
         durableName = "mule." + connector.getName() + "." + event.getContext().getOriginatingConnectorName();
         if (logger.isDebugEnabled()) {
@@ -462,7 +463,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return connector.getJmsSupport().createConsumer(session, replyTo, selector, connector.isNoLocal(), null, topic, endpoint);
   }
 
-  protected Destination getReplyToDestination(Message message, Session session, MuleEvent event, boolean remoteSync,
+  protected Destination getReplyToDestination(Message message, Session session, Event event, boolean remoteSync,
                                               boolean topic)
       throws JMSException, EndpointException, InitialisationException {
     Destination replyTo = null;
@@ -563,9 +564,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected MuleEvent applyOutboundTransformers(MuleEvent event) throws MuleException {
+  protected Event applyOutboundTransformers(Event event) throws MuleException {
     try {
-      event = MuleEvent.builder(event).message(preTransformMessage(event.getMessage())).build();
+      event = Event.builder(event).message(preTransformMessage(event.getMessage())).build();
     } catch (Exception e) {
       throw new TransformerException(CoreMessages.failedToInvoke("preTransformMessage"), e);
     }

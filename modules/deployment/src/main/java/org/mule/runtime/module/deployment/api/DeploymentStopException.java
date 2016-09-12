@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.module.deployment.api;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  *
  */
 public class DeploymentStopException extends DeploymentException {
 
-  public DeploymentStopException(Message message) {
+  public DeploymentStopException(I18nMessage message) {
     super(message);
   }
 
-  public DeploymentStopException(Message message, Throwable cause) {
+  public DeploymentStopException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

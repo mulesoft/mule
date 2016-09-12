@@ -15,7 +15,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -60,13 +60,13 @@ public class VMUsersDefaultObjectSerializerTestCase extends FunctionalTestCase {
     final String payload = "payload";
     flowRunner("dispatch").withPayload(payload).run();
 
-    MuleMessage response = muleContext.getClient().request("vm://in", 5000).getRight().get();
+    InternalMessage response = muleContext.getClient().request("vm://in", 5000).getRight().get();
     assertThat(response, is(notNullValue()));
     assertThat(getPayloadAsString(response), is(payload));
 
-    ArgumentCaptor<MuleMessage> messageArgumentCaptor = ArgumentCaptor.forClass(MuleMessage.class);
+    ArgumentCaptor<InternalMessage> messageArgumentCaptor = ArgumentCaptor.forClass(InternalMessage.class);
     verify(objectSerializer, atLeastOnce()).serialize(messageArgumentCaptor.capture());
-    MuleMessage capturedMessage = messageArgumentCaptor.getValue();
+    InternalMessage capturedMessage = messageArgumentCaptor.getValue();
     assertThat(capturedMessage, is(notNullValue()));
     assertThat(getPayloadAsString(capturedMessage), is(payload));
 

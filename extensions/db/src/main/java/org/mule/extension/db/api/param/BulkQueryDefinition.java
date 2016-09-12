@@ -19,8 +19,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 public class BulkQueryDefinition extends StatementDefinition<BulkQueryDefinition> {
 
   /**
-   * A reference to a globally defined query
-   * to be used as a template
+   * A reference to a globally defined query to be used as a template
    */
   @Parameter
   @Optional

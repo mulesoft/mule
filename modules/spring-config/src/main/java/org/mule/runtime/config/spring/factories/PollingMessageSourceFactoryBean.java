@@ -8,7 +8,7 @@ package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.schedule.SchedulerFactory;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride;
 import org.mule.runtime.core.source.polling.PollingMessageSource;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class PollingMessageSourceFactoryBean implements FactoryBean, MuleContextAware {
 
   protected SchedulerFactory<Runnable> schedulerFactory;
-  protected MessageProcessor messageProcessor;
+  protected Processor messageProcessor;
   protected MessageProcessorPollingOverride override;
   protected Long frequency;
   private MuleContext muleContext;
@@ -31,7 +31,7 @@ public class PollingMessageSourceFactoryBean implements FactoryBean, MuleContext
     return factory;
   }
 
-  public void setMessageProcessor(MessageProcessor messageProcessor) {
+  public void setMessageProcessor(Processor messageProcessor) {
     this.messageProcessor = messageProcessor;
   }
 

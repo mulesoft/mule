@@ -10,7 +10,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
@@ -71,7 +71,7 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
   }
 
   private void testHeaders(String flowName, String expectedResponse) throws Exception {
-    MuleMessage response = flowRunner(flowName).run().getMessage();
-    assertThat(response.getPayload(), is(expectedResponse));
+    InternalMessage response = flowRunner(flowName).run().getMessage();
+    assertThat(response.getPayload().getValue(), is(expectedResponse));
   }
 }

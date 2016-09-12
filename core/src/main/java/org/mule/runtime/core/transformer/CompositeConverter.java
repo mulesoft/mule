@@ -9,7 +9,7 @@ package org.mule.runtime.core.transformer;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -128,10 +128,10 @@ public class CompositeConverter implements Converter, MuleContextAware {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event != null && event.getMessage() != null) {
       try {
-        event = MuleEvent.builder(event)
+        event = Event.builder(event)
             .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, this)).build();
       } catch (Exception e) {
         throw new MessageTransformerException(this, e);

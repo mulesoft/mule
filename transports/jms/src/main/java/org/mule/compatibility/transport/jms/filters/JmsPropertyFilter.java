@@ -9,8 +9,8 @@ package org.mule.compatibility.transport.jms.filters;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -50,7 +50,7 @@ public class JmsPropertyFilter implements Filter {
   private Pattern pattern = null;
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     if (StringUtils.isBlank(propertyName)) {
       logger.warn("No property name was specified");
       return false;
@@ -61,9 +61,9 @@ public class JmsPropertyFilter implements Filter {
       return false;
     }
 
-    if (message.getPayload() instanceof javax.jms.Message) {
+    if (message.getPayload().getValue() instanceof javax.jms.Message) {
       try {
-        Message m = (javax.jms.Message) message.getPayload();
+        Message m = (javax.jms.Message) message.getPayload().getValue();
 
         if (StringUtils.isBlank(propertyClass)) {
           Object object = m.getObjectProperty(propertyName);
@@ -104,7 +104,7 @@ public class JmsPropertyFilter implements Filter {
       }
     } else {
       logger.warn("Expected a payload of javax.jms.Message but instead received "
-          + ClassUtils.getSimpleName(message.getDataType().getType()));
+          + ClassUtils.getSimpleName(message.getPayload().getDataType().getType()));
     }
 
     return false;

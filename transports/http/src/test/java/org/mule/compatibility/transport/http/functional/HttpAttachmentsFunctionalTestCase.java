@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.message.ds.StringDataSource;
 import org.mule.runtime.core.util.IOUtils;
@@ -39,7 +39,7 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase {
     FunctionalTestComponent ftc = getFunctionalTestComponent("testComponent");
     assertNotNull(ftc);
     ftc.setEventCallback((context, component, muleContext) -> {
-      assertThat(context.getMessage().getDataType().getMediaType().toRfcString(),
+      assertThat(context.getMessage().getPayload().getDataType().getMediaType().toRfcString(),
                  is("application/octet-stream; charset=ISO-8859-1"));
       assertEquals("We should have an attachment", 1, context.getMessage().getInboundAttachmentNames().size());
       DataHandler dh = context.getMessage().getInboundAttachment("attach1");
@@ -49,10 +49,10 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase {
     });
 
     MuleClient client = muleContext.getClient();
-    MuleMessage msg = MuleMessage.builder().payload("test")
+    InternalMessage msg = InternalMessage.builder().payload("test")
         .addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1"))).build();
 
-    MuleMessage result = client.send("endpoint1", msg).getRight();
+    InternalMessage result = client.send("endpoint1", msg).getRight();
     assertEquals("We should have no attachments coming back", 0, result.getInboundAttachmentNames().size());
   }
 
@@ -71,11 +71,11 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase {
   // });
   //
   // LocalMuleClient client = muleContext.getClient();
-  // MuleMessage msg = new DefaultMuleMessage("test", muleContext);
+  // Message msg = new DefaultMuleMessage("test", muleContext);
   //
   // //msg.addOutboundAttachment("attach1", new DataHandler(new StringDataSource("foo", "attach1")));
   //
-  // MuleMessage result = client.send("endpoint1", msg);
+  // Message result = client.send("endpoint1", msg);
   // assertEquals("We should have 1 attachments coming back", 1, result.getInboundAttachmentNames().size());
   // assertEquals("There should be no outbound attachments", 0, result.getOutboundAttachmentNames().size());
   // DataHandler dh = result.getInboundAttachment("attach1");

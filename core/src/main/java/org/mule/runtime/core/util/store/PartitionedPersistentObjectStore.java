@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableExpirableObjectStore;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.UUID;
 
@@ -158,7 +158,7 @@ public class PartitionedPersistentObjectStore<T extends Serializable> extends Ab
     // To support concurrency we need to check if directory exists again inside
     // synchronized method
     if (!directory.exists() && !directory.mkdirs()) {
-      Message message = CoreMessages.failedToCreate("object store directory " + directory.getAbsolutePath());
+      I18nMessage message = CoreMessages.failedToCreate("object store directory " + directory.getAbsolutePath());
       throw new MuleRuntimeException(message);
     }
   }

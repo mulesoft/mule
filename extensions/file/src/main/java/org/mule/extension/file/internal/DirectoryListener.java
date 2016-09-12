@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCHER;
 import static org.mule.extension.file.common.api.FileDisplayConstants.MATCH_WITH;
@@ -26,7 +26,7 @@ import org.mule.extension.file.api.DeletedFileAttributes;
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.extension.file.internal.command.DirectoryListenerCommand;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -82,7 +82,7 @@ import org.slf4j.LoggerFactory;
  * Listens for near real-time events that happens on files contained inside a directory or on the directory itself. The events are
  * not acquired by polling the filesystem but rather actually listening for operating system events.
  * <p>
- * Whenever a file (or the directory) is created, updated or deleted, this {@link Source} will fire a {@link MuleMessage} which
+ * Whenever a file (or the directory) is created, updated or deleted, this {@link Source} will fire a {@link Message} which
  * payload reference the affected file and the attributes will be a {@link ListenerFileAttributes} instance.
  * <p>
  * There're however some special cases to be considered:
@@ -320,7 +320,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
     return stopRequested.get() || Thread.currentThread().isInterrupted();
   }
 
-  private MuleMessage createMessage(Path path, ListenerFileAttributes attributes) {
+  private Message createMessage(Path path, ListenerFileAttributes attributes) {
     Object payload = null;
     MediaType mediaType = MediaType.ANY;
 
@@ -331,7 +331,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
       payload = new FileInputStream(path, new NullPathLock());
     }
 
-    return MuleMessage.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
+    return Message.builder().payload(payload).mediaType(mediaType).attributes(attributes).build();
   }
 
   @Override

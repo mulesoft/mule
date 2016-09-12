@@ -13,10 +13,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.Base64;
 
@@ -81,15 +81,15 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Abstract
 
       while (--requestCount >= 0) {
         try {
-          MuleEvent event = flowRunner("flowTestSync").withPayload(payload).run();
-          final MuleMessage outbound = event.getMessage();
+          Event event = flowRunner("flowTestSync").withPayload(payload).run();
+          final InternalMessage outbound = event.getMessage();
           assertThat(event.getError().isPresent(), is(false));
-          assertNotNull(outbound.getPayload());
+          assertNotNull(outbound.getPayload().getValue());
           byte[] bytes = null;
-          if (outbound.getPayload() instanceof byte[]) {
-            bytes = (byte[]) outbound.getPayload();
-          } else if (outbound.getPayload() instanceof List) {
-            final List<?> list = (List<?>) outbound.getPayload();
+          if (outbound.getPayload().getValue() instanceof byte[]) {
+            bytes = (byte[]) outbound.getPayload().getValue();
+          } else if (outbound.getPayload().getValue() instanceof List) {
+            final List<?> list = (List<?>) outbound.getPayload().getValue();
             assertEquals(1, list.size());
             assertTrue(list.get(0) instanceof byte[]);
             bytes = (byte[]) list.get(0);

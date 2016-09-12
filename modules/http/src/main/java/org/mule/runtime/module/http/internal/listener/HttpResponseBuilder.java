@@ -20,12 +20,12 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.ALWAYS;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
 
-import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -88,7 +88,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
   }
 
   public HttpResponse build(org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder httpResponseBuilder,
-                            MuleEvent event)
+                            Event event)
       throws MessagingException {
     final HttpResponseHeaderBuilder httpResponseHeaderBuilder = new HttpResponseHeaderBuilder();
     final Set<String> outboundProperties = event.getMessage().getOutboundPropertyNames();
@@ -102,7 +102,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
       }
     }
 
-    DataType dataType = event.getMessage().getDataType();
+    DataType dataType = event.getMessage().getPayload().getDataType();
     if (!MediaType.ANY.matches(dataType.getMediaType())) {
       httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
     }
@@ -127,7 +127,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     HttpEntity httpEntity;
 
     if (!event.getMessage().getOutboundAttachmentNames().isEmpty()
-        || event.getMessage().getPayload() instanceof MultiPartPayload) {
+        || event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
       if (configuredContentType == null) {
         httpResponseHeaderBuilder.addContentType(createMultipartFormDataContentType());
       } else if (!configuredContentType.startsWith(MULTIPART)) {
@@ -137,7 +137,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event),
                       (ByteArrayHttpEntity) httpEntity);
     } else {
-      final Object payload = event.getMessage().getPayload();
+      final Object payload = event.getMessage().getPayload().getValue();
       if (payload == null) {
         setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
         httpEntity = new EmptyHttpEntity();
@@ -202,7 +202,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     return httpResponseBuilder.build();
   }
 
-  private boolean supportsTransferEncoding(MuleEvent event) {
+  private boolean supportsTransferEncoding(Event event) {
     String httpVersion = event.getMessage().<String>getInboundProperty(HTTP_VERSION_PROPERTY);
     return !(HttpProtocol.HTTP_0_9.asString().equals(httpVersion) || HttpProtocol.HTTP_1_0.asString().equals(httpVersion));
   }
@@ -241,7 +241,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     httpResponseHeaderBuilder.addHeader(TRANSFER_ENCODING, CHUNKED);
   }
 
-  private Integer resolveStatusCode(MuleEvent event) {
+  private Integer resolveStatusCode(Event event) {
     if (statusCode != null) {
       return statusCodeEvaluator.resolveIntegerValue(event);
     }
@@ -254,7 +254,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     return null;
   }
 
-  private String resolveReasonPhrase(MuleEvent event, Integer resolvedStatusCode) {
+  private String resolveReasonPhrase(Event event, Integer resolvedStatusCode) {
     if (reasonPhrase != null) {
       return reasonPhraseEvaluator.resolveStringValue(event);
     }
@@ -273,12 +273,12 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
   }
 
-  private HttpEntity createUrlEncodedEntity(MuleEvent event, Map payload) {
+  private HttpEntity createUrlEncodedEntity(Event event, Map payload) {
     final Map mapPayload = payload;
     HttpEntity entity = new EmptyHttpEntity();
     if (!mapPayload.isEmpty()) {
       String encodedBody;
-      final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
+      final Charset encoding = event.getMessage().getPayload().getDataType().getMediaType().getCharset().get();
       if (mapPayload instanceof ParameterMap) {
         encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
       } else {
@@ -307,7 +307,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     }
   }
 
-  private HttpEntity createMultipartEntity(MuleEvent event, String contentType) throws MessagingException {
+  private HttpEntity createMultipartEntity(Event event, String contentType) throws MessagingException {
     if (logger.isDebugEnabled()) {
       logger.debug("Message contains outbound attachments. Ignoring payload and trying to generate multipart response");
     }
@@ -317,10 +317,12 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     }
 
     try {
-      if (event.getMessage().getPayload() instanceof MultiPartPayload) {
-        for (org.mule.runtime.api.message.MuleMessage part : ((MultiPartPayload) event.getMessage().getPayload()).getParts()) {
+      if (event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
+        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) event.getMessage().getPayload().getValue())
+            .getParts()) {
           final String partName = ((PartAttributes) part.getAttributes()).getName();
-          parts.put(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType()));
+          parts.put(partName,
+                    toDataHandler(partName, part.getPayload().getValue(), part.getPayload().getDataType().getMediaType()));
         }
       }
 

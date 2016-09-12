@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * <code>FutureMessageResult</code> is an MuleMessage result of a remote invocation on a Mule Server. This object makes the result
+ * <code>FutureMessageResult</code> is an Message result of a remote invocation on a Mule Server. This object makes the result
  * available to the client code once the request has been processed. This execution happens asynchronously.
  */
 // @ThreadSafe
@@ -88,25 +88,25 @@ public class FutureMessageResult extends FutureTask {
     }
   }
 
-  public Either<Error, MuleMessage> getResult() throws InterruptedException, ExecutionException, MuleException {
+  public Either<Error, InternalMessage> getResult() throws InterruptedException, ExecutionException, MuleException {
     return this.getResult(this.get());
   }
 
-  public Either<Error, MuleMessage> getResult(long timeout)
+  public Either<Error, InternalMessage> getResult(long timeout)
       throws InterruptedException, ExecutionException, TimeoutException, MuleException {
     return this.getResult(this.get(timeout, TimeUnit.MILLISECONDS));
   }
 
-  private Either<Error, MuleMessage> getResult(Object obj) throws MuleException {
-    Either<Error, MuleMessage> result = null;
+  private Either<Error, InternalMessage> getResult(Object obj) throws MuleException {
+    Either<Error, InternalMessage> result = null;
     if (obj != null) {
       if (obj instanceof Error) {
         result = left((Error) obj);
       } else {
-        if (obj instanceof MuleMessage) {
-          result = right((MuleMessage) obj);
+        if (obj instanceof InternalMessage) {
+          result = right((InternalMessage) obj);
         } else {
-          result = right(MuleMessage.builder().payload(obj).build());
+          result = right(InternalMessage.builder().payload(obj).build());
         }
 
         synchronized (this) {

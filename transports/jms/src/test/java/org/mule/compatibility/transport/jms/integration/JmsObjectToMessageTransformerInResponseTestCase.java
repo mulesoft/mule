@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class JmsObjectToMessageTransformerInResponseTestCase extends AbstractJms
   @Test
   public void testObjectToMessageDoesntFail() throws Exception {
     MuleClient muleClient = muleContext.getClient();
-    MuleMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT).getRight();
+    InternalMessage response = muleClient.send("inWithTransformers", "A message", null, TIMEOUT).getRight();
     assertThat(response, notNullValue());
     assertThat(getPayloadAsString(response), is("A message with something more"));
   }

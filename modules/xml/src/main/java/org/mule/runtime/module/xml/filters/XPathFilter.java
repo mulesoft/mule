@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.xml.filters;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.module.xml.util.NamespaceManager;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
@@ -72,7 +72,7 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
 
     if (pattern == null) {
       throw new InitialisationException(
-                                        MessageFactory.createStaticMessage("A pattern must be supplied to the " +
+                                        I18nMessageFactory.createStaticMessage("A pattern must be supplied to the " +
                                             ClassUtils.getSimpleName(getClass())),
                                         this);
     }
@@ -93,13 +93,13 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
   }
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     throw new UnsupportedOperationException("MULE-9341 Remove Filters that are not needed.  This method will be removed when filters are cleaned up.");
   }
 
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
-    Object payload = event.getMessage().getPayload();
+  public boolean accept(Event event, Event.Builder builder) {
+    Object payload = event.getMessage().getPayload().getValue();
     if (payload == null) {
       if (logger.isWarnEnabled()) {
         logger.warn("Applying {} to null object.", ClassUtils.getSimpleName(getClass()));
@@ -137,7 +137,7 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
       return false;
     }
 
-    builder.message(MuleMessage.builder(event.getMessage()).payload(node).build());
+    builder.message(InternalMessage.builder(event.getMessage()).payload(node).build());
 
     return accept(node);
   }

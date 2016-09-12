@@ -7,9 +7,9 @@
 package org.mule.compatibility.core.endpoint.outbound;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.SessionHandler;
 import org.mule.runtime.core.util.ObjectUtils;
 
@@ -18,7 +18,7 @@ import org.mule.runtime.core.util.ObjectUtils;
  *
  * @see SessionHandler
  */
-public class OutboundSessionHandlerMessageProcessor implements MessageProcessor {
+public class OutboundSessionHandlerMessageProcessor implements Processor {
 
   private SessionHandler sessionHandler;
   private MuleContext muleContext;
@@ -29,7 +29,7 @@ public class OutboundSessionHandlerMessageProcessor implements MessageProcessor 
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     sessionHandler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
     return event;
   }

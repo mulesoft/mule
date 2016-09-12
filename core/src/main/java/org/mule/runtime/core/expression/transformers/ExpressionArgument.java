@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -90,7 +90,7 @@ public class ExpressionArgument implements MuleContextAware {
    * @return the result of the expression
    * @throws ExpressionRuntimeException if the wrong return type is returned from the expression.
    */
-  public Object evaluate(MuleEvent event) throws ExpressionRuntimeException {
+  public Object evaluate(Event event) throws ExpressionRuntimeException {
 
     // MULE-4797 Because there is no way to specify the class-loader that script
     // engines use and because scripts when used for expressions are compiled in

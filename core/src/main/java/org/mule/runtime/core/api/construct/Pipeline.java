@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.construct;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.ProcessingDescriptor;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import java.util.List;
 
 /**
- * A pipeline has an ordered list of {@link MessageProcessor}'s that are invoked in order to processor new messages received from
- * it's {@link MessageSource}
+ * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from it's
+ * {@link MessageSource}
  */
 public interface Pipeline extends FlowConstruct, MessageProcessorContainer, ProcessingDescriptor, MessageProcessorPathResolver {
 
@@ -24,9 +24,9 @@ public interface Pipeline extends FlowConstruct, MessageProcessorContainer, Proc
 
   public MessageSource getMessageSource();
 
-  public void setMessageProcessors(List<MessageProcessor> messageProcessors);
+  public void setMessageProcessors(List<Processor> messageProcessors);
 
-  public List<MessageProcessor> getMessageProcessors();
+  public List<Processor> getMessageProcessors();
 
   public void setProcessingStrategy(ProcessingStrategy processingStrategy);
 

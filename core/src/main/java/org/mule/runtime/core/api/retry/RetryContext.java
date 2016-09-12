@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.retry;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.Map;
 
@@ -25,13 +25,13 @@ public interface RetryContext {
    */
   Map<Object, Object> getMetaInfo();
 
-  MuleMessage[] getReturnMessages();
+  InternalMessage[] getReturnMessages();
 
-  MuleMessage getFirstReturnMessage();
+  InternalMessage getFirstReturnMessage();
 
-  void setReturnMessages(MuleMessage[] returnMessages);
+  void setReturnMessages(InternalMessage[] returnMessages);
 
-  void addReturnMessage(MuleMessage result);
+  void addReturnMessage(InternalMessage result);
 
   String getDescription();
 

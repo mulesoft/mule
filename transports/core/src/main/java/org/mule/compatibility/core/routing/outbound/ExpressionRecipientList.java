@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.routing.outbound;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.expression.ExpressionConfig;
@@ -28,7 +28,7 @@ public class ExpressionRecipientList extends AbstractRecipientList {
   protected ExpressionConfig expressionConfig = new ExpressionConfig();
 
   @Override
-  protected List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException {
+  protected List<Object> getRecipients(Event event) throws CouldNotRouteOutboundMessageException {
     String expr = getFullExpression();
     if (!muleContext.getExpressionLanguage().isValid(expr)) {
       throw new CouldNotRouteOutboundMessageException(CoreMessages.expressionInvalidForProperty("expression", expr), null);

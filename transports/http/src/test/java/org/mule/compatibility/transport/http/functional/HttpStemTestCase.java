@@ -13,7 +13,7 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -46,7 +46,7 @@ public class HttpStemTestCase extends FunctionalTestCase {
     assertNotNull(testComponent);
 
     EventCallback callback = (context, component, muleContext) -> {
-      MuleMessage msg = context.getMessage();
+      InternalMessage msg = context.getMessage();
       assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY));
       assertEquals(requestPath, msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
       assertEquals(contextPath, msg.getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY));
@@ -54,7 +54,7 @@ public class HttpStemTestCase extends FunctionalTestCase {
 
     testComponent.setEventCallback(callback);
 
-    MuleMessage result = client.send(url, "Hello World", null).getRight();
+    InternalMessage result = client.send(url, "Hello World", null).getRight();
     assertEquals("Hello World Received", getPayloadAsString(result));
     final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
     assertEquals(200, status);

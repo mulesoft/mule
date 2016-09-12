@@ -9,7 +9,7 @@ package org.mule.compatibility.core.api.client;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ public interface LocalMuleClient extends MuleClient {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  MuleMessage process(OutboundEndpoint endpoint, Object payload, Map<String, Object> messageProperties) throws MuleException;
+  InternalMessage process(OutboundEndpoint endpoint, Object payload, Map<String, Object> messageProperties) throws MuleException;
 
   /**
    * Sends an event synchronously to a endpointUri via a Mule server and a resulting message is returned.
@@ -45,7 +45,7 @@ public interface LocalMuleClient extends MuleClient {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  MuleMessage process(OutboundEndpoint endpoint, MuleMessage message) throws MuleException;
+  InternalMessage process(OutboundEndpoint endpoint, InternalMessage message) throws MuleException;
 
   /**
    * Will receive an event from an endpointUri determined by the URL.
@@ -58,7 +58,7 @@ public interface LocalMuleClient extends MuleClient {
    * @deprecated Transport infrastructure is deprecated.
    */
   @Deprecated
-  MuleMessage request(InboundEndpoint endpoint, long timeout) throws MuleException;
+  InternalMessage request(InboundEndpoint endpoint, long timeout) throws MuleException;
 
   /**
    * Will register the specified processor as a listener for the inbound endpoint. This may be implemented by subscription or

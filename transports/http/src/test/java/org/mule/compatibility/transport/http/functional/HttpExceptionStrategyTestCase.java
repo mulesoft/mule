@@ -18,8 +18,8 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -42,18 +42,18 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
   @Test
   public void testInExceptionDoRollbackHttpSync() throws Exception {
     String url = String.format("http://localhost:%d/flowWithoutExceptionStrategySync", port1.getNumber());
-    MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT).getRight();
+    InternalMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT).getRight();
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), not(nullValue()));
+    assertThat(response.getPayload().getValue(), not(nullValue()));
     assertThat(getPayloadAsString(response), not(TEST_MESSAGE));
-    assertThat(response.getExceptionPayload(), notNullValue()); //to be fixed
-    assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); //to be review/fixed
+    assertThat(response.getExceptionPayload(), notNullValue()); // to be fixed
+    assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); // to be review/fixed
   }
 
   @Test
   public void testCustomStatusCodeOnExceptionWithCustomExceptionStrategy() throws Exception {
     String url = String.format("http://localhost:%d/flowWithtCESAndStatusCode", port1.getNumber());
-    MuleMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT).getRight();
+    InternalMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT).getRight();
     assertThat(response, notNullValue());
     assertThat(response.<String>getInboundProperty("http.status"), is(valueOf(SC_FORBIDDEN)));
   }
@@ -61,8 +61,8 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
   public static class CustomExceptionStrategy extends AbstractMessagingExceptionStrategy {
 
     @Override
-    public MuleEvent handleException(MessagingException ex, MuleEvent event) {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+    public Event handleException(MessagingException ex, Event event) {
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage())
           .addOutboundProperty(HTTP_STATUS_PROPERTY, valueOf(SC_FORBIDDEN)).build()).build();
     }
   }

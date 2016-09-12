@@ -7,13 +7,13 @@
 package org.mule.runtime.core.api.registry;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class RegistrationException extends MuleException {
 
   private static final long serialVersionUID = 9143114426140546637L;
 
-  public RegistrationException(Message message) {
+  public RegistrationException(I18nMessage message) {
     super(message);
   }
 
@@ -21,7 +21,7 @@ public class RegistrationException extends MuleException {
     super(cause);
   }
 
-  public RegistrationException(Message message, Throwable cause) {
+  public RegistrationException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

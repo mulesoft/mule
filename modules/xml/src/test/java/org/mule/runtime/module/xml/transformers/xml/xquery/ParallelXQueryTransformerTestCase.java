@@ -8,13 +8,13 @@ package org.mule.runtime.module.xml.transformers.xml.xquery;
 
 import static java.lang.Runtime.getRuntime;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
@@ -71,8 +71,8 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
     for (int i = 0; i < getParallelThreadCount(); ++i) {
       new Thread(() -> {
         try {
-          setCurrentEvent(MuleEvent.builder(DefaultMessageContext.create(testFlow, TEST_CONNECTOR))
-              .message(MuleMessage.builder().payload("test").build()).exchangePattern(REQUEST_RESPONSE).flow(testFlow)
+          setCurrentEvent(Event.builder(DefaultEventContext.create(testFlow, TEST_CONNECTOR))
+              .message(InternalMessage.builder().payload("test").build()).exchangePattern(REQUEST_RESPONSE).flow(testFlow)
               .session(getTestSession(testFlow, muleContext)).build());
         } catch (Exception e1) {
           e1.printStackTrace();

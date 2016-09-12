@@ -8,15 +8,15 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.INTERCEPTING_CALLBACK_PARAM;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -45,7 +45,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InterceptingOperationMessageProcessor.class);
 
-  private MessageProcessor next;
+  private Processor next;
 
   public InterceptingOperationMessageProcessor(RuntimeExtensionModel extensionModel, RuntimeOperationModel operationModel,
                                                String configurationProviderName, String target, ResolverSet resolverSet,
@@ -54,9 +54,9 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
   }
 
   @Override
-  protected MuleEvent doProcess(org.mule.runtime.core.api.MuleEvent event, OperationContextAdapter operationContext)
+  protected Event doProcess(org.mule.runtime.core.api.Event event, OperationContextAdapter operationContext)
       throws MuleException {
-    MuleEvent resultEvent = (MuleEvent) super.doProcess(event, operationContext);
+    Event resultEvent = (Event) super.doProcess(event, operationContext);
     InterceptingCallback<?> interceptingCallback = getInterceptorCallback(operationContext);
 
     try {
@@ -84,7 +84,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
 
   }
 
-  private MuleException onException(InterceptingCallback<?> interceptingCallback, MuleEvent event,
+  private MuleException onException(InterceptingCallback<?> interceptingCallback, Event event,
                                     OperationContextAdapter operationContext, Exception exception) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(format("Intercepting operation '%s' got an exception while processing intercepted chain",
@@ -109,7 +109,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
     return new MessagingException(event, exception, this);
   }
 
-  private void onSuccess(OperationContextAdapter operationContext, MuleEvent resultEvent,
+  private void onSuccess(OperationContextAdapter operationContext, Event resultEvent,
                          InterceptingCallback<?> interceptingCallback)
       throws MessagingException {
     LOGGER.debug("Intercepting operation '{}' success", operationContext.getOperationModel().getName());
@@ -122,7 +122,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
     }
   }
 
-  private void onComplete(InterceptingCallback<?> interceptingCallback, MuleEvent event, OperationContextAdapter operationContext)
+  private void onComplete(InterceptingCallback<?> interceptingCallback, Event event, OperationContextAdapter operationContext)
       throws MuleException {
     LOGGER.debug("Intercepting operation '{}' completed", operationContext.getOperationModel().getName());
     try {
@@ -143,7 +143,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
     return interceptingCallback;
   }
 
-  private MuleEvent processNext(MuleEvent interceptedEvent, OperationContextAdapter operationContext) throws MuleException {
+  private Event processNext(Event interceptedEvent, OperationContextAdapter operationContext) throws MuleException {
     if (next == null) {
       return interceptedEvent;
     } else if (interceptedEvent == null) {
@@ -158,7 +158,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
         LOGGER.debug("Invoking next MessageProcessor: '{}'", next.getClass().getName());
       }
 
-      MuleEvent resultEvent = next.process(interceptedEvent);
+      Event resultEvent = next.process(interceptedEvent);
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(format("Intercepting operation '%s' executed intercepted chain and got the following event back: ",
                             operationContext.getOperationModel().getName(), resultEvent));
@@ -174,7 +174,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
   }
 
   @Override
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     next = listener;
   }
 

@@ -18,11 +18,11 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
@@ -74,10 +74,10 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   @Test
   public void testFaultInCxfServiceWithCatchExceptionStrategy() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
+    InternalMessage request = InternalMessage.builder().payload(requestFaultPayload).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException",
-                                       request, HTTP_REQUEST_OPTIONS)
+    InternalMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchException",
+                                           request, HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(response);
     assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
@@ -86,9 +86,9 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   @Test
   public void testFaultInCxfServiceWithCatchExceptionStrategyRethrown() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
+    InternalMessage request = InternalMessage.builder().payload(requestFaultPayload).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response =
+    InternalMessage response =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFaultCatchExceptionRethrown", request,
                     HTTP_REQUEST_OPTIONS)
             .getRight();
@@ -100,11 +100,12 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   @Test
   public void testExceptionThrownInTransformerWithCatchExceptionStrategy() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException",
-                                       request, HTTP_REQUEST_OPTIONS)
-        .getRight();
+    InternalMessage response =
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/testTransformerExceptionCatchException",
+                    request, HTTP_REQUEST_OPTIONS)
+            .getRight();
     assertNotNull(response);
     assertEquals(String.valueOf(OK.getStatusCode()), response.getInboundProperty(HTTP_STATUS_PROPERTY).toString());
     assertTrue(getPayloadAsString(response).contains("APPEND"));
@@ -112,14 +113,14 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientWithSOAPFaultCatchException() throws Exception {
-    MuleEvent event = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run();
+    Event event = flowRunner("FlowWithClientAndSOAPFaultCatchException").withPayload("hello").run();
     assertNotNull(event);
     assertThat(event.getError().isPresent(), is(false));
   }
 
   @Test
   public void testClientWithSOAPFaultCatchExceptionRedirect() throws Exception {
-    MuleEvent event = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run();
+    Event event = flowRunner("FlowWithClientAndSOAPFaultCatchExceptionRedirect").withPayload("TEST").run();
     assertNotNull(event);
     assertNotNull(event.getMessage());
     assertThat(getPayloadAsString(event.getMessage()), containsString("TEST"));
@@ -128,7 +129,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientWithTransformerExceptionCatchException() throws Exception {
-    MuleMessage response =
+    InternalMessage response =
         flowRunner("FlowWithClientAndTransformerExceptionCatchException").withPayload("hello").run().getMessage();
     assertNotNull(response);
     assertTrue(getPayloadAsString(response).contains(" Anonymous"));
@@ -137,7 +138,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
   @Test
   public void testServerClientProxyWithTransformerExceptionCatchStrategy() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy",
                     getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
             .getRight();
@@ -146,10 +147,10 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     assertTrue(resString.contains("Anonymous"));
   }
 
-  public static class ProxyCustomProcessor implements MessageProcessor {
+  public static class ProxyCustomProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       String payload =
           "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
               + "<soap:Body>"
@@ -158,14 +159,14 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
               + "</ns2:sayHiResponse>"
               + "</soap:Body>"
               + "</soap:Envelope>";
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(payload).build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(payload).build()).build();
     }
   }
 
-  public static class RethrowFaultProcessor implements MessageProcessor {
+  public static class RethrowFaultProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       throw new Fault(event.getError().get().getException().getCause());
     }
   }
@@ -173,17 +174,17 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
   public static class RethrowExceptionStrategy extends TemplateOnErrorHandler {
 
     @Override
-    protected MuleEvent nullifyExceptionPayloadIfRequired(MuleEvent event) {
+    protected Event nullifyExceptionPayloadIfRequired(Event event) {
       return event;
     }
 
     @Override
-    protected MuleEvent afterRouting(MessagingException exception, MuleEvent event) {
+    protected Event afterRouting(MessagingException exception, Event event) {
       return event;
     }
 
     @Override
-    protected MuleEvent beforeRouting(MessagingException exception, MuleEvent event) {
+    protected Event beforeRouting(MessagingException exception, Event event) {
       return event;
     }
   }

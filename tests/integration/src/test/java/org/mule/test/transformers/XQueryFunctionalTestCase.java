@@ -10,8 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -53,9 +53,9 @@ public class XQueryFunctionalTestCase extends AbstractIntegrationTestCase {
     props.put("ListRating", new Integer(6));
 
     // Invoke the service
-    final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
+    final Event muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
 
-    MuleMessage message = muleEvent.getMessage();
+    InternalMessage message = muleEvent.getMessage();
     assertNotNull(message);
     assertThat(muleEvent.getError().isPresent(), is(false));
     // Compare results

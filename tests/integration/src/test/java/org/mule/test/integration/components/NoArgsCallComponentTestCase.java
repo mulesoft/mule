@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -37,18 +37,18 @@ public class NoArgsCallComponentTestCase extends AbstractIntegrationTestCase {
   public void testDelegateClass() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner(INPUT_DC_FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
-    MuleMessage message = client.request(OUTPUT_DC_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = client.request(OUTPUT_DC_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
-    assertEquals(message.getPayload(), DEFAULT_OUTPUT_MESSAGE);
+    assertEquals(message.getPayload().getValue(), DEFAULT_OUTPUT_MESSAGE);
   }
 
   @Test
   public void testWithInjectedDelegate() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner(INPUT_DI_FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
-    MuleMessage reply = client.request(OUTPUT_DI_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage reply = client.request(OUTPUT_DI_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
     // same as original input
-    assertEquals(TEST_PAYLOAD, reply.getPayload());
+    assertEquals(TEST_PAYLOAD, reply.getPayload().getValue());
   }
 }

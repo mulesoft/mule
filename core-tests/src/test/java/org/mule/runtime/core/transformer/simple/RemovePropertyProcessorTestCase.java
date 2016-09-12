@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.processor.simple.RemovePropertyProcessor;
 import org.mule.tck.size.SmallTest;
 
@@ -28,18 +28,18 @@ public class RemovePropertyProcessorTestCase extends AbstractRemoveVariablePrope
   }
 
   @Override
-  protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties) {
-    MuleMessage mockMessage = mockEvent.getMessage();
+  protected void addMockedPropeerties(Event mockEvent, HashSet properties) {
+    InternalMessage mockMessage = mockEvent.getMessage();
     when(mockMessage.getOutboundPropertyNames()).thenReturn(properties);
   }
 
   @Override
-  protected void verifyRemoved(MuleEvent mockEvent, String key) {
+  protected void verifyRemoved(Event mockEvent, String key) {
     assertThat(mockEvent.getMessage().getOutboundProperty(key), is(nullValue()));
   }
 
   @Override
-  protected void verifyNotRemoved(MuleEvent mockEvent, String key) {
+  protected void verifyNotRemoved(Event mockEvent, String key) {
     assertThat(mockEvent.getMessage().getOutboundProperty(key), not(nullValue()));
   }
 }

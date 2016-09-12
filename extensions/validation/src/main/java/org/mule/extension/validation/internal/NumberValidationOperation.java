@@ -11,7 +11,7 @@ import org.mule.extension.validation.api.ValidationOptions;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.api.NumberType;
 import org.mule.extension.validation.internal.validator.NumberValidator;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -37,11 +37,11 @@ public class NumberValidationOperation extends ValidationSupport {
    * @param maxValue If provided, check that the parsed value is less or equal than this value
    * @param numberType the type of number to test {@code value} against
    * @param options the {@link ValidationOptions}
-   * @param event the current {@link MuleEvent}
+   * @param event the current {@link Event}
    */
   public void isNumber(String value, @Optional String locale, @Optional String pattern, @Optional String minValue,
                        @Optional String maxValue, NumberType numberType, @ParameterGroup ValidationOptions options,
-                       MuleEvent event, @UseConfig ValidationExtension config)
+                       Event event, @UseConfig ValidationExtension config)
       throws Exception {
 
     ValidationContext context = createContext(options, event, config);

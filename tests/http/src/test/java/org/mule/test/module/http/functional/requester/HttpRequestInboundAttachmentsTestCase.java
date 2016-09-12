@@ -12,9 +12,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
 
@@ -39,24 +39,24 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
 
   @Test
   public void processInboundAttachments() throws Exception {
-    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
-    assertThat(event.getMessage().getPayload(), instanceOf(MultiPartPayload.class));
+    assertThat(event.getMessage().getPayload().getValue(), instanceOf(MultiPartContent.class));
 
-    MultiPartPayload payload = event.getMessage().getPayload();
+    MultiPartContent payload = (MultiPartContent) event.getMessage().getPayload().getValue();
     assertThat(payload.getParts(), hasSize(2));
     assertAttachment(payload, "partName1", "Test part 1", MediaType.TEXT);
     assertAttachment(payload, "partName2", "Test part 2", MediaType.HTML);
   }
 
-  private void assertAttachment(MultiPartPayload payload, String attachmentName, String attachmentContents, MediaType contentType)
+  private void assertAttachment(MultiPartContent payload, String attachmentName, String attachmentContents, MediaType contentType)
       throws IOException {
     assertTrue(payload.getPartNames().contains(attachmentName));
 
-    org.mule.runtime.api.message.MuleMessage attachment = payload.getPart(attachmentName);
-    assertThat(attachment.getDataType().getMediaType(), equalTo(contentType));
+    org.mule.runtime.api.message.Message attachment = payload.getPart(attachmentName);
+    assertThat(attachment.getPayload().getDataType().getMediaType(), equalTo(contentType));
 
-    assertThat(IOUtils.toString((InputStream) attachment.getPayload()), equalTo(attachmentContents));
+    assertThat(IOUtils.toString((InputStream) attachment.getPayload().getValue()), equalTo(attachmentContents));
   }
 
   @Override

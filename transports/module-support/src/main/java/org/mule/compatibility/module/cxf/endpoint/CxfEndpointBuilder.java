@@ -17,7 +17,7 @@ import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.compatibility.module.cxf.builder.LocalClientMessageProcessorBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
 
@@ -59,7 +59,7 @@ public class CxfEndpointBuilder extends AbstractMetaEndpointBuilder {
     builder.setAddress(getEndpointBuilder().getEndpoint().toString());
 
     try {
-      ArrayList<MessageProcessor> processors = new ArrayList<MessageProcessor>();
+      ArrayList<Processor> processors = new ArrayList<Processor>();
       processors.add(builder.build());
       if (messageProcessors != null) {
         processors.addAll(messageProcessors);

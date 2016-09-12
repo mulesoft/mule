@@ -8,11 +8,11 @@ package org.mule.compatibility.core.api.transport;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.nio.charset.Charset;
 
@@ -22,7 +22,7 @@ import java.nio.charset.Charset;
  * @deprecated Transport infrastructure is deprecated.
  */
 @Deprecated
-public interface MessageDispatcher extends Connectable, MessageProcessor, LifecycleStateEnabled {
+public interface MessageDispatcher extends Connectable, Processor, LifecycleStateEnabled {
 
   long RECEIVE_WAIT_INDEFINITELY = 0;
   long RECEIVE_NO_WAIT = -1;
@@ -62,7 +62,7 @@ public interface MessageDispatcher extends Connectable, MessageProcessor, Lifecy
    */
   OutboundEndpoint getEndpoint();
 
-  MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
+  InternalMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 
-  MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
+  InternalMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

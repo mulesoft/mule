@@ -8,7 +8,7 @@ package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * @deprecated Transport infrastructure is deprecated.
@@ -16,11 +16,11 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
 @Deprecated
 public interface EndpointMessageProcessorChainFactory {
 
-  public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct,
-                                                             MessageProcessor target)
+  public Processor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct,
+                                                      Processor target)
       throws MuleException;
 
-  public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target)
+  public Processor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, Processor target)
       throws MuleException;
 }
 

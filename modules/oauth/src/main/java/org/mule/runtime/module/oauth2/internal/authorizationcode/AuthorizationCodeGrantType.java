@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.oauth2.internal.ApplicationCredentials;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
@@ -49,7 +49,7 @@ public interface AuthorizationCodeGrantType extends ApplicationCredentials {
    * @param currentFlowEvent event from the flow that requires a new access token.
    * @param resourceOwnerId the id of the oauth context to refresh.
    */
-  void refreshToken(MuleEvent currentFlowEvent, String resourceOwnerId) throws MuleException;
+  void refreshToken(Event currentFlowEvent, String resourceOwnerId) throws MuleException;
 
   /**
    * @return the oauth context holder for all the resource owners authenticated in this config.

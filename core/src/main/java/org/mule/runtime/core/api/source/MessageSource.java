@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.api.source;
 
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * Implemented by objects that receives or generates messages which are then processed by a {@link MessageProcessor}.
+ * Implemented by objects that receives or generates messages which are then processed by a {@link Processor}.
  *
  * @since 3.0
  */
@@ -18,5 +18,5 @@ public interface MessageSource {
   /**
    * Set the MessageProcessor listener on a message source which will be invoked when a message is received or generated.
    */
-  void setListener(MessageProcessor listener);
+  void setListener(Processor listener);
 }

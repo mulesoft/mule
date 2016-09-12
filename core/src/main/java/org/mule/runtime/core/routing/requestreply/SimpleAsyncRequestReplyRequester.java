@@ -10,27 +10,27 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROP
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transport.LegacyInboundEndpoint;
 
 public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester implements Startable, Stoppable {
 
-  protected MessageProcessor requestMessageProcessor;
+  protected Processor requestMessageProcessor;
 
   @Override
-  protected void sendAsyncRequest(MuleEvent event) throws MuleException {
-    event = MuleEvent.builder(event)
-        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
+  protected void sendAsyncRequest(Event event) throws MuleException {
+    event = Event.builder(event)
+        .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MULE_REPLY_TO_PROPERTY, getReplyTo())
             .addOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY, flowConstruct.getName()).build())
         .build();
     requestMessageProcessor.process(event);
@@ -42,7 +42,7 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
         : null;
   }
 
-  public void setMessageProcessor(MessageProcessor processor) {
+  public void setMessageProcessor(Processor processor) {
     requestMessageProcessor = processor;
   }
 

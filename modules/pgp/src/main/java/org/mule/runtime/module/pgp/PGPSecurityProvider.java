@@ -42,7 +42,7 @@ public class PGPSecurityProvider extends AbstractSecurityProvider {
       throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
     }
 
-    Message msg = (Message) auth.getCredentials();
+    PgpMessage msg = (PgpMessage) auth.getCredentials();
 
     if (msg instanceof SignedMessage) {
       try {

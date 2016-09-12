@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -49,15 +49,15 @@ public class SafeProtocolTestCase extends FunctionalTestCase {
         .getRight());
   }
 
-  private void assertResponseOk(MuleMessage message) {
+  private void assertResponseOk(InternalMessage message) {
     assertNotNull("Null message", message);
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     assertNotNull("Null payload", payload);
     assertTrue("Payload not byte[]", payload instanceof byte[]);
     assertEquals(TEST_MESSAGE + " Received", new String((byte[]) payload));
   }
 
-  protected void assertResponseBad(MuleMessage message) {
+  protected void assertResponseBad(InternalMessage message) {
     try {
       if (getPayloadAsString(message).equals(TEST_MESSAGE + " Received")) {
         fail("expected error");

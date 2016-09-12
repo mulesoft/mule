@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.processor.simple;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.processor.simple.AbstractAddVariablePropertyProcessor;
 
 import java.io.Serializable;
@@ -15,13 +15,13 @@ import java.io.Serializable;
 public class AddSessionVariableProcessor extends AbstractAddVariablePropertyProcessor<Object> {
 
   @Override
-  protected MuleEvent addProperty(MuleEvent event, String propertyName, Object value, DataType dataType) {
+  protected Event addProperty(Event event, String propertyName, Object value, DataType dataType) {
     event.getSession().setProperty(propertyName, (Serializable) value, dataType);
     return event;
   }
 
   @Override
-  protected MuleEvent removeProperty(MuleEvent event, String propertyName) {
+  protected Event removeProperty(Event event, String propertyName) {
     event.getSession().removeProperty(propertyName);
     return event;
   }

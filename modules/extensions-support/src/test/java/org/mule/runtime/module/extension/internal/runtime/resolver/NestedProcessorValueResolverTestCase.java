@@ -14,9 +14,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -32,32 +32,32 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
   private static final String RESPONSE = "Hello world!";
 
   @Mock
-  private MessageProcessor messageProcessor;
+  private Processor messageProcessor;
 
   @Before
   public void before() throws Exception {
-    when(messageProcessor.process(any(MuleEvent.class))).thenReturn(getTestEvent(RESPONSE));
+    when(messageProcessor.process(any(Event.class))).thenReturn(getTestEvent(RESPONSE));
   }
 
   @Test
   public void yieldsNestedProcessor() throws Exception {
-    MuleEvent muleEvent = getTestEvent("");
+    Event muleEvent = getTestEvent("");
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
     NestedProcessor nestedProcessor = resolver.resolve(muleEvent);
     Object response = nestedProcessor.process();
     assertThat((String) response, is(sameInstance(RESPONSE)));
 
-    ArgumentCaptor<MuleEvent> captor = ArgumentCaptor.forClass(MuleEvent.class);
+    ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(Event.class);
     verify(messageProcessor).process(captor.capture());
 
-    MuleEvent capturedEvent = captor.getValue();
+    Event capturedEvent = captor.getValue();
     assertThat(capturedEvent, is(muleEvent));
   }
 
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
-    MuleEvent muleEvent = getTestEvent("");
+    Event muleEvent = getTestEvent("");
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
     NestedProcessor resolved1 = resolver.resolve(muleEvent);

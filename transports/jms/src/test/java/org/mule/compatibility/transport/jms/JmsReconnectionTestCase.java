@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MessageReceiver;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -113,8 +113,8 @@ public class JmsReconnectionTestCase extends AbstractBrokerFunctionalTestCase {
 
   private void assertMessageRouted() throws Exception {
     flowRunner("put").withPayload(PAYLOAD).run();
-    MuleMessage message = muleContext.getClient().request("vm://out", TIMEOUT_MILLIS).getRight().get();
+    InternalMessage message = muleContext.getClient().request("vm://out", TIMEOUT_MILLIS).getRight().get();
     assertNotNull(message);
-    assertEquals(PAYLOAD, message.getPayload());
+    assertEquals(PAYLOAD, message.getPayload().getValue());
   }
 }

@@ -8,8 +8,8 @@ package org.mule.runtime.core.service.processor;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.BlockingProcessorExecutor;
 
@@ -21,14 +21,14 @@ import java.util.List;
  */
 public class ServiceProcessorExecutor extends BlockingProcessorExecutor {
 
-  public ServiceProcessorExecutor(MuleEvent event, List<MessageProcessor> processors,
+  public ServiceProcessorExecutor(Event event, List<Processor> processors,
                                   MessageProcessorExecutionTemplate messageProcessorExecutionTemplate, boolean copyOnVoidEvent) {
     super(event, processors, messageProcessorExecutionTemplate, copyOnVoidEvent);
   }
 
   @Override
-  protected MuleEvent executeNext() throws MessagingException {
-    MuleEvent result = messageProcessorExecutionTemplate.execute(nextProcessor(), event);
+  protected Event executeNext() throws MessagingException {
+    Event result = messageProcessorExecutionTemplate.execute(nextProcessor(), event);
 
     if (VoidMuleEvent.getInstance().equals(result) && copyOnVoidEvent) {
       return null;

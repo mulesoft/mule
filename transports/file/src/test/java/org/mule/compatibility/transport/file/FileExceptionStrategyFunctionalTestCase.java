@@ -13,9 +13,9 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.util.FileUtils;
@@ -213,14 +213,14 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase 
     return target;
   }
 
-  public static class BeforeCloseStream implements MessageProcessor {
+  public static class BeforeCloseStream implements Processor {
 
     public static Latch releaseLatch = new Latch();
     public static Latch awaitLatch = new Latch();
     public File file;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       releaseLatch.release();
       try {
         awaitLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -231,13 +231,13 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase 
     }
   }
 
-  public static class AfterCloseStream implements MessageProcessor {
+  public static class AfterCloseStream implements Processor {
 
     public static Latch releaseLatch = new Latch();
     public File file;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       releaseLatch.release();
       return event;
     }

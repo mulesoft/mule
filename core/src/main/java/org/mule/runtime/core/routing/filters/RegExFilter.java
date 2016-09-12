@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.config.i18n.CoreMessages.transformFailedBeforeFilter;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -74,28 +74,28 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
   }
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     // TODO MULE-9341 Remove Filters that are not needed
     Flow flowConstruct = new Flow("", muleContext);
-    return accept(MuleEvent.builder(create(flowConstruct, "RegExFilter")).message(message).exchangePattern(ONE_WAY)
+    return accept(Event.builder(create(flowConstruct, "RegExFilter")).message(message).exchangePattern(ONE_WAY)
         .flow(flowConstruct).build(), builder);
   }
 
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     try {
       if (value != null && value.getRawValue() != null) {
         return accept(value.resolveValue(event));
       } else {
-        final MuleMessage transformedMessage =
+        final InternalMessage transformedMessage =
             muleContext.getTransformationService().transform(event.getMessage(), DataType.STRING);
         // If the payload is a stream and we've consumed it, then we should set the payload on the message. This is the only time
         // this method will alter the payload on the message.
         // TODO MULE-9142 See how this API can be improved to not need the builder.
-        if (event.getMessage().getDataType().isStreamType()) {
+        if (event.getMessage().getPayload().getDataType().isStreamType()) {
           builder.message(transformedMessage);
         }
-        return accept(transformedMessage.getPayload());
+        return accept(transformedMessage.getPayload().getValue());
       }
     } catch (Exception e) {
       throw new IllegalArgumentException(e);

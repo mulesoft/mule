@@ -7,7 +7,7 @@
 package org.mule.runtime.module.tooling.api.connectivity;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Exception type that represents a failure when there's no {@link ConnectivityTestingService} that can do connectivity testing
@@ -20,7 +20,7 @@ public class UnsupportedConnectivityTestingObjectException extends MuleRuntimeEx
   /**
    * {@inheritDoc}
    */
-  public UnsupportedConnectivityTestingObjectException(Message message) {
+  public UnsupportedConnectivityTestingObjectException(I18nMessage message) {
     super(message);
   }
 }

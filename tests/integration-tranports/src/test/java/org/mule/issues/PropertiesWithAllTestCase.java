@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -29,7 +29,7 @@ public class PropertiesWithAllTestCase extends FunctionalTestCase {
 
   @Test
   public void testSessionAndOutboundProperties() throws Exception {
-    MuleEvent response = flowRunner("flow1").withPayload("Hello").run();
+    Event response = flowRunner("flow1").withPayload("Hello").run();
     assertNotNull(response);
     assertEquals("foo", response.getSession().getProperty("foo"));
     assertEquals("bar", response.getSession().getProperty("bar"));

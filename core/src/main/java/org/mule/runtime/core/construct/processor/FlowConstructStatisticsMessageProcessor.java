@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.core.construct.processor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
-public class FlowConstructStatisticsMessageProcessor implements MessageProcessor, FlowConstructAware {
+public class FlowConstructStatisticsMessageProcessor implements Processor, FlowConstructAware {
 
   protected FlowConstruct flowConstruct;
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (flowConstruct.getStatistics().isEnabled()) {
       if (event.getExchangePattern().hasResponse()) {
         flowConstruct.getStatistics().incReceivedEventSync();

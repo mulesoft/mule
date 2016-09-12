@@ -13,9 +13,9 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
 import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
@@ -43,10 +43,10 @@ public class SecurityFilterTestCase extends FunctionalTestCase {
     EndpointBuilder epb = lookupEndpointBuilder(muleContext.getRegistry(), "testEndpoint1");
     assertNotNull(epb);
     InboundEndpoint iep = epb.buildInboundEndpoint();
-    List<MessageProcessor> mps = iep.getMessageProcessors();
+    List<Processor> mps = iep.getMessageProcessors();
     int count = 0;
     SecurityFilterMessageProcessor securityMp = null;
-    for (MessageProcessor mp : mps) {
+    for (Processor mp : mps) {
       if (mp instanceof SecurityFilterMessageProcessor) {
         count++;
         securityMp = (SecurityFilterMessageProcessor) mp;
@@ -61,7 +61,7 @@ public class SecurityFilterTestCase extends FunctionalTestCase {
     mps = iep.getMessageProcessors();
     count = 0;
     securityMp = null;
-    for (MessageProcessor mp : mps) {
+    for (Processor mp : mps) {
       if (mp instanceof SecurityFilterMessageProcessor) {
         count++;
         securityMp = (SecurityFilterMessageProcessor) mp;
@@ -80,7 +80,7 @@ public class SecurityFilterTestCase extends FunctionalTestCase {
     protected void doInitialise() throws InitialisationException {}
 
     @Override
-    public MuleEvent authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+    public Event authenticate(Event event) throws SecurityException, UnknownAuthenticationTypeException,
         CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
       return event;
     }

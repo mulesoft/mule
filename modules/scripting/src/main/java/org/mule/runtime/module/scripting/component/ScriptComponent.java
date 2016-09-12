@@ -8,8 +8,8 @@ package org.mule.runtime.module.scripting.component;
 
 import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MESSAGE;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.component.AbstractComponent;
@@ -40,7 +40,7 @@ public class ScriptComponent extends AbstractComponent {
   }
 
   @Override
-  protected Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+  protected Object doInvoke(Event event, Event.Builder eventBuilder) throws Exception {
     // Set up initial script variables.
     Bindings bindings = script.getScriptEngine().createBindings();
     putBindings(bindings);
@@ -51,7 +51,7 @@ public class ScriptComponent extends AbstractComponent {
       // leave this catch block in place to help debug classloading issues
       throw e;
     } finally {
-      eventBuilder.message((MuleMessage) bindings.get(BINDING_MESSAGE));
+      eventBuilder.message((InternalMessage) bindings.get(BINDING_MESSAGE));
       bindings.clear();
     }
   }

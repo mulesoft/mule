@@ -13,7 +13,7 @@ import static org.mule.functional.functional.FlowAssert.verify;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class NonBlockingFullySupportedEndpointFunctionalTestCase extends Functio
 
   @Test
   public void testTransportOutboundEndpoint() throws Exception {
-    final MuleEvent result = flowRunner("testOutboundEndpoint").withPayload(TEST_MESSAGE)
+    final Event result = flowRunner("testOutboundEndpoint").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
     verify("testOutboundEndpoint");
     assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));
@@ -34,7 +34,7 @@ public class NonBlockingFullySupportedEndpointFunctionalTestCase extends Functio
 
   @Test
   public void testTransportOutboundEndpointError() throws Exception {
-    MuleEvent result = flowRunner("testOutboundEndpointError").withPayload(TEST_MESSAGE)
+    Event result = flowRunner("testOutboundEndpointError").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
     verify("testOutboundEndpointError");
     assertThat(result.getMessageAsString(muleContext), is(equalTo(TEST_MESSAGE)));

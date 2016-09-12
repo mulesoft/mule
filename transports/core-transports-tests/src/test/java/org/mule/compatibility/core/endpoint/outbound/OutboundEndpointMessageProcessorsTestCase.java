@@ -12,8 +12,8 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.security.EndpointSecurityFilter;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -27,9 +27,9 @@ import org.junit.Test;
  */
 public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessageProcessorTestCase {
 
-  private MuleEvent testOutboundEvent;
+  private Event testOutboundEvent;
   private OutboundEndpoint endpoint;
-  private MuleEvent result;
+  private Event result;
 
   @Override
   protected void doSetUp() throws Exception {
@@ -42,19 +42,19 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessagePr
   public void testProcessors() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     builder.chain(new TestMessageProcessor("1"), new TestMessageProcessor("2"), new TestMessageProcessor("3"));
-    MessageProcessor mpChain = builder.build();
+    Processor mpChain = builder.build();
 
     result = mpChain.process(testOutboundEvent);
-    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload().getValue());
   }
 
   @Test
   public void testNoProcessors() throws Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
-    MessageProcessor mpChain = builder.build();
+    Processor mpChain = builder.build();
 
     result = mpChain.process(testOutboundEvent);
-    assertEquals(TEST_MESSAGE, result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE, result.getMessage().getPayload().getValue());
   }
 
   protected OutboundEndpoint createOutboundEndpoint(Filter filter, EndpointSecurityFilter securityFilter, Transformer in,

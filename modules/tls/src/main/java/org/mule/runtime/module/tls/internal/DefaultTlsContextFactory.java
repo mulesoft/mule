@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.tls.TlsConfiguration;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
@@ -60,7 +60,8 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
     try {
       tlsConfiguration.initialise(null == getKeyStorePath(), null);
     } catch (CreateException e) {
-      throw new InitialisationException(MessageFactory.createStaticMessage("Unable to initialise TLS configuration"), e, this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Unable to initialise TLS configuration"), e,
+                                        this);
     }
 
     if (!isUseDefaults(enabledProtocols)) {
@@ -89,7 +90,7 @@ public class DefaultTlsContextFactory implements TlsContextFactory, Initialisabl
   }
 
   private void globalConfigNotHonored(String element, String[] elementArray) throws InitialisationException {
-    throw new InitialisationException(MessageFactory.createStaticMessage(String
+    throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
         .format("Some selected %1$s are invalid. Valid %1$s according to your TLS configuration file are: %2$s", element,
                 Joiner.on(", ").join(elementArray))), this);
   }

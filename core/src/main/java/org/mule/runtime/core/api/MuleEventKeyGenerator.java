@@ -10,7 +10,7 @@ import java.io.NotSerializableException;
 import java.io.Serializable;
 
 /**
- * Defines a way to generate cache keys for {@link MuleEvent} instances.
+ * Defines a way to generate cache keys for {@link Event} instances.
  */
 public interface MuleEventKeyGenerator {
 
@@ -23,5 +23,5 @@ public interface MuleEventKeyGenerator {
    * @return the generated key
    * @throws NotSerializableException if the generated key is not {@link Serializable}
    */
-  Serializable generateKey(MuleEvent event) throws NotSerializableException;
+  Serializable generateKey(Event event) throws NotSerializableException;
 }

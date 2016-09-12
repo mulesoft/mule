@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.getTestEventContext;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
@@ -30,7 +30,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("bite");
     MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -39,7 +39,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("wash");
     MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new Apple(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -47,7 +47,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testDynamicMethodMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new Apple(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals("Apple service has a number of matching method, so should have failed", result.getState(),
                  InvocationResult.State.FAILED);
   }
@@ -56,7 +56,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testDynamicMethodMatchPass() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 
@@ -65,7 +65,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     assertTrue(resolver.removeIgnoredMethod("is*"));
     MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new InvalidSatsuma(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals("Satsuma service has a number of matching method, so should have failed", result.getState(),
                  InvocationResult.State.FAILED);
   }
@@ -76,7 +76,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("wash");
     MuleEventContext eventContext = getTestEventContext(null, REQUEST_RESPONSE, muleContext);
-    InvocationResult result = resolver.invoke(new Apple(), eventContext, MuleEvent.builder(eventContext.getEvent()));
+    InvocationResult result = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
 }

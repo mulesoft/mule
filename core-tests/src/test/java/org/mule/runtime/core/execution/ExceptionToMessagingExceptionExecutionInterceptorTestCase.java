@@ -18,9 +18,9 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
@@ -38,13 +38,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends AbstractMuleTestCase {
 
   @Mock
-  private MessageProcessor mockMessageProcessor;
+  private Processor mockMessageProcessor;
   @Mock
   private MuleContext mockMuleContext;
   @Mock
-  private MuleEvent mockMuleEvent;
+  private Event mockMuleEvent;
   @Mock
-  private MuleEvent mockResultMuleEvent;
+  private Event mockResultMuleEvent;
   @Mock
   private MessagingException mockMessagingException;
   @Mock
@@ -75,7 +75,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptorTestCase extends A
   @Test
   public void executionSuccessfully() throws MuleException {
     when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
-    MuleEvent result = cut.execute(mockMessageProcessor, mockMuleEvent);
+    Event result = cut.execute(mockMessageProcessor, mockMuleEvent);
     assertThat(result, is(mockResultMuleEvent));
   }
 

@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.util.IOUtils.toByteArray;
 
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
@@ -99,11 +99,11 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void proxy() {
-    final Class<?> muleMessageProxy = Proxy.getProxyClass(DataTypeBuilderTestCase.class.getClassLoader(), MuleMessage.class);
+    final Class<?> muleMessageProxy = Proxy.getProxyClass(DataTypeBuilderTestCase.class.getClassLoader(), Message.class);
 
     final DataType dataType = DataType.fromType(muleMessageProxy);
 
-    assertThat(dataType.getType(), is(equalTo(MuleMessage.class)));
+    assertThat(dataType.getType(), is(equalTo(Message.class)));
   }
 
   @Test
@@ -151,10 +151,10 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
 
       @Override
       public Class<?> loadClass(String name) throws ClassNotFoundException {
-        if (MuleMessage.class.getName().equals(name)) {
+        if (Message.class.getName().equals(name)) {
           byte[] classBytes;
           try {
-            classBytes = toByteArray(this.getClass().getResourceAsStream("/org/mule/runtime/api/message/MuleMessage.class"));
+            classBytes = toByteArray(this.getClass().getResourceAsStream("/org/mule/runtime/api/message/Message.class"));
             return this.defineClass(null, classBytes, 0, classBytes.length);
           } catch (Exception e) {
             return super.loadClass(name);
@@ -166,7 +166,7 @@ public class DataTypeBuilderTestCase extends AbstractMuleTestCase {
     };
 
     PhantomReference<ClassLoader> clRef = new PhantomReference<>(custom, new ReferenceQueue<>());
-    DataType.builder().type(custom.loadClass(MuleMessage.class.getName())).build();
+    DataType.builder().type(custom.loadClass(Message.class.getName())).build();
     custom = null;
 
     new PollingProber().check(new JUnitLambdaProbe(() -> {

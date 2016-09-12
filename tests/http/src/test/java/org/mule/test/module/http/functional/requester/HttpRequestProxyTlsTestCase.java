@@ -14,7 +14,7 @@ import static org.mule.test.module.http.functional.matcher.HttpMessageAttributes
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -90,7 +90,7 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
     proxyServer.start();
 
-    MuleEvent event = flowRunner("clientFlow").withPayload(TEST_MESSAGE).withFlowVariable("host", requestHost)
+    Event event = flowRunner("clientFlow").withPayload(TEST_MESSAGE).withFlowVariable("host", requestHost)
         .withFlowVariable("path", PATH).run();
 
     assertThat(requestPayload, equalTo(TEST_MESSAGE));

@@ -8,10 +8,10 @@ package org.mule.test.core;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
@@ -31,11 +31,11 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
 
 
   private String payload;
-  private MuleEvent events[];
-  private MuleEvent muleEventWith0Properties;
-  private MuleEvent muleEventWith10Properties;
-  private MuleEvent muleEventWith50Properties;
-  private MuleEvent muleEventWith100Properties;
+  private Event events[];
+  private Event muleEventWith0Properties;
+  private Event muleEventWith10Properties;
+  private Event muleEventWith50Properties;
+  private Event muleEventWith100Properties;
   private static final int repetitions = 1000;
 
   @Override
@@ -46,8 +46,8 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Before
   public void before() throws IOException {
     payload = IOUtils.getResourceAsString("test-data.json", getClass());
-    events = new MuleEvent[repetitions];
-    muleEventWith0Properties = createMuleEvent(MuleMessage.builder().payload(payload).build(), 0);
+    events = new Event[repetitions];
+    muleEventWith0Properties = createMuleEvent(InternalMessage.builder().payload(payload).build(), 0);
     muleEventWith10Properties = createMuleEventWithFlowVarsAndProperties(10);
     muleEventWith50Properties = createMuleEventWithFlowVarsAndProperties(50);
     muleEventWith100Properties = createMuleEventWithFlowVarsAndProperties(100);
@@ -57,9 +57,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Required(throughput = 1200, average = 1, percentile90 = 2)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copy() throws Exception {
-    MuleEvent original = muleEventWith0Properties;
+    Event original = muleEventWith0Properties;
     for (int i = 0; i < repetitions; i++) {
-      events[i] = MuleEvent.builder(original).session(new DefaultMuleSession(original.getSession())).build();
+      events[i] = Event.builder(original).session(new DefaultMuleSession(original.getSession())).build();
     }
   }
 
@@ -67,9 +67,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Required(throughput = 1200, average = 1, percentile90 = 2)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copyWith10FlowVarsAnd10Properties() throws Exception {
-    MuleEvent original = muleEventWith10Properties;
+    Event original = muleEventWith10Properties;
     for (int i = 0; i < repetitions; i++) {
-      events[i] = MuleEvent.builder(original).session(new DefaultMuleSession(original.getSession())).build();
+      events[i] = Event.builder(original).session(new DefaultMuleSession(original.getSession())).build();
     }
   }
 
@@ -77,9 +77,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Required(throughput = 1100, average = 1, percentile90 = 2)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copyWith50FlowVarsAnd50Properties() throws Exception {
-    MuleEvent original = muleEventWith50Properties;
+    Event original = muleEventWith50Properties;
     for (int i = 0; i < repetitions; i++) {
-      events[i] = MuleEvent.builder(original).session(new DefaultMuleSession(original.getSession())).build();
+      events[i] = Event.builder(original).session(new DefaultMuleSession(original.getSession())).build();
     }
   }
 
@@ -87,11 +87,11 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Required(throughput = 340, average = 3, percentile90 = 4)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copyWith10FlowVarsAnd10PropertiesWrite1OfEach() throws Exception {
-    MuleEvent original = muleEventWith10Properties;
+    Event original = muleEventWith10Properties;
     for (int i = 0; i < repetitions; i++) {
-      events[i] = MuleEvent.builder(original).session(new DefaultMuleSession(original.getSession()))
-          .addFlowVariable("newKey", "val")
-          .message(MuleMessage.builder(events[i].getMessage()).addInboundProperty("newKey", "val")
+      events[i] = Event.builder(original).session(new DefaultMuleSession(original.getSession()))
+          .addVariable("newKey", "val")
+          .message(InternalMessage.builder(events[i].getMessage()).addInboundProperty("newKey", "val")
               .addOutboundProperty("newKey", "val").build())
           .build();
     }
@@ -101,13 +101,13 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Required(throughput = 170, average = 6, percentile90 = 7)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copyWith10FlowVarsAnd10PropertiesWrite5OfEach() throws Exception {
-    MuleEvent original = muleEventWith10Properties;
+    Event original = muleEventWith10Properties;
     for (int i = 0; i < repetitions; i++) {
-      final Builder eventBuilder = MuleEvent.builder(original);
+      final Builder eventBuilder = Event.builder(original);
       eventBuilder.session(new DefaultMuleSession(original.getSession())).build();
-      MuleMessage.Builder builder = MuleMessage.builder(events[i].getMessage());
+      InternalMessage.Builder builder = InternalMessage.builder(events[i].getMessage());
       for (int j = 1; j <= 5; j++) {
-        eventBuilder.addFlowVariable("newKey" + j, "val");
+        eventBuilder.addVariable("newKey" + j, "val");
         builder.addInboundProperty("newKey", "val").addOutboundProperty("newKey", "val").build();
       }
       events[i] = eventBuilder.message(builder.build()).build();
@@ -118,11 +118,11 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Required(throughput = 120, average = 8, percentile90 = 9)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copyWith50FlowVarsAnd50PropertiesWrite1OfEach() throws Exception {
-    MuleEvent original = muleEventWith50Properties;
+    Event original = muleEventWith50Properties;
     for (int i = 0; i < repetitions; i++) {
-      events[i] = MuleEvent.builder(original).session(new DefaultMuleSession(original.getSession()))
-          .addFlowVariable("newKey", "val")
-          .message(MuleMessage.builder(events[i].getMessage()).addInboundProperty("newKey", "val")
+      events[i] = Event.builder(original).session(new DefaultMuleSession(original.getSession()))
+          .addVariable("newKey", "val")
+          .message(InternalMessage.builder(events[i].getMessage()).addInboundProperty("newKey", "val")
               .addOutboundProperty("newKey", "val").build())
           .build();
     }
@@ -132,41 +132,41 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   @Required(throughput = 35, average = 27, percentile90 = 30)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
   public void copyWith100FlowVarsAndPropertiesWrite25OfEach() throws Exception {
-    MuleEvent original = muleEventWith100Properties;
+    Event original = muleEventWith100Properties;
     for (int i = 0; i < repetitions; i++) {
-      final Builder eventBuilder = MuleEvent.builder(original);
+      final Builder eventBuilder = Event.builder(original);
       eventBuilder.session(new DefaultMuleSession(original.getSession())).build();
-      MuleMessage.Builder builder = MuleMessage.builder(events[i].getMessage());
+      InternalMessage.Builder builder = InternalMessage.builder(events[i].getMessage());
       for (int j = 1; j <= 25; j++) {
-        eventBuilder.addFlowVariable("newKey" + j, "val");
+        eventBuilder.addVariable("newKey" + j, "val");
         builder.addInboundProperty("newKey", "val").addOutboundProperty("newKey", "val").build();
       }
       events[i] = eventBuilder.message(builder.build()).build();
     }
   }
 
-  protected MuleEvent createMuleEvent(MuleMessage message, int numProperties) {
+  protected Event createMuleEvent(InternalMessage message, int numProperties) {
     Flow flow;
     try {
       flow = getTestFlow();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    final MuleEvent.Builder builder = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message)
+    final Event.Builder builder = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
         .exchangePattern(ONE_WAY).flow(flow);
     for (int i = 1; i <= numProperties; i++) {
-      builder.addFlowVariable("FlOwVaRiAbLeKeY" + i, "val");
+      builder.addVariable("FlOwVaRiAbLeKeY" + i, "val");
     }
     return builder.build();
   }
 
-  protected MuleEvent createMuleEventWithFlowVarsAndProperties(int numProperties) {
-    MuleMessage.Builder builder = MuleMessage.builder().payload(payload);
+  protected Event createMuleEventWithFlowVarsAndProperties(int numProperties) {
+    InternalMessage.Builder builder = InternalMessage.builder().payload(payload);
     for (int i = 1; i <= numProperties; i++) {
       builder.addInboundProperty("InBoUnDpRoPeRtYkEy" + i, "val");
     }
-    MuleMessage message = builder.build();
-    MuleEvent event = createMuleEvent(message, numProperties);
+    InternalMessage message = builder.build();
+    Event event = createMuleEvent(message, numProperties);
     return event;
   }
 

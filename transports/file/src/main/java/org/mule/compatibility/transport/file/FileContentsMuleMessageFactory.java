@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;
@@ -16,7 +16,7 @@ import java.nio.charset.Charset;
 
 /**
  * <code>FileContentsMuleMessageFactory</code> converts the {@link InputStream}'s content into a <code>byte[]</code> as payload
- * for the {@link MuleMessage}.
+ * for the {@link Message}.
  */
 public class FileContentsMuleMessageFactory extends FileMuleMessageFactory {
 

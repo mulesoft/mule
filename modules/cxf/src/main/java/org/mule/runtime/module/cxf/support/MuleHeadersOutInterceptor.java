@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_S
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.module.cxf.MuleSoapHeaders.MULE_HEADER;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.cxf.CxfConstants;
 import org.mule.runtime.module.cxf.MuleSoapHeaders;
 
@@ -43,7 +43,7 @@ public class MuleHeadersOutInterceptor extends AbstractMuleHeaderInterceptor {
     }
 
     SoapMessage message = (SoapMessage) m;
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
 
     if (event == null || event instanceof NonBlockingVoidMuleEvent) {
       return;

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.oauth2.internal;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.TokenResponseConfiguration;
 
@@ -48,8 +48,8 @@ public class TokenResponseProcessor {
     this.retrieveRefreshToken = retrieveRefreshToken;
   }
 
-  public void process(MuleEvent muleEvent) {
-    Builder builder = MuleEvent.builder(muleEvent);
+  public void process(Event muleEvent) {
+    Builder builder = Event.builder(muleEvent);
     accessToken = expressionLanguage.parse(tokenResponseConfiguration.getAccessToken(), muleEvent, builder, null);
     muleEvent = builder.build();
     accessToken = isEmpty(accessToken) ? null : accessToken;
@@ -58,17 +58,17 @@ public class TokenResponseProcessor {
           + tokenResponseConfiguration.getAccessToken());
     }
     if (retrieveRefreshToken) {
-      builder = MuleEvent.builder(muleEvent);
+      builder = Event.builder(muleEvent);
       refreshToken = expressionLanguage.parse(tokenResponseConfiguration.getRefreshToken(), muleEvent, builder, null);
       muleEvent = builder.build();
       refreshToken = isEmpty(refreshToken) ? null : refreshToken;
     }
-    builder = MuleEvent.builder(muleEvent);
+    builder = Event.builder(muleEvent);
     expiresIn = expressionLanguage.parse(tokenResponseConfiguration.getExpiresIn(), muleEvent, builder, null);
     muleEvent = builder.build();
     customResponseParameters = new HashMap<>();
     for (ParameterExtractor parameterExtractor : tokenResponseConfiguration.getParameterExtractors()) {
-      builder = MuleEvent.builder(muleEvent);
+      builder = Event.builder(muleEvent);
       customResponseParameters.put(parameterExtractor.getParamName(),
                                    expressionLanguage.evaluate(parameterExtractor.getValue(), muleEvent, builder, null));
       muleEvent = builder.build();

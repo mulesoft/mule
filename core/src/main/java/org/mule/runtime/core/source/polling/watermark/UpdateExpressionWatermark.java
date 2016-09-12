@@ -7,12 +7,12 @@
 
 package org.mule.runtime.core.source.polling.watermark;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.store.ObjectStore;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingInterceptor;
 
 import java.io.NotSerializableException;
@@ -44,7 +44,7 @@ public class UpdateExpressionWatermark extends Watermark implements Initialisabl
       try {
         this.muleContext.getExpressionLanguage().validate(this.updateExpression);
       } catch (InvalidExpressionException e) {
-        throw new InitialisationException(MessageFactory.createStaticMessage(String
+        throw new InitialisationException(I18nMessageFactory.createStaticMessage(String
             .format("update-expression requires a valid MEL expression. '%s' was found instead", this.updateExpression)), e,
                                           this);
       }
@@ -54,13 +54,13 @@ public class UpdateExpressionWatermark extends Watermark implements Initialisabl
   /**
    * Returns the new watermark value by evaluating {@link #updateExpression} on the flowVar of the given name
    * 
-   * @param event the @{link {@link MuleEvent} in which the watermark is being evaluated
+   * @param event the @{link {@link Event} in which the watermark is being evaluated
    * @return a {@link Serializable} value
    */
   @Override
-  protected Object getUpdatedValue(MuleEvent event) {
+  protected Object getUpdatedValue(Event event) {
     try {
-      return StringUtils.isEmpty(this.updateExpression) ? event.getFlowVariable(this.resolveVariable(event))
+      return StringUtils.isEmpty(this.updateExpression) ? event.getVariable(this.resolveVariable(event))
           : WatermarkUtils.evaluate(this.updateExpression, event, muleContext);
     } catch (NotSerializableException e) {
       throw new IllegalArgumentException(e);

@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.PropertyScope;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
 import java.io.Serializable;
@@ -53,7 +53,7 @@ public final class StringMessageUtils {
 
   public static String getBoilerPlate(String message, char c, int maxlength) {
     List<String> messages = Arrays.asList(new String[] {message});
-    messages = new ArrayList<String>(messages);
+    messages = new ArrayList<>(messages);
     return getBoilerPlate(messages, c, maxlength);
   }
 
@@ -184,7 +184,7 @@ public final class StringMessageUtils {
     }
   }
 
-  public static String headersToString(MuleMessage m) {
+  public static String headersToString(InternalMessage m) {
     if (m == null) {
       return null;
     }
@@ -207,13 +207,13 @@ public final class StringMessageUtils {
     return buf.toString();
   }
 
-  private static void appendPropertyValues(MuleMessage m, StringBuilder buf, Set<String> names,
+  private static void appendPropertyValues(InternalMessage m, StringBuilder buf, Set<String> names,
                                            Function<String, Serializable> valueResolver) {
     for (String name : names) {
       Serializable value = valueResolver.apply(name);
-      // avoid calling toString recursively on MuleMessages
-      if (value instanceof MuleMessage) {
-        value = "<<<MuleMessage>>>";
+      // avoid calling toString recursively on Messages
+      if (value instanceof InternalMessage) {
+        value = "<<<Message>>>";
       }
       if (name.equals("password") || name.toString().contains("secret") || name.equals("pass")) {
         value = "****";

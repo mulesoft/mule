@@ -11,11 +11,11 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 /**
- * Extension of {@link MessageContext} with core specific methods.
+ * Extension of {@link EventContext} with core specific methods.
  *
  * @since 4.0
  */
-public interface CoreMessageContext extends MessageContext {
+public interface CoreEventContext extends EventContext {
 
   /**
    * @returns information about the times spent processing the events for this context (so far).

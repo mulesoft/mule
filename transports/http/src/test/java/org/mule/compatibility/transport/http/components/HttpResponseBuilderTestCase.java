@@ -24,16 +24,17 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -78,21 +79,21 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
 
 
   private MuleContext muleContext;
-  private MuleMessage mockMuleMessage;
+  private InternalMessage mockMuleMessage;
   private ExpressionLanguage mockExpressionLanguage = mock(ExpressionLanguage.class);
-  private MuleEvent mockEvent;
+  private Event mockEvent;
 
   @Before
   public void setUp() {
     muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    mockEvent = mock(MuleEvent.class);
-    mockMuleMessage = mock(MuleMessage.class);
+    mockEvent = mock(Event.class);
+    mockMuleMessage = mock(InternalMessage.class);
     when(mockEvent.getMessage()).thenAnswer(invocation -> mockMuleMessage);
     when(mockEvent.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(mockEvent.getError()).thenReturn(empty());
     final Flow flow = mock(Flow.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
-    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
     when(mockEvent.getContext()).thenReturn(executionContext);
     mockExpressionLanguage = mock(ExpressionLanguage.class);
     when(muleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
@@ -101,10 +102,10 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testEmptyHttpResponseBuilder() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).build();
 
     mockParse();
-    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
+    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload().getValue();
     assertEquals(HTTP_BODY, httpResponse.getBodyAsString());
     assertEquals(HttpConstants.HTTP11, httpResponse.getHttpVersion().toString());
     assertEquals(HttpConstants.SC_OK, httpResponse.getStatusCode());
@@ -114,13 +115,13 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testHttpResponseBuilderAttributes() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).build();
 
     httpResponseBuilder.setContentType("text/html");
     httpResponseBuilder.setStatus(String.valueOf(HttpConstants.SC_INTERNAL_SERVER_ERROR));
 
     mockParse();
-    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
+    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload().getValue();
     assertEquals(HTTP_BODY, httpResponse.getBodyAsString());
     assertEquals(HttpConstants.HTTP11, httpResponse.getHttpVersion().toString());
     assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, httpResponse.getStatusCode());
@@ -130,7 +131,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testHttpResponseBuilderAttributesWithExpressions() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).build();
 
     httpResponseBuilder.setStatus(HEADER_STATUS);
     httpResponseBuilder.setContentType(HEADER_CONTENT_TYPE);
@@ -140,7 +141,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     when(mockExpressionLanguage.parse(HEADER_CONTENT_TYPE, mockEvent, null)).thenReturn("text/html");
 
 
-    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
+    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload().getValue();
     assertEquals(HTTP_BODY, httpResponse.getBodyAsString());
     assertEquals(HttpConstants.HTTP11, httpResponse.getHttpVersion().toString());
     assertEquals(HttpConstants.SC_INTERNAL_SERVER_ERROR, httpResponse.getStatusCode());
@@ -267,7 +268,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void testHttpResponseDefaultContentType() throws Exception {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
-    when(mockMuleMessage.getDataType()).thenReturn(DataType.HTML_STRING);
+    when(mockMuleMessage.getPayload()).thenReturn(new DefaultTypedValue("", DataType.HTML_STRING));
 
     when(mockEvent.getMessage()).thenReturn(mockMuleMessage);
 
@@ -363,7 +364,8 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     when(mockMuleMessage.getOutboundPropertyNames()).thenReturn(propertyNames);
     for (String propertyName : propertyNames) {
       when(mockMuleMessage.getOutboundProperty(propertyName)).thenReturn(outboundProperties.get(propertyName));
-      when(mockMuleMessage.getDataType()).thenReturn(DataType.builder(DataType.OBJECT).charset(StandardCharsets.UTF_8).build());
+      when(mockMuleMessage.getPayload())
+          .thenReturn(new DefaultTypedValue<>(null, DataType.builder(DataType.OBJECT).charset(StandardCharsets.UTF_8).build()));
     }
 
     HttpResponse response = new HttpResponse();
@@ -405,9 +407,9 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     outboundProperties.put(HttpConstants.HEADER_LOCATION, "http://localhost:9090");
 
     mockParse();
-    mockMuleMessage = MuleMessage.builder().payload(HTTP_BODY).outboundProperties(outboundProperties).build();
+    mockMuleMessage = InternalMessage.builder().payload(HTTP_BODY).outboundProperties(outboundProperties).build();
 
-    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload();
+    HttpResponse httpResponse = (HttpResponse) httpResponseBuilder.process(mockEvent).getMessage().getPayload().getValue();
     Header[] resultHeaders = httpResponse.getHeaders();
     validateHeader(resultHeaders, HttpConstants.HEADER_CACHE_CONTROL, "max-age=3600,public");
     validateHeader(resultHeaders, HttpConstants.HEADER_AGE, "12");
@@ -466,7 +468,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     HttpResponse response = new HttpResponse();
     response.setBody(HTTP_BODY);
 
-    when(mockMuleMessage.getPayload()).thenReturn(response);
+    when(mockMuleMessage.getPayload()).thenReturn(new DefaultTypedValue(HTTP_BODY, DataType.OBJECT));
 
     httpResponseBuilder.setBody(response, mockMuleMessage, mockEvent);
     assertEquals(HTTP_BODY, response.getBodyAsString());
@@ -477,7 +479,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
     HttpResponseBuilder httpResponseBuilder = createHttpResponseBuilder();
     HttpResponse response = new HttpResponse();
 
-    when(mockMuleMessage.getPayload()).thenReturn(HTTP_BODY);
+    when(mockMuleMessage.getPayload()).thenReturn(new DefaultTypedValue(HTTP_BODY, DataType.HTML_STRING));
 
     httpResponseBuilder.setBody(response, mockMuleMessage, mockEvent);
     assertEquals(HTTP_BODY, response.getBodyAsString());
@@ -530,7 +532,7 @@ public class HttpResponseBuilderTestCase extends AbstractMuleTestCase {
   }
 
   private void mockParse() {
-    when(mockExpressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 }

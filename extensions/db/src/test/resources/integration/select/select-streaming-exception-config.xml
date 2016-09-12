@@ -23,7 +23,7 @@
         <set-payload value="#[true]"/>
         <error-handler>
             <on-error-continue>
-                <set-payload value="#[planets.payload.hasNext()]"/>
+                <set-payload value="#[planets.payload.value.hasNext()]"/>
             </on-error-continue>
         </error-handler>
     </flow>

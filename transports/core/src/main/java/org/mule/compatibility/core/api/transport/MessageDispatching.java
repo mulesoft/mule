@@ -6,8 +6,8 @@
  */
 package org.mule.compatibility.core.api.transport;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 
 /**
@@ -29,7 +29,7 @@ public interface MessageDispatching {
    * @param event The event to dispatch
    * @throws DispatchException if the event fails to be dispatched
    */
-  void dispatch(MuleEvent event) throws DispatchException;
+  void dispatch(Event event) throws DispatchException;
 
   /**
    * Sends an event from the endpoint to the external system
@@ -38,6 +38,6 @@ public interface MessageDispatching {
    * @return event the response form the external system wrapped in a MuleEvent
    * @throws DispatchException if the event fails to be dispatched
    */
-  MuleMessage send(MuleEvent event) throws DispatchException;
+  InternalMessage send(Event event) throws DispatchException;
 
 }

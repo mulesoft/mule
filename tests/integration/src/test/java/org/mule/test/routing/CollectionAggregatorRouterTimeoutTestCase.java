@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
 import org.mule.runtime.core.context.notification.RoutingNotification;
@@ -57,7 +57,7 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrati
     Thread.sleep(RECEIVE_TIMEOUT);
 
     // no correlation timeout should ever fire
-    assertThat("Correlation timeout should not have happened.", correlationTimeoutCount.intValue(), is(0));
+    assertThat("GroupCorrelation timeout should not have happened.", correlationTimeoutCount.intValue(), is(0));
 
     // should receive only the second message
     assertThat("Vortex received wrong number of messages.", vortex.getReceivedMessagesCount(), is(1));
@@ -65,7 +65,8 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrati
 
     // should receive only the first part
     assertThat("Aggregator received wrong number of messages.", aggregator.getReceivedMessagesCount(), is(1));
-    assertThat("Wrong message received", ((List<MuleMessage>) aggregator.getLastReceivedMessage()).get(0).getPayload(),
+    assertThat("Wrong message received",
+               ((List<InternalMessage>) aggregator.getLastReceivedMessage()).get(0).getPayload().getValue(),
                is("first"));
 
     // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator

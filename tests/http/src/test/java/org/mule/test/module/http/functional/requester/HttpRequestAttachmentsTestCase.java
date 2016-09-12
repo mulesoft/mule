@@ -35,7 +35,7 @@ public class HttpRequestAttachmentsTestCase extends AbstractHttpTestCase {
   @Test
   public void inputStreamAttachmentWithUnsupportedContentType() throws Exception {
     final MuleEvent result = runFlow("attachmentFromBytes");
-    assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload()), is("OK"));
+    assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload().getValue()), is("OK"));
     FlowAssert.verify("reqWithAttachment");
   }
 
@@ -45,7 +45,7 @@ public class HttpRequestAttachmentsTestCase extends AbstractHttpTestCase {
   @Test
   public void byteArrayAttachmentWithUnsupportedContentType() throws Exception {
     final MuleEvent result = runFlow("attachmentFromStream");
-    assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload()), is("OK"));
+    assertThat(IOUtils.toString((InputStream) result.getMessage().getPayload().getValue()), is("OK"));
     FlowAssert.verify("reqWithAttachment");
   }
 }

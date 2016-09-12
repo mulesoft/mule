@@ -6,7 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.routing.MessageFilter;
 
 public class ExceptionThrowingInboundRouter extends MessageFilter {
@@ -20,7 +20,7 @@ public class ExceptionThrowingInboundRouter extends MessageFilter {
   }
 
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     throw new RuntimeException();
   }
 }

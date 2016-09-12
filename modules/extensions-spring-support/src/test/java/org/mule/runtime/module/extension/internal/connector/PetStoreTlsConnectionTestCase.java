@@ -54,7 +54,7 @@ public class PetStoreTlsConnectionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void tls() throws Exception {
-    PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload();
+    PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload().getValue();
     assertThat(client.getTlsContext(), is(notNullValue()));
   }
 }

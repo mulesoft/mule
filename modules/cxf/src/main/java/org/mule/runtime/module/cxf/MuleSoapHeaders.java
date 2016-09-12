@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_I
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
-import org.mule.runtime.core.api.CoreMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.CoreEventContext;
+import org.mule.runtime.core.api.Event;
 
 import java.util.Iterator;
 
@@ -49,14 +49,14 @@ public class MuleSoapHeaders {
    * 
    * @param event
    */
-  public MuleSoapHeaders(MuleEvent event) {
-    if ((event.getContext() instanceof CoreMessageContext
-        && ((CoreMessageContext) event.getContext()).isCorrelationIdFromSource())
+  public MuleSoapHeaders(Event event) {
+    if ((event.getContext() instanceof CoreEventContext
+        && ((CoreEventContext) event.getContext()).isCorrelationIdFromSource())
         || !event.getCorrelationId().equals(event.getContext().getCorrelationId())) {
       setCorrelationId(event.getCorrelationId());
     }
-    event.getCorrelation().getGroupSize().map(v -> v.toString()).ifPresent(v -> setCorrelationGroup(v));
-    event.getCorrelation().getSequence().map(v -> v.toString()).ifPresent(v -> setCorrelationSequence(v));
+    event.getGroupCorrelation().getGroupSize().map(v -> v.toString()).ifPresent(v -> setCorrelationGroup(v));
+    event.getGroupCorrelation().getSequence().map(v -> v.toString()).ifPresent(v -> setCorrelationSequence(v));
   }
 
   /**

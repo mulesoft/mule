@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.cxf.config;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
@@ -53,8 +53,8 @@ public class WsConfig implements MuleContextAware {
     }
 
     private Map<String, Object> getEvaluatedMap() {
-      MuleEvent event = getCurrentEvent();
-      MuleMessage message = (event != null) ? event.getMessage() : null;
+      Event event = getCurrentEvent();
+      InternalMessage message = (event != null) ? event.getMessage() : null;
       if (map != null && message != null) {
         Map<String, Object> evaluatedMap = new LinkedHashMap<>(map.size());
         for (Entry<String, Object> entry : map.entrySet()) {

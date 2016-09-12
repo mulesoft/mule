@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.exception;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 /**
  * Handler that will consume errors and finally commit transactions. Replaces the catch-exception-strategy from Mule 3.
@@ -21,18 +21,18 @@ public class OnErrorContinueHandler extends TemplateOnErrorHandler {
   }
 
   @Override
-  protected MuleEvent nullifyExceptionPayloadIfRequired(MuleEvent event) {
-    return MuleEvent.builder(event).error(null).message(MuleMessage.builder(event.getMessage()).exceptionPayload(null).build())
+  protected Event nullifyExceptionPayloadIfRequired(Event event) {
+    return Event.builder(event).error(null).message(InternalMessage.builder(event.getMessage()).exceptionPayload(null).build())
         .build();
   }
 
   @Override
-  protected MuleEvent afterRouting(MessagingException exception, MuleEvent event) {
+  protected Event afterRouting(MessagingException exception, Event event) {
     return event;
   }
 
   @Override
-  protected MuleEvent beforeRouting(MessagingException exception, MuleEvent event) {
+  protected Event beforeRouting(MessagingException exception, Event event) {
     return event;
   }
 

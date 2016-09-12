@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 
@@ -36,9 +36,9 @@ public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase {
   public void testFilterScript() throws Exception {
     MuleClient client = muleContext.getClient();
     flowRunner("filterService").withPayload("hello").asynchronously().run();
-    MuleMessage response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertEquals("hello", response.getPayload());
+    assertEquals("hello", response.getPayload().getValue());
 
     flowRunner("filterService").withPayload("1").asynchronously().run();
     assertThat(client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));

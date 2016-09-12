@@ -7,8 +7,8 @@
 package org.mule.runtime.core.routing.correlation;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
@@ -20,13 +20,13 @@ import java.util.Comparator;
 /**
  * A Correlator that correlates messages based on Mule correlation settings. Note that the
  * {@link #aggregateEvents(org.mule.runtime.core.routing.EventGroup)} method only resequences the events and returns an
- * MuleEvent[] wrapped in a MuleMessage impl. This means that this callback can ONLY be used with a {@link Resequencer}
+ * MuleEvent[] wrapped in a Message impl. This means that this callback can ONLY be used with a {@link Resequencer}
  */
 public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
 
-  protected Comparator<MuleEvent> eventComparator;
+  protected Comparator<Event> eventComparator;
 
-  public ResequenceCorrelatorCallback(Comparator<MuleEvent> eventComparator, MuleContext muleContext, String storePrefix) {
+  public ResequenceCorrelatorCallback(Comparator<Event> eventComparator, MuleContext muleContext, String storePrefix) {
     super(muleContext, storePrefix);
     this.eventComparator = eventComparator;
   }
@@ -41,8 +41,8 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
    *         exception handler for this componenet
    */
   @Override
-  public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
-    MuleEvent results[];
+  public Event aggregateEvents(EventGroup events) throws AggregationException {
+    Event results[];
 
     try {
       results = events.toArray(false);
@@ -53,7 +53,7 @@ public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback {
     Arrays.sort(results, eventComparator);
     // This is a bit of a hack since we wrap the the collection of events in a
     // Mule Message to pass back
-    return MuleEvent.builder(results[0]).message(MuleMessage.builder().payload(results).build()).build();
+    return Event.builder(results[0]).message(InternalMessage.builder().payload(results).build()).build();
   }
 
 }

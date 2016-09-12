@@ -8,7 +8,7 @@ package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * your needs.
  */
 public class LoggerMessageProcessor extends AbstractAnnotatedObject
-    implements MessageProcessor, Initialisable, MuleContextAware, FlowConstructAware {
+    implements Processor, Initialisable, MuleContextAware, FlowConstructAware {
 
   protected transient Logger logger;
 
@@ -56,12 +56,12 @@ public class LoggerMessageProcessor extends AbstractAnnotatedObject
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     log(event);
     return event;
   }
 
-  protected void log(MuleEvent event) {
+  protected void log(Event event) {
     if (event == null) {
       logWithLevel(null);
     } else {

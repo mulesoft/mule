@@ -7,7 +7,7 @@
 package org.mule.runtime.core.keygenerator;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventKeyGenerator;
 import org.mule.runtime.core.api.context.MuleContextAware;
 
@@ -29,7 +29,7 @@ public class ExpressionMuleEventKeyGenerator implements MuleEventKeyGenerator, M
   private MuleContext muleContext;
 
   @Override
-  public Serializable generateKey(MuleEvent event) throws NotSerializableException {
+  public Serializable generateKey(Event event) throws NotSerializableException {
     Object key = muleContext.getExpressionLanguage().evaluate(expression, event, null);
 
     if (logger.isDebugEnabled()) {

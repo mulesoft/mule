@@ -17,13 +17,13 @@ import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMe
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.builder.HttpResponseAttributesBuilder;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.MuleMessage.Builder;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.Message.Builder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component that transforms an HTTP response to a proper {@link MuleMessage}.
+ * Component that transforms an HTTP response to a proper {@link Message}.
  *
  * @since 4.0
  */
@@ -63,9 +63,9 @@ public class HttpResponseToMuleMessage {
     this.muleContext = muleContext;
   }
 
-  public MuleMessage convert(MuleEvent muleEvent, HttpResponse response, String uri) throws MessagingException {
+  public Message convert(Event muleEvent, HttpResponse response, String uri) throws MessagingException {
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
-    DataType dataType = muleEvent.getMessage().getDataType();
+    DataType dataType = muleEvent.getMessage().getPayload().getDataType();
     if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType())) {
       responseContentType = dataType.getMediaType().toRfcString();
     }
@@ -93,7 +93,7 @@ public class HttpResponseToMuleMessage {
     HttpResponseAttributes responseAttributes = createAttributes(response);
 
     dataType = DataType.builder(dataType).charset(encoding).build();
-    final Builder builder = MuleMessage.builder(muleEvent.getMessage()).payload(payload);
+    final Builder builder = Message.builder(muleEvent.getMessage()).payload(payload);
 
     if (StringUtils.isEmpty(responseContentType)) {
       builder.mediaType(dataType.getMediaType());

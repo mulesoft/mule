@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -85,7 +85,7 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase {
   }
 
   private void doTest(String path, String soapMethod, String faultTemplate, String faultMessage) throws Exception {
-    MuleMessage response =
+    InternalMessage response =
         muleContext.getClient().send(String.format("http://localhost:%d/services/%s", dynamicPort.getNumber(), path),
                                      getTestMuleMessage(getRequestPayload(soapMethod)), HTTP_REQUEST_OPTIONS)
             .getRight();

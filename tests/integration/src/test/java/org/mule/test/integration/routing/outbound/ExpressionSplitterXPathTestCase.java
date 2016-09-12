@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.List;
 
@@ -44,12 +44,13 @@ public class ExpressionSplitterXPathTestCase extends AbstractIntegrationTestCase
 
   @Test
   public void testRecipientList() throws Exception {
-    MuleMessage result = flowRunner("Distributor").withPayload(MESSAGE).run().getMessage();
+    InternalMessage result = flowRunner("Distributor").withPayload(MESSAGE).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
+    assertTrue(result.getPayload().getValue() instanceof List);
     List<String> results =
-        ((List<MuleMessage>) result.getPayload()).stream().map(msg -> (String) msg.getPayload()).collect(toList());
+        ((List<InternalMessage>) result.getPayload().getValue()).stream().map(msg -> (String) msg.getPayload().getValue())
+            .collect(toList());
     assertEquals(2, results.size());
 
     assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString()).identical());

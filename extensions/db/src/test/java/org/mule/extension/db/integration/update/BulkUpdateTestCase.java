@@ -17,11 +17,12 @@ import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.extension.db.integration.model.Planet.EARTH;
 import static org.mule.extension.db.integration.model.Planet.MARS;
 import static org.mule.extension.db.integration.model.Planet.VENUS;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -51,19 +52,19 @@ public class BulkUpdateTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void bulkUpdate() throws Exception {
-    MuleMessage response = flowRunner("bulkUpdate").withPayload(values()).run().getMessage();
+    Message response = flowRunner("bulkUpdate").withPayload(values()).run().getMessage();
     assertBulkUpdate(response);
   }
 
   @Test
   public void bulkUpdateWithOverriddenType() throws Exception {
-    MuleMessage response = flowRunner("bulkUpdateWithOverriddenType").withPayload(values()).run().getMessage();
+    Message response = flowRunner("bulkUpdateWithOverriddenType").withPayload(values()).run().getMessage();
     assertBulkUpdate(response);
   }
 
   @Test
   public void updateBulkAfterSelect() throws Exception {
-    MuleMessage response = flowRunner("updateBulkAfterSelect").run().getMessage();
+    Message response = flowRunner("updateBulkAfterSelect").run().getMessage();
     assertBulkUpdate(response);
   }
 
@@ -82,9 +83,9 @@ public class BulkUpdateTestCase extends AbstractDbIntegrationTestCase {
     values.add(record);
   }
 
-  private void assertBulkUpdate(MuleMessage response) throws SQLException {
-    assertTrue(response.getPayload() instanceof int[]);
-    int[] counters = response.getPayload();
+  private void assertBulkUpdate(Message response) throws SQLException {
+    assertTrue(response.getPayload().getValue() instanceof int[]);
+    int[] counters = (int[]) response.getPayload().getValue();
     assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
     assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
     assertThat(counters[2], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));

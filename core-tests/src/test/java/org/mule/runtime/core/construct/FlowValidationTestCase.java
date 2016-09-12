@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.source.NonBlockingMessageSource;
 import org.mule.runtime.core.exception.OnErrorPropagateHandler;
@@ -65,7 +65,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
     flow.setMessageSource(new NonBlockingMessageSource() {
 
       @Override
-      public void setListener(MessageProcessor listener) {}
+      public void setListener(Processor listener) {}
     });
     flow.validateConstruct();
   }
@@ -76,7 +76,7 @@ public class FlowValidationTestCase extends AbstractMuleTestCase {
     flow.setMessageSource(new MessageSource() {
 
       @Override
-      public void setListener(MessageProcessor listener) {}
+      public void setListener(Processor listener) {}
     });
     flow.validateConstruct();
   }

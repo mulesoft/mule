@@ -9,7 +9,7 @@ package org.mule.functional.functional;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 /**
  * This service is useful for unit tests involving transactionality because it will roll back the current transaction upon message
@@ -29,7 +29,7 @@ public class TransactionalFunctionalTestComponent extends FunctionalTestComponen
       // Verify transaction has begun.
       Transaction currentTx = context.getCurrentTransaction();
       if (currentTx == null || !currentTx.isBegun()) {
-        throw new TransactionException(MessageFactory
+        throw new TransactionException(I18nMessageFactory
             .createStaticMessage("Trying to roll back transaction but no transaction is underway."));
       }
 

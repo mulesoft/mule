@@ -10,7 +10,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 
@@ -19,12 +19,12 @@ import java.util.function.Function;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * Represents a function that accepts a {@link MuleEvent} and evaluates a MEL expression that produces a result of the specified
- * type using a {@link TypeSafeExpressionValueResolver}.
+ * Represents a function that accepts a {@link Event} and evaluates a MEL expression that produces a result of the specified type
+ * using a {@link TypeSafeExpressionValueResolver}.
  *
  * @since 4.0
  */
-final class ExpressionFunction<T> implements Function<MuleEvent, T> {
+final class ExpressionFunction<T> implements Function<Event, T> {
 
   private final String expression;
   private final MetadataType type;
@@ -37,7 +37,7 @@ final class ExpressionFunction<T> implements Function<MuleEvent, T> {
   }
 
   @Override
-  public T apply(MuleEvent event) {
+  public T apply(Event event) {
     try {
       return new TypeSafeExpressionValueResolver<T>(expression, getType(type), muleContext).resolve(event);
     } catch (MuleException e) {

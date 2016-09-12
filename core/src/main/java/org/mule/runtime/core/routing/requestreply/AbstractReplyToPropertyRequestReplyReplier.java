@@ -9,11 +9,11 @@ package org.mule.runtime.core.routing.requestreply;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
@@ -21,8 +21,8 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
     implements RequestReplyReplierMessageProcessor, InternalMessageProcessor {
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleEvent resultEvent;
+  public Event process(Event event) throws MuleException {
+    Event resultEvent;
     if (shouldProcessEvent(event)) {
       Object replyTo = event.getReplyToDestination();
       ReplyToHandler replyToHandler = event.getReplyToHandler();
@@ -40,9 +40,9 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
     return resultEvent;
   }
 
-  protected abstract boolean shouldProcessEvent(MuleEvent event);
+  protected abstract boolean shouldProcessEvent(Event event);
 
-  protected MuleEvent processReplyTo(MuleEvent event, MuleEvent result, ReplyToHandler replyToHandler, Object replyTo)
+  protected Event processReplyTo(Event event, Event result, ReplyToHandler replyToHandler, Object replyTo)
       throws MuleException {
     if (result != null && replyToHandler != null) {
       String requestor = result.getMessage().getOutboundProperty(MULE_REPLY_TO_REQUESTOR_PROPERTY);
@@ -57,7 +57,7 @@ public abstract class AbstractReplyToPropertyRequestReplyReplier extends Abstrac
   }
 
   @Override
-  public void setReplyProcessor(MessageProcessor replyMessageProcessor) {
+  public void setReplyProcessor(Processor replyMessageProcessor) {
     // Not used
   }
 

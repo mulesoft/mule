@@ -10,7 +10,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConnectionProviderFactory;
@@ -21,8 +21,8 @@ import java.util.function.Function;
 /**
  * Uses a {@link ImplicitConnectionProviderFactory} to create an implicit {@link ConnectionProvider}.
  * <p>
- * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the
- * {@link #resolve(MuleEvent)} method is invoked on {@code this} instance. Subsequent invokations will return the same instance.
+ * This is a static {@link ValueResolver}. The {@link ConnectionProvider} is created the first time the {@link #resolve(Event)}
+ * method is invoked on {@code this} instance. Subsequent invokations will return the same instance.
  * <p>
  * This class is thread-safe
  *
@@ -31,7 +31,7 @@ import java.util.function.Function;
 public final class ImplicitConnectionProviderValueResolver implements ValueResolver<ConnectionProvider> {
 
   private ConnectionProvider connectionProvider = null;
-  private Function<MuleEvent, ConnectionProvider> delegate;
+  private Function<Event, ConnectionProvider> delegate;
 
   public ImplicitConnectionProviderValueResolver(String name, RuntimeConfigurationModel configurationModel,
                                                  MuleContext muleContext) {
@@ -54,7 +54,7 @@ public final class ImplicitConnectionProviderValueResolver implements ValueResol
   }
 
   @Override
-  public ConnectionProvider resolve(MuleEvent event) throws MuleException {
+  public ConnectionProvider resolve(Event event) throws MuleException {
     return delegate.apply(event);
   }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.spring.security;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.Authentication;
 
 import java.util.Map;
@@ -19,7 +19,7 @@ public class SpringAuthenticationAdapter implements Authentication {
 
   private org.springframework.security.core.Authentication delegate;
   private Map<String, Object> properties;
-  transient private MuleEvent event;
+  transient private Event event;
 
   public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication) {
     this(authentication, null);
@@ -31,7 +31,7 @@ public class SpringAuthenticationAdapter implements Authentication {
   }
 
   public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication,
-                                     Map<String, Object> properties, MuleEvent event) {
+                                     Map<String, Object> properties, Event event) {
     this.delegate = authentication;
     this.properties = properties;
     this.event = event;
@@ -94,11 +94,11 @@ public class SpringAuthenticationAdapter implements Authentication {
   }
 
   @Override
-  public MuleEvent getEvent() {
+  public Event getEvent() {
     return event;
   }
 
-  public void setEvent(MuleEvent muleEvent) {
+  public void setEvent(Event muleEvent) {
     this.event = muleEvent;
   }
 }

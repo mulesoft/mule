@@ -6,7 +6,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
@@ -29,7 +29,7 @@ public class TestEntryPointResolverSet implements EntryPointResolverSet {
 
   }
 
-  public Object invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
+  public Object invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
     return null;
   }
 

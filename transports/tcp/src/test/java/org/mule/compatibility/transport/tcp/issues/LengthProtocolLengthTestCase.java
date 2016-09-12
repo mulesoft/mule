@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -53,16 +53,16 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase {
 
     MuleClient client = muleContext.getClient();
     if (ok) {
-      MuleMessage response = client.send(endpoint, message, null).getRight();
+      InternalMessage response = client.send(endpoint, message, null).getRight();
       assertNotNull(response);
-      assertNotNull(response.getPayload());
+      assertNotNull(response.getPayload().getValue());
       assertTrue(Arrays.equals(message, getPayloadAsBytes(response)));
     } else {
       assertResponseBad(client.send(endpoint, message, null).getRight());
     }
   }
 
-  protected void assertResponseBad(MuleMessage message) {
+  protected void assertResponseBad(InternalMessage message) {
     try {
       if (getPayloadAsString(message).equals(TEST_MESSAGE + " Received")) {
         fail("expected error");

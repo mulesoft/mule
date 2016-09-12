@@ -8,7 +8,7 @@ package org.mule.test.integration.message;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -22,9 +22,9 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
 
   @Test
   public void testRequestResponseChain() throws Exception {
-    MuleMessage result = flowRunner("s1").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
+    InternalMessage result = flowRunner("s1").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
 
-    assertThat(result.getPayload(), is("test bar"));
+    assertThat(result.getPayload().getValue(), is("test bar"));
     assertThat(result.getOutboundProperty("foo4"), is("fooValue"));
   }
 
@@ -33,8 +33,8 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
     flowRunner("oneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(result.getPayload(), is("test bar"));
+    InternalMessage result = client.request("test://queueOut", RECEIVE_TIMEOUT).getRight().get();
+    assertThat(result.getPayload().getValue(), is("test bar"));
     assertThat(result.getOutboundProperty("foo2"), is("fooValue"));
   }
 
@@ -43,8 +43,8 @@ public class PropertyScopeTestCase extends AbstractPropertyScopeTestCase {
     flowRunner("rrToOneWay").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "rrfooValue").asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT).getRight().get();
-    assertThat(result.getPayload(), is("test baz"));
+    InternalMessage result = client.request("test://rrQueueOut", RECEIVE_TIMEOUT).getRight().get();
+    assertThat(result.getPayload().getValue(), is("test baz"));
     assertThat(result.getOutboundProperty("foo2"), is("rrfooValue"));
   }
 }

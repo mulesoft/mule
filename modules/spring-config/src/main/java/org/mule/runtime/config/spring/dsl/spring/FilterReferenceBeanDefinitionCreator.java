@@ -13,7 +13,7 @@ import static org.mule.runtime.config.spring.dsl.processor.xml.CoreXmlNamespaceI
 import static org.mule.runtime.config.spring.dsl.processor.xml.XmlCustomAttributeHandler.from;
 import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.config.spring.dsl.model.ComponentModel;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.routing.MessageFilter;
 
@@ -39,7 +39,7 @@ class FilterReferenceBeanDefinitionCreator extends BeanDefinitionCreator {
         componentModel.setType(Filter.class);
         componentModel.setBeanReference(new RuntimeBeanReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE)));
       } else {
-        componentModel.setType(MessageProcessor.class);
+        componentModel.setType(Processor.class);
         BeanDefinitionBuilder beanDefinitionBuilder =
             org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition(MessageFilter.class);
         beanDefinitionBuilder.addConstructorArgReference(componentModel.getParameters().get(REFERENCE_ATTRIBUTE));

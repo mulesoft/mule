@@ -22,7 +22,7 @@ import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.util.ClassUtils;
@@ -201,7 +201,7 @@ public class MuleServer implements Runnable {
         }
         setConfigBuilderClassName(cfgBuilderClassName);
       } catch (Exception e) {
-        final Message message = CoreMessages.failedToLoad("Builder: " + cfgBuilderClassName);
+        final I18nMessage message = CoreMessages.failedToLoad("Builder: " + cfgBuilderClassName);
         logger.error(message.toString(), e);
         System.err.println(StringMessageUtils.getBoilerPlate("ERROR: " + message.toString()));
         System.exit(1);
@@ -352,7 +352,7 @@ public class MuleServer implements Runnable {
     doShutdown();
     unregisterShutdownHook();
 
-    Message msg = CoreMessages.fatalErrorWhileRunning();
+    I18nMessage msg = CoreMessages.fatalErrorWhileRunning();
     MuleException muleException = ExceptionHelper.getRootMuleException(e);
     int exitCode = 1;
     if (muleException != null) {

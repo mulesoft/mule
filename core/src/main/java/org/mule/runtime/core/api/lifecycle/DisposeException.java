@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /** <code>DisposeException</code> TODO (document class) */
 
@@ -19,7 +19,7 @@ public class DisposeException extends LifecycleException {
    * @param message the exception message
    * @param component the object that failed during a lifecycle method call
    */
-  public DisposeException(Message message, Disposable component) {
+  public DisposeException(I18nMessage message, Disposable component) {
     super(message, component);
   }
 
@@ -28,7 +28,7 @@ public class DisposeException extends LifecycleException {
    * @param cause the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
-  public DisposeException(Message message, Throwable cause, Disposable component) {
+  public DisposeException(I18nMessage message, Throwable cause, Disposable component) {
     super(message, cause, component);
   }
 

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 class CallAndExpectPayloadResult implements CallAndExpect {
@@ -31,9 +31,9 @@ class CallAndExpectPayloadResult implements CallAndExpect {
   @Override
   public void callEndpointAndExecuteAsserts() throws MuleException {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send(outputEndpointName, payload, null).getRight();
+    InternalMessage result = client.send(outputEndpointName, payload, null).getRight();
 
-    assertEquals(here(), expectedPayloadResult, result.getPayload());
+    assertEquals(here(), expectedPayloadResult, result.getPayload().getValue());
   }
 
   private String here() {

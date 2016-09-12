@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import org.junit.Test;
 
@@ -26,14 +26,14 @@ public class SessionPropertiesTestCase extends FunctionalTestCase {
 
   @Test
   public void setSessionPropertyUsingAPIGetInFlow() throws Exception {
-    MuleEvent result = flowRunner("A").withPayload("data").withSessionProperty("key", "value").run();
+    Event result = flowRunner("A").withPayload("data").withSessionProperty("key", "value").run();
 
     assertThat(result.getMessageAsString(muleContext), is("value"));
   }
 
   @Test
   public void setSessionPropertyInFlowGetUsingAPI() throws Exception {
-    MuleEvent result = flowRunner("B").withPayload("data").run();
+    Event result = flowRunner("B").withPayload("data").run();
     assertThat(result.getSession().getProperty("key"), is("value"));
   }
 
@@ -46,8 +46,8 @@ public class SessionPropertiesTestCase extends FunctionalTestCase {
 
     FlowRunner runner = flowRunner("FlowRefWithSessionProperties").withPayload("data")
         .withSessionProperty("keyNonSerializable", nonSerializable).withSessionProperty("key", "value");
-    MuleEvent event = runner.buildEvent();
-    MuleEvent result = runner.run();
+    Event event = runner.buildEvent();
+    Event result = runner.run();
 
     assertSame(event.getSession(), result.getSession());
 

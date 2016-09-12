@@ -8,8 +8,8 @@ package org.mule.runtime.core.lifecycle.processor;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.interruptedWaitingForPaused;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -24,8 +24,8 @@ public class ProcessIfStartedWaitIfSyncPausedMessageProcessor extends ProcessIfS
   // TODO DF This needs refactoring. This is to ensure processNext()
   // is used and not next.process()
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    Builder builder = MuleEvent.builder(event);
+  public Event process(Event event) throws MuleException {
+    Builder builder = Event.builder(event);
     if (accept(event, builder)) {
       if (isPaused() && event.getExchangePattern().hasResponse()) {
         try {

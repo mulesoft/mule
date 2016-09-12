@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -44,11 +44,12 @@ public class AggregationTimeoutTestCase extends AbstractIntegrationTestCase {
       MuleClient client = muleContext.getClient();
       flowRunner("main").withPayload(inputData).asynchronously().run();
 
-      MuleMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
-      assertThat(response.getPayload(), instanceOf(List.class));
+      InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
+      assertThat(response.getPayload().getValue(), instanceOf(List.class));
 
       List<String> payloads =
-          ((List<MuleMessage>) response.getPayload()).stream().map(m -> (String) m.getPayload()).collect(toList());
+          ((List<InternalMessage>) response.getPayload().getValue()).stream().map(m -> (String) m.getPayload().getValue())
+              .collect(toList());
       assertThat(payloads.size(), equalTo(1));
       assertThat(payloads, hasItem(PROCESSED_EVENT));
     } finally {

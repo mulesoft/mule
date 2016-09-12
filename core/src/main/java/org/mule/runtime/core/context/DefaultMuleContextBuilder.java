@@ -36,8 +36,8 @@ import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.ImmutableThreadingProfile;
 import org.mule.runtime.core.config.bootstrap.BootstrapServiceDiscoverer;
 import org.mule.runtime.core.config.bootstrap.PropertiesBootstrapServiceDiscoverer;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
@@ -203,7 +203,8 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   @Override
   public void setLifecycleManager(LifecycleManager manager) {
     if (!(manager instanceof MuleContextLifecycleManager)) {
-      Message msg = MessageFactory.createStaticMessage("lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
+      I18nMessage msg =
+          I18nMessageFactory.createStaticMessage("lifecycle manager for MuleContext must be a MuleContextLifecycleManager");
       throw new MuleRuntimeException(msg);
     }
 

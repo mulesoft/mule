@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
@@ -56,18 +56,17 @@ import java.util.List;
 import org.apache.commons.collections.Predicate;
 
 /**
- * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s that will be used to
- * process messages to be configured. These MessageProcessors are chained together using the
- * {@link DefaultMessageProcessorChainBuilder}.
+ * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
+ * messages to be configured. These MessageProcessors are chained together using the {@link DefaultMessageProcessorChainBuilder}.
  * <p/>
  * If no message processors are configured then the source message is simply returned.
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline {
 
   protected MessageSource messageSource;
-  protected MessageProcessor pipeline;
+  protected Processor pipeline;
 
-  protected List<MessageProcessor> messageProcessors = Collections.emptyList();
+  protected List<Processor> messageProcessors = Collections.emptyList();
   private PathResolver flowMap;
 
   protected ProcessingStrategy processingStrategy;
@@ -93,15 +92,15 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   /**
-   * Creates a {@link MessageProcessor} that will process messages from the configured {@link MessageSource} .
+   * Creates a {@link Processor} that will process messages from the configured {@link MessageSource} .
    * <p>
    * The default implementation of this methods uses a {@link DefaultMessageProcessorChainBuilder} and allows a chain of
-   * {@link MessageProcessor}s to be configured using the
+   * {@link Processor}s to be configured using the
    * {@link #configureMessageProcessors(org.mule.runtime.core.api.processor.MessageProcessorChainBuilder)} method but if you wish
-   * to use another {@link MessageProcessorBuilder} or just a single {@link MessageProcessor} then this method can be overridden
-   * and return a single {@link MessageProcessor} instead.
+   * to use another {@link MessageProcessorBuilder} or just a single {@link Processor} then this method can be overridden and
+   * return a single {@link Processor} instead.
    */
-  protected MessageProcessor createPipeline() throws MuleException {
+  protected Processor createPipeline() throws MuleException {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(this);
     builder.setName("'" + getName() + "' processor chain");
     configurePreProcessors(builder);
@@ -135,7 +134,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     builder.chain(new AbstractRequestResponseMessageProcessor() {
 
       @Override
-      protected MuleEvent processRequest(MuleEvent event) throws MuleException {
+      protected Event processRequest(Event event) throws MuleException {
         muleContext.getNotificationManager()
             .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event,
                                                               PipelineMessageNotification.PROCESS_START));
@@ -143,7 +142,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       }
 
       @Override
-      protected void processFinally(MuleEvent event, MessagingException exception) {
+      protected void processFinally(Event event, MessagingException exception) {
         muleContext.getNotificationManager()
             .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event,
                                                               PipelineMessageNotification.PROCESS_COMPLETE, exception));
@@ -152,10 +151,10 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    builder.chain(new MessageProcessor() {
+    builder.chain(new Processor() {
 
       @Override
-      public MuleEvent process(MuleEvent event) throws MuleException {
+      public Event process(Event event) throws MuleException {
         muleContext.getNotificationManager()
             .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event,
                                                               PipelineMessageNotification.PROCESS_END));
@@ -165,12 +164,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   @Override
-  public void setMessageProcessors(List<MessageProcessor> messageProcessors) {
+  public void setMessageProcessors(List<Processor> messageProcessors) {
     this.messageProcessors = messageProcessors;
   }
 
   @Override
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return messageProcessors;
   }
 
@@ -216,7 +215,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       messageSource.setListener(new AbstractInterceptingMessageProcessor() {
 
         @Override
-        public MuleEvent process(MuleEvent event) throws MuleException {
+        public Event process(Event event) throws MuleException {
           return pipeline.process(event);
         }
       });
@@ -319,8 +318,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     // Only MP till first InterceptingMessageProcessor should be used to generate the Path,
     // since the next ones will be generated by the InterceptingMessageProcessor because they are added as an inned chain
-    List<MessageProcessor> filteredMessageProcessorList = new ArrayList<MessageProcessor>();
-    for (MessageProcessor messageProcessor : getMessageProcessors()) {
+    List<Processor> filteredMessageProcessorList = new ArrayList<Processor>();
+    for (Processor messageProcessor : getMessageProcessors()) {
       if (messageProcessor instanceof InterceptingMessageProcessor) {
         {
           filteredMessageProcessorList.add(messageProcessor);
@@ -355,7 +354,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   @Override
-  public String getProcessorPath(MessageProcessor processor) {
+  public String getProcessorPath(Processor processor) {
     return flowMap.resolvePath(processor);
   }
 
@@ -363,12 +362,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   public class ProcessIfPipelineStartedMessageProcessor extends AbstractFilteringMessageProcessor {
 
     @Override
-    protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+    protected boolean accept(Event event, Event.Builder builder) {
       return canProcessMessage;
     }
 
     @Override
-    protected MuleEvent handleUnaccepted(MuleEvent event) throws LifecycleException {
+    protected Event handleUnaccepted(Event event) throws LifecycleException {
       throw new LifecycleException(CoreMessages.isStopped(getName()), event.getMessage());
     }
   }

@@ -14,11 +14,11 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -144,12 +144,12 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint {
   }
 
   @Override
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return endpoint.getMessageProcessors();
   }
 
   @Override
-  public List<MessageProcessor> getResponseMessageProcessors() {
+  public List<Processor> getResponseMessageProcessors() {
     return endpoint.getResponseMessageProcessors();
   }
 
@@ -242,7 +242,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return endpoint.process(event);
   }
 

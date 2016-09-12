@@ -79,7 +79,7 @@ public class TcpStreamingTestCase extends SocketExtensionTestCase {
 
     ((FunctionalStreamingTestComponent) functionalTestComponent).setEventCallback(callback, TEST_MESSAGE.length());
 
-    flowRunner("tcp-send").withPayload(payload).run().getMessage().getPayload();
+    flowRunner("tcp-send").withPayload(payload).run().getMessage().getPayload().getValue();
 
     latch.await(10, TimeUnit.SECONDS);
     assertThat(format(RESULT, iterations * TEST_MESSAGE.length()), is(message.get()));

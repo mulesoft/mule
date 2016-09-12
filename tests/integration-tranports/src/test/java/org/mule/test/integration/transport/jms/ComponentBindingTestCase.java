@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -28,8 +28,8 @@ public class ComponentBindingTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     String message = "Mule";
     client.dispatch("jms://invoker.in", message, null);
-    MuleMessage reply = client.request("jms://invoker.out", 10000).getRight().get();
+    InternalMessage reply = client.request("jms://invoker.out", 10000).getRight().get();
     assertNotNull(reply);
-    assertEquals("Received: Hello " + message + " " + 0xC0DE, reply.getPayload());
+    assertEquals("Received: Hello " + message + " " + 0xC0DE, reply.getPayload().getValue());
   }
 }

@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.jms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -25,11 +25,12 @@ public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase {
   public void testDynamicEndpointAcceptsConnectorRef() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    final MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("queueName", "test.out").build();
-    MuleMessage test = client.send("vm://input", message).getRight();
+    final InternalMessage message =
+        InternalMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("queueName", "test.out").build();
+    InternalMessage test = client.send("vm://input", message).getRight();
     assertNotNull(test);
 
-    MuleMessage response = client.request("jms://test.out", 5000).getRight().get();
-    assertEquals(TEST_PAYLOAD, response.getPayload());
+    InternalMessage response = client.request("jms://test.out", 5000).getRight().get();
+    assertEquals(TEST_PAYLOAD, response.getPayload().getValue());
   }
 }

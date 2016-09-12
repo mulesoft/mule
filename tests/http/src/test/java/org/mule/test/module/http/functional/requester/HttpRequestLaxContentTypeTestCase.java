@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -37,13 +37,13 @@ public class HttpRequestLaxContentTypeTestCase extends AbstractHttpTestCase {
     MuleClient client = muleContext.getClient();
     final String url = String.format("http://localhost:%s/requestClientInvalid", httpPort.getNumber());
 
-    MuleMessage response = client.send(url, TEST_MESSAGE, null).getRight();
+    InternalMessage response = client.send(url, TEST_MESSAGE, null).getRight();
 
     assertNoContentTypeProperty(response);
     assertThat(getPayloadAsString(response), equalTo("invalidMimeType"));
   }
 
-  private void assertNoContentTypeProperty(MuleMessage response) {
+  private void assertNoContentTypeProperty(InternalMessage response) {
     assertThat(response.getInboundPropertyNames(), not(hasItem(equalToIgnoringCase(CONTENT_TYPE))));
   }
 }

@@ -8,17 +8,17 @@ package org.mule.tck;
 
 import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.concurrent.Latch;
 
-public class SensingNullCompletionHandler extends BlockingCompletionHandler<MuleEvent, MessagingException, Void> {
+public class SensingNullCompletionHandler extends BlockingCompletionHandler<Event, MessagingException, Void> {
 
-  public MuleEvent event;
+  public Event event;
   public Exception exception;
   public Latch latch = new Latch();
 
   @Override
-  protected void doOnCompletion(MuleEvent result) {
+  protected void doOnCompletion(Event result) {
     this.event = result;
     latch.countDown();
   }

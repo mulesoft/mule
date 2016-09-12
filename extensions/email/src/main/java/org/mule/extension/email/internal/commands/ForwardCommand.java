@@ -15,7 +15,7 @@ import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailContent;
 import org.mule.extension.email.api.exception.EmailSenderException;
 import org.mule.extension.email.internal.sender.SenderConnection;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import com.google.common.collect.ImmutableList;
 
@@ -34,11 +34,10 @@ public final class ForwardCommand {
   /**
    * Forwards an email message. The message will be sent to all recipient {@code toAddresses}.
    * <p>
-   * The forwarded content is taken from the incoming {@link MuleMessage}'s payload. If not possible this operation is going to
-   * fail.
+   * The forwarded content is taken from the incoming {@link Message}'s payload. If not possible this operation is going to fail.
    *
    * @param connection the connection associated to the operation.
-   * @param muleMessage the incoming {@link MuleMessage} from which the email is going to getPropertiesInstance the content.
+   * @param muleMessage the incoming {@link Message} from which the email is going to getPropertiesInstance the content.
    * @param content the content of the email.
    * @param subject the subject of the email.
    * @param from the person who sends the email.
@@ -46,10 +45,10 @@ public final class ForwardCommand {
    * @param toAddresses the primary recipient addresses of the email.
    * @param ccAddresses the carbon copy recipient addresses of the email.
    * @param bccAddresses the blind carbon copy recipient addresses of the email.
-   * @param attachments   Attachments that are bounded with the email message
+   * @param attachments Attachments that are bounded with the email message
    */
   public void forward(SenderConnection connection,
-                      MuleMessage muleMessage,
+                      Message muleMessage,
                       EmailContent content,
                       String subject,
                       String from,
@@ -67,7 +66,7 @@ public final class ForwardCommand {
       subject = "Fwd: " + attributes.getSubject();
     }
 
-    String body = muleMessage.getPayload().toString();
+    String body = muleMessage.getPayload().getValue().toString();
     String forwardBody = content != null ? format("%s\r\n\r\n%s", content.getBody(), body) : body;
 
     EmailContent forwardContent = content != null ? new EmailContent(forwardBody, content.getContentType(), content.getCharset())
@@ -75,7 +74,7 @@ public final class ForwardCommand {
 
     ImmutableList<EmailAttachment> emailAttachments =
         ImmutableList.<EmailAttachment>builder()
-            .addAll(mapToEmailAttachments(muleMessage.getPayload()))
+            .addAll(mapToEmailAttachments(muleMessage.getPayload().getValue()))
             .addAll(attachments)
             .build();
 

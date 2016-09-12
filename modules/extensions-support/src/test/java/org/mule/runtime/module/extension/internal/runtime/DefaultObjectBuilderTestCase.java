@@ -12,8 +12,8 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -41,7 +41,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
   private static LifetimeInfo LIFETIME_INFO = new LifetimeInfo();
 
   @Mock
-  private MuleEvent event;
+  private Event event;
 
   @Mock
   private MuleContext muleContext;
@@ -104,7 +104,7 @@ public class DefaultObjectBuilderTestCase extends AbstractMuleTestCase {
 
   @Test(expected = IllegalArgumentException.class)
   public void buildInterface() throws Exception {
-    builder = new DefaultObjectBuilder(MuleMessage.class);
+    builder = new DefaultObjectBuilder(InternalMessage.class);
     builder.build(event);
   }
 

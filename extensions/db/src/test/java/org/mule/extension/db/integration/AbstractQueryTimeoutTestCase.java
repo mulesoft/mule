@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.List;
@@ -36,19 +36,19 @@ public abstract class AbstractQueryTimeoutTestCase extends AbstractDbIntegration
   }
 
   /**
-   * Verifies that queryTimeout is used and query execution is aborted with an error.
-   * As different DB drivers thrown different type of exceptions instead of throwing
-   * SQLTimeoutException, the test firsts executes the flow using no timeout, which
-   * must pass, and then using a timeout which must fail. Because the first execution
-   * was successful is assumed that the error is because of an aborted execution.
+   * Verifies that queryTimeout is used and query execution is aborted with an error. As different DB drivers thrown different
+   * type of exceptions instead of throwing SQLTimeoutException, the test firsts executes the flow using no timeout, which must
+   * pass, and then using a timeout which must fail. Because the first execution was successful is assumed that the error is
+   * because of an aborted execution.
+   * 
    * @throws Exception
    */
   @Test
   public void timeoutsQuery() throws Exception {
     MuleEvent responseEvent = flowRunner(QUERY_TIMEOUT_FLOW).withPayload(0).run();
 
-    MuleMessage response = responseEvent.getMessage();
-    assertThat(response.getPayload(), is(notNullValue()));
+    Message response = responseEvent.getMessage();
+    assertThat(response.getPayload().getValue(), is(notNullValue()));
 
     try {
       flowRunner(QUERY_TIMEOUT_FLOW).withPayload(5).run();

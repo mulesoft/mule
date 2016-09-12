@@ -12,8 +12,8 @@ import org.mule.compatibility.module.cxf.endpoint.CxfEndpointBuilder;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.module.cxf.component.AbstractWebServiceWrapperComponent;
 
@@ -24,7 +24,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
   private String operation;
 
   @Override
-  protected MuleMessage doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+  protected InternalMessage doInvoke(Event event, Event.Builder eventBuilder) throws Exception {
     MuleContext muleContext = flowConstruct.getMuleContext();
 
     String tempUrl;
@@ -50,7 +50,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
     endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
     OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
 
-    MuleEvent responseEvent = endpoint.process(event);
+    Event responseEvent = endpoint.process(event);
 
     if (responseEvent != null && !VoidMuleEvent.getInstance().equals(responseEvent)) {
       return responseEvent.getMessage();

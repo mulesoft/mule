@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ public class HttpRequest401TestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void returns401Response() throws Exception {
-    MuleMessage response = runFlow("executeRequest").getMessage();
+    InternalMessage response = runFlow("executeRequest").getMessage();
     assertThat((HttpResponseAttributes) response.getAttributes(), hasStatusCode(SC_UNAUTHORIZED));
     assertThat(getPayloadAsString(response), is(UNAUTHORIZED_MESSAGE));
   }

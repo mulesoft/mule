@@ -7,7 +7,7 @@
 package org.mule.runtime.module.json.transformers;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.module.json.filters.IsJsonFilter;
@@ -68,8 +68,8 @@ public class ObjectToJson extends AbstractJsonTransformer {
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+    Object src = event.getMessage().getPayload().getValue();
     if (src instanceof String && isJsonFilter.accept(src)) {
       // Nothing to transform
       return src;

@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.api.security;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authorizationDeniedOnEndpoint;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>NotPermittedException</code> is thrown if the user isn't authorized to perform an action.
@@ -25,30 +25,30 @@ public class NotPermittedException extends SecurityException {
    */
   private static final long serialVersionUID = -6664384216189042673L;
 
-  public NotPermittedException(Message message) {
+  public NotPermittedException(I18nMessage message) {
     super(message, getCurrentEvent());
   }
 
-  public NotPermittedException(Message message, Throwable cause, MessageProcessor failingMessageProcessor) {
+  public NotPermittedException(I18nMessage message, Throwable cause, Processor failingMessageProcessor) {
     super(message, getCurrentEvent(), cause, failingMessageProcessor);
   }
 
-  public NotPermittedException(Message message, MuleEvent event) {
+  public NotPermittedException(I18nMessage message, Event event) {
     super(message, event);
   }
 
-  public NotPermittedException(Message message, MuleEvent event, Throwable cause, MessageProcessor failingMessageProcessor) {
+  public NotPermittedException(I18nMessage message, Event event, Throwable cause, Processor failingMessageProcessor) {
     super(message, event, cause, failingMessageProcessor);
   }
 
-  public NotPermittedException(MuleEvent event, SecurityContext context, SecurityFilter filter) {
+  public NotPermittedException(Event event, SecurityContext context, SecurityFilter filter) {
     super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter), event);
   }
 
-  private static Message constructMessage(SecurityContext context,
-                                          String originatingConnectorName,
-                                          SecurityFilter filter) {
-    Message m;
+  private static I18nMessage constructMessage(SecurityContext context,
+                                              String originatingConnectorName,
+                                              SecurityFilter filter) {
+    I18nMessage m;
     if (context == null) {
       m = authSetButNoContext(filter.getClass().getName());
     } else {

@@ -12,9 +12,9 @@ import static org.mockito.Mockito.mock;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
@@ -41,18 +41,18 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextEndpoint
     ir.setStorePrefix("foo");
     ir.setStore(new InMemoryObjectStore<String>());
 
-    MuleMessage okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow2)
+    InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(okMessage).flow(flow2)
         .session(session).build();
     event = populateFieldsFromInboundEndpoint(event, endpoint1);
 
     // This one will process the event on the target endpoint
-    MuleEvent processedEvent = ir.process(event);
+    Event processedEvent = ir.process(event);
     assertNotNull(processedEvent);
 
     // This will not process, because the ID is a duplicate
-    okMessage = MuleMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    event = MuleEvent.builder(DefaultMessageContext.create(flow2, TEST_CONNECTOR)).message(okMessage).flow(flow2).session(session)
+    okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
+    event = Event.builder(DefaultEventContext.create(flow2, TEST_CONNECTOR)).message(okMessage).flow(flow2).session(session)
         .build();
     event = populateFieldsFromInboundEndpoint(event, endpoint1);
     processedEvent = ir.process(event);

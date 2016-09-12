@@ -16,8 +16,8 @@ import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
@@ -68,12 +68,12 @@ public class TransactedPollingMessageReceiverTestCase {
     }
 
     @Override
-    protected List<MuleMessage> getMessages() throws Exception {
+    protected List<InternalMessage> getMessages() throws Exception {
       throw new MuleRuntimeException(TransportCoreMessages.createStaticMessage("test exception"));
     }
 
     @Override
-    protected MuleEvent processMessage(Object message) throws Exception {
+    protected Event processMessage(Object message) throws Exception {
       return null;
     }
   }

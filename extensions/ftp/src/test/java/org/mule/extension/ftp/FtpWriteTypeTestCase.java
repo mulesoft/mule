@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import org.mule.extension.FtpTestHarness;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.extension.file.common.api.FileWriteMode;
@@ -81,7 +81,7 @@ public class FtpWriteTypeTestCase extends FtpConnectorTestCase {
   private static class TestOutputHandler implements OutputHandler {
 
     @Override
-    public void write(MuleEvent event, OutputStream out) throws IOException {
+    public void write(Event event, OutputStream out) throws IOException {
       IOUtils.write(HELLO_WORLD, out);
     }
   }

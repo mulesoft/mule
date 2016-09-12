@@ -9,8 +9,8 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.InputStream;
@@ -48,16 +48,16 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
 
   @Test
   public void responseBodyToPayloadTarget() throws Exception {
-    MuleEvent event = flowRunner("payloadTargetFlow").withPayload(TEST_MESSAGE).run();
+    Event event = flowRunner("payloadTargetFlow").withPayload(TEST_MESSAGE).run();
     assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 
   @Test
   public void responseBodyToCustomTarget() throws Exception {
-    MuleEvent event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
-    MuleMessage customTarget = event.getFlowVariable("customTarget");
+    Event event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
+    InternalMessage customTarget = event.getVariable("customTarget");
     assertThat(customTarget, notNullValue());
-    assertThat(IOUtils.toString((InputStream) customTarget.getPayload()), equalTo(DEFAULT_RESPONSE));
+    assertThat(IOUtils.toString((InputStream) customTarget.getPayload().getValue()), equalTo(DEFAULT_RESPONSE));
     assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));
   }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.getClassName;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;

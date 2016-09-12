@@ -17,8 +17,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.tck.size.SmallTest;
 
@@ -36,7 +36,7 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
   private InterceptingCallback interceptingCallback;
 
   @Mock
-  private MessageProcessor next;
+  private Processor next;
 
   @Override
   @Before
@@ -59,8 +59,8 @@ public class InterceptingOperationMessageProcessorTestCase extends AbstractOpera
 
   @Test
   public void nextExecuted() throws Exception {
-    org.mule.runtime.core.api.MuleEvent resultEvent = mock(org.mule.runtime.core.api.MuleEvent.class);
-    MuleMessage resultMessage = mock(MuleMessage.class);
+    org.mule.runtime.core.api.Event resultEvent = mock(org.mule.runtime.core.api.Event.class);
+    InternalMessage resultMessage = mock(InternalMessage.class);
     when(resultEvent.getMessage()).thenReturn(resultMessage);
     when(next.process(any())).thenReturn(resultEvent);
 

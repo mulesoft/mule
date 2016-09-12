@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import org.mule.runtime.config.spring.factories.ConstantFactoryBean;
 import org.mule.runtime.core.api.Injector;
@@ -415,7 +415,7 @@ public class SpringRegistry extends AbstractRegistry implements LifecycleRegistr
           throw new RegistrationException(createStaticMessage("Could not register object for key " + key), e);
         }
       } else {
-        //since the context has not yet bean initialized, we register a bean definition instead.
+        // since the context has not yet bean initialized, we register a bean definition instead.
         registeredBeanDefinitionsBeforeInitialization.put(key, genericBeanDefinition(ConstantFactoryBean.class)
             .addConstructorArgValue(value).getBeanDefinition());
       }

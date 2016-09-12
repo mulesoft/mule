@@ -19,8 +19,8 @@ import org.mule.mvel2.util.CompilerTools;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.el.mvel.datatype.MvelDataTypeResolver;
 import org.mule.runtime.core.el.mvel.datatype.MvelEnricherDataTypePropagator;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.TemplateParser;
 
@@ -135,22 +135,22 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct) {
-    return (T) evaluate(expression, event, MuleEvent.builder(event), flowConstruct);
+  public <T> T evaluate(String expression, Event event, FlowConstruct flowConstruct) {
+    return (T) evaluate(expression, event, Event.builder(event), flowConstruct);
   }
 
   @Override
-  public <T> T evaluate(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct) {
+  public <T> T evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct) {
     return (T) evaluate(expression, event, eventBuilder, flowConstruct, null);
   }
 
   @Override
-  public <T> T evaluate(String expression, MuleEvent event, FlowConstruct flowConstruct, Map<String, Object> vars) {
-    return evaluate(expression, event, MuleEvent.builder(event), flowConstruct, vars);
+  public <T> T evaluate(String expression, Event event, FlowConstruct flowConstruct, Map<String, Object> vars) {
+    return evaluate(expression, event, Event.builder(event), flowConstruct, vars);
   }
 
   @Override
-  public <T> T evaluate(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
+  public <T> T evaluate(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                         Map<String, Object> vars) {
     if (event == null) {
       return evaluate(expression, vars);
@@ -171,7 +171,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
                      Object object) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
@@ -179,8 +179,8 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public void enrich(String expression, MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct,
-                     TypedValue typedValue) {
+  public void enrich(String expression, Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct,
+                     DefaultTypedValue typedValue) {
     expression = removeExpressionMarker(expression);
     expression = createEnrichmentExpression(expression);
     evaluate(expression, event, eventBuilder, flowConstruct, singletonMap(OBJECT_FOR_ENRICHMENT, typedValue.getValue()));
@@ -192,20 +192,20 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public TypedValue evaluateTyped(String expression, MuleEvent event, FlowConstruct flowConstruct) {
-    return evaluateTyped(expression, event, MuleEvent.builder(event), flowConstruct);
+  public DefaultTypedValue evaluateTyped(String expression, Event event, FlowConstruct flowConstruct) {
+    return evaluateTyped(expression, event, Event.builder(event), flowConstruct);
   }
 
   @Override
-  public TypedValue evaluateTyped(String expression, MuleEvent event, MuleEvent.Builder eventBuilder,
-                                  FlowConstruct flowConstruct) {
+  public DefaultTypedValue evaluateTyped(String expression, Event event, Event.Builder eventBuilder,
+                                         FlowConstruct flowConstruct) {
     expression = removeExpressionMarker(expression);
 
     final Object value = evaluate(expression, event, eventBuilder, flowConstruct);
     final Serializable compiledExpression = expressionExecutor.getCompiledExpression(expression);
     final DataType dataType = dataTypeResolver.resolve(value, event, compiledExpression);
 
-    return new TypedValue(value, dataType);
+    return new DefaultTypedValue(value, dataType);
   }
 
   @SuppressWarnings("unchecked")
@@ -342,7 +342,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     this.globalFunctionsFile = globalFunctionsFile;
   }
 
-  protected VariableResolverFactory createVariableVariableResolverFactory(MuleEvent event, MuleEvent.Builder eventBuilder) {
+  protected VariableResolverFactory createVariableVariableResolverFactory(Event event, Event.Builder eventBuilder) {
     if (autoResolveVariables) {
       return new VariableVariableResolverFactory(parserConfiguration, muleContext, event, eventBuilder);
     } else {
@@ -363,17 +363,17 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public String parse(String expression, final MuleEvent event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
-    return parse(expression, event, MuleEvent.builder(event), flowConstruct);
+  public String parse(String expression, final Event event, FlowConstruct flowConstruct) throws ExpressionRuntimeException {
+    return parse(expression, event, Event.builder(event), flowConstruct);
   }
 
   @Override
-  public String parse(String expression, final MuleEvent event, MuleEvent.Builder eventBuilder, FlowConstruct flowConstruct)
+  public String parse(String expression, final Event event, Event.Builder eventBuilder, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
     return parser.parse((TemplateParser.TemplateCallback) token -> {
       Object result = evaluate(token, event, eventBuilder, flowConstruct);
-      if (result instanceof MuleMessage) {
-        return ((MuleMessage) result).getPayload();
+      if (result instanceof InternalMessage) {
+        return ((InternalMessage) result).getPayload().getValue();
       } else {
         return result;
       }
@@ -391,13 +391,13 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct)
+  public boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct)
       throws ExpressionRuntimeException {
     return evaluateBoolean(expression, event, flowConstruct, false, false);
   }
 
   @Override
-  public boolean evaluateBoolean(String expression, MuleEvent event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
+  public boolean evaluateBoolean(String expression, Event event, FlowConstruct flowConstruct, boolean nullReturnsTrue,
                                  boolean nonBooleanReturnsTrue)
       throws ExpressionRuntimeException {
     return resolveBoolean(evaluate(expression, event, flowConstruct), nullReturnsTrue, nonBooleanReturnsTrue, expression);

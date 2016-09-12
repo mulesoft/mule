@@ -11,7 +11,7 @@ import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.transformers.HttpClientMethodResponseToObject;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -53,11 +53,11 @@ public class HttpClientMessageRequester extends AbstractMessageRequester {
    *
    * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
    *        data available. If no data becomes available before the timeout elapses, null will be returned
-   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was avaialable
+   * @return the result of the request wrapped in a Message object. Null will be returned if no data was avaialable
    * @throws Exception if the call to the underlying protocal cuases an exception
    */
   @Override
-  protected MuleMessage doRequest(long timeout) throws Exception {
+  protected InternalMessage doRequest(long timeout) throws Exception {
     HttpMethod httpMethod = new GetMethod(endpoint.getEndpointURI().getAddress());
     connector.setupClientAuthorization(null, httpMethod, client, endpoint);
 
@@ -67,8 +67,8 @@ public class HttpClientMessageRequester extends AbstractMessageRequester {
       client.executeMethod(httpMethod);
 
       if (httpMethod.getStatusCode() == HttpStatus.SC_OK) {
-        MuleMessage res = (MuleMessage) receiveTransformer.transform(httpMethod);
-        if (StringUtils.EMPTY.equals(res.getPayload())) {
+        InternalMessage res = (InternalMessage) receiveTransformer.transform(httpMethod);
+        if (StringUtils.EMPTY.equals(res.getPayload().getValue())) {
           releaseConn = true;
         }
         return res;

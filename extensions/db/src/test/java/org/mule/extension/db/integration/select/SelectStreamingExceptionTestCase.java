@@ -16,7 +16,7 @@ import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
 
   @Test
   public void selectExceptionClosesPreviousResultSets() throws Exception {
-    MuleMessage response = flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
-    assertThat(response.getPayload(), is((Object) FALSE));
+    InternalMessage response = flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
+    assertThat(response.getPayload().getValue(), is((Object) FALSE));
   }
 }

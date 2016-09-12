@@ -14,9 +14,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -37,10 +37,10 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Test
   public void exception() throws Exception {
-    MuleEvent event = createEvent();
+    Event event = createEvent();
     RuntimeException rte = new RuntimeException();
     when(mockError.getException()).thenReturn(rte);
-    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).build()).build();
+    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     Object exception = evaluate("exception", event);
 
     assertThat(exception, is(instanceOf(MessagingException.class)));
@@ -49,8 +49,8 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Test
   public void assignException() throws Exception {
-    MuleEvent event = createEvent();
-    event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).build()).build();
+    Event event = createEvent();
+    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).build()).build();
     RuntimeException runtimeException = new RuntimeException();
     when(mockError.getException()).thenReturn(runtimeException);
     assertImmutableVariable("exception='other'", event);
@@ -58,18 +58,18 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Test
   public void exceptionCausedBy() throws Exception {
-    MuleEvent event = createEvent();
-    MuleMessage message = event.getMessage();
+    Event event = createEvent();
+    InternalMessage message = event.getMessage();
     MessagingException me =
         new MessagingException(CoreMessages.createStaticMessage(""),
-                               MuleEvent.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build(),
+                               Event.builder(context).message(message).exchangePattern(ONE_WAY).flow(flowConstruct).build(),
                                new IllegalAccessException());
     when(mockError.getException()).thenReturn(me);
     assertTrue((Boolean) evaluate("exception.causedBy(java.lang.IllegalAccessException)", event));
   }
 
-  private MuleEvent createEvent() throws Exception {
-    return MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload("").build()).flow(flowConstruct).error(mockError).build();
+  private Event createEvent() throws Exception {
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload("").build()).flow(flowConstruct).error(mockError).build();
   }
 }

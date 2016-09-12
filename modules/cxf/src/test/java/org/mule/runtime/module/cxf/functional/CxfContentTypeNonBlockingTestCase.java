@@ -12,7 +12,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -36,22 +36,22 @@ public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testCxfService() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
-    String contentType = received.getDataType().getMediaType().toRfcString();
+    String contentType = received.getPayload().getDataType().getMediaType().toRfcString();
     assertNotNull(contentType);
     assertTrue(contentType.contains("charset"));
   }
 
   @Test
   public void testCxfClient() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("hello").build();
+    InternalMessage request = InternalMessage.builder().payload("hello").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClient", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClient", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     String contentType = received.getInboundProperty("contentType");
     assertNotNull(contentType);
@@ -61,10 +61,10 @@ public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase {
 
   @Test
   public void testCxfClientProxy() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload("hello").build();
+    InternalMessage request = InternalMessage.builder().payload("hello").build();
     MuleClient client = muleContext.getClient();
-    MuleMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy", request,
-                                       newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/helloClientProxy", request,
+                                           newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     String contentType = received.getInboundProperty("contentType");
     assertNotNull(contentType);

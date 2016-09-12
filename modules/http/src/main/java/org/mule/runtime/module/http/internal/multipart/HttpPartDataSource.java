@@ -8,12 +8,12 @@ package org.mule.runtime.module.http.internal.multipart;
 
 import static org.mule.runtime.module.http.internal.HttpParser.parseMultipartContent;
 
-import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.message.PartAttributes;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
@@ -95,17 +95,17 @@ public class HttpPartDataSource implements DataSource {
     return httpParts;
   }
 
-  public static MultiPartPayload multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException {
+  public static MultiPartContent multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException {
     return multiPartPayloadForAttachments(entity.getParts());
   }
 
-  public static MultiPartPayload multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)
+  public static MultiPartContent multiPartPayloadForAttachments(String responseContentType, InputStream responseInputStream)
       throws IOException {
     return multiPartPayloadForAttachments(parseMultipartContent(responseInputStream, responseContentType));
   }
 
-  private static MultiPartPayload multiPartPayloadForAttachments(Collection<HttpPart> httpParts) throws IOException {
-    List<org.mule.runtime.api.message.MuleMessage> parts = new ArrayList<>();
+  private static MultiPartContent multiPartPayloadForAttachments(Collection<HttpPart> httpParts) throws IOException {
+    List<org.mule.runtime.api.message.Message> parts = new ArrayList<>();
 
     int partNumber = 1;
     for (HttpPart httpPart : httpParts) {
@@ -117,7 +117,7 @@ public class HttpPartDataSource implements DataSource {
         headers.get(headerName).addAll(httpPart.getHeaders(headerName));
       }
 
-      parts.add(MuleMessage.builder().payload(httpPart.getInputStream()).mediaType(MediaType.parse(httpPart.getContentType()))
+      parts.add(InternalMessage.builder().payload(httpPart.getInputStream()).mediaType(MediaType.parse(httpPart.getContentType()))
           .attributes(new PartAttributes(httpPart.getName() != null ? httpPart.getName() : "part_" + partNumber,
                                          httpPart.getFileName(), httpPart.getSize(), headers))
           .build());
@@ -125,7 +125,7 @@ public class HttpPartDataSource implements DataSource {
       partNumber++;
     }
 
-    return new DefaultMultiPartPayload(parts);
+    return new DefaultMultiPartContent(parts);
   }
 
   public HttpPart getPart() {

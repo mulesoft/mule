@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.routing;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.processor.AbstractFilteringMessageProcessor;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
@@ -34,23 +34,23 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/WireTap.html">http://www.eaipatterns.com/WireTap.html<a/>
  */
-public class WireTap extends AbstractMessageProcessorOwner implements MessageProcessor, NonBlockingSupported {
+public class WireTap extends AbstractMessageProcessorOwner implements Processor, NonBlockingSupported {
 
   protected final transient Logger logger = LoggerFactory.getLogger(getClass());
-  protected volatile MessageProcessor tap;
+  protected volatile Processor tap;
   protected volatile Filter filter;
 
-  protected MessageProcessor filteredTap = new WireTapFilter();
+  protected Processor filteredTap = new WireTapFilter();
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (tap == null) {
       return event;
     }
 
     try {
       // Tap should not respond to reply to handler
-      MuleEvent tapEvent = MuleEvent.builder(event).replyToHandler(null).build();
+      Event tapEvent = Event.builder(event).replyToHandler(null).build();
       setCurrentEvent(tapEvent);
       filteredTap.process(tapEvent);
       setCurrentEvent(event);
@@ -61,16 +61,16 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
     return event;
   }
 
-  public MessageProcessor getTap() {
+  public Processor getTap() {
     return tap;
   }
 
-  public void setTap(MessageProcessor tap) {
+  public void setTap(Processor tap) {
     this.tap = tap;
   }
 
   @Deprecated
-  public void setMessageProcessor(MessageProcessor tap) {
+  public void setMessageProcessor(Processor tap) {
     setTap(tap);
   }
 
@@ -85,7 +85,7 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
   private class WireTapFilter extends AbstractFilteringMessageProcessor {
 
     @Override
-    protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+    protected boolean accept(Event event, Event.Builder builder) {
       if (filter == null) {
         return true;
       } else {
@@ -94,7 +94,7 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
     }
 
     @Override
-    protected MuleEvent processNext(MuleEvent event) throws MuleException {
+    protected Event processNext(Event event) throws MuleException {
       if (tap != null) {
         tap.process(event);
       }
@@ -113,7 +113,7 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
+  protected List<Processor> getOwnedMessageProcessors() {
     return Collections.singletonList(tap);
   }
 

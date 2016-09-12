@@ -7,8 +7,8 @@
 package org.mule.runtime.core.api.transport;
 
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
@@ -26,7 +26,7 @@ public interface LegacyOutboundEndpoint {
 
   MessageExchangePattern getExchangePattern();
 
-  default boolean filterAccepts(MuleMessage message, MuleEvent.Builder builder) {
+  default boolean filterAccepts(InternalMessage message, Event.Builder builder) {
     return getFilter() == null || (getFilter() != null && getFilter().accept(message, builder));
   }
 

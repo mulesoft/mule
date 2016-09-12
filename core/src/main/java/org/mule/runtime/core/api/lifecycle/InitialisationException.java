@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>InitialisationException</code> is thrown by the initialise method defined in the
@@ -22,7 +22,7 @@ public class InitialisationException extends LifecycleException {
    * @param message the exception message
    * @param component the object that failed during a lifecycle method call
    */
-  public InitialisationException(Message message, Initialisable component) {
+  public InitialisationException(I18nMessage message, Initialisable component) {
     super(message, component);
   }
 
@@ -31,7 +31,7 @@ public class InitialisationException extends LifecycleException {
    * @param cause the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
-  public InitialisationException(Message message, Throwable cause, Initialisable component) {
+  public InitialisationException(I18nMessage message, Throwable cause, Initialisable component) {
     super(message, cause, component);
   }
 

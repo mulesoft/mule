@@ -13,9 +13,9 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -44,36 +44,39 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
   @Test
   public void testContentTypesPlainXmlXml() throws Exception {
     EchoComponent.setExpectedMimeType("text/xml");
-    MuleMessage response =
-        client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
+    InternalMessage response =
+        client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
             .getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
   public void testContentTypesAnyXmlXml() throws Exception {
     EchoComponent.setExpectedMimeType("text/xml");
-    MuleMessage response = client.send("vm://in1?connector=vm-in1", MuleMessage.builder().payload("OK").build()).getRight();
+    InternalMessage response =
+        client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
   public void testContentTypesXmlPlainPlain() throws Exception {
     EchoComponent.setExpectedMimeType("text/plain");
-    MuleMessage response =
-        client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").mediaType(MediaType.XML).build()).getRight();
+    InternalMessage response =
+        client.send("vm://in2?connector=vm-in2", InternalMessage.builder().payload("OK").mediaType(MediaType.XML).build())
+            .getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
   public void testContentTypesAnyPlainPlain() throws Exception {
     EchoComponent.setExpectedMimeType("text/plain");
-    MuleMessage response = client.send("vm://in2?connector=vm-in2", MuleMessage.builder().payload("OK").build()).getRight();
+    InternalMessage response =
+        client.send("vm://in2?connector=vm-in2", InternalMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   public static class EchoComponent implements Callable {
@@ -82,8 +85,8 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      MuleMessage message = eventContext.getMessage();
-      String contentType = message.getDataType().getMediaType().withoutParameters().toRfcString();
+      InternalMessage message = eventContext.getMessage();
+      String contentType = message.getPayload().getDataType().getMediaType().withoutParameters().toRfcString();
       assertThat(contentType, is(expectedMimeType));
       return message;
     }
@@ -96,8 +99,8 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
   public static class SetTextMediaTypeTransformer extends AbstractMessageTransformer {
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.TEXT.withCharset(StandardCharsets.UTF_8)).build();
+    public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+      return InternalMessage.builder(event.getMessage()).mediaType(MediaType.TEXT.withCharset(StandardCharsets.UTF_8)).build();
     }
 
   }
@@ -105,8 +108,8 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
   public static class SetXmlMediaTypeTransformer extends AbstractMessageTransformer {
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-      return MuleMessage.builder(event.getMessage()).mediaType(MediaType.XML.withCharset(StandardCharsets.UTF_8)).build();
+    public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+      return InternalMessage.builder(event.getMessage()).mediaType(MediaType.XML.withCharset(StandardCharsets.UTF_8)).build();
     }
 
   }

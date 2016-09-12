@@ -13,16 +13,16 @@ import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
@@ -50,7 +50,7 @@ public class TestEventBuilder {
   private Map<String, Object> sessionProperties = new HashMap<>();
 
   private String sourceCorrelationId = null;
-  private Correlation correlation = null;
+  private GroupCorrelation correlation = null;
 
   private Map<String, Object> flowVariables = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class TestEventBuilder {
 
 
   /**
-   * Prepares the given data to be sent as the mediaType of the payload of the {@link MuleEvent} to the configured flow.
+   * Prepares the given data to be sent as the mediaType of the payload of the {@link Event} to the configured flow.
    *
    * @param mediaType the mediaType to use in the message
    * @return this {@link FlowRunner}
@@ -88,9 +88,9 @@ public class TestEventBuilder {
   }
 
   /**
-   * Sets the {@link org.mule.runtime.api.message.MuleMessage#getAttributes()} value of the produced message
+   * Sets the {@link org.mule.runtime.api.message.Message#getAttributes()} value of the produced message
    *
-   * @param attributes the attributes object for the produced {@link org.mule.runtime.api.message.MuleMessage}
+   * @param attributes the attributes object for the produced {@link org.mule.runtime.api.message.Message}
    * @return this {@link TestEventBuilder}
    */
   public TestEventBuilder withAttributes(Attributes attributes) {
@@ -191,7 +191,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link MuleEvent#getCorrelationId()}.
+   * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link Event#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -202,11 +202,11 @@ public class TestEventBuilder {
   }
 
   /**
-   * Configures the product event to have the provided {@code correlation}. See {@link MuleEvent#getCorrelation()}.
+   * Configures the product event to have the provided {@code correlation}. See {@link Event#getGroupCorrelation()}.
    *
    * @return this {@link TestEventBuilder}
    */
-  public TestEventBuilder withCorrelation(Correlation correlation) {
+  public TestEventBuilder withCorrelation(GroupCorrelation correlation) {
     this.correlation = correlation;
 
     return this;
@@ -265,7 +265,7 @@ public class TestEventBuilder {
   }
 
   /**
-   * Will spy the built {@link MuleMessage} and {@link MuleEvent}. See {@link Mockito#spy(Object) spy}.
+   * Will spy the built {@link Message} and {@link Event}. See {@link Mockito#spy(Object) spy}.
    *
    * @return this {@link TestEventBuilder}
    */
@@ -282,13 +282,13 @@ public class TestEventBuilder {
    * @param flow the recipient for the event to be built.
    * @return an event with the specified configuration.
    */
-  public MuleEvent build(MuleContext muleContext, FlowConstruct flow) {
+  public Event build(MuleContext muleContext, FlowConstruct flow) {
     final Builder messageBuilder;
 
-    if (payload instanceof MuleMessage) {
-      messageBuilder = MuleMessage.builder((MuleMessage) payload);
+    if (payload instanceof InternalMessage) {
+      messageBuilder = InternalMessage.builder((InternalMessage) payload);
     } else {
-      messageBuilder = MuleMessage.builder().payload(payload);
+      messageBuilder = InternalMessage.builder().payload(payload);
     }
     messageBuilder.mediaType(mediaType).inboundProperties(inboundProperties).outboundProperties(outboundProperties)
         .inboundAttachments(inboundAttachments);
@@ -296,10 +296,10 @@ public class TestEventBuilder {
     if (attributes != null) {
       messageBuilder.attributes(attributes);
     }
-    final MuleMessage muleMessage = messageBuilder.build();
+    final InternalMessage muleMessage = messageBuilder.build();
 
-    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
-        .message((MuleMessage) spyTransformer.transform(muleMessage)).flowVariables(flowVariables)
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
+        .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(flowVariables)
         .exchangePattern(exchangePattern).flow(flow).replyToHandler(replyToHandler).transacted(transacted).build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
@@ -309,12 +309,12 @@ public class TestEventBuilder {
       event.getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
     }
 
-    return (MuleEvent) spyTransformer.transform(event);
+    return (Event) spyTransformer.transform(event);
   }
 
   private interface Attachment {
 
-    MuleEvent addOutboundTo(MuleEvent event, String key);
+    Event addOutboundTo(Event event, String key);
   }
 
   private class DataHandlerAttachment implements Attachment {
@@ -326,9 +326,9 @@ public class TestEventBuilder {
     }
 
     @Override
-    public MuleEvent addOutboundTo(MuleEvent event, String key) {
-      return MuleEvent.builder(event)
-          .message(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, dataHandler).build()).build();
+    public Event addOutboundTo(Event event, String key) {
+      return Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage()).addOutboundAttachment(key, dataHandler).build()).build();
     }
   }
 
@@ -343,9 +343,9 @@ public class TestEventBuilder {
     }
 
     @Override
-    public MuleEvent addOutboundTo(MuleEvent event, String key) {
+    public Event addOutboundTo(Event event, String key) {
       try {
-        return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+        return Event.builder(event).message(InternalMessage.builder(event.getMessage())
             .addOutboundAttachment(key, IOUtils.toDataHandler(key, object, contentType)).build()).build();
       } catch (Exception e) {
         throw new MuleRuntimeException(e);

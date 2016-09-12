@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY;
 import static org.mule.runtime.core.config.i18n.CoreMessages.responseTimedOutWaitingForId;
 import static org.mule.runtime.core.context.notification.RoutingNotification.MISSED_ASYNC_REPLY;
-import static org.mule.runtime.core.message.Correlation.NOT_SET;
+import static org.mule.runtime.core.message.GroupCorrelation.NOT_SET;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -62,12 +62,12 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   protected volatile boolean failOnTimeout = true;
   protected MessageSource replyMessageSource;
   protected FlowConstruct flowConstruct;
-  private final MessageProcessor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
+  private final Processor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
   private AsyncReplyMonitoringThread replyThread;
   protected final Map<String, Latch> locks = new ConcurrentHashMap<>();
   private String storePrefix = "";
 
-  protected final ConcurrentMap<String, MuleEvent> responseEvents = new ConcurrentHashMap<>();
+  protected final ConcurrentMap<String, Event> responseEvents = new ConcurrentHashMap<>();
   protected final Object processedLock = new Object();
   // @GuardedBy processedLock
   protected final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
@@ -75,7 +75,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
   protected ListableObjectStore store;
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (replyMessageSource == null) {
       return processNext(event);
     } else {
@@ -83,7 +83,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
       sendAsyncRequest(event);
 
-      MuleEvent resultEvent = receiveAsyncReply(event);
+      Event resultEvent = receiveAsyncReply(event);
 
       if (resultEvent != null) {
         // If result has MULE_SESSION property then merge session properties returned with existing
@@ -91,7 +91,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         if (resultEvent.getMessage().getInboundProperty(MULE_SESSION_PROPERTY) != null) {
           event.getSession().merge(resultEvent.getSession());
         }
-        resultEvent = MuleEvent.builder(event).message(resultEvent.getMessage()).build();
+        resultEvent = Event.builder(event).message(resultEvent.getMessage()).build();
         setCurrentEvent(resultEvent);
       }
       return resultEvent;
@@ -162,18 +162,18 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     // template method
   }
 
-  protected String getAsyncReplyCorrelationId(MuleEvent event) {
+  protected String getAsyncReplyCorrelationId(Event event) {
     StringBuilder stringBuilder = new StringBuilder();
     stringBuilder.append(event.getContext().getCorrelationId());
-    event.getCorrelation().getSequence().ifPresent(v -> stringBuilder.append("-" + v));
+    event.getGroupCorrelation().getSequence().ifPresent(v -> stringBuilder.append("-" + v));
     return stringBuilder.toString();
   }
 
-  protected void sendAsyncRequest(MuleEvent event) throws MuleException {
+  protected void sendAsyncRequest(Event event) throws MuleException {
     processNext(event);
   }
 
-  protected MuleEvent receiveAsyncReply(MuleEvent event) throws MuleException {
+  protected Event receiveAsyncReply(Event event) throws MuleException {
     String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
     System.out.println("receiveAsyncReply: " + asyncReplyCorrelationId);
     Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
@@ -181,7 +181,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     // result
     boolean interruptedWhileWaiting = false;
     boolean resultAvailable = false;
-    MuleEvent result = null;
+    Event result = null;
 
     try {
       if (logger.isDebugEnabled()) {
@@ -253,10 +253,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     }
   }
 
-  class InternalAsyncReplyMessageProcessor implements MessageProcessor {
+  class InternalAsyncReplyMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       store.store(getAsyncReplyCorrelationId(event), event);
       replyThread.processNow();
       return null;
@@ -291,10 +291,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
             if (isAlreadyProcessed(correlationId)) {
               deleteEvent = true;
-              MuleEvent event = (MuleEvent) store.retrieve(correlationId);
+              Event event = (Event) store.retrieve(correlationId);
               if (logger.isDebugEnabled()) {
                 logger.debug("An event was received for an event group that has already been processed, "
-                    + "this is probably because the async-reply timed out. Correlation Id is: "
+                    + "this is probably because the async-reply timed out. GroupCorrelation Id is: "
                     + correlationId + ". Dropping event");
               }
               // Fire a notification to say we received this message
@@ -304,9 +304,9 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             } else {
               Latch l = locks.get(correlationId);
               if (l != null) {
-                MuleEvent event = retrieveEvent(correlationId);
+                Event event = retrieveEvent(correlationId);
 
-                MuleEvent previousResult = responseEvents.putIfAbsent(correlationId, event);
+                Event previousResult = responseEvents.putIfAbsent(correlationId, event);
                 if (previousResult != null) {
                   // this would indicate that we need a better way to prevent
                   // continued aggregation for a group that is currently being
@@ -330,8 +330,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
       }
     }
 
-    private MuleEvent retrieveEvent(String correlationId) throws ObjectStoreException, DefaultMuleException {
-      MuleEvent event = (MuleEvent) store.retrieve(correlationId);
+    private Event retrieveEvent(String correlationId) throws ObjectStoreException, DefaultMuleException {
+      Event event = (Event) store.retrieve(correlationId);
 
       // TODO MULE-10302 remove this.
       if (event.getFlowConstruct() == null) {

@@ -22,7 +22,7 @@ public interface QueryResolver<T extends StatementDefinition> {
    *
    * @param statementDefinition
    * @param connector
-   * @param connection      connection to the database. not null
+   * @param connection connection to the database. not null
    * @return query resolved for the given event
    */
   Query resolve(T statementDefinition, DbConnector connector, DbConnection connection) throws QueryResolutionException;

@@ -23,10 +23,10 @@ import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.serialization.SerializationException;
@@ -85,7 +85,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
 
   @Override
   public Serializable getStorableValue() {
-    return MuleMessage.builder().payload(TEST_MESSAGE).build();
+    return InternalMessage.builder().payload(TEST_MESSAGE).build();
   }
 
   @Override
@@ -164,20 +164,20 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     QueuePersistenceObjectStore<Serializable> store = getObjectStore();
     String id = UUID.getUUID();
     QueueKey key = new QueueKey(QUEUE_NAME, id);
-    MuleMessage msg = MuleMessage.builder().payload("Hello").build();
+    InternalMessage msg = InternalMessage.builder().payload("Hello").build();
     Flow flow = getTestFlow();
-    MuleEvent event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(msg).exchangePattern(ONE_WAY)
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(msg).exchangePattern(ONE_WAY)
         .flow(flow).build();
 
     ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
     monitored.store(key, event);
     MonitoredObjectStoreWrapper.StoredObject retrieved = (MonitoredObjectStoreWrapper.StoredObject) store.retrieve(key);
     Object item = retrieved.getItem();
-    assertTrue(item instanceof MuleEvent);
-    MuleEvent newEvent = (MuleEvent) item;
-    MuleMessage newMessage = newEvent.getMessage();
+    assertTrue(item instanceof Event);
+    Event newEvent = (Event) item;
+    InternalMessage newMessage = newEvent.getMessage();
     assertNotNull(newMessage);
-    assertEquals("Hello", newMessage.getPayload());
+    assertEquals("Hello", newMessage.getPayload().getValue());
   }
 
   @Test

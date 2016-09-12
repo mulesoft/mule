@@ -6,16 +6,16 @@
  */
 package org.mule.test.integration.exceptions;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.routing.outbound.FilteringOutboundRouter;
 
 public class ExceptionThrowingOutboundRouter extends FilteringOutboundRouter {
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    throw new RoutingException(MessageFactory.createStaticMessage("dummyException"), null);
+  public Event process(Event event) throws MuleException {
+    throw new RoutingException(I18nMessageFactory.createStaticMessage("dummyException"), null);
   }
 }
 

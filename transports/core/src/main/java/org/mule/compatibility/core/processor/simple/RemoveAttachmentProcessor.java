@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.core.processor.simple;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;
@@ -32,19 +32,19 @@ public class RemoveAttachmentProcessor extends SimpleMessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleMessage message = event.getMessage();
+  public Event process(Event event) throws MuleException {
+    InternalMessage message = event.getMessage();
     try {
       if (wildcardAttributeEvaluator.hasWildcards()) {
-        final Builder builder = MuleMessage.builder(event.getMessage());
+        final Builder builder = InternalMessage.builder(event.getMessage());
         wildcardAttributeEvaluator.processValues(message.getOutboundAttachmentNames(),
                                                  matchedValue -> builder.removeOutboundAttachment(matchedValue));
-        return MuleEvent.builder(event).message(builder.build()).build();
+        return Event.builder(event).message(builder.build()).build();
       } else {
         Object keyValue = nameEvaluator.resolveValue(event);
         if (keyValue != null) {
-          return MuleEvent.builder(event)
-              .message(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(keyValue.toString()).build()).build();
+          return Event.builder(event)
+              .message(InternalMessage.builder(event.getMessage()).removeOutboundAttachment(keyValue.toString()).build()).build();
         } else {
           logger.info("Attachment key expression return null, no attachment will be removed");
         }

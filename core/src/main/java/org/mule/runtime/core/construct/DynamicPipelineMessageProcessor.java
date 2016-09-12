@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.construct;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
@@ -40,7 +40,7 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
   private String pipelineId;
   private AbstractMessageProcessorChain preChain;
   private AbstractMessageProcessorChain postChain;
-  private MessageProcessor staticChain;
+  private Processor staticChain;
   private Flow flow;
 
   public DynamicPipelineMessageProcessor(Flow flow) {
@@ -48,12 +48,12 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return processNext(event);
   }
 
   @Override
-  public void setListener(MessageProcessor next) {
+  public void setListener(Processor next) {
     if (staticChain == null) {
       if (next instanceof InterceptingMessageProcessor) {
         // wrap with chain to avoid intercepting the postChain
@@ -65,8 +65,8 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
     super.setListener(next);
   }
 
-  private String resetAndUpdatePipeline(String id, List<MessageProcessor> preMessageProcessors,
-                                        List<MessageProcessor> postMessageProcessors)
+  private String resetAndUpdatePipeline(String id, List<Processor> preMessageProcessors,
+                                        List<Processor> postMessageProcessors)
       throws MuleException {
     checkPipelineId(id);
 
@@ -110,7 +110,7 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
   }
 
   private String resetPipeline(String id) throws MuleException {
-    List<MessageProcessor> emptyList = new ArrayList<>();
+    List<Processor> emptyList = new ArrayList<>();
     return resetAndUpdatePipeline(id, emptyList, emptyList);
   }
 
@@ -142,29 +142,29 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
 
   private class Builder implements DynamicPipelineBuilder {
 
-    private List<MessageProcessor> preList = new ArrayList<>();
-    private List<MessageProcessor> postList = new ArrayList<>();
+    private List<Processor> preList = new ArrayList<>();
+    private List<Processor> postList = new ArrayList<>();
 
     @Override
-    public DynamicPipelineBuilder injectBefore(MessageProcessor... messageProcessors) {
+    public DynamicPipelineBuilder injectBefore(Processor... messageProcessors) {
       Collections.addAll(preList, messageProcessors);
       return this;
     }
 
     @Override
-    public DynamicPipelineBuilder injectBefore(List<MessageProcessor> messageProcessors) {
-      return injectBefore(messageProcessors.toArray(new MessageProcessor[messageProcessors.size()]));
+    public DynamicPipelineBuilder injectBefore(List<Processor> messageProcessors) {
+      return injectBefore(messageProcessors.toArray(new Processor[messageProcessors.size()]));
     }
 
     @Override
-    public DynamicPipelineBuilder injectAfter(MessageProcessor... messageProcessors) {
+    public DynamicPipelineBuilder injectAfter(Processor... messageProcessors) {
       Collections.addAll(postList, messageProcessors);
       return this;
     }
 
     @Override
-    public DynamicPipelineBuilder injectAfter(List<MessageProcessor> messageProcessors) {
-      return injectAfter(messageProcessors.toArray(new MessageProcessor[messageProcessors.size()]));
+    public DynamicPipelineBuilder injectAfter(List<Processor> messageProcessors) {
+      return injectAfter(messageProcessors.toArray(new Processor[messageProcessors.size()]));
     }
 
     @Override

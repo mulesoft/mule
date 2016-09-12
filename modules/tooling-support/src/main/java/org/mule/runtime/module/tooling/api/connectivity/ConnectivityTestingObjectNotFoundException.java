@@ -7,7 +7,7 @@
 package org.mule.runtime.module.tooling.api.connectivity;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * Exception type for representing a failure due to connectivity object not found.
@@ -19,7 +19,7 @@ public class ConnectivityTestingObjectNotFoundException extends MuleRuntimeExcep
   /**
    * {@inheritDoc}
    */
-  public ConnectivityTestingObjectNotFoundException(Message message) {
+  public ConnectivityTestingObjectNotFoundException(I18nMessage message) {
     super(message);
   }
 }

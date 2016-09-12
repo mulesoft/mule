@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 import java.lang.Throwable;
 
@@ -19,11 +19,11 @@ public class RouteResolverException extends RoutingFailedException {
     super(cause);
   }
 
-  public RouteResolverException(Message message, Throwable cause) {
+  public RouteResolverException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 
-  public RouteResolverException(Message message) {
+  public RouteResolverException(I18nMessage message) {
     super(message);
   }
 

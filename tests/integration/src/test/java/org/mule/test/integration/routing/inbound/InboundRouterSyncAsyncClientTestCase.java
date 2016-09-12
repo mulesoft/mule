@@ -9,7 +9,7 @@ package org.mule.test.integration.routing.inbound;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -24,10 +24,10 @@ public class InboundRouterSyncAsyncClientTestCase extends AbstractIntegrationTes
 
   @Test
   public void testSync() throws Exception {
-    MuleMessage result =
+    InternalMessage result =
         flowRunner("SyncAsync").withPayload("testSync").withInboundProperty("messageType", "sync").run().getMessage();
 
-    assertThat(result.getPayload(), is("OK"));
+    assertThat(result.getPayload().getValue(), is("OK"));
   }
 
   @Test
@@ -35,8 +35,8 @@ public class InboundRouterSyncAsyncClientTestCase extends AbstractIntegrationTes
     flowRunner("SyncAsync").withPayload("testAsync").withInboundProperty("messageType", "async").run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://asyncResponse", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("test://asyncResponse", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    assertThat(result.getPayload(), is("Response sent to asyncResponse"));
+    assertThat(result.getPayload().getValue(), is("Response sent to asyncResponse"));
   }
 }

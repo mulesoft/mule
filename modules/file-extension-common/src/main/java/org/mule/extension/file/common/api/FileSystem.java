@@ -7,7 +7,7 @@
 package org.mule.extension.file.common.api;
 
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.message.OutputHandler;
@@ -44,12 +44,12 @@ public interface FileSystem {
    * @param config the config that is parameterizing this operation
    * @param directoryPath the path to the directory to be listed
    * @param recursive whether to include the contents of sub-directories
-   * @param message the {@link MuleMessage} on which this operation was triggered
+   * @param message the {@link Message} on which this operation was triggered
    * @param matcher a {@link Predicate} of {@link FileAttributes} used to filter the output list
    * @return a {@link TreeNode} object representing the listed directory
    * @throws IllegalArgumentException if {@code directoryPath} points to a file which doesn't exists or is not a directory
    */
-  TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message,
+  TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
                 Predicate<FileAttributes> matcher);
 
   /**
@@ -66,14 +66,14 @@ public interface FileSystem {
    * be used to make an educated guess on the file's mime type
    *
    * @param config the config that is parameterizing this operation
-   * @param message the incoming {@link MuleMessage}
+   * @param message the incoming {@link Message}
    * @param filePath the path of the file you want to read
    * @param lock whether or not to lock the file
    * @return An {@link OperationResult} with an {@link InputStream} with the file's content as payload and a
-   *         {@link FileAttributes} object as {@link MuleMessage#getAttributes()}
+   *         {@link FileAttributes} object as {@link Message#getAttributes()}
    * @throws IllegalArgumentException if the file at the given path doesn't exists
    */
-  OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+  OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
                                                     boolean lock);
 
   /**
@@ -98,7 +98,7 @@ public interface FileSystem {
    * If the file itself already exists, then the behavior depends on the supplied {@code mode}.
    * <p>
    * This method also supports locking support depending on the value of the {@code lock} argument, but following the same rules
-   * and considerations as described in the {@link #read(FileConnectorConfig, MuleMessage, String, boolean)} method
+   * and considerations as described in the {@link #read(FileConnectorConfig, Message, String, boolean)} method
    *
    * @param config the config on which is parameterizing this operation
    * @param filePath the path of the file to be written
@@ -213,7 +213,7 @@ public interface FileSystem {
   Lock createMuleLock(String id);
 
   /**
-   * Creates a new {@link DataType} to be associated with a {@link MuleMessage} which payload is a {@link InputStream} and the
+   * Creates a new {@link DataType} to be associated with a {@link Message} which payload is a {@link InputStream} and the
    * attributes an instance of {@link FileAttributes}
    * <p>
    * It will try to update the {@link DataType#getMediaType()} with a best guess derived from the given {@code attributes}. If no
@@ -221,7 +221,7 @@ public interface FileSystem {
    * <p>
    * As for the {@link MediaType#getCharset()}, the {@code dataType} one is respected
    *
-   * @param originalMediaType the original {@link MediaType} that the {@link MuleMessage} had before executing the operation
+   * @param originalMediaType the original {@link MediaType} that the {@link Message} had before executing the operation
    * @param attributes the {@link FileAttributes} of the file being processed
    * @return a {@link DataType} the resulting {@link DataType}.
    */

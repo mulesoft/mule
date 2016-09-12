@@ -28,7 +28,7 @@
 
     <flow name="interceptingWithTarget">
         <vegan:get-lunch target="banana"/>
-        <expression-component>banana.payload.bite()</expression-component>
+        <expression-component>banana.payload.value.bite()</expression-component>
     </flow>
 
     <flow name="nestedInterceptingWithTarget">

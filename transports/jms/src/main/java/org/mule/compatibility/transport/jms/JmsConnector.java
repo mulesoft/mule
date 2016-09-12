@@ -29,12 +29,12 @@ import org.mule.runtime.core.api.context.notification.ConnectionNotificationList
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.StartException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.ClusterNodeNotification;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
@@ -359,7 +359,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
           tx.setRollbackOnly();
         }
       } catch (TransactionException e) {
-        throw new MuleRuntimeException(MessageFactory.createStaticMessage("Failed to mark transaction for rollback: "), e);
+        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Failed to mark transaction for rollback: "), e);
       }
 
       // re-throw
@@ -1174,7 +1174,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
   }
 
   public JmsSelectorFilter getSelector(ImmutableEndpoint endpoint) {
-    for (MessageProcessor mp : endpoint.getMessageProcessors()) {
+    for (Processor mp : endpoint.getMessageProcessors()) {
       if (mp instanceof JmsSelectorFilter) {
         return (JmsSelectorFilter) mp;
       } else if (mp instanceof MessageFilter) {

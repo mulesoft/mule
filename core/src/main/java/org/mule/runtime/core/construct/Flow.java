@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.construct;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 
 import org.mule.runtime.api.message.Error;
@@ -14,9 +14,9 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.NamedStageNameSource;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
@@ -55,7 +55,7 @@ import java.util.Optional;
  * from a one-way message source and there is no current transactions message processing in another thread asynchronously.</li>
  * </ul>
  */
-public class Flow extends AbstractPipeline implements MessageProcessor, StageNameSourceProvider, DynamicPipeline {
+public class Flow extends AbstractPipeline implements Processor, StageNameSourceProvider, DynamicPipeline {
 
   private int stageCount = 0;
   private final StageNameSource sequentialStageNameSource;
@@ -95,12 +95,12 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
   }
 
   @Override
-  public MuleEvent process(final MuleEvent event) throws MuleException {
-    final MuleEvent newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
+  public Event process(final Event event) throws MuleException {
+    final Event newEvent = createMuleEventForCurrentFlow(event, event.getReplyToDestination(), event.getReplyToHandler());
     try {
-      ExecutionTemplate<MuleEvent> executionTemplate =
+      ExecutionTemplate<Event> executionTemplate =
           createErrorHandlingExecutionTemplate(muleContext, this, getExceptionListener());
-      MuleEvent result = executionTemplate.execute(() -> pipeline.process(newEvent));
+      Event result = executionTemplate.execute(() -> pipeline.process(newEvent));
       return createReturnEventForParentFlowConstruct(result, event);
     } catch (MessagingException e) {
       e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
@@ -111,7 +111,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     }
   }
 
-  private MuleEvent createMuleEventForCurrentFlow(MuleEvent event, Object replyToDestination, ReplyToHandler replyToHandler) {
+  private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
     // Wrap and propagate reply to handler only if it's not a standard DefaultReplyToHandler.
     if (replyToHandler != null && replyToHandler instanceof NonBlockingReplyToHandler) {
       replyToHandler = createNonBlockingReplyToHandler(event, replyToHandler);
@@ -122,17 +122,17 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     }
 
     // Create new event for current flow with current flowConstruct, replyToHandler etc.
-    event = MuleEvent.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination)
+    event = Event.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination)
         .synchronous(event.isSynchronous() || isSynchronous()).build();
     resetRequestContextEvent(event);
     return event;
   }
 
-  private ReplyToHandler createNonBlockingReplyToHandler(final MuleEvent event, final ReplyToHandler replyToHandler) {
+  private ReplyToHandler createNonBlockingReplyToHandler(final Event event, final ReplyToHandler replyToHandler) {
     return new ExceptionHandlingReplyToHandlerDecorator(new NonBlockingReplyToHandler() {
 
       @Override
-      public MuleEvent processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
+      public Event processReplyTo(Event result, InternalMessage returnMessage, Object replyTo) throws MuleException {
         return replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
       }
 
@@ -144,11 +144,11 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     }, getExceptionListener(), this);
   }
 
-  private MuleEvent createReturnEventForParentFlowConstruct(MuleEvent result, MuleEvent original) {
+  private Event createReturnEventForParentFlowConstruct(Event result, Event original) {
     if (result != null && !(result instanceof VoidMuleEvent)) {
       Optional<Error> errorOptional = result.getError();
       // Create new event with original FlowConstruct, ReplyToHandler and synchronous
-      result = MuleEvent.builder(result).flow(original.getFlowConstruct()).replyToHandler(original.getReplyToHandler())
+      result = Event.builder(result).flow(original.getFlowConstruct()).replyToHandler(original.getReplyToHandler())
           .replyToDestination(original.getReplyToDestination()).synchronous(original.isSynchronous())
           .error(errorOptional.orElse(null)).build();
     }
@@ -156,7 +156,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
     return result;
   }
 
-  private void resetRequestContextEvent(MuleEvent event) {
+  private void resetRequestContextEvent(Event event) {
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(event);
   }

@@ -11,7 +11,7 @@ import static org.mule.extension.http.internal.HttpConnector.TLS;
 import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
 import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -28,7 +28,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
@@ -71,7 +71,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Parameter
   @Optional
   @Placement(group = URL_CONFIGURATION, order = 2)
-  private Function<MuleEvent, String> host;
+  private Function<Event, String> host;
 
   /**
    * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the
@@ -80,7 +80,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Parameter
   @Optional
   @Placement(group = URL_CONFIGURATION, order = 3)
-  private Function<MuleEvent, Integer> port;
+  private Function<Event, Integer> port;
 
   /**
    * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
@@ -215,7 +215,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
     }
   }
 
-  public Function<MuleEvent, Integer> getPort() {
+  public Function<Event, Integer> getPort() {
     return port;
   }
 

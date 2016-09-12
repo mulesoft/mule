@@ -6,15 +6,15 @@
  */
 package org.mule.compatibility.core.transformer.simple;
 
-import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
@@ -25,7 +25,7 @@ import java.util.List;
 import javax.activation.DataHandler;
 
 /**
- * Transforms the message, putting all inbound attachments of the source message as parts in a {@link DefaultMultiPartPayload} of
+ * Transforms the message, putting all inbound attachments of the source message as parts in a {@link DefaultMultiPartContent} of
  * the returning message.
  *
  * @since 4.0
@@ -38,25 +38,25 @@ public class AttachmentsToMultiPartTransformer extends AbstractMessageTransforme
   }
 
   @Override
-  public Object transformMessage(MuleEvent event, Charset outputEncoding) throws TransformerException {
-    final MuleMessage message = event.getMessage();
+  public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
+    final InternalMessage message = event.getMessage();
     try {
-      final Builder builder = MuleMessage.builder(message);
+      final Builder builder = InternalMessage.builder(message);
 
-      List<org.mule.runtime.api.message.MuleMessage> parts = new ArrayList<>();
+      List<org.mule.runtime.api.message.Message> parts = new ArrayList<>();
 
-      if (message.getPayload() != null) {
-        parts.add(MuleMessage.builder().payload(message.getPayload()).attributes(BODY_ATTRIBUTES).build());
+      if (message.getPayload().getValue() != null) {
+        parts.add(InternalMessage.builder().payload(message.getPayload().getValue()).attributes(BODY_ATTRIBUTES).build());
       }
 
       for (String attachmentName : message.getInboundAttachmentNames()) {
         DataHandler attachment = message.getInboundAttachment(attachmentName);
 
-        parts.add(MuleMessage.builder().payload(attachment.getInputStream())
+        parts.add(InternalMessage.builder().payload(attachment.getInputStream())
             .mediaType(MediaType.parse(attachment.getContentType())).attributes(new PartAttributes(attachmentName)).build());
       }
 
-      return builder.payload(new DefaultMultiPartPayload(parts)).build();
+      return builder.payload(new DefaultMultiPartContent(parts)).build();
     } catch (Exception e) {
       throw new TransformerException(this, e);
     }

@@ -7,8 +7,8 @@
 package org.mule.compatibility.transport.file.filters;
 
 import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 import java.io.File;
@@ -47,7 +47,7 @@ public class FilenameWildcardFilter extends WildcardFilter implements FilenameFi
   }
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     Object filename = message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME);
     return accept(filename);
   }

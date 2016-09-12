@@ -14,7 +14,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -35,13 +35,13 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
   private CookieWrapper cookieWrapper;
   private ExpressionLanguage mockExpressionLanguage;
-  private MuleEvent mockMuleEvent;
+  private Event mockMuleEvent;
 
   @Before
   public void setUp() {
     cookieWrapper = new CookieWrapper();
     mockExpressionLanguage = mock(ExpressionLanguage.class);
-    mockMuleEvent = mock(MuleEvent.class);
+    mockMuleEvent = mock(Event.class);
   }
 
   @Test
@@ -161,7 +161,7 @@ public class CookieWrapperTestCase extends AbstractMuleTestCase {
 
 
   private void mockParse() {
-    when(mockExpressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
   }
 

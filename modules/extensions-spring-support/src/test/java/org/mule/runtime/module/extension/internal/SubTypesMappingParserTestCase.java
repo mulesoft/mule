@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.extension.internal.config.AbstractConfigParserTestCase;
@@ -53,9 +54,9 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   public void shapeRetriever() throws Exception {
     MuleEvent responseEvent = flowRunner("shapeRetriever").withPayload("").run();
 
-    assertThat(responseEvent.getMessage().getPayload(), instanceOf(ParentShape.class));
+    assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(ParentShape.class));
 
-    ParentShape payload = responseEvent.getMessage().getPayload();
+    ParentShape payload = (ParentShape) responseEvent.getMessage().getPayload().getValue();
     assertThat(payload.getArea(), is(16));
   }
 
@@ -63,9 +64,9 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   public void doorRetriever() throws Exception {
     MuleEvent responseEvent = flowRunner("doorRetriever").withPayload("").run();
 
-    assertThat(responseEvent.getMessage().getPayload(), instanceOf(CarDoor.class));
+    assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(CarDoor.class));
 
-    CarDoor payload = responseEvent.getMessage().getPayload();
+    CarDoor payload = (CarDoor) responseEvent.getMessage().getPayload().getValue();
     assertThat(payload.getColor(), is("blue"));
   }
 
@@ -73,9 +74,9 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   public void configRetriever() throws Exception {
     MuleEvent responseEvent = flowRunner("configRetriever").withPayload("").run();
 
-    assertThat(responseEvent.getMessage().getPayload(), instanceOf(SubTypesMappingConnector.class));
+    assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(SubTypesMappingConnector.class));
 
-    SubTypesMappingConnector payload = responseEvent.getMessage().getPayload();
+    SubTypesMappingConnector payload = (SubTypesMappingConnector) responseEvent.getMessage().getPayload().getValue();
     assertThat(payload.getAbstractShape(), instanceOf(Square.class));
     assertThat(payload.getAbstractShape().getArea(), is(1));
 
@@ -113,9 +114,9 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   public void connectionRetriever() throws Exception {
     MuleEvent responseEvent = flowRunner("connectionRetriever").withPayload("").run();
 
-    assertThat(responseEvent.getMessage().getPayload(), instanceOf(SubTypesConnectorConnection.class));
+    assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(SubTypesConnectorConnection.class));
 
-    SubTypesConnectorConnection payload = responseEvent.getMessage().getPayload();
+    SubTypesConnectorConnection payload = (SubTypesConnectorConnection) responseEvent.getMessage().getPayload().getValue();
     assertThat(payload.getDoor(), instanceOf(HouseDoor.class));
     assertThat(payload.getShape(), instanceOf(Triangle.class));
     assertThat(payload.getShape().getArea(), is(1));
@@ -125,9 +126,9 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   public void subtypedAndConcreteParameters() throws Exception {
     MuleEvent responseEvent = flowRunner("subtypedAndConcreteParameters").withPayload("").run();
 
-    assertThat(responseEvent.getMessage().getPayload(), notNullValue());
+    assertThat(responseEvent.getMessage().getPayload().getValue(), notNullValue());
 
-    List<Object> payload = responseEvent.getMessage().getPayload();
+    List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload().getValue();
     assertThat(payload, hasSize(7));
 
     assertThat(payload.get(0), instanceOf(ParentShape.class));
@@ -158,9 +159,9 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   @Test
   public void subtypedAndConcreteParametersAsAttributes() throws Exception {
     MuleEvent responseEvent = flowRunner("subtypedAndConcreteParametersAsAttributes").withPayload("").run();
-    assertThat(responseEvent.getMessage().getPayload(), notNullValue());
+    assertThat(responseEvent.getMessage().getPayload().getValue(), notNullValue());
 
-    List<Object> payload = responseEvent.getMessage().getPayload();
+    List<Object> payload = (List<Object>) responseEvent.getMessage().getPayload().getValue();
     assertThat(payload, hasSize(7));
 
     assertThat(payload.get(1), instanceOf(CarDoor.class));
@@ -203,8 +204,8 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   public void duplicatedOperationParameterAndTypeNames() throws Exception {
     MuleEvent responseEvent = flowRunner("duplicatedOperationParameterAndTypeNames").run();
 
-    assertThat(responseEvent.getMessage().getPayload(), notNullValue());
-    assertThat(responseEvent.getMessage().getPayload(), instanceOf(NoGlobalPojo.class));
+    assertThat(responseEvent.getMessage().getPayload().getValue(), notNullValue());
+    assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(NoGlobalPojo.class));
   }
 
   @Test

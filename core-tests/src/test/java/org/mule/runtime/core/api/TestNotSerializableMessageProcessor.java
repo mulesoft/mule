@@ -7,18 +7,18 @@
 
 package org.mule.runtime.core.api;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
-public class TestNotSerializableMessageProcessor implements MessageProcessor {
+public class TestNotSerializableMessageProcessor implements Processor {
 
   public TestNotSerializableMessageProcessor() {
     super();
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return event;
   }
 }

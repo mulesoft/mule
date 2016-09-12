@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 public class PGPSecurityProviderTestCase extends AbstractEncryptionStrategyTestCase {
 
   private PGPSecurityProvider securityProvider;
-  private Message message;
+  private PgpMessage message;
 
   @Override
   protected void doSetUp() throws Exception {

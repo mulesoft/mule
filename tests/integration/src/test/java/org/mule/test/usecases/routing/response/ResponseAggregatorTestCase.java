@@ -14,12 +14,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -46,8 +45,8 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
   public void testSyncResponse() throws Exception {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions = newOptions().method(POST.name()).build();
-    MuleMessage message = client.send(format("http://localhost:%s", port.getNumber()),
-                                      MuleMessage.builder().payload("request").build(), httpRequestOptions)
+    InternalMessage message = client.send(format("http://localhost:%s", port.getNumber()),
+                                          InternalMessage.builder().payload("request").build(), httpRequestOptions)
         .getRight();
     assertNotNull(message);
     assertThat(new String(getPayloadAsBytes(message)), is("Received: request"));
@@ -58,10 +57,10 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
     RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();
 
     try {
-      MuleEvent event = getTestEvent("message1");
-      final MuleMessage message = MuleMessage.builder(event.getMessage()).build();
-      event = MuleEvent.builder(event).message(message).correlationId(event.getCorrelationId())
-          .correlation(new Correlation(1, null)).build();
+      Event event = getTestEvent("message1");
+      final InternalMessage message = InternalMessage.builder(event.getMessage()).build();
+      event = Event.builder(event).message(message).correlationId(event.getCorrelationId())
+          .groupCorrelation(new GroupCorrelation(1, null)).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
       mp.setListener(listener);
@@ -69,7 +68,7 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
 
       mp.process(event);
 
-      Map<String, MuleEvent> responseEvents = mp.getResponseEvents();
+      Map<String, Event> responseEvents = mp.getResponseEvents();
       assertTrue("Response events should be cleaned up.", responseEvents.isEmpty());
     } finally {
       mp.stop();
@@ -87,7 +86,7 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
       start();
     }
 
-    public Map<String, MuleEvent> getResponseEvents() {
+    public Map<String, Event> getResponseEvents() {
       return responseEvents;
     }
   }

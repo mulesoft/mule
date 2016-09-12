@@ -8,28 +8,28 @@ package org.mule.runtime.core;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MessageContext;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.Set;
 
 /**
- * A {@link VoidMuleEvent} represents a void return from a {@link MessageProcessor} such as a ONE_WAY
+ * A {@link VoidMuleEvent} represents a void return from a {@link Processor} such as a ONE_WAY
  */
-public class VoidMuleEvent implements MuleEvent {
+public class VoidMuleEvent implements Event {
 
   private static final long serialVersionUID = 1418044092304465540L;
 
@@ -44,12 +44,12 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public MessageContext getContext() {
+  public EventContext getContext() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public MuleMessage getMessage() {
+  public InternalMessage getMessage() {
     throw new UnsupportedOperationException();
   }
 
@@ -129,17 +129,17 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public <T> T getFlowVariable(String key) {
+  public <T> T getVariable(String key) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DataType getFlowVariableDataType(String key) {
+  public DataType getVariableDataType(String key) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Set<String> getFlowVariableNames() {
+  public Set<String> getVariableNames() {
     throw new UnsupportedOperationException();
   }
 
@@ -164,7 +164,7 @@ public class VoidMuleEvent implements MuleEvent {
   }
 
   @Override
-  public Correlation getCorrelation() {
+  public GroupCorrelation getGroupCorrelation() {
     throw new UnsupportedOperationException();
   }
 

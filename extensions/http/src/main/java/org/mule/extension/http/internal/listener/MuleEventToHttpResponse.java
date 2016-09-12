@@ -21,8 +21,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Component that transforms a {@link MuleEvent} to an {@link HttpResponse}.
+ * Component that transforms a {@link Event} to an {@link HttpResponse}.
  *
  * @since 4.0
  */
@@ -72,7 +72,7 @@ public class MuleEventToHttpResponse {
   /**
    * Creates an {@HttpResponse}.
    *
-   * @param event The {@link MuleEvent} that should be used to set the {@link HttpResponse} content.
+   * @param event The {@link Event} that should be used to set the {@link HttpResponse} content.
    * @param responseBuilder The {@link HttpResponseBuilder} that should be modified if necessary and used to build the
    *        {@link HttpResponse}.
    * @param listenerResponseBuilder The generic {@HttpListenerResponseBuilder} configured for this listener.
@@ -80,7 +80,7 @@ public class MuleEventToHttpResponse {
    * @return an {@HttpResponse} configured based on the parameters.
    * @throws MessagingException if the response creation fails.
    */
-  public HttpResponse create(MuleEvent event, HttpResponseBuilder responseBuilder,
+  public HttpResponse create(Event event, HttpResponseBuilder responseBuilder,
                              HttpListenerResponseBuilder listenerResponseBuilder, boolean supportsTransferEncoding)
       throws MessagingException {
     Map<String, String> headers = listenerResponseBuilder.getHeaders(event);
@@ -98,7 +98,7 @@ public class MuleEventToHttpResponse {
     }
 
     if (httpResponseHeaderBuilder.getContentType() == null) {
-      DataType dataType = event.getMessage().getDataType();
+      DataType dataType = event.getMessage().getPayload().getDataType();
       if (!MediaType.ANY.matches(dataType.getMediaType())) {
         httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toString());
       }
@@ -122,7 +122,7 @@ public class MuleEventToHttpResponse {
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                       (ByteArrayHttpEntity) httpEntity);
     } else {
-      final Object payload = event.getMessage().getPayload();
+      final Object payload = event.getMessage().getPayload().getValue();
       if (payload == null) {
         setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
         httpEntity = new EmptyHttpEntity();
@@ -227,12 +227,12 @@ public class MuleEventToHttpResponse {
     return String.format("%s; boundary=%s", HttpHeaders.Values.MULTIPART_FORM_DATA, UUID.getUUID());
   }
 
-  private HttpEntity createUrlEncodedEntity(MuleEvent event, Map payload) {
+  private HttpEntity createUrlEncodedEntity(Event event, Map payload) {
     final Map mapPayload = payload;
     HttpEntity entity = new EmptyHttpEntity();
     if (!mapPayload.isEmpty()) {
       String encodedBody;
-      final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
+      final Charset encoding = event.getMessage().getPayload().getDataType().getMediaType().getCharset().get();
       if (mapPayload instanceof ParameterMap) {
         encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
       } else {
@@ -261,7 +261,7 @@ public class MuleEventToHttpResponse {
     }
   }
 
-  private HttpEntity createMultipartEntity(MuleEvent event, String contentType, Map<String, DataHandler> parts)
+  private HttpEntity createMultipartEntity(Event event, String contentType, Map<String, DataHandler> parts)
       throws MessagingException {
     if (logger.isDebugEnabled()) {
       logger.debug("Message contains attachments. Ignoring payload and trying to generate multipart response.");
@@ -272,7 +272,7 @@ public class MuleEventToHttpResponse {
       multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(parts));
       return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
     } catch (Exception e) {
-      throw new MessagingException(MessageFactory.createStaticMessage("Error creating multipart HTTP entity."),
+      throw new MessagingException(I18nMessageFactory.createStaticMessage("Error creating multipart HTTP entity."),
                                    event.getMessage(), muleContext, e);
     }
   }

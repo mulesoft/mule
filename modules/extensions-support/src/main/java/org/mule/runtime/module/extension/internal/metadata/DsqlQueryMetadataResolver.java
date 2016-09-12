@@ -24,11 +24,11 @@ import org.mule.runtime.extension.api.introspection.dsql.Field;
 import java.util.List;
 
 /**
- * {@link MetadataOutputResolver} implementation that automatic resolves the output {@link MetadataType}
- * for a given {@link DsqlQuery}.
+ * {@link MetadataOutputResolver} implementation that automatic resolves the output {@link MetadataType} for a given
+ * {@link DsqlQuery}.
  * <p>
- * This resolver goes for all the selected fields in the {@link DsqlQuery} and return a new entity with a subset of the
- * total field of the entity, unless all the fields were selected ("*") that the whole entity {@link MetadataType} is returned.
+ * This resolver goes for all the selected fields in the {@link DsqlQuery} and return a new entity with a subset of the total
+ * field of the entity, unless all the fields were selected ("*") that the whole entity {@link MetadataType} is returned.
  *
  * @since 4.0
  */
@@ -46,11 +46,11 @@ final class DsqlQueryMetadataResolver implements MetadataOutputResolver {
   /**
    * Automatically resolves the output metadata for the {@link DsqlQuery}.
    * <p>
-   * The base entity is resolved using the component {@link QueryEntityResolver} and assuming the
-   * key of the entity is the DSQL {@link DsqlQuery#getType() type}.
+   * The base entity is resolved using the component {@link QueryEntityResolver} and assuming the key of the entity is the DSQL
+   * {@link DsqlQuery#getType() type}.
    *
    * @param context {@link MetadataContext} of the MetaData resolution
-   * @param query   the {@link DsqlQuery} to resolve the output metadata from.
+   * @param query the {@link DsqlQuery} to resolve the output metadata from.
    */
   @Override
   public MetadataType getOutputMetadata(MetadataContext context, Object query)

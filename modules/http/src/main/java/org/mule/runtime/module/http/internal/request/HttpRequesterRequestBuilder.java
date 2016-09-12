@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal.request;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.internal.HttpMessageBuilder;
 import org.mule.runtime.module.http.internal.HttpParamType;
 import org.mule.runtime.module.http.internal.ParameterMap;
@@ -16,15 +16,15 @@ import java.util.List;
 
 public class HttpRequesterRequestBuilder extends HttpMessageBuilder {
 
-  public ParameterMap getQueryParams(MuleEvent event, MuleContext muleContext) {
+  public ParameterMap getQueryParams(Event event, MuleContext muleContext) {
     return resolveParams(event, HttpParamType.QUERY_PARAM, muleContext);
   }
 
-  public ParameterMap getHeaders(MuleEvent event, MuleContext muleContext) {
+  public ParameterMap getHeaders(Event event, MuleContext muleContext) {
     return resolveParams(event, HttpParamType.HEADER, muleContext);
   }
 
-  public String replaceUriParams(String path, MuleEvent event, MuleContext muleContext) {
+  public String replaceUriParams(String path, Event event, MuleContext muleContext) {
     ParameterMap uriParamMap = resolveParams(event, HttpParamType.URI_PARAM, muleContext);
 
     for (String uriParamName : uriParamMap.keySet()) {

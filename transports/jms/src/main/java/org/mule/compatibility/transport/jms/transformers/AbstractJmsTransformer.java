@@ -13,7 +13,7 @@ import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.JmsConstants;
 import org.mule.compatibility.transport.jms.JmsMessageUtils;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
@@ -53,12 +53,12 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer
 
   protected abstract void declareInputOutputClasses();
 
-  protected Message transformToMessage(MuleMessage message) throws Exception {
+  protected Message transformToMessage(InternalMessage message) throws Exception {
     Session session = null;
     try {
       Message result;
 
-      Object src = message.getPayload();
+      Object src = message.getPayload().getValue();
       if (src instanceof Message) {
         result = (Message) src;
         result.clearProperties();
@@ -127,7 +127,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer
     return JmsMessageUtils.toObject(source, jmsSpec, outputEncoding);
   }
 
-  public void setJmsProperties(MuleMessage message, Message msg) throws JMSException {
+  public void setJmsProperties(InternalMessage message, Message msg) throws JMSException {
     for (String key : message.getOutboundPropertyNames()) {
       if (JmsConstants.JMS_PROPERTY_NAMES.contains(key)) {
         continue;

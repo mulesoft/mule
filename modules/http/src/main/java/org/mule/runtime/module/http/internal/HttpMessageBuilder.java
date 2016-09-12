@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
@@ -35,7 +35,7 @@ public class HttpMessageBuilder implements Initialisable {
     LifecycleUtils.initialiseIfNeeded(params.values());
   }
 
-  public ParameterMap resolveParams(MuleEvent muleEvent, HttpParamType httpParamType, MuleContext muleContext) {
+  public ParameterMap resolveParams(Event muleEvent, HttpParamType httpParamType, MuleContext muleContext) {
     Iterable<HttpParam> paramList = params.get(httpParamType);
     ParameterMap httpParams = new ParameterMap();
 

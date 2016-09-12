@@ -8,8 +8,8 @@ package org.mule.compatibility.transport.vm;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
 
@@ -32,11 +32,11 @@ public class VMMessageRequester extends AbstractMessageRequester {
    *
    * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
    *        data available. If no data becomes available before the timeout elapses, null will be returned
-   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was available
+   * @return the result of the request wrapped in a Message object. Null will be returned if no data was available
    * @throws Exception if the call to the underlying protocol causes an exception
    */
   @Override
-  protected MuleMessage doRequest(long timeout) throws Exception {
+  protected InternalMessage doRequest(long timeout) throws Exception {
     try {
       QueueSession queueSession = connector.getTransactionalResource(endpoint);
       Queue queue = queueSession.getQueue(endpoint.getEndpointURI().getAddress());
@@ -47,17 +47,17 @@ public class VMMessageRequester extends AbstractMessageRequester {
         }
         return null;
       } else {
-        MuleMessage message = null;
+        InternalMessage message = null;
         if (logger.isDebugEnabled()) {
           logger.debug("Waiting for a message on " + endpoint.getEndpointURI().getAddress());
         }
         try {
           Serializable polledItem = queue.poll(timeout);
 
-          if (polledItem instanceof MuleEvent) {
-            message = ((MuleEvent) polledItem).getMessage();
+          if (polledItem instanceof Event) {
+            message = ((Event) polledItem).getMessage();
           } else {
-            message = (MuleMessage) polledItem;
+            message = (InternalMessage) polledItem;
           }
         } catch (InterruptedException e) {
           logger.error("Failed to receive message from queue: " + endpoint.getEndpointURI());

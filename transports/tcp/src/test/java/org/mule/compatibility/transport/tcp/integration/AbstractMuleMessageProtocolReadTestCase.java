@@ -12,7 +12,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat;
@@ -35,19 +35,20 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
   @Test
   public void testServer() throws Exception {
     MuleClient client = muleContext.getClient();
-    safeProtocolSend("localhost", port.getNumber(), MuleMessage.builder().payload(TEST_MESSAGE).build());
-    MuleMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
-    assertEquals(TEST_MESSAGE, response.getPayload());
+    safeProtocolSend("localhost", port.getNumber(), InternalMessage.builder().payload(TEST_MESSAGE).build());
+    InternalMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
+    assertEquals(TEST_MESSAGE, response.getPayload().getValue());
   }
 
-  private void safeProtocolSend(String host, int port, MuleMessage msg) throws IOException, MuleException {
+  private void safeProtocolSend(String host, int port, InternalMessage msg) throws IOException, MuleException {
     Socket clientSocket = new Socket(host, port);
     DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     WireFormat wireFormat = new SerializedMuleMessageWireFormat();
     wireFormat.setMuleContext(muleContext);
-    wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+    wireFormat.write(baos, msg,
+                     msg.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
     TcpProtocol delegate = createMuleMessageProtocol();
     delegate.write(outToServer, baos.toByteArray());
     clientSocket.close();

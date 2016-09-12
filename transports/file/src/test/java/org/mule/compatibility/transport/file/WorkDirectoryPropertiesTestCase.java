@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,10 +49,10 @@ public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase {
 
     muleContext.start();
 
-    MuleMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT * 6).getRight().get();
+    InternalMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT * 6).getRight().get();
 
-    assertTrue(response.getPayload() instanceof Map);
-    Map<String, String> payload = (Map<String, String>) response.getPayload();
+    assertTrue(response.getPayload().getValue() instanceof Map);
+    Map<String, String> payload = (Map<String, String>) response.getPayload().getValue();
     assertEquals(dataFolder.getCanonicalPath(), payload.get(FileConnector.PROPERTY_SOURCE_DIRECTORY));
     assertEquals(testfile.getName(), payload.get(FileConnector.PROPERTY_SOURCE_FILENAME));
   }

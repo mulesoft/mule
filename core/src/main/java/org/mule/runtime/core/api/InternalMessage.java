@@ -7,10 +7,11 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.message.DefaultMuleMessageBuilderFactory;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.DefaultMessageBuilderFactory;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -20,40 +21,40 @@ import java.util.Map;
 import javax.activation.DataHandler;
 
 /**
- * MuleMessage
+ * Message
  */
-public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, MessageProperties, MessageAttachments {
+public interface InternalMessage extends Message, MessageProperties, MessageAttachments {
 
   /**
-   * Provides a builder to create {@link MuleMessage} objects.
+   * Provides a builder to create {@link Message} objects.
    *
    * @return a new {@link Builder}.
    */
   static PayloadBuilder builder() {
-    return DefaultMuleMessageBuilderFactory.getInstance().create();
+    return DefaultMessageBuilderFactory.getInstance().create();
   }
 
   /**
-   * Provides a builder to create {@link MuleMessage} objects based on an existing {@link MuleMessage} instance.
+   * Provides a builder to create {@link Message} objects based on an existing {@link Message} instance.
    *
-   * @param message existing {@link MuleMessage} to use as a template to create a new {@link Builder} instance.
+   * @param message existing {@link Message} to use as a template to create a new {@link Builder} instance.
    * @return a new {@link Builder} based on the template {@code message} provided.
    */
-  static Builder builder(MuleMessage message) {
-    return DefaultMuleMessageBuilderFactory.getInstance().create(message);
+  static Builder builder(InternalMessage message) {
+    return DefaultMessageBuilderFactory.getInstance().create(message);
   }
 
-  static Builder builder(org.mule.runtime.api.message.MuleMessage message) {
-    return DefaultMuleMessageBuilderFactory.getInstance().create(message);
+  static Builder builder(Message message) {
+    return DefaultMessageBuilderFactory.getInstance().create(message);
   }
 
   /**
-   * Create a new {@link MuleMessage instance} with the given payload.
+   * Create a new {@link Message instance} with the given payload.
    *
    * @param payload the message payload
    * @return new message instance
    */
-  static MuleMessage of(Object payload) {
+  static InternalMessage of(Object payload) {
     return builder().payload(payload).build();
   }
 
@@ -65,7 +66,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
    */
   ExceptionPayload getExceptionPayload();
 
-  interface PayloadBuilder extends org.mule.runtime.api.message.MuleMessage.PayloadBuilder {
+  interface PayloadBuilder extends Message.PayloadBuilder {
 
     @Override
     Builder nullPayload();
@@ -83,7 +84,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     CollectionBuilder collectionPayload(Object[] payload);
   }
 
-  interface Builder extends org.mule.runtime.api.message.MuleMessage.Builder, PayloadBuilder {
+  interface Builder extends Message.Builder, PayloadBuilder {
 
     @Override
     Builder mediaType(MediaType mediaType);
@@ -175,7 +176,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @param key
      * @param value
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartContent} instead.
      */
     @Deprecated
     Builder addInboundAttachment(String key, DataHandler value);
@@ -184,7 +185,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
      * @param key
      * @param value
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartContent} instead.
      */
     @Deprecated
     Builder addOutboundAttachment(String key, DataHandler value);
@@ -192,7 +193,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     /**
      * @param key
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartContent} instead.
      */
     @Deprecated
     Builder removeInboundAttachment(String key);
@@ -200,7 +201,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     /**
      * @param key
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartContent} instead.
      */
     @Deprecated
     Builder removeOutboundAttachment(String key);
@@ -224,7 +225,7 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     /**
      * @param inboundAttachments
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartContent} instead.
      */
     @Deprecated
     Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
@@ -232,16 +233,16 @@ public interface MuleMessage extends org.mule.runtime.api.message.MuleMessage, M
     /**
      * @param outbundAttachments
      * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
+     * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartContent} instead.
      */
     @Deprecated
     Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
 
     @Override
-    MuleMessage build();
+    InternalMessage build();
   }
 
-  interface CollectionBuilder extends org.mule.runtime.api.message.MuleMessage.CollectionBuilder, Builder {
+  interface CollectionBuilder extends Message.CollectionBuilder, Builder {
 
     @Override
     CollectionBuilder itemMediaType(MediaType mediaType);

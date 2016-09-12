@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 
 import org.junit.Rule;
@@ -56,7 +56,7 @@ public class SoapHeadersFunctionalTestCase extends AbstractWSConsumerFunctionalT
 
   @Test
   public void messagePropertiesAreMappedToSoapHeaders() throws Exception {
-    MuleEvent event =
+    Event event =
         flowRunner("testFlow").withPayload(ECHO_HEADERS_REQUEST).withOutboundProperty(SOAP_HEADER_IN, REQUEST_HEADER_IN)
             .withOutboundProperty(SOAP_HEADER_INOUT, REQUEST_HEADER_INOUT).run();
 

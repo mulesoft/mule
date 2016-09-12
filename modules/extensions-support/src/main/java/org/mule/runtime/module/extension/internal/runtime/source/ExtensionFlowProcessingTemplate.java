@@ -10,18 +10,18 @@ import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 final class ExtensionFlowProcessingTemplate implements AsyncResponseFlowProcessingPhaseTemplate {
 
   private final MuleEvent event;
-  private final MessageProcessor messageProcessor;
+  private final Processor messageProcessor;
   private final CompletionHandler<MuleEvent, MessagingException, MuleEvent> completionHandler;
 
   ExtensionFlowProcessingTemplate(MuleEvent event,
-                                  MessageProcessor messageProcessor,
+                                  Processor messageProcessor,
                                   CompletionHandler<MuleEvent, MessagingException, MuleEvent> completionHandler) {
     this.event = event;
     this.messageProcessor = messageProcessor;
@@ -29,17 +29,17 @@ final class ExtensionFlowProcessingTemplate implements AsyncResponseFlowProcessi
   }
 
   @Override
-  public org.mule.runtime.core.api.MuleEvent getMuleEvent() throws MuleException {
-    return (org.mule.runtime.core.api.MuleEvent) event;
+  public org.mule.runtime.core.api.Event getMuleEvent() throws MuleException {
+    return (org.mule.runtime.core.api.Event) event;
   }
 
   @Override
-  public org.mule.runtime.core.api.MuleEvent routeEvent(org.mule.runtime.core.api.MuleEvent muleEvent) throws MuleException {
+  public org.mule.runtime.core.api.Event routeEvent(org.mule.runtime.core.api.Event muleEvent) throws MuleException {
     return messageProcessor.process(muleEvent);
   }
 
   @Override
-  public void sendResponseToClient(org.mule.runtime.core.api.MuleEvent muleEvent,
+  public void sendResponseToClient(org.mule.runtime.core.api.Event muleEvent,
                                    ResponseCompletionCallback responseCompletionCallback)
       throws MuleException {
     ExtensionSourceExceptionCallback exceptionCallback =
@@ -59,8 +59,8 @@ final class ExtensionFlowProcessingTemplate implements AsyncResponseFlowProcessi
       runnable.run();
       responseCompletionCallback.responseSentSuccessfully();
     } catch (Exception e) {
-      responseCompletionCallback.responseSentWithFailure(new MessagingException((org.mule.runtime.core.api.MuleEvent) event, e),
-                                                         (org.mule.runtime.core.api.MuleEvent) event);
+      responseCompletionCallback.responseSentWithFailure(new MessagingException((org.mule.runtime.core.api.Event) event, e),
+                                                         (org.mule.runtime.core.api.Event) event);
     }
   }
 

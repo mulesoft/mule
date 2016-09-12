@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor.strategy;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor;
@@ -25,7 +25,7 @@ public class AsynchronousProcessingStrategy extends AbstractThreadingProfileProc
   protected ProcessingStrategy synchronousProcessingStrategy = new SynchronousProcessingStrategy();
 
   @Override
-  public void configureProcessors(List<MessageProcessor> processors,
+  public void configureProcessors(List<Processor> processors,
                                   org.mule.runtime.core.api.processor.StageNameSource nameSource,
                                   MessageProcessorChainBuilder chainBuilder, MuleContext muleContext) {
     if (processors.size() > 0) {

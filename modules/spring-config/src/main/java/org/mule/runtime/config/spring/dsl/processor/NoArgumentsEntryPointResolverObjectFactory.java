@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link ObjectFactory} for <no-arguments-entry-point-resolver> configuration element
- * which defines that a method with no arguments should be invoked.
+ * {@link ObjectFactory} for <no-arguments-entry-point-resolver> configuration element which defines that a method with no
+ * arguments should be invoked.
  *
  * @since 4.0
  */

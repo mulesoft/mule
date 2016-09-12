@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.component;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;
@@ -53,11 +53,11 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
   }
 
   @Override
-  protected Object doInvoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+  protected Object doInvoke(Event event, Event.Builder eventBuilder) throws Exception {
     return invokeComponentInstance(event, eventBuilder);
   }
 
-  protected Object invokeComponentInstance(MuleEvent event, MuleEvent.Builder eventBuilder) throws Exception {
+  protected Object invokeComponentInstance(Event event, Event.Builder eventBuilder) throws Exception {
     LifecycleAdapter componentLifecycleAdapter = null;
     try {
       componentLifecycleAdapter = borrowComponentLifecycleAdaptor();

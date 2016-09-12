@@ -25,7 +25,7 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -54,35 +54,35 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void createNewAPIMessageViaMessageInterface() {
-    org.mule.runtime.api.message.MuleMessage message;
-    message = org.mule.runtime.api.message.MuleMessage.builder().payload(TEST_PAYLOAD).mediaType(HTML_STRING_UTF8)
+    org.mule.runtime.api.message.Message message;
+    message = org.mule.runtime.api.message.Message.builder().payload(TEST_PAYLOAD).mediaType(HTML_STRING_UTF8)
         .attributes(TEST_ATTR).build();
 
-    assertThat(message.getPayload(), is(TEST_PAYLOAD));
-    assertThat(message.getDataType().getType(), equalTo(String.class));
-    assertThat(message.getDataType().getMediaType(), is(HTML_STRING_UTF8));
+    assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(message.getPayload().getDataType().getType(), equalTo(String.class));
+    assertThat(message.getPayload().getDataType().getMediaType(), is(HTML_STRING_UTF8));
     assertThat(message.getAttributes(), is(TEST_ATTR));
   }
 
   @Test
   public void createAPIMessageViaMessageInterfaceFromCopy() {
-    org.mule.runtime.api.message.MuleMessage message;
-    message = org.mule.runtime.api.message.MuleMessage.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR).build();
+    org.mule.runtime.api.message.Message message;
+    message = org.mule.runtime.api.message.Message.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR).build();
 
-    org.mule.runtime.api.message.MuleMessage messageCopy;
-    messageCopy = org.mule.runtime.api.message.MuleMessage.builder(message).payload(true).attributes(TEST_ATTR_2).build();
+    org.mule.runtime.api.message.Message messageCopy;
+    messageCopy = org.mule.runtime.api.message.Message.builder(message).payload(true).attributes(TEST_ATTR_2).build();
 
-    assertThat(messageCopy.getPayload(), is(true));
-    assertThat(messageCopy.getDataType(), is(BOOLEAN));
+    assertThat(messageCopy.getPayload().getValue(), is(true));
+    assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
     assertThat(messageCopy.getAttributes(), is(TEST_ATTR_2));
   }
 
   @Test
   public void createNewMessageViaMessageInterface() {
-    MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR).build();
+    InternalMessage message = InternalMessage.builder().payload(TEST_PAYLOAD).attributes(TEST_ATTR).build();
 
-    assertThat(message.getPayload(), is(TEST_PAYLOAD));
-    assertThat(message.getDataType(), is(STRING));
+    assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(message.getPayload().getDataType(), is(STRING));
     assertThat(message.getAttributes(), is(TEST_ATTR));
   }
 
@@ -93,15 +93,16 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     htmlStringList.add("HTML2");
     htmlStringList.add("HTML3");
 
-    MuleMessage message;
+    InternalMessage message;
     message =
-        MuleMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML).attributes(TEST_ATTR).build();
+        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML).attributes(TEST_ATTR)
+            .build();
 
-    assertThat(message.getPayload(), is(htmlStringList));
-    assertThat(message.getDataType().getType(), equalTo(ArrayList.class));
-    assertThat(message.getDataType().getMediaType(), is(ANY));
-    assertThat(message.getDataType(), instanceOf(DefaultCollectionDataType.class));
-    assertThat(((DefaultCollectionDataType) message.getDataType()).getItemDataType().getMediaType(), equalTo(HTML));
+    assertThat(message.getPayload().getValue(), is(htmlStringList));
+    assertThat(message.getPayload().getDataType().getType(), equalTo(ArrayList.class));
+    assertThat(message.getPayload().getDataType().getMediaType(), is(ANY));
+    assertThat(message.getPayload().getDataType(), instanceOf(DefaultCollectionDataType.class));
+    assertThat(((DefaultCollectionDataType) message.getPayload().getDataType()).getItemDataType().getMediaType(), equalTo(HTML));
   }
 
   @Test
@@ -111,32 +112,33 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
     htmlStringList.add("HTML2");
     htmlStringList.add("HTML3");
 
-    MuleMessage message;
+    InternalMessage message;
     message =
-        MuleMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML).attributes(TEST_ATTR).build();
+        InternalMessage.builder().collectionPayload(htmlStringList, String.class).itemMediaType(HTML).attributes(TEST_ATTR)
+            .build();
 
-    MuleMessage copy = MuleMessage.builder(message).build();
+    InternalMessage copy = InternalMessage.builder(message).build();
 
-    assertThat(copy.getPayload(), is(htmlStringList));
-    assertThat(copy.getDataType().getType(), equalTo(ArrayList.class));
-    assertThat(copy.getDataType().getMediaType(), is(ANY));
-    assertThat(copy.getDataType(), instanceOf(DefaultCollectionDataType.class));
-    assertThat(((DefaultCollectionDataType) copy.getDataType()).getItemDataType().getMediaType(), equalTo(HTML));
+    assertThat(copy.getPayload().getValue(), is(htmlStringList));
+    assertThat(copy.getPayload().getDataType().getType(), equalTo(ArrayList.class));
+    assertThat(copy.getPayload().getDataType().getMediaType(), is(ANY));
+    assertThat(copy.getPayload().getDataType(), instanceOf(DefaultCollectionDataType.class));
+    assertThat(((DefaultCollectionDataType) copy.getPayload().getDataType()).getItemDataType().getMediaType(), equalTo(HTML));
   }
 
   @Test
   public void createMessageViaMessageInterfaceFromCopy() {
-    MuleMessage messageCopy = MuleMessage.builder(createTestMessage()).payload(true).attributes(TEST_ATTR_2).build();
+    InternalMessage messageCopy = InternalMessage.builder(createTestMessage()).payload(true).attributes(TEST_ATTR_2).build();
 
-    assertThat(messageCopy.getPayload(), is(true));
-    assertThat(messageCopy.getDataType(), is(BOOLEAN));
+    assertThat(messageCopy.getPayload().getValue(), is(true));
+    assertThat(messageCopy.getPayload().getDataType(), is(BOOLEAN));
     assertThat(messageCopy.getAttributes(), is(TEST_ATTR_2));
   }
 
   @Test
   public void testOnlyPayload() {
-    MuleMessage message = MuleMessage.builder().payload(TEST_PAYLOAD).build();
-    assertThat(message.getPayload(), is(TEST_PAYLOAD));
+    InternalMessage message = InternalMessage.builder().payload(TEST_PAYLOAD).build();
+    assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
   }
 
   @Test
@@ -146,13 +148,13 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void messageAttributesCopy() {
-    assertTestMessage(new DefaultMuleMessageBuilder(createTestMessage()).build());
+    assertTestMessage(new DefaultMessageBuilder(createTestMessage()).build());
   }
 
   @Test
   public void inboundPropertyMap() {
     Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).inboundProperties(inboundProperties).build();
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).inboundProperties(inboundProperties).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -163,7 +165,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void inboundPropertyMapCopy() {
     Map<String, Serializable> inboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
         .inboundProperties(inboundProperties).build()).build();
 
     assertThat(copy.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -175,7 +177,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void outboundPropertyMap() {
     Map<String, Serializable> outboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).outboundProperties(outboundProperties).build();
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD).outboundProperties(outboundProperties).build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -186,7 +188,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void outboundPropertyMapCopy() {
     Map<String, Serializable> outboundProperties = singletonMap(PROPERTY_KEY, PROPERTY_VALUE);
-    MuleMessage copy = new DefaultMuleMessageBuilder(new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage copy = new DefaultMessageBuilder(new DefaultMessageBuilder().payload(TEST_PAYLOAD)
         .outboundProperties(outboundProperties).build()).build();
 
     assertThat(copy.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -197,8 +199,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void inboundProperty() {
-    MuleMessage message =
-        new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE).build();
+    InternalMessage message =
+        new DefaultMessageBuilder().payload(TEST_PAYLOAD).addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getInboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -208,7 +210,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void inboundPropertyDataType() {
-    MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD)
         .addInboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
 
     assertThat(message.getInboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -219,8 +221,8 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void outboundProperty() {
-    MuleMessage message =
-        new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE).build();
+    InternalMessage message =
+        new DefaultMessageBuilder().payload(TEST_PAYLOAD).addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE).build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
     assertThat(message.getOutboundPropertyDataType(PROPERTY_KEY), equalTo(STRING));
@@ -230,7 +232,7 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void outboundPropertyDataType() {
-    MuleMessage message = new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD)
+    InternalMessage message = new DefaultMessageBuilder().payload(TEST_PAYLOAD)
         .addOutboundProperty(PROPERTY_KEY, PROPERTY_VALUE, HTML_STRING).build();
 
     assertThat(message.getOutboundProperty(PROPERTY_KEY), equalTo(PROPERTY_VALUE));
@@ -241,47 +243,47 @@ public class DefaultMuleMessageBuilderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void nullPayload() {
-    MuleMessage message = MuleMessage.builder().nullPayload().build();
-    assertThat(message.getDataType().getType(), equalTo(Object.class));
+    InternalMessage message = InternalMessage.builder().nullPayload().build();
+    assertThat(message.getPayload().getDataType().getType(), equalTo(Object.class));
   }
 
   @Test
   public void mutatePayloadSameTypeConserveTypeAndMimeType() {
-    MuleMessage message = createTestMessage();
-    MuleMessage copy = new DefaultMuleMessageBuilder(message).payload(NEW_PAYLOAD).build();
+    InternalMessage message = createTestMessage();
+    InternalMessage copy = new DefaultMessageBuilder(message).payload(NEW_PAYLOAD).build();
 
-    assertThat(copy.getPayload(), equalTo(NEW_PAYLOAD));
-    assertThat(copy.getDataType().getType(), equalTo(String.class));
-    assertThat(copy.getDataType().getMediaType(), is(TEXT));
+    assertThat(copy.getPayload().getValue(), equalTo(NEW_PAYLOAD));
+    assertThat(copy.getPayload().getDataType().getType(), equalTo(String.class));
+    assertThat(copy.getPayload().getDataType().getMediaType(), is(TEXT));
   }
 
   @Test
   public void mutatePayloadDifferentTypeUpdateTypeAndConserveMimeType() {
-    MuleMessage copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(1).build();
+    InternalMessage copy = new DefaultMessageBuilder(createTestMessage()).payload(1).build();
 
-    assertThat(copy.getPayload(), equalTo(1));
-    assertThat(copy.getDataType().getType(), equalTo(Integer.class));
-    assertThat(copy.getDataType().getMediaType(), is(TEXT));
+    assertThat(copy.getPayload().getValue(), equalTo(1));
+    assertThat(copy.getPayload().getDataType().getType(), equalTo(Integer.class));
+    assertThat(copy.getPayload().getDataType().getMediaType(), is(TEXT));
   }
 
   @Test
   public void mutatePayloadDifferentTypeWithMediaTypeUpdateTypeAndConserveMimeType() {
     Long payload = new Long(1);
     DataHandler dataHandler = new DataHandler(payload, XML.toString());
-    MuleMessage copy = new DefaultMuleMessageBuilder(createTestMessage()).payload(dataHandler).build();
+    InternalMessage copy = new DefaultMessageBuilder(createTestMessage()).payload(dataHandler).build();
 
-    assertThat(copy.getPayload(), is(dataHandler));
-    assertThat(copy.getDataType().getType(), equalTo(DataHandler.class));
-    assertThat(copy.getDataType().getMediaType(), is(XML));
+    assertThat(copy.getPayload().getValue(), is(dataHandler));
+    assertThat(copy.getPayload().getDataType().getType(), equalTo(DataHandler.class));
+    assertThat(copy.getPayload().getDataType().getMediaType(), is(XML));
   }
 
-  private MuleMessage createTestMessage() {
-    return new DefaultMuleMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).attributes(TEST_ATTR).build();
+  private InternalMessage createTestMessage() {
+    return new DefaultMessageBuilder().payload(TEST_PAYLOAD).mediaType(TEXT).attributes(TEST_ATTR).build();
   }
 
-  private void assertTestMessage(MuleMessage message) {
-    assertThat(message.getPayload(), is(TEST_PAYLOAD));
-    assertThat(message.getDataType(), is(TEXT_STRING));
+  private void assertTestMessage(InternalMessage message) {
+    assertThat(message.getPayload().getValue(), is(TEST_PAYLOAD));
+    assertThat(message.getPayload().getDataType(), is(TEXT_STRING));
     assertThat(message.getAttributes(), is(TEST_ATTR));
   }
 

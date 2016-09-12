@@ -13,14 +13,14 @@ import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.outbound.FilteringOutboundRouter;
 
 import java.util.ArrayList;
@@ -42,19 +42,19 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
   private Boolean synchronous;
 
   @Override
-  public MuleEvent route(MuleEvent event) throws RoutingException {
-    MuleMessage message = event.getMessage();
+  public Event route(Event event) throws RoutingException {
+    InternalMessage message = event.getMessage();
 
     List<Object> recipients = getRecipients(event);
-    List<MuleEvent> results = new ArrayList<>();
+    List<Event> results = new ArrayList<>();
 
-    event = MuleEvent.builder(event).correlation(new Correlation(recipients.size(), null)).build();
+    event = Event.builder(event).groupCorrelation(new GroupCorrelation(recipients.size(), null)).build();
 
     OutboundEndpoint endpoint = null;
     for (Object recipient : recipients) {
       // Make a copy of the message. Question is do we do a proper clone? in
       // which case there would potentially be multiple messages with the same id...
-      MuleMessage request = MuleMessage.builder(message).payload(message.getPayload()).build();
+      InternalMessage request = InternalMessage.builder(message).payload(message.getPayload().getValue()).build();
       try {
         endpoint = getRecipientEndpoint(request, recipient);
 
@@ -73,7 +73,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
     return resultsHandler.aggregateResults(results, event);
   }
 
-  protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws MuleException {
+  protected OutboundEndpoint getRecipientEndpoint(InternalMessage message, Object recipient) throws MuleException {
     OutboundEndpoint endpoint = null;
     if (recipient instanceof OutboundEndpoint) {
       endpoint = (OutboundEndpoint) recipient;
@@ -83,7 +83,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
       endpoint = getRecipientEndpointFromString(message, (String) recipient);
     }
     if (null == endpoint) {
-      throw new RegistrationException(MessageFactory.createStaticMessage("Failed to create endpoint for: " + recipient));
+      throw new RegistrationException(I18nMessageFactory.createStaticMessage("Failed to create endpoint for: " + recipient));
     }
 
     OutboundEndpoint existingEndpoint = recipientCache.putIfAbsent(recipient, endpoint);
@@ -104,7 +104,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
     return endpoint;
   }
 
-  protected OutboundEndpoint getRecipientEndpointFromString(MuleMessage message, String recipient) throws MuleException {
+  protected OutboundEndpoint getRecipientEndpointFromString(InternalMessage message, String recipient) throws MuleException {
     OutboundEndpoint endpoint = recipientCache.get(recipient);
     if (null == endpoint && null != getMuleContext() && null != getMuleContext().getRegistry()) {
       endpoint = buildOutboundEndpoint(recipient);
@@ -141,7 +141,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
     return true;
   }
 
-  protected abstract List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException;
+  protected abstract List<Object> getRecipients(Event event) throws CouldNotRouteOutboundMessageException;
 
   public EndpointFactory getEndpointFactory() {
     return (EndpointFactory) getMuleContext().getRegistry().lookupObject(MuleEndpointProperties.OBJECT_MULE_ENDPOINT_FACTORY);

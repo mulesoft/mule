@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.registry.PreInitProcessor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transport.LegacyConnector;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.ExceptionUtils;
@@ -231,7 +231,7 @@ public class TransientRegistry extends AbstractRegistry {
   public void registerObject(String key, Object object, Object metadata) throws RegistrationException {
     checkDisposed();
     if (StringUtils.isBlank(key)) {
-      throw new RegistrationException(MessageFactory.createStaticMessage("Attempt to register object with no key"));
+      throw new RegistrationException(I18nMessageFactory.createStaticMessage("Attempt to register object with no key"));
     }
 
     if (logger.isDebugEnabled()) {
@@ -272,7 +272,7 @@ public class TransientRegistry extends AbstractRegistry {
 
   protected void checkDisposed() throws RegistrationException {
     if (getLifecycleManager().isPhaseComplete(Disposable.PHASE_NAME)) {
-      throw new RegistrationException(MessageFactory
+      throw new RegistrationException(I18nMessageFactory
           .createStaticMessage("Cannot register objects on the registry as the context is disposed"));
     }
   }

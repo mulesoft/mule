@@ -7,7 +7,7 @@
 package org.mule.runtime.config.spring.dsl.processor;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.expression.ExpressionConfig;
@@ -18,7 +18,8 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import java.util.List;
 
 /**
- * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} that constructs {@link ExpressionTransformer} from the mule configuration.
+ * {@link org.mule.runtime.config.spring.dsl.api.ObjectFactory} that constructs {@link ExpressionTransformer} from the mule
+ * configuration.
  *
  * @since 4.0
  */
@@ -37,7 +38,8 @@ public class ExpressionTransformerObjectFactory extends TransformerObjectFactory
   }
 
   /**
-   * @param returnSourceIfNull if true and all arguments are null then the input message will be return, otherwise the results will be return even if they are null.
+   * @param returnSourceIfNull if true and all arguments are null then the input message will be return, otherwise the results
+   *        will be return even if they are null.
    */
   public void setReturnSourceIfNull(boolean returnSourceIfNull) {
     this.returnSourceIfNull = returnSourceIfNull;

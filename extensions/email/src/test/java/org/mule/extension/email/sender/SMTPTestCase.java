@@ -17,6 +17,7 @@ import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
+
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
@@ -28,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.activation.DataHandler;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 import org.junit.runners.Parameterized;
@@ -58,9 +58,9 @@ public abstract class SMTPTestCase extends EmailConnectorTestCase {
     return protocol;
   }
 
-  Message[] getReceivedMessagesAndAssertCount(int receivedNumber) {
+  javax.mail.Message[] getReceivedMessagesAndAssertCount(int receivedNumber) {
     assertThat(server.waitForIncomingEmail(5000, receivedNumber), is(true));
-    Message[] messages = server.getReceivedMessages();
+    javax.mail.Message[] messages = server.getReceivedMessages();
     assertThat(messages, arrayWithSize(receivedNumber));
     return messages;
   }

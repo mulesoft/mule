@@ -18,8 +18,8 @@ public interface DbTypeManager {
    * Finds a mapping for a given type ID and name
    *
    * @param connection connection used to connect to the database if required
-   * @param id         type ID
-   * @param name       type name
+   * @param id type ID
+   * @param name type name
    * @return a type that corresponds to the given ID and name
    * @throws UnknownDbTypeException when there is no managed type with the given ID and name
    */
@@ -29,7 +29,7 @@ public interface DbTypeManager {
    * Finds a mapping for a given type name
    *
    * @param connection connection used to connect to the database if required
-   * @param name       type name
+   * @param name type name
    * @return a type that corresponds to the given name
    * @throws UnknownDbTypeException when there is no managed type with the given name
    */

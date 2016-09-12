@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.interceptor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
@@ -25,10 +25,10 @@ public class TimerInterceptor extends AbstractInterceptingMessageProcessor imple
   private static Logger logger = LoggerFactory.getLogger(TimerInterceptor.class);
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     long startTime = System.currentTimeMillis();
 
-    MuleEvent resultEvent = processNext(event);
+    Event resultEvent = processNext(event);
 
     if (logger.isInfoEnabled()) {
       long executionTime = System.currentTimeMillis() - startTime;

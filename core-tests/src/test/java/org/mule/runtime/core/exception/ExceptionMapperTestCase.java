@@ -53,8 +53,7 @@ public class ExceptionMapperTestCase extends AbstractMuleTestCase {
 
   /**
    * Creates a complex hierarchy starting with {@link RuntimeException} and several children, but with gaps in between and adding
-   * them out of order.
-   * Verifies that the error types respect the hierarchy even for those classes in the gap.
+   * them out of order. Verifies that the error types respect the hierarchy even for those classes in the gap.
    */
   @Test
   public void complexHierarchyMapping() {

@@ -7,8 +7,8 @@
 package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.Matchers.instanceOf;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -36,7 +36,7 @@ public class ExceptionStrategyFilterMule5342TestCase extends AbstractIntegration
   public static class FalseFilter implements Filter {
 
     @Override
-    public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+    public boolean accept(InternalMessage message, Event.Builder builder) {
       return false;
     }
   }

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -31,8 +31,8 @@ public class TcpJmsResponseTestCase extends FunctionalTestCase {
   @Test
   public void testSyncResponse() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message =
-        client.send("tcp://localhost:" + httpPort.getValue(), MuleMessage.builder().payload("request").build()).getRight();
+    InternalMessage message =
+        client.send("tcp://localhost:" + httpPort.getValue(), InternalMessage.builder().payload("request").build()).getRight();
     assertNotNull(message);
     assertEquals("Received: request", getPayloadAsString(message));
   }

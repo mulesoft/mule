@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.context.notification;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 
 /**
@@ -32,7 +32,7 @@ public class RoutingNotification extends ServerNotification {
     registerAction("missed aggregation group event", MISSED_AGGREGATION_GROUP_EVENT);
   }
 
-  public RoutingNotification(MuleMessage resource, String identifier, int action) {
+  public RoutingNotification(InternalMessage resource, String identifier, int action) {
     super(resource, action);
     resourceIdentifier = identifier;
   }

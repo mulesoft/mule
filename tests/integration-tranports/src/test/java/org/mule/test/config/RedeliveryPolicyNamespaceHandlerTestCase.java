@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
@@ -70,7 +70,7 @@ public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase
 
   private IdempotentRedeliveryPolicy redeliveryPolicyFromFlow(String flowName) throws Exception {
     Flow flow = (Flow) getFlowConstruct(flowName);
-    MessageProcessor messageProcessor = flow.getMessageProcessors().get(0);
+    Processor messageProcessor = flow.getMessageProcessors().get(0);
     assertThat(messageProcessor, instanceOf(IdempotentRedeliveryPolicy.class));
     return (IdempotentRedeliveryPolicy) messageProcessor;
   }

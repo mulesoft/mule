@@ -9,7 +9,7 @@ package org.mule.test.xml.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.Random;
 
@@ -28,10 +28,10 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase {
   @Test
   public void testNotXml() throws Exception {
     logger.debug("not xml");
-    MuleMessage response = flowRunner("test for xml").withPayload(STRING_MESSAGE).run().getMessage();
+    InternalMessage response = flowRunner("test for xml").withPayload(STRING_MESSAGE).run().getMessage();
 
     assertNotNull(response);
-    assertNotNull(response.getPayload());
+    assertNotNull(response.getPayload().getValue());
     assertEquals(STRING_MESSAGE, getPayloadAsString(response));
   }
 
@@ -48,9 +48,9 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase {
   }
 
   public void doTestXml(String endpoint, String xml) throws Exception {
-    MuleMessage response = flowRunner("test for xml").withPayload(xml).run().getMessage();
+    InternalMessage response = flowRunner("test for xml").withPayload(xml).run().getMessage();
     assertNotNull(response);
-    assertNotNull(response.getPayload());
+    assertNotNull(response.getPayload().getValue());
     assertEquals(xml, getPayloadAsString(response));
   }
 

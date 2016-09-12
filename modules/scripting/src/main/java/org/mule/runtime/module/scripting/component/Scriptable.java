@@ -8,13 +8,13 @@ package org.mule.runtime.module.scripting.component;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.cannotLoadFromClasspath;
 import static org.mule.runtime.core.config.i18n.CoreMessages.propertiesNotSet;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsStream;
 
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -184,7 +184,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     }
   }
 
-  protected void populatePropertyBindings(Bindings bindings, MuleEvent event) {
+  protected void populatePropertyBindings(Bindings bindings, Event event) {
     if (properties != null) {
       for (Entry entry : properties.entrySet()) {
         String value = (String) entry.getValue();
@@ -206,7 +206,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     bindings.put(BINDING_REGISTRY, muleContext.getRegistry());
   }
 
-  public void populateBindings(Bindings bindings, MuleEvent event, MuleEvent.Builder eventBuilder) {
+  public void populateBindings(Bindings bindings, Event event, Event.Builder eventBuilder) {
     populatePropertyBindings(bindings, event);
     populateDefaultBindings(bindings);
     populateMessageBindings(bindings, event, eventBuilder);
@@ -215,8 +215,8 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     bindings.put(BINDING_FLOW_CONSTRUCT, flow);
   }
 
-  protected void populateMessageBindings(Bindings bindings, MuleEvent event, MuleEvent.Builder eventBuilder) {
-    MuleMessage message = event.getMessage();
+  protected void populateMessageBindings(Bindings bindings, Event event, Event.Builder eventBuilder) {
+    InternalMessage message = event.getMessage();
 
     populateVariablesInOrder(bindings, event);
 
@@ -224,14 +224,14 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     bindings.put(BINDING_MESSAGE, event.getMessage());
     // This will get overwritten if populateBindings(Bindings bindings, MuleEvent event) is called
     // and not this method directly.
-    bindings.put(BINDING_PAYLOAD, message.getPayload());
+    bindings.put(BINDING_PAYLOAD, message.getPayload().getValue());
     // For backward compatability
-    bindings.put(BINDING_SRC, message.getPayload());
+    bindings.put(BINDING_SRC, message.getPayload().getValue());
 
     populateHeadersVariablesAndException(bindings, event, eventBuilder);
   }
 
-  private void populateHeadersVariablesAndException(Bindings bindings, MuleEvent event, MuleEvent.Builder eventBuilder) {
+  private void populateHeadersVariablesAndException(Bindings bindings, Event event, Event.Builder eventBuilder) {
     bindings.put(BINDING_FLOW_VARS, new FlowVariableMapContext(event, eventBuilder));
     bindings.put(BINDING_SESSION_VARS, new SessionVariableMapContext(event.getSession()));
 
@@ -243,12 +243,12 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     }
   }
 
-  private void populateVariablesInOrder(Bindings bindings, MuleEvent event) {
+  private void populateVariablesInOrder(Bindings bindings, Event event) {
     for (String key : event.getSession().getPropertyNamesAsSet()) {
       bindings.put(key, event.getSession().getProperty(key));
     }
-    for (String key : event.getFlowVariableNames()) {
-      bindings.put(key, event.getFlowVariable(key));
+    for (String key : event.getVariableNames()) {
+      bindings.put(key, event.getVariable(key));
     }
   }
 

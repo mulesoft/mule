@@ -30,7 +30,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -120,7 +120,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   private OperationExecutor executor;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleEvent event;
+  private Event event;
 
   private ClassLoader classLoader;
 

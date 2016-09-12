@@ -16,8 +16,8 @@ import java.io.OutputStream;
 
 /**
  * This Protocol will send the actual Mule Message over the TCP channel, and in this way we are preserving any headers which might
- * be needed, for example Correlation IDs in order to be able to aggregate messages after chunking. Data are read until the client
- * closes the channel.
+ * be needed, for example GroupCorrelation IDs in order to be able to aggregate messages after chunking. Data are read until the
+ * client closes the channel.
  */
 public class MuleMessageEOFProtocol extends EOFProtocol implements MuleContextAware {
 

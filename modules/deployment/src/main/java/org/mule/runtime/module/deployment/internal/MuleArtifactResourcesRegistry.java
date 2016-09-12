@@ -78,8 +78,7 @@ public class MuleArtifactResourcesRegistry {
   }
 
   /**
-   * @return a loader for creating the {@link ArtifactPluginDescriptor} from a zipped
-   *         extension
+   * @return a loader for creating the {@link ArtifactPluginDescriptor} from a zipped extension
    */
   public ArtifactPluginDescriptorLoader getArtifactPluginDescriptorLoader() {
     return artifactPluginDescriptorLoader;

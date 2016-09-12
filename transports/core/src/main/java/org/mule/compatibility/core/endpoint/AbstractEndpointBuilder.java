@@ -39,7 +39,7 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -98,8 +98,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
   protected RetryPolicyTemplate retryPolicyTemplate;
   protected String responsePropertiesList;
   protected EndpointMessageProcessorChainFactory messageProcessorsFactory;
-  protected List<MessageProcessor> messageProcessors = new LinkedList<>();
-  protected List<MessageProcessor> responseMessageProcessors = new LinkedList<>();
+  protected List<Processor> messageProcessors = new LinkedList<>();
+  protected List<Processor> responseMessageProcessors = new LinkedList<>();
   protected List<Transformer> transformers = new LinkedList<>();
   protected List<Transformer> responseTransformers = new LinkedList<>();
   protected Boolean disableTransportTransformer;
@@ -171,8 +171,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     EndpointURI endpointURI = uriBuilder.getEndpoint();
     endpointURI.initialise();
 
-    List<MessageProcessor> mergedProcessors = addTransformerProcessors(endpointURI);
-    List<MessageProcessor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
+    List<Processor> mergedProcessors = addTransformerProcessors(endpointURI);
+    List<Processor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
 
     Connector connector = getConnector();
     if (connector != null && !connector.supportsProtocol(endpointURI.getFullScheme())) {
@@ -183,7 +183,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     checkInboundExchangePattern();
 
     // Filters on inbound endpoints need to throw exceptions in case the receiver needs to reject the message
-    for (MessageProcessor mp : messageProcessors) {
+    for (Processor mp : messageProcessors) {
       if (mp instanceof MessageFilter) {
         ((MessageFilter) mp).setThrowOnUnaccepted(true);
       }
@@ -197,8 +197,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     return inboundEndpoint;
   }
 
-  protected InboundEndpoint createInboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> mergedProcessors,
-                                                  List<MessageProcessor> mergedResponseProcessors, Connector connector)
+  protected InboundEndpoint createInboundEndpoint(EndpointURI endpointURI, List<Processor> mergedProcessors,
+                                                  List<Processor> mergedResponseProcessors, Connector connector)
       throws EndpointException {
     return new DefaultInboundEndpoint(connector, endpointURI, getName(endpointURI), getProperties(), getTransactionConfig(),
                                       getDefaultDeleteUnacceptedMessages(connector), messageExchangePattern,
@@ -229,8 +229,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     EndpointURI endpointURI = uriBuilder.getEndpoint();
     endpointURI.initialise();
 
-    List<MessageProcessor> mergedProcessors = addTransformerProcessors(endpointURI);
-    List<MessageProcessor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
+    List<Processor> mergedProcessors = addTransformerProcessors(endpointURI);
+    List<Processor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
 
     Connector connector = getConnector();
     if (connector != null && !connector.supportsProtocol(getScheme())) {
@@ -249,8 +249,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     return outboundEndpoint;
   }
 
-  protected OutboundEndpoint createOutboundEndpoint(EndpointURI endpointURI, List<MessageProcessor> messageProcessors,
-                                                    List<MessageProcessor> responseMessageProcessors, Connector connector) {
+  protected OutboundEndpoint createOutboundEndpoint(EndpointURI endpointURI, List<Processor> messageProcessors,
+                                                    List<Processor> responseMessageProcessors, Connector connector) {
 
     return new DefaultOutboundEndpoint(connector, endpointURI, getName(endpointURI), getProperties(), getTransactionConfig(),
                                        getDefaultDeleteUnacceptedMessages(connector), messageExchangePattern,
@@ -271,8 +271,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
   }
 
 
-  protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException {
-    List<MessageProcessor> tempProcessors = new LinkedList<>(messageProcessors);
+  protected List<Processor> addTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException {
+    List<Processor> tempProcessors = new LinkedList<>(messageProcessors);
     tempProcessors.addAll(getTransformersFromUri(endpointURI));
     tempProcessors.addAll(transformers);
 
@@ -281,14 +281,14 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     return tempProcessors;
   }
 
-  private void registerMessageProcessors(EndpointURI endpointURI, List<MessageProcessor> tempProcessors)
+  private void registerMessageProcessors(EndpointURI endpointURI, List<Processor> tempProcessors)
       throws TransportFactoryException {
-    for (MessageProcessor messageProcessor : tempProcessors) {
+    for (Processor messageProcessor : tempProcessors) {
       registerMessageProcessor(messageProcessor, endpointURI);
     }
   }
 
-  private void registerMessageProcessor(MessageProcessor messageProcessor, EndpointURI uri) throws TransportFactoryException {
+  private void registerMessageProcessor(Processor messageProcessor, EndpointURI uri) throws TransportFactoryException {
     try {
       registerComponent(messageProcessor, uri);
     } catch (RegistrationException e) {
@@ -302,8 +302,8 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     muleContext.getRegistry().registerObject(name, component);
   }
 
-  protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException {
-    List<MessageProcessor> tempResponseProcessors = new LinkedList<>(responseMessageProcessors);
+  protected List<Processor> addResponseTransformerProcessors(EndpointURI endpointURI) throws TransportFactoryException {
+    List<Processor> tempResponseProcessors = new LinkedList<>(responseMessageProcessors);
     tempResponseProcessors.addAll(getResponseTransformersFromUri(endpointURI));
     tempResponseProcessors.addAll(responseTransformers);
 
@@ -404,7 +404,7 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
   }
 
   protected SecurityFilter getSecurityFilter() {
-    for (MessageProcessor mp : messageProcessors) {
+    for (Processor mp : messageProcessors) {
       if (mp instanceof SecurityFilterMessageProcessor) {
         return ((SecurityFilterMessageProcessor) mp).getFilter();
       }
@@ -600,36 +600,36 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void addMessageProcessor(MessageProcessor messageProcessor) {
+  public void addMessageProcessor(Processor messageProcessor) {
     messageProcessors.add(messageProcessor);
   }
 
   @Override
-  public void setMessageProcessors(List<MessageProcessor> newMessageProcessors) {
+  public void setMessageProcessors(List<Processor> newMessageProcessors) {
     if (newMessageProcessors == null) {
       newMessageProcessors = new LinkedList<>();
     }
     this.messageProcessors = newMessageProcessors;
   }
 
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return messageProcessors;
   }
 
   @Override
-  public void addResponseMessageProcessor(MessageProcessor messageProcessor) {
+  public void addResponseMessageProcessor(Processor messageProcessor) {
     responseMessageProcessors.add(messageProcessor);
   }
 
   @Override
-  public void setResponseMessageProcessors(List<MessageProcessor> newResponseMessageProcessors) {
+  public void setResponseMessageProcessors(List<Processor> newResponseMessageProcessors) {
     if (newResponseMessageProcessors == null) {
       newResponseMessageProcessors = new LinkedList<>();
     }
     this.responseMessageProcessors = newResponseMessageProcessors;
   }
 
-  public List<MessageProcessor> getResponseMessageProcessors() {
+  public List<Processor> getResponseMessageProcessors() {
     return responseMessageProcessors;
   }
 
@@ -803,10 +803,10 @@ public abstract class AbstractEndpointBuilder extends AbstractAnnotatedObject im
     return builder;
   }
 
-  private List<MessageProcessor> cloneMessageProcessors(List<MessageProcessor> messageProcessors) {
-    List<MessageProcessor> result = new ArrayList<>(messageProcessors.size());
+  private List<Processor> cloneMessageProcessors(List<Processor> messageProcessors) {
+    List<Processor> result = new ArrayList<>(messageProcessors.size());
 
-    for (MessageProcessor messageProcessor : messageProcessors) {
+    for (Processor messageProcessor : messageProcessors) {
       if (messageProcessor instanceof CloneableMessageProcessor) {
         result.add(((CloneableMessageProcessor) messageProcessor).clone());
       } else {

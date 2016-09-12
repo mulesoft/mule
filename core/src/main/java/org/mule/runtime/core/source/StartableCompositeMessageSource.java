@@ -7,7 +7,7 @@
 package org.mule.runtime.core.source;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -47,13 +47,13 @@ public class StartableCompositeMessageSource implements CompositeMessageSource, 
 
   protected static final Logger logger = LoggerFactory.getLogger(StartableCompositeMessageSource.class);
 
-  protected MessageProcessor listener;
+  protected Processor listener;
   protected AtomicBoolean initialised = new AtomicBoolean(false);
   protected AtomicBoolean started = new AtomicBoolean(false);
   protected final List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
   protected AtomicBoolean starting = new AtomicBoolean(false);
   protected FlowConstruct flowConstruct;
-  private final MessageProcessor internalListener = new InternalMessageProcessor();
+  private final Processor internalListener = new InternalMessageProcessor();
   protected MuleContext muleContext;
 
   @Override
@@ -167,7 +167,7 @@ public class StartableCompositeMessageSource implements CompositeMessageSource, 
   }
 
   @Override
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     this.listener = listener;
   }
 
@@ -192,14 +192,14 @@ public class StartableCompositeMessageSource implements CompositeMessageSource, 
     muleContext = context;
   }
 
-  private class InternalMessageProcessor implements MessageProcessor {
+  private class InternalMessageProcessor implements Processor {
 
     public InternalMessageProcessor() {
       super();
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       if (started.get() || starting.get()) {
         return listener.process(event);
       } else {

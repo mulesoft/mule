@@ -42,7 +42,7 @@ public class XsltTransformerXXETestCase extends FunctionalTestCase {
     String input = this.makeInput();
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(MessageTransformerException.class));
-    this.flowRunner("safeXxe").withPayload(new ByteArrayInputStream(input.getBytes())).run().getMessage().getPayload();
+    this.flowRunner("safeXxe").withPayload(new ByteArrayInputStream(input.getBytes())).run().getMessage().getPayload().getValue();
   }
 
   @Test
@@ -50,7 +50,7 @@ public class XsltTransformerXXETestCase extends FunctionalTestCase {
     String input = this.makeInput();
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(MessageTransformerException.class));
-    this.flowRunner("safeXxe").withPayload(input).run().getMessage().getPayload();
+    this.flowRunner("safeXxe").withPayload(input).run().getMessage().getPayload().getValue();
   }
 
   @Test
@@ -58,7 +58,7 @@ public class XsltTransformerXXETestCase extends FunctionalTestCase {
     String input = this.makeInput();
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(MessageTransformerException.class));
-    this.flowRunner("safeXxe").withPayload(input.getBytes()).run().getMessage().getPayload();
+    this.flowRunner("safeXxe").withPayload(input.getBytes()).run().getMessage().getPayload().getValue();
   }
 
   @Test
@@ -80,7 +80,7 @@ public class XsltTransformerXXETestCase extends FunctionalTestCase {
   }
 
   private void assertUnsafe(Object payload) throws Exception {
-    String output = (String) this.flowRunner("unsafeXxe").withPayload(payload).run().getMessage().getPayload();
+    String output = (String) this.flowRunner("unsafeXxe").withPayload(payload).run().getMessage().getPayload().getValue();
     assertTrue(output.contains("secret"));
   }
 

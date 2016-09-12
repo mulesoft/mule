@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transaction;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.transaction.constraints.ConstraintFilter;
 
@@ -22,7 +22,7 @@ public class TransactionConstraintTestCase extends AbstractMuleTestCase {
   @Test
   public void testConstraintFilter() throws Exception {
     ConstraintFilter filter = new ConstraintFilter();
-    MuleEvent event = Mockito.mock(MuleEvent.class);
+    Event event = Mockito.mock(Event.class);
     assertTrue(filter.accept(event));
 
     ConstraintFilter clone = (ConstraintFilter) filter.clone();

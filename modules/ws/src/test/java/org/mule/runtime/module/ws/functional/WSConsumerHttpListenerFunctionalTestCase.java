@@ -10,7 +10,7 @@ package org.mule.runtime.module.ws.functional;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -35,8 +35,8 @@ public class WSConsumerHttpListenerFunctionalTestCase extends AbstractWSConsumer
   @Test
   public void listenerReturnsSoapEnvelopeXMLCorrectly() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send("http://localhost:" + clientPort.getValue(), getTestMuleMessage(ECHO_REQUEST),
-                                       newOptions().method(POST.name()).build())
+    InternalMessage response = client.send("http://localhost:" + clientPort.getValue(), getTestMuleMessage(ECHO_REQUEST),
+                                           newOptions().method(POST.name()).build())
         .getRight();
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));
   }

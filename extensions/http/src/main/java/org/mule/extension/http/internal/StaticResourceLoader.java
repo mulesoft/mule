@@ -8,12 +8,12 @@
 package org.mule.extension.http.internal;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -48,7 +48,7 @@ public class StaticResourceLoader {
   @Optional(defaultValue = "index.html")
   private String defaultFile;
 
-  public MuleMessage load(MuleEvent event) throws ResourceNotFoundException {
+  public InternalMessage load(Event event) throws ResourceNotFoundException {
     // TODO: MULE-10163 - Analyse removing the static resource loader in favor of file read
     checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes,
                   "Message attributes must be HttpRequestAttributes.");
@@ -70,7 +70,7 @@ public class StaticResourceLoader {
     }
 
     File file = new File(resourceBasePath + path);
-    MuleMessage result;
+    InternalMessage result;
 
     if (file.isDirectory()) {
       if (!path.endsWith("/")) {
@@ -94,7 +94,7 @@ public class StaticResourceLoader {
         mimeType = DEFAULT_MIME_TYPE;
       }
 
-      result = MuleMessage.builder().payload(buffer).mediaType(MediaType.parse(mimeType)).build();
+      result = InternalMessage.builder().payload(buffer).mediaType(MediaType.parse(mimeType)).build();
       return result;
     } catch (IOException e) {
       throw new ResourceNotFoundException(createStaticMessage(format("The file: %s was not found.", resourceBasePath + path)),

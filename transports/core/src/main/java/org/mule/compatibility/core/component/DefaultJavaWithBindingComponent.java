@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.api.object.ObjectFactory;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class DefaultJavaWithBindingComponent extends AbstractJavaWithBindingsCom
           singletonComponentLifecycleAdapter = createLifecycleAdaptor();
         }
       } catch (Exception e) {
-        throw new InitialisationException(MessageFactory.createStaticMessage("Unable to create instance of POJO service"), e,
+        throw new InitialisationException(I18nMessageFactory.createStaticMessage("Unable to create instance of POJO service"), e,
                                           this);
 
       }

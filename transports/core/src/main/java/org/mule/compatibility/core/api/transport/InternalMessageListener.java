@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.transport;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 
 import java.io.OutputStream;
@@ -21,7 +21,7 @@ import java.io.OutputStream;
 @Deprecated
 public interface InternalMessageListener {
 
-  MuleMessage onMessage(MuleMessage message, Transaction trans, boolean synchronous, OutputStream outputStream)
+  InternalMessage onMessage(InternalMessage message, Transaction trans, boolean synchronous, OutputStream outputStream)
       throws MuleException;
 
 }

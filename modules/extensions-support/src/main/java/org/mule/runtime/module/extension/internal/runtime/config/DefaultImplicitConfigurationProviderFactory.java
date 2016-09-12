@@ -10,7 +10,7 @@ import static org.mule.runtime.module.extension.internal.introspection.utils.Imp
 import static org.mule.runtime.module.extension.internal.introspection.utils.ImplicitObjectUtils.getFirstImplicit;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.time.TimeSupplier;
@@ -37,7 +37,7 @@ public final class DefaultImplicitConfigurationProviderFactory implements Implic
    */
   @Override
   public ConfigurationProvider createImplicitConfigurationProvider(ExtensionModel extensionModel,
-                                                                   MuleEvent event,
+                                                                   Event event,
                                                                    MuleContext muleContext) {
     RuntimeConfigurationModel implicitConfigurationModel =
         (RuntimeConfigurationModel) getFirstImplicit(extensionModel.getConfigurationModels());

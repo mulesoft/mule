@@ -14,7 +14,7 @@ import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.util.FileUtils;
@@ -44,7 +44,7 @@ public class FileAgeAndPollingFrequencyInteractionTestCase extends FunctionalTes
 
     muleContext.start();
 
-    MuleMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull("File was not processed", response);
     assertEquals(TEST_MESSAGE, getPayloadAsString(response));

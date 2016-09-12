@@ -8,7 +8,7 @@ package org.mule.extension.http.api.request.validator;
 
 import static java.lang.String.format;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 
 /**
@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 public class FailureStatusCodeValidator extends RangeStatusCodeValidator {
 
   @Override
-  public void validate(MuleMessage responseMessage, MuleContext context) throws ResponseValidatorException {
+  public void validate(Message responseMessage, MuleContext context) throws ResponseValidatorException {
     int status = ((HttpResponseAttributes) responseMessage.getAttributes()).getStatusCode();
 
     if (belongs(status)) {

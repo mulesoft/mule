@@ -15,7 +15,7 @@ import org.mule.extension.socket.api.socket.tcp.TcpSocketProperties;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 
 import java.io.IOException;
@@ -36,7 +36,7 @@ public final class SocketUtils {
   private static final String SOCKET_COULD_NOT_BE_CREATED = "%s Socket could not be created correctly";
 
   /**
-   * UDP doesn't allow streaming and it always sends payload when dealing with a {@link MuleMessage}
+   * UDP doesn't allow streaming and it always sends payload when dealing with a {@link Message}
    */
   public static byte[] getUdpAllowedByteArray(Object data, String encoding, ObjectSerializer objectSerializer)
       throws IOException {
@@ -48,9 +48,10 @@ public final class SocketUtils {
       throws IOException {
     if (data instanceof InputStream && !streamingIsAllowed) {
       throw new IOException("Streaming is not allowed with this configuration");
-    } else if (data instanceof MuleMessage) {
+    } else if (data instanceof Message) {
       if (payloadOnly) {
-        return getByteArray(((MuleMessage) data).getPayload(), payloadOnly, streamingIsAllowed, encoding, objectSerializer);
+        return getByteArray(((Message) data).getPayload().getValue(), payloadOnly, streamingIsAllowed, encoding,
+                            objectSerializer);
       } else {
         return objectSerializer.serialize(data);
       }
@@ -73,8 +74,8 @@ public final class SocketUtils {
     return connection.validate();
   }
 
-  public static MuleMessage createMuleMessage(InputStream content, SocketAttributes attributes) {
-    return MuleMessage.builder().payload(content).attributes(attributes).build();
+  public static Message createMuleMessage(InputStream content, SocketAttributes attributes) {
+    return Message.builder().payload(content).attributes(attributes).build();
   }
 
   /**

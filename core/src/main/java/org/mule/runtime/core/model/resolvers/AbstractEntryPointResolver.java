@@ -90,7 +90,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver {
 
 
   protected Object[] getPayloadFromMessage(MuleEventContext context) throws TransformerException {
-    Object temp = context.getMessage().getPayload();
+    Object temp = context.getMessage().getPayload().getValue();
     if (temp instanceof Object[]) {
       return (Object[]) temp;
     } else if (temp == null) {

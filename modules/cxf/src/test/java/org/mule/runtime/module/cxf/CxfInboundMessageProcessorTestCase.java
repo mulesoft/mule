@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.runtime.module.cxf.testmodels.Echo;
@@ -34,19 +34,19 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
   public void testInbound() throws Exception {
     CxfInboundMessageProcessor processor = createCxfMessageProcessor();
 
-    MessageProcessor messageProcessor = event -> {
-      payload = event.getMessage().getPayload();
+    Processor messageProcessor = event -> {
+      payload = event.getMessage().getPayload().getValue();
       assertEquals("echo", payload);
       gotEvent = true;
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("echo").build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("echo").build()).build();
     };
     processor.setListener(messageProcessor);
 
-    MuleEvent event = getTestEvent(msg);
+    Event event = getTestEvent(msg);
 
-    MuleEvent response = processor.process(event);
+    Event response = processor.process(event);
 
-    Object payload = response.getMessage().getPayload();
+    Object payload = response.getMessage().getPayload().getValue();
     assertTrue(payload instanceof OutputHandler);
 
     ((OutputHandler) payload).write(response, new NullOutputStream());
@@ -57,17 +57,17 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
   public void testOneWay() throws Exception {
     CxfInboundMessageProcessor processor = createCxfMessageProcessor();
 
-    MessageProcessor messageProcessor = event -> {
-      payload = event.getMessage().getPayload();
+    Processor messageProcessor = event -> {
+      payload = event.getMessage().getPayload().getValue();
       assertEquals("echo", payload);
       gotEvent = true;
       return null;
     };
     processor.setListener(messageProcessor);
 
-    MuleEvent event = getTestEvent(msg);
+    Event event = getTestEvent(msg);
 
-    MuleEvent response = processor.process(event);
+    Event response = processor.process(event);
 
     assertTrue(gotEvent);
     assertNull(response);

@@ -11,8 +11,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.A;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.B;
 
@@ -27,18 +27,18 @@ public class SpringPrototypesLifecycleTestCase extends AbstractIntegrationTestCa
 
   @Test
   public void registersTransformerOnce() throws Exception {
-    final MuleEvent muleEvent = flowRunner("testFlow").withPayload(new A(TEST_MESSAGE)).run();
-    final MuleMessage response = muleEvent.getMessage();
+    final Event muleEvent = flowRunner("testFlow").withPayload(new A(TEST_MESSAGE)).run();
+    final InternalMessage response = muleEvent.getMessage();
 
-    assertThat(response.getPayload(), is(instanceOf(B.class)));
+    assertThat(response.getPayload().getValue(), is(instanceOf(B.class)));
   }
 
   @Test
   public void exceptionHandlerWithTransformerInEndpoint() throws Exception {
-    final MuleEvent muleEvent =
+    final Event muleEvent =
         flowRunner("testExceptionHandlerWithTransformerInEndpointFlow").withPayload(new A(TEST_MESSAGE)).run();
-    final MuleMessage response = muleEvent.getMessage();
+    final InternalMessage response = muleEvent.getMessage();
 
-    assertThat(response.getPayload(), is(instanceOf(B.class)));
+    assertThat(response.getPayload().getValue(), is(instanceOf(B.class)));
   }
 }

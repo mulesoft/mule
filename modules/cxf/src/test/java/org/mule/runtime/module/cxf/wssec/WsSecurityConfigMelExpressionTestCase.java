@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -35,7 +35,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase {
   @Test
   public void testSuccessfulAuthentication() throws Exception {
     ClientPasswordCallback.setPassword("secret");
-    MuleMessage received = flowRunner("cxfClient").withPayload("PasswordText").run().getMessage();
+    InternalMessage received = flowRunner("cxfClient").withPayload("PasswordText").run().getMessage();
 
     assertNotNull(received);
     assertEquals("Hello PasswordText", getPayloadAsString(received));

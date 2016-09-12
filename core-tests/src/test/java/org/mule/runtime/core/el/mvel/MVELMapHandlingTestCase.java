@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -51,7 +51,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
     Map<String, String> payload = new HashMap<>();
     payload.put(KEY, VALUE);
 
-    MuleEvent event = getTestEvent(payload);
+    Event event = getTestEvent(payload);
 
     assertMapKey(event, KEY, VALUE);
     payload.remove(KEY);
@@ -62,7 +62,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   public void nullKeyWhichGetsValueLater() throws Exception {
     Map<String, String> payload = new HashMap<>();
 
-    MuleEvent event = getTestEvent(payload);
+    Event event = getTestEvent(payload);
 
     assertMapKey(event, KEY, null);
 
@@ -74,13 +74,13 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
     assertMapKey(getTestEvent(payload), key, expectedValue);
   }
 
-  private void assertMapKey(MuleEvent event, String key, Object expectedValue) throws Exception {
+  private void assertMapKey(Event event, String key, Object expectedValue) throws Exception {
     runExpressionAndExpect(String.format("#[payload.%s]", key), expectedValue, event);
     runExpressionAndExpect(String.format("#[payload['%s']]", key), expectedValue, event);
     runExpressionAndExpect(String.format("#[payload.'%s']", key), expectedValue, event);
   }
 
-  private void runExpressionAndExpect(String expression, Object expectedValue, MuleEvent event) throws Exception {
+  private void runExpressionAndExpect(String expression, Object expectedValue, Event event) throws Exception {
     Object result = el.evaluate(expression, event, getTestFlow());
     assertThat(format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
   }

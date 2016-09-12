@@ -8,9 +8,9 @@ package org.mule.test.core.el.mvel;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -47,7 +47,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
 
   final protected String payload = "Tom,Fennelly,Male,4,Ireland";
 
-  protected MuleEvent event;
+  protected Event event;
   protected Flow flow;
 
   @Before
@@ -106,15 +106,15 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  protected MuleEvent createMuleEvent() {
+  protected Event createMuleEvent() {
     Flow flow;
     try {
       flow = getTestFlow();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(payload).build()).exchangePattern(ONE_WAY).flow(flow).build();
+    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload(payload).build()).exchangePattern(ONE_WAY).flow(flow).build();
   }
 
 }

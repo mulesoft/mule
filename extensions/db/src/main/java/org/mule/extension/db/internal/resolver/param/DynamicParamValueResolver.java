@@ -8,7 +8,7 @@
 package org.mule.extension.db.internal.resolver.param;
 
 import org.mule.extension.db.internal.domain.query.QueryParamValue;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 
 import java.util.LinkedList;
@@ -26,7 +26,7 @@ public class DynamicParamValueResolver implements ParamValueResolver {
   }
 
   @Override
-  public List<QueryParamValue> resolveParams(MuleEvent muleEvent, List<QueryParamValue> templateParams) {
+  public List<QueryParamValue> resolveParams(Event muleEvent, List<QueryParamValue> templateParams) {
     List<QueryParamValue> params = new LinkedList<>();
 
     if (templateParams != null) {

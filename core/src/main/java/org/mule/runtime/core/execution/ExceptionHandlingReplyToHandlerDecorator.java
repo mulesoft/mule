@@ -7,9 +7,9 @@
 package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -20,14 +20,13 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
  * {@link org.mule.runtime.core.api.exception .MessagingExceptionHandler} to handle errors before delegating to the delegate
  * ReplyToHandler instance.
  * <p>
- * Invocations of {@link #processReplyTo(org.mule.runtime.core.api.MuleEvent, org.mule.runtime.core.api.MuleMessage, Object)} are
+ * Invocations of {@link #processReplyTo(org.mule.runtime.core.api.Event, org.mule.runtime.core.api.InternalMessage, Object)} are
  * passed straight through to the delegate ReplyToHandler where as invocations of
- * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(MessagingException, Object)}
- * may result in a delegation to either
- * {@link #processReplyTo(org.mule.runtime.core.api.MuleEvent, org.mule.runtime.core.api.MuleMessage, Object)} or
- * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(MessagingException, Object)}
- * depending on the result of {@link MessagingException#handled()} after the MessagingExceptionHandler
- * has been invoked.
+ * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(MessagingException, Object)} may result in a
+ * delegation to either
+ * {@link #processReplyTo(org.mule.runtime.core.api.Event, org.mule.runtime.core.api.InternalMessage, Object)} or
+ * {@link org.mule.runtime.core.api.connector.ReplyToHandler#processExceptionReplyTo(MessagingException, Object)} depending on the
+ * result of {@link MessagingException#handled()} after the MessagingExceptionHandler has been invoked.
  */
 public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingReplyToHandler {
 
@@ -43,13 +42,13 @@ public class ExceptionHandlingReplyToHandlerDecorator implements NonBlockingRepl
   }
 
   @Override
-  public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+  public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
     return delegate.processReplyTo(event, returnMessage, replyTo);
   }
 
   @Override
   public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-    MuleEvent result;
+    Event result;
     if (messagingExceptionHandler != null) {
       result = messagingExceptionHandler.handleException(exception, exception.getEvent());
     } else {

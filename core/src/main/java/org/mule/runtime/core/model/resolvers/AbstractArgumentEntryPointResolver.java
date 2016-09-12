@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.util.ClassUtils;
@@ -80,7 +80,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
   }
 
   @Override
-  public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
+  public InvocationResult invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
     Method method = null;
     Object[] payload = getPayloadFromMessage(context);
 

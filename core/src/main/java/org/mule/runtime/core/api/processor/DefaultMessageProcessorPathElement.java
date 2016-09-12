@@ -14,10 +14,10 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
 
   private MessageProcessorPathElement parent;
   private List<MessageProcessorPathElement> children;
-  private MessageProcessor messageProcessor;
+  private Processor messageProcessor;
   private String name;
 
-  public DefaultMessageProcessorPathElement(MessageProcessor messageProcessor, String name) {
+  public DefaultMessageProcessorPathElement(Processor messageProcessor, String name) {
     this.messageProcessor = messageProcessor;
     this.name = escape(name);
     this.children = new ArrayList<MessageProcessorPathElement>();
@@ -40,7 +40,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
   }
 
   @Override
-  public MessageProcessorPathElement addChild(MessageProcessor mp) {
+  public MessageProcessorPathElement addChild(Processor mp) {
     int size = children.size();
     DefaultMessageProcessorPathElement result = new DefaultMessageProcessorPathElement(mp, String.valueOf(size));
     addChild(result);
@@ -54,7 +54,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
     return result;
   }
 
-  public MessageProcessor getMessageProcessor() {
+  public Processor getMessageProcessor() {
     return messageProcessor;
   }
 

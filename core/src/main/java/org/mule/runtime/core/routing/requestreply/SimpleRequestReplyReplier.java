@@ -7,23 +7,23 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RequestReplyReplierMessageProcessor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 
 public class SimpleRequestReplyReplier extends AbstractInterceptingMessageProcessor
     implements RequestReplyReplierMessageProcessor {
 
-  protected MessageProcessor replyMessageProcessor;
+  protected Processor replyMessageProcessor;
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     replyMessageProcessor.process(processNext(event));
     return VoidMuleEvent.getInstance();
   }
 
-  public void setReplyProcessor(MessageProcessor replyMessageProcessor) {
+  public void setReplyProcessor(Processor replyMessageProcessor) {
     this.replyMessageProcessor = replyMessageProcessor;
   }
 

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.compatibility.transport.socket.api.TcpClientSocketProperties;

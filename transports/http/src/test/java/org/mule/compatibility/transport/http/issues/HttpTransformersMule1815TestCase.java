@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.functional.functional.StringAppendTestTransformer;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -40,9 +40,9 @@ public class HttpTransformersMule1815TestCase extends FunctionalTestCase {
     return "http-transformers-mule-1815-test-flow.xml";
   }
 
-  private MuleMessage sendTo(String uri) throws MuleException {
+  private InternalMessage sendTo(String uri) throws MuleException {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send(uri, OUTBOUND_MESSAGE, null).getRight();
+    InternalMessage message = client.send(uri, OUTBOUND_MESSAGE, null).getRight();
     assertNotNull(message);
     return message;
   }

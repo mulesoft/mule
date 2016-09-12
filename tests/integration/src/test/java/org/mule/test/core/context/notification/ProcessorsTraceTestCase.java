@@ -13,12 +13,12 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_FLOW_TRACE;
 
-import org.mule.runtime.core.api.CoreMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.CoreEventContext;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.notification.MessageProcessorNotificationListener;
 import org.mule.runtime.core.api.context.notification.ProcessorsTrace;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -42,13 +42,13 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class ProcessorsTraceTestCase extends AbstractIntegrationTestCase {
 
-  public static class ProcessorsTraceAsserter implements MessageProcessor {
+  public static class ProcessorsTraceAsserter implements Processor {
 
     public static ProcessorsTrace processorsTraceToAssert;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      processorsTraceToAssert = ((CoreMessageContext) event.getContext()).getProcessorsTrace();
+    public Event process(Event event) throws MuleException {
+      processorsTraceToAssert = ((CoreEventContext) event.getContext()).getProcessorsTrace();
       return event;
     }
   }
@@ -58,7 +58,7 @@ public class ProcessorsTraceTestCase extends AbstractIntegrationTestCase {
     public static CountDownLatch latch;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       super.process(event);
       latch.countDown();
       return event;

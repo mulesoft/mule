@@ -6,15 +6,15 @@
  */
 package org.mule.runtime.core.routing.filters;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.construct.Flow;
@@ -71,7 +71,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    * @return <code>true</code> if the message matches the filter
    */
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     String expr = getFullExpression();
     if (delegateFilter != null) {
       boolean result = delegateFilter.accept(message, builder);
@@ -83,7 +83,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
 
     // TODO MULE-9341 Remove Filters. Expression filter will be replaced by something that uses MuleEvent.
     Flow flowConstruct = new Flow("", muleContext);
-    return accept(MuleEvent.builder(create(flowConstruct, "ExpressionFilter")).message(message).exchangePattern(ONE_WAY)
+    return accept(Event.builder(create(flowConstruct, "ExpressionFilter")).message(message).exchangePattern(ONE_WAY)
         .flow(flowConstruct).build(), builder);
   }
 
@@ -94,7 +94,7 @@ public class ExpressionFilter implements Filter, MuleContextAware {
    * @return <code>true</code> if the event matches the filter
    */
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     return withContextClassLoader(muleContext.getExecutionClassLoader(), () -> muleContext.getExpressionLanguage()
         .evaluateBoolean(getFullExpression(), event, null, nullReturnsTrue, !nullReturnsTrue));
   }

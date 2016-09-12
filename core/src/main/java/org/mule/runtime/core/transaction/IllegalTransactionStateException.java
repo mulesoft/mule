@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transaction;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>IllegalTransactionStateException</code> TODO (document class)
@@ -21,7 +21,7 @@ public class IllegalTransactionStateException extends TransactionStatusException
   /**
    * @param message the exception message
    */
-  public IllegalTransactionStateException(Message message) {
+  public IllegalTransactionStateException(I18nMessage message) {
     super(message);
   }
 
@@ -29,7 +29,7 @@ public class IllegalTransactionStateException extends TransactionStatusException
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public IllegalTransactionStateException(Message message, Throwable cause) {
+  public IllegalTransactionStateException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

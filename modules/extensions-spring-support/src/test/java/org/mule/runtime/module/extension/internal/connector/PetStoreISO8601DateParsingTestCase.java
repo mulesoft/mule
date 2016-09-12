@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.connector;
 
 import static org.junit.Assert.assertEquals;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -73,7 +74,7 @@ public class PetStoreISO8601DateParsingTestCase extends ExtensionFunctionalTestC
 
 
   public Date getDate(String flowName) throws Exception {
-    PetStoreClient client = flowRunner(flowName).run().getMessage().getPayload();
+    PetStoreClient client = (PetStoreClient) flowRunner(flowName).run().getMessage().getPayload().getValue();
 
     return client.getOpeningDate(); // 2008-09-15T15:53:23+05:00
   }

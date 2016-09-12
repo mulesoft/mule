@@ -9,8 +9,8 @@ package org.mule.runtime.core.routing;
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.routing.MapSplitter.MAP_ENTRY_KEY;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -51,41 +51,41 @@ public class ExpressionSplitter extends AbstractSplitter implements Initialisabl
   }
 
   @Override
-  protected List<MuleEvent> splitMessage(MuleEvent event) {
+  protected List<Event> splitMessage(Event event) {
     Object result =
         muleContext.getExpressionLanguage().evaluate(config.getFullExpression(expressionLanguage), event, flowConstruct);
     if (result instanceof Object[]) {
       result = Arrays.asList((Object[]) result);
     }
     if (result instanceof Iterable<?>) {
-      List<MuleEvent> messages = new ArrayList<>();
+      List<Event> messages = new ArrayList<>();
       ((Iterable<?>) result).iterator()
           .forEachRemaining(value -> messages
-              .add(MuleEvent.builder(event).message(MuleMessage.builder().payload(value).build()).build()));
+              .add(Event.builder(event).message(InternalMessage.builder().payload(value).build()).build()));
       return messages;
     } else if (result instanceof Map<?, ?>) {
-      List<MuleEvent> list = new LinkedList<>();
+      List<Event> list = new LinkedList<>();
       Set<Map.Entry<?, ?>> set = ((Map) result).entrySet();
       for (Entry<?, ?> entry : set) {
-        MuleEvent newEvent = MuleEvent.builder(event).message(MuleMessage.builder().payload(entry.getValue()).build())
-            .addFlowVariable(MAP_ENTRY_KEY, entry.getKey()).build();
+        Event newEvent = Event.builder(event).message(InternalMessage.builder().payload(entry.getValue()).build())
+            .addVariable(MAP_ENTRY_KEY, entry.getKey()).build();
         list.add(newEvent);
       }
       return list;
-    } else if (result instanceof MuleMessage) {
-      return singletonList(MuleEvent.builder(event).message((MuleMessage) result).build());
+    } else if (result instanceof InternalMessage) {
+      return singletonList(Event.builder(event).message((InternalMessage) result).build());
     } else if (result instanceof NodeList) {
       NodeList nodeList = (NodeList) result;
-      List<MuleEvent> messages = new ArrayList<>(nodeList.getLength());
+      List<Event> messages = new ArrayList<>(nodeList.getLength());
       for (int i = 0; i < nodeList.getLength(); i++) {
-        messages.add(MuleEvent.builder(event).message(MuleMessage.builder().payload(nodeList.item(i)).build()).build());
+        messages.add(Event.builder(event).message(InternalMessage.builder().payload(nodeList.item(i)).build()).build());
       }
       return messages;
     } else if (result == null) {
       return new ArrayList<>();
     } else {
       logger.info("The expression does not evaluate to a type that can be split: " + result.getClass().getName());
-      return singletonList(MuleEvent.builder(event).message(MuleMessage.builder().payload(result).build()).build());
+      return singletonList(Event.builder(event).message(InternalMessage.builder().payload(result).build()).build());
     }
   }
 

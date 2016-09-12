@@ -19,8 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Processes {@link Statement} eagerly fetching all results from any returned {@link ResultSet} and then closes the
- * statement.
+ * Processes {@link Statement} eagerly fetching all results from any returned {@link ResultSet} and then closes the statement.
  */
 public class EagerStatementResultHandler extends AbstractMapStatementResultHandler {
 

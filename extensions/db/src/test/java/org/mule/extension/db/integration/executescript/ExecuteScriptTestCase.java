@@ -16,7 +16,7 @@ import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -43,14 +43,14 @@ public class ExecuteScriptTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void updatesDataRequestResponse() throws Exception {
-    MuleMessage response = flowRunner("executeScript").run().getMessage();
-    assertBulkModeResult(response.getPayload());
+    Message response = flowRunner("executeScript").run().getMessage();
+    assertBulkModeResult(response.getPayload().getValue());
   }
 
   @Test
   public void executeScriptFromFile() throws Exception {
-    MuleMessage response = flowRunner("executeScriptFromFile").run().getMessage();
-    assertBulkModeResult(response.getPayload());
+    Message response = flowRunner("executeScriptFromFile").run().getMessage();
+    assertBulkModeResult(response.getPayload().getValue());
   }
 
   private void assertBulkModeResult(Object payload) throws SQLException {

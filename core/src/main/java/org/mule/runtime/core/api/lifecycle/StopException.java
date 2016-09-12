@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.lifecycle;
 
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /** <code>DisposeException</code> TODO (document class) */
 
@@ -19,7 +19,7 @@ public class StopException extends LifecycleException {
    * @param message the exception message
    * @param component the object that failed during a lifecycle method call
    */
-  public StopException(Message message, Stoppable component) {
+  public StopException(I18nMessage message, Stoppable component) {
     super(message, component);
   }
 
@@ -28,7 +28,7 @@ public class StopException extends LifecycleException {
    * @param cause the exception that cause this exception to be thrown
    * @param component the object that failed during a lifecycle method call
    */
-  public StopException(Message message, Throwable cause, Stoppable component) {
+  public StopException(I18nMessage message, Throwable cause, Stoppable component) {
     super(message, cause, component);
   }
 

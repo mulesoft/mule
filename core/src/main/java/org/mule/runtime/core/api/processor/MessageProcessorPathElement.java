@@ -17,11 +17,11 @@ public interface MessageProcessorPathElement {
 
   public List<MessageProcessorPathElement> getChildren();
 
-  public MessageProcessorPathElement addChild(MessageProcessor mp);
+  public MessageProcessorPathElement addChild(Processor mp);
 
   public MessageProcessorPathElement addChild(String name);
 
-  public MessageProcessor getMessageProcessor();
+  public Processor getMessageProcessor();
 
   public String getName();
 

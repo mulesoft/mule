@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +32,10 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
     list.add("two");
     list.add("three");
 
-    MuleEvent event = flowRunner("test").withPayload(list).run();
+    Event event = flowRunner("test").withPayload(list).run();
 
     assertThat(event.getError().isPresent(), is(false));
-    assertThat(event.getMessage().getPayload(), is(notNullValue()));
+    assertThat(event.getMessage().getPayload().getValue(), is(notNullValue()));
     assertThat(event.getSession().getProperty("ErrorCount"), is(list.size()));
   }
 }

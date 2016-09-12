@@ -14,11 +14,10 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.junit.Test;
 
 /**
- * This test case validates that the XSLT transformer is not vulnerable to
- * Billion Laughs attack when internal entity expansion is disabled
+ * This test case validates that the XSLT transformer is not vulnerable to Billion Laughs attack when internal entity expansion is
+ * disabled
  * <p>
- * <b>EIP Reference:</b> <a
- * href="https://en.wikipedia.org/wiki/Billion_laughs"<a/>
+ * <b>EIP Reference:</b> <a href="https://en.wikipedia.org/wiki/Billion_laughs"<a/>
  * </p>
  */
 public class XsltTransformerBLTestCase extends FunctionalTestCase {
@@ -42,7 +41,7 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase {
   public void enabled() throws Exception {
     String input = makeInput();
     Object payload = input.getBytes();
-    String output = (String) flowRunner("flowBLEnabled").withPayload(payload).run().getMessage().getPayload();
+    String output = (String) flowRunner("flowBLEnabled").withPayload(payload).run().getMessage().getPayload().getValue();
     assertThat(output, containsString("010101010101010101010101010101010101010101010101"));
   }
 
@@ -50,7 +49,7 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase {
   public void disabled() throws Exception {
     String input = makeInput();
     Object payload = input.getBytes();
-    String output = (String) flowRunner("flowBLDisabled").withPayload(payload).run().getMessage().getPayload();
+    String output = (String) flowRunner("flowBLDisabled").withPayload(payload).run().getMessage().getPayload().getValue();
     assertThat(output, not(containsString("010101010101010101010101010101010101010101010101")));
   }
 }

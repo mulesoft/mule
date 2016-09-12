@@ -8,7 +8,7 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -66,7 +66,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
    * @param throwExceptionOnUnaccepted throw a FilterUnacceptedException when a message is rejected by the filter?
    * @param messageProcessor used to handler unaccepted messages
    */
-  public MessageFilter(Filter filter, boolean throwExceptionOnUnaccepted, MessageProcessor messageProcessor) {
+  public MessageFilter(Filter filter, boolean throwExceptionOnUnaccepted, Processor messageProcessor) {
     this.filter = filter;
     this.throwOnUnaccepted = throwExceptionOnUnaccepted;
     this.unacceptedMessageProcessor = messageProcessor;
@@ -74,7 +74,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
   }
 
   @Override
-  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  protected boolean accept(Event event, Event.Builder builder) {
     if (filter == null) {
       return true;
     }
@@ -87,7 +87,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
   }
 
   @Override
-  protected MessagingException filterFailureException(MuleEvent event, Exception ex) {
+  protected MessagingException filterFailureException(Event event, Exception ex) {
     MessagingException messagingException = new MessagingException(event, ex, this);
     String docName = LocationExecutionContextProvider.getDocName(filter);
     messagingException.getInfo().put("Filter",
@@ -96,7 +96,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
   }
 
   @Override
-  protected MuleException filterUnacceptedException(MuleEvent event) {
+  protected MuleException filterUnacceptedException(Event event) {
     return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), filter);
   }
 

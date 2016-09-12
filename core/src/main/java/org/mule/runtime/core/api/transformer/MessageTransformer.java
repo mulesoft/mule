@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.transformer;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.nio.charset.Charset;
 
@@ -21,10 +21,10 @@ public interface MessageTransformer extends Transformer {
    * @param src the data to transform
    * @param event the event currently being processed
    * @return the transformed data
-   * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same
-   *         as the transformed data
+   * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same as
+   *         the transformed data
    */
-  Object transform(Object src, MuleEvent event) throws MessageTransformerException;
+  Object transform(Object src, Event event) throws MessageTransformerException;
 
   /**
    * Thransforms the supplied data and returns the result
@@ -34,8 +34,8 @@ public interface MessageTransformer extends Transformer {
    *        so you only need to use this method if yo wish to customize the encoding
    * @param event the event currently being processed
    * @return the transformed data
-   * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same
-   *         as the transformed data
+   * @throws MessageTransformerException if a error occurs transforming the data or if the expected returnClass isn't the same as
+   *         the transformed data
    */
-  Object transform(Object src, Charset encoding, MuleEvent event) throws MessageTransformerException;
+  Object transform(Object src, Charset encoding, Event event) throws MessageTransformerException;
 }

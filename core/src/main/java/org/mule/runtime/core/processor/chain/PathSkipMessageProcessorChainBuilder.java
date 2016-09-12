@@ -10,9 +10,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 /**
- * Constructs a chain of {@link org.mule.runtime.core.api.processor.MessageProcessor}s and wraps the invocation of the chain in a composite
- * MessageProcessor. This Builder wrapps the chain in an {@link InterceptingChainLifecycleWrapperPathSkip},
- * so it does not add a level into the path elements.
+ * Constructs a chain of {@link org.mule.runtime.core.api.processor.Processor}s and wraps the invocation of the chain in a
+ * composite MessageProcessor. This Builder wrapps the chain in an {@link InterceptingChainLifecycleWrapperPathSkip}, so it does
+ * not add a level into the path elements.
  */
 public class PathSkipMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 

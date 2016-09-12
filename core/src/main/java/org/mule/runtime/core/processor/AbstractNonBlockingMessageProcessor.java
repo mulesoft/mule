@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -20,8 +20,8 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.exception.MessagingException;
 
 /**
- * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing should
- * be performed blocking or non-blocking..
+ * Abstract implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that determines if processing
+ * should be performed blocking or non-blocking..
  */
 public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnotatedObject
     implements NonBlockingMessageProcessor, MessagingExceptionHandlerAware {
@@ -29,10 +29,10 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
   private MessagingExceptionHandler messagingExceptionHandler;
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (isNonBlocking(event)) {
       processNonBlocking(event, createNonBlockingCompletionHandler(event));
-      // Update RequestContext ThreadLocal for backwards compatibility.  Clear event as we are done with this
+      // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with this
       // thread.
       setCurrentEvent(null);
       return NonBlockingVoidMuleEvent.getInstance();
@@ -41,7 +41,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
     }
   }
 
-  protected boolean isNonBlocking(MuleEvent event) {
+  protected boolean isNonBlocking(Event event) {
     return event.isAllowNonBlocking() && event.getReplyToHandler() != null;
   }
 
@@ -50,26 +50,26 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
     this.messagingExceptionHandler = messagingExceptionHandler;
   }
 
-  abstract protected void processNonBlocking(MuleEvent event, CompletionHandler completionHandler) throws MuleException;
+  abstract protected void processNonBlocking(Event event, CompletionHandler completionHandler) throws MuleException;
 
-  abstract protected MuleEvent processBlocking(MuleEvent event) throws MuleException;
+  abstract protected Event processBlocking(Event event) throws MuleException;
 
-  protected ExceptionCallback<Void, ? extends MessagingException> createCompletionExceptionCallback(MuleEvent event) {
+  protected ExceptionCallback<Void, ? extends MessagingException> createCompletionExceptionCallback(Event event) {
     return (ExceptionCallback<Void, MessagingException>) exception -> {
       messagingExceptionHandler.handleException(exception, event);
       return null;
     };
   }
 
-  private NonBlockingCompletionHandler createNonBlockingCompletionHandler(MuleEvent event) {
+  private NonBlockingCompletionHandler createNonBlockingCompletionHandler(Event event) {
     return new NonBlockingCompletionHandler(event);
   }
 
-  class NonBlockingCompletionHandler implements CompletionHandler<MuleEvent, MessagingException, Void> {
+  class NonBlockingCompletionHandler implements CompletionHandler<Event, MessagingException, Void> {
 
     final private ReplyToHandler replyToHandler;
 
-    NonBlockingCompletionHandler(MuleEvent event) {
+    NonBlockingCompletionHandler(Event event) {
       this.replyToHandler = event.getReplyToHandler();
     }
 
@@ -79,7 +79,7 @@ public abstract class AbstractNonBlockingMessageProcessor extends AbstractAnnota
     }
 
     @Override
-    public void onCompletion(MuleEvent result, ExceptionCallback<Void, Exception> exceptionCallback) {
+    public void onCompletion(Event result, ExceptionCallback<Void, Exception> exceptionCallback) {
       try {
         replyToHandler.processReplyTo(result, null, null);
       } catch (Exception e) {

@@ -21,7 +21,7 @@ import org.mule.compatibility.core.api.transport.MessageRequesterFactory;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -78,16 +78,18 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
 
     assertNotNull(muleContext.getExceptionListener());
     muleContext.setExceptionListener(ehandlerMock);
-    muleContext.getExceptionListener().handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
+    muleContext.getExceptionListener().handleException(new DefaultMuleException(I18nMessageFactory.createStaticMessage("Dummy")));
 
     if (connector instanceof AbstractConnector) {
-      muleContext.getExceptionListener().handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
+      muleContext.getExceptionListener()
+          .handleException(new DefaultMuleException(I18nMessageFactory.createStaticMessage("Dummy")));
     }
 
 
     muleContext.setExceptionListener(null);
     try {
-      muleContext.getExceptionListener().handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
+      muleContext.getExceptionListener()
+          .handleException(new DefaultMuleException(I18nMessageFactory.createStaticMessage("Dummy")));
       fail("Should have thrown exception as no strategy is set");
     } catch (RuntimeException e) {
       // expected

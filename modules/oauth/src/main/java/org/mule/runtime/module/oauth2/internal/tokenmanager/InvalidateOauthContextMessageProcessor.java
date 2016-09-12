@@ -8,12 +8,12 @@ package org.mule.runtime.module.oauth2.internal.tokenmanager;
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.core.util.AttributeEvaluator;
@@ -21,14 +21,14 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 /**
  * Clears the oauth context for a token manager and a resource owner id.
  */
-public class InvalidateOauthContextMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware {
+public class InvalidateOauthContextMessageProcessor implements Processor, Initialisable, MuleContextAware {
 
   private TokenManagerConfig config;
   private AttributeEvaluator resourceOwnerIdEvaluator;
   private MuleContext muleContext;
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     final String resourceOwnerId = resourceOwnerIdEvaluator.resolveStringValue(event);
     if (resourceOwnerId == null) {
       throw new MessagingException(CoreMessages.createStaticMessage("Resource owner id cannot be null"), event, this);

@@ -10,7 +10,7 @@ import static java.lang.String.format;
 
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.ArrayUtils;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
@@ -50,7 +50,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
    * {@inheritDoc}
    */
   @Override
-  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, MuleMessage message,
+  public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
                        Predicate<FileAttributes> matcher) {
     FileAttributes directoryAttributes = getExistingFile(config, directoryPath);
     Path path = Paths.get(directoryAttributes.getPath());
@@ -80,7 +80,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
   }
 
   private void doList(FileConnectorConfig config, Path path, TreeNode.Builder treeNodeBuilder, boolean recursive,
-                      MuleMessage message, Predicate<FileAttributes> matcher)
+                      Message message, Predicate<FileAttributes> matcher)
       throws IOException {
     LOGGER.debug("Listing directory {}", path);
 

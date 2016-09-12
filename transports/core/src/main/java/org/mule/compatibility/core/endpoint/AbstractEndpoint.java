@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -73,11 +73,11 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
 
   private final EndpointMessageProcessorChainFactory messageProcessorsFactory;
 
-  private final List<MessageProcessor> messageProcessors;
+  private final List<Processor> messageProcessors;
 
-  private final List<MessageProcessor> responseMessageProcessors;
+  private final List<Processor> responseMessageProcessors;
 
-  private MessageProcessor messageProcessorChain;
+  private Processor messageProcessorChain;
 
   /**
    * The name for the endpoint
@@ -133,8 +133,8 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
                           MessageExchangePattern messageExchangePattern, int responseTimeout, String initialState,
                           Charset endpointEncoding, String endpointBuilderName, MuleContext muleContext,
                           RetryPolicyTemplate retryPolicyTemplate, AbstractRedeliveryPolicy redeliveryPolicy,
-                          EndpointMessageProcessorChainFactory messageProcessorsFactory, List<MessageProcessor> messageProcessors,
-                          List<MessageProcessor> responseMessageProcessors, boolean disableTransportTransformer,
+                          EndpointMessageProcessorChainFactory messageProcessorsFactory, List<Processor> messageProcessors,
+                          List<Processor> responseMessageProcessors, boolean disableTransportTransformer,
                           MediaType endpointMimeType) {
     this.connector = connector;
     this.endpointUri = endpointUri;
@@ -209,12 +209,12 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
   }
 
   @Override
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return messageProcessors;
   }
 
   @Override
-  public List<MessageProcessor> getResponseMessageProcessors() {
+  public List<Processor> getResponseMessageProcessors() {
     return responseMessageProcessors;
   }
 
@@ -317,7 +317,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
   @Override
   public Filter getFilter() {
     // Call the first MessageFilter in the chain "the filter".
-    for (MessageProcessor mp : messageProcessors) {
+    for (Processor mp : messageProcessors) {
       if (mp instanceof MessageFilter) {
         return ((MessageFilter) mp).getFilter();
       }
@@ -339,7 +339,7 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
    */
   @Override
   public EndpointSecurityFilter getSecurityFilter() {
-    for (MessageProcessor mp : messageProcessors) {
+    for (Processor mp : messageProcessors) {
       if (mp instanceof SecurityFilterMessageProcessor) {
         SecurityFilter filter = ((SecurityFilterMessageProcessor) mp).getFilter();
         if (filter instanceof EndpointSecurityFilter) {
@@ -379,9 +379,9 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
     return initialState;
   }
 
-  private List<Transformer> getTransformersFromProcessorList(List<MessageProcessor> processors) {
+  private List<Transformer> getTransformersFromProcessorList(List<Processor> processors) {
     List<Transformer> transformers = new LinkedList<>();
-    for (MessageProcessor processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof Transformer) {
         transformers.add((Transformer) processor);
       } else if (processor instanceof MessageProcessorChain) {
@@ -441,12 +441,12 @@ public abstract class AbstractEndpoint extends AbstractAnnotatedObject implement
     this.messageProcessorChain = null;
   }
 
-  public MessageProcessor getMessageProcessorChain(FlowConstruct flowContruct) throws MuleException {
+  public Processor getMessageProcessorChain(FlowConstruct flowContruct) throws MuleException {
     if (messageProcessorChain == null) {
       messageProcessorChain = createMessageProcessorChain(flowContruct);
     }
     return messageProcessorChain;
   }
 
-  abstract protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException;
+  abstract protected Processor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException;
 }

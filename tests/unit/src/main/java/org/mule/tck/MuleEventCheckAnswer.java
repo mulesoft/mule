@@ -9,22 +9,22 @@ package org.mule.tck;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class MuleEventCheckAnswer extends Object implements Answer<MuleEvent> {
+public class MuleEventCheckAnswer extends Object implements Answer<Event> {
 
-  private MuleEvent returnEvent;
+  private Event returnEvent;
   private MuleException exceptionToThrow;
 
   public MuleEventCheckAnswer() {
-    this((MuleEvent) null);
+    this((Event) null);
   }
 
-  public MuleEventCheckAnswer(MuleEvent returnEvent) {
+  public MuleEventCheckAnswer(Event returnEvent) {
     this.returnEvent = returnEvent;
   }
 
@@ -33,7 +33,7 @@ public class MuleEventCheckAnswer extends Object implements Answer<MuleEvent> {
   }
 
   @Override
-  public MuleEvent answer(InvocationOnMock invocation) throws Throwable {
+  public Event answer(InvocationOnMock invocation) throws Throwable {
     if (exceptionToThrow != null) {
       throw exceptionToThrow;
     } else {
@@ -41,10 +41,10 @@ public class MuleEventCheckAnswer extends Object implements Answer<MuleEvent> {
     }
   }
 
-  private MuleEvent checkInvocation(InvocationOnMock invocation) {
+  private Event checkInvocation(InvocationOnMock invocation) {
     Object[] arguments = invocation.getArguments();
     assertEquals(1, arguments.length);
-    assertTrue(arguments[0] instanceof MuleEvent);
+    assertTrue(arguments[0] instanceof Event);
 
     return returnEvent;
   }

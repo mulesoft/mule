@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.File;
@@ -31,11 +31,11 @@ public class VMAttachmentsTestCase extends FunctionalTestCase {
   @Test
   public void testAttachments() throws Exception {
     FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/" + getConfigFile()).getAbsoluteFile());
-    MuleMessage msg = MuleMessage.builder().payload("Mmm... attachments!")
+    InternalMessage msg = InternalMessage.builder().payload("Mmm... attachments!")
         .addOutboundAttachment("test-attachment", new DataHandler(ds)).build();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage reply = client.send("vm-in", msg).getRight();
+    InternalMessage reply = client.send("vm-in", msg).getRight();
 
     assertNotNull(reply);
     assertEquals(1, reply.getInboundAttachmentNames().size());

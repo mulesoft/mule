@@ -6,9 +6,9 @@
  */
 package org.mule.compatibility.transport.http;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.SystemUtils;
 import org.mule.runtime.core.util.concurrent.Latch;

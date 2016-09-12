@@ -7,8 +7,8 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.emptyMap;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.Set;
 
@@ -16,11 +16,11 @@ import javax.activation.DataHandler;
 
 public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler> {
 
-  private MuleEvent event;
-  private MuleEvent.Builder eventBuilder;
+  private Event event;
+  private Event.Builder eventBuilder;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public OutboundAttachmentMapContext(MuleEvent event, MuleEvent.Builder eventBuilder) {
+  public OutboundAttachmentMapContext(Event event, Event.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
   }
@@ -32,13 +32,13 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
 
   @Override
   public void doPut(String key, DataHandler value) {
-    eventBuilder.message(MuleMessage.builder(event.getMessage()).addOutboundAttachment(key, value).build());
+    eventBuilder.message(InternalMessage.builder(event.getMessage()).addOutboundAttachment(key, value).build());
     event = eventBuilder.build();
   }
 
   @Override
   public void doRemove(String key) {
-    eventBuilder.message(MuleMessage.builder(event.getMessage()).removeOutboundAttachment(key).build());
+    eventBuilder.message(InternalMessage.builder(event.getMessage()).removeOutboundAttachment(key).build());
     event = eventBuilder.build();
   }
 
@@ -49,7 +49,7 @@ public class OutboundAttachmentMapContext extends AbstractMapContext<DataHandler
 
   @Override
   public void clear() {
-    eventBuilder.message(MuleMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
+    eventBuilder.message(InternalMessage.builder(event.getMessage()).outboundAttachments(emptyMap()).build());
     event = eventBuilder.build();
   }
 

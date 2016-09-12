@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.transport.service;
 
 import org.mule.compatibility.core.api.endpoint.EndpointException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>TransportFactoryException</code> is thrown by the endpoint factory if the endpoint service cannot be found in the
@@ -25,7 +25,7 @@ public class TransportFactoryException extends EndpointException {
   /**
    * @param message the exception message
    */
-  public TransportFactoryException(Message message) {
+  public TransportFactoryException(I18nMessage message) {
     super(message);
   }
 
@@ -33,7 +33,7 @@ public class TransportFactoryException extends EndpointException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public TransportFactoryException(Message message, Throwable cause) {
+  public TransportFactoryException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

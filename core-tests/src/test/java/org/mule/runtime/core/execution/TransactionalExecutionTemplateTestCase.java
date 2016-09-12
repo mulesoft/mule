@@ -15,8 +15,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -52,7 +52,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Mock
   protected FlowConstruct mockFlow = mock(FlowConstruct.class, RETURNS_DEEP_STUBS);
   @Mock
-  protected MuleEvent RETURN_VALUE;
+  protected Event RETURN_VALUE;
   @Spy
   protected TestTransaction mockTransaction = new TestTransaction(mockMuleContext);
   @Spy
@@ -62,13 +62,13 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Mock
   protected MessagingException mockMessagingException;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  protected MuleEvent mockEvent;
+  protected Event mockEvent;
   @Mock
   protected MessagingExceptionHandler mockMessagingExceptionHandler;
 
   @Before
   public void prepareEvent() {
-    when(mockEvent.getMessage()).thenReturn(MuleMessage.builder().payload("").build());
+    when(mockEvent.getMessage()).thenReturn(InternalMessage.builder().payload("").build());
   }
 
   @Before
@@ -85,7 +85,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_INDIFFERENT);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
   }
 
@@ -94,7 +94,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NEVER);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
   }
 
   @Test(expected = IllegalTransactionStateException.class)
@@ -110,7 +110,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
   }
 
   @Test
@@ -119,7 +119,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
   }
@@ -132,7 +132,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).rollback();
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
   }
@@ -144,7 +144,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_NONE);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).suspend();
     verify(mockTransaction).resume();
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
@@ -165,7 +165,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     mockTransaction.setXA(true);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).suspend();
     verify(mockTransaction).resume();
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
@@ -184,7 +184,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     when(mockExternalTransactionFactory.joinExternalTransaction(mockMuleContext)).thenReturn(externalTransaction);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
@@ -196,7 +196,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockTransaction));
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
@@ -209,7 +209,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).commit();
     verify(mockNewTransaction).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
@@ -225,7 +225,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).rollback();
     verify(mockNewTransaction).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
@@ -241,7 +241,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
     Object result = executionTemplate.execute(getRollbackTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).rollback();
     verify(mockNewTransaction).rollback();
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
@@ -257,7 +257,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockNewTransaction).commit();
     verify(mockNewTransaction, VerificationModeFactory.times(0)).rollback();
     verify(mockTransaction).suspend();
@@ -276,7 +276,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockNewTransaction));
     Object result = executionTemplate.execute(getRollbackTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockNewTransaction).rollback();
     verify(mockNewTransaction, VerificationModeFactory.times(0)).commit();
     verify(mockTransaction).suspend();
@@ -301,7 +301,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_ALWAYS_JOIN);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getRollbackTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
@@ -314,7 +314,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockTransaction));
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
@@ -327,7 +327,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     config.setFactory(new TestTransactionFactory(mockTransaction));
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), is(mockTransaction));
@@ -338,7 +338,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_JOIN_IF_POSSIBLE);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     assertThat(TransactionCoordination.getInstance().getTransaction(), IsNull.<Object>nullValue());
   }
 
@@ -348,7 +348,7 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     MuleTransactionConfig config = new MuleTransactionConfig(TransactionConfig.ACTION_JOIN_IF_POSSIBLE);
     ExecutionTemplate executionTemplate = createExecutionTemplate(config);
     Object result = executionTemplate.execute(getEmptyTransactionCallback());
-    assertThat((MuleEvent) result, is(RETURN_VALUE));
+    assertThat((Event) result, is(RETURN_VALUE));
     verify(mockTransaction, VerificationModeFactory.times(0)).commit();
     verify(mockTransaction, VerificationModeFactory.times(0)).rollback();
     assertThat((TestTransaction) TransactionCoordination.getInstance().getTransaction(), Is.is(mockTransaction));

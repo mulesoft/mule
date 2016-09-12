@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.enricher.MessageEnricher;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import javax.xml.namespace.QName;
 public class MessageEnricherObjectFactory
     implements ObjectFactory<MessageEnricher>, MuleContextAware, FlowConstructAware, AnnotatedObject {
 
-  private MessageProcessor messageProcessor;
+  private Processor messageProcessor;
   private String source;
   private String target;
   private List<MessageEnricher.EnrichExpressionPair> enrichExpressionPairs = new ArrayList<>();
@@ -38,7 +38,7 @@ public class MessageEnricherObjectFactory
   private MuleContext muleContext;
   private Map<QName, Object> annotations;
 
-  public void setMessageProcessor(MessageProcessor messageProcessor) {
+  public void setMessageProcessor(Processor messageProcessor) {
     this.messageProcessor = messageProcessor;
   }
 

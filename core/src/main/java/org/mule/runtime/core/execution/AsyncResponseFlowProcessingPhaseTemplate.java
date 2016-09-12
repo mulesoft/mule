@@ -7,7 +7,7 @@
 package org.mule.runtime.core.execution;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 /**
@@ -16,18 +16,18 @@ import org.mule.runtime.core.api.MuleException;
 public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcessTemplate {
 
   /**
-   * @return a {@link org.mule.runtime.core.api.MuleEvent} created from the original message
+   * @return a {@link org.mule.runtime.core.api.Event} created from the original message
    */
-  MuleEvent getMuleEvent() throws MuleException;
+  Event getMuleEvent() throws MuleException;
 
   /**
-   * Routes the {@link org.mule.runtime.core.api.MuleEvent} through the processors chain
+   * Routes the {@link org.mule.runtime.core.api.Event} through the processors chain
    *
-   * @param muleEvent {@link org.mule.runtime.core.api.MuleEvent} created from the raw message of this context
-   * @return the response {@link org.mule.runtime.core.api.MuleEvent}
+   * @param muleEvent {@link org.mule.runtime.core.api.Event} created from the raw message of this context
+   * @return the response {@link org.mule.runtime.core.api.Event}
    * @throws org.mule.runtime.core.api.MuleException
    */
-  MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException;
+  Event routeEvent(Event muleEvent) throws MuleException;
 
   /**
    * Template method to send a response after processing the message.
@@ -40,7 +40,7 @@ public interface AsyncResponseFlowProcessingPhaseTemplate extends MessageProcess
    *         the response using the underlying transport or connector then the exception to throw must be a
    *         {@link ResponseDispatchException}.
    */
-  void sendResponseToClient(MuleEvent muleEvent, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
+  void sendResponseToClient(Event muleEvent, ResponseCompletionCallback responseCompletionCallback) throws MuleException;
 
 
   /**

@@ -18,10 +18,10 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.metadata.TypedValue;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -51,12 +51,12 @@ public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleConte
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    MuleEvent testEvent = getTestEvent(TEST_MESSAGE);
+    Event testEvent = getTestEvent(TEST_MESSAGE);
 
-    final Builder builder = MuleEvent.builder(testEvent);
-    dataTypePropagator.propagate(testEvent, builder, new TypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    final Builder builder = Event.builder(testEvent);
+    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
     testEvent = builder.build();
 
-    assertThat(testEvent.getMessage().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(testEvent.getMessage().getPayload().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
   }
 }

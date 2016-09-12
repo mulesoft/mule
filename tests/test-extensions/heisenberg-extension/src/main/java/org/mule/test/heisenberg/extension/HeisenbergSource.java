@@ -13,7 +13,7 @@ import org.mule.runtime.api.execution.BlockingCompletionHandler;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -75,7 +75,7 @@ public class HeisenbergSource extends Source<Void, Attributes> implements Initia
 
       @Override
       protected void doOnCompletion(MuleEvent event) {
-        Long payment = (Long) ((org.mule.runtime.core.api.MuleEvent) event).getMessage().getPayload();
+        Long payment = (Long) ((org.mule.runtime.core.api.Event) event).getMessage().getPayload().getValue();
         heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
       }
 
@@ -98,12 +98,12 @@ public class HeisenbergSource extends Source<Void, Attributes> implements Initia
     }
   }
 
-  private MuleMessage makeMessage(SourceContext sourceContext) {
+  private Message makeMessage(SourceContext sourceContext) {
     if (initialBatchNumber < 0) {
       sourceContext.getExceptionCallback().onException(new RuntimeException(INITIAL_BATCH_NUMBER_ERROR_MESSAGE));
     }
 
-    return MuleMessage.builder()
+    return Message.builder()
         .payload(format("Meth Batch %d. If found by DEA contact %s", ++initialBatchNumber, connection.getSaulPhoneNumber()))
         .build();
   }

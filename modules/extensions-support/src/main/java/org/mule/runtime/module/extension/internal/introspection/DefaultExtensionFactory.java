@@ -103,7 +103,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
    * Creates a new instance and uses the given {@code serviceRegistry} to locate instances of {@link ModelEnricher}
    *
    * @param serviceRegistry a {@link ServiceRegistry}
-   * @param classLoader     the {@link ClassLoader} on which the {@code serviceRegistry} will search into
+   * @param classLoader the {@link ClassLoader} on which the {@code serviceRegistry} will search into
    */
   public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader) {
     modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));

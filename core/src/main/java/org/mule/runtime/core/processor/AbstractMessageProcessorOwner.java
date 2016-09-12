@@ -10,7 +10,7 @@ import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.util.NotificationUtils;
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * An object that owns message processors and delegates startup/shutdown events to them.
  */
-public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOwner<MessageProcessor>
+public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOwner<Processor>
     implements Lifecycle, MuleContextAware, FlowConstructAware, AnnotatedObject, MessageProcessorContainer {
 
   private final Map<QName, Object> annotations = new ConcurrentHashMap<QName, Object>();
@@ -42,11 +42,11 @@ public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOw
     annotations.putAll(newAnnotations);
   }
 
-  protected List<MessageProcessor> getOwnedObjects() {
+  protected List<Processor> getOwnedObjects() {
     return getOwnedMessageProcessors();
   }
 
-  protected abstract List<MessageProcessor> getOwnedMessageProcessors();
+  protected abstract List<Processor> getOwnedMessageProcessors();
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {

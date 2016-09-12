@@ -9,12 +9,14 @@ package org.mule.extension.email.internal.util;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
 import org.mule.runtime.core.message.PartAttributes;
 
 import java.util.List;
@@ -111,12 +113,12 @@ public final class EmailConnectorUtils {
   }
 
   /**
-   * Extracts the incoming {@link MuleMessage} attributes of {@link EmailAttributes} type.
+   * Extracts the incoming {@link InternalMessage} attributes of {@link EmailAttributes} type.
    *
-   * @param muleMessage the incoming {@link MuleMessage}.
+   * @param muleMessage the incoming {@link InternalMessage}.
    * @return an {@link Optional} value with the {@link EmailAttributes}.
    */
-  public static Optional<EmailAttributes> getAttributesFromMessage(MuleMessage muleMessage) {
+  public static Optional<EmailAttributes> getAttributesFromMessage(Message muleMessage) {
     if (muleMessage.getAttributes() instanceof EmailAttributes) {
       return Optional.ofNullable((EmailAttributes) muleMessage.getAttributes());
     }
@@ -124,16 +126,17 @@ public final class EmailConnectorUtils {
   }
 
   /**
-   * Transforms the attachments in a {@link MultiPartPayload} into a {@link List} of {@link EmailAttachment}s.
+   * Transforms the attachments in a {@link MultiPartContent} into a {@link List} of {@link EmailAttachment}s.
    *
-   * @param payload a {@link MultiPartPayload} that carries the attachments.
-   * @return a {@link List} of {@link EmailAttachment}, or an empty {@link List} if payload is not a {@link MultiPartPayload}.
+   * @param payload a {@link MultiPartContent} that carries the attachments.
+   * @return a {@link List} of {@link EmailAttachment}, or an empty {@link List} if payload is not a {@link MultiPartContent}.
    */
   public static List<EmailAttachment> mapToEmailAttachments(Object payload) {
-    return payload instanceof DefaultMultiPartPayload
-        ? ((DefaultMultiPartPayload) payload)
+    return payload instanceof DefaultMultiPartContent
+        ? ((DefaultMultiPartContent) payload)
             .getNonBodyParts().stream().map(p -> new EmailAttachment(((PartAttributes) p.getAttributes()).getName(),
-                                                                     p.getPayload(), p.getDataType().getMediaType()))
+                                                                     p.getPayload().getValue(),
+                                                                     p.getPayload().getDataType().getMediaType()))
             .collect(toList())
         : emptyList();
   }

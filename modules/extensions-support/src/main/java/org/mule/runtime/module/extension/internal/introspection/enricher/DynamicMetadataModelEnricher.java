@@ -52,8 +52,8 @@ import java.util.Optional;
 
 /**
  * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for components (Operations and
- * Message sources) annotated with {@link MetadataScope} or {@link Query}. If a custom metadata scope is used,
- * the component will be considered of dynamic type.
+ * Message sources) annotated with {@link MetadataScope} or {@link Query}. If a custom metadata scope is used, the component will
+ * be considered of dynamic type.
  *
  * @since 4.0
  */
@@ -222,7 +222,7 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
    * Enriches the {@link ParameterDeclarer} with a {@link MetadataKeyPartModelProperty} or a {@link MetadataContentModelProperty}
    * if the parsedParameter is annotated either as {@link MetadataKeyId}, {@link MetadataKeyPart} or {@link Content} respectively.
    *
-   * @param element         the method annotated parameter parsed
+   * @param element the method annotated parameter parsed
    * @param baseDeclaration the {@link ParameterDeclarer} associated to the parsed parameter
    */
   private void parseMetadataAnnotations(AnnotatedElement element, BaseDeclaration baseDeclaration) {

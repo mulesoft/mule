@@ -6,14 +6,14 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 
-public class TestMessageProcessor implements MessageProcessor, NameableObject {
+public class TestMessageProcessor implements Processor, NameableObject {
 
   /** Simple label string to be appended to the payload. */
   private String label;
@@ -30,10 +30,11 @@ public class TestMessageProcessor implements MessageProcessor, NameableObject {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event != null && event.getMessage() != null) {
-      return MuleEvent.builder(event)
-          .message(MuleMessage.builder(event.getMessage()).payload(event.getMessage().getPayload() + ":" + label).build())
+      return Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage()).payload(event.getMessage().getPayload().getValue() + ":" + label)
+              .build())
           .build();
     }
     return event;

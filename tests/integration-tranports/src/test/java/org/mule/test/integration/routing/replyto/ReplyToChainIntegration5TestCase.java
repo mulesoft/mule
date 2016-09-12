@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROP
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -37,11 +37,11 @@ public class ReplyToChainIntegration5TestCase extends FunctionalTestCase {
     final Latch flowExecutedLatch = new Latch();
     FunctionalTestComponent ftc = getFunctionalTestComponent("replierService");
     ftc.setEventCallback((context, component, muleContext) -> flowExecutedLatch.release());
-    MuleMessage muleMessage =
-        MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
+    InternalMessage muleMessage =
+        InternalMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty(MULE_REPLY_TO_PROPERTY, "jms://response").build();
     client.dispatch("jms://jmsIn1", muleMessage);
     flowExecutedLatch.await(TIMEOUT, MILLISECONDS);
-    MuleMessage response = client.request("jms://response", TIMEOUT).getRight().get();
+    InternalMessage response = client.request("jms://response", TIMEOUT).getRight().get();
     assertThat(response, notNullValue());
     assertThat(getPayloadAsString(response), is(EXPECTED_PAYLOAD));
   }

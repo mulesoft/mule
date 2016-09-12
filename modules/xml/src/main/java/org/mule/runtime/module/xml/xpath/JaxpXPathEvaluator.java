@@ -7,7 +7,7 @@
 package org.mule.runtime.module.xml.xpath;
 
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.module.xml.i18n.XmlMessages;
 import org.mule.runtime.module.xml.util.NamespaceManager;
@@ -46,7 +46,7 @@ import org.w3c.dom.Node;
  *
  * In order to allow binding expression parameters to flow variables, this class also implements the {@link XPathVariableResolver}
  * interface. Because this class caches compiled expressions which might be executed concurrently in different threads, we need a
- * way to correlate different {@link MuleEvent} instances to each invocation of the {@link #resolveVariable(QName)} method. To do
+ * way to correlate different {@link Event} instances to each invocation of the {@link #resolveVariable(QName)} method. To do
  * that, it uses a {@link ThreadLocal} in the {@link #evaluationEvent} attribute, so that we can determine the corresponding event
  * for each thread evaluating an XPath expression. Notice that because xpath evaluation is an operation that happens in RAM memory
  * (basically because the DOM {@link Node} needs to be completely loaded), we can use a {@link ThreadLocal} without risking
@@ -58,7 +58,7 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
 
   private final XPathFactory xpathFactory;
   private final Map<String, String> prefixToNamespaceMap = new HashMap<>();
-  private final ThreadLocal<MuleEvent> evaluationEvent = new ThreadLocal<>();
+  private final ThreadLocal<Event> evaluationEvent = new ThreadLocal<>();
 
   private final LoadingCache<String, XPathExpression> expressionCache =
       CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.MINUTES).build(new CacheLoader<String, XPathExpression>() {
@@ -87,7 +87,7 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
    * {@inheritDoc}
    */
   @Override
-  public String evaluate(String xpathExpression, Node input, MuleEvent event) {
+  public String evaluate(String xpathExpression, Node input, Event event) {
     return (String) evaluate(xpathExpression, input, XPathReturnType.STRING, event);
   }
 
@@ -95,7 +95,7 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
    * {@inheritDoc}
    */
   @Override
-  public Object evaluate(String xpathExpression, Node input, XPathReturnType returnType, MuleEvent event) {
+  public Object evaluate(String xpathExpression, Node input, XPathReturnType returnType, Event event) {
     try {
       evaluationEvent.set(event);
       XPathExpression xpath = expressionCache.getUnchecked(xpathExpression);
@@ -108,16 +108,16 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
   }
 
   /**
-   * Resolves the given variable against the flow variables in the {@link MuleEvent} held by {@link #evaluationEvent}
+   * Resolves the given variable against the flow variables in the {@link Event} held by {@link #evaluationEvent}
    * 
    * @param variableName the variable name
    * @return the variable value. Might be {@code null}
    */
   @Override
   public Object resolveVariable(QName variableName) {
-    MuleEvent event = evaluationEvent.get();
+    Event event = evaluationEvent.get();
     if (event != null) {
-      return event.getFlowVariable(variableName.getLocalPart());
+      return event.getVariable(variableName.getLocalPart());
     }
 
     return null;

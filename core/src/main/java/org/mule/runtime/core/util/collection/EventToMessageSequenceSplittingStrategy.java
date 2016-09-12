@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.util.collection;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.util.Copiable;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.routing.MessageSequence;
@@ -22,13 +22,13 @@ import java.util.LinkedList;
 
 import org.w3c.dom.NodeList;
 
-public class EventToMessageSequenceSplittingStrategy implements SplittingStrategy<MuleEvent, MessageSequence<?>> {
+public class EventToMessageSequenceSplittingStrategy implements SplittingStrategy<Event, MessageSequence<?>> {
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public MessageSequence<?> split(MuleEvent event) {
-    MuleMessage msg = event.getMessage();
-    Object payload = msg.getPayload();
+  public MessageSequence<?> split(Event event) {
+    InternalMessage msg = event.getMessage();
+    Object payload = msg.getPayload().getValue();
     if (payload instanceof MessageSequence<?>) {
       return ((MessageSequence<?>) payload);
     }

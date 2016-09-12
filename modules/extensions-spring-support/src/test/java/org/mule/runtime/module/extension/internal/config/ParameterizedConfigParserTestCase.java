@@ -23,7 +23,7 @@ import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -99,15 +99,15 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
   @Test
   public void sameInstanceForEquivalentEvent() throws Exception {
-    MuleEvent event = getHeisenbergEvent();
+    Event event = getHeisenbergEvent();
     HeisenbergExtension heisenberg = lookupHeisenberg(testConfig, event);
     assertThat(heisenberg, is(sameInstance(lookupHeisenberg(testConfig, event))));
   }
 
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
-    MuleEvent event = getHeisenbergEvent();
-    MuleEvent anotherEvent = getTestEvent("");
+    Event event = getHeisenbergEvent();
+    Event anotherEvent = getTestEvent("");
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
     assertThat(config, is(sameInstance(anotherConfig)));
@@ -115,8 +115,8 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
   @Test
   public void configWithExpressionFunctionStillDynamic() throws Exception {
-    MuleEvent event = getHeisenbergEvent();
-    MuleEvent anotherEvent = MuleEvent.builder(getHeisenbergEvent()).addFlowVariable("age", 40).build();
+    Event event = getHeisenbergEvent();
+    Event anotherEvent = Event.builder(getHeisenbergEvent()).addVariable("age", 40).build();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_EXPRESSION, anotherEvent);
     assertThat(config, is(not(sameInstance(anotherConfig))));
@@ -124,7 +124,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
 
   @Test
   public void getFunctionParameterFromConfig() throws Exception {
-    MuleEvent event = getHeisenbergEvent();
+    Event event = getHeisenbergEvent();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_EXPRESSION, event);
     assertThat(config.getWeaponTypeFunction().apply(event), is(FIRE_WEAPON));
   }

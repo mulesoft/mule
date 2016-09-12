@@ -21,7 +21,7 @@ import static org.mule.test.module.http.functional.matcher.HttpMessageAttributes
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -50,7 +50,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void requestConfigDefaultPortHttp() throws Exception {
-    MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
+    Event testEvent = getTestEvent(TEST_PAYLOAD);
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
@@ -60,7 +60,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void requestConfigDefaultPortHttps() throws Exception {
-    MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
+    Event testEvent = getTestEvent(TEST_PAYLOAD);
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
@@ -70,7 +70,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void requestConfigDefaultTlsContextHttps() throws Exception {
-    MuleEvent testEvent = getTestEvent(TEST_PAYLOAD);
+    Event testEvent = getTestEvent(TEST_PAYLOAD);
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
@@ -86,8 +86,8 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void responseBodyIsMappedToPayload() throws Exception {
-    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-    assertTrue(event.getMessage().getPayload() instanceof InputStream);
+    Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    assertTrue(event.getMessage().getPayload().getValue() instanceof InputStream);
     assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 
@@ -96,20 +96,20 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void blockingResponseBodyIsMappedToPayload() throws Exception {
-    MuleEvent event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
-    assertTrue(event.getMessage().getPayload() instanceof String);
+    Event event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
+    assertTrue(event.getMessage().getPayload().getValue() instanceof String);
     assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
   }
 
   @Test
   public void responseStatusCodeIsSetAsInboundProperty() throws Exception {
-    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
     assertThat((HttpResponseAttributes) event.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
   }
 
   @Test
   public void responseHeadersAreMappedInAttributes() throws Exception {
-    MuleEvent event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
+    Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
     HttpResponseAttributes responseAttributes = (HttpResponseAttributes) event.getMessage().getAttributes();
     assertThat(responseAttributes.getHeaders(), hasEntry(TEST_HEADER_NAME.toLowerCase(), TEST_HEADER_VALUE));
   }
@@ -122,7 +122,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void previousInboundPropertiesAreCleared() throws Exception {
-    MuleEvent event =
+    Event event =
         flowRunner("requestFlow").withPayload(TEST_MESSAGE).withInboundProperty("TestInboundProperty", "TestValue").run();
     assertThat(event.getMessage().getInboundProperty("TestInboundProperty"), nullValue());
   }

@@ -6,16 +6,16 @@
  */
 package org.mule.test.config;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class TestMessages extends MessageFactory {
+public class TestI18nMessages extends I18nMessageFactory {
 
-  private static final TestMessages factory = new TestMessages();
+  private static final TestI18nMessages factory = new TestI18nMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("test");
 
-  public static Message testMessage(String arg1, String arg2, String arg3) {
+  public static I18nMessage testMessage(String arg1, String arg2, String arg3) {
     return factory.createMessage(BUNDLE_PATH, 1, arg1, arg2, arg3);
   }
 }

@@ -9,7 +9,6 @@ package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
-import static javax.mail.Flags.Flag;
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.RECENT;
 import static javax.mail.Flags.Flag.SEEN;
@@ -18,22 +17,24 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.runners.Parameterized.Parameters;
 import static org.mule.extension.email.internal.commands.EmailIdConsumerExecutor.NO_ID_ERROR;
+
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import javax.mail.Flags.Flag;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
 public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
@@ -66,17 +67,17 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
 
   @Test
   public void retrieveAndRead() throws Exception {
-    List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    List<Message> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(messages, hasSize(10));
     messages.forEach(m -> {
-      assertBodyContent(m.getPayload());
+      assertBodyContent((String) m.getPayload().getValue());
       assertThat(((EmailAttributes) m.getAttributes()).getFlags().isSeen(), is(true));
     });
   }
 
   @Test
   public void retrieveAndDontRead() throws Exception {
-    List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
+    List<Message> messages = runFlowAndGetMessages(RETRIEVE_AND_DONT_READ);
     assertThat(messages, hasSize(10));
     messages.forEach(m -> assertThat(((EmailAttributes) m.getAttributes()).getFlags().isSeen(), is(false)));
   }
@@ -136,7 +137,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
       message.setFlag(flag, flagState);
     }
 
-    List<MuleMessage> messages = runFlowAndGetMessages(flowName);
+    List<Message> messages = runFlowAndGetMessages(flowName);
     assertThat(server.getReceivedMessages(), arrayWithSize(10));
     assertThat(messages, hasSize(7));
   }

@@ -10,12 +10,12 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.LOCATION;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.listener.HttpListener;
@@ -96,15 +96,15 @@ public class AuthorizationRequestHandler implements MuleContextAware {
     }
   }
 
-  private List<MessageProcessor> createLocalAuthorizationUrlListener() {
-    final MessageProcessor listenerMessageProcessor = muleEvent -> {
-      final Builder builder = MuleEvent.builder(muleEvent);
+  private List<Processor> createLocalAuthorizationUrlListener() {
+    final Processor listenerMessageProcessor = muleEvent -> {
+      final Builder builder = Event.builder(muleEvent);
 
       final String onCompleteRedirectToValue =
           ((Map<String, String>) muleEvent.getMessage().getInboundProperty("http.query.params")).get("onCompleteRedirectTo");
       final String resourceOwnerId =
           getOauthConfig().getLocalAuthorizationUrlResourceOwnerIdEvaluator().resolveStringValue(muleEvent);
-      muleEvent = builder.addFlowVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();
+      muleEvent = builder.addVariable(OAUTH_STATE_ID_FLOW_VAR_NAME, resourceOwnerId).build();
       final String stateValue = stateEvaluator.resolveStringValue(muleEvent);
       final StateEncoder stateEncoder = new StateEncoder(stateValue);
       if (resourceOwnerId != null) {
@@ -119,7 +119,8 @@ public class AuthorizationRequestHandler implements MuleContextAware {
           .setState(stateEncoder.getEncodedState()).setScope(scopes).buildUrl();
 
       return builder
-          .message(MuleMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION, authorizationUrlWithParams).build())
+          .message(InternalMessage.builder(muleEvent.getMessage()).addOutboundProperty(LOCATION, authorizationUrlWithParams)
+              .build())
           .build();
     };
     return Arrays.asList(listenerMessageProcessor);

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class ConfigurationException extends MuleException {
 
@@ -16,11 +16,11 @@ public class ConfigurationException extends MuleException {
    */
   private static final long serialVersionUID = 3658822340943734960L;
 
-  public ConfigurationException(Message message) {
+  public ConfigurationException(I18nMessage message) {
     super(message);
   }
 
-  public ConfigurationException(Message message, Throwable cause) {
+  public ConfigurationException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

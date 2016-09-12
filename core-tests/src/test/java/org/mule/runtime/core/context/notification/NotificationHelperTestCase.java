@@ -20,8 +20,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
@@ -40,13 +40,13 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   private ServerNotificationManager eventNotificationHandler;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleEvent event;
+  private Event event;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
-  private MuleMessage message;
+  private InternalMessage message;
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MessageSource messageSource;
@@ -57,7 +57,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   public void before() {
     when(muleContext.getNotificationManager()).thenReturn(eventNotificationHandler);
     when(event.getMessage()).thenReturn(message);
-    when((Class<String>) message.getDataType().getType()).thenReturn(String.class);
+    when((Class<String>) message.getPayload().getDataType().getType()).thenReturn(String.class);
     initMocks(eventNotificationHandler);
     initMocks(defaultNotificationHandler);
 

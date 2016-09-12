@@ -8,14 +8,14 @@ package org.mule.runtime.config.spring.factories;
 
 import static java.lang.String.format;
 import static java.util.ServiceLoader.load;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transaction.TypedTransactionFactory;
@@ -56,8 +56,8 @@ public class BlockMessageProcessorFactoryBean extends AbstractAnnotatedObject im
     txProcessor.setTransactionConfig(createTransactionConfig(this.transactionalAction, this.transactionType));
     builder.chain(txProcessor);
     for (Object processor : messageProcessors) {
-      if (processor instanceof MessageProcessor) {
-        builder.chain((MessageProcessor) processor);
+      if (processor instanceof Processor) {
+        builder.chain((Processor) processor);
       } else if (processor instanceof MessageProcessorBuilder) {
         builder.chain((MessageProcessorBuilder) processor);
       } else {

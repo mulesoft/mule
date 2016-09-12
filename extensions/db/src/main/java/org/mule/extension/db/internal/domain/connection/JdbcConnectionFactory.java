@@ -28,6 +28,7 @@ class JdbcConnectionFactory {
 
   /**
    * Creates a new JDBC {@link Connection}
+   * 
    * @param dataSource the {@link DataSource} from which the connection comes from
    * @param customDataTypes user defined data types
    * @return a {@link Connection}

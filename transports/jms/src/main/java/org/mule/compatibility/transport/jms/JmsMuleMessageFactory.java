@@ -10,7 +10,7 @@ import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
 
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
@@ -103,7 +103,7 @@ public class JmsMuleMessageFactory extends AbstractMuleMessageFactory {
     }
   }
 
-  protected void addJMSReplyTo(MuleMessage.Builder messageBuilder, Message jmsMessage) {
+  protected void addJMSReplyTo(InternalMessage.Builder messageBuilder, Message jmsMessage) {
     try {
       Destination replyTo = jmsMessage.getJMSReplyTo();
       if (replyTo != null) {

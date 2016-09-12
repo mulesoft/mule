@@ -12,10 +12,10 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.connector.EndpointConnectException;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -26,8 +26,8 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateEnabled;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.runtime.core.util.ClassUtils;
 
@@ -119,7 +119,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     try {
       muleMessageFactory = connector.getMuleMessageFactory();
     } catch (CreateException ce) {
-      Message message = MessageFactory.createStaticMessage(ce.getMessage());
+      I18nMessage message = I18nMessageFactory.createStaticMessage(ce.getMessage());
       throw new InitialisationException(message, ce, this);
     }
   }
@@ -346,44 +346,44 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
   }
 
   /**
-   * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance. The payload of the new message
-   * will be taken from <code>transportMessage</code>, all message properties will be copied from <code>previousMessage</code>.
+   * Uses this object's {@link MuleMessageFactory} to create a new {@link Message} instance. The payload of the new message will
+   * be taken from <code>transportMessage</code>, all message properties will be copied from <code>previousMessage</code>.
    */
-  public MuleMessage createMuleMessage(Object transportMessage, MuleMessage previousMessage, Charset encoding)
+  public InternalMessage createMuleMessage(Object transportMessage, InternalMessage previousMessage, Charset encoding)
       throws MuleException {
     try {
       return muleMessageFactory.create(transportMessage, previousMessage, encoding);
     } catch (Exception e) {
-      throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e);
+      throw new CreateException(CoreMessages.failedToCreate("Message"), e);
     }
   }
 
   /**
-   * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance. This is the designated way to
-   * build {@link MuleMessage}s from the transport specific message.
+   * Uses this object's {@link MuleMessageFactory} to create a new {@link Message} instance. This is the designated way to build
+   * {@link Message}s from the transport specific message.
    */
-  public MuleCompatibilityMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException {
+  public CompatibilityMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException {
     try {
       return muleMessageFactory.create(transportMessage, encoding);
     } catch (Exception e) {
-      throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e, this);
+      throw new CreateException(CoreMessages.failedToCreate("Message"), e, this);
     }
   }
 
   /**
-   * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance. Uses the default encoding.
+   * Uses this object's {@link MuleMessageFactory} to create a new {@link Message} instance. Uses the default encoding.
    *
    * @see MuleConfiguration#getDefaultEncoding()
    */
-  public MuleMessage createMuleMessage(Object transportMessage) throws MuleException {
+  public InternalMessage createMuleMessage(Object transportMessage) throws MuleException {
     Charset encoding = getDefaultEncoding(endpoint.getMuleContext());
     return createMuleMessage(transportMessage, encoding);
   }
 
   /**
-   * Uses this object's {@link MuleMessageFactory} to create a new {@link MuleMessage} instance. Uses the default encoding.
+   * Uses this object's {@link MuleMessageFactory} to create a new {@link Message} instance. Uses the default encoding.
    */
-  protected MuleMessage createNullMuleMessage() throws MuleException {
+  protected InternalMessage createNullMuleMessage() throws MuleException {
     return createMuleMessage(null);
   }
 

@@ -15,7 +15,7 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -48,8 +48,8 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
 
   @Test
   public void testErrorExpressionOnRegexFilterFail() throws Exception {
-    MuleMessage result =
-        muleContext.getClient().send("restServiceEndpoint", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
+    InternalMessage result =
+        muleContext.getClient().send("restServiceEndpoint", InternalMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertThat(result, notNullValue());
     assertThat(result.getExceptionPayload(), notNullValue());
     assertThat(result.getExceptionPayload().getException(), hasCause(instanceOf(RestServiceException.class)));
@@ -57,8 +57,8 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
 
   @Test
   public void testErrorExpressionOnRegexFilterPass() throws Exception {
-    MuleMessage result =
-        muleContext.getClient().send("restServiceEndpoint2", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
+    InternalMessage result =
+        muleContext.getClient().send("restServiceEndpoint2", InternalMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertEquals("echo=" + TEST_REQUEST, getPayloadAsString(result));
   }
 
@@ -68,24 +68,25 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
     props.put("baz-header", "baz");
     props.put("bar-optional-header", "bar");
 
-    MuleMessage result = muleContext.getClient().send("restServiceEndpoint3",
-                                                      MuleMessage.builder().nullPayload().outboundProperties(props).build())
+    InternalMessage result = muleContext.getClient().send("restServiceEndpoint3",
+                                                          InternalMessage.builder().nullPayload().outboundProperties(props)
+                                                              .build())
         .getRight();
     assertEquals("foo=boo&faz=baz&far=bar", getPayloadAsString(result));
   }
 
   @Test
   public void testOptionalParametersMissing() throws Exception {
-    MuleMessage result = muleContext.getClient()
-        .send("restServiceEndpoint3", MuleMessage.builder().nullPayload().addOutboundProperty("baz-header", "baz").build())
+    InternalMessage result = muleContext.getClient()
+        .send("restServiceEndpoint3", InternalMessage.builder().nullPayload().addOutboundProperty("baz-header", "baz").build())
         .getRight();
     assertEquals("foo=boo&faz=baz", getPayloadAsString(result));
   }
 
   @Test
   public void testRequiredParametersMissing() throws Exception {
-    MuleMessage result =
-        muleContext.getClient().send("restServiceEndpoint3", MuleMessage.builder().nullPayload().build()).getRight();
+    InternalMessage result =
+        muleContext.getClient().send("restServiceEndpoint3", InternalMessage.builder().nullPayload().build()).getRight();
     assertThat(result, notNullValue());
     assertThat(result.getExceptionPayload(), notNullValue());
     assertThat(result.getExceptionPayload().getException(), hasCause(instanceOf(ComponentException.class)));
@@ -93,16 +94,16 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
 
   @Test
   public void testRestServiceComponentInFlow() throws Exception {
-    MuleMessage result =
-        muleContext.getClient().send("vm://toFlow", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
+    InternalMessage result =
+        muleContext.getClient().send("vm://toFlow", InternalMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertNotNull(result);
     assertEquals("echo=Test Http Request", getPayloadAsString(result));
   }
 
   @Test
   public void restServiceComponentShouldPreserveContentTypeOnIncomingMessage() throws Exception {
-    MuleMessage result =
-        muleContext.getClient().send("vm://restservice4", MuleMessage.builder().payload(TEST_REQUEST).build()).getRight();
+    InternalMessage result =
+        muleContext.getClient().send("vm://restservice4", InternalMessage.builder().payload(TEST_REQUEST).build()).getRight();
     assertNotNull(result);
     assertEquals("foo/bar", MediaType.parse(getPayloadAsString(result)).withoutParameters().toRfcString());
   }
@@ -111,7 +112,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      return eventContext.getMessage().getDataType().getMediaType().toRfcString();
+      return eventContext.getMessage().getPayload().getDataType().getMediaType().toRfcString();
     }
   }
 }

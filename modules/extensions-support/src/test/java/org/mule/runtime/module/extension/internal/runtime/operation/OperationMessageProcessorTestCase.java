@@ -27,8 +27,8 @@ import static org.mule.runtime.module.extension.internal.runtime.operation.Opera
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;
@@ -87,12 +87,12 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any(OperationContext.class)))
         .thenReturn(OperationResult.builder().output(payload).mediaType(mediaType).attributes(attributes).build());
 
-    MuleMessage message = messageProcessor.process(event).getMessage();
+    InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(attributes)));
-    assertThat(message.getDataType().getMediaType(), is(mediaType));
+    assertThat(message.getPayload().getDataType().getMediaType(), is(mediaType));
   }
 
   @Test
@@ -107,12 +107,12 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any(OperationContext.class)))
         .thenReturn(OperationResult.builder().output(payload).mediaType(mediaType).attributes(attributes).build());
 
-    MuleMessage message = messageProcessor.process(event).getFlowVariable(TARGET_VAR);
+    InternalMessage message = messageProcessor.process(event).getVariable(TARGET_VAR);
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(attributes)));
-    assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
+    assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
   @Test
@@ -124,14 +124,14 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
         .thenReturn(OperationResult.builder().output(payload).mediaType(mediaType).build());
 
     event =
-        MuleEvent.builder(event).message(MuleMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
+        Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
 
-    MuleMessage message = messageProcessor.process(event).getMessage();
+    InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-    assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
+    assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
   @Test
@@ -140,14 +140,14 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     when(operationExecutor.execute(any(OperationContext.class))).thenReturn(OperationResult.builder().output(payload).build());
     event =
-        MuleEvent.builder(event).message(MuleMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
+        Event.builder(event).message(InternalMessage.builder().payload("").attributes(mock(Attributes.class)).build()).build();
 
-    MuleMessage message = messageProcessor.process(event).getMessage();
+    InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-    assertThat(message.getDataType().getType().equals(String.class), is(true));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   @Test
@@ -158,12 +158,12 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any(OperationContext.class)))
         .thenReturn(OperationResult.builder().output(payload).attributes(attributes).build());
 
-    MuleMessage message = messageProcessor.process(event).getMessage();
+    InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(attributes)));
-    assertThat(message.getDataType().getType().equals(String.class), is(true));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   @Test
@@ -171,9 +171,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Object value = new Object();
     when(operationExecutor.execute(any(OperationContext.class))).thenReturn(value);
 
-    MuleMessage message = messageProcessor.process(event).getMessage();
+    InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
-    assertThat(message.getPayload(), is(sameInstance(value)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(value)));
   }
 
   @Test
@@ -184,9 +184,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Object value = new Object();
     when(operationExecutor.execute(any(OperationContext.class))).thenReturn(value);
 
-    MuleMessage message = messageProcessor.process(event).getFlowVariable(TARGET_VAR);
+    InternalMessage message = messageProcessor.process(event).getVariable(TARGET_VAR);
     assertThat(message, is(notNullValue()));
-    assertThat(message.getPayload(), is(sameInstance(value)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(value)));
   }
 
   @Test
@@ -231,7 +231,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void operationIsVoid() throws Exception {
     when(operationModel.getOutput())
-        .thenReturn(new ImmutableOutputModel("MuleMessage.Payload", toMetadataType(void.class), false, emptySet()));
+        .thenReturn(new ImmutableOutputModel("Message.Payload", toMetadataType(void.class), false, emptySet()));
     messageProcessor = setUpOperationMessageProcessor();
 
     when(operationExecutor.execute(any(OperationContext.class))).thenReturn(null);

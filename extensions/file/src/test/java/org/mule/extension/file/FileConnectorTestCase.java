@@ -10,8 +10,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
@@ -62,20 +62,20 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
     }
   }
 
-  protected MuleEvent readHelloWorld() throws Exception {
+  protected Event readHelloWorld() throws Exception {
     return getPath(HELLO_PATH);
   }
 
-  protected MuleMessage readPath(String path) throws Exception {
+  protected Message readPath(String path) throws Exception {
     return getPath(path).getMessage();
   }
 
-  protected MuleEvent getPath(String path) throws Exception {
+  protected Event getPath(String path) throws Exception {
     return flowRunner("read").withFlowVariable("path", path).run();
   }
 
   protected String readPathAsString(String path) throws Exception {
-    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload());
+    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload().getValue());
   }
 
   protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {

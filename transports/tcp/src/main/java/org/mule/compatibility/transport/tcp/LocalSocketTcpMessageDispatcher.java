@@ -7,8 +7,8 @@
 package org.mule.compatibility.transport.tcp;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -40,26 +40,26 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher {
   }
 
   @Override
-  protected void doDispatch(MuleEvent event) throws Exception {
+  protected void doDispatch(Event event) throws Exception {
     dispatchToSocket(event);
   }
 
   @Override
-  protected synchronized MuleMessage doSend(MuleEvent event) throws Exception {
+  protected synchronized InternalMessage doSend(Event event) throws Exception {
     try {
       dispatchToSocket(event);
       if (returnResponse(event)) {
         try {
           Object result = receiveFromSocket(socket, getTimeout(), endpoint);
           if (result == null) {
-            return MuleMessage.builder().nullPayload().build();
+            return InternalMessage.builder().nullPayload().build();
           }
 
-          if (result instanceof MuleMessage) {
-            return (MuleMessage) result;
+          if (result instanceof InternalMessage) {
+            return (InternalMessage) result;
           }
 
-          return MuleMessage.builder().payload(result).build();
+          return InternalMessage.builder().payload(result).build();
         } catch (Exception ex) {
           if (logger.isInfoEnabled()) {
             logger.info("Error occurred while Reading; Message: " + ex.getMessage(), ex);
@@ -86,7 +86,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher {
     }
   }
 
-  protected void dispatchToSocket(MuleEvent event) throws Exception {
+  protected void dispatchToSocket(Event event) throws Exception {
     if (socket == null || socket.isClosed()) {
       if (logger.isDebugEnabled()) {
         logger.debug("Socket is null; Creating... ");
@@ -98,7 +98,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher {
       logger.debug("Is socket closed? " + (socket != null && socket.isClosed()));
     }
     try {
-      write(event.getMessage().getPayload());
+      write(event.getMessage().getPayload().getValue());
       return;
     } catch (IOException ioEx) {
       closeSocket();

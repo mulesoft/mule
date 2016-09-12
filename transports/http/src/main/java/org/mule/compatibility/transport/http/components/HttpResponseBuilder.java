@@ -21,15 +21,15 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 
@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpResponseBuilder extends AbstractMessageProcessorOwner
-    implements Initialisable, MessageProcessor, NonBlockingSupported {
+    implements Initialisable, Processor, NonBlockingSupported {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpResponseBuilder.class);
 
@@ -65,7 +65,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
   private SimpleDateFormat expiresHeaderFormatter;
   private SimpleDateFormat dateFormatter;
 
-  private List<MessageProcessor> ownedMessageProcessor = new ArrayList<>();
+  private List<Processor> ownedMessageProcessor = new ArrayList<>();
 
   @Override
   public void initialise() throws InitialisationException {
@@ -76,12 +76,12 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    MuleMessage message = event.getMessage();
+  public Event process(Event event) throws MuleException {
+    InternalMessage message = event.getMessage();
 
     HttpResponse httpResponse = getHttpResponse(message);
 
-    propagateMessageProperties(httpResponse, message, event.getCorrelationId(), event.getCorrelation());
+    propagateMessageProperties(httpResponse, message, event.getCorrelationId(), event.getGroupCorrelation());
     checkVersion(message);
     setStatus(httpResponse, event);
     setContentType(httpResponse, event);
@@ -91,7 +91,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     setDateHeader(httpResponse, new Date());
     setBody(httpResponse, message, event);
 
-    return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(httpResponse).build()).build();
+    return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(httpResponse).build()).build();
   }
 
   protected void setDateHeader(HttpResponse httpResponse, Date date) {
@@ -99,18 +99,18 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
   }
 
   @Override
-  protected List<MessageProcessor> getOwnedMessageProcessors() {
+  protected List<Processor> getOwnedMessageProcessors() {
     return ownedMessageProcessor;
   }
 
-  protected void setBody(HttpResponse response, MuleMessage message, MuleEvent event) throws MuleException {
+  protected void setBody(HttpResponse response, InternalMessage message, Event event) throws MuleException {
     if (bodyTransformer != null) {
       message = muleContext.getTransformationService().applyTransformers(event.getMessage(), event, bodyTransformer);
     }
 
     try {
       // If the payload is already HttpResponse then it already has the body set
-      if (!(message.getPayload() instanceof HttpResponse)) {
+      if (!(message.getPayload().getValue() instanceof HttpResponse)) {
         response.setBody(message, muleContext);
       }
     } catch (Exception e) {
@@ -118,8 +118,8 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  private void propagateMessageProperties(HttpResponse response, MuleMessage message, String correlationId,
-                                          Correlation correlation) {
+  private void propagateMessageProperties(HttpResponse response, InternalMessage message, String correlationId,
+                                          GroupCorrelation correlation) {
     copyOutboundProperties(response, message);
     if (propagateMuleProperties) {
       copyCorrelationIdProperties(response, message, correlationId, correlation);
@@ -127,8 +127,8 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  private void copyCorrelationIdProperties(HttpResponse response, MuleMessage message, String correlationId,
-                                           Correlation correlation) {
+  private void copyCorrelationIdProperties(HttpResponse response, InternalMessage message, String correlationId,
+                                           GroupCorrelation correlation) {
     response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_CORRELATION_ID_PROPERTY, correlationId));
     if (correlation != null) {
       correlation.getGroupSize().ifPresent(s -> response
@@ -138,14 +138,14 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  private void copyReplyToProperty(HttpResponse response, MuleMessage message) {
+  private void copyReplyToProperty(HttpResponse response, InternalMessage message) {
     if (message.getOutboundProperty(MULE_REPLY_TO_PROPERTY) != null) {
       response.setHeader(new Header(CUSTOM_HEADER_PREFIX + MULE_REPLY_TO_PROPERTY,
                                     message.getOutboundProperty(MULE_REPLY_TO_PROPERTY).toString()));
     }
   }
 
-  protected void copyOutboundProperties(HttpResponse response, MuleMessage message) {
+  protected void copyOutboundProperties(HttpResponse response, InternalMessage message) {
     for (String headerName : message.getOutboundPropertyNames()) {
       Object headerValue = message.getOutboundProperty(headerName);
       if (headerValue != null) {
@@ -181,11 +181,11 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     return HttpConstants.HEADER_COOKIE_SET.equals(headerName) && headerValue instanceof Cookie[];
   }
 
-  private HttpResponse getHttpResponse(MuleMessage message) {
+  private HttpResponse getHttpResponse(InternalMessage message) {
     HttpResponse httpResponse;
 
-    if (message.getPayload() instanceof HttpResponse) {
-      httpResponse = (HttpResponse) message.getPayload();
+    if (message.getPayload().getValue() instanceof HttpResponse) {
+      httpResponse = (HttpResponse) message.getPayload().getValue();
     } else {
       httpResponse = new HttpResponse();
     }
@@ -194,7 +194,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
   }
 
 
-  protected void setCacheControl(HttpResponse response, MuleEvent event) {
+  protected void setCacheControl(HttpResponse response, Event event) {
     if (cacheControl != null) {
       cacheControl.parse(event, muleContext.getExpressionLanguage());
       String cacheControlValue = cacheControl.toString();
@@ -210,7 +210,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  protected void setCookies(HttpResponse response, MuleEvent event) throws MuleException {
+  protected void setCookies(HttpResponse response, Event event) throws MuleException {
     if (!cookies.isEmpty()) {
       for (CookieWrapper cookie : cookies) {
         try {
@@ -226,7 +226,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  protected void setHeaders(HttpResponse response, MuleEvent event) {
+  protected void setHeaders(HttpResponse response, Event event) {
     if (headers != null && !headers.isEmpty()) {
       for (String headerName : headers.keySet()) {
         String name = parse(headerName, event);
@@ -240,14 +240,14 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  protected void checkVersion(MuleMessage message) {
+  protected void checkVersion(InternalMessage message) {
     version = message.getInboundProperty(HttpConnector.HTTP_VERSION_PROPERTY);
     if (version == null) {
       version = HttpConstants.HTTP11;
     }
   }
 
-  private void setStatus(HttpResponse response, MuleEvent event) throws MuleException {
+  private void setStatus(HttpResponse response, Event event) throws MuleException {
     if (status != null) {
       try {
         response.setStatusLine(HttpVersion.parse(version), Integer.valueOf(parse(status, event)));
@@ -257,7 +257,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     }
   }
 
-  protected void setContentType(HttpResponse response, MuleEvent event) {
+  protected void setContentType(HttpResponse response, Event event) {
     if (contentType == null) {
       contentType = getDefaultContentType(event.getMessage());
 
@@ -265,14 +265,14 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     response.setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, parse(contentType, event)));
   }
 
-  private String parse(String value, MuleEvent event) {
+  private String parse(String value, Event event) {
     if (value != null) {
       return muleContext.getExpressionLanguage().parse(value, event, flowConstruct);
     }
     return value;
   }
 
-  private String evaluateDate(String value, MuleEvent event) {
+  private String evaluateDate(String value, Event event) {
     Object realValue = value;
 
     if (value != null && muleContext.getExpressionLanguage().isExpression(value)) {
@@ -288,8 +288,8 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
 
 
-  private String getDefaultContentType(MuleMessage message) {
-    final MediaType mediaType = message.getDataType().getMediaType();
+  private String getDefaultContentType(InternalMessage message) {
+    final MediaType mediaType = message.getPayload().getDataType().getMediaType();
     String contentType;
     if (MediaType.ANY.matches(mediaType)) {
       contentType = HttpConstants.DEFAULT_CONTENT_TYPE;
@@ -337,7 +337,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     this.propagateMuleProperties = propagateMuleProperties;
   }
 
-  public void setMessageProcessor(MessageProcessor messageProcessor) {
+  public void setMessageProcessor(Processor messageProcessor) {
     this.bodyTransformer = (AbstractTransformer) messageProcessor;
     ownedMessageProcessor.add(bodyTransformer);
   }

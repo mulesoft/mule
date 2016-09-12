@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.routing.outbound.AbstractMessageSequenceSplitter;
 import org.mule.runtime.core.util.collection.EventToMessageSequenceSplittingStrategy;
 import org.mule.runtime.core.util.collection.SplittingStrategy;
@@ -19,9 +19,9 @@ import org.mule.runtime.core.util.collection.SplittingStrategy;
  */
 public class CollectionSplitter extends AbstractMessageSequenceSplitter {
 
-  private SplittingStrategy<MuleEvent, MessageSequence<?>> strategy = new EventToMessageSequenceSplittingStrategy();
+  private SplittingStrategy<Event, MessageSequence<?>> strategy = new EventToMessageSequenceSplittingStrategy();
 
-  protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event) {
+  protected MessageSequence<?> splitMessageIntoSequence(Event event) {
     return this.strategy.split(event);
   }
 }

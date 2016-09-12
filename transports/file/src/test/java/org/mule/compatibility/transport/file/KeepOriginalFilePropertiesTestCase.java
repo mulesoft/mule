@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
@@ -37,7 +37,7 @@ public class KeepOriginalFilePropertiesTestCase extends FunctionalTestCase {
 
   @Test
   public void moveToPatternWithDirectory() throws Exception {
-    MuleMessage msg = waitUntilMessageIsProcessed();
+    InternalMessage msg = waitUntilMessageIsProcessed();
     assertNotNull(msg);
 
     assertPropertiesAvailableAtPatternResolution(msg);
@@ -47,20 +47,20 @@ public class KeepOriginalFilePropertiesTestCase extends FunctionalTestCase {
     assertOriginalDirectoryIsCorrectlySet(msg);
   }
 
-  private MuleMessage waitUntilMessageIsProcessed() throws MuleException {
+  private InternalMessage waitUntilMessageIsProcessed() throws MuleException {
     return muleContext.getClient().request(OUT_QUEUE, 3000).getRight().get();
   }
 
-  private String getProperty(MuleMessage msg, String propertyName) {
+  private String getProperty(InternalMessage msg, String propertyName) {
     return msg.getInboundProperty(propertyName);
   }
 
-  private void assertPropertiesAvailableAtPatternResolution(MuleMessage msg) {
+  private void assertPropertiesAvailableAtPatternResolution(InternalMessage msg) {
     assertTrue(new File(getFileInsideWorkingDirectory(OUTPUT_DIRECTORY),
                         PROCESSED_PREFIX + getProperty(msg, CUSTOM_PROPERTY_ORIGINAL_FILENAME)).exists());
   }
 
-  private void assertOriginalDirectoryIsCorrectlySet(MuleMessage msg) throws IOException {
+  private void assertOriginalDirectoryIsCorrectlySet(InternalMessage msg) throws IOException {
     String originalDirectory = getFileInsideWorkingDirectory(INPUT_DIRECTORY).getPath();
     String originalDirectoryPropertyValue = getProperty(msg, CUSTOM_PROPERTY_ORIGINAL_DIRECTORY);
 

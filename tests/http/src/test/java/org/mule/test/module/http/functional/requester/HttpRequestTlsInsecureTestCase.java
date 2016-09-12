@@ -14,7 +14,7 @@ import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
@@ -56,7 +56,7 @@ public class HttpRequestTlsInsecureTestCase extends AbstractHttpTestCase {
 
   @Test
   public void insecureRequest() throws Exception {
-    final MuleEvent res = flowRunner("testInsecureRequest").withPayload(TEST_PAYLOAD).run();
+    final Event res = flowRunner("testInsecureRequest").withPayload(TEST_PAYLOAD).run();
     assertThat(res.getMessageAsString(muleContext), is(TEST_PAYLOAD));
   }
 

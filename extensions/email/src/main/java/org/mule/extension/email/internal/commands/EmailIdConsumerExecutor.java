@@ -7,9 +7,10 @@
 package org.mule.extension.email.internal.commands;
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
+
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,22 +31,22 @@ public class EmailIdConsumerExecutor {
   /**
    * Receives {@link Consumer} operation to perform for an specific emailId.
    * <p>
-   * if no emailId is specified, the operation will try to find one or more emails in the incoming {@link MuleMessage}.
+   * if no emailId is specified, the operation will try to find one or more emails in the incoming {@link Message}.
    * <p>
-   * If no explicit {@code emailId} is provided and this method is not able to find any emailIds in the incoming
-   * {@link MuleMessage} the execution of the {@link Consumer} will fail.
+   * If no explicit {@code emailId} is provided and this method is not able to find any emailIds in the incoming {@link Message}
+   * the execution of the {@link Consumer} will fail.
    *
-   * @param muleMessage the incoming {@link MuleMessage}.
+   * @param muleMessage the incoming {@link Message}.
    * @param emailId the id of the email that is wanted to perform the operation, can be {@code null}
    * @param consumer a {@link Consumer} to be applied to an email.
    */
-  public void execute(MuleMessage muleMessage, Integer emailId, Consumer<Integer> consumer) {
+  public void execute(Message muleMessage, Integer emailId, Consumer<Integer> consumer) {
     if (emailId == null) {
-      Object payload = muleMessage.getPayload();
+      Object payload = muleMessage.getPayload().getValue();
       if (payload instanceof List) {
         for (Object o : (List) payload) {
-          if (o instanceof MuleMessage) {
-            emailId = getIdOrFail(((MuleMessage) o));
+          if (o instanceof Message) {
+            emailId = getIdOrFail(((Message) o));
             consumer.accept(emailId);
           } else {
             throw new EmailException(NO_ID_ERROR);
@@ -61,7 +62,7 @@ public class EmailIdConsumerExecutor {
   /**
    * Gets an emailId from a MuleMessage of fails if the MuleMessage does not contains attributes of {@link EmailAttributes} type.
    */
-  private int getIdOrFail(MuleMessage muleMessage) {
+  private int getIdOrFail(Message muleMessage) {
     return getAttributesFromMessage(muleMessage).orElseThrow(() -> new EmailException(NO_ID_ERROR)).getId();
   }
 }

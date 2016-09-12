@@ -12,7 +12,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
     assertEquals(2, endpoint.getMessageProcessors().size());
 
-    MessageProcessor endpointProcessor =
+    Processor endpointProcessor =
         endpoint.getMessageProcessorsFactory().createInboundMessageProcessorChain(endpoint, getTestFlow(),
                                                                                   new NullMessageProcessor());
 

@@ -11,9 +11,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+
+import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -65,12 +68,11 @@ public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleCont
   }
 
   private Object[] callGetArgsWithPayload(Object payload) throws TransformerException {
-    MuleEvent muleEvent = mock(MuleEvent.class);
-    MuleMessage muleMessage = mock(MuleMessage.class);
+    Event muleEvent = mock(Event.class);
+    InternalMessage muleMessage = mock(InternalMessage.class);
 
     when(muleEvent.getMessage()).thenReturn(muleMessage);
-    when(muleEvent.getMessage().getPayload()).thenReturn(payload);
-    when(muleMessage.getPayload()).thenReturn(payload);
+    when(muleMessage.getPayload()).thenReturn(new DefaultTypedValue<>(payload, DataType.OBJECT));
 
     Object[] args = cxfMP.getArgs(muleEvent);
     return args;

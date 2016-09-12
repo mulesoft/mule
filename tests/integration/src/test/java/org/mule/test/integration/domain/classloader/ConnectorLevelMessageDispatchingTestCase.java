@@ -11,7 +11,7 @@ import org.mule.functional.listener.Callback;
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -50,10 +50,10 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleSe
     MuleContext applicationContext = fakeMuleServer.findApplication(appName).getMuleContext();
     final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<ClassLoader>();
     FlowExecutionListener flowExecutionListener = new FlowExecutionListener(applicationContext);
-    flowExecutionListener.addListener(new Callback<MuleEvent>() {
+    flowExecutionListener.addListener(new Callback<Event>() {
 
       @Override
-      public void execute(MuleEvent source) {
+      public void execute(Event source) {
         executionClassLoader.set(Thread.currentThread().getContextClassLoader());
       }
     });

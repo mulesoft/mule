@@ -9,7 +9,7 @@ package org.mule.compatibility.core.api.transport;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.util.ObjectUtils;
 
 /**
@@ -31,7 +31,7 @@ public class ReceiveException extends MuleException {
   /**
    * @param message the exception message
    */
-  public ReceiveException(Message message, ImmutableEndpoint endpoint, long timeout) {
+  public ReceiveException(I18nMessage message, ImmutableEndpoint endpoint, long timeout) {
     super(message);
     this.endpoint = endpoint;
     addInfo("Endpoint", ObjectUtils.toString(this.endpoint, "null"));
@@ -42,7 +42,7 @@ public class ReceiveException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public ReceiveException(Message message, ImmutableEndpoint endpoint, long timeout, Throwable cause) {
+  public ReceiveException(I18nMessage message, ImmutableEndpoint endpoint, long timeout, Throwable cause) {
     super(message, cause);
     this.endpoint = endpoint;
     addInfo("Endpoint", ObjectUtils.toString(this.endpoint, "null"));

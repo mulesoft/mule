@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -31,7 +31,7 @@ public class InOnlyOptionalOutTestCase extends AbstractIntegrationTestCase {
     flowRunner("In-Only_Optional-Out--Service").withPayload("some data").asynchronously().run();
     flowRunner("In-Only_Optional-Out--Service").withPayload("some data").withInboundProperty("foo", "bar").asynchronously().run();
 
-    MuleMessage result = client.request("test://received", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("test://received", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
     assertThat(getPayloadAsString(result), is("foo header received"));
     assertThat(client.request("test://notReceived", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));

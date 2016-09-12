@@ -14,13 +14,13 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.MuleMessage.Builder;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.ds.StringDataSource;
 
 import java.util.Set;
@@ -39,14 +39,14 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase {
     return "org/mule/test/message/attachment-propagation.xml";
   }
 
-  public static class AttachmentsPropagator implements MessageProcessor, FlowConstructAware {
+  public static class AttachmentsPropagator implements Processor, FlowConstructAware {
 
     private FlowConstruct flowconstruct;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      final MuleMessage message = event.getMessage();
-      final Builder builder = MuleMessage.builder(message);
+    public Event process(Event event) throws MuleException {
+      final InternalMessage message = event.getMessage();
+      final Builder builder = InternalMessage.builder(message);
       final Set<String> attachmentNames = new TreeSet<>(message.getOutboundAttachmentNames());
 
       for (String attachmentName : message.getInboundAttachmentNames()) {
@@ -63,9 +63,9 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase {
 
       builder.payload(attachmentNames);
 
-      final MuleMessage built = builder.build();
+      final InternalMessage built = builder.build();
 
-      return MuleEvent.builder(event).message(built).build();
+      return Event.builder(event).message(built).build();
     }
 
     @Override
@@ -76,13 +76,13 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase {
 
   @Test
   public void singleFlowShouldReceiveAttachment() throws Exception {
-    MuleMessage result = flowRunner("SINGLE").withPayload("").run().getMessage();
+    InternalMessage result = flowRunner("SINGLE").withPayload("").run().getMessage();
 
     assertThat(result, is(notNullValue()));
-    assertThat(result.getPayload(), instanceOf(Set.class));
+    assertThat(result.getPayload().getValue(), instanceOf(Set.class));
 
     // expect SINGLE attachment from SINGLE service
-    assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE"));
+    assertThat((Set<String>) result.getPayload().getValue(), containsInAnyOrder("SINGLE"));
 
     DataHandler attachment = result.getOutboundAttachment("SINGLE");
     assertThat(attachment, is(notNullValue()));
@@ -91,14 +91,14 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase {
 
   @Test
   public void chainedFlowShouldReceiveAttachments() throws Exception {
-    MuleMessage result = flowRunner("CHAINED").withPayload("").run().getMessage();
+    InternalMessage result = flowRunner("CHAINED").withPayload("").run().getMessage();
 
     assertThat(result, is(notNullValue()));
-    assertThat(result.getPayload(), instanceOf(Set.class));
+    assertThat(result.getPayload().getValue(), instanceOf(Set.class));
 
     // expect CHAINED attachment from CHAINED service
     // and SINGLE attachment from SINGLE service
-    assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE", "CHAINED"));
+    assertThat((Set<String>) result.getPayload().getValue(), containsInAnyOrder("SINGLE", "CHAINED"));
 
     // don't check the attachments now - it seems they're not copied properly from inbound
     // to outbound on flow boundaries

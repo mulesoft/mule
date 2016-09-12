@@ -57,14 +57,14 @@ final class MetadataKeyIdObjectResolver {
    * parameter requires.
    *
    * @param component the component model that contains the parameter annotated with {@link MetadataKeyId}
-   * @param key       the {@link MetadataKey} associated to the {@link MetadataKeyId}
+   * @param key the {@link MetadataKey} associated to the {@link MetadataKeyId}
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
    * @throws MetadataResolvingException if:
-   *                                    <ul>
-   *                                    <li>Parameter types is not instantiable</li>
-   *                                    <li>{@param key} does not provide the required levels</li>
-   *                                    <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
-   *                                    </ul>
+   *         <ul>
+   *         <li>Parameter types is not instantiable</li>
+   *         <li>{@param key} does not provide the required levels</li>
+   *         <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
+   *         </ul>
    */
   public Object resolve(ComponentModel component, MetadataKey key) throws MetadataResolvingException {
     final List<ParameterModel> metadataKeyParts = getMetadataKeyParts(component);
@@ -124,7 +124,7 @@ final class MetadataKeyIdObjectResolver {
    * Resolves the KeyIdObject for a MultiLevel {@link MetadataKeyId}
    *
    * @param componentModel model property of the {@link MetadataKeyId} parameter
-   * @param key            key containing the values of each level
+   * @param key key containing the values of each level
    * @return the KeyIdObject for the {@link MetadataKeyId} parameter
    * @throws MetadataResolvingException
    */

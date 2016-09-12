@@ -10,10 +10,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.store.InMemoryObjectStore;
@@ -40,24 +40,24 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleConte
     ir.setStore(new InMemoryObjectStore<String>());
     ir.setMuleContext(muleContext);
 
-    final MessageContext context = DefaultMessageContext.create(flow, TEST_CONNECTOR);
+    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
 
-    MuleMessage okMessage = MuleMessage.builder().payload("OK").build();
-    MuleEvent event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    InternalMessage okMessage = InternalMessage.builder().payload("OK").build();
+    Event event = Event.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
 
     // This one will process the event on the target endpoint
-    MuleEvent processedEvent = ir.process(event);
+    Event processedEvent = ir.process(event);
     assertNotNull(processedEvent);
 
     // This will not process, because the message is a duplicate
-    okMessage = MuleMessage.builder().payload("OK").build();
-    event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    okMessage = InternalMessage.builder().payload("OK").build();
+    event = Event.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
     processedEvent = ir.process(event);
     assertNull(processedEvent);
 
     // This will process, because the message is not a duplicate
-    okMessage = MuleMessage.builder().payload("Not OK").build();
-    event = MuleEvent.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    okMessage = InternalMessage.builder().payload("Not OK").build();
+    event = Event.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
     processedEvent = ir.process(event);
     assertNotNull(processedEvent);
   }

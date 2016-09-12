@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class CustomFilterMule2437TestCase extends FunctionalTestCase {
   protected void doTest(String message, String destination) throws Exception {
     MuleClient client = muleContext.getClient();
     client.dispatch("vm://in", getTestMuleMessage(message));
-    MuleMessage response = client.request(destination, TIMEOUT).getRight().get();
+    InternalMessage response = client.request(destination, TIMEOUT).getRight().get();
     assertNotNull(response);
     assertEquals(message, getPayloadAsString(response));
   }

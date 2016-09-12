@@ -48,7 +48,7 @@ public @interface ArtifactClassLoaderRunnerConfig {
   String[] providedExclusions() default {};
 
   /**
-   * Maven artifacts to be  included from the {@code provided} scope direct dependencies of the rootArtifact. In format
+   * Maven artifacts to be included from the {@code provided} scope direct dependencies of the rootArtifact. In format
    * {@code <groupId>:<artifactId>:[[<classifier>]:<version>]}.
    * <p/>
    * This artifacts have to be declared as {@code provided} scope in rootArtifact direct dependencies and no matter if they were

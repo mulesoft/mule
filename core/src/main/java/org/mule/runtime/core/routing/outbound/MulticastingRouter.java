@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing.outbound;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
@@ -35,7 +35,7 @@ public class MulticastingRouter extends AbstractSequenceRouter {
    * Indicates that this router always routes messages to all the configured endpoints no matters what a given response is.
    */
   @Override
-  protected boolean continueRoutingMessageAfter(MuleEvent response) throws MuleException {
+  protected boolean continueRoutingMessageAfter(Event response) throws MuleException {
     return true;
   }
 }

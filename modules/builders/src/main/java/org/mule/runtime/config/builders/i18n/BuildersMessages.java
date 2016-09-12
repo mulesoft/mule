@@ -6,28 +6,28 @@
  */
 package org.mule.runtime.config.builders.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class BuildersMessages extends MessageFactory {
+public class BuildersMessages extends I18nMessageFactory {
 
   private static final BuildersMessages factory = new BuildersMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("builders");
 
-  public static Message failedToParseConfigResource(String description) {
+  public static I18nMessage failedToParseConfigResource(String description) {
     return factory.createMessage(BUNDLE_PATH, 1, description);
   }
 
-  public static Message propertyTemplateMalformed(String string) {
+  public static I18nMessage propertyTemplateMalformed(String string) {
     return factory.createMessage(BUNDLE_PATH, 2, string);
   }
 
-  public static Message systemPropertyNotSet(String property) {
+  public static I18nMessage systemPropertyNotSet(String property) {
     return factory.createMessage(BUNDLE_PATH, 3, property);
   }
 
-  public static Message mustSpecifyContainerRefOrClassAttribute(String containerAttrib, String refAttrib, String config) {
+  public static I18nMessage mustSpecifyContainerRefOrClassAttribute(String containerAttrib, String refAttrib, String config) {
     return factory.createMessage(BUNDLE_PATH, 4, containerAttrib, refAttrib, config);
   }
 }

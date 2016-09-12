@@ -12,7 +12,8 @@ import java.io.File;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * Resolves locations of {@link Artifact}s from a IDE workspace, a Maven build session or a similar ad-hoc collection of artifacts.
+ * Resolves locations of {@link Artifact}s from a IDE workspace, a Maven build session or a similar ad-hoc collection of
+ * artifacts.
  *
  * @since 4.0
  */

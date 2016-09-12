@@ -16,7 +16,7 @@ import org.junit.Ignore;
 import org.mule.compatibility.core.processor.simple.AddSessionVariableProcessor;
 import org.mule.functional.transformer.simple.AbstractAddVariablePropertyProcessorTestCase;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.size.SmallTest;
 
 @SmallTest
@@ -28,22 +28,22 @@ public class AddSessionVariableProcessorTestCase extends AbstractAddVariableProp
   }
 
   @Override
-  protected void verifyAdded(MuleEvent event, String key, String value) {
+  protected void verifyAdded(Event event, String key, String value) {
     assertThat(event.getSession().getProperty(key), is(value));
   }
 
   @Override
-  protected void verifyNotAdded(MuleEvent event) {
+  protected void verifyNotAdded(Event event) {
     assertThat(event.getSession().getPropertyNamesAsSet(), empty());
   }
 
   @Override
-  protected void verifyRemoved(MuleEvent event, String key) {
+  protected void verifyRemoved(Event event, String key) {
     assertThat(event.getSession().getProperty(key), is(nullValue()));
   }
 
   @Override
-  protected DataType getVariableDataType(MuleEvent event, String key) {
+  protected DataType getVariableDataType(Event event, String key) {
     return event.getSession().getPropertyDataType(key);
   }
 }

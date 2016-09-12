@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -39,7 +39,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
     return this.methods.remove(name);
   }
 
-  public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
+  public InvocationResult invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
     if (methods == null || methods.size() == 0) {
       throw new IllegalStateException(CoreMessages.objectIsNull("methods").toString());
     }

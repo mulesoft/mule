@@ -11,7 +11,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.serialization.SerializationException;
@@ -41,10 +41,10 @@ public class CollectionAggregatorRouterSerializationTestCase extends AbstractInt
     flowRunner("splitter").withPayload(list).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage request = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage request = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(request);
-    assertThat(request.getPayload(), instanceOf(List.class));
-    assertThat(((List<MuleMessage>) request.getPayload()), hasSize(list.size()));
+    assertThat(request.getPayload().getValue(), instanceOf(List.class));
+    assertThat(((List<InternalMessage>) request.getPayload().getValue()), hasSize(list.size()));
   }
 
   private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable> {

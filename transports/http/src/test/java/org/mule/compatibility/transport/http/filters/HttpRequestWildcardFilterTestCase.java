@@ -14,7 +14,7 @@ import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -45,7 +45,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase {
   @Test
   public void testReference() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client
+    InternalMessage result = client
         .send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("reference")).getMessageSource()).getAddress(),
               TEST_HTTP_MESSAGE, null)
         .getRight();
@@ -56,7 +56,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase {
   @Test
   public void testHttpPost() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress(),
                     TEST_HTTP_MESSAGE, null)
             .getRight();
@@ -70,7 +70,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase {
     props.put(HttpConstants.METHOD_GET, "true");
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress()
             + "/" + "mulerulez", TEST_HTTP_MESSAGE, props).getRight();
 
@@ -84,7 +84,7 @@ public class HttpRequestWildcardFilterTestCase extends FunctionalTestCase {
     // props.put(HttpConstants.METHOD_GET, "true");
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result =
+    InternalMessage result =
         client.send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject("httpIn")).getMessageSource()).getAddress()
             + "/" + TEST_BAD_MESSAGE, "mule", props).getRight();
 

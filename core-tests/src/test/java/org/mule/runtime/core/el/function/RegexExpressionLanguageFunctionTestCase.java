@@ -11,28 +11,28 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.mule.mvel2.CompileException;
+import org.mule.mvel2.ParserConfiguration;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.el.context.MessageContext;
 import org.mule.runtime.core.el.mvel.MVELExpressionExecutor;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguageContext;
-import org.mule.mvel2.CompileException;
-import org.mule.mvel2.ParserConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Date;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
@@ -45,9 +45,9 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
   protected MVELExpressionLanguageContext context;
   protected RegexExpressionLanguageFuntion regexFuntion;
   protected MuleContext muleContext;
-  private MuleEvent event;
-  private MuleEvent.Builder eventBuilder;
-  private MuleMessage message;
+  private Event event;
+  private Event.Builder eventBuilder;
+  private InternalMessage message;
 
   @Before
   public void setup() throws InitialisationException {
@@ -201,17 +201,17 @@ public class RegexExpressionLanguageFunctionTestCase extends AbstractMuleTestCas
   }
 
   protected void addMessageToContextWithPayload(String payload) throws TransformerException {
-    event = mock(MuleEvent.class);
+    event = mock(Event.class);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
-    eventBuilder = MuleEvent.builder(event);
-    message = mock(MuleMessage.class);
+    eventBuilder = Event.builder(event);
+    message = mock(InternalMessage.class);
     when(event.getMessage()).thenAnswer(invocation -> message);
-    MuleMessage transformedMessage = mock(MuleMessage.class);
-    when(transformedMessage.getPayload()).thenReturn(payload);
+    InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
+    when(transformedMessage.getPayload().getValue()).thenReturn(payload);
     TransformationService transformationService = mock(TransformationService.class);
     when(muleContext.getTransformationService()).thenReturn(transformationService);
-    when(transformationService.transform(any(MuleMessage.class), any(DataType.class))).thenReturn(transformedMessage);
+    when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
     context.addFinalVariable("message", new MessageContext(event, eventBuilder, muleContext));
   }
 

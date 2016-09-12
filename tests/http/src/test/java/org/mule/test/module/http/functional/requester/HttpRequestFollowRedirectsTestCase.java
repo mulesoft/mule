@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
   private static final String REDIRECT_URI = "/redirect";
   private static final String REDIRECT_WITH_PARAMS_URI = REDIRECT_URI + "?param1=value1&param2=value2";
 
-  private MuleEvent testEvent;
+  private Event testEvent;
   private boolean addParams = false;
 
   @Before
@@ -139,7 +139,7 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
   }
 
   private void doTest(String expectedPayload, String expectedPath, FlowRunner runner) throws MuleException, Exception {
-    MuleEvent result = runner.run();
+    Event result = runner.run();
     assertThat(getPayloadAsString(result.getMessage()), is(expectedPayload));
     assertThat(uri, is(expectedPath));
   }

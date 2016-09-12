@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.model.streaming.DelegatingInputStream;
 import org.mule.runtime.core.util.IOUtils;
@@ -144,7 +144,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     assertFiles(inFile, moveToDir, false, false);
   }
 
-  protected void assertRequested(MuleMessage message, File inFile, boolean streaming)
+  protected void assertRequested(InternalMessage message, File inFile, boolean streaming)
       throws IOException, MessagingException, InterruptedException {
     // Allow time for deletes/moves, so we can then assert to check files that
     // shouldn't havn't been moved havn't
@@ -153,12 +153,12 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     assertNotNull(message);
     assertEquals(inFile.getName(), message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
 
-    assertNotNull(message.getPayload());
+    assertNotNull(message.getPayload().getValue());
     if (streaming) {
       // We can't check ReceiverFileInputStream is received because it is
       // wrapped in a DelegatingInputStream
-      assertTrue(message.getPayload() instanceof DelegatingInputStream);
-      InputStream fis = (InputStream) message.getPayload();
+      assertTrue(message.getPayload().getValue() instanceof DelegatingInputStream);
+      InputStream fis = (InputStream) message.getPayload().getValue();
       ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       IOUtils.copy(fis, byteOut);
 
@@ -169,12 +169,12 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
       String result = new String(byteOut.toByteArray());
       assertEquals(TEST_MESSAGE, result);
     } else {
-      assertTrue(message.getPayload() instanceof byte[]);
-      assertEquals(TEST_MESSAGE, new String((byte[]) message.getPayload()));
+      assertTrue(message.getPayload().getValue() instanceof byte[]);
+      assertEquals(TEST_MESSAGE, new String((byte[]) message.getPayload().getValue()));
     }
   }
 
-  protected MuleMessage request(File file) throws MuleException, MalformedURLException {
+  protected InternalMessage request(File file) throws MuleException, MalformedURLException {
     MuleClient muleClient = muleContext.getClient();
     return muleClient.request(fileToUrl(file) + "?connector=moveDeleteConnector", 2000).getRight().get();
   }

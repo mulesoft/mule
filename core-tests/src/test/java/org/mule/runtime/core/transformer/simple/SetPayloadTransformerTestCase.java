@@ -17,8 +17,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -37,8 +37,8 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
 
   private SetPayloadTransformer setPayloadTransformer;
   private MuleContext mockMuleContext;
-  private MuleEvent mockMuleEvent;
-  private MuleMessage mockMuleMessage;
+  private Event mockMuleEvent;
+  private InternalMessage mockMuleMessage;
   private ExpressionLanguage mockExpressionLanguage;
 
   @Before
@@ -47,12 +47,12 @@ public class SetPayloadTransformerTestCase extends AbstractMuleTestCase {
     mockMuleContext = mock(MuleContext.class);
     setPayloadTransformer.setMuleContext(mockMuleContext);
     mockExpressionLanguage = mock(ExpressionLanguage.class);
-    mockMuleEvent = mock(MuleEvent.class);
-    mockMuleMessage = mock(MuleMessage.class);
+    mockMuleEvent = mock(Event.class);
+    mockMuleMessage = mock(InternalMessage.class);
 
     when(mockMuleEvent.getMessage()).thenReturn(mockMuleMessage);
     when(mockMuleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
-    when(mockExpressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
   }
 

@@ -16,7 +16,7 @@ import org.junit.Ignore;
 
 import org.mule.compatibility.core.processor.simple.RemoveSessionVariableProcessor;
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.tck.size.SmallTest;
 
@@ -29,18 +29,18 @@ public class RemoveSessionVariableProcessorTestCase extends AbstractRemoveVariab
   }
 
   @Override
-  protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties) {
+  protected void addMockedPropeerties(Event mockEvent, HashSet properties) {
     MuleSession mockSession = mockEvent.getSession();
     when(mockSession.getPropertyNamesAsSet()).thenReturn(properties);
   }
 
   @Override
-  protected void verifyRemoved(MuleEvent mockEvent, String key) {
+  protected void verifyRemoved(Event mockEvent, String key) {
     verify(mockEvent.getSession()).removeProperty(key);
   }
 
   @Override
-  protected void verifyNotRemoved(MuleEvent mockEvent, String key) {
+  protected void verifyNotRemoved(Event mockEvent, String key) {
     verify(mockEvent.getSession(), times(0)).removeProperty(key);
   }
 }

@@ -19,7 +19,7 @@ import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.api.Validator;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.mvel2.compiler.BlankLiteral;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 
 import com.google.common.base.Joiner;
@@ -176,7 +176,8 @@ public class BasicValidationTestCase extends ValidationTestCase {
     FlowRunner runner = flowRunner("all");
     cofigureGetAllRunner(runner, VALID_EMAIL, VALID_URL);
 
-    assertThat(runner.buildEvent().getMessage().getPayload(), is(sameInstance(runner.run().getMessage().getPayload())));
+    assertThat(runner.buildEvent().getMessage().getPayload().getValue(),
+               is(sameInstance(runner.run().getMessage().getPayload().getValue())));
   }
 
   @Test
@@ -279,7 +280,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
   public static class TestCustomValidator implements Validator {
 
     @Override
-    public ValidationResult validate(MuleEvent event) {
+    public ValidationResult validate(Event event) {
       return error(CUSTOM_VALIDATOR_MESSAGE);
     }
   }

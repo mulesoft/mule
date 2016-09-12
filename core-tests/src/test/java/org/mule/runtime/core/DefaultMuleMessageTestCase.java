@@ -17,7 +17,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -45,7 +45,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
     properties.put("boolean", "true");
     Apple apple = new Apple(true);
     properties.put("apple", apple);
-    MuleMessage message = MuleMessage.builder().payload(TEST_MESSAGE).outboundProperties(properties).build();
+    InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(properties).build();
     assertTrue(message.getOutboundProperty("boolean", false));
     assertEquals(new Integer(24), message.getOutboundProperty("number", 0));
     assertEquals(new Byte((byte) 24), message.getOutboundProperty("number", (byte) 0));
@@ -75,12 +75,12 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testClearProperties() {
-    MuleMessage payload = MuleMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, "fooValue").build();
+    InternalMessage payload = InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, "fooValue").build();
 
     assertThat(payload.getOutboundPropertyNames(), hasSize(2));
     assertThat(payload.getInboundPropertyNames(), empty());
 
-    payload = MuleMessage.builder(payload).outboundProperties(emptyMap()).build();
+    payload = InternalMessage.builder(payload).outboundProperties(emptyMap()).build();
     assertThat(payload.getOutboundPropertyNames(), empty());
 
     // See http://www.mulesoft.org/jira/browse/MULE-4968 for additional test needed here
@@ -95,37 +95,37 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase {
     return map;
   }
 
-  private MuleMessage createMuleMessage() {
-    return MuleMessage.builder().payload(TEST_PAYLOAD).attributes(testAttributes)
-        .addOutboundProperty("MuleMessage", "MuleMessage").build();
+  private InternalMessage createMuleMessage() {
+    return InternalMessage.builder().payload(TEST_PAYLOAD).attributes(testAttributes)
+        .addOutboundProperty("Message", "Message").build();
   }
 
-  private void assertOutboundMessageProperty(String key, MuleMessage message) {
+  private void assertOutboundMessageProperty(String key, InternalMessage message) {
     // taking advantage of the fact here that key and value are the same
     assertThat(message.getOutboundProperty(key), is(key));
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testPropertyNamesImmutable() throws Exception {
-    MuleMessage message = createMuleMessage();
+    InternalMessage message = createMuleMessage();
     message.getOutboundPropertyNames().add("other");
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testInboundPropertyNamesAddImmutable() throws Exception {
-    MuleMessage message = createMuleMessage();
+    InternalMessage message = createMuleMessage();
     message.getOutboundPropertyNames().add("other");
   }
 
   @Test(expected = UnsupportedOperationException.class)
   public void testOutboundPropertyNamesImmutable() throws Exception {
-    MuleMessage message = createMuleMessage();
+    InternalMessage message = createMuleMessage();
     message.getOutboundPropertyNames().add("other");
   }
 
   @Test
   public void usesNullPayloadAsNull() throws Exception {
-    MuleMessage message = MuleMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, null).build();
+    InternalMessage message = InternalMessage.builder(createMuleMessage()).addOutboundProperty(FOO_PROPERTY, null).build();
 
     assertThat(message.getOutboundProperty(FOO_PROPERTY), is(nullValue()));
   }

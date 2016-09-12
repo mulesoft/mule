@@ -15,7 +15,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.construct.Flow;
@@ -63,10 +63,10 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase {
   @Test
   public void testDecreaseOutboundEndpointResponseTimeout() throws Exception {
     Date beforeCall = new Date();
-    MuleMessage result = muleClient.send("vm://decreaseTimeoutRequest", getTestMessage()).getRight();
+    InternalMessage result = muleClient.send("vm://decreaseTimeoutRequest", getTestMessage()).getRight();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
-    assertEquals(DispatchException.class, result.getPayload().getClass());
+    assertNotNull(result.getPayload().getValue());
+    assertEquals(DispatchException.class, result.getPayload().getValue().getClass());
 
     // If everything is good the connection will timeout after 5s and throw an
     // exception. The original unprocessed message is returned in the response
@@ -75,14 +75,14 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase {
     assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
   }
 
-  private MuleMessage getTestMessage() {
-    return MuleMessage.builder().payload(getPayload()).build();
+  private InternalMessage getTestMessage() {
+    return InternalMessage.builder().payload(getPayload()).build();
   }
 
   @Test
   public void testIncreaseOutboundEndpointResponseTimeout() throws Exception {
     Date beforeCall = new Date();
-    MuleMessage message = muleClient.send("vm://increaseTimeoutRequest", getPayload(), null).getRight();
+    InternalMessage message = muleClient.send("vm://increaseTimeoutRequest", getPayload(), null).getRight();
     Date afterCall = new Date();
 
     // If everything is good the connection will not timeout and the processed
@@ -113,7 +113,7 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase {
   @Test
   public void testIncreaseMuleClientSendResponseTimeout() throws Exception {
     Date beforeCall = new Date();
-    MuleMessage message = muleClient.send(getInDelayServiceAddress(), getTestMessage(), 3000).getRight();
+    InternalMessage message = muleClient.send(getInDelayServiceAddress(), getTestMessage(), 3000).getRight();
     Date afterCall = new Date();
 
     // If everything is good the we'll have received a result after more than 10s

@@ -7,9 +7,9 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.component.ComponentException;
@@ -207,14 +207,14 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
 
   public static class TestMessageSource implements MessageSource {
 
-    private MessageProcessor listener;
+    private Processor listener;
 
-    MuleEvent fireEvent(MuleEvent event) throws MuleException {
+    Event fireEvent(Event event) throws MuleException {
       return listener.process(event);
     }
 
     @Override
-    public void setListener(MessageProcessor listener) {
+    public void setListener(Processor listener) {
       this.listener = listener;
     }
 

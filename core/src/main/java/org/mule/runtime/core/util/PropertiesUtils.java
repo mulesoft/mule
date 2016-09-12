@@ -10,7 +10,7 @@ import static org.mule.runtime.core.util.ClassUtils.getResources;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,7 +103,7 @@ public final class PropertiesUtils {
   public static synchronized Properties loadProperties(String fileName, final Class<?> callingClass) throws IOException {
     InputStream is = IOUtils.getResourceAsStream(fileName, callingClass, /* tryAsFile */true, /* tryAsUrl */false);
     if (is == null) {
-      Message error = CoreMessages.cannotLoadFromClasspath(fileName);
+      I18nMessage error = CoreMessages.cannotLoadFromClasspath(fileName);
       throw new IOException(error.toString());
     }
 
@@ -112,7 +112,7 @@ public final class PropertiesUtils {
 
   public static Properties loadProperties(URL url) throws IOException {
     if (url == null) {
-      Message error = CoreMessages.objectIsNull("url");
+      I18nMessage error = CoreMessages.objectIsNull("url");
       throw new IOException(error.toString());
     }
 
@@ -154,7 +154,7 @@ public final class PropertiesUtils {
 
   public static Properties loadProperties(InputStream is) throws IOException {
     if (is == null) {
-      Message error = CoreMessages.objectIsNull("input stream");
+      I18nMessage error = CoreMessages.objectIsNull("input stream");
       throw new IOException(error.toString());
     }
 

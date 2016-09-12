@@ -67,9 +67,8 @@ public class DataSourceConfig {
   private String password;
 
   /**
-   * Maximum time that the data source will wait while attempting to connect to a
-   * database. A value of zero (default) specifies that the timeout is the default system timeout if there is one;
-   * otherwise, it specifies that there is no timeout.
+   * Maximum time that the data source will wait while attempting to connect to a database. A value of zero (default) specifies
+   * that the timeout is the default system timeout if there is one; otherwise, it specifies that there is no timeout.
    */
   @Parameter
   @Optional(defaultValue = "0")

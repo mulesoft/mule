@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.security.MuleCredentials;
 
 import java.io.Serializable;
@@ -37,33 +37,33 @@ public class MultiuserSecurityTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testMultipleAuthentications() throws Exception {
-    MuleMessage reply;
+    InternalMessage reply;
 
     reply = getResponse("Data1", "marie");
     assertNotNull(reply);
-    assertEquals("user = marie, logins = 1, color = bright red", reply.getPayload());
+    assertEquals("user = marie, logins = 1, color = bright red", reply.getPayload().getValue());
 
     reply = getResponse("Data2", "stan");
     assertNotNull(reply);
-    assertEquals("user = stan, logins = 1, color = metallic blue", reply.getPayload());
+    assertEquals("user = stan, logins = 1, color = metallic blue", reply.getPayload().getValue());
 
     reply = getResponse("Data3", "cindy");
-    assertEquals("user = cindy, logins = 1, color = dark violet", reply.getPayload());
+    assertEquals("user = cindy, logins = 1, color = dark violet", reply.getPayload().getValue());
 
     reply = getResponse("Data4", "marie");
     assertNotNull(reply);
-    assertEquals("user = marie, logins = 2, color = bright red", reply.getPayload());
+    assertEquals("user = marie, logins = 2, color = bright red", reply.getPayload().getValue());
 
     reply = getResponse("Data4", "marie");
     assertNotNull(reply);
-    assertEquals("user = marie, logins = 3, color = bright red", reply.getPayload());
+    assertEquals("user = marie, logins = 3, color = bright red", reply.getPayload().getValue());
 
     reply = getResponse("Data2", "stan");
     assertNotNull(reply);
-    assertEquals("user = stan, logins = 2, color = metallic blue", reply.getPayload());
+    assertEquals("user = stan, logins = 2, color = metallic blue", reply.getPayload().getValue());
   }
 
-  public MuleMessage getResponse(String data, String user) throws Exception {
+  public InternalMessage getResponse(String data, String user) throws Exception {
     EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
 
     Map<String, Serializable> props = new HashMap<>();

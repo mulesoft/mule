@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import org.junit.Test;
 
@@ -18,8 +18,8 @@ public class DynamicRoundRobinTestCase extends AbstractDynamicRoundRobinTestCase
   @Test
   public void testDynamicRoundRobinWithDefaultIdentifier() throws Exception {
     DynamicRoundRobin dynamicRoundRobin = getDynamicRoundRobin(getDynamicRouteResolver());
-    MuleEvent eventToProcessId1 = getEventWithId(ID_1);
-    MuleEvent eventToProcessId2 = getEventWithId(ID_2);
+    Event eventToProcessId1 = getEventWithId(ID_1);
+    Event eventToProcessId2 = getEventWithId(ID_2);
     assertEquals(LETTER_A, getPayloadAsString(dynamicRoundRobin.process(eventToProcessId1).getMessage()));
     assertEquals(LETTER_B, getPayloadAsString(dynamicRoundRobin.process(eventToProcessId2).getMessage()));
     assertEquals(LETTER_C, getPayloadAsString(dynamicRoundRobin.process(eventToProcessId1).getMessage()));
@@ -29,8 +29,8 @@ public class DynamicRoundRobinTestCase extends AbstractDynamicRoundRobinTestCase
   @Test
   public void testDynamicRoundRobinWithIdentifier() throws Exception {
     DynamicRoundRobin dynamicRoundRobin = getDynamicRoundRobin(getIdentifiableDynamicRouteResolver());
-    MuleEvent eventToProcessId1 = getEventWithId(ID_1);
-    MuleEvent eventToProcessId2 = getEventWithId(ID_2);
+    Event eventToProcessId1 = getEventWithId(ID_1);
+    Event eventToProcessId2 = getEventWithId(ID_2);
     assertEquals(LETTER_A, getPayloadAsString(dynamicRoundRobin.process(eventToProcessId1).getMessage()));
     assertEquals(LETTER_A, getPayloadAsString(dynamicRoundRobin.process(eventToProcessId2).getMessage()));
     assertEquals(LETTER_B, getPayloadAsString(dynamicRoundRobin.process(eventToProcessId1).getMessage()));

@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * Provides a value which is dependant on a {@link MuleEvent}
+ * Provides a value which is dependant on a {@link Event}
  *
  * @since 3.7.0
  */
@@ -19,14 +19,14 @@ public interface ValueResolver<T> {
   /**
    * Resolves a value from the given {@code event}
    *
-   * @param event a {@link MuleEvent}
+   * @param event a {@link Event}
    * @return a resolved value
    * @throws MuleException if the resolution of the value fails
    */
-  T resolve(MuleEvent event) throws MuleException;
+  T resolve(Event event) throws MuleException;
 
   /**
-   * returns {@code false} if subsequent invocations to {@link #resolve(MuleEvent)} will return the same value. Notice that if it
+   * returns {@code false} if subsequent invocations to {@link #resolve(Event)} will return the same value. Notice that if it
    * returns {@code true}, then it might return different values per invocation but that's not guaranteed.
    *
    * @return whether this resolve is dynamic

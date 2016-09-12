@@ -8,7 +8,7 @@ package org.mule.runtime.core.config.i18n;
 
 import java.io.Serializable;
 
-public class Message implements Serializable {
+public class I18nMessage implements Serializable {
 
   /**
    * Serial version
@@ -18,9 +18,9 @@ public class Message implements Serializable {
   private String message;
   private int code = 0;
   private Object[] args;
-  private Message nextMessage;
+  private I18nMessage nextMessage;
 
-  protected Message(String message, int code, Object... args) {
+  protected I18nMessage(String message, int code, Object... args) {
     super();
     this.message = message;
     this.code = code;
@@ -39,12 +39,12 @@ public class Message implements Serializable {
     return message + (nextMessage != null ? ". " + nextMessage.getMessage() : "");
   }
 
-  public Message setNextMessage(Message nextMessage) {
+  public I18nMessage setNextMessage(I18nMessage nextMessage) {
     this.nextMessage = nextMessage;
     return this;
   }
 
-  public Message getNextMessage() {
+  public I18nMessage getNextMessage() {
     return nextMessage;
   }
 

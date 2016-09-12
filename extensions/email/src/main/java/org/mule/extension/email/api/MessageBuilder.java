@@ -15,6 +15,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.MULTIPA
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddressArray;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
+
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.util.EmailConnectorUtils;
 import org.mule.runtime.api.metadata.DataType;
@@ -28,7 +29,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.activation.DataHandler;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;

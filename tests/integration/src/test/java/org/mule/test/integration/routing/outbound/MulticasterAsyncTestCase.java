@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -35,17 +35,17 @@ public class MulticasterAsyncTestCase extends AbstractIntegrationTestCase {
     List<Apple> results = new ArrayList<>(3);
 
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add((Apple) result.getPayload());
+    results.add((Apple) result.getPayload().getValue());
 
     result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add((Apple) result.getPayload());
+    results.add((Apple) result.getPayload().getValue());
 
     result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add((Apple) result.getPayload());
+    results.add((Apple) result.getPayload().getValue());
 
     assertThat(results.size(), equalTo(3));
 

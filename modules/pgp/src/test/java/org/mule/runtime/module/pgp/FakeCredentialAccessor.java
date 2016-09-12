@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.pgp;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 
 import java.io.Serializable;
@@ -31,11 +31,11 @@ public class FakeCredentialAccessor implements CredentialsAccessor {
     this.credentials = credentials;
   }
 
-  public Serializable getCredentials(MuleEvent event) {
+  public Serializable getCredentials(Event event) {
     return this.credentials;
   }
 
-  public void setCredentials(MuleEvent event, Serializable credentials) {
+  public void setCredentials(Event event, Serializable credentials) {
     // dummy
   }
 

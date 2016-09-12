@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -138,7 +138,7 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
     assertNoStreaming(runFlowWithPayload("streamingNever", TEST_MESSAGE));
   }
 
-  public MuleEvent runFlowWithPayload(String flow, Object payload) throws Exception {
+  public Event runFlowWithPayload(String flow, Object payload) throws Exception {
     return flowRunner(flow).withPayload(payload).withFlowVariable(HEADERS, headersToSend).run();
   }
 
@@ -146,17 +146,17 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
     headersToSend.put(name, value);
   }
 
-  private void assertNoStreaming(MuleEvent response) throws Exception {
+  private void assertNoStreaming(Event response) throws Exception {
     assertNull(transferEncodingHeader);
     assertThat(Integer.parseInt(contentLengthHeader), equalTo(TEST_MESSAGE.length()));
-    assertTrue(response.getMessage().getPayload() instanceof InputStream);
+    assertTrue(response.getMessage().getPayload().getValue() instanceof InputStream);
     assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 
-  private void assertStreaming(MuleEvent response) throws Exception {
+  private void assertStreaming(Event response) throws Exception {
     assertThat(transferEncodingHeader, equalTo(CHUNKED));
     assertNull(contentLengthHeader);
-    assertTrue(response.getMessage().getPayload() instanceof InputStream);
+    assertTrue(response.getMessage().getPayload().getValue() instanceof InputStream);
     assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 

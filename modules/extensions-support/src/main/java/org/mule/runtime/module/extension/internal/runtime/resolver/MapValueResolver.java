@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
@@ -21,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(MuleEvent)} it
- * return a {@link Map} of values with the outcome of each original resolver.
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(Event)} it return a
+ * {@link Map} of values with the outcome of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
  *
@@ -67,12 +67,12 @@ public final class MapValueResolver<K, V> implements ValueResolver<Map<K, V>> {
   /**
    * Passes the given {@code event} to each resolvers and outputs a map of type {@code mapType} with each result
    *
-   * @param event a {@link MuleEvent} the event to evaluate
+   * @param event a {@link Event} the event to evaluate
    * @return a {@link Map} of type {@code mapType}
    * @throws MuleException
    */
   @Override
-  public Map<K, V> resolve(MuleEvent event) throws MuleException {
+  public Map<K, V> resolve(Event event) throws MuleException {
     Map<K, V> map = instantiateMap();
 
     Iterator<ValueResolver<K>> keyIt = keyResolvers.iterator();

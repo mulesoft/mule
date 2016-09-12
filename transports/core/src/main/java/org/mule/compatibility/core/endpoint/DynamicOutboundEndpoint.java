@@ -18,13 +18,13 @@ import org.mule.compatibility.core.util.TransportObjectNameHelper;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -92,7 +92,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint {
     return properties;
   }
 
-  public OutboundEndpoint getStaticEndpoint(MuleEvent event) throws MuleException {
+  public OutboundEndpoint getStaticEndpoint(Event event) throws MuleException {
     final String uri = resolveUri(event);
 
     OutboundEndpoint outboundEndpoint = staticEndpoints.get(uri);
@@ -113,7 +113,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint {
     return endpointUri;
   }
 
-  private String resolveUri(MuleEvent event) throws DispatchException {
+  private String resolveUri(Event event) throws DispatchException {
     try {
       return dynamicURIBuilder.build(event);
     } catch (Exception e) {
@@ -227,12 +227,12 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint {
   }
 
   @Override
-  public List<MessageProcessor> getMessageProcessors() {
+  public List<Processor> getMessageProcessors() {
     return prototypeEndpoint.getMessageProcessors();
   }
 
   @Override
-  public List<MessageProcessor> getResponseMessageProcessors() {
+  public List<Processor> getResponseMessageProcessors() {
     return prototypeEndpoint.getResponseMessageProcessors();
   }
 
@@ -287,7 +287,7 @@ public class DynamicOutboundEndpoint implements OutboundEndpoint {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return getStaticEndpoint(event).process(event);
   }
 

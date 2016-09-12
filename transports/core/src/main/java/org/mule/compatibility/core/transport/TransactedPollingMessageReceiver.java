@@ -9,9 +9,9 @@ package org.mule.compatibility.core.transport;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -104,7 +104,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
   @Override
   public void poll() throws Exception {
     try {
-      ExecutionTemplate<MuleEvent> pt = createExecutionTemplate();
+      ExecutionTemplate<Event> pt = createExecutionTemplate();
 
       if (this.isReceiveMessagesInTransaction()) {
         if (hasNoMessages()) {
@@ -116,13 +116,13 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but several workers
         // may have been started
-        ExecutionCallback<MuleEvent> cb = new ExecutionCallback<MuleEvent>() {
+        ExecutionCallback<Event> cb = new ExecutionCallback<Event>() {
 
           @Override
-          public MuleEvent process() throws Exception {
-            // this is not ideal, but jdbc receiver returns a list of maps, not List<MuleMessage>
+          public Event process() throws Exception {
+            // this is not ideal, but jdbc receiver returns a list of maps, not List<Message>
             List messages = getMessages();
-            LinkedList<MuleEvent> results = new LinkedList<MuleEvent>();
+            LinkedList<Event> results = new LinkedList<Event>();
             if (messages != null && messages.size() > 0) {
               for (Object message : messages) {
                 results.add(processMessage(message));
@@ -169,14 +169,14 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     return false;
   }
 
-  protected class MessageProcessorWorker implements Work, ExecutionCallback<MuleEvent> {
+  protected class MessageProcessorWorker implements Work, ExecutionCallback<Event> {
 
-    private final ExecutionTemplate<MuleEvent> pt;
+    private final ExecutionTemplate<Event> pt;
     private final Object message;
     private final CountDownLatch latch;
     private final SystemExceptionHandler exceptionHandler;
 
-    public MessageProcessorWorker(ExecutionTemplate<MuleEvent> pt, CountDownLatch latch, SystemExceptionHandler exceptionHandler,
+    public MessageProcessorWorker(ExecutionTemplate<Event> pt, CountDownLatch latch, SystemExceptionHandler exceptionHandler,
                                   Object message) {
       this.pt = pt;
       this.message = message;
@@ -203,14 +203,14 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
     }
 
     @Override
-    public MuleEvent process() throws Exception {
+    public Event process() throws Exception {
       processMessage(message);
       return null;
     }
   }
 
-  protected abstract List<MuleMessage> getMessages() throws Exception;
+  protected abstract List<InternalMessage> getMessages() throws Exception;
 
-  protected abstract MuleEvent processMessage(Object message) throws Exception;
+  protected abstract Event processMessage(Object message) throws Exception;
 
 }

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.mule.functional.transformer.simple.AbstractRemoveVariablePropertyProcessorTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.tck.size.SmallTest;
 
@@ -28,17 +28,17 @@ public class RemoveFlowVariableProcessorTestCase extends AbstractRemoveVariableP
   }
 
   @Override
-  protected void addMockedPropeerties(MuleEvent mockEvent, HashSet properties) {
-    when(mockEvent.getFlowVariableNames()).thenReturn(properties);
+  protected void addMockedPropeerties(Event mockEvent, HashSet properties) {
+    when(mockEvent.getVariableNames()).thenReturn(properties);
   }
 
   @Override
-  protected void verifyRemoved(MuleEvent mockEvent, String key) {
-    assertThat(mockEvent.getFlowVariableNames(), not(contains(key)));
+  protected void verifyRemoved(Event mockEvent, String key) {
+    assertThat(mockEvent.getVariableNames(), not(contains(key)));
   }
 
   @Override
-  protected void verifyNotRemoved(MuleEvent mockEvent, String key) {
-    assertThat(mockEvent.getFlowVariable(key), not(nullValue()));
+  protected void verifyNotRemoved(Event mockEvent, String key) {
+    assertThat(mockEvent.getVariable(key), not(nullValue()));
   }
 }

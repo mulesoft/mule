@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.meta.NameableObject;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
 
@@ -36,14 +36,14 @@ public class ResponseTransformerTestCase extends FunctionalTestCase {
     assertEquals(2, endpoint.getMessageProcessors().size());
     checkNames("normal", endpoint.getMessageProcessors());
     assertFalse(endpoint.getResponseMessageProcessors().isEmpty());
-    final List<MessageProcessor> messageProcessors =
+    final List<Processor> messageProcessors =
         ((InterceptingChainLifecycleWrapper) endpoint.getResponseMessageProcessors().get(0)).getMessageProcessors();
     assertEquals(2, messageProcessors.size());
     checkNames("response", messageProcessors);
   }
 
-  protected void checkNames(String prefix, List<MessageProcessor> transformers) {
-    Iterator<MessageProcessor> iterator = transformers.iterator();
+  protected void checkNames(String prefix, List<Processor> transformers) {
+    Iterator<Processor> iterator = transformers.iterator();
     for (int count = 1; iterator.hasNext(); count++) {
       NameableObject transformer = (NameableObject) iterator.next();
       logger.debug(transformer.toString());

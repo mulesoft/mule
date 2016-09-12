@@ -15,17 +15,17 @@ import org.mule.runtime.config.spring.dsl.api.ObjectFactory;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingObjectFactory implements ObjectFactory<MessageProcessor>, Lifecycle {
+public class LifecycleSensingObjectFactory implements ObjectFactory<Processor>, Lifecycle {
 
   private List<LifecycleAction> lifecycleActions = new LinkedList<>();
 
   @Override
-  public MessageProcessor getObject() throws Exception {
+  public Processor getObject() throws Exception {
     lifecycleActions.add(GET_OBJECT);
     LifecycleSensingMessageProcessor lifecycleSensingMessageProcessor = new LifecycleSensingMessageProcessor();
     lifecycleSensingMessageProcessor.setObjectFactory(this);

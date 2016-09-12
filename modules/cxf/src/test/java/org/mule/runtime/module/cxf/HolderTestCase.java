@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -34,9 +34,9 @@ public class HolderTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEchoHolder() throws Exception {
-    MuleMessage received = flowRunner("echoServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received = flowRunner("echoServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
     assertNotNull(received);
-    Object[] payload = (Object[]) received.getPayload();
+    Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
     assertEquals(null, payload[1]);
     assertEquals("one-holder1", ((Holder) payload[2]).value);
@@ -45,9 +45,10 @@ public class HolderTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientProxyEchoHolder() throws Exception {
-    MuleMessage received = flowRunner("echoServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received =
+        flowRunner("echoServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
     assertNotNull(received);
-    Object[] payload = (Object[]) received.getPayload();
+    Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
     assertEquals("one-holder1", ((Holder) payload[1]).value);
     assertEquals("one-holder2", ((Holder) payload[2]).value);
@@ -55,9 +56,9 @@ public class HolderTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEcho2Holder() throws Exception {
-    MuleMessage received = flowRunner("echo2ServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received = flowRunner("echo2ServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
     assertNotNull(received);
-    Object[] payload = (Object[]) received.getPayload();
+    Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
     assertEquals(null, payload[1]);
     assertEquals("two-holder", ((Holder) payload[2]).value);
@@ -65,27 +66,29 @@ public class HolderTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientProxyEcho2Holder() throws Exception {
-    MuleMessage received = flowRunner("echo2ServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received =
+        flowRunner("echo2ServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
     assertNotNull(received);
-    Object[] payload = (Object[]) received.getPayload();
+    Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
     assertEquals("two-holder", ((Holder) payload[1]).value);
   }
 
   @Test
   public void testClientEcho3Holder() throws Exception {
-    MuleMessage received = flowRunner("echo3ServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received = flowRunner("echo3ServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
     assertNotNull(received);
-    Object[] payload = (Object[]) received.getPayload();
+    Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals(null, payload[0]);
     assertEquals("one", ((Holder) payload[1]).value);
   }
 
   @Test
   public void testClientProxyEcho3Holder() throws Exception {
-    MuleMessage received = flowRunner("echo3ServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received =
+        flowRunner("echo3ServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
     assertNotNull(received);
-    Object[] payload = (Object[]) received.getPayload();
+    Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals(null, payload[0]);
     assertEquals("one", ((Holder) payload[1]).value);
   }

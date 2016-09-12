@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.scripting.filter;
 
-import static org.mule.runtime.core.DefaultMessageContext.create;
+import static org.mule.runtime.core.DefaultEventContext.create;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MESSAGE;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -45,7 +45,7 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
   }
 
   @Override
-  public boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  public boolean accept(Event event, Event.Builder builder) {
     Bindings bindings = script.getScriptEngine().createBindings();
 
     script.populateBindings(bindings, event, builder);
@@ -55,18 +55,18 @@ public class ScriptFilter extends AbstractFilteringMessageProcessor implements F
       // TODO MULE-9356 ScriptFilter should rethrow exceptions, or at least log, not ignore them
       return false;
     } finally {
-      builder.message((MuleMessage) bindings.get(BINDING_MESSAGE));
+      builder.message((InternalMessage) bindings.get(BINDING_MESSAGE));
     }
   }
 
   @Override
-  public boolean accept(MuleMessage message, MuleEvent.Builder builder) {
+  public boolean accept(InternalMessage message, Event.Builder builder) {
     Bindings bindings = script.getScriptEngine().createBindings();
 
     // TODO MULE-9341 Remove Filters.
     Flow flow = new Flow("", muleContext);
-    MuleEvent event =
-        MuleEvent.builder(create(flow, "ScriptFilter")).message(message).exchangePattern(ONE_WAY).flow(flow).build();
+    Event event =
+        Event.builder(create(flow, "ScriptFilter")).message(message).exchangePattern(ONE_WAY).flow(flow).build();
     script.populateBindings(bindings, event, builder);
     try {
       return (Boolean) script.runScript(bindings);

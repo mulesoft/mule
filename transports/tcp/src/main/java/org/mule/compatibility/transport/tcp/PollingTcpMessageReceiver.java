@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.tcp;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractPollingMessageReceiver;
 import org.mule.compatibility.transport.tcp.i18n.TcpMessages;
@@ -59,7 +59,7 @@ public class PollingTcpMessageReceiver extends AbstractPollingMessageReceiver {
     try {
       Object result = TcpMessageDispatcher.receiveFromSocket(socket, timeout, endpoint);
       if (!(result == null)) {
-        this.routeMessage((MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder().payload(result).build());
+        this.routeMessage((CompatibilityMessage) new MuleCompatibilityMessageBuilder().payload(result).build());
         if (logger.isDebugEnabled()) {
           logger.debug("Routing new message: " + result);
         }

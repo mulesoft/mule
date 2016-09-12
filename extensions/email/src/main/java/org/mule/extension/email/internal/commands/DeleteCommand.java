@@ -7,8 +7,9 @@
 package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Flags.Flag.DELETED;
+
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
@@ -27,17 +28,17 @@ public final class DeleteCommand {
    * messages).
    * <p>
    * if no emailId is specified, the operation will try to find an email or {@link List} of emails in the incoming
-   * {@link MuleMessage}.
+   * {@link Message}.
    * <p>
-   * If no {@code emailId} is provided and no emails are found in the incoming {@link MuleMessage} this operation will fail and no
+   * If no {@code emailId} is provided and no emails are found in the incoming {@link Message} this operation will fail and no
    * email is going to be erased from the folder, not even the ones marked as DELETED previously.
    *
-   * @param message the incoming {@link MuleMessage}.
+   * @param message the incoming {@link Message}.
    * @param connection the corresponding {@link RetrieverConnection} instance.
    * @param folderName the folder where the emails are going to be fetched
    * @param emailId an optional email number to look up in the folder.
    */
-  public void delete(MuleMessage message, RetrieverConnection connection, String folderName, Integer emailId) {
+  public void delete(Message message, RetrieverConnection connection, String folderName, Integer emailId) {
     setFlagCommand.set(message, connection, folderName, emailId, DELETED);
     connection.closeFolder(true);
   }

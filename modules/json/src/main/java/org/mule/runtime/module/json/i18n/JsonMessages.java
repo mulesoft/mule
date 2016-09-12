@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.module.json.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 /**
  * Internationalised messages for the Json module
  */
-public class JsonMessages extends MessageFactory {
+public class JsonMessages extends I18nMessageFactory {
 
   private static final JsonMessages factory = new JsonMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("json");
 
-  public static Message messageStringIsNotJson() {
+  public static I18nMessage messageStringIsNotJson() {
     return factory.createMessage(BUNDLE_PATH, 1);
   }
 }

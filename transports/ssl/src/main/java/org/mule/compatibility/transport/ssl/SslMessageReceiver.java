@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.ssl;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.connector.EndpointConnectException;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageReceiver;
 import org.mule.compatibility.transport.tcp.TcpMessageReceiver;
@@ -66,7 +66,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
     return new SslWorker(socket, this);
   }
 
-  private MuleCompatibilityMessage preRoute(MuleCompatibilityMessage message) throws Exception {
+  private CompatibilityMessage preRoute(CompatibilityMessage message) throws Exception {
     long sslHandshakeTimeout = ((SslConnector) getConnector()).getSslHandshakeTimeout();
     boolean rc = handshakeComplete.await(sslHandshakeTimeout, TimeUnit.MILLISECONDS);
     if (rc == false) {
@@ -105,7 +105,7 @@ public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeC
     }
 
     @Override
-    protected MuleCompatibilityMessage preRouteMuleMessage(MuleCompatibilityMessage message) throws Exception {
+    protected CompatibilityMessage preRouteMuleMessage(CompatibilityMessage message) throws Exception {
       return preRoute(super.preRouteMuleMessage(message));
     }
 

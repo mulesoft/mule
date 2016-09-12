@@ -17,12 +17,12 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.context.notification.NotificationException;
@@ -66,11 +66,11 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
 
   @Test
   public void testFaultInCxfService() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestFaultPayload).build();
+    InternalMessage request = InternalMessage.builder().payload(requestFaultPayload).build();
     MuleClient client = muleContext.getClient();
     latch = new CountDownLatch(1);
     registerExceptionNotificationListener();
-    MuleMessage response =
+    InternalMessage response =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithFault", request, HTTP_REQUEST_OPTIONS)
             .getRight();
     assertNotNull(response);
@@ -82,11 +82,11 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
 
   @Test
   public void testExceptionInCxfService() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
+    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
     MuleClient client = muleContext.getClient();
     latch = new CountDownLatch(1);
     registerExceptionNotificationListener();
-    MuleMessage response =
+    InternalMessage response =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/testServiceWithException", request, HTTP_REQUEST_OPTIONS)
             .getRight();
     assertNotNull(response);
@@ -115,8 +115,8 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     latch = new CountDownLatch(1);
     registerExceptionNotificationListener();
-    MuleMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy",
-                                       getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
+    InternalMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy",
+                                           getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(response);
     assertTrue(getPayloadAsString(response).contains("<faultstring>"));
@@ -140,10 +140,10 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
     }
   }
 
-  public static class CustomProcessor implements MessageProcessor {
+  public static class CustomProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return event;
     }
   }

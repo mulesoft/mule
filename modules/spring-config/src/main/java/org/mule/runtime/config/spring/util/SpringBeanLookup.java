@@ -9,7 +9,7 @@ package org.mule.runtime.config.spring.util;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.object.AbstractObjectFactory;
 
 import org.springframework.beans.BeansException;
@@ -41,10 +41,11 @@ public class SpringBeanLookup extends AbstractObjectFactory implements Applicati
   @Override
   public void initialise() throws InitialisationException {
     if (bean == null) {
-      throw new InitialisationException(MessageFactory.createStaticMessage("Bean name has not been set."), this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("Bean name has not been set."), this);
     }
     if (applicationContext == null) {
-      throw new InitialisationException(MessageFactory.createStaticMessage("ApplicationContext has not been injected."), this);
+      throw new InitialisationException(I18nMessageFactory.createStaticMessage("ApplicationContext has not been injected."),
+                                        this);
     }
 
     // Get instance of spring bean to determine bean type.

@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.http.internal.listener;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -20,7 +19,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.execution.MessageProcessingManager;
 import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
@@ -52,7 +51,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
   private String path;
   private String allowedMethods;
   private Boolean parseRequest;
-  private MessageProcessor messageProcessor;
+  private Processor messageProcessor;
   private MethodRequestMatcher methodRequestMatcher = AcceptsAllMethodsRequestMatcher.instance();
   private MuleContext muleContext;
   private FlowConstruct flowConstruct;
@@ -66,7 +65,7 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
   private ListenerPath listenerPath;
 
   @Override
-  public void setListener(final MessageProcessor messageProcessor) {
+  public void setListener(final Processor messageProcessor) {
     this.messageProcessor = messageProcessor;
   }
 
@@ -154,8 +153,8 @@ public class DefaultHttpListener implements HttpListener, Initialisable, MuleCon
     };
   }
 
-  private MuleEvent createEvent(HttpRequestContext requestContext) throws HttpRequestParsingException {
-    MuleEvent muleEvent =
+  private Event createEvent(HttpRequestContext requestContext) throws HttpRequestParsingException {
+    Event muleEvent =
         HttpRequestToMuleEvent.transform(requestContext, muleContext, flowConstruct, parseRequest, listenerPath);
     // Update RequestContext ThreadLocal for backwards compatibility
     setCurrentEvent(muleEvent);

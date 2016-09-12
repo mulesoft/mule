@@ -12,11 +12,11 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
@@ -32,10 +32,10 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
   public void testAsyncBefore() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage msgSync = flowRunner("test-async-block-before-outbound").withPayload("message").run().getMessage();
+    InternalMessage msgSync = flowRunner("test-async-block-before-outbound").withPayload("message").run().getMessage();
 
-    MuleMessage msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT).getRight().get();
-    MuleMessage msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msgAsync = client.request("test://test.before.async.out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msgOut = client.request("test://test.before.out", RECEIVE_TIMEOUT).getRight().get();
 
     assertCorrectThreads(msgSync, msgAsync, msgOut);
 
@@ -45,15 +45,15 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
   public void testAsyncAfter() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    MuleMessage msgSync = flowRunner("test-async-block-after-outbound").withPayload("message").run().getMessage();
+    InternalMessage msgSync = flowRunner("test-async-block-after-outbound").withPayload("message").run().getMessage();
 
-    MuleMessage msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT).getRight().get();
-    MuleMessage msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msgAsync = client.request("test://test.after.async.out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msgOut = client.request("test://test.after.out", RECEIVE_TIMEOUT).getRight().get();
 
     assertCorrectThreads(msgSync, msgAsync, msgOut);
   }
 
-  private void assertCorrectThreads(MuleMessage msgSync, MuleMessage msgAsync, MuleMessage msgOut) throws Exception {
+  private void assertCorrectThreads(InternalMessage msgSync, InternalMessage msgAsync, InternalMessage msgOut) throws Exception {
     assertThat(msgSync, not(nullValue()));
     assertThat(msgAsync, not(nullValue()));
     assertThat(msgOut, not(nullValue()));
@@ -65,12 +65,12 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
     assertThat(msgOut.getOutboundProperty("request-response-thread"), not(equalTo(msgAsync.getOutboundProperty("async-thread"))));
   }
 
-  public static class ThreadSensingMessageProcessor implements MessageProcessor {
+  public static class ThreadSensingMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
-          .addOutboundProperty(event.getFlowVariable("property-name"), currentThread().getName()).build()).build();
+    public Event process(Event event) throws MuleException {
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage())
+          .addOutboundProperty(event.getVariable("property-name"), currentThread().getName()).build()).build();
     }
   }
 }

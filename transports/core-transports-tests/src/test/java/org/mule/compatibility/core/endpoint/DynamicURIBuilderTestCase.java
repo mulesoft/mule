@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.MalformedEndpointException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -28,7 +28,7 @@ import org.junit.Test;
 public class DynamicURIBuilderTestCase extends AbstractMuleTestCase {
 
   public static final String EXPECTED_ADDRESS = "http://admin%40abc:admin%40123@localhost:8080/test?foo=bar";
-  private final MuleEvent event = mock(MuleEvent.class);
+  private final Event event = mock(Event.class);
   private final MuleContext muleContext = mock(MuleContext.class);
   public static final String ATTRIBUTE_EXPRESSION = "#[expression]";
 

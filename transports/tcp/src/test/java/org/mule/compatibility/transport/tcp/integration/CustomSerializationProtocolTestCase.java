@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -42,9 +42,9 @@ public class CustomSerializationProtocolTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < messages; i++) {
-      MuleMessage msg = client.request("vm://out", 30000).getRight().get();
-      assertTrue(msg.getPayload() instanceof NonSerializableMessageObject);
-      NonSerializableMessageObject received = (NonSerializableMessageObject) msg.getPayload();
+      InternalMessage msg = client.request("vm://out", 30000).getRight().get();
+      assertTrue(msg.getPayload().getValue() instanceof NonSerializableMessageObject);
+      NonSerializableMessageObject received = (NonSerializableMessageObject) msg.getPayload().getValue();
       assertEquals("Hello", received.s);
       assertEquals(1, received.i);
       assertEquals(true, received.b);

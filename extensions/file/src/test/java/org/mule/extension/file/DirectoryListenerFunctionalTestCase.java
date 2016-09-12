@@ -15,9 +15,10 @@ import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
+
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.MessageContext;
@@ -48,7 +49,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
   private static final int TIMEOUT_MILLIS = 5000;
   private static final int POLL_DELAY_MILLIS = 100;
 
-  private static List<MuleMessage> receivedMessages;
+  private static List<Message> receivedMessages;
 
   private File matcherLessFolder;
   private File withMatcherFolder;
@@ -156,9 +157,9 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
   public void matcher() throws Exception {
     final File file = new File(withMatcherFolder, MATCH_FILE);
     write(file, "");
-    MuleMessage message = listen(CREATE, file);
+    Message message = listen(CREATE, file);
 
-    assertThat(message.getPayload(), equalTo(DR_MANHATTAN));
+    assertThat(message.getPayload().getValue(), equalTo(DR_MANHATTAN));
   }
 
   @Test
@@ -182,8 +183,8 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
     }, "source did not stop"));
   }
 
-  private void assertEvent(MuleMessage message, Object expectedContent) throws Exception {
-    Object payload = message.getPayload();
+  private void assertEvent(Message message, Object expectedContent) throws Exception {
+    Object payload = message.getPayload().getValue();
     if (payload instanceof InputStream) {
       payload = IOUtils.toString((InputStream) payload);
       assertThat((String) payload, not(containsString(DR_MANHATTAN)));
@@ -192,11 +193,11 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
     assertThat(payload, equalTo(expectedContent));
   }
 
-  private MuleMessage listen(FileEventType type, File file) {
+  private Message listen(FileEventType type, File file) {
     PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
-    ValueHolder<MuleMessage> messageHolder = new ValueHolder<>();
+    ValueHolder<Message> messageHolder = new ValueHolder<>();
     prober.check(new JUnitLambdaProbe(() -> {
-      for (MuleMessage message : receivedMessages) {
+      for (Message message : receivedMessages) {
         ListenerFileAttributes attributes = (ListenerFileAttributes) message.getAttributes();
         if (attributes.getPath().equals(file.getAbsolutePath()) && attributes.getEventType().equals(type.name())) {
           messageHolder.set(message);
@@ -212,7 +213,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
 
   public static void onMessage(MessageContext messageContext) {
     Object payload = messageContext.getPayload() != null ? messageContext.getPayload() : null;
-    MuleMessage message = MuleMessage.builder().payload(payload).mediaType(messageContext.getDataType().getMediaType())
+    Message message = Message.builder().payload(payload).mediaType(messageContext.getDataType().getMediaType())
         .attributes(messageContext.getAttributes()).build();
     receivedMessages.add(message);
   }

@@ -10,11 +10,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_P
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ROOT_MESSAGE_ID_PROPERTY;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -35,16 +35,16 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
 
   private final MessageReceiverType messageReceiver;
   private Object rawMessage;
-  private MuleEvent muleEvent;
+  private Event muleEvent;
 
   public AbstractTransportMessageProcessTemplate(MessageReceiverType messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
 
   @Override
-  public MuleEvent getMuleEvent() throws MuleException {
+  public Event getMuleEvent() throws MuleException {
     if (muleEvent == null) {
-      MuleCompatibilityMessage messageFromSource = createMessageFromSource(getOriginalMessage());
+      CompatibilityMessage messageFromSource = createMessageFromSource(getOriginalMessage());
       muleEvent = createEventFromMuleMessage(messageFromSource);
     }
     return muleEvent;
@@ -66,8 +66,8 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
   public void afterFailureProcessingFlow(MuleException exception) throws MuleException {}
 
   @Override
-  public MuleEvent routeEvent(MuleEvent muleEvent) throws MuleException {
-    MuleEvent response = messageReceiver.routeEvent(muleEvent);
+  public Event routeEvent(Event muleEvent) throws MuleException {
+    Event response = messageReceiver.routeEvent(muleEvent);
     if (!messageReceiver.getEndpoint().getExchangePattern().hasResponse()) {
       return null;
     }
@@ -75,7 +75,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
   }
 
   @Override
-  public void afterSuccessfulProcessingFlow(MuleEvent response) throws MuleException {}
+  public void afterSuccessfulProcessingFlow(Event response) throws MuleException {}
 
   /**
    * This method will only be called once for the {@link MessageProcessContext}
@@ -85,7 +85,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
    */
   public abstract Object acquireMessage() throws MuleException;
 
-  protected MuleCompatibilityMessage propagateRootMessageIdProperty(MuleCompatibilityMessage message) {
+  protected CompatibilityMessage propagateRootMessageIdProperty(CompatibilityMessage message) {
     String rootId = message.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
     if (rootId != null) {
       final MuleCompatibilityMessageBuilder builder = new MuleCompatibilityMessageBuilder(message);
@@ -104,7 +104,7 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
   @Override
   public void discardInvalidMessage() throws MuleException {}
 
-  protected MuleCompatibilityMessage warnIfMuleClientSendUsed(MuleCompatibilityMessage message) {
+  protected CompatibilityMessage warnIfMuleClientSendUsed(CompatibilityMessage message) {
     MuleCompatibilityMessageBuilder messageBuilder = new MuleCompatibilityMessageBuilder(message);
     final Object remoteSyncProperty = message.getInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
     messageBuilder.removeInboundProperty(MULE_REMOTE_SYNC_PROPERTY);
@@ -116,8 +116,8 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     return messageBuilder.build();
   }
 
-  protected MuleEvent createEventFromMuleMessage(MuleCompatibilityMessage muleMessage) throws MuleException {
-    MuleEvent muleEvent = messageReceiver.createMuleEvent(muleMessage, getOutputStream());
+  protected Event createEventFromMuleMessage(CompatibilityMessage muleMessage) throws MuleException {
+    Event muleEvent = messageReceiver.createMuleEvent(muleMessage, getOutputStream());
     if (!messageReceiver.getEndpoint().isDisableTransportTransformer()) {
       messageReceiver.applyInboundTransformers(muleEvent);
     }
@@ -128,8 +128,8 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
     return null;
   }
 
-  protected MuleCompatibilityMessage createMessageFromSource(Object message) throws MuleException {
-    MuleCompatibilityMessage muleMessage =
+  protected CompatibilityMessage createMessageFromSource(Object message) throws MuleException {
+    CompatibilityMessage muleMessage =
         messageReceiver.createMuleMessage(message, messageReceiver.getEndpoint().getEncoding());
     muleMessage = warnIfMuleClientSendUsed(muleMessage);
     muleMessage = propagateRootMessageIdProperty(muleMessage);
@@ -158,12 +158,12 @@ public abstract class AbstractTransportMessageProcessTemplate<MessageReceiverTyp
   }
 
   @Override
-  public MuleEvent beforeRouteEvent(MuleEvent muleEvent) throws MuleException {
+  public Event beforeRouteEvent(Event muleEvent) throws MuleException {
     return muleEvent;
   }
 
   @Override
-  public MuleEvent afterRouteEvent(MuleEvent muleEvent) throws MuleException {
+  public Event afterRouteEvent(Event muleEvent) throws MuleException {
     return muleEvent;
   }
 

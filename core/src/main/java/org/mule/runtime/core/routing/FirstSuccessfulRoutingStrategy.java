@@ -9,17 +9,17 @@ package org.mule.runtime.core.routing;
 import static org.mule.runtime.core.config.i18n.CoreMessages.createStaticMessage;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
 
 import java.util.List;
 
 /**
  *
- * Routing strategy that routes the message through a list of {@link MessageProcessor} until one is successfully executed.
+ * Routing strategy that routes the message through a list of {@link Processor} until one is successfully executed.
  *
  * The message will be route to the first route, if the route execution is successful then execution ends, if not the message will
  * be route to the next route. This continues until a successful route is found.
@@ -31,7 +31,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
 
   /**
    * @param muleContext
-   * @param failureExpression Mule expression that validates if a {@link MessageProcessor} execution was successful or not.
+   * @param failureExpression Mule expression that validates if a {@link Processor} execution was successful or not.
    */
   public FirstSuccessfulRoutingStrategy(final MuleContext muleContext, final String failureExpression, RouteProcessor processor) {
     super(muleContext);
@@ -45,14 +45,14 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
   }
 
   @Override
-  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MuleException {
-    MuleEvent returnEvent = null;
+  public Event route(Event event, List<Processor> messageProcessors) throws MuleException {
+    Event returnEvent = null;
 
     boolean failed = true;
     Exception failExceptionCause = null;
-    for (MessageProcessor mp : messageProcessors) {
+    for (Processor mp : messageProcessors) {
       try {
-        MuleEvent toProcess = cloneEventForRouting(event, mp);
+        Event toProcess = cloneEventForRouting(event, mp);
         returnEvent = processor.processRoute(mp, toProcess);
 
         if (returnEvent == null || VoidMuleEvent.getInstance().equals(returnEvent)) {
@@ -60,7 +60,7 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
         } else if (returnEvent.getMessage() == null) {
           failed = true;
         } else {
-          Builder builder = MuleEvent.builder(returnEvent);
+          Builder builder = Event.builder(returnEvent);
           failed = returnEvent == null || failureExpressionFilter.accept(returnEvent, builder);
           returnEvent = builder.build();
         }
@@ -85,12 +85,12 @@ public class FirstSuccessfulRoutingStrategy extends AbstractRoutingStrategy {
     return returnEvent;
   }
 
-  private MuleEvent cloneEventForRouting(MuleEvent event, MessageProcessor mp) throws MuleException {
+  private Event cloneEventForRouting(Event event, Processor mp) throws MuleException {
     return createEventToRoute(event, cloneMessage(event.getMessage()), mp);
   }
 
   interface RouteProcessor {
 
-    MuleEvent processRoute(MessageProcessor route, MuleEvent event) throws MuleException;
+    Event processRoute(Processor route, Event event) throws MuleException;
   }
 }

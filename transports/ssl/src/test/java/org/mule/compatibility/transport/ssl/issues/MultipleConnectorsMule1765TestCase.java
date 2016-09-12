@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.ssl.issues;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class MultipleConnectorsMule1765TestCase extends FunctionalTestCase {
   @Test
   public void testSend() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result = client.send("clientEndpoint", TEST_SSL_MESSAGE, null).getRight();
+    InternalMessage result = client.send("clientEndpoint", TEST_SSL_MESSAGE, null).getRight();
     assertEquals(TEST_SSL_MESSAGE + " Received", getPayloadAsString(result));
   }
 }

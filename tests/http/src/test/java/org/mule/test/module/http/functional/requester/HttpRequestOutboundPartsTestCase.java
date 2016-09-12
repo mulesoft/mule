@@ -19,7 +19,7 @@ import static org.mule.test.module.http.functional.matcher.HttpMessageAttributes
 import org.mule.extension.http.api.HttpPart;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -142,7 +142,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
     // Set a part bigger than the queue size.
     addPartToSend(TEST_PART_NAME, new byte[maxAsyncWriteQueueSize * 2], TEXT);
 
-    MuleEvent response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withFlowVariable(PARTS, partsToSend).run();
+    Event response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withFlowVariable(PARTS, partsToSend).run();
 
     assertThat((HttpResponseAttributes) response.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
   }

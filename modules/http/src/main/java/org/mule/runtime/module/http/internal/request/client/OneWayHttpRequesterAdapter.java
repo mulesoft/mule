@@ -8,11 +8,11 @@ package org.mule.runtime.module.http.internal.request.client;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,24 +22,24 @@ import org.apache.commons.io.IOUtils;
 /**
  * Adapts an HTTP operation to be one-way.
  */
-public class OneWayHttpRequesterAdapter implements MessageProcessor, FlowConstructAware {
+public class OneWayHttpRequesterAdapter implements Processor, FlowConstructAware {
 
-  private MessageProcessor httpRequester;
+  private Processor httpRequester;
 
 
-  public OneWayHttpRequesterAdapter(final MessageProcessor httpRequester) {
+  public OneWayHttpRequesterAdapter(final Processor httpRequester) {
     this.httpRequester = httpRequester;
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    final MuleEvent result = this.httpRequester.process(event);
+  public Event process(Event event) throws MuleException {
+    final Event result = this.httpRequester.process(event);
     consumePayload(event, result);
     return VoidMuleEvent.getInstance();
   }
 
-  private void consumePayload(MuleEvent event, MuleEvent result) throws MessagingException {
-    final Object payload = result.getMessage().getPayload();
+  private void consumePayload(Event event, Event result) throws MessagingException {
+    final Object payload = result.getMessage().getPayload().getValue();
     if (payload instanceof InputStream) {
       try {
         IOUtils.toByteArray((InputStream) payload);

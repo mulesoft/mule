@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.core.Is.is;
 import static org.mule.test.heisenberg.extension.MoneyLaunderingOperation.INVOLVED_PEOPLE;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.streaming.ConsumerIterator;
@@ -45,7 +46,7 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
 
   @Test
   public void basicPagedOperation() throws Exception {
-    Object payload = flowRunner("getPersonalInfo").run().getMessage().getPayload();
+    Object payload = flowRunner("getPersonalInfo").run().getMessage().getPayload().getValue();
     assertThat(payload, is(instanceOf(ConsumerIterator.class)));
     ConsumerIterator consumerIterator = (ConsumerIterator) payload;
     assertThat(consumerIterator.size(), is(11));
@@ -56,7 +57,7 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
 
   @Test
   public void emptyPagedOperation() throws Exception {
-    ConsumerIterator iterator = flowRunner("emptyPagedOperation").run().getMessage().getPayload();
+    ConsumerIterator iterator = (ConsumerIterator) flowRunner("emptyPagedOperation").run().getMessage().getPayload().getValue();
     assertThat(iterator.hasNext(), is(false));
     assertThat(iterator.size(), is(0));
   }
@@ -64,13 +65,14 @@ public class PagedOperationExecutionTestCase extends ExtensionFunctionalTestCase
   @Test
   public void pagedOperationException() throws Exception {
     expectedException.expect(IllegalArgumentException.class);
-    ConsumerIterator iterator = flowRunner("failingPagedOperation").run().getMessage().getPayload();
+    ConsumerIterator iterator = (ConsumerIterator) flowRunner("failingPagedOperation").run().getMessage().getPayload().getValue();
     iterator.next();
   }
 
   @Test
   public void pagedOperationUsingConnection() throws Exception {
-    ConsumerIterator iterator = flowRunner("pagedOperationUsingConnection").run().getMessage().getPayload();
+    ConsumerIterator iterator =
+        (ConsumerIterator) flowRunner("pagedOperationUsingConnection").run().getMessage().getPayload().getValue();
     while (iterator.hasNext()) {
       assertThat(iterator.next().toString(), containsString(SAUL_NEW_NUMBER));
     }

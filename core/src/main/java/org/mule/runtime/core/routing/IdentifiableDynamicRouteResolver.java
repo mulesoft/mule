@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 /**
  * SPI for identifiable dynamic route resolvers
@@ -21,5 +21,5 @@ public interface IdentifiableDynamicRouteResolver extends DynamicRouteResolver {
    * @return an identifier of {@link org.mule.runtime.core.routing.DynamicRouteResolver}
    * @throws MessagingException
    */
-  String getRouteIdentifier(MuleEvent event) throws MessagingException;
+  String getRouteIdentifier(Event event) throws MessagingException;
 }

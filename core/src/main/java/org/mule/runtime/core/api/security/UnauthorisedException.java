@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.api.security;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authDeniedOnEndpoint;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>UnauthorisedException</code> is thrown if authentication fails
@@ -25,33 +25,33 @@ public class UnauthorisedException extends SecurityException {
    */
   private static final long serialVersionUID = -6664384216189042673L;
 
-  public UnauthorisedException(Message message) {
+  public UnauthorisedException(I18nMessage message) {
     super(message, getCurrentEvent());
   }
 
-  public UnauthorisedException(Message message, Throwable cause) {
+  public UnauthorisedException(I18nMessage message, Throwable cause) {
     super(message, getCurrentEvent(), cause);
   }
 
-  public UnauthorisedException(Message message, MuleEvent event) {
+  public UnauthorisedException(I18nMessage message, Event event) {
     super(message, event);
   }
 
-  public UnauthorisedException(Message message, MuleEvent event, Throwable cause) {
+  public UnauthorisedException(I18nMessage message, Event event, Throwable cause) {
     super(message, event, cause);
   }
 
-  public UnauthorisedException(MuleEvent event, SecurityContext context, SecurityFilter filter) {
+  public UnauthorisedException(Event event, SecurityContext context, SecurityFilter filter) {
     super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter), event);
   }
 
   @Deprecated
-  public UnauthorisedException(MuleEvent event, SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
+  public UnauthorisedException(Event event, SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
     super(constructMessage(context, originatingConnectorName, filter), event);
   }
 
-  private static Message constructMessage(SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
-    Message m;
+  private static I18nMessage constructMessage(SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
+    I18nMessage m;
     if (context == null) {
       m = authSetButNoContext(filter.getClass().getName());
     } else {

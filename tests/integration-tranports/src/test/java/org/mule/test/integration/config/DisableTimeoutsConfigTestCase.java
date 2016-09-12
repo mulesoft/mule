@@ -9,7 +9,7 @@ package org.mule.test.integration.config;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -37,7 +37,7 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase {
   @Test
   public void socketReadWriteResponseTimeout() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.send("vm://tcpTimeout", "hi", null).getRight();
-    assertEquals("hiho", message.getPayload());
+    InternalMessage message = client.send("vm://tcpTimeout", "hi", null).getRight();
+    assertEquals("hiho", message.getPayload().getValue());
   }
 }

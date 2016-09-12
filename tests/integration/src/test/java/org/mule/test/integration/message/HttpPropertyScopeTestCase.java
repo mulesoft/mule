@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
@@ -20,7 +20,7 @@ public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
     return "org/mule/test/message/http-property-scope.xml";
   }
 
-  protected MuleMessage sendRequest(MuleClient client, MuleMessage message) throws MuleException {
+  protected InternalMessage sendRequest(MuleClient client, InternalMessage message) throws MuleException {
     return client.send(format("http://localhost:%s/foo", port.getNumber()), message, newOptions().method(POST.name()).build())
         .getRight();
   }

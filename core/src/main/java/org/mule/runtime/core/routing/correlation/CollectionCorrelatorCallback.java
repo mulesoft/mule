@@ -9,9 +9,9 @@ package org.mule.runtime.core.routing.correlation;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -46,14 +46,14 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
    * @param events the event group for this request
    * @return an aggregated message
    * @throws org.mule.runtime.core.routing.AggregationException if the aggregation fails. in this scenario the whole event group
-   *         is removed and passed to the exception handler for this componenet
+   *         is removed and passed to the exception handler for this component
    */
   @Override
-  public MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
+  public Event aggregateEvents(EventGroup events) throws AggregationException {
     return events.getMessageCollectionEvent();
   }
 
-  protected MuleSession getMergedSession(MuleEvent[] events) {
+  protected MuleSession getMergedSession(Event[] events) {
     MuleSession session = new DefaultMuleSession(events[0].getSession());
     for (int i = 1; i < events.length; i++) {
       for (String name : events[i].getSession().getPropertyNamesAsSet()) {
@@ -64,11 +64,12 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
   }
 
   /**
-   * Creates a new EventGroup that will expect the number of events as returned by {@link Correlation#getGroupSize()}.
+   * Creates a new EventGroup that will expect the number of events as returned by {@link GroupCorrelation#getGroupSize()}.
    */
   @Override
-  public EventGroup createEventGroup(MuleEvent event, Object groupId) {
-    return new EventGroup(groupId, muleContext, event.getCorrelation() != null ? event.getCorrelation().getGroupSize() : empty(),
+  public EventGroup createEventGroup(Event event, Object groupId) {
+    return new EventGroup(groupId, muleContext,
+                          event.getGroupCorrelation() != null ? event.getGroupCorrelation().getGroupSize() : empty(),
                           storePrefix);
   }
 
@@ -80,14 +81,15 @@ public class CollectionCorrelatorCallback implements EventCorrelatorCallback {
   public boolean shouldAggregateEvents(EventGroup events) {
 
     if (!events.expectedSize().isPresent()) {
-      logger.warn("Correlation Group Size not set, but correlation aggregator is being used."
+      logger.warn("GroupCorrelation Group Size not set, but correlation aggregator is being used."
           + " Message is being forwarded as is");
       return true;
     }
 
     Integer size = events.expectedSize().get();
     if (logger.isDebugEnabled()) {
-      logger.debug(MessageFormat.format("Correlation group size is {0}. Current event group size is {1} for group ID: {2}", size,
+      logger.debug(MessageFormat.format("GroupCorrelation group size is {0}. Current event group size is {1} for group ID: {2}",
+                                        size,
                                         events.size(), events.getGroupId()));
     }
 

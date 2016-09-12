@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.el.datetime.DateTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -67,11 +67,11 @@ public abstract class AbstractObjectSerializerContractTestCase extends AbstractM
     DateTime dateTime = new DateTime(calendar, locale);
     dateTime.changeTimeZone("Pacific/Midway");
 
-    MuleEvent event = getTestEvent(dateTime);
+    Event event = getTestEvent(dateTime);
     byte[] bytes = serializer.serialize(event.getMessage());
 
-    MuleMessage message = serializer.deserialize(bytes);
-    DateTime deserealized = (DateTime) message.getPayload();
+    InternalMessage message = serializer.deserialize(bytes);
+    DateTime deserealized = (DateTime) message.getPayload().getValue();
 
     assertEquals(calendar, deserealized.toCalendar());
     assertEquals(dateTime.format(), deserealized.format());

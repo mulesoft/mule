@@ -15,7 +15,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -42,25 +42,27 @@ public class CxfDataTypeTestCase extends FunctionalTestCase {
 
   @Test
   public void testCxfService() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-    MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
-                                                        newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
+    InternalMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
+                                                            newOptions().method(POST.name()).disableStatusCodeValidation()
+                                                                .build())
         .getRight();
     Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
   }
 
   @Test
   public void testCxfClient() throws Exception {
-    MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
+    InternalMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
     Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
   }
 
   @Test
   public void testCxfProxy() throws Exception {
-    MuleMessage request = MuleMessage.builder().payload(requestPayload).build();
-    MuleMessage received = muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request,
-                                                        newOptions().method(POST.name()).disableStatusCodeValidation().build())
-        .getRight();
+    InternalMessage request = InternalMessage.builder().payload(requestPayload).build();
+    InternalMessage received =
+        muleContext.getClient().send("http://localhost:" + dynamicPort.getNumber() + "/hello-proxy", request,
+                                     newOptions().method(POST.name()).disableStatusCodeValidation().build())
+            .getRight();
     Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
   }
 
@@ -68,16 +70,16 @@ public class CxfDataTypeTestCase extends FunctionalTestCase {
   public void testCxfSimpleService() throws Exception {
     MuleClient client = muleContext.getClient();
     InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-    MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo",
-                                     MuleMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(),
-                                     newOptions().method(POST.name()).disableStatusCodeValidation().build())
+    InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/echo",
+                                         InternalMessage.builder().payload(xml).mediaType(APP_SOAP_XML).build(),
+                                         newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
     Assert.assertThat(getPayloadAsString(result), not(containsString("Fault")));
   }
 
   @Test
   public void testCxfSimpleClient() throws Exception {
-    MuleMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
+    InternalMessage received = flowRunner("helloServiceClient").withPayload("hello").run().getMessage();
     Assert.assertThat(getPayloadAsString(received), not(containsString("Fault")));
   }
 
@@ -105,10 +107,10 @@ public class CxfDataTypeTestCase extends FunctionalTestCase {
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      if (!eventContext.getMessage().getDataType().getMediaType().matches(mimeType)) {
+      if (!eventContext.getMessage().getPayload().getDataType().getMediaType().matches(mimeType)) {
         throw new RuntimeException();
       }
-      return eventContext.getMessage().getPayload();
+      return eventContext.getMessage().getPayload().getValue();
     }
   }
 

@@ -14,9 +14,9 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import org.junit.Test;
@@ -30,10 +30,10 @@ public class SetFlowVariableDataTypeTestCase extends AbstractIntegrationTestCase
 
   @Test
   public void setsPropertyDataType() throws Exception {
-    final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
+    final Event muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
-    MuleMessage response = muleEvent.getMessage();
-    DataType dataType = (DataType) response.getPayload();
+    InternalMessage response = muleEvent.getMessage();
+    DataType dataType = (DataType) response.getPayload().getValue();
     assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
   }
 
@@ -41,7 +41,7 @@ public class SetFlowVariableDataTypeTestCase extends AbstractIntegrationTestCase
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      return eventContext.getEvent().getFlowVariableDataType("testVariable");
+      return eventContext.getEvent().getVariableDataType("testVariable");
     }
   }
 }

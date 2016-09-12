@@ -7,15 +7,16 @@
 package org.mule.runtime.core.api.lifecycle;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -115,8 +116,9 @@ public class LifecycleUtils {
       try {
         muleContext.getInjector().inject(object);
       } catch (MuleException e) {
-        Message message = createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
-                                                     object.getClass().getName()));
+        I18nMessage message =
+            createStaticMessage(format("Found exception trying to inject object of type '%s' on initialising phase",
+                                       object.getClass().getName()));
         if (object instanceof Initialisable) {
           throw new InitialisationException(message, e, (Initialisable) object);
         }

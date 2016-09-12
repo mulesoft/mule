@@ -9,7 +9,7 @@ package org.mule.test.integration.resolvers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Test;
 
@@ -26,9 +26,9 @@ public class MethodEntryPointWithTransformerTestCase extends AbstractIntegration
    */
   @Test
   public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception {
-    MuleMessage response = flowRunner("testService").withPayload("payload").run().getMessage();
+    InternalMessage response = flowRunner("testService").withPayload("payload").run().getMessage();
     assertNotNull(response);
-    assertNotNull(response.getPayload());
+    assertNotNull(response.getPayload().getValue());
     assertEquals("Transformed payload", getPayloadAsString(response));
   }
 }

@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.module.xml.el;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageFunction;
@@ -149,15 +149,15 @@ public class XPath3Function implements ExpressionLanguageFunction {
     final MessageContext ctx = context.getVariable("message");
     final String xpathExpression = getXpathExpression(params);
     final XPathReturnType returnType = getReturnType(params);
-    final MuleEvent event = getMuleEvent(context);
+    final Event event = getMuleEvent(context);
     final Object input = getInput(params, event);
 
     try {
       Node node = toDOMNode(input, event);
       Object result = xpathEvaluatorSupplier.get().evaluate(xpathExpression, node, returnType, event);
 
-      MuleMessage message = event.getMessage();
-      if (input == message.getPayload() && message.getDataType().isStreamType()) {
+      InternalMessage message = event.getMessage();
+      if (input == message.getPayload().getValue() && message.getPayload().getDataType().isStreamType()) {
         ctx.setPayload(node);
       }
 
@@ -167,8 +167,8 @@ public class XPath3Function implements ExpressionLanguageFunction {
     }
   }
 
-  private MuleEvent getMuleEvent(ExpressionLanguageContext context) {
-    MuleEvent event = context.getVariable(MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE);
+  private Event getMuleEvent(ExpressionLanguageContext context) {
+    Event event = context.getVariable(MVELExpressionLanguageContext.MULE_EVENT_INTERNAL_VARIABLE);
     if (event == null) {
       event = getCurrentEvent();
     }
@@ -177,7 +177,7 @@ public class XPath3Function implements ExpressionLanguageFunction {
     return event;
   }
 
-  private Node toDOMNode(Object input, MuleEvent event) throws Exception {
+  private Node toDOMNode(Object input, Event event) throws Exception {
     if (input == null) {
       throw new IllegalArgumentException("Can't evaluate an XPath expression over a null input");
     }
@@ -198,12 +198,12 @@ public class XPath3Function implements ExpressionLanguageFunction {
     return node;
   }
 
-  private Object getInput(Object[] params, MuleEvent event) {
+  private Object getInput(Object[] params, Event event) {
     if (params.length >= 2) {
       return params[1];
     }
 
-    return event.getMessage().getPayload();
+    return event.getMessage().getPayload().getValue();
   }
 
   private void validateParams(Object[] params) {

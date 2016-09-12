@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http;
 
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.extension.api.annotation.Expression;
 
@@ -29,7 +29,7 @@ public class CookieWrapper extends NameValuePair {
   private String secure;
   private String version;
 
-  public void parse(MuleEvent event, ExpressionLanguage expressionLanguage) {
+  public void parse(Event event, ExpressionLanguage expressionLanguage) {
     setName(parse(getName(), event, expressionLanguage));
     setValue(parse(getValue(), event, expressionLanguage));
     this.domain = parse(domain, event, expressionLanguage);
@@ -42,14 +42,14 @@ public class CookieWrapper extends NameValuePair {
     this.version = parse(version, event, expressionLanguage);
   }
 
-  private String parse(String value, MuleEvent event, ExpressionLanguage expressionLanguage) {
+  private String parse(String value, Event event, ExpressionLanguage expressionLanguage) {
     if (value != null) {
       return expressionLanguage.parse(value, event, null);
     }
     return value;
   }
 
-  private Object evaluateDate(Object date, MuleEvent event, ExpressionLanguage expressionLanguage) {
+  private Object evaluateDate(Object date, Event event, ExpressionLanguage expressionLanguage) {
 
     if (date != null && date instanceof String && expressionLanguage.isExpression(date.toString())) {
       return expressionLanguage.evaluate(date.toString(), event, null);

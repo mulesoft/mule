@@ -11,8 +11,8 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Test;
 
@@ -25,10 +25,10 @@ public class DynamicSubFlowTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testCofiguration() throws Exception {
-    final MuleEvent muleEvent = flowRunner("ApplicationFlow").withPayload("").run();
-    MuleMessage result = muleEvent.getMessage();
+    final Event muleEvent = flowRunner("ApplicationFlow").withPayload("").run();
+    InternalMessage result = muleEvent.getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(muleEvent.getError().isPresent(), is(false));
-    assertThat(result.getPayload(), is(notNullValue()));
+    assertThat(result.getPayload().getValue(), is(notNullValue()));
   }
 }

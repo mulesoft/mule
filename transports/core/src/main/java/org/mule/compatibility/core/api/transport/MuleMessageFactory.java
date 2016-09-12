@@ -6,14 +6,14 @@
  */
 package org.mule.compatibility.core.api.transport;
 
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.nio.charset.Charset;
 
 /**
- * <code>MuleMessageFactory</code> is a factory for creating a {@link MuleMessage} from a transport's native message format (e.g.
- * JMS message).
+ * <code>MuleMessageFactory</code> is a factory for creating a {@link Message} from a transport's native message format (e.g. JMS
+ * message).
  * 
  * @deprecated Transport infrastructure is deprecated.
  */
@@ -21,14 +21,14 @@ import java.nio.charset.Charset;
 public interface MuleMessageFactory {
 
   /**
-   * Creates a {@link MuleMessage} instance from <code>transportMessage</code> by extracting its payload and, if available, any
+   * Creates a {@link Message} instance from <code>transportMessage</code> by extracting its payload and, if available, any
    * relevant message properties and attachments.
    */
-  MuleCompatibilityMessage create(Object transportMessage, Charset encoding) throws Exception;
+  CompatibilityMessage create(Object transportMessage, Charset encoding) throws Exception;
 
   /**
-   * Creates a {@link MuleMessage} instance by extracting the payload from <code>transportMessage</code>. Additional message
+   * Creates a {@link Message} instance by extracting the payload from <code>transportMessage</code>. Additional message
    * properties will be taken from <code>previousMessage</code>.
    */
-  MuleCompatibilityMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding) throws Exception;
+  CompatibilityMessage create(Object transportMessage, InternalMessage previousMessage, Charset encoding) throws Exception;
 }

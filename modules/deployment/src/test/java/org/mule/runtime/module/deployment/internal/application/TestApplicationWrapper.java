@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.module.deployment.api.DeploymentException;
 import org.mule.runtime.module.deployment.api.DeploymentStopException;
 import org.mule.runtime.module.deployment.api.application.Application;
@@ -29,7 +29,7 @@ public class TestApplicationWrapper extends ApplicationWrapper {
   @Override
   public void dispose() {
     if (failOnDisposeApplication) {
-      throw new DeploymentException(MessageFactory.createStaticMessage("Error disposing application"));
+      throw new DeploymentException(I18nMessageFactory.createStaticMessage("Error disposing application"));
     }
 
     getDelegate().dispose();
@@ -38,7 +38,7 @@ public class TestApplicationWrapper extends ApplicationWrapper {
   @Override
   public void stop() {
     if (failOnStopApplication) {
-      throw new DeploymentStopException(MessageFactory.createStaticMessage("Error stopping application"));
+      throw new DeploymentStopException(I18nMessageFactory.createStaticMessage("Error stopping application"));
     }
 
     getDelegate().stop();

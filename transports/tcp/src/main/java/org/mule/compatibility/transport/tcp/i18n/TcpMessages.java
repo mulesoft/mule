@@ -8,38 +8,38 @@ package org.mule.compatibility.transport.tcp.i18n;
 
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.compatibility.transport.tcp.TcpPropertyHelper;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
 import java.net.URI;
 
-public class TcpMessages extends MessageFactory {
+public class TcpMessages extends I18nMessageFactory {
 
   private static final TcpMessages factory = new TcpMessages();
 
   private static final String BUNDLE_PATH = getBundlePath(TcpConnector.TCP);
 
-  public static Message failedToBindToUri(URI uri) {
+  public static I18nMessage failedToBindToUri(URI uri) {
     return factory.createMessage(BUNDLE_PATH, 1, uri);
   }
 
-  public static Message failedToCloseSocket() {
+  public static I18nMessage failedToCloseSocket() {
     return factory.createMessage(BUNDLE_PATH, 2);
   }
 
-  public static Message failedToInitMessageReader() {
+  public static I18nMessage failedToInitMessageReader() {
     return factory.createMessage(BUNDLE_PATH, 3);
   }
 
-  public static Message invalidStreamingOutputType(Class c) {
+  public static I18nMessage invalidStreamingOutputType(Class c) {
     return factory.createMessage(BUNDLE_PATH, 4, c.getName());
   }
 
-  public static Message pollingReceiverCannotbeUsed() {
+  public static I18nMessage pollingReceiverCannotbeUsed() {
     return factory.createMessage(BUNDLE_PATH, 5);
   }
 
-  public static Message localhostBoundToAllLocalInterfaces() {
+  public static I18nMessage localhostBoundToAllLocalInterfaces() {
     return factory.createMessage(BUNDLE_PATH, 6, TcpPropertyHelper.MULE_TCP_BIND_LOCALHOST_TO_ALL_LOCAL_INTERFACES_PROPERTY);
   }
 }

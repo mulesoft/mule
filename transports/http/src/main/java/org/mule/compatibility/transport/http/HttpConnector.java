@@ -19,12 +19,12 @@ import org.mule.compatibility.transport.http.i18n.HttpMessages;
 import org.mule.compatibility.transport.http.ntlm.NTLMScheme;
 import org.mule.compatibility.transport.tcp.TcpConnector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.BooleanUtils;
 import org.mule.runtime.core.util.MapUtils;
@@ -313,7 +313,7 @@ public class HttpConnector extends TcpConnector {
   }
 
   @Override
-  public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct)
+  public void registerListener(InboundEndpoint endpoint, Processor listener, FlowConstruct flowConstruct)
       throws Exception {
     if (endpoint != null) {
       Map endpointProperties = endpoint.getProperties();
@@ -451,7 +451,7 @@ public class HttpConnector extends TcpConnector {
     return client;
   }
 
-  protected void setupClientAuthorization(MuleEvent event, HttpMethod httpMethod, HttpClient client, ImmutableEndpoint endpoint)
+  protected void setupClientAuthorization(Event event, HttpMethod httpMethod, HttpClient client, ImmutableEndpoint endpoint)
       throws UnsupportedEncodingException {
     httpMethod.setDoAuthentication(true);
     client.getParams().setAuthenticationPreemptive(true);
@@ -645,7 +645,7 @@ public class HttpConnector extends TcpConnector {
   }
 
   @Override
-  public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
+  public Processor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException {
     if (singleDispatcherPerEndpoint) {
       // Avoid lazy initialization of dispatcher in borrow method which would be less performant by
       // creating the dispatcher instance when DispatcherMessageProcessor is created.

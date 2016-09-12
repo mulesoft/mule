@@ -8,8 +8,8 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
@@ -29,7 +29,7 @@ import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RouterStatisticsRecorder;
 import org.mule.runtime.core.api.routing.SelectiveRouter;
 import org.mule.runtime.core.api.routing.filter.Filter;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.util.NotificationUtils;
 
@@ -45,7 +45,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
     RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer {
 
   private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<>();
-  private MessageProcessor defaultProcessor;
+  private Processor defaultProcessor;
   private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   private RouterStatistics routerStatistics;
 
@@ -127,7 +127,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void addRoute(MessageProcessor processor, Filter filter) {
+  public void addRoute(Processor processor, Filter filter) {
     synchronized (conditionalMessageProcessors) {
       MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
       conditionalMessageProcessors.add(transitionLifecycleManagedObjectForAddition(addedPair));
@@ -135,7 +135,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void removeRoute(MessageProcessor processor) {
+  public void removeRoute(Processor processor) {
     updateRoute(processor, (RoutesUpdater) index -> {
       MessageProcessorFilterPair removedPair = conditionalMessageProcessors.remove(index);
 
@@ -144,7 +144,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void updateRoute(final MessageProcessor processor, final Filter filter) {
+  public void updateRoute(final Processor processor, final Filter filter) {
     updateRoute(processor, (RoutesUpdater) index -> {
       MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
 
@@ -156,14 +156,14 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   }
 
   @Override
-  public void setDefaultRoute(MessageProcessor processor) {
+  public void setDefaultRoute(Processor processor) {
     defaultProcessor = processor;
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    Builder builder = MuleEvent.builder(event);
-    Collection<MessageProcessor> selectedProcessors = selectProcessors(event, builder);
+  public Event process(Event event) throws MuleException {
+    Builder builder = Event.builder(event);
+    Collection<Processor> selectedProcessors = selectProcessors(event, builder);
 
     if (!selectedProcessors.isEmpty()) {
       return routeWithProcessors(selectedProcessors, builder.build());
@@ -177,7 +177,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
       getRouterStatistics().incrementNoRoutedMessage();
     }
 
-    throw new RoutePathNotFoundException(MessageFactory
+    throw new RoutePathNotFoundException(I18nMessageFactory
         .createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
                                          this);
   }
@@ -185,7 +185,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   /**
    * @return the processors selected according to the specific router strategy or an empty collection (not null).
    */
-  protected abstract Collection<MessageProcessor> selectProcessors(MuleEvent event, MuleEvent.Builder builder);
+  protected abstract Collection<Processor> selectProcessors(Event event, Event.Builder builder);
 
   private Collection<?> getLifecycleManagedObjects() {
     if (defaultProcessor == null) {
@@ -235,21 +235,21 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
     return managedObject;
   }
 
-  private MuleEvent routeWithProcessor(MessageProcessor processor, MuleEvent event) throws MuleException {
+  private Event routeWithProcessor(Processor processor, Event event) throws MuleException {
     return routeWithProcessors(Collections.singleton(processor), event);
   }
 
-  private MuleEvent routeWithProcessors(Collection<MessageProcessor> processors, MuleEvent event) throws MuleException {
-    List<MuleEvent> results = new ArrayList<>();
+  private Event routeWithProcessors(Collection<Processor> processors, Event event) throws MuleException {
+    List<Event> results = new ArrayList<>();
 
-    for (MessageProcessor processor : processors) {
+    for (Processor processor : processors) {
       processEventWithProcessor(event, processor, results);
     }
 
     return resultsHandler.aggregateResults(results, event);
   }
 
-  private void processEventWithProcessor(MuleEvent event, MessageProcessor processor, List<MuleEvent> results)
+  private void processEventWithProcessor(Event event, Processor processor, List<Event> results)
       throws MuleException {
     results.add(processor.process(event));
 
@@ -267,7 +267,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
     void updateAt(int index);
   }
 
-  private void updateRoute(MessageProcessor processor, RoutesUpdater routesUpdater) {
+  private void updateRoute(Processor processor, RoutesUpdater routesUpdater) {
     synchronized (conditionalMessageProcessors) {
       for (int i = 0; i < conditionalMessageProcessors.size(); i++) {
         if (conditionalMessageProcessors.get(i).getMessageProcessor().equals(processor)) {
@@ -288,7 +288,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    List<MessageProcessor> messageProcessors = new ArrayList<>();
+    List<Processor> messageProcessors = new ArrayList<>();
     for (MessageProcessorFilterPair cmp : conditionalMessageProcessors) {
       messageProcessors.add(cmp.getMessageProcessor());
     }

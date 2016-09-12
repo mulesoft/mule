@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 public class ReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 
   @Override
-  protected boolean shouldProcessEvent(MuleEvent event) {
+  protected boolean shouldProcessEvent(Event event) {
     return event.getExchangePattern().hasResponse();
   }
 

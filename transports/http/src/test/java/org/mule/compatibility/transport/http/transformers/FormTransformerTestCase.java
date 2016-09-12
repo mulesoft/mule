@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -32,7 +32,7 @@ public class FormTransformerTestCase extends AbstractMuleContextEndpointTestCase
 
   @Test
   public void testFormTransformer() throws TransformerException {
-    MuleMessage msg = MuleMessage.builder().payload("test1=value1&test2=value2&test3").build();
+    InternalMessage msg = InternalMessage.builder().payload("test1=value1&test2=value2&test3").build();
     Object result = transformer.transform(msg);
     assertTrue(result instanceof Map);
 
@@ -44,7 +44,7 @@ public class FormTransformerTestCase extends AbstractMuleContextEndpointTestCase
 
   @Test
   public void testMultipleValues() throws TransformerException {
-    MuleMessage msg = MuleMessage.builder().payload("test1=value1&test1=value2").build();
+    InternalMessage msg = InternalMessage.builder().payload("test1=value1&test1=value2").build();
     Object result = transformer.transform(msg);
     assertTrue(result instanceof Map);
 

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.tck.testmodels.mule.TestTransaction;
@@ -19,7 +19,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessRequestResponse() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
 
     assertSync(messageProcessor, event);
   }
@@ -27,7 +27,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -41,7 +41,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    MuleEvent event = getTestEvent(TEST_MESSAGE);
+    Event event = getTestEvent(TEST_MESSAGE);
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -53,7 +53,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   }
 
   @Override
-  protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
+  protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(Processor listener)
       throws Exception {
     LaxAsyncInterceptingMessageProcessor mp = new LaxAsyncInterceptingMessageProcessor(new TestWorkManagerSource());
     mp.setMuleContext(muleContext);

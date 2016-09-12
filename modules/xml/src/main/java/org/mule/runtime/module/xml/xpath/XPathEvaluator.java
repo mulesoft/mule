@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.xml.xpath;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.xml.util.NamespaceManager;
 
 import java.util.Map;
@@ -18,7 +18,7 @@ import org.w3c.dom.Node;
  * 3.0 (everything except features which require schema awareness and high order functions).
  * <p/>
  * All implementations are require to support the ability to pass parameters into the query. For that reason, all the evaluation
- * methods will require the current {@link MuleEvent} to be passed on, in order to resolve those parameters against the flow
+ * methods will require the current {@link Event} to be passed on, in order to resolve those parameters against the flow
  * variables.
  * <p/>
  * All implementations are required to be thread-safe
@@ -34,10 +34,10 @@ public interface XPathEvaluator {
    *
    * @param xpathExpression the xpathExpression to be evaluated
    * @param input a {@link Node}
-   * @param event the current {@link MuleEvent}.
+   * @param event the current {@link Event}.
    * @return the result of the evaluation as a String
    */
-  String evaluate(String xpathExpression, Node input, MuleEvent event);
+  String evaluate(String xpathExpression, Node input, Event event);
 
   /**
    * Evaluates the {@code xpathExpression} over the {@code input} and returns the evaluation as a type in concordance with
@@ -48,10 +48,10 @@ public interface XPathEvaluator {
    * @param xpathExpression the xpathExpression to be evaluated
    * @param input a {@link Node}
    * @param returnType a {@link XPathReturnType} that will be used to decide the return type of the evaluation
-   * @param event the current {@link MuleEvent}.
+   * @param event the current {@link Event}.
    * @return the result of the evaluation in concordance with {@code returnType}
    */
-  Object evaluate(String xpathExpression, Node input, XPathReturnType returnType, MuleEvent event);
+  Object evaluate(String xpathExpression, Node input, XPathReturnType returnType, Event event);
 
   /**
    * Registers the given namespaces so that they can be recognized during evaluation

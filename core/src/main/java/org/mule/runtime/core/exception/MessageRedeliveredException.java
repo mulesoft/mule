@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.exception;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 public class MessageRedeliveredException extends MessagingException {
 
@@ -22,24 +22,25 @@ public class MessageRedeliveredException extends MessagingException {
   int redeliveryCount;
   int maxRedelivery;
 
-  protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event,
-                                        Message message) {
+  protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, Event event,
+                                        I18nMessage message) {
     super(message, event);
     this.messageId = messageId;
     this.redeliveryCount = redeliveryCount;
     this.maxRedelivery = maxRedelivery;
   }
 
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event, Message message,
-                                     MessageProcessor failingMessageProcessor) {
+  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, Event event,
+                                     I18nMessage message,
+                                     Processor failingMessageProcessor) {
     super(message, event, failingMessageProcessor);
     this.messageId = messageId;
     this.redeliveryCount = redeliveryCount;
     this.maxRedelivery = maxRedelivery;
   }
 
-  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, MuleEvent event,
-                                     MessageProcessor failingMessageProcessor) {
+  public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, Event event,
+                                     Processor failingMessageProcessor) {
     this(messageId, redeliveryCount, maxRedelivery, event,
          CoreMessages.createStaticMessage("Maximum redelivery attempts reached"), failingMessageProcessor);
   }

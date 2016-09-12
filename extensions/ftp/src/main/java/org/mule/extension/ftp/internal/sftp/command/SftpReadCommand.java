@@ -12,7 +12,7 @@ import org.mule.extension.ftp.internal.sftp.SftpInputStream;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -43,7 +43,7 @@ public final class SftpReadCommand extends SftpCommand implements ReadCommand {
    * {@inheritDoc}
    */
   @Override
-  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
                                                            boolean lock) {
     FtpFileAttributes attributes = getExistingFile(config, filePath);
     if (attributes.isDirectory()) {
@@ -62,7 +62,7 @@ public final class SftpReadCommand extends SftpCommand implements ReadCommand {
 
     try {
       InputStream payload = SftpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
-      MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
+      MediaType mediaType = fileSystem.getFileMessageMediaType(message.getPayload().getDataType().getMediaType(), attributes);
       return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes)
           .build();
     } catch (ConnectionException e) {

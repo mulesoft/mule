@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.cxf.support;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
@@ -31,6 +31,7 @@ public class MuleSecurityManagerValidator implements Validator {
 
   private org.mule.runtime.core.api.security.SecurityManager securityManager;
 
+  @Override
   public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
     if (credential == null || credential.getUsernametoken() == null) {
       throw new WSSecurityException(WSSecurityException.FAILURE, "noCredential");

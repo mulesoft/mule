@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.tcp.issues;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.compatibility.transport.tcp.TcpPropertyHelper;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -36,7 +36,7 @@ public class TcpSocketToAddressLegacyBindingTestCase extends AbstractTcpSocketTo
   @Test
   public void testRequestNotUsingLoopbackAddressAtLocalhost() throws Exception {
     MuleClient client = muleContext.getClient();
-    MuleMessage result;
+    InternalMessage result;
 
     // Iterate over local addresses.
     for (InetAddress inetAddress : localInetAddresses) {

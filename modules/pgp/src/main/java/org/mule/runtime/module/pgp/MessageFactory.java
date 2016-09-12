@@ -9,7 +9,7 @@ package org.mule.runtime.module.pgp;
 
 public class MessageFactory {
 
-  public static Message getMessage(byte[] raw) {
+  public static PgpMessage getMessage(byte[] raw) {
     return new LiteralMessage(raw);
   }
 

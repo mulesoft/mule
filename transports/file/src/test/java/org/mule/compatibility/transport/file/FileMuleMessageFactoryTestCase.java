@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.File;
 
@@ -37,7 +37,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
   public void testMessageProperties() throws Exception {
     MuleMessageFactory factory = createMuleMessageFactory();
 
-    MuleMessage message = factory.create(getValidTransportMessage(), encoding);
+    InternalMessage message = factory.create(getValidTransportMessage(), encoding);
     assertNotNull(message);
     assertMessageProperties(message);
   }
@@ -47,7 +47,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     MuleMessageFactory factory = createMuleMessageFactory();
 
     ReceiverFileInputStream stream = new ReceiverFileInputStream(tempFile, false, null);
-    MuleMessage message = factory.create(stream, encoding);
+    InternalMessage message = factory.create(stream, encoding);
     assertNotNull(message);
     assertMessageProperties(message);
   }
@@ -58,7 +58,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     File moveTo = tempFolder.newFile("moveTo.tmp");
     moveTo.deleteOnExit();
     ReceiverFileInputStream mockStream = new ReceiverFileInputStream(tempFile, false, moveTo);
-    MuleMessage message = factory.create(mockStream, encoding);
+    InternalMessage message = factory.create(mockStream, encoding);
     assertNotNull(message);
 
     assertTrue(tempFile.exists());
@@ -76,12 +76,12 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     file.deleteOnExit();
     ReceiverFileInputStream mockStream = new ReceiverFileInputStream(file, false, null);
 
-    MuleMessage message = factory.create(mockStream, encoding);
-    assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
-    assertThat(message.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
+    InternalMessage message = factory.create(mockStream, encoding);
+    assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+    assertThat(message.getPayload().getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
   }
 
-  private void assertMessageProperties(MuleMessage message) {
+  private void assertMessageProperties(InternalMessage message) {
     assertEquals(tempFile.getName(), message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
     assertEquals(tempFile.getParent(), message.getInboundProperty(FileConnector.PROPERTY_DIRECTORY));
     assertThat(message.getInboundProperty(FileConnector.PROPERTY_FILE_SIZE), is(0l));

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf.config;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -30,18 +30,18 @@ public class FlowConfiguringMessageProcessor
     implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor, MessageProcessorContainer, NonBlockingSupported {
 
   private MessageProcessorBuilder builder;
-  private MessageProcessor messageProcessor;
-  private MessageProcessor listener;
+  private Processor messageProcessor;
+  private Processor listener;
 
   public FlowConfiguringMessageProcessor(MessageProcessorBuilder builder) {
     this.builder = builder;
   }
 
-  public void setListener(MessageProcessor listener) {
+  public void setListener(Processor listener) {
     this.listener = listener;
   }
 
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return messageProcessor.process(event);
   }
 
@@ -92,7 +92,7 @@ public class FlowConfiguringMessageProcessor
   /**
    * The MessageProcessor that this class built.
    */
-  public MessageProcessor getWrappedMessageProcessor() {
+  public Processor getWrappedMessageProcessor() {
     return messageProcessor;
   }
 

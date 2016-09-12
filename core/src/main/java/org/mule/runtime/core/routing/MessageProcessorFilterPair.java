@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 /**
@@ -28,17 +28,17 @@ import org.mule.runtime.core.api.routing.filter.Filter;
  */
 public class MessageProcessorFilterPair implements FlowConstructAware, MuleContextAware, Lifecycle {
 
-  private final MessageProcessor messageProcessor;
+  private final Processor messageProcessor;
   private final Filter filter;
 
-  public MessageProcessorFilterPair(MessageProcessor messageProcessor, Filter filter) {
+  public MessageProcessorFilterPair(Processor messageProcessor, Filter filter) {
     Validate.notNull(messageProcessor, "messageProcessor can't be null");
     Validate.notNull(filter, "filter can't be null");
     this.messageProcessor = messageProcessor;
     this.filter = filter;
   }
 
-  public MessageProcessor getMessageProcessor() {
+  public Processor getMessageProcessor() {
     return messageProcessor;
   }
 

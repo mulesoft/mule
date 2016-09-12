@@ -11,8 +11,8 @@ import static org.mule.compatibility.core.endpoint.AbstractEndpoint.TIMEOUT_WAIT
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
@@ -36,7 +36,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected synchronized void doDispatch(MuleEvent event) throws Exception {
+  protected synchronized void doDispatch(Event event) throws Exception {
     Socket socket = connector.getSocket(endpoint);
     try {
       dispatchToSocket(socket, event);
@@ -45,7 +45,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
     }
   }
 
-  private void doDispatchToSocket(Socket socket, MuleEvent event) throws Exception {
+  private void doDispatchToSocket(Socket socket, Event event) throws Exception {
     try {
       dispatchToSocket(socket, event);
     } catch (Exception e) {
@@ -55,7 +55,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected synchronized MuleMessage doSend(MuleEvent event) throws Exception {
+  protected synchronized InternalMessage doSend(Event event) throws Exception {
     Socket socket = connector.getSocket(endpoint);
     doDispatchToSocket(socket, event);
     try {
@@ -63,21 +63,21 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
         try {
           Object result = receiveFromSocket(socket, getTimeout(), endpoint);
           if (result == null) {
-            return MuleMessage.builder().nullPayload().build();
+            return InternalMessage.builder().nullPayload().build();
           }
 
-          if (result instanceof MuleMessage) {
-            return (MuleMessage) result;
+          if (result instanceof InternalMessage) {
+            return (InternalMessage) result;
           }
 
           return createMuleMessage(result, endpoint.getEncoding());
         } catch (SocketTimeoutException e) {
           // we don't necessarily expect to receive a response here
           logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: " + endpoint.getEndpointURI());
-          return MuleMessage.builder().nullPayload().build();
+          return InternalMessage.builder().nullPayload().build();
         }
       } else {
-        return MuleMessage.builder().nullPayload().build();
+        return InternalMessage.builder().nullPayload().build();
       }
     } finally {
       if (!returnResponse(event)) {
@@ -96,8 +96,8 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   // Socket management (get and release) is handled outside this method
-  private void dispatchToSocket(Socket socket, MuleEvent event) throws Exception {
-    Object payload = event.getMessage().getPayload();
+  private void dispatchToSocket(Socket socket, Event event) throws Exception {
+    Object payload = event.getMessage().getPayload().getValue();
     write(socket, payload);
   }
 

@@ -9,8 +9,8 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -52,7 +52,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
   static class RootIDGatherer extends AbstractMessageTransformer {
 
     static int messageCount;
-    static Map<String, MuleMessage> idMap;
+    static Map<String, InternalMessage> idMap;
     static int counter;
 
 
@@ -61,7 +61,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
       messageCount = 0;
     }
 
-    public static synchronized void process(MuleMessage msg) {
+    public static synchronized void process(InternalMessage msg) {
       messageCount++;
       String where = msg.<String>getOutboundProperty("where");
       if (where == null) {
@@ -71,12 +71,12 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
     }
 
     @Override
-    public Object transformMessage(MuleEvent event, Charset outputEncoding) {
+    public Object transformMessage(Event event, Charset outputEncoding) {
       process(event.getMessage());
-      return event.getMessage().getPayload();
+      return event.getMessage().getPayload().getValue();
     }
 
-    public static Set<MuleMessage> getIds() {
+    public static Set<InternalMessage> getIds() {
       return new HashSet<>(idMap.values());
     }
 
@@ -84,7 +84,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
       return messageCount;
     }
 
-    public static Map<String, MuleMessage> getIdMap() {
+    public static Map<String, InternalMessage> getIdMap() {
       return idMap;
     }
   }

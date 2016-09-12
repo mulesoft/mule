@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.expression;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * If thrown by the {@link org.mule.runtime.core.expression.DefaultExpressionManager} if an expression returns null and failIfNull
@@ -18,7 +18,7 @@ public class ExpressionRuntimeException extends MuleRuntimeException {
   /**
    * @param message the exception message
    */
-  public ExpressionRuntimeException(Message message) {
+  public ExpressionRuntimeException(I18nMessage message) {
     super(message);
   }
 
@@ -26,7 +26,7 @@ public class ExpressionRuntimeException extends MuleRuntimeException {
    * @param message the exception message
    * @param cause the exception that triggered this exception
    */
-  public ExpressionRuntimeException(Message message, Throwable cause) {
+  public ExpressionRuntimeException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

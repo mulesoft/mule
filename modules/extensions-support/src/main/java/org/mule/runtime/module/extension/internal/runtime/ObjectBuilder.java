@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
@@ -24,8 +24,8 @@ import java.lang.reflect.Field;
  * <li>It must have a standard setter for each property that this builder will be populating</li>
  * </ul>
  * <p/>
- * Instances of this class are to be considered thread safe and reusable since the {@link #build(MuleEvent)} method can be invoked
- * several times on the same instance. Each time {@link #build(MuleEvent)} is invoked, the resolvers will be re evaluated with the
+ * Instances of this class are to be considered thread safe and reusable since the {@link #build(Event)} method can be invoked
+ * several times on the same instance. Each time {@link #build(Event)} is invoked, the resolvers will be re evaluated with the
  * given event.
  *
  * @since 3.7.0
@@ -50,12 +50,12 @@ public interface ObjectBuilder<T> {
   boolean isDynamic();
 
   /**
-   * Returns a new instance of the specified class. The given {@link MuleEvent} will be used to obtain a value from each
-   * registered {@link ValueResolver}
+   * Returns a new instance of the specified class. The given {@link Event} will be used to obtain a value from each registered
+   * {@link ValueResolver}
    *
-   * @param event a {@link MuleEvent}
+   * @param event a {@link Event}
    * @return a new instance
    * @throws {@link MuleException}
    */
-  T build(MuleEvent event) throws MuleException;
+  T build(Event event) throws MuleException;
 }

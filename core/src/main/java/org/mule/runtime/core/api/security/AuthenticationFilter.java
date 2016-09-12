@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 /**
@@ -18,6 +18,6 @@ public interface AuthenticationFilter extends SecurityFilter {
 
   CredentialsAccessor getCredentialsAccessor();
 
-  MuleEvent authenticate(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+  Event authenticate(Event event) throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 }

@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.xml.filters;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.xml.transformer.XmlToDomDocument;
 import org.mule.runtime.module.xml.util.XMLUtils;
@@ -42,14 +42,14 @@ public abstract class AbstractJaxpFilter {
   }
 
   /**
-   * @deprecated use {@link #toDOMNode(Object, MuleEvent)} instead
+   * @deprecated use {@link #toDOMNode(Object, Event)} instead
    */
   @Deprecated
   public Node toDOMNode(Object src) throws Exception {
     return toDOMNode(src, getCurrentEvent());
   }
 
-  public Node toDOMNode(Object src, MuleEvent event) throws Exception {
+  public Node toDOMNode(Object src, Event event) throws Exception {
     Node node = XMLUtils.toDOMNode(src, event, getDocumentBuilderFactory());
     return node == null ? (Node) xmlToDom.transform(src) : node;
   }

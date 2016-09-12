@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -46,14 +46,14 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase {
             + "<soap:Body>" + "<ssss xmlns=\"http://www.muleumo.org\">"
             + "<request xmlns=\"http://www.muleumo.org\">Bad Request</request>" + "</ssss>" + "</soap:Body>" + "</soap:Envelope>";
 
-    MuleMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent",
-                                    getTestMuleMessage(soapRequest), HTTP_REQUEST_OPTIONS)
+    InternalMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent",
+                                        getTestMuleMessage(soapRequest), HTTP_REQUEST_OPTIONS)
         .getRight();
 
     assertNotNull(reply);
-    assertNotNull(reply.getPayload());
+    assertNotNull(reply.getPayload().getValue());
 
-    String ct = reply.getDataType().getMediaType().toRfcString();
+    String ct = reply.getPayload().getDataType().getMediaType().toRfcString();
     assertEquals("text/xml; charset=UTF-8", ct);
 
     Document document = DocumentHelper.parseText(getPayloadAsString(reply));

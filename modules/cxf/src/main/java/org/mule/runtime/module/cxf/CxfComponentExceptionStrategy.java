@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
@@ -23,7 +23,7 @@ import org.apache.cxf.interceptor.Fault;
 public class CxfComponentExceptionStrategy extends DefaultMessagingExceptionStrategy {
 
   @Override
-  protected MuleEvent doHandleException(Exception e, MuleEvent event) {
+  protected Event doHandleException(Exception e, Event event) {
     if (e.getCause() instanceof Fault) {
       return super.doHandleException((Exception) e.getCause(), event);
     } else {

@@ -7,18 +7,18 @@
 package org.mule.compatibility.core.transport;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  *
  */
 class ResponseDispatchMessagingException extends MuleException {
 
-  ResponseDispatchMessagingException(Message message) {
+  ResponseDispatchMessagingException(I18nMessage message) {
     super(message);
   }
 
-  ResponseDispatchMessagingException(Message message, Throwable cause) {
+  ResponseDispatchMessagingException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

@@ -9,10 +9,10 @@ package org.mule.compatibility.core.api.transport;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.compatibility.core.message.CompatibilityMessage;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.Connectable;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -59,13 +59,13 @@ public interface MessageReceiver extends Connectable, MessageSource {
 
   void setReceiverKey(String key);
 
-  MuleEvent routeMessage(MuleCompatibilityMessage message) throws MuleException;
+  Event routeMessage(CompatibilityMessage message) throws MuleException;
 
-  MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans) throws MuleException;
+  Event routeMessage(CompatibilityMessage message, Transaction trans) throws MuleException;
 
-  MuleEvent routeMessage(MuleCompatibilityMessage message, Transaction trans, OutputStream outputStream) throws MuleException;
+  Event routeMessage(CompatibilityMessage message, Transaction trans, OutputStream outputStream) throws MuleException;
 
-  MuleMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
+  InternalMessage createMuleMessage(Object transportMessage, Charset encoding) throws MuleException;
 
-  MuleMessage createMuleMessage(Object transportMessage) throws MuleException;
+  InternalMessage createMuleMessage(Object transportMessage) throws MuleException;
 }

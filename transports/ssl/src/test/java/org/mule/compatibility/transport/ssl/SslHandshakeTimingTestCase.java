@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -41,8 +41,8 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
     // note how we call preRoute without a prior handshakeCompleted ... this must
     // run into a timeout
     try {
-      MuleCompatibilityMessage message =
-          (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder().payload(TEST_MESSAGE).build();
+      CompatibilityMessage message =
+          (CompatibilityMessage) new MuleCompatibilityMessageBuilder().payload(TEST_MESSAGE).build();
       callPreRoute(receiver, message);
       fail();
     } catch (InvocationTargetException ite) {
@@ -55,8 +55,8 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
   public void testSslHandshakeSuccessful() throws Exception {
     SslMessageReceiver receiver = setupMockSslMessageReciever();
 
-    MuleCompatibilityMessage message =
-        (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder().payload(TEST_MESSAGE).build();
+    CompatibilityMessage message =
+        (CompatibilityMessage) new MuleCompatibilityMessageBuilder().payload(TEST_MESSAGE).build();
     receiver.handshakeCompleted(new MockHandshakeCompletedEvent());
     message = callPreRoute(receiver, message);
 
@@ -79,11 +79,11 @@ public class SslHandshakeTimingTestCase extends AbstractMuleContextEndpointTestC
     return new SslMessageReceiver(connector, mock(Flow.class), endpoint);
   }
 
-  private MuleCompatibilityMessage callPreRoute(SslMessageReceiver receiver, MuleCompatibilityMessage message) throws Exception {
-    Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", MuleCompatibilityMessage.class);
+  private CompatibilityMessage callPreRoute(SslMessageReceiver receiver, CompatibilityMessage message) throws Exception {
+    Method preRouteMessage = receiver.getClass().getDeclaredMethod("preRoute", CompatibilityMessage.class);
     assertNotNull(preRouteMessage);
     preRouteMessage.setAccessible(true);
 
-    return (MuleCompatibilityMessage) preRouteMessage.invoke(receiver, new Object[] {message});
+    return (CompatibilityMessage) preRouteMessage.invoke(receiver, new Object[] {message});
   }
 }

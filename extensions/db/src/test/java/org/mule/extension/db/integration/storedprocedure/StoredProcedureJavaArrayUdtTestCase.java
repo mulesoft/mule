@@ -15,7 +15,7 @@ import static org.mule.extension.db.integration.model.Region.SOUTHWEST;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,13 +57,13 @@ public class StoredProcedureJavaArrayUdtTestCase extends AbstractDbIntegrationTe
 
   @Test
   public void returnsDefaultArray() throws Exception {
-    MuleMessage response = flowRunner("returnsDefaultArrayValue").run().getMessage();
-    assertThat(response.getPayload(), equalTo(SOUTHWEST.getZips()));
+    Message response = flowRunner("returnsDefaultArrayValue").run().getMessage();
+    assertThat(response.getPayload().getValue(), equalTo(SOUTHWEST.getZips()));
   }
 
   @Test
   public void returnsCustomArray() throws Exception {
-    MuleMessage response = flowRunner("returnsCustomArrayValue").run().getMessage();
-    assertThat(response.getPayload(), equalTo(CONTACT1.getDetails()));
+    Message response = flowRunner("returnsCustomArrayValue").run().getMessage();
+    assertThat(response.getPayload().getValue(), equalTo(CONTACT1.getDetails()));
   }
 }

@@ -8,20 +8,20 @@ package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
- * Base class for {@link MessageProcessor}s that change the event or message. Implementations will return a new instance of the
- * event with the updated data, since the {@link MuleEvent} and {@link MuleMessage} objects are immutable.
+ * Base class for {@link Processor}s that change the event or message. Implementations will return a new instance of the event
+ * with the updated data, since the {@link Event} and {@link Message} objects are immutable.
  *
  * @since 4.0
  */
 public abstract class SimpleMessageProcessor extends AbstractAnnotatedObject
-    implements MessageProcessor, MuleContextAware, Initialisable {
+    implements Processor, MuleContextAware, Initialisable {
 
   protected MuleContext muleContext;
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 
 /**
@@ -16,9 +16,9 @@ import org.mule.runtime.core.api.MuleException;
 public interface ThrottlingPhaseTemplate extends MessageProcessTemplate {
 
   /**
-   * @return a {@link org.mule.runtime.core.api.MuleEvent} created from the original message
+   * @return a {@link org.mule.runtime.core.api.Event} created from the original message
    */
-  MuleEvent getMuleEvent() throws MuleException;
+  Event getMuleEvent() throws MuleException;
 
   /**
    * Discards the message due to ThrottlingPolicy configured for the {@link org.mule.runtime.core.api.source.MessageSource} is

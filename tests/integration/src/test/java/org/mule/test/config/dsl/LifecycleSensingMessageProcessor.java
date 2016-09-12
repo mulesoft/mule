@@ -10,16 +10,16 @@ import static org.mule.test.config.dsl.LifecycleAction.DISPOSE;
 import static org.mule.test.config.dsl.LifecycleAction.INITIALISE;
 import static org.mule.test.config.dsl.LifecycleAction.START;
 import static org.mule.test.config.dsl.LifecycleAction.STOP;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class LifecycleSensingMessageProcessor implements Lifecycle, MessageProcessor {
+public class LifecycleSensingMessageProcessor implements Lifecycle, Processor {
 
   private List<LifecycleAction> lifecycleActions = new LinkedList<>();
   private LifecycleSensingObjectFactory objectFactory;
@@ -57,7 +57,7 @@ public class LifecycleSensingMessageProcessor implements Lifecycle, MessageProce
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return event;
   }
 }

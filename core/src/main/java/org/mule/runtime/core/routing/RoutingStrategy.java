@@ -6,24 +6,24 @@
  */
 package org.mule.runtime.core.routing;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.List;
 
 /**
- * Defines an strategy to route a {@link org.mule.runtime.core.api.MuleEvent} through a set of
- * {@link org.mule.runtime.core.api.processor.MessageProcessor}
+ * Defines an strategy to route a {@link org.mule.runtime.core.api.Event} through a set of
+ * {@link org.mule.runtime.core.api.processor.Processor}
  */
 public interface RoutingStrategy {
 
   /**
-   * Routes {@link MuleEvent} through a set of {@link MessageProcessor}
+   * Routes {@link Event} through a set of {@link Processor}
    *
    * @param event
    * @param messageProcessors
    * @return
    */
-  MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MuleException;
+  Event route(Event event, List<Processor> messageProcessors) throws MuleException;
 }

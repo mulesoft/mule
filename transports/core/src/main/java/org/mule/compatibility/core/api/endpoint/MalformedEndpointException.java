@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.endpoint;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>MalformedEndpointException</code> is thrown by the MuleEndpointURI class if it fails to parse a Url
@@ -33,7 +33,7 @@ public class MalformedEndpointException extends EndpointException {
   /**
    * @param endpoint the endpoint that could not be parsed
    */
-  public MalformedEndpointException(Message message, String endpoint) {
+  public MalformedEndpointException(I18nMessage message, String endpoint) {
     super(TransportCoreMessages.endpointIsMalformed(endpoint).setNextMessage(message));
   }
 

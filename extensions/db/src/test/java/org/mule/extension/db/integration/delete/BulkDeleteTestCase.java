@@ -13,9 +13,10 @@ import static org.mule.extension.db.integration.DbTestUtil.assertExpectedUpdateC
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.model.Planet.MARS;
 import static org.mule.extension.db.integration.model.Planet.VENUS;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -44,13 +45,13 @@ public class BulkDeleteTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void bulkDelete() throws Exception {
-    MuleMessage response = flowRunner("bulkDelete").withPayload(values()).run().getMessage();
+    Message response = flowRunner("bulkDelete").withPayload(values()).run().getMessage();
     assertBulkDelete(response);
   }
 
   @Test
   public void bulkDeleteWithOverriddenType() throws Exception {
-    MuleMessage response = flowRunner("bulkDeleteWithOverriddenType").withPayload(values()).run().getMessage();
+    Message response = flowRunner("bulkDeleteWithOverriddenType").withPayload(values()).run().getMessage();
     assertBulkDelete(response);
   }
 
@@ -68,9 +69,9 @@ public class BulkDeleteTestCase extends AbstractDbIntegrationTestCase {
     values.add(record);
   }
 
-  private void assertBulkDelete(MuleMessage response) throws SQLException {
-    assertTrue(response.getPayload() instanceof int[]);
-    int[] counters = response.getPayload();
+  private void assertBulkDelete(Message response) throws SQLException {
+    assertTrue(response.getPayload().getValue() instanceof int[]);
+    int[] counters = (int[]) response.getPayload().getValue();
     assertEquals(2, counters.length);
     assertExpectedUpdateCount(1, counters[0]);
     assertExpectedUpdateCount(1, counters[1]);

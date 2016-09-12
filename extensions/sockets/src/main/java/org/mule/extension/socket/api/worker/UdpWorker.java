@@ -58,7 +58,7 @@ public final class UdpWorker extends SocketWorker {
       @Override
       public void onCompletion(MuleEvent muleEvent, ExceptionCallback<MuleEvent, Exception> exceptionCallback) {
         try {
-          byte[] byteArray = getUdpAllowedByteArray(muleEvent.getMessage().getPayload(), encoding, objectSerializer);
+          byte[] byteArray = getUdpAllowedByteArray(muleEvent.getMessage().getPayload().getValue(), encoding, objectSerializer);
           DatagramPacket sendPacket = createPacket(byteArray);
           sendPacket.setSocketAddress(packet.getSocketAddress());
           socket.send(sendPacket);

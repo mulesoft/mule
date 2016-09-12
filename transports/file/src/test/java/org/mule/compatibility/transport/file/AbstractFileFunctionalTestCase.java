@@ -14,7 +14,7 @@ import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -82,12 +82,12 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase 
     return target;
   }
 
-  protected void checkReceivedMessage(MuleMessage message) throws Exception {
+  protected void checkReceivedMessage(InternalMessage message) throws Exception {
     assertNotNull(message);
-    assertNotNull(message.getPayload());
-    assertTrue(message.getPayload() instanceof InputStream);
+    assertNotNull(message.getPayload().getValue());
+    assertTrue(message.getPayload().getValue() instanceof InputStream);
 
-    InputStream fis = (InputStream) message.getPayload();
+    InputStream fis = (InputStream) message.getPayload().getValue();
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     IOUtils.copy(fis, byteOut);
     fis.close();

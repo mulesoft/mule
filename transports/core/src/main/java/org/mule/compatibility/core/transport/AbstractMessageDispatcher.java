@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
@@ -16,9 +16,9 @@ import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
@@ -59,7 +59,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     try {
       connect();
 
@@ -96,13 +96,13 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     }
   }
 
-  private MuleEvent createResponseEvent(MuleMessage resultMessage, MuleEvent requestEvent) throws MuleException {
+  private Event createResponseEvent(InternalMessage resultMessage, Event requestEvent) throws MuleException {
     if (resultMessage != null) {
       MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(
                                                                                                resultMessage,
                                                                                                endpoint.getMuleContext());
       requestEvent.getSession().merge(storedSession);
-      MuleEvent resultEvent = MuleEvent.builder(requestEvent).message(resultMessage).build();
+      Event resultEvent = Event.builder(requestEvent).message(resultMessage).build();
       setCurrentEvent(resultEvent);
       return resultEvent;
     } else {
@@ -110,7 +110,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     }
   }
 
-  private boolean isNonBlocking(MuleEvent event) {
+  private boolean isNonBlocking(Event event) {
     return endpoint.getFlowConstruct() instanceof Flow && event.isAllowNonBlocking() && event.getReplyToHandler() != null &&
         isSupportsNonBlocking() && !endpoint.getTransactionConfig().isTransacted();
   }
@@ -118,7 +118,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
   /**
    * Dispatcher implementations that support non-blocking processing should override this method and return 'true'. To support
    * non-blocking processing it is also necessary to implment the
-   * {@link AbstractMessageDispatcher#doSendNonBlocking(MuleEvent, CompletionHandler)} method.
+   * {@link AbstractMessageDispatcher#doSendNonBlocking(Event, CompletionHandler)} method.
    *
    * @return true if non-blocking processing is supported by this dispatcher implemnetation.
    */
@@ -130,7 +130,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
    * @deprecated
    */
   @Deprecated
-  protected boolean returnResponse(MuleEvent event) {
+  protected boolean returnResponse(Event event) {
     // Pass through false to conserve the existing behavior of this method but
     // avoid duplication of code.
     return returnResponse(event, false);
@@ -154,7 +154,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
    * @param event the current event
    * @return true if a response channel should be used to get a response from the event dispatch.
    */
-  protected boolean returnResponse(MuleEvent event, boolean doSend) {
+  protected boolean returnResponse(Event event, boolean doSend) {
     boolean remoteSync = false;
     if (endpoint.getConnector().isResponseEnabled()) {
       boolean hasResponse = endpoint.getExchangePattern().hasResponse();
@@ -178,42 +178,42 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     return (OutboundEndpoint) super.getEndpoint();
   }
 
-  protected MuleEvent applyOutboundTransformers(MuleEvent event) throws MuleException {
-    return MuleEvent.builder(event)
+  protected Event applyOutboundTransformers(Event event) throws MuleException {
+    return Event.builder(event)
         .message(getTransformationService().applyTransformers(event.getMessage(), event, defaultOutboundTransformers))
         .build();
   }
 
-  protected abstract void doDispatch(MuleEvent event) throws Exception;
+  protected abstract void doDispatch(Event event) throws Exception;
 
-  protected abstract MuleMessage doSend(MuleEvent event) throws Exception;
+  protected abstract InternalMessage doSend(Event event) throws Exception;
 
-  protected void doSendNonBlocking(MuleEvent event, CompletionHandler<MuleMessage, Exception, Void> completionHandler) {
+  protected void doSendNonBlocking(Event event, CompletionHandler<InternalMessage, Exception, Void> completionHandler) {
     throw new IllegalStateException("This MessageDispatcher does not support non-blocking");
   }
 
-  private class NonBlockingSendCompletionHandler implements CompletionHandler<MuleMessage, Exception, Void> {
+  private class NonBlockingSendCompletionHandler implements CompletionHandler<InternalMessage, Exception, Void> {
 
-    private final MuleEvent event;
+    private final Event event;
     private final WorkManager workManager;
     private final WorkListener workListener;
 
 
-    public NonBlockingSendCompletionHandler(MuleEvent event, WorkManager workManager, WorkListener workListener) {
+    public NonBlockingSendCompletionHandler(Event event, WorkManager workManager, WorkListener workListener) {
       this.event = event;
       this.workManager = workManager;
       this.workListener = workListener;
     }
 
     @Override
-    public void onCompletion(final MuleMessage result, ExceptionCallback<Void, Exception> exceptionCallback) {
+    public void onCompletion(final InternalMessage result, ExceptionCallback<Void, Exception> exceptionCallback) {
       try {
         workManager.scheduleWork(new Work() {
 
           @Override
           public void run() {
             try {
-              MuleEvent responseEvent = createResponseEvent(result, event);
+              Event responseEvent = createResponseEvent(result, event);
               // Set RequestContext ThreadLocal in new thread for backwards compatibility
               setCurrentEvent(responseEvent);
               event.getReplyToHandler().processReplyTo(responseEvent, null, null);
@@ -259,8 +259,8 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     }
   }
 
-  protected Charset resolveEncoding(MuleEvent event) {
-    return event.getMessage().getDataType().getMediaType().getCharset().orElseGet(() -> {
+  protected Charset resolveEncoding(Event event) {
+    return event.getMessage().getPayload().getDataType().getMediaType().getCharset().orElseGet(() -> {
       Charset encoding = getEndpoint().getEncoding();
       if (encoding == null) {
         encoding = getDefaultEncoding(getEndpoint().getMuleContext());

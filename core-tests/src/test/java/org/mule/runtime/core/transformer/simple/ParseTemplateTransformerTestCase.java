@@ -13,8 +13,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -33,8 +33,8 @@ public class ParseTemplateTransformerTestCase {
   private static final String INVALID_LOCATION = "wrong_error.html";
 
   private ParseTemplateTransformer parseTemplateTransformer;
-  private MuleEvent mockMuleEvent = mock(MuleEvent.class);
-  private MuleMessage mockMuleMessage = mock(MuleMessage.class);
+  private Event mockMuleEvent = mock(Event.class);
+  private InternalMessage mockMuleMessage = mock(InternalMessage.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExpressionLanguage mockExpressionLanguage = mock(ExpressionLanguage.class);
 

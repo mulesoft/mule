@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -23,11 +23,11 @@ public abstract class AbstractStreamingDownloadMule1389TestCase extends Function
   public void testDownloadSpeed() throws Exception {
     MuleClient client = muleContext.getClient();
     long now = System.currentTimeMillis();
-    MuleMessage result =
+    InternalMessage result =
         client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inTestComponent")).getAddress(), "request", null)
             .getRight();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
+    assertNotNull(result.getPayload().getValue());
     assertEquals(InputStreamSource.SIZE, getPayloadAsBytes(result).length);
     long then = System.currentTimeMillis();
     double speed = InputStreamSource.SIZE / (double) (then - now) * 1000 / AbstractStreamingCapacityTestCase.ONE_MB;

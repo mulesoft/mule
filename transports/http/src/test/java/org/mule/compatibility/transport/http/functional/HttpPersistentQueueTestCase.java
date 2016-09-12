@@ -18,7 +18,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.CountDownLatch;
@@ -90,14 +90,15 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase {
 
     @Override
     public void eventReceived(MuleEventContext context, Object component, MuleContext muleContext) throws Exception {
-      MuleMessage message = context.getMessage();
+      InternalMessage message = context.getMessage();
 
       Object httpMethod = message.getInboundProperty("http.method");
       if (HttpConstants.METHOD_GET.equals(httpMethod)) {
         assertEquals("/services/Echo?foo=bar",
-                     muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
+                     muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue());
       } else if (HttpConstants.METHOD_POST.equals(httpMethod)) {
-        assertEquals("foo=bar", muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
+        assertEquals("foo=bar",
+                     muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue());
       } else {
         fail("invalid HTTP method : " + httpMethod);
       }

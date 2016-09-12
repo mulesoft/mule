@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -65,25 +65,26 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
    *
    * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
    *        data available. If no data becomes available before the timeout elapses, null will be returned
-   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was available
+   * @return the result of the request wrapped in a Message object. Null will be returned if no data was available
    * @throws Exception if the call to the underlying protocol causes an exception
    */
   @Override
-  public final MuleMessage request(long timeout) throws Exception {
+  public final InternalMessage request(long timeout) throws Exception {
     try {
       EndpointMessageNotification beginNotification = null;
       if (connector.isEnableMessageEvents()) {
         beginNotification =
-            new EndpointMessageNotification(MuleMessage.builder().nullPayload().build(), endpoint, null, MESSAGE_REQUEST_BEGIN);
+            new EndpointMessageNotification(InternalMessage.builder().nullPayload().build(), endpoint, null,
+                                            MESSAGE_REQUEST_BEGIN);
       }
       // Make sure we are connected
       connect();
-      MuleMessage result = doRequest(timeout);
+      InternalMessage result = doRequest(timeout);
       MuleCompatibilityMessageBuilder builder;
       if (result != null) {
         builder = new MuleCompatibilityMessageBuilder(result);
       } else {
-        builder = new MuleCompatibilityMessageBuilder(MuleMessage.builder().nullPayload().build());
+        builder = new MuleCompatibilityMessageBuilder(InternalMessage.builder().nullPayload().build());
       }
       if (result != null) {
         String rootId = result.getInboundProperty(MULE_ROOT_MESSAGE_ID_PROPERTY);
@@ -110,12 +111,12 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
     }
   }
 
-  protected MuleMessage applyInboundTransformers(MuleMessage message) throws MuleException {
-    MuleMessage transformed = getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
-    if (transformed instanceof MuleMessage) {
+  protected InternalMessage applyInboundTransformers(InternalMessage message) throws MuleException {
+    InternalMessage transformed = getTransformationService().applyTransformers(message, null, defaultInboundTransformers);
+    if (transformed instanceof InternalMessage) {
       return transformed;
     } else {
-      return MuleMessage.builder().payload(transformed).build();
+      return InternalMessage.builder().payload(transformed).build();
     }
   }
 
@@ -134,9 +135,9 @@ public abstract class AbstractMessageRequester extends AbstractTransportMessageH
    *
    * @param timeout the maximum time the operation should block before returning. The call should return immediately if there is
    *        data available. If no data becomes available before the timeout elapses, null will be returned
-   * @return the result of the request wrapped in a MuleMessage object. Null will be returned if no data was avaialable
+   * @return the result of the request wrapped in a Message object. Null will be returned if no data was avaialable
    * @throws Exception if the call to the underlying protocal cuases an exception
    */
-  protected abstract MuleMessage doRequest(long timeout) throws Exception;
+  protected abstract InternalMessage doRequest(long timeout) throws Exception;
 
 }

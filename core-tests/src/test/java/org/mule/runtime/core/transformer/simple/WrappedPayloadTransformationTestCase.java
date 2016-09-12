@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import org.junit.Test;
@@ -18,7 +18,7 @@ public class WrappedPayloadTransformationTestCase extends HexStringByteArrayTran
   // extra test for MULE-1274: transforming Mule Messages with regular payload
   @Test
   public void testPayloadWrappedInMuleMessage() throws TransformerException {
-    Object wrappedPayload = MuleMessage.builder().payload(this.getResultData()).build();
+    Object wrappedPayload = InternalMessage.builder().payload(this.getResultData()).build();
     assertEquals(this.getTestData(), this.getRoundTripTransformer().transform(wrappedPayload));
   }
 

@@ -24,7 +24,7 @@ public class UdpSendAndReceiveStringTestCase extends SocketExtensionTestCase {
   @Test
   public void sendStringAndReceiveModifiedString() throws Exception {
     InputStream inputStream =
-        (InputStream) flowRunner("udp-send-and-receive").withPayload(TEST_STRING).run().getMessage().getPayload();
+        (InputStream) flowRunner("udp-send-and-receive").withPayload(TEST_STRING).run().getMessage().getPayload().getValue();
 
     String response = IOUtils.toString(inputStream);
     assertEquals(response, RESPONSE_TEST_STRING);

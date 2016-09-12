@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.Map;
@@ -39,11 +39,11 @@ public class HttpOutboundHeadersPropagationTestCase extends HttpFunctionalTestCa
   @Test
   public void outboundHttpContentTypeTest() throws Exception {
     MuleClient client = muleContext.getClient();
-    client.dispatch("vm://in", MuleMessage.builder().payload("HelloWorld!")
+    client.dispatch("vm://in", InternalMessage.builder().payload("HelloWorld!")
         .addOutboundProperty("custom-header", "value-custom-header").build());
 
-    MuleMessage reply = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
-    Map<String, Object> headers = (Map<String, Object>) reply.getPayload();
+    InternalMessage reply = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
+    Map<String, Object> headers = (Map<String, Object>) reply.getPayload().getValue();
 
     for (String header : HttpConstants.REQUEST_HEADER_NAMES.values()) {
       // TODO: the Expect header should be sent on the request, it seems the apache commons HttpClient 3.1 has

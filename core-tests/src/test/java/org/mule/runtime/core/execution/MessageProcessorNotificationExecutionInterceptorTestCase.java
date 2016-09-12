@@ -17,17 +17,17 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
@@ -55,19 +55,19 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
   @Mock
   private MessageProcessorExecutionInterceptor mockNextInterceptor;
   @Mock
-  private MessageProcessor mockMessageProcessor;
+  private Processor mockMessageProcessor;
   @Mock
   private MuleContext mockMuleContext;
   @Mock
   private Pipeline mockPipeline;
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleEvent mockMuleEvent;
+  private Event mockMuleEvent;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleEvent mockMuleEventPreviousExecution;
+  private Event mockMuleEventPreviousExecution;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private MuleEvent mockResultMuleEvent;
+  private Event mockResultMuleEvent;
 
   @Mock
   private ReplyToHandler mockReplyToHandler;
@@ -97,7 +97,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
       serverNotifications.add((ServerNotification) invocationOnMock.getArguments()[0]);
       return null;
     }).when(mockNotificationManager).fireNotification(any(ServerNotification.class));
-    MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+    Event result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
     assertThat(result, is(mockResultMuleEvent));
     assertThat(serverNotifications.size(), is(2));
     MessageProcessorNotification beforeMessageProcessorNotification = (MessageProcessorNotification) serverNotifications.get(0);
@@ -121,7 +121,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
       return null;
     }).when(mockNotificationManager).fireNotification(any(ServerNotification.class));
 
-    MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+    Event result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
 
     assertThat(result, is(mockResultMuleEvent));
     assertThat(serverNotifications.size(), is(0));
@@ -144,7 +144,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
 
     setCurrentEvent(mockMuleEventPreviousExecution);
 
-    MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+    Event result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
 
     assertThat(result, is(mockResultMuleEvent));
     assertThat(serverNotifications.size(), is(0));
@@ -160,11 +160,11 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
   @Test
   public void requestContextSetBeforeProcessingEventNonBlockingPrcocessor() throws MuleException {
     final List<ServerNotification> serverNotifications = new ArrayList<>();
-    mockMessageProcessor = mock(MessageProcessor.class,
+    mockMessageProcessor = mock(Processor.class,
                                 withSettings().extraInterfaces(NonBlockingMessageProcessor.class));
 
     when(mockMessageProcessor.process(mockMuleEvent)).thenReturn(mockResultMuleEvent);
-    when(mockNextInterceptor.execute(Mockito.eq(mockMessageProcessor), any(MuleEvent.class)))
+    when(mockNextInterceptor.execute(Mockito.eq(mockMessageProcessor), any(Event.class)))
         .thenReturn(mockResultMuleEvent);
 
     String muleEventIdToProcess = UUID.getUUID();
@@ -180,7 +180,7 @@ public class MessageProcessorNotificationExecutionInterceptorTestCase extends Ab
 
     setCurrentEvent(mockMuleEventPreviousExecution);
 
-    MuleEvent result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
+    Event result = messageProcessorNotificationExecutionInterceptor.execute(mockMessageProcessor, mockMuleEvent);
 
     assertThat(result, is(mockResultMuleEvent));
     assertThat(serverNotifications.size(), is(0));

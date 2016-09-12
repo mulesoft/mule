@@ -14,12 +14,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.message.Correlation;
+import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -49,32 +49,32 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
+    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
 
-    MuleEvent event1 =
-        MuleEvent.builder(executionContext).message(message1).correlation(new Correlation(3, null)).flow(flow).build();
-    MuleEvent event2 = MuleEvent.builder(executionContext).message(message2).flow(flow).build();
-    MuleEvent event3 = MuleEvent.builder(executionContext).message(message3).flow(flow).build();
+    Event event1 =
+        Event.builder(executionContext).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(flow).build();
+    Event event2 = Event.builder(executionContext).message(message2).flow(flow).build();
+    Event event3 = Event.builder(executionContext).message(message3).flow(flow).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));
 
-    MuleEvent resultEvent = router.process(event3);
+    Event resultEvent = router.process(event3);
 
     assertNotNull(sensingMessageProcessor.event);
     assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
 
-    MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();
+    InternalMessage nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
-    assertTrue(nextMessage.getPayload() instanceof List<?>);
-    List<MuleMessage> list = nextMessage.getPayload();
+    assertTrue(nextMessage.getPayload().getValue() instanceof List<?>);
+    List<InternalMessage> list = (List<InternalMessage>) nextMessage.getPayload().getValue();
     assertEquals(3, list.size());
     String[] results = new String[3];
-    list.stream().map(MuleMessage::getPayload).collect(toList()).toArray(results);
+    list.stream().map(msg -> msg.getPayload().getValue()).collect(toList()).toArray(results);
     // Need to sort result because of MULE-5998
     Arrays.sort(results);
     assertEquals("test event A", results[0]);
@@ -94,23 +94,23 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
-    MuleMessage message1 = MuleMessage.of("test event A");
+    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
+    InternalMessage message1 = InternalMessage.of("test event A");
 
-    MuleEvent event1 =
-        MuleEvent.builder(executionContext).message(message1).correlation(new Correlation(1, null)).flow(flow).build();
+    Event event1 =
+        Event.builder(executionContext).message(message1).groupCorrelation(new GroupCorrelation(1, null)).flow(flow).build();
 
-    MuleEvent resultEvent = router.process(event1);
+    Event resultEvent = router.process(event1);
 
     assertNotNull(sensingMessageProcessor.event);
     assertThat(resultEvent, equalTo(sensingMessageProcessor.event));
 
-    MuleMessage nextMessage = sensingMessageProcessor.event.getMessage();
+    InternalMessage nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
-    assertTrue(nextMessage.getPayload() instanceof List<?>);
-    List<MuleMessage> payload = nextMessage.getPayload();
+    assertTrue(nextMessage.getPayload().getValue() instanceof List<?>);
+    List<InternalMessage> payload = (List<InternalMessage>) nextMessage.getPayload().getValue();
     assertEquals(1, payload.size());
-    assertEquals("test event A", payload.get(0).getPayload());
+    assertEquals("test event A", payload.get(0).getPayload().getValue());
   }
 
   @Test
@@ -123,38 +123,40 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     router.setFlowConstruct(flow);
     router.initialise();
 
-    MessageContext executionContext = DefaultMessageContext.create(flow, TEST_CONNECTOR, "foo");
+    EventContext executionContext = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
-    MuleMessage message1 = MuleMessage.builder().payload("test event A").build();
-    MuleMessage message2 = MuleMessage.builder().payload("test event B").build();
-    MuleMessage message3 = MuleMessage.builder().payload("test event C").build();
-    MuleMessage message4 = MuleMessage.builder().payload("test event D").build();
-    List<MuleMessage> list = new ArrayList<>();
-    List<MuleMessage> list2 = new ArrayList<>();
+    InternalMessage message1 = InternalMessage.builder().payload("test event A").build();
+    InternalMessage message2 = InternalMessage.builder().payload("test event B").build();
+    InternalMessage message3 = InternalMessage.builder().payload("test event C").build();
+    InternalMessage message4 = InternalMessage.builder().payload("test event D").build();
+    List<InternalMessage> list = new ArrayList<>();
+    List<InternalMessage> list2 = new ArrayList<>();
     list.add(message1);
     list.add(message2);
     list2.add(message3);
     list2.add(message4);
-    MuleMessage messageCollection1 = MuleMessage.builder().payload(list).build();
-    MuleMessage messageCollection2 = MuleMessage.builder().payload(list2).build();
+    InternalMessage messageCollection1 = InternalMessage.builder().payload(list).build();
+    InternalMessage messageCollection2 = InternalMessage.builder().payload(list2).build();
 
-    MuleEvent event1 =
-        MuleEvent.builder(executionContext).message(messageCollection1).correlation(new Correlation(2, null)).flow(flow).build();
-    MuleEvent event2 =
-        MuleEvent.builder(executionContext).message(messageCollection2).correlation(new Correlation(2, null)).flow(flow).build();
+    Event event1 =
+        Event.builder(executionContext).message(messageCollection1).groupCorrelation(new GroupCorrelation(2, null)).flow(flow)
+            .build();
+    Event event2 =
+        Event.builder(executionContext).message(messageCollection2).groupCorrelation(new GroupCorrelation(2, null)).flow(flow)
+            .build();
 
     assertNull(router.process(event1));
-    MuleEvent resultEvent = router.process(event2);
+    Event resultEvent = router.process(event2);
     assertNotNull(resultEvent);
-    MuleMessage resultMessage = resultEvent.getMessage();
+    InternalMessage resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
-    List<MuleMessage> payload = (List<MuleMessage>) resultMessage.getPayload();
+    List<InternalMessage> payload = (List<InternalMessage>) resultMessage.getPayload().getValue();
     assertEquals(2, payload.size());
 
-    assertEquals("test event A", ((List<MuleMessage>) payload.get(0).getPayload()).get(0).getPayload());
-    assertEquals("test event B", ((List<MuleMessage>) payload.get(0).getPayload()).get(1).getPayload());
-    assertEquals("test event C", ((List<MuleMessage>) payload.get(1).getPayload()).get(0).getPayload());
-    assertEquals("test event D", ((List<MuleMessage>) payload.get(1).getPayload()).get(1).getPayload());
+    assertEquals("test event A", ((List<InternalMessage>) payload.get(0).getPayload().getValue()).get(0).getPayload().getValue());
+    assertEquals("test event B", ((List<InternalMessage>) payload.get(0).getPayload().getValue()).get(1).getPayload().getValue());
+    assertEquals("test event C", ((List<InternalMessage>) payload.get(1).getPayload().getValue()).get(0).getPayload().getValue());
+    assertEquals("test event D", ((List<InternalMessage>) payload.get(1).getPayload().getValue()).get(1).getPayload().getValue());
 
   }
 

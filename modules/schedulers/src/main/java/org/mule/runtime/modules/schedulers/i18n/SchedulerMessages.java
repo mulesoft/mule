@@ -6,32 +6,32 @@
  */
 package org.mule.runtime.modules.schedulers.i18n;
 
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 
-public class SchedulerMessages extends MessageFactory {
+public class SchedulerMessages extends I18nMessageFactory {
 
   private static final SchedulerMessages factory = new SchedulerMessages();
 
   private static final String BUNDLE_PATH = getBundlePath("schedulers");
 
-  public static Message couldNotCreateScheduler() {
+  public static I18nMessage couldNotCreateScheduler() {
     return factory.createMessage(BUNDLE_PATH, 1);
   }
 
-  public static Message invalidCronExpression() {
+  public static I18nMessage invalidCronExpression() {
     return factory.createMessage(BUNDLE_PATH, 2);
   }
 
-  public static Message couldNotScheduleJob() {
+  public static I18nMessage couldNotScheduleJob() {
     return factory.createMessage(BUNDLE_PATH, 3);
   }
 
-  public static Message couldNotPauseSchedulers() {
+  public static I18nMessage couldNotPauseSchedulers() {
     return factory.createMessage(BUNDLE_PATH, 4);
   }
 
-  public static Message couldNotShutdownScheduler() {
+  public static I18nMessage couldNotShutdownScheduler() {
     return factory.createMessage(BUNDLE_PATH, 5);
   }
 }

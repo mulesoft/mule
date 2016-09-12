@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.exception.MessagingException;
@@ -14,7 +14,7 @@ import org.mule.runtime.core.exception.MessagingException;
 public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor {
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     try {
       return processNext(event);
     } catch (Exception e) {

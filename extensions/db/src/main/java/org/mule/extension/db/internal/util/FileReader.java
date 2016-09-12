@@ -13,8 +13,7 @@ package org.mule.extension.db.internal.util;
 public interface FileReader {
 
   /**
-   * Attempts to load a resource from the file system, from a URL, or from the
-   * classpath, in that order.
+   * Attempts to load a resource from the file system, from a URL, or from the classpath, in that order.
    *
    * @param resourceName The name of the resource to load
    * @return the requested resource as a string

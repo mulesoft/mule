@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.io.Serializable;
@@ -25,17 +25,17 @@ public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWire
     // Create message to send over wire
     Map<String, Serializable> messageProerties = new HashMap<>();
     messageProerties.put("key1", "val1");
-    MuleMessage inMessage = MuleMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
+    InternalMessage inMessage = InternalMessage.builder().payload("testMessage").outboundProperties(messageProerties).build();
 
     Object outMessage = readWrite(inMessage);
 
     // Test deserialized message
     // NOTE: As we are using SerializedMuleMessageWireFormat we get
-    // MuleMessage rather than just the payload
+    // Message rather than just the payload
 
-    assertTrue(outMessage instanceof MuleMessage);
-    assertEquals("testMessage", ((MuleMessage) outMessage).getPayload());
-    assertEquals("val1", ((MuleMessage) outMessage).getOutboundProperty("key1"));
+    assertTrue(outMessage instanceof InternalMessage);
+    assertEquals("testMessage", ((InternalMessage) outMessage).getPayload().getValue());
+    assertEquals("val1", ((InternalMessage) outMessage).getOutboundProperty("key1"));
   }
 
   @Override

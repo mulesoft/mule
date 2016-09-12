@@ -7,6 +7,8 @@
 package org.mule.runtime.core.api;
 
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
@@ -16,34 +18,34 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.message.Correlation;
-import org.mule.runtime.core.message.DefaultMuleEventBuilder;
+import org.mule.runtime.core.message.DefaultEventBuilder;
+import org.mule.runtime.core.message.GroupCorrelation;
 
 import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
- * Legacy implementation of {@link MuleEvent}
+ * Legacy implementation of {@link Event}
  * <p>
- * Holds a MuleMessage payload and provides helper methods for obtaining the data in a format that the receiving Mule component
+ * Holds a Message payload and provides helper methods for obtaining the data in a format that the receiving Mule component
  * understands. The event can also maintain any number of properties that can be set and retrieved by Mule components.
  *
  * @see org.mule.runtime.api.message.MuleEvent
- * @see MuleMessage
+ * @see Message
  */
-public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
+public interface Event extends MuleEvent {
 
   /**
-   * @return the context applicable to all events created from the same root {@link MuleEvent} from a {@link MessageSource}.
+   * @return the context applicable to all events created from the same root {@link Event} from a {@link MessageSource}.
    */
-  MessageContext getContext();
+  EventContext getContext();
 
   /**
-   * Returns the correlation metadata of this message. See {@link Correlation}.
+   * Returns the correlation metadata of this message. See {@link GroupCorrelation}.
    * 
    * @return the correlation metadata of this message.
    */
-  Correlation getCorrelation();
+  GroupCorrelation getGroupCorrelation();
 
   /**
    * The returned value will depend on the {@link MessageSource} that created this event, and the flow that is executing the
@@ -59,7 +61,7 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
    * @return the message payload for this event
    */
   @Override
-  MuleMessage getMessage();
+  InternalMessage getMessage();
 
   /**
    * Returns the contents of the message as a byte array.
@@ -244,71 +246,71 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
   /**
    * Create new {@link Builder}.
    *
-   * @param eventContext the event context to create event instance with.
+   * @param context the context to create event instance with.
    * @return new builder instance.
    */
-  static Builder builder(MessageContext eventContext) {
-    return new DefaultMuleEventBuilder(eventContext);
+  static Builder builder(EventContext context) {
+    return new DefaultEventBuilder(context);
   }
 
   /**
-   * Create new {@link Builder} based on an existing {@link org.mule.runtime.api.message.MuleEvent} instance.
-   * The existing {@link MessageContext} is conserved.
+   * Create new {@link Builder} based on an existing {@link org.mule.runtime.api.message.MuleEvent} instance. The existing
+   * {@link EventContext} is conserved.
    *
    * @param event existing event to use as a template to create builder instance
    * @return new builder instance.
    */
-  static Builder builder(MuleEvent event) {
-    return new DefaultMuleEventBuilder(event);
+  static Builder builder(Event event) {
+    return new DefaultEventBuilder(event);
   }
 
   interface Builder {
 
     /**
-     * Set the {@link MuleMessage} to construct {@link MuleEvent} with.
+     * Set the {@link Message} to construct {@link Event} with.
      *
      * @param message the message instance.
      * @return the builder instance
      */
-    Builder message(MuleMessage message);
+    Builder message(InternalMessage message);
 
     /**
-     * Set a map of flow variables.  Any existing flow variables added to the builder will be removed.
+     * Set a map of variables. Any existing variables added to the builder will be removed.
      *
-     * @param flowVariables flow variables to be set.
+     * @param variables variables to be set.
      * @return the builder instance
      */
-    Builder flowVariables(Map<String, Object> flowVariables);
+    Builder variables(Map<String, Object> variables);
 
     /**
-     * Add a flow variable.
+     * Add a variable.
      *
-     * @param key the key of the flow variable to add.
-     * @param value the value of the flow varibale to add.
+     * @param key the key of the variable to add.
+     * @param value the value of the variable to add.
      * @return the builder instance.
      */
-    Builder addFlowVariable(String key, Object value);
+    Builder addVariable(String key, Object value);
 
     /**
-     * Add a flow variable.
+     * Add a variable.
      *
-     * @param key the key of the flow variable to add.
-     * @param value the value of the flow variable to add.
-     * @param mediaType the flow variable media this
+     * @param key the key of the variable to add.
+     * @param value the value of the variable to add.
+     * @param mediaType the variable media this
      * @return the builder instance
      */
-    Builder addFlowVariable(String key, Object value, DataType mediaType);
+    Builder addVariable(String key, Object value, DataType mediaType);
 
     /**
-     * Remove a flow variable.
+     * Remove a variable.
      *
-     * @param key the flow variable key.
+     * @param key the variable key.
      * @return the builder instance
      */
-    Builder removeFlowVariable(String key);
+    Builder removeVariable(String key);
 
     /**
-     * Set correlationId overriding the correlationId from {@link MessageContext#getCorrelationId()} that came from the source
+     * Set correlationId overriding the correlationId from {@link EventContext#getCorrelationId()} that came from the source
      * system or that was configured in the connector source. This is only used to support transports and should not be used
      * otherwise.
      *
@@ -320,12 +322,12 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder correlationId(String correlationId);
 
     /**
-     * Sets the correlation information to the produced event.
+     * Sets the group correlation information to the produced event.
      *
-     * @param correlation the object containing the correlation information to set on the produced event
+     * @param groupCorrelation the object containing the group correlation information to set on the produced event
      * @return the builder instance
      */
-    Builder correlation(Correlation correlation);
+    Builder groupCorrelation(GroupCorrelation groupCorrelation);
 
     /**
      * Sets an error related to the produced event.
@@ -413,11 +415,11 @@ public interface MuleEvent extends org.mule.runtime.api.message.MuleEvent {
     Builder refreshSync();
 
     /**
-     * Build a new {@link MuleEvent} based on the state configured in the {@link Builder}.
+     * Build a new {@link Event} based on the state configured in the {@link Builder}.
      *
-     * @return new {@link MuleEvent} instance.
+     * @return new {@link Event} instance.
      */
-    MuleEvent build();
+    Event build();
 
   }
 }

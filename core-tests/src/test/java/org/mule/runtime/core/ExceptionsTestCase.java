@@ -11,12 +11,12 @@ import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
@@ -28,8 +28,8 @@ public class ExceptionsTestCase extends AbstractMuleTestCase {
     String rootMsg = "Root Test Exception Message";
     String msg = "Test Exception Message";
 
-    Exception e = new MuleContextException(MessageFactory.createStaticMessage(msg),
-                                           new DefaultMuleException(MessageFactory.createStaticMessage(rootMsg)));
+    Exception e = new MuleContextException(I18nMessageFactory.createStaticMessage(msg),
+                                           new DefaultMuleException(I18nMessageFactory.createStaticMessage(rootMsg)));
 
     assertEquals(rootMsg, e.getCause().getMessage());
     assertEquals(msg, e.getMessage());
@@ -38,7 +38,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase {
 
   @Test
   public final void testRoutingExceptionNullMessageValidProcessor() throws MuleException {
-    MessageProcessor processor = mock(MessageProcessor.class);
+    Processor processor = mock(Processor.class);
     RoutingException rex = new RoutingException(processor);
     assertSame(processor, rex.getRoute());
   }

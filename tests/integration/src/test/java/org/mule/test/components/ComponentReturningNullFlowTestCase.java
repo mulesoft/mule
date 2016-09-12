@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
@@ -25,12 +25,12 @@ public class ComponentReturningNullFlowTestCase extends AbstractIntegrationTestC
 
   @Test
   public void testNullReturnStopsFlow() throws Exception {
-    MuleMessage msg = flowRunner("StopFlowService").withPayload(TEST_PAYLOAD).run().getMessage();
+    InternalMessage msg = flowRunner("StopFlowService").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(msg);
     final String payload = getPayloadAsString(msg);
     assertNotNull(payload);
     assertFalse("ERROR".equals(payload));
-    assertThat(msg.getPayload(), is(nullValue()));
+    assertThat(msg.getPayload().getValue(), is(nullValue()));
   }
 
   public static final class ComponentReturningNull {

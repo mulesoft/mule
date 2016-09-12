@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.file.transformers;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.ArrayUtils;
 
@@ -65,7 +65,8 @@ public class FileToByteArray extends AbstractTransformer implements Discoverable
       }
 
     } else {
-      throw new TransformerException(MessageFactory.createStaticMessage("Cannot handle source type %s", src.getClass().getName()),
+      throw new TransformerException(I18nMessageFactory.createStaticMessage("Cannot handle source type %s",
+                                                                            src.getClass().getName()),
                                      this);
     }
 

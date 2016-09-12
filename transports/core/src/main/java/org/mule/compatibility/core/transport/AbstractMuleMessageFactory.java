@@ -8,12 +8,12 @@ package org.mule.compatibility.core.transport;
 
 import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedException;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;
@@ -28,20 +28,20 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory {
   public AbstractMuleMessageFactory() {}
 
   @Override
-  public MuleCompatibilityMessage create(Object transportMessage, MuleMessage previousMessage, Charset encoding)
+  public CompatibilityMessage create(Object transportMessage, InternalMessage previousMessage, Charset encoding)
       throws Exception {
     return doCreate(transportMessage, previousMessage, encoding);
   }
 
   @Override
-  public MuleCompatibilityMessage create(Object transportMessage, Charset encoding) throws Exception {
+  public CompatibilityMessage create(Object transportMessage, Charset encoding) throws Exception {
     return doCreate(transportMessage, null, encoding);
   }
 
-  private MuleCompatibilityMessage doCreate(Object transportMessage, MuleMessage previousMessage, Charset encoding)
+  private CompatibilityMessage doCreate(Object transportMessage, InternalMessage previousMessage, Charset encoding)
       throws Exception {
     if (transportMessage == null) {
-      return (MuleCompatibilityMessage) new MuleCompatibilityMessageBuilder().nullPayload().build();
+      return (CompatibilityMessage) new MuleCompatibilityMessageBuilder().nullPayload().build();
     }
 
     if (!isTransportMessageTypeSupported(transportMessage)) {
@@ -59,8 +59,8 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory {
     MuleCompatibilityMessageBuilder messageBuilder;
     if (previousMessage != null) {
       messageBuilder = (MuleCompatibilityMessageBuilder) new MuleCompatibilityMessageBuilder(previousMessage).payload(payload);
-    } else if (payload instanceof MuleMessage) {
-      messageBuilder = new MuleCompatibilityMessageBuilder((MuleMessage) payload);
+    } else if (payload instanceof InternalMessage) {
+      messageBuilder = new MuleCompatibilityMessageBuilder((InternalMessage) payload);
     } else if (payload == null) {
       messageBuilder = (MuleCompatibilityMessageBuilder) new MuleCompatibilityMessageBuilder().nullPayload();
     } else {
@@ -85,7 +85,7 @@ public abstract class AbstractMuleMessageFactory implements MuleMessageFactory {
     // Template method
   }
 
-  protected void addAttachments(MuleMessage.Builder messageBuilder, Object transportMessage) throws Exception {
+  protected void addAttachments(InternalMessage.Builder messageBuilder, Object transportMessage) throws Exception {
     // Template method
   }
 

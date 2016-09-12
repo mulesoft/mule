@@ -8,12 +8,11 @@ package org.mule.compatibility.transport.jms.integration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.compatibility.transport.jms.transformers.JMSMessageToObject;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMuleEvent;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.compression.CompressionStrategy;
 import org.mule.runtime.core.util.compression.GZipCompression;
@@ -185,7 +184,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
     String text = "Test Text";
     int i = 97823;
     double d = 0923.2143E124;
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     list.add(new Integer(i));
     list.add(new Double(d));
     list.add(text);

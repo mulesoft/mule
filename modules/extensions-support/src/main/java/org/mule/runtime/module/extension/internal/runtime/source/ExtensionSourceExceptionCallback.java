@@ -12,7 +12,8 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
 
 /**
- * Channels exceptions through the {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, org.mule.runtime.core.api.MuleEvent)}.
+ * Channels exceptions through the
+ * {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, org.mule.runtime.core.api.Event)}.
  *
  * @since 4.0
  */
@@ -25,7 +26,7 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback<MuleEvent, E
    * Creates a new instance
    *
    * @param completionCallback the callback used to send the failure response
-   * @param muleEvent          the related {@link MuleEvent}
+   * @param muleEvent the related {@link MuleEvent}
    */
   ExtensionSourceExceptionCallback(ResponseCompletionCallback completionCallback, MuleEvent muleEvent) {
     this.completionCallback = completionCallback;
@@ -33,8 +34,8 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback<MuleEvent, E
   }
 
   /**
-   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, org.mule.runtime.core.api.MuleEvent)}
-   * over the {@link #completionCallback}, using the {@code exception} and {@link #muleEvent}
+   * Invokes {@link ResponseCompletionCallback#responseSentWithFailure(MessagingException, org.mule.runtime.core.api.Event)} over
+   * the {@link #completionCallback}, using the {@code exception} and {@link #muleEvent}
    *
    * @param exception a {@link Exception}
    * @return a response {@link MuleEvent}
@@ -42,7 +43,7 @@ class ExtensionSourceExceptionCallback implements ExceptionCallback<MuleEvent, E
   @Override
   public MuleEvent onException(Exception exception) {
     return completionCallback
-        .responseSentWithFailure(new MessagingException((org.mule.runtime.core.api.MuleEvent) muleEvent, exception),
-                                 (org.mule.runtime.core.api.MuleEvent) muleEvent);
+        .responseSentWithFailure(new MessagingException((org.mule.runtime.core.api.Event) muleEvent, exception),
+                                 (org.mule.runtime.core.api.Event) muleEvent);
   }
 }

@@ -11,7 +11,7 @@ import static junit.framework.Assert.assertEquals;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -45,8 +45,9 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase {
   @Test
   public void testProxyWSDLRewriteSinglePort() throws Exception {
     String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/single";
-    MuleMessage response =
-        muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage response =
+        muleContext.getClient()
+            .send(proxyAddress + "?wsdl", InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
             .getRight();
     for (Element port : getPorts(getWsdl(response))) {
       String location = getLocation(port);
@@ -63,15 +64,16 @@ public class ProxyWSDLRewriteAddressTestCase extends FunctionalTestCase {
   @Test
   public void testProxyWSDLRewriteAllPorts() throws Exception {
     String proxyAddress = "http://localhost:" + httpPort.getNumber() + "/all";
-    MuleMessage response =
-        muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage response =
+        muleContext.getClient()
+            .send(proxyAddress + "?wsdl", InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
             .getRight();
     for (Element port : getPorts(getWsdl(response))) {
       assertEquals(proxyAddress, getLocation(port));
     }
   }
 
-  private Document getWsdl(MuleMessage response) throws Exception {
+  private Document getWsdl(InternalMessage response) throws Exception {
     return XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
   }
 

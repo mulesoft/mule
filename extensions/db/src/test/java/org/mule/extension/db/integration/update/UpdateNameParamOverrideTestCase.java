@@ -9,11 +9,13 @@ package org.mule.extension.db.integration.update;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
+
+import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -39,43 +41,43 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
 
   @Test
   public void usesDefaultParams() throws Exception {
-    MuleMessage response = flowRunner("defaultParams").run().getMessage();
+    Message response = flowRunner("defaultParams").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
   }
 
   @Test
   public void usesOverriddenParams() throws Exception {
-    MuleMessage response = flowRunner("overriddenParams").run().getMessage();
+    Message response = flowRunner("overriddenParams").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=2", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 2)));
   }
 
   public void usesInlineOverriddenParams() throws Exception {
-    MuleMessage response = flowRunner("inlineOverriddenParams").run().getMessage();
+    Message response = flowRunner("inlineOverriddenParams").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=3", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 3)));
   }
 
   @Test
   public void usesParamsInInlineQuery() throws Exception {
-    MuleMessage response = flowRunner("inlineQuery").run().getMessage();
+    Message response = flowRunner("inlineQuery").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
   }
 
   @Test
   public void usesExpressionParam() throws Exception {
-    MuleMessage response = flowRunner("expressionParam").withFlowVariable("type", 3).run().getMessage();
-    assertAffectedRows(response.getPayload(), 1);
+    Message response = flowRunner("expressionParam").withFlowVariable("type", 3).run().getMessage();
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
 
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=3", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 3)));

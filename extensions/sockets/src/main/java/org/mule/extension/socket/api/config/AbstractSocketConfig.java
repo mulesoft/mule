@@ -11,7 +11,7 @@ import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.extension.socket.api.connection.RequesterConnection;
 import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.api.worker.SocketWorker;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -32,7 +32,7 @@ public class AbstractSocketConfig implements Initialisable {
 
   /**
    * Default encoding used for serializing {@link String}. This encoding is used in
-   * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, MuleMessage)} operation for
+   * {@link SocketOperations#send(RequesterConnection, RequesterConfig, Object, String, String, Message)} operation for
    * serializing {@link String} types if no encoding parameter is specified.
    *
    * It is also used by the {@link SocketWorker} for encoding the replies send by the {@link SocketListener} source.

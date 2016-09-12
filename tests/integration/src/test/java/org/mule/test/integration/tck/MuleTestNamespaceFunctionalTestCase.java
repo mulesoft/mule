@@ -11,10 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.FileNotFoundException;
@@ -31,8 +31,8 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
 
   @Test
   public void testService1() throws Exception {
-    MuleEvent event = flowRunner("testService1").withPayload("foo").run();
-    MuleMessage message = event.getMessage();
+    Event event = flowRunner("testService1").withPayload("foo").run();
+    InternalMessage message = event.getMessage();
 
     assertNotNull(message);
     assertThat(event.getError().isPresent(), is(false));
@@ -41,8 +41,8 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
 
   @Test
   public void testService2() throws Exception {
-    MuleEvent event = flowRunner("testService2").withPayload("foo").run();
-    MuleMessage message = event.getMessage();
+    Event event = flowRunner("testService2").withPayload("foo").run();
+    InternalMessage message = event.getMessage();
     assertNotNull(message);
     assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(message), is(loadResourceAsString("org/mule/test/integration/tck/test-data.txt")));
@@ -50,8 +50,8 @@ public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTest
 
   @Test
   public void testService3() throws Exception {
-    MuleEvent event = flowRunner("testService3").withPayload("foo").run();
-    MuleMessage message = event.getMessage();
+    Event event = flowRunner("testService3").withPayload("foo").run();
+    InternalMessage message = event.getMessage();
     assertNotNull(message);
     assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(message), is("foo received"));

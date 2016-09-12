@@ -9,9 +9,9 @@ package org.mule.test.config.spring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;
 import org.mule.runtime.core.routing.IdempotentSecureHashMessageFilter;
@@ -33,7 +33,7 @@ public class CoreNamespaceRoutersFlowTestCase extends AbstractIntegrationTestCas
 
   @Test
   public void testIdempotentSecureHashReceiverRouter() throws Exception {
-    MessageProcessor router = lookupMessageProcessorFromFlow("IdempotentSecureHashReceiverRouter");
+    Processor router = lookupMessageProcessorFromFlow("IdempotentSecureHashReceiverRouter");
     assertTrue(router instanceof IdempotentSecureHashMessageFilter);
 
     IdempotentSecureHashMessageFilter filter = (IdempotentSecureHashMessageFilter) router;
@@ -51,7 +51,7 @@ public class CoreNamespaceRoutersFlowTestCase extends AbstractIntegrationTestCas
 
   @Test
   public void testIdempotentReceiverRouter() throws Exception {
-    MessageProcessor router = lookupMessageProcessorFromFlow("IdempotentReceiverRouter");
+    Processor router = lookupMessageProcessorFromFlow("IdempotentReceiverRouter");
     assertTrue(router instanceof IdempotentMessageFilter);
 
     IdempotentMessageFilter filter = (IdempotentMessageFilter) router;
@@ -70,18 +70,18 @@ public class CoreNamespaceRoutersFlowTestCase extends AbstractIntegrationTestCas
 
   @Test
   public void testCustomRouter() throws Exception {
-    MessageProcessor router = lookupCustomRouterFromFlow("CustomRouter");
+    Processor router = lookupCustomRouterFromFlow("CustomRouter");
     assertTrue(router instanceof CustomRouter);
   }
 
-  protected MessageProcessor lookupCustomRouterFromFlow(String flowName) throws Exception {
+  protected Processor lookupCustomRouterFromFlow(String flowName) throws Exception {
     Flow flow = lookupFlow(flowName);
     return flow.getMessageProcessors().get(0);
   }
 
-  protected MessageProcessor lookupMessageProcessorFromFlow(String flowName) throws Exception {
+  protected Processor lookupMessageProcessorFromFlow(String flowName) throws Exception {
     Flow flow = lookupFlow(flowName);
-    List<MessageProcessor> routers = flow.getMessageProcessors();
+    List<Processor> routers = flow.getMessageProcessors();
     assertEquals(1, routers.size());
     return routers.get(0);
   }
@@ -95,12 +95,12 @@ public class CoreNamespaceRoutersFlowTestCase extends AbstractIntegrationTestCas
   public static class CustomRouter extends AbstractOutboundRouter {
 
     @Override
-    public boolean isMatch(MuleEvent message, MuleEvent.Builder builder) throws MuleException {
+    public boolean isMatch(Event message, Event.Builder builder) throws MuleException {
       return true;
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event) throws MuleException {
+    protected Event route(Event event) throws MuleException {
       return event;
     }
   }

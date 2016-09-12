@@ -9,9 +9,9 @@ package org.mule.test.heisenberg.extension;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
@@ -133,8 +133,8 @@ public class HeisenbergOperations {
     return extensionManager;
   }
 
-  public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, MuleEvent event) {
-    Long payment = (Long) event.getMessage().getPayload();
+  public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, Event event) {
+    Long payment = (Long) event.getMessage().getPayload().getValue();
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
@@ -142,8 +142,8 @@ public class HeisenbergOperations {
     return String.format("%s, my name is %s and I'm %d years old", greeting, info.getName(), info.getAge());
   }
 
-  public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, MuleMessage message) {
-    Long payment = (Long) message.getPayload();
+  public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, Message message) {
+    Long payment = (Long) message.getPayload().getValue();
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.routing.requestreply;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 
@@ -14,7 +14,7 @@ public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToProp
     implements NonBlockingSupported {
 
   @Override
-  protected boolean shouldProcessEvent(MuleEvent event) {
+  protected boolean shouldProcessEvent(Event event) {
     // Only process ReplyToHandler is running one-way and standard ReplyToHandler is being used.
     return !event.getExchangePattern().hasResponse() && event.getReplyToHandler() instanceof DefaultReplyToHandler;
   }

@@ -14,8 +14,8 @@ import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 
@@ -105,7 +105,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     try {
       FileUtils.cleanDirectory(this.storeDirectory);
     } catch (IOException e) {
-      throw new ObjectStoreException(MessageFactory.createStaticMessage("Could not clear object store"), e);
+      throw new ObjectStoreException(I18nMessageFactory.createStaticMessage("Could not clear object store"), e);
     }
   }
 
@@ -128,7 +128,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     // To support concurrency we need to check if directory exists again inside
     // synchronized method
     if (!directory.exists() && !directory.mkdirs()) {
-      Message message = CoreMessages.failedToCreate("queue store store directory " + directory.getAbsolutePath());
+      I18nMessage message = CoreMessages.failedToCreate("queue store store directory " + directory.getAbsolutePath());
       throw new ObjectStoreException(message);
     }
   }
@@ -232,7 +232,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     } catch (FileNotFoundException fnfe) {
       throw new ObjectStoreException(fnfe);
     } catch (IOException e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not write to file"), e);
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Could not write to file"), e);
     }
   }
 
@@ -284,7 +284,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
   protected void deleteStoreFile(File file) throws ObjectStoreException {
     if (file.exists()) {
       if (!file.delete()) {
-        Message message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath() + " failed");
+        I18nMessage message = CoreMessages.createStaticMessage("Deleting " + file.getAbsolutePath() + " failed");
         throw new ObjectStoreException(message);
       }
     } else {

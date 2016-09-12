@@ -47,7 +47,7 @@ public class PetStoreThreadingProfileTestCase extends ExtensionFunctionalTestCas
 
   @Test
   public void threadingProfileOnConnection() throws Exception {
-    PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload();
+    PetStoreClient client = (PetStoreClient) runFlow("getClient").getMessage().getPayload().getValue();
     assertThreadingProfile(client.getThreadingProfile());
   }
 

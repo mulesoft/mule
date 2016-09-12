@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.client.RequestCacheKey;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 
 /**
@@ -28,7 +28,7 @@ public class HttpConnectorMessageProcessorProvider extends AbstractConnectorMess
   }
 
   @Override
-  protected MessageProcessor buildMessageProcessor(final RequestCacheKey cacheKey) throws MuleException {
+  protected Processor buildMessageProcessor(final RequestCacheKey cacheKey) throws MuleException {
     final OperationOptions operationOptions = cacheKey.getOperationOptions();
     final MessageExchangePattern exchangePattern = cacheKey.getExchangePattern();
     final String url = cacheKey.getUrl();
@@ -40,7 +40,7 @@ public class HttpConnectorMessageProcessorProvider extends AbstractConnectorMess
         httpRequesterBuilder.responseTimeout(operationOptions.getResponseTimeout());
       }
     }
-    MessageProcessor messageProcessor = httpRequesterBuilder.build();
+    Processor messageProcessor = httpRequesterBuilder.build();
     if (exchangePattern.equals(MessageExchangePattern.ONE_WAY)) {
       messageProcessor = new OneWayHttpRequesterAdapter(messageProcessor);
     }

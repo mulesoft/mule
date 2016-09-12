@@ -9,9 +9,9 @@ package org.mule.test.integration.config;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -37,8 +37,8 @@ public class DisableTimeoutsConfigTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void httpOutboundEndpointResponseTimeout() throws Exception {
-    MuleEvent event = flowRunner("HttpTimeout").withPayload("hi").run();
-    MuleMessage result = event.getMessage();
+    Event event = flowRunner("HttpTimeout").withPayload("hi").run();
+    InternalMessage result = event.getMessage();
     assertNotNull(result);
     assertThat(event.getError().isPresent(), is((false)));
   }

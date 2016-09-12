@@ -7,8 +7,8 @@
 package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.api.GlobalNameableObject;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3.
- * On error handlers must implement {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor} to be part of
+ * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
+ * handlers must implement {@link org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor} to be part of
  * ErrorHandler.
  *
  * @since 4.0
@@ -49,9 +49,9 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public MuleEvent handleException(MessagingException exception, MuleEvent event) {
-    event = MuleEvent.builder(event)
-        .message(MuleMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
+  public Event handleException(MessagingException exception, Event event) {
+    event = Event.builder(event)
+        .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .build();
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
@@ -123,7 +123,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
   }
 
   @Override
-  public boolean accept(MuleEvent event) {
+  public boolean accept(Event event) {
     return true;
   }
 

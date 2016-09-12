@@ -9,8 +9,8 @@ package org.mule.test.routing;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class DynamicAllTestCase extends DynamicRouterTestCase {
   @Test
   public void oneRoute() throws Exception {
     CustomRouteResolver.routes.add(new CustomRouteResolver.AddLetterMessageProcessor(LETTER_A));
-    MuleEvent result = flowRunner(DYNAMIC_ALL).withPayload(TEST_MESSAGE).run();
+    Event result = flowRunner(DYNAMIC_ALL).withPayload(TEST_MESSAGE).run();
     assertThat(getPayloadAsString(result.getMessage()), is(LETTER_A));
   }
 
@@ -64,15 +64,15 @@ public class DynamicAllTestCase extends DynamicRouterTestCase {
     runFlowAndAssertResponse("dynamicAllResultAggregator", (Object) TEST_MESSAGE, LETTER_A);
   }
 
-  private MuleEvent runFlowAndAssertResponse(String flowName, String... letters) throws Exception {
+  private Event runFlowAndAssertResponse(String flowName, String... letters) throws Exception {
     return runFlowAndAssertResponse(flowName, TEST_MESSAGE, letters);
   }
 
-  private MuleEvent runFlowAndAssertResponse(String flowName, Object payload, String... letters) throws Exception {
-    MuleEvent resultEvent = flowRunner(flowName).withPayload(payload).run();
-    MuleMessage messageCollection = resultEvent.getMessage();
+  private Event runFlowAndAssertResponse(String flowName, Object payload, String... letters) throws Exception {
+    Event resultEvent = flowRunner(flowName).withPayload(payload).run();
+    InternalMessage messageCollection = resultEvent.getMessage();
     for (int i = 0; i < letters.length; i++) {
-      MuleMessage message = ((List<MuleMessage>) messageCollection.getPayload()).get(i);
+      InternalMessage message = ((List<InternalMessage>) messageCollection.getPayload().getValue()).get(i);
       assertThat(getPayloadAsString(message), is(letters[i]));
     }
     return resultEvent;

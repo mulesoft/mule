@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.model;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>SessionException</code> is thrown when errors occur in the DefaultMuleSession or Seession Manager
@@ -22,7 +22,7 @@ public class SessionException extends MuleException {
   /**
    * @param message the exception message
    */
-  public SessionException(Message message) {
+  public SessionException(I18nMessage message) {
     super(message);
   }
 
@@ -30,7 +30,7 @@ public class SessionException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public SessionException(Message message, Throwable cause) {
+  public SessionException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

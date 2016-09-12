@@ -9,7 +9,7 @@ package org.mule.test.integration.message;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
@@ -22,9 +22,10 @@ public abstract class AbstractPropertyScopeTestCase extends AbstractIntegrationT
 
   @Test
   public void testRequestResponse() throws Exception {
-    MuleMessage result = flowRunner("foo").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
+    InternalMessage result =
+        flowRunner("foo").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
 
-    assertThat(result.getPayload(), is("test bar"));
+    assertThat(result.getPayload().getValue(), is("test bar"));
     assertThat(result.getOutboundProperty("foo"), is("fooValue"));
   }
 

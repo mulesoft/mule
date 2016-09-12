@@ -14,10 +14,10 @@ import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -124,8 +124,8 @@ public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase {
 
   @Test
   public void sendsRequest() throws Exception {
-    MuleEvent response = flowRunner("client").withPayload("PEPE").run();
-    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload()), is("WOW"));
+    Event response = flowRunner("client").withPayload("PEPE").run();
+    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload().getValue()), is("WOW"));
     assertThat(method, is("GET"));
     assertThat(headers, hasEntry("X-Custom", "custom-value"));
     assertThat(query, is("query=param"));
@@ -148,12 +148,12 @@ public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase {
     }
   }
 
-  protected static class RequestCheckerMessageProcessor implements MessageProcessor {
+  protected static class RequestCheckerMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      MuleMessage message = event.getMessage();
-      Object payload = message.getPayload();
+    public Event process(Event event) throws MuleException {
+      Message message = event.getMessage();
+      Object payload = message.getPayload().getValue();
       assertThat(payload, is(nullValue()));
       assertThat(message.getAttributes(), instanceOf(HttpRequestAttributes.class));
       HttpRequestAttributes requestAttributes = (HttpRequestAttributes) message.getAttributes();

@@ -7,12 +7,12 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 
 /**
@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.processor.MessageProcessor;
  * be route to the next route. This continues until a successful route is found.
  *
  */
-public class DynamicFirstSuccessful implements MessageProcessor, Initialisable, MuleContextAware {
+public class DynamicFirstSuccessful implements Processor, Initialisable, MuleContextAware {
 
   private FirstSuccessfulRoutingStrategy routingStrategy;
   private MuleContext muleContext;
@@ -32,7 +32,7 @@ public class DynamicFirstSuccessful implements MessageProcessor, Initialisable, 
 
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return routingStrategy.route(event, dynamicRouteResolver.resolveRoutes(event));
   }
 

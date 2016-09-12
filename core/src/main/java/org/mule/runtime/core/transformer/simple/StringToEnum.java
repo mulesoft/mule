@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformer.simple;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.metadata.DataType;

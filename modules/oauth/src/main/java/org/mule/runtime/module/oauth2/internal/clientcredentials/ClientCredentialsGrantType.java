@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.module.oauth2.internal.clientcredentials;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -97,7 +97,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
   }
 
   @Override
-  public void authenticate(MuleEvent muleEvent, HttpRequestBuilder builder) throws MuleException {
+  public void authenticate(Event muleEvent, HttpRequestBuilder builder) throws MuleException {
     final String accessToken = tokenManager.getConfigOAuthContext()
         .getContextForResourceOwner(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID).getAccessToken();
     if (accessToken == null) {
@@ -108,7 +108,7 @@ public class ClientCredentialsGrantType extends AbstractGrantType implements Ini
   }
 
   @Override
-  public boolean shouldRetry(final MuleEvent firstAttemptResponseEvent) {
+  public boolean shouldRetry(final Event firstAttemptResponseEvent) {
     final Object value = muleContext.getExpressionLanguage().evaluate(getRefreshTokenWhen(), firstAttemptResponseEvent, null);
     if (!(value instanceof Boolean)) {
       throw new MuleRuntimeException(createStaticMessage("Expression %s should return a boolean but return %s",

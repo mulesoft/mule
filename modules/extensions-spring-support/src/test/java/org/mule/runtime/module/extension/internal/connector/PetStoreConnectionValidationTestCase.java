@@ -34,11 +34,11 @@ public class PetStoreConnectionValidationTestCase extends PetStoreConnectionTest
     expectedEx.expectCause(is(instanceOf(Exception.class)));
     expectedEx.expectMessage(is(INVALID_CREDENTIALS_ERROR_MESSAGE));
 
-    runFlow("getPetsWithInvalidConfigWithConnectionValidation").getMessage().getPayload();
+    runFlow("getPetsWithInvalidConfigWithConnectionValidation").getMessage().getPayload().getValue();
   }
 
   @Test
   public void getInvalidConnectionWithDisabledValidation() throws Exception {
-    runFlow("getPetsWithInvalidConfigAndDisabledValidation").getMessage().getPayload();
+    runFlow("getPetsWithInvalidConfigAndDisabledValidation").getMessage().getPayload().getValue();
   }
 }

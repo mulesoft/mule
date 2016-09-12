@@ -8,9 +8,9 @@ package org.mule.runtime.core.routing;
 
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutePathNotFoundException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 
@@ -37,7 +37,7 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy {
   }
 
   @Override
-  public MuleEvent route(MuleEvent event, List<MessageProcessor> messageProcessors) throws MuleException {
+  public Event route(Event event, List<Processor> messageProcessors) throws MuleException {
     if (messageProcessors == null || messageProcessors.isEmpty()) {
       throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), null);
     }
@@ -54,9 +54,9 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy {
       }
     }
 
-    MessageProcessor mp = messageProcessors.get(nextMessageProcessor);
+    Processor mp = messageProcessors.get(nextMessageProcessor);
 
-    MuleEvent eventCopy = cloneEventForRouting(event, mp);
+    Event eventCopy = cloneEventForRouting(event, mp);
     try {
       return mp.process(eventCopy);
     } catch (MuleException me) {
@@ -64,7 +64,7 @@ public class RoundRobinRoutingStrategy extends AbstractRoutingStrategy {
     }
   }
 
-  private MuleEvent cloneEventForRouting(MuleEvent event, MessageProcessor mp) throws MuleException {
+  private Event cloneEventForRouting(Event event, Processor mp) throws MuleException {
     return createEventToRoute(event, cloneMessage(event.getMessage()), mp);
   }
 }

@@ -8,7 +8,7 @@ package org.mule.runtime.components.script.refreshable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -41,7 +41,7 @@ public abstract class AbstractRefreshableBeanTestCase extends FunctionalTestCase
     writeScript(script, nameToPath(name));
     Thread.sleep(WAIT_TIME); // wait for bean to refresh
 
-    MuleMessage m = flowRunner(flowName).withPayload(payload).run().getMessage();
+    InternalMessage m = flowRunner(flowName).withPayload(payload).run().getMessage();
     assertNotNull(m);
     assertEquals(payload + result, getPayloadAsString(m));
   }

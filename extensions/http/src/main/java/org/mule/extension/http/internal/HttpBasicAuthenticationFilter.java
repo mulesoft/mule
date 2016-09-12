@@ -9,14 +9,14 @@ package org.mule.extension.http.internal;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.mule.runtime.core.DefaultMuleEvent.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -90,35 +90,35 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   }
 
 
-  protected Authentication createAuthentication(String username, String password, MuleEvent event) {
+  protected Authentication createAuthentication(String username, String password, Event event) {
     return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
   }
 
-  protected MuleEvent setUnauthenticated(MuleEvent event) {
+  protected Event setUnauthenticated(Event event) {
     String realmHeader = "Basic realm=";
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
     Map<String, String> headers = getFlowVariableOrNull(headersFlowVar, event);
-    Builder builder = MuleEvent.builder(event);
+    Builder builder = Event.builder(event);
     if (headers == null) {
       headers = new HashMap<>();
-      builder.addFlowVariable(headersFlowVar, headers);
+      builder.addVariable(headersFlowVar, headers);
     }
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    builder.addFlowVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
+    builder.addVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
     return builder.build();
   }
 
   /**
    * Authenticates the current message if authenticate is set to true. This method will always populate the secure context in the
-   * {@link MuleEvent} session
+   * {@link Event} session
    *
    * @param event the current message received
    * @throws SecurityException if authentication fails
    */
   @Override
-  public MuleEvent authenticate(MuleEvent event)
+  public Event authenticate(Event event)
       throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
       SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException {
     checkArgument(event.getMessage().getAttributes() instanceof HttpRequestAttributes,

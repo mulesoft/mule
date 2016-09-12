@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.interceptor;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
@@ -24,7 +24,7 @@ import java.util.List;
 public class InterceptorStack extends AbstractInterceptingMessageProcessor implements Interceptor, Initialisable, Disposable {
 
   private List<Interceptor> interceptors;
-  private MessageProcessor chain;
+  private Processor chain;
 
   public InterceptorStack() {
     // For spring
@@ -35,7 +35,7 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor imple
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     return chain.process(event);
   }
 

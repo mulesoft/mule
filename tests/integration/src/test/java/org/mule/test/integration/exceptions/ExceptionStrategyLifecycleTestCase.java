@@ -10,12 +10,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.exception.ErrorHandler;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.TemplateOnErrorHandler;
 
 import org.junit.Test;
@@ -66,7 +66,7 @@ public class ExceptionStrategyLifecycleTestCase extends AbstractIntegrationTestC
     assertThat(lifecycleCheckerMessageProcessorFlowD.isStopped(), is(false));
   }
 
-  public static class LifecycleCheckerMessageProcessor implements MessageProcessor, Lifecycle {
+  public static class LifecycleCheckerMessageProcessor implements Processor, Lifecycle {
 
     private boolean initialized;
     private boolean disposed;
@@ -74,7 +74,7 @@ public class ExceptionStrategyLifecycleTestCase extends AbstractIntegrationTestC
     private boolean stopped;
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return event;
     }
 

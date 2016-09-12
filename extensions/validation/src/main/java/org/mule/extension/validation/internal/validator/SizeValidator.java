@@ -8,8 +8,8 @@ package org.mule.extension.validation.internal.validator;
 
 import static org.mule.extension.validation.internal.ImmutableValidationResult.ok;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.runtime.core.util.ArrayUtils;
@@ -29,7 +29,7 @@ public class SizeValidator extends AbstractValidator {
   private final int minSize;
   private final Integer maxSize;
 
-  private Message errorMessage;
+  private I18nMessage errorMessage;
 
   public SizeValidator(Object value, int minSize, Integer maxSize, ValidationContext validationContext) {
     super(validationContext);
@@ -39,7 +39,7 @@ public class SizeValidator extends AbstractValidator {
   }
 
   @Override
-  public ValidationResult validate(MuleEvent event) {
+  public ValidationResult validate(Event event) {
     int inputLength = getSize(value);
     if (inputLength < minSize) {
       errorMessage = getMessages().lowerThanMinSize(value, minSize, inputLength);
@@ -72,7 +72,7 @@ public class SizeValidator extends AbstractValidator {
   }
 
   @Override
-  protected Message getDefaultErrorMessage() {
+  protected I18nMessage getDefaultErrorMessage() {
     return errorMessage;
   }
 }

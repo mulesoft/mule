@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.Arrays;
@@ -35,9 +35,9 @@ public class VMQueueTestCase extends FunctionalTestCase {
   public void testSingleMessage() throws Exception {
     MuleClient client = muleContext.getClient();
     client.dispatch("queue", "Marco", null);
-    MuleMessage response = client.request("queue", WAIT).getRight().get();
+    InternalMessage response = client.request("queue", WAIT).getRight().get();
     assertNotNull("Response is null", response);
-    assertEquals("Marco", response.getPayload());
+    assertEquals("Marco", response.getPayload().getValue());
   }
 
   @Test
@@ -50,9 +50,9 @@ public class VMQueueTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < 3; ++i) {
-      MuleMessage response = client.request("queue", WAIT).getRight().get();
+      InternalMessage response = client.request("queue", WAIT).getRight().get();
       assertNotNull("Response is null", response);
-      String person = (String) response.getPayload();
+      String person = (String) response.getPayload().getValue();
       assertTrue(person, polos.contains(person));
       polos.remove(person);
     }
@@ -68,9 +68,9 @@ public class VMQueueTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < 3; ++i) {
-      MuleMessage response = client.request("queue", WAIT).getRight().get();
+      InternalMessage response = client.request("queue", WAIT).getRight().get();
       assertNotNull("Response is null", response);
-      String person = (String) response.getPayload();
+      String person = (String) response.getPayload().getValue();
       String personName = new StringTokenizer(person).nextToken();
       assertTrue(personName, polos.contains(personName));
       polos.remove(personName);
@@ -87,9 +87,9 @@ public class VMQueueTestCase extends FunctionalTestCase {
     }
 
     for (int i = 0; i < 3; ++i) {
-      MuleMessage response = client.request("queue", WAIT).getRight().get();
+      InternalMessage response = client.request("queue", WAIT).getRight().get();
       assertNotNull("Response is null", response);
-      String person = (String) response.getPayload();
+      String person = (String) response.getPayload().getValue();
       String personName = new StringTokenizer(person).nextToken();
       assertTrue(personName, polos.contains(personName));
       polos.remove(personName);

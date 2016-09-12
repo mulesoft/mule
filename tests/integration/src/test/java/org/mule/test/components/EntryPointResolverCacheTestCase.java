@@ -10,9 +10,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 import org.junit.Test;
@@ -29,18 +29,18 @@ public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
 
   @Test
   public void testCache() throws Exception {
-    MuleEvent responseEvent =
+    Event responseEvent =
         flowRunner("refServiceOne").withPayload("a request").withInboundProperty("method", "retrieveReferenceData").run();
-    MuleMessage response = responseEvent
+    InternalMessage response = responseEvent
         .getMessage();
-    Object payload = response.getPayload();
+    Object payload = response.getPayload().getValue();
 
     assertThat(payload, instanceOf(String.class));
     assertThat(payload, is("ServiceOne"));
 
     response = flowRunner("refServiceTwo").withPayload("another request").withInboundProperty("method", "retrieveReferenceData")
         .run().getMessage();
-    payload = response.getPayload();
+    payload = response.getPayload().getValue();
     if ((payload == null) || (responseEvent.getError().isPresent())) {
       Throwable exception = responseEvent.getError().get().getException();
       if (exception != null) {

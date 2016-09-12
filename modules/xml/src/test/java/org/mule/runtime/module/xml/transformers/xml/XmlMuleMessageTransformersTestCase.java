@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -35,7 +35,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
     ObjectToXml t1 = createObject(ObjectToXml.class);
     t1.setAcceptMuleMessage(true);
 
-    MuleMessage msg = MuleMessage.builder().payload("test").mediaType(MediaType.ANY.withCharset(UTF_8))
+    InternalMessage msg = InternalMessage.builder().payload("test").mediaType(MediaType.ANY.withCharset(UTF_8))
         .addOutboundProperty("object", new Apple()).addOutboundProperty("string", "hello").build();
 
     String xml = (String) t1.transform(msg);
@@ -45,9 +45,9 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
 
     Object result = t2.transform(xml);
     assertNotNull(result);
-    assertThat(result, instanceOf(MuleMessage.class));
+    assertThat(result, instanceOf(InternalMessage.class));
 
-    msg = (MuleMessage) result;
+    msg = (InternalMessage) result;
 
     assertEquals("test", getPayloadAsString(msg));
     assertEquals(new Apple(), msg.getOutboundProperty("object"));
@@ -66,7 +66,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
     assertNull(msg.getInboundProperty("number"));
     assertNull(msg.getOutboundProperty("number"));
 
-    assertThat(msg.getDataType().getMediaType().getCharset().get(), is(UTF_8));
+    assertThat(msg.getPayload().getDataType().getMediaType().getCharset().get(), is(UTF_8));
 
     Set<String> outboundProps = msg.getOutboundPropertyNames();
     assertThat(outboundProps, hasSize(2));

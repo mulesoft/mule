@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.tck.MuleTestUtils.getTestEvent;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -46,10 +46,10 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase {
     filter.initialise();
 
     assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext),
-                             mock(MuleEvent.Builder.class)),
+                             mock(Event.Builder.class)),
                is(true));
     assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext),
-                             mock(MuleEvent.Builder.class)),
+                             mock(Event.Builder.class)),
                is(false));
   }
 
@@ -69,10 +69,10 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase {
     filter.initialise();
 
     assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext),
-                             mock(MuleEvent.Builder.class)),
+                             mock(Event.Builder.class)),
                is(true));
     assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext),
-                             mock(MuleEvent.Builder.class)),
+                             mock(Event.Builder.class)),
                is(false));
   }
 }

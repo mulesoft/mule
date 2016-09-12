@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.ArrayList;
@@ -34,15 +34,15 @@ public class ForwardingMessageSplitterTestCase extends AbstractIntegrationTestCa
     payload.add(new Integer(3));
     payload.add(new Exception());
     flowRunner("forwardingSplitter").withPayload(payload).asynchronously().run();
-    MuleMessage m = client.request("test://component.1", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage m = client.request("test://component.1", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
-    assertThat(m.getPayload(), instanceOf(String.class));
+    assertThat(m.getPayload().getValue(), instanceOf(String.class));
     m = client.request("test://component.2", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
-    assertThat(m.getPayload(), instanceOf(Integer.class));
+    assertThat(m.getPayload().getValue(), instanceOf(Integer.class));
 
     m = client.request("test://error.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(m);
-    assertThat(m.getPayload(), instanceOf(Exception.class));
+    assertThat(m.getPayload().getValue(), instanceOf(Exception.class));
   }
 }

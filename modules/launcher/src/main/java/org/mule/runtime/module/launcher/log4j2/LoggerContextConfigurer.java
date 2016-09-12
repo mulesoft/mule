@@ -8,7 +8,7 @@ package org.mule.runtime.module.launcher.log4j2;
 
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
@@ -99,7 +99,7 @@ final class LoggerContextConfigurer {
     try {
       ClassUtils.setFieldValue(context.getConfiguration(), "isShutdownHookEnabled", false, true);
     } catch (Exception e) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage("Could not configure shutdown hook. Unexpected configuration type"), e);
     }
 
@@ -125,7 +125,8 @@ final class LoggerContextConfigurer {
     try {
       return ClassUtils.getFieldValue(configuration, "listeners", true);
     } catch (Exception e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not get listeners. Unexpected configuration type"),
+      throw new MuleRuntimeException(I18nMessageFactory
+          .createStaticMessage("Could not get listeners. Unexpected configuration type"),
                                      e);
     }
   }
@@ -226,7 +227,7 @@ final class LoggerContextConfigurer {
     try {
       url = uri.toURL();
     } catch (MalformedURLException e) {
-      throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not locate file " + uri), e);
+      throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Could not locate file " + uri), e);
     }
 
     if (directory != null && FileUtils.isFile(url)) {

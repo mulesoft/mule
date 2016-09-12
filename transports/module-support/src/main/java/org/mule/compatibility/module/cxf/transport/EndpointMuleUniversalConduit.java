@@ -7,26 +7,26 @@
 package org.mule.compatibility.module.cxf.transport;
 
 import static org.mule.runtime.api.metadata.MediaType.XML;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.OutputHandler;
@@ -96,7 +96,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
       message.getInterceptorChain().doIntercept(message);
     };
 
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
     // are we sending an out of band response for a server side request?
     boolean decoupled = event != null && message.getExchange().getInMessage() != null;
 
@@ -105,7 +105,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
     if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled) {
       // we've got an out of band WS-RM message or a message from a standalone client
       MuleContext muleContext = configuration.getMuleContext();
-      MuleMessage muleMsg = MuleMessage.builder().payload(handler).build();
+      InternalMessage muleMsg = InternalMessage.builder().payload(handler).build();
 
       String url = setupURL(message);
 
@@ -138,13 +138,13 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
             return null;
           }
         };
-        event = MuleEvent.builder(event == null ? DefaultMessageContext.create(flowConstruct, "EndpointMuleUniversalConduit")
+        event = Event.builder(event == null ? DefaultEventContext.create(flowConstruct, "EndpointMuleUniversalConduit")
             : event.getContext()).message(muleMsg).exchangePattern(ep.getExchangePattern()).flow(flowConstruct).build();
       } catch (Exception e) {
         throw new Fault(e);
       }
     } else {
-      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build())
+      event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build())
           .build();
     }
 
@@ -153,7 +153,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
     }
     message.put(CxfConstants.MULE_EVENT, event);
 
-    final MuleEvent finalEvent = event;
+    final Event finalEvent = event;
     final OutboundEndpoint finalEndpoint = ep;
     AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM) {
 
@@ -169,19 +169,19 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
     message.getInterceptorChain().add(i);
   }
 
-  protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent, OutboundEndpoint endpoint) throws MuleException {
+  protected void dispatchMuleMessage(final Message m, Event reqEvent, OutboundEndpoint endpoint) throws MuleException {
     try {
       if (reqEvent.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-        reqEvent = MuleEvent.builder(reqEvent).message(MuleMessage.builder(reqEvent.getMessage())
+        reqEvent = Event.builder(reqEvent).message(InternalMessage.builder(reqEvent.getMessage())
             .addOutboundProperty(HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString())
             .build()).replyToHandler(new NonBlockingReplyToHandler() {
 
               @Override
-              public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+              public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
                 try {
-                  Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
+                  Holder<Event> holder = (Holder<Event>) m.getExchange().get("holder");
                   holder.value = event;
                   sendResultBackToCxf(m, event);
                 } catch (IOException e) {
@@ -199,7 +199,7 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(reqEvent);
 
-      MuleEvent resEvent = processNext(reqEvent, m.getExchange(), endpoint);
+      Event resEvent = processNext(reqEvent, m.getExchange(), endpoint);
 
       if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
         sendResultBackToCxf(m, resEvent);
@@ -207,22 +207,22 @@ public class EndpointMuleUniversalConduit extends MuleUniversalConduit {
     } catch (MuleException me) {
       throw me;
     } catch (Exception e) {
-      throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
+      throw new DefaultMuleException(I18nMessageFactory.createStaticMessage("Could not send message to Mule."), e);
     }
   }
 
-  protected MuleEvent processNext(MuleEvent event,
-                                  Exchange exchange, OutboundEndpoint endpoint)
+  protected Event processNext(Event event,
+                              Exchange exchange, OutboundEndpoint endpoint)
       throws MuleException {
     CxfOutboundMessageProcessor processor =
         (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
-    MuleEvent response;
+    Event response;
     if (processor == null) {
       response = endpoint.process(event);
     } else {
       response = processor.processNext(event);
 
-      Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
+      Holder<Event> holder = (Holder<Event>) exchange.get("holder");
       holder.value = response;
     }
 

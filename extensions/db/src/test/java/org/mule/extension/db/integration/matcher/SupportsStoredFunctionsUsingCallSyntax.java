@@ -13,8 +13,7 @@ import java.sql.SQLException;
 import org.hamcrest.Description;
 
 /**
- * Checks whether or not a dataSource supports invoking user-defined or vendor
- * functions using the stored procedure escape syntax.
+ * Checks whether or not a dataSource supports invoking user-defined or vendor functions using the stored procedure escape syntax.
  */
 public class SupportsStoredFunctionsUsingCallSyntax extends AbstractDataSourceFeatureMatcher {
 

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -29,7 +29,7 @@ public class StaticConfigurationProvider extends LifecycleAwareConfigurationProv
   /**
    * Returns {@link #configuration}.
    *
-   * @param muleEvent the current {@link MuleEvent}
+   * @param muleEvent the current {@link Event}
    * @return {@link #configuration}
    */
   @Override

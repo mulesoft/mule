@@ -8,7 +8,7 @@ package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;
@@ -26,13 +26,13 @@ public class FlowOutboundInMiddleOfFlowTestCase extends AbstractIntegrationTestC
 
     flowRunner("flowTest").withPayload("message").asynchronously().run();
 
-    MuleMessage msg = client.request("test://test.out.1", 1000).getRight().get();
+    InternalMessage msg = client.request("test://test.out.1", 1000).getRight().get();
     assertEquals("messagehello", getPayloadAsString(msg));
 
-    MuleMessage msg2 = client.request("test://test.out.2", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msg2 = client.request("test://test.out.2", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("messagebye", getPayloadAsString(msg2));
 
-    MuleMessage msg3 = client.request("test://test.out.3", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage msg3 = client.request("test://test.out.3", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("egassem", getPayloadAsString(msg3));
   }
 }

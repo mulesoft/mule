@@ -13,18 +13,18 @@ import org.mule.functional.functional.FlowAssert;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
 import org.mule.runtime.core.component.AbstractJavaComponent;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.chain.SubflowInterceptingChainLifecycleWrapper;
@@ -110,7 +110,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     if (flowConstruct != null) {
       return getComponent(flowConstruct);
     } else {
-      throw new RegistrationException(MessageFactory.createStaticMessage("Service " + serviceName + " not found in Registry"));
+      throw new RegistrationException(I18nMessageFactory
+          .createStaticMessage("Service " + serviceName + " not found in Registry"));
     }
   }
 
@@ -123,14 +124,14 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     if (flowConstruct instanceof AbstractPipeline) {
       AbstractPipeline flow = (AbstractPipeline) flowConstruct;
       // Retrieve the first component
-      for (MessageProcessor processor : flow.getMessageProcessors()) {
+      for (Processor processor : flow.getMessageProcessors()) {
         if (processor instanceof Component) {
           return getComponentObject(((Component) processor));
         }
       }
     }
 
-    throw new RegistrationException(MessageFactory
+    throw new RegistrationException(I18nMessageFactory
         .createStaticMessage("Can't get component from flow construct " + flowConstruct.getName()));
   }
 
@@ -205,7 +206,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * @return the resulting <code>MuleEvent</code>
    * @throws Exception
    */
-  protected MuleEvent runFlow(String flowName) throws Exception {
+  protected Event runFlow(String flowName) throws Exception {
     return flowRunner(flowName).run();
   }
 

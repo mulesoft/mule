@@ -11,12 +11,12 @@ import static org.mule.runtime.core.api.LocatedMuleException.INFO_SOURCE_XML_KEY
 
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.LocationExecutionContextProvider;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
   }
 
   @Override
-  public Map<String, Object> getContextInfo(MuleEvent event, MessageProcessor lastProcessed, FlowConstruct flowConstruct) {
+  public Map<String, Object> getContextInfo(Event event, Processor lastProcessed, FlowConstruct flowConstruct) {
     Map<String, Object> contextInfo = new HashMap<>();
 
     contextInfo.put(INFO_LOCATION_KEY,
@@ -50,7 +50,7 @@ public class MessagingExceptionLocationProvider extends LocationExecutionContext
     return contextInfo;
   }
 
-  protected String getProcessorPath(MuleEvent event, MessageProcessor lastProcessed, FlowConstruct flowConstruct) {
+  protected String getProcessorPath(Event event, Processor lastProcessed, FlowConstruct flowConstruct) {
     if (flowConstruct instanceof MessageProcessorPathResolver) {
       return ((MessageProcessorPathResolver) flowConstruct).getProcessorPath(lastProcessed);
     } else {

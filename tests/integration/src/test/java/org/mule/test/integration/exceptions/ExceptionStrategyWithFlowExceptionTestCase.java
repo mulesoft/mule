@@ -10,11 +10,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.ExceptionMessage;
 
 import org.junit.Test;
@@ -30,16 +30,16 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends AbstractIntegrat
   public void testFlowExceptionExceptionStrategy() throws Exception {
     flowRunner("customException").withPayload(getTestMuleMessage(TEST_MESSAGE)).asynchronously().run();
     MuleClient client = muleContext.getClient();
-    MuleMessage message = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull("request returned no message", message);
-    assertTrue(message.getPayload() instanceof ExceptionMessage);
+    assertTrue(message.getPayload().getValue() instanceof ExceptionMessage);
   }
 
-  public static class ExceptionThrower implements MessageProcessor {
+  public static class ExceptionThrower implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       throw new MessagingException(event, null);
     }
   }

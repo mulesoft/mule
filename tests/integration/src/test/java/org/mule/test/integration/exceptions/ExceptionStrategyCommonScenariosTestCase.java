@@ -11,8 +11,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
@@ -73,9 +73,10 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractIntegratio
     public PreservePayloadExceptionStrategy() {}
 
     @Override
-    public MuleEvent handleException(MessagingException e, MuleEvent event) {
-      return MuleEvent.builder(super.handleException(e, event))
-          .message(MuleMessage.builder(event.getMessage()).payload(event.getMessage().getPayload()).build()).build();
+    public Event handleException(MessagingException e, Event event) {
+      return Event.builder(super.handleException(e, event))
+          .message(InternalMessage.builder(event.getMessage()).payload(event.getMessage().getPayload().getValue()).build())
+          .build();
     }
   }
 }

@@ -109,8 +109,8 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   }
 
   /**
-   * Detects if a bean is an inner bean to prevent applying lifecycle to it since
-   * lifecycle is already applied by the owner, i.e.: a flow
+   * Detects if a bean is an inner bean to prevent applying lifecycle to it since lifecycle is already applied by the owner, i.e.:
+   * a flow
    *
    * @param name bean name.
    * @return true if contains inner bean as prefix of the bean name, false otherwise.
@@ -120,9 +120,8 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
   }
 
   /**
-   * A lifecycle phase that will delegate to the
-   * {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in turn
-   * will destroy the application context managed by this registry
+   * A lifecycle phase that will delegate to the {@link org.mule.runtime.config.spring.SpringRegistry#doDispose()} method which in
+   * turn will destroy the application context managed by this registry
    */
   class SpringContextDisposePhase extends MuleContextDisposePhase {
 

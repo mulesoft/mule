@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -69,7 +69,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
     request.setRequestEntity(entity);
     httpClient.executeMethod(request);
 
-    MuleMessage message = muleClient.request("vm://out", 1000).getRight().get();
+    InternalMessage message = muleClient.request("vm://out", 1000).getRight().get();
     assertNotNull(message);
     assertEquals(MESSAGE, getPayloadAsString(message));
   }
@@ -87,7 +87,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase {
     request.setRequestEntity(entity);
 
     httpClient.executeMethod(request);
-    MuleMessage message = muleClient.request("vm://out", 1000).getRight().get();
+    InternalMessage message = muleClient.request("vm://out", 1000).getRight().get();
     assertNotNull(message);
     assertEquals(MESSAGE, getPayloadAsString(message));
   }

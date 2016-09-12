@@ -18,7 +18,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
@@ -61,16 +61,16 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
   }
 
   protected void assertMessageInDlq() throws MuleException {
-    MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000).getRight().get();
+    InternalMessage dl = client.request(JMS_DEAD_LETTER, 1000).getRight().get();
     assertNotNull(dl);
-    assertTrue(dl.getPayload() instanceof ExceptionMessage);
-    ExceptionMessage em = (ExceptionMessage) dl.getPayload();
+    assertTrue(dl.getPayload().getValue() instanceof ExceptionMessage);
+    ExceptionMessage em = (ExceptionMessage) dl.getPayload().getValue();
     assertNotNull(em.getException());
     assertTrue(em.getException() instanceof MessageRedeliveredException);
   }
 
   protected void assertMessageInDlqRollbackEs() throws Exception {
-    MuleMessage dl = client.request(JMS_DEAD_LETTER, 1000).getRight().get();
+    InternalMessage dl = client.request(JMS_DEAD_LETTER, 1000).getRight().get();
     assertNotNull(dl);
     assertTrue(getPayloadAsString(dl).equals(TEST_MESSAGE));
   }

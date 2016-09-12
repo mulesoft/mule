@@ -8,7 +8,7 @@ package org.mule.runtime.module.jaas.filters;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.Credentials;
@@ -31,7 +31,7 @@ public class JaasSecurityFilter extends AbstractOperationSecurityFilter {
   }
 
   @Override
-  protected final MuleEvent authenticateInbound(MuleEvent event)
+  protected final Event authenticateInbound(Event event)
       throws SecurityException, CryptoFailureException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException {
     String userHeader = (String) getCredentialsAccessor().getCredentials(event);
     if (userHeader == null) {

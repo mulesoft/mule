@@ -26,12 +26,12 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODI
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
 
-import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -135,22 +135,22 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
 
   @Test
   public void respondWithSeveralAttachments() throws Exception {
-    MuleMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage()).getRight();
-    assertThat(response.getPayload(), instanceOf(MultiPartPayload.class));
-    assertThat(((MultiPartPayload) response.getPayload()).getParts(), hasSize(2));
+    InternalMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage()).getRight();
+    assertThat(response.getPayload().getValue(), instanceOf(MultiPartContent.class));
+    assertThat(((MultiPartContent) response.getPayload().getValue()).getParts(), hasSize(2));
 
-    org.mule.runtime.api.message.MuleMessage attachment1 =
-        ((MultiPartPayload) response.getPayload()).getPart(FILE_BODY_FIELD_NAME);
+    org.mule.runtime.api.message.Message attachment1 =
+        ((MultiPartContent) response.getPayload().getValue()).getPart(FILE_BODY_FIELD_NAME);
     assertThat(attachment1.getAttributes(), instanceOf(PartAttributes.class));
     assertThat(((PartAttributes) attachment1.getAttributes()).getName(), is(FILE_BODY_FIELD_NAME));
     assertThat(((PartAttributes) attachment1.getAttributes()).getFileName(), is(FILE_BODY_FIELD_FILENAME));
-    assertThat(attachment1.getDataType().getMediaType(), is(MediaType.BINARY));
-    assertThat(IOUtils.toString((InputStream) attachment1.getPayload()), is(FILE_BODY_FIELD_VALUE));
+    assertThat(attachment1.getPayload().getDataType().getMediaType(), is(MediaType.BINARY));
+    assertThat(IOUtils.toString((InputStream) attachment1.getPayload().getValue()), is(FILE_BODY_FIELD_VALUE));
 
-    org.mule.runtime.api.message.MuleMessage attachment2 =
-        ((MultiPartPayload) response.getPayload()).getPart(TEXT_BODY_FIELD_NAME);
-    assertThat(IOUtils.toString((InputStream) attachment2.getPayload()), is(TEXT_BODY_FIELD_VALUE));
-    assertThat(attachment2.getDataType().getMediaType().toRfcString(), is(TEXT_PLAIN.toString()));
+    org.mule.runtime.api.message.Message attachment2 =
+        ((MultiPartContent) response.getPayload().getValue()).getPart(TEXT_BODY_FIELD_NAME);
+    assertThat(IOUtils.toString((InputStream) attachment2.getPayload().getValue()), is(TEXT_BODY_FIELD_VALUE));
+    assertThat(attachment2.getPayload().getDataType().getMediaType().toRfcString(), is(TEXT_PLAIN.toString()));
   }
 
   @Test
@@ -190,9 +190,9 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
       httpPost.setEntity(multipart);
       final CloseableHttpResponse response = httpClient.execute(httpPost);
       try {
-        final MuleMessage receivedMessage = muleContext.getClient().request("test://out", 1000).getRight().get();
-        assertThat(receivedMessage.getPayload(), instanceOf(MultiPartPayload.class));
-        MultiPartPayload receivedParts = ((MultiPartPayload) receivedMessage.getPayload());
+        final InternalMessage receivedMessage = muleContext.getClient().request("test://out", 1000).getRight().get();
+        assertThat(receivedMessage.getPayload().getValue(), instanceOf(MultiPartContent.class));
+        MultiPartContent receivedParts = ((MultiPartContent) receivedMessage.getPayload().getValue());
         assertThat(receivedParts.getParts().size(), is(2));
         assertThat(receivedParts.getPartNames(), hasItem(TEXT_BODY_FIELD_NAME));
         assertThat(receivedParts.getPartNames(), hasItem(FILE_BODY_FIELD_NAME));
@@ -256,44 +256,45 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
     return partsAsMap;
   }
 
-  public static class CreatePartMessageProcessor implements MessageProcessor {
+  public static class CreatePartMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       org.mule.extension.http.api.HttpPart part =
           new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, TEXT_PLAIN_LATIN, null);
-      return MuleEvent.builder(event).addFlowVariable("parts", asList(part)).build();
+      return Event.builder(event).addVariable("parts", asList(part)).build();
     }
   }
 
-  public static class CreatePartsMessageProcessor implements MessageProcessor {
+  public static class CreatePartsMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       org.mule.extension.http.api.HttpPart part1 =
           new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, TEXT_PLAIN_LATIN, null);
       org.mule.extension.http.api.HttpPart part2 =
           new org.mule.extension.http.api.HttpPart(FILE_BODY_FIELD_NAME, FILE_BODY_FIELD_VALUE.getBytes(), BINARY,
                                                    FILE_BODY_FIELD_FILENAME);
-      return MuleEvent.builder(event).addFlowVariable("parts", asList(part1, part2)).build();
+      return Event.builder(event).addVariable("parts", asList(part1, part2)).build();
     }
   }
 
-  public static class ConvertPartsMessageProcessor implements MessageProcessor {
+  public static class ConvertPartsMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       List<org.mule.extension.http.api.HttpPart> parts = new LinkedList<>();
-      ((MultiPartPayload) event.getMessage().getPayload()).getParts().forEach(m -> {
+      ((MultiPartContent) event.getMessage().getPayload().getValue()).getParts().forEach(m -> {
         String filename = null;
         final PartAttributes attributes = (PartAttributes) m.getAttributes();
         if (!attributes.getName().equals(attributes.getFileName())) {
           filename = ((PartAttributes) m.getAttributes()).getFileName();
         }
-        parts.add(new org.mule.extension.http.api.HttpPart(attributes.getName(), m.getPayload(), m.getDataType().getMediaType(),
+        parts.add(new org.mule.extension.http.api.HttpPart(attributes.getName(), m.getPayload().getValue(),
+                                                           m.getPayload().getDataType().getMediaType(),
                                                            filename));
       });
-      return MuleEvent.builder(event).addFlowVariable("parts", parts).build();
+      return Event.builder(event).addVariable("parts", parts).build();
     }
   }
 }

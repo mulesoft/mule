@@ -13,11 +13,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.exceptions.FunctionalTestException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
@@ -64,7 +65,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     assertTrue(flowConstruct.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
     DefaultMessagingExceptionStrategy exceptionListener =
         (DefaultMessagingExceptionStrategy) flowConstruct.getExceptionListener();
-    MessageProcessor mp = exceptionListener.getMessageProcessors().iterator().next();
+    Processor mp = exceptionListener.getMessageProcessors().iterator().next();
     assertTrue(mp.getClass().getName(), mp instanceof MulticastingRouter);
     assertEquals(2, ((MulticastingRouter) mp).getRoutes().size());
 
@@ -72,8 +73,8 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
 
     flowRunner("testService2").withPayload(getTestMuleMessage()).asynchronously().run();
 
-    MuleMessage out2 = client.request("test://out2", RECEIVE_TIMEOUT).getRight().get();
-    MuleMessage out3 = client.request("test://out3", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage out2 = client.request("test://out2", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage out3 = client.request("test://out3", RECEIVE_TIMEOUT).getRight().get();
     assertExceptionMessage(out2);
     assertExceptionMessage(out3);
     assertThat(out2, equalTo(out3));
@@ -85,23 +86,23 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
 
     flowRunner("testService3").withPayload(getTestMuleMessage()).asynchronously().run();
 
-    MuleMessage out4 = mc.request("test://out4", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage out4 = mc.request("test://out4", RECEIVE_TIMEOUT).getRight().get();
     assertEquals("ERROR!", getPayloadAsString(out4));
   }
 
   @Test
   public void testSerializablePayload() throws Exception {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("key1", "value1");
     map.put("key2", "value2");
 
     MuleClient client = muleContext.getClient();
     flowRunner("testService6").withPayload(getTestMuleMessage(map)).asynchronously().run();
 
-    MuleMessage message = client.request("test://out6", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = client.request("test://out6", RECEIVE_TIMEOUT).getRight().get();
 
-    assertTrue(message.getPayload() instanceof ExceptionMessage);
-    Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
+    assertTrue(message.getPayload().getValue() instanceof ExceptionMessage);
+    Object payload = ((ExceptionMessage) message.getPayload().getValue()).getPayload();
     assertTrue("payload shoud be a Map, but is " + payload.getClass().getName(), payload instanceof Map<?, ?>);
     Map<?, ?> payloadMap = (Map<?, ?>) payload;
     assertEquals("value1", payloadMap.get("key1"));
@@ -132,9 +133,9 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
     });
   }
 
-  private void assertExceptionMessage(MuleMessage out) {
-    assertThat(out.getPayload(), is(instanceOf(ExceptionMessage.class)));
-    ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
+  private void assertExceptionMessage(InternalMessage out) {
+    assertThat(out.getPayload().getValue(), is(instanceOf(ExceptionMessage.class)));
+    ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload().getValue();
     assertThat(exceptionMessage.getException().getCause().getCause(), is(instanceOf(FunctionalTestException.class)));
     assertThat(exceptionMessage.getPayload(), is("test"));
   }

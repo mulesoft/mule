@@ -10,11 +10,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
 
-  protected MuleEvent originalEvent;
+  protected Event originalEvent;
   protected Latch latch = new Latch();
 
   @Override
@@ -35,7 +35,7 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
     super.doSetUp();
     // Create a dummy event and give it some properties
     originalEvent = getTestEvent("test");
-    originalEvent = MuleEvent.builder(originalEvent).message(MuleMessage.builder(originalEvent.getMessage())
+    originalEvent = Event.builder(originalEvent).message(InternalMessage.builder(originalEvent.getMessage())
         .addOutboundProperty("test", "val")
         .addOutboundProperty("test2", "val2")
         .build()).build();
@@ -66,7 +66,7 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
 
   private class TestMuleEventWork extends AbstractMuleEventWork {
 
-    public TestMuleEventWork(MuleEvent event) {
+    public TestMuleEventWork(Event event) {
       super(event);
     }
 

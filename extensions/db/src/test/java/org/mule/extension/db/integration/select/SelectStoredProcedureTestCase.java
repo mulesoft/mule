@@ -13,7 +13,7 @@ import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase
 
   @Test
   public void selectsFromStoredProcedure() throws Exception {
-    MuleMessage response = flowRunner("selectStoredProcedure").run().getMessage();
+    Message response = flowRunner("selectStoredProcedure").run().getMessage();
     assertMessageContains(response, getAllPlanetRecords());
   }
 

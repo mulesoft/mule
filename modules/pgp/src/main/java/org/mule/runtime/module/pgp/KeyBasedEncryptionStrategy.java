@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.pgp;
 
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CredentialsAccessor;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -37,6 +37,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy 
   private boolean checkKeyExpirity = false;
   private Provider provider;
 
+  @Override
   public void initialise() throws InitialisationException {
     if (!SecurityUtils.isFipsSecurityModel()) {
       java.security.Security.addProvider(new BouncyCastleProvider());
@@ -44,6 +45,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy 
     provider = SecurityUtils.getDefaultSecurityProvider();
   }
 
+  @Override
   public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException {
     try {
       PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
@@ -55,6 +57,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy 
     }
   }
 
+  @Override
   public InputStream decrypt(InputStream data, Object cryptInfo) throws CryptoFailureException {
     try {
       PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
@@ -70,7 +73,7 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy 
 
   private PGPCryptInfo safeGetCryptInfo(Object cryptInfo) {
     if (cryptInfo == null) {
-      MuleEvent event = getCurrentEvent();
+      Event event = getCurrentEvent();
       PGPPublicKey publicKey = keyManager.getPublicKey((String) this.getCredentialsAccessor().getCredentials(event));
       this.checkKeyExpirity(publicKey);
       return new PGPCryptInfo(publicKey, false);

@@ -35,9 +35,9 @@ import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessa
 import static org.mule.extension.email.util.EmailTestUtils.testSession;
 
 import org.mule.extension.email.EmailConnectorTestCase;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -88,7 +88,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveNothing() throws Exception {
     server.purgeEmailFromAllMailboxes();
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
-    List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    List<Message> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(messages, hasSize(0));
   }
 
@@ -100,7 +100,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
           .withContent(EMAIL_CONTENT).withSubject("Non Matching Subject").fromAddresses(fromEmail).build());
     }
 
-    List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    List<Message> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(15));
     assertThat(messages, hasSize(10));
   }
@@ -109,15 +109,15 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveEmailWithAttachments() throws Exception {
     server.purgeEmailFromAllMailboxes();
     user.deliver(getMultipartTestMessage());
-    List<MuleMessage> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
+    List<Message> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
     assertThat(messages, hasSize(1));
-    assertThat(messages.get(0).getPayload(), instanceOf(MultiPartPayload.class));
-    List<MuleMessage> emailAttachments = ((MultiPartPayload) messages.get(0).getPayload()).getParts();
+    assertThat(messages.get(0).getPayload().getValue(), instanceOf(MultiPartContent.class));
+    List<Message> emailAttachments = ((MultiPartContent) messages.get(0).getPayload().getValue()).getParts();
 
     assertThat(emailAttachments, hasSize(3));
-    assertThat(((DefaultMultiPartPayload) messages.get(0).getPayload()).hasBodyPart(), is(true));
-    assertThat(((MultiPartPayload) messages.get(0).getPayload()).getPartNames(),
+    assertThat(((DefaultMultiPartContent) messages.get(0).getPayload().getValue()).hasBodyPart(), is(true));
+    assertThat(((MultiPartContent) messages.get(0).getPayload().getValue()).getPartNames(),
                hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
     assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
     assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
@@ -160,8 +160,8 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     assertThat(fileContent, containsString(EMAIL_CONTENT));
   }
 
-  protected List<MuleMessage> runFlowAndGetMessages(String flowName) throws Exception {
-    return flowRunner(flowName).run().getMessage().getPayload();
+  protected List<Message> runFlowAndGetMessages(String flowName) throws Exception {
+    return (List<Message>) flowRunner(flowName).run().getMessage().getPayload().getValue();
   }
 
   protected void assertFlag(MimeMessage m, Flag flag, boolean contains) {

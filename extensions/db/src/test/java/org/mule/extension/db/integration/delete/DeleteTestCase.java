@@ -12,7 +12,7 @@ import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.model.Planet.VENUS;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
@@ -46,8 +46,8 @@ public class DeleteTestCase extends AbstractDbIntegrationTestCase {
   }
 
   private void doDelete(String flowName, String payload) throws Exception {
-    MuleMessage response = flowRunner(flowName).withPayload(payload).run().getMessage();
-    assertThat(response.getPayload(), is(1));
+    Message response = flowRunner(flowName).withPayload(payload).run().getMessage();
+    assertThat(response.getPayload().getValue(), is(1));
     assertDeletedPlanetRecords(payload);
   }
 }

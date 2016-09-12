@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api.request.client;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpConstants.Protocols;
 
 import java.util.function.Function;
@@ -26,10 +26,10 @@ public interface UriParameters {
   /**
    * @return the function that will resolve to the URI host.
    */
-  Function<MuleEvent, String> getHost();
+  Function<Event, String> getHost();
 
   /**
    * @return the function that will resolve to the URI port.
    */
-  Function<MuleEvent, Integer> getPort();
+  Function<Event, Integer> getPort();
 }

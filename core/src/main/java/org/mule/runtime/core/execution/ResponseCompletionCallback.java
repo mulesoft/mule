@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.execution;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.exception.MessagingException;
 
 /**
@@ -26,6 +26,6 @@ public interface ResponseCompletionCallback {
    * @param event the event that was the source for the response.
    * @return the event that is the result of the exception strategy.
    */
-  MuleEvent responseSentWithFailure(MessagingException e, MuleEvent event);
+  Event responseSentWithFailure(MessagingException e, Event event);
 
 }

@@ -25,7 +25,7 @@ public interface DynamicPipelineBuilder {
    * @param messageProcessors message processors to be executed before the ones specified in the flow
    * @return the pipeline injector builder instance
    */
-  DynamicPipelineBuilder injectBefore(MessageProcessor... messageProcessors);
+  DynamicPipelineBuilder injectBefore(Processor... messageProcessors);
 
   /**
    * Helper builder for injecting message processors to be executed before the ones specified in the flow. After adding all
@@ -34,7 +34,7 @@ public interface DynamicPipelineBuilder {
    * @param messageProcessors list of message processors to be executed before the ones specified in the flow
    * @return the pipeline injector builder instance
    */
-  DynamicPipelineBuilder injectBefore(List<MessageProcessor> messageProcessors);
+  DynamicPipelineBuilder injectBefore(List<Processor> messageProcessors);
 
   /**
    * Helper builder for injecting message processors to be executed after the ones specified in the flow. After adding all
@@ -43,7 +43,7 @@ public interface DynamicPipelineBuilder {
    * @param messageProcessors message processors to be executed after the ones specified in the flow
    * @return the pipeline injector builder instance
    */
-  DynamicPipelineBuilder injectAfter(MessageProcessor... messageProcessors);
+  DynamicPipelineBuilder injectAfter(Processor... messageProcessors);
 
   /**
    * Helper builder for injecting message processors to be executed after the ones specified in the flow. After adding all
@@ -52,12 +52,12 @@ public interface DynamicPipelineBuilder {
    * @param messageProcessors list of message processors to be executed after the ones specified in the flow
    * @return the pipeline injector builder instance
    */
-  DynamicPipelineBuilder injectAfter(List<MessageProcessor> messageProcessors);
+  DynamicPipelineBuilder injectAfter(List<Processor> messageProcessors);
 
   /**
-   * Injects the message processors added with {@link #injectBefore(org.mule.runtime.core.api.processor.MessageProcessor...)} and
-   * {@link #injectAfter(org.mule.runtime.core.api.processor.MessageProcessor...)} If none were added the effect is the same as
-   * calling {@link #reset()}
+   * Injects the message processors added with {@link #injectBefore(org.mule.runtime.core.api.processor.Processor...)} and
+   * {@link #injectAfter(org.mule.runtime.core.api.processor.Processor...)} If none were added the effect is the same as calling
+   * {@link #reset()}
    *
    * @return pipeline ID for future updates
    * @throws org.mule.runtime.core.api.MuleException if the update fails

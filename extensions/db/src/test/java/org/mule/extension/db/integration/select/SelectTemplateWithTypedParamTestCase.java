@@ -12,7 +12,7 @@ import static org.mule.extension.db.integration.model.Planet.MARS;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class SelectTemplateWithTypedParamTestCase extends AbstractDbIntegrationT
 
   @Test
   public void selectParameterizedQuery() throws Exception {
-    MuleMessage response = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).run().getMessage();
+    Message response = flowRunner("selectParameterizedQuery").withPayload(MARS.getName()).run().getMessage();
     assertMessageContains(response, getMarsRecord());
   }
 }

@@ -9,7 +9,7 @@ package org.mule.compatibility.core.routing;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.routing.UntilSuccessful;
 
 public class EndpointDlqUntilSuccessful extends UntilSuccessful {
@@ -21,7 +21,7 @@ public class EndpointDlqUntilSuccessful extends UntilSuccessful {
 
         dlqMP = ((EndpointBuilder) deadLetterQueue).buildOutboundEndpoint();
       } catch (final EndpointException ee) {
-        throw new InitialisationException(MessageFactory
+        throw new InitialisationException(I18nMessageFactory
             .createStaticMessage("deadLetterQueue-ref is not a valid endpoint builder: " + deadLetterQueue), ee, this);
       }
     } else {

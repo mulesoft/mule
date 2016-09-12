@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 
@@ -27,7 +27,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testFirstSuccessful() throws Exception {
-    MuleMessage response = flowRunner("test-router").withPayload("XYZ").run().getMessage();
+    InternalMessage response = flowRunner("test-router").withPayload("XYZ").run().getMessage();
     assertThat(getPayloadAsString(response), is("XYZ is a string"));
 
     response = flowRunner("test-router").withPayload(Integer.valueOf(9)).run().getMessage();
@@ -45,7 +45,7 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testFirstSuccessfulWithExpression() throws Exception {
-    MuleMessage response = flowRunner("test-router2").withPayload("XYZ").run().getMessage();
+    InternalMessage response = flowRunner("test-router2").withPayload("XYZ").run().getMessage();
     assertThat(getPayloadAsString(response), is("XYZ is a string"));
   }
 
@@ -60,8 +60,8 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
     flowRunner("test-router4").withPayload(TEST_MESSAGE).asynchronously().run();
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertThat(response.getPayload(), is(TEST_MESSAGE));
+    assertThat(response.getPayload().getValue(), is(TEST_MESSAGE));
   }
 }

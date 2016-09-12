@@ -9,10 +9,10 @@ package org.mule.runtime.core.execution;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.ComponentIdentifier;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
@@ -30,7 +30,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
   private ErrorTypeLocator errorTypeLocator;
 
   @Override
-  public MuleEvent execute(MessageProcessor messageProcessor, MuleEvent event) throws MessagingException {
+  public Event execute(Processor messageProcessor, Event event) throws MessagingException {
     try {
       return messageProcessor.process(event);
     } catch (Exception exception) {
@@ -43,17 +43,18 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         } else {
           messagingException = new MessagingException(event, exception, messageProcessor);
         }
-        MuleEvent exceptionEvent = messagingException.getEvent();
-        event = MuleEvent.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
+        Event exceptionEvent = messagingException.getEvent();
+        event = Event.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
         messagingException.setProcessedEvent(event);
       } else {
         messagingException = (MessagingException) exception;
-        MuleEvent exceptionEvent = messagingException.getEvent();
-        //TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the messagingException.causedExactlyBy(..) condition.
+        Event exceptionEvent = messagingException.getEvent();
+        // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
+        // messagingException.causedExactlyBy(..) condition.
         if (!exceptionEvent.getError().isPresent() || !(exceptionEvent.getError().get().equals(exception)
             || messagingException.causedExactlyBy(exceptionEvent.getError().get().getException().getClass()))) {
           ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, exception);
-          event = MuleEvent.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
+          event = Event.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
           messagingException.setProcessedEvent(event);
         }
       }
@@ -68,7 +69,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     }
   }
 
-  private ErrorType getErrorTypeFromFailingProcessor(MessageProcessor messageProcessor, Exception exception) {
+  private ErrorType getErrorTypeFromFailingProcessor(Processor messageProcessor, Exception exception) {
     ErrorType errorType;
     if (AnnotatedObject.class.isAssignableFrom(messageProcessor.getClass())) {
       ComponentIdentifier componentIdentifier =
@@ -80,8 +81,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     return errorType;
   }
 
-  private MessagingException putContext(MessagingException messagingException, MessageProcessor failingMessageProcessor,
-                                        MuleEvent event) {
+  private MessagingException putContext(MessagingException messagingException, Processor failingMessageProcessor,
+                                        Event event) {
     for (ExceptionContextProvider exceptionContextProvider : muleContext.getExceptionContextProviders()) {
       for (Entry<String, Object> contextInfoEntry : exceptionContextProvider
           .getContextInfo(event, failingMessageProcessor, flowConstruct).entrySet()) {

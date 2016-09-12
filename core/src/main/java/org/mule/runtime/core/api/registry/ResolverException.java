@@ -7,18 +7,18 @@
 package org.mule.runtime.core.api.registry;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * An exception that is thrown by resolver classes responsible for finding objects in the registry based on particular criteria
  */
 public class ResolverException extends MuleException {
 
-  public ResolverException(Message message) {
+  public ResolverException(I18nMessage message) {
     super(message);
   }
 
-  public ResolverException(Message message, Throwable cause) {
+  public ResolverException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 }

@@ -17,8 +17,8 @@ import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import java.util.Set;
 
 /**
- * Null implementation of a {@link QueryEntityResolver}, returns an emptySet of {@code entityKeys} and
- * {@code null} when the {@link QueryEntityResolver#getEntityMetadata(MetadataContext, String)} method is invoked.
+ * Null implementation of a {@link QueryEntityResolver}, returns an emptySet of {@code entityKeys} and {@code null} when the
+ * {@link QueryEntityResolver#getEntityMetadata(MetadataContext, String)} method is invoked.
  *
  * @since 4.0
  */
@@ -43,7 +43,7 @@ class NullQueryEntityMetadataResolver implements QueryEntityResolver {
   @Override
   public MetadataType getEntityMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
-    //TODO - MDM-21: change when VoidType is added to the MDM
+    // TODO - MDM-21: change when VoidType is added to the MDM
     return null;
   }
 }

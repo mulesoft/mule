@@ -147,8 +147,12 @@ public class MuleHierarchicalBeanDefinitionParserDelegate extends BeanDefinition
                                                                 postProcessBeanDefinition(resolvedComponent, registry, name);
                                                               }
                                                             }, (mpElement, beanDefinition) -> {
-                                                              //We don't want the bean definition to be automatically injected in the parent bean in this cases since the parent is using the new parsing mechanism.
-                                                              //Here it will always be a nested element. We use a fake bean definition so it does not try to validate the ID if it thinks is a global element
+                                                              // We don't want the bean definition to be automatically injected in
+                                                              // the parent bean in this cases since the parent is using the new
+                                                              // parsing mechanism.
+                                                              // Here it will always be a nested element. We use a fake bean
+                                                              // definition so it does not try to validate the ID if it thinks is
+                                                              // a global element
                                                               return parseCustomElement(mpElement, BeanDefinitionBuilder
                                                                   .genericBeanDefinition().getBeanDefinition());
                                                             });

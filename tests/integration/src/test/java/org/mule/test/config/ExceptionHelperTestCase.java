@@ -20,7 +20,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.runtime.core.util.SystemUtils;
@@ -110,7 +110,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
             @Override
             public void execute(Object input) {
-              throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+              throw new RuntimeException(new DefaultMuleException(I18nMessageFactory.createStaticMessage("foo")));
             }
           });
         }
@@ -139,7 +139,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
             @Override
             public int compareTo(Object o) {
-              throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+              throw new RuntimeException(new DefaultMuleException(I18nMessageFactory.createStaticMessage("foo")));
             }
           };
           Collections.sort(Arrays.asList(exceptionComparable, exceptionComparable), ComparableComparator.getInstance());
@@ -170,7 +170,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
         @Override
         public void execute(Object input) {
-          throw new RuntimeException(new DefaultMuleException(MessageFactory.createStaticMessage("foo")));
+          throw new RuntimeException(new DefaultMuleException(I18nMessageFactory.createStaticMessage("foo")));
 
         }
       });
@@ -231,12 +231,12 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
   private Exception getException() {
     DefaultMuleException innerMuleException =
-        new DefaultMuleException(MessageFactory.createStaticMessage("bar"), new Exception("blah"));
+        new DefaultMuleException(I18nMessageFactory.createStaticMessage("bar"), new Exception("blah"));
 
     innerMuleException.addInfo("info_1", "Imma in!");
 
     DefaultMuleException outerMuleException =
-        new DefaultMuleException(MessageFactory.createStaticMessage("foo"), innerMuleException);
+        new DefaultMuleException(I18nMessageFactory.createStaticMessage("foo"), innerMuleException);
 
     outerMuleException.addInfo("info_1", "Imma out!");
     outerMuleException.addInfo("info_2", "Imma out!");

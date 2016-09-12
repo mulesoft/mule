@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -64,7 +64,7 @@ public class ProxyPortMatchingSoapVersionTest extends FunctionalTestCase {
   }
 
   private void assertValidRequest(String flowName, String request) throws Exception {
-    MuleEvent result = flowRunner(flowName).withPayload(request).run();
+    Event result = flowRunner(flowName).withPayload(request).run();
 
     // As there is nothing else after the service, if there were no problems the same contents of the request
     // will be returned.
@@ -72,7 +72,7 @@ public class ProxyPortMatchingSoapVersionTest extends FunctionalTestCase {
   }
 
   private void assertInvalidRequest(String flowName, String request) throws Exception {
-    MuleEvent result = flowRunner(flowName).withPayload(request).run();
+    Event result = flowRunner(flowName).withPayload(request).run();
 
     assertTrue(getPayloadAsString(result.getMessage()).contains("VersionMismatch"));
   }

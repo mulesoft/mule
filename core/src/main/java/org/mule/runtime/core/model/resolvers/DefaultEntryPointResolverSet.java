@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
@@ -26,7 +26,7 @@ public class DefaultEntryPointResolverSet implements EntryPointResolverSet {
 
   private final Set<EntryPointResolver> entryPointResolvers = new LinkedHashSet<EntryPointResolver>(4);
 
-  public Object invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
+  public Object invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
     Set<String> exceptions = new HashSet<String>();
 
     for (EntryPointResolver resolver : entryPointResolvers) {

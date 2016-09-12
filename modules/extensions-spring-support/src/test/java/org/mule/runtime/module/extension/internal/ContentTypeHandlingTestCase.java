@@ -18,7 +18,7 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
@@ -53,8 +53,8 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void setsContentTypeOnXml() throws Exception {
-    MuleEvent response = runFlow("setsContentTypeOnXml");
-    DataType dataType = response.getMessage().getDataType();
+    Event response = runFlow("setsContentTypeOnXml");
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertCustomEncoding(dataType);
     assertThat(dataType.getMediaType().getPrimaryType(), is(MediaType.TEXT.getPrimaryType()));
     assertThat(dataType.getMediaType().getSubType(), is(MediaType.TEXT.getSubType()));
@@ -62,24 +62,24 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void onlySetEncodingOnXml() throws Exception {
-    MuleEvent response = runFlow("onlySetEncodingOnXml");
-    DataType dataType = response.getMessage().getDataType();
+    Event response = runFlow("onlySetEncodingOnXml");
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertCustomEncoding(dataType);
     assertCustomMimeType(dataType);
   }
 
   @Test
   public void onlySetMimeTypeOnXml() throws Exception {
-    MuleEvent response = runFlow("onlySetMimeTypeOnXml");
-    DataType dataType = response.getMessage().getDataType();
+    Event response = runFlow("onlySetMimeTypeOnXml");
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertDefaultEncoding(dataType);
     assertCustomMimeType(dataType);
   }
 
   @Test
   public void maintainsContentType() throws Exception {
-    MuleEvent response = flowRunner("defaultContentType").withPayload("").run();
-    final DataType responseDataType = response.getMessage().getDataType();
+    Event response = flowRunner("defaultContentType").withPayload("").run();
+    final DataType responseDataType = response.getMessage().getPayload().getDataType();
 
     assertDefaultEncoding(responseDataType);
     assertDefaultMimeType(responseDataType);
@@ -87,8 +87,8 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void setEncodingInMimeTypeAndParam() throws Exception {
-    MuleEvent response = runFlow("setEncodingInMimeTypeAndParam");
-    DataType dataType = response.getMessage().getDataType();
+    Event response = runFlow("setEncodingInMimeTypeAndParam");
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertThat(dataType.getMediaType().getPrimaryType(), is("application"));
     assertThat(dataType.getMediaType().getSubType(), is("json"));
     assertThat(dataType.getMediaType().getCharset().get(), is(StandardCharsets.UTF_16));
@@ -97,9 +97,9 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void overridesContentType() throws Exception {
     Charset lastSupportedEncoding = availableCharsets().values().stream().reduce((first, last) -> last).get();
-    MuleEvent response = runFlow("setsContentTypeProgrammatically");
+    Event response = runFlow("setsContentTypeProgrammatically");
 
-    final DataType dataType = response.getMessage().getDataType();
+    final DataType dataType = response.getMessage().getPayload().getDataType();
     assertCustomMimeType(dataType);
     assertThat(dataType.getMediaType().getCharset().get(), is(lastSupportedEncoding));
   }
@@ -124,6 +124,6 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
 
   private DataType getDefaultDataType() {
     FlowRunner runner = flowRunner("defaultContentType").withPayload("");
-    return runner.buildEvent().getMessage().getDataType();
+    return runner.buildEvent().getMessage().getPayload().getDataType();
   }
 }

@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpHeaders;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class HttpRequestEncodingTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void testEncoding() throws Exception {
-    MuleEvent result = flowRunner("encodingTest").withPayload(TEST_MESSAGE).run();
+    Event result = flowRunner("encodingTest").withPayload(TEST_MESSAGE).run();
     assertThat(getPayloadAsString(result.getMessage()), is(testMessage));
   }
 

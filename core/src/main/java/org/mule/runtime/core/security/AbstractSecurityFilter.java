@@ -7,9 +7,9 @@
 package org.mule.runtime.core.security;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -98,13 +98,13 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
   }
 
   @Override
-  public abstract MuleEvent doFilter(MuleEvent event) throws SecurityException, UnknownAuthenticationTypeException,
+  public abstract Event doFilter(Event event) throws SecurityException, UnknownAuthenticationTypeException,
       CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException;
 
-  protected MuleEvent updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException {
+  protected Event updatePayload(InternalMessage message, final Object payload, Event event) throws MuleException {
     TransformerTemplate trans = new TransformerTemplate(message1 -> payload);
 
-    return MuleEvent.builder(event)
+    return Event.builder(event)
         .message(muleContext.getTransformationService().applyTransformers(event.getMessage(), event, trans)).build();
   }
 }

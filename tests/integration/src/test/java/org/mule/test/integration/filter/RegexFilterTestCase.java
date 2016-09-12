@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,38 +37,38 @@ public class RegexFilterTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void matchesUsingDefaultPayload() throws Exception {
-    MuleEvent event = flowRunner("default-payload-value").withPayload("run with the mules").run();
+    Event event = flowRunner("default-payload-value").withPayload("run with the mules").run();
     assertThat(event, is(notNullValue()));
   }
 
   @Test
   public void notMatchesUsingDefaultPayload() throws Exception {
-    MuleEvent event = flowRunner("default-payload-value").withPayload("run with the zebras").run();
+    Event event = flowRunner("default-payload-value").withPayload("run with the zebras").run();
     assertThat(event, is(nullValue()));
   }
 
   @Test
   public void matchesConfiguringValue() throws Exception {
-    MuleEvent event = flowRunner("matches-configuring-value").withPayload(payloadMap).run();
+    Event event = flowRunner("matches-configuring-value").withPayload(payloadMap).run();
     assertThat(event, is(notNullValue()));
   }
 
   @Test
   public void notMatchesConfiguringValue() throws Exception {
-    MuleEvent event = flowRunner("not-matches-configuring-value").withPayload(payloadMap).run();
+    Event event = flowRunner("not-matches-configuring-value").withPayload(payloadMap).run();
     assertThat(event, is(nullValue()));
   }
 
   @Test
   public void notMatchesConfiguringNonStringValue() throws Exception {
     payloadMap.remove("goodValue");
-    MuleEvent event = flowRunner("not-matches-configuring-non-string-value").withPayload(payloadMap).run();
+    Event event = flowRunner("not-matches-configuring-non-string-value").withPayload(payloadMap).run();
     assertThat(event, is(nullValue()));
   }
 
   @Test
   public void matchesConfiguringPlainTextValue() throws Exception {
-    MuleEvent event = runFlow("matches-configuring-plain-text-value");
+    Event event = runFlow("matches-configuring-plain-text-value");
     assertThat(event, is(notNullValue()));
   }
 

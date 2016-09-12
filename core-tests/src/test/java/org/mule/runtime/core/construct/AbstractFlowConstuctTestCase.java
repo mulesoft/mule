@@ -10,10 +10,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -24,13 +24,13 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleContextTe
 
   public static class DirectInboundMessageSource implements MessageSource {
 
-    private MessageProcessor listener;
+    private Processor listener;
 
-    public void setListener(MessageProcessor listener) {
+    public void setListener(Processor listener) {
       this.listener = listener;
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       return listener.process(event);
     }
 

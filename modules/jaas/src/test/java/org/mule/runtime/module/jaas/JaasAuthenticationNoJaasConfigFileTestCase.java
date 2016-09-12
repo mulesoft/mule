@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 
 import org.junit.Test;
 
@@ -27,22 +27,22 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunc
   @Test
   public void goodAuthentication() throws Exception {
     SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
-    MuleMessage message = flowRunner("TestUMO").withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
+    InternalMessage message = flowRunner("TestUMO").withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
         .withPayload("Test").run().getMessage();
 
     assertNotNull(message);
-    assertTrue(message.getPayload() instanceof String);
+    assertTrue(message.getPayload().getValue() instanceof String);
     assertEquals("Test Received", getPayloadAsString(message));
   }
 
   @Test
   public void anotherGoodAuthentication() throws Exception {
     SecurityHeader securityHeader = createSecurityHeader("anon", "anon");
-    MuleMessage message = flowRunner("TestUMO").withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
+    InternalMessage message = flowRunner("TestUMO").withInboundProperty(securityHeader.getKey(), securityHeader.getValue())
         .withPayload("Test").run().getMessage();
 
     assertNotNull(message);
-    assertTrue(message.getPayload() instanceof String);
+    assertTrue(message.getPayload().getValue() instanceof String);
     assertEquals("Test Received", getPayloadAsString(message));
   }
 
@@ -64,11 +64,11 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends AbstractJaasFunc
     runFlowAndExpectUnauthorizedException(securityHeader);
   }
 
-  public static class AddNotSerializableProperty implements MessageProcessor {
+  public static class AddNotSerializableProperty implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      return MuleEvent.builder(event).addFlowVariable("notSerializableProperty", new Object()).build();
+    public Event process(Event event) throws MuleException {
+      return Event.builder(event).addVariable("notSerializableProperty", new Object()).build();
     }
   }
 }

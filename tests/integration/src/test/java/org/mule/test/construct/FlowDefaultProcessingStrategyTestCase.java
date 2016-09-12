@@ -13,10 +13,10 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.TransactionConfigEnum;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -34,16 +34,16 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
 
   @Test
   public void requestResponse() throws Exception {
-    MuleMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
-    assertThat(response.getPayload().toString(), is(TEST_PAYLOAD));
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage response = flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).run().getMessage();
+    assertThat(response.getPayload().getValue().toString(), is(TEST_PAYLOAD));
+    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
   @Test
   public void oneWay() throws Exception {
     flowRunner(FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(not(Thread.currentThread().getName())));
   }
 
@@ -52,7 +52,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
         .run();
 
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
@@ -61,7 +61,7 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
         .asynchronously().run();
 
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
@@ -69,17 +69,17 @@ public class FlowDefaultProcessingStrategyTestCase extends AbstractIntegrationTe
     flowRunner("Flow").withPayload(TEST_PAYLOAD).transactionally(TransactionConfigEnum.ACTION_NONE, new TestTransactionFactory())
         .run();
 
-    MuleMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = muleContext.getClient().request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertThat(message.getOutboundProperty(PROCESSOR_THREAD), is(Thread.currentThread().getName()));
   }
 
 
-  public static class ThreadSensingMessageProcessor implements MessageProcessor {
+  public static class ThreadSensingMessageProcessor implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
-      return MuleEvent.builder(event)
-          .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(PROCESSOR_THREAD, currentThread().getName())
+    public Event process(Event event) throws MuleException {
+      return Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(PROCESSOR_THREAD, currentThread().getName())
               .build())
           .build();
     }

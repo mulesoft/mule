@@ -7,7 +7,7 @@
 
 package org.mule.runtime.core.api.debug;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 
 import java.util.List;
 
@@ -24,5 +24,5 @@ public interface DebugInfoProvider {
    * @param event event used while debugging. Non null
    * @return a non null {@link List}
    */
-  List<FieldDebugInfo<?>> getDebugInfo(MuleEvent event);
+  List<FieldDebugInfo<?>> getDebugInfo(Event event);
 }

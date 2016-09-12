@@ -9,7 +9,7 @@ package org.mule.runtime.core.transaction;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.xa.XaResourceFactoryHolder;
 
@@ -239,7 +239,7 @@ public class XaTransaction extends AbstractTransaction {
     try {
       Transaction jtaTransaction = txManager.getTransaction();
       if (jtaTransaction == null) {
-        throw new TransactionException(MessageFactory.createStaticMessage("XATransaction is null"));
+        throw new TransactionException(I18nMessageFactory.createStaticMessage("XATransaction is null"));
       }
       resource.setTransactionTimeout(getTimeoutInSeconds());
       return jtaTransaction.enlistResource(resource);

@@ -14,7 +14,7 @@ import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 
@@ -48,7 +48,7 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
     return getPath(HELLO_PATH);
   }
 
-  protected MuleMessage readPath(String path) throws Exception {
+  protected Message readPath(String path) throws Exception {
     return getPath(path).getMessage();
   }
 
@@ -74,7 +74,7 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
     return getPayloadAsString(readPath(path));
   }
 
-  protected boolean isLocked(MuleMessage message) {
-    return ((AbstractFileInputStream) message.getPayload()).isLocked();
+  protected boolean isLocked(Message message) {
+    return ((AbstractFileInputStream) message.getPayload().getValue()).isLocked();
   }
 }

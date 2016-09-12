@@ -8,15 +8,15 @@ package org.mule.extension.email.internal.commands;
 
 import static java.lang.String.format;
 import static javax.mail.Folder.READ_WRITE;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
 import javax.mail.Flags.Flag;
 import javax.mail.Folder;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
@@ -34,22 +34,22 @@ public class SetFlagCommand {
    * Sets the specified {@code flag} into the email of number {@code emailId}
    * <p>
    * if no emailId is specified, the operation will try to find an email or {@link List} of emails in the incoming
-   * {@link MuleMessage}.
+   * {@link Message}.
    * <p>
-   * If no email(s) are found in the {@link MuleMessage} and no {@code emailId} is specified. the operation will fail.
+   * If no email(s) are found in the {@link Message} and no {@code emailId} is specified. the operation will fail.
    *
-   * @param muleMessage the incoming {@link MuleMessage}.
+   * @param muleMessage the incoming {@link Message}.
    * @param connection the associated {@link RetrieverConnection}.
    * @param folderName the name of the folder where the email(s) is going to be fetched.
    * @param emailId the optional number of the email to be marked. for default the email is taken from the incoming
-   *        {@link MuleMessage}.
+   *        {@link Message}.
    * @param flag the flag to be set.
    */
-  public void set(MuleMessage muleMessage, RetrieverConnection connection, String folderName, Integer emailId, Flag flag) {
+  public void set(Message muleMessage, RetrieverConnection connection, String folderName, Integer emailId, Flag flag) {
     Folder folder = connection.getFolder(folderName, READ_WRITE);
     executor.execute(muleMessage, emailId, id -> {
       try {
-        Message message = folder.getMessage(id);
+        javax.mail.Message message = folder.getMessage(id);
         message.setFlag(flag, true);
       } catch (MessagingException e) {
         throw new EmailException(format(SET_FLAG_ERROR_MESSAGE_MASK, flag.toString(), id), e);

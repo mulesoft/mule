@@ -12,8 +12,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.Serializable;
@@ -48,8 +48,8 @@ public class XSLTWikiDocsTestCase extends AbstractIntegrationTestCase {
     props.put("ListRating", new Integer(6));
 
     // Invoke the service
-    final MuleEvent muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
-    MuleMessage message = muleEvent.getMessage();
+    final Event muleEvent = flowRunner("Echo").withPayload(srcData).withInboundProperties(props).run();
+    InternalMessage message = muleEvent.getMessage();
     assertNotNull(message);
     assertThat(muleEvent.getError().isPresent(), is(false));
     // Compare results

@@ -21,15 +21,15 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
@@ -57,13 +57,13 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("test").build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("test").build()).build();
     });
     enricher.initialise();
 
-    MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
     assertEquals("test", result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -73,13 +73,13 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.header1]",
                                                               "#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event)
-          .message(MuleMessage.builder(event.getMessage()).addOutboundProperty("header1", "test").build()).build();
+      return Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("header1", "test").build()).build();
     });
 
-    MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
     assertEquals("test", result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -93,20 +93,20 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.header3]",
                                                               "#[message.outboundProperties.myHeader3]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage())
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage())
           .addOutboundProperty("header1", "test")
           .addOutboundProperty("header2", "test2")
           .addOutboundProperty("header3", "test3")
           .build()).build();
     });
 
-    MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
 
     assertNull(result.getOutboundProperty("myHeader"));
     assertEquals("test2", result.getOutboundProperty("myHeader2"));
     assertEquals("test3", result.getOutboundProperty("myHeader3"));
 
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -116,9 +116,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> null);
 
-    MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
     assertNull(result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -145,14 +145,14 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("enriched").build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build();
     });
-    MuleEvent in = getTestEvent("");
-    in = MuleEvent.builder(in).message(MuleMessage.builder(in.getMessage()).addOutboundProperty("foo", "bar").build()).build();
-    MuleEvent out = enricher.process(in);
+    Event in = getTestEvent("");
+    in = Event.builder(in).message(InternalMessage.builder(in.getMessage()).addOutboundProperty("foo", "bar").build()).build();
+    Event out = enricher.process(in);
     assertThat(out.getCorrelationId(), equalTo(in.getCorrelationId()));
     assertThat(out.getMessage().getOutboundProperty("foo"), equalTo("bar"));
-    assertThat(out.getMessage().getPayload(), equalTo(in.getMessage().getPayload()));
+    assertThat(out.getMessage().getPayload().getValue(), equalTo(in.getMessage().getPayload().getValue()));
   }
 
   @Test
@@ -161,16 +161,16 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("enriched").build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build();
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
     in.getSession().setProperty("sessionFoo", "bar");
-    in = MuleEvent.builder(in).addFlowVariable("flowFoo", "bar").build();
+    in = Event.builder(in).addVariable("flowFoo", "bar").build();
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
     assertEquals("bar", out.getSession().getProperty("sessionFoo"));
-    assertEquals("bar", out.getFlowVariable("flowFoo"));
+    assertEquals("bar", out.getVariable("flowFoo"));
   }
 
   @Test
@@ -179,13 +179,13 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("enriched").build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build();
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
-    assertEquals("", out.getMessage().getPayload());
+    assertEquals("", out.getMessage().getPayload().getValue());
   }
 
   @Test
@@ -194,12 +194,12 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).addInboundProperty("foo", "bar").build())
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).addInboundProperty("foo", "bar").build())
           .build();
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
     assertNull(out.getMessage().getOutboundProperty("foo"));
   }
@@ -210,13 +210,13 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).addFlowVariable("flowFoo", "bar").build();
+      return Event.builder(event).addVariable("flowFoo", "bar").build();
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
-    assertThat(out.getFlowVariableNames(), not(contains("flowFoo")));
+    assertThat(out.getVariableNames(), not(contains("flowFoo")));
   }
 
   @Test
@@ -228,9 +228,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
       event.getSession().setProperty("sessionFoo", "bar");
       return event;
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
     assertNull(out.getSession().getProperty("sessionFoo"));
   }
@@ -241,13 +241,13 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[flowVars.foo]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("bar").build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("bar").build()).build();
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
-    assertEquals("bar", out.getFlowVariable("foo"));
+    assertEquals("bar", out.getVariable("foo"));
   }
 
   @Test
@@ -256,11 +256,11 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setMuleContext(muleContext);
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload("bar").build()).build();
+      return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("bar").build()).build();
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
     assertEquals("bar", out.getSession().getProperty("foo"));
   }
@@ -294,13 +294,13 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     assertThat(getCurrentEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
   }
 
-  private MuleEvent createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler) {
+  private Event createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler) {
     Flow flow = mock(Flow.class);
     when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
     when(flow.getMuleContext()).thenReturn(muleContext);
 
-    return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(TEST_MESSAGE).build())
+    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload(TEST_MESSAGE).build())
         .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(flow).build();
   }
 
@@ -312,7 +312,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     return enricher;
   }
 
-  private MuleEvent processEnricherInChain(MessageEnricher enricher, final MuleEvent in) throws MuleException {
+  private Event processEnricherInChain(MessageEnricher enricher, final Event in) throws MuleException {
     return DefaultMessageProcessorChain.from(muleContext, enricher, event -> {
       assertThat(event.getMessage(), is(sameInstance(in.getMessage())));
       return event;
@@ -327,14 +327,14 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     enricher.addEnrichExpressionPair(pair);
     enricher.setEnrichmentMessageProcessor(event -> {
-      return MuleEvent.builder(event)
-          .message(MuleMessage.builder(event.getMessage()).payload("bar").mediaType(dataType.getMediaType()).build()).build();
+      return Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage()).payload("bar").mediaType(dataType.getMediaType()).build()).build();
     });
-    MuleEvent in = getTestEvent("");
+    Event in = getTestEvent("");
 
-    MuleEvent out = enricher.process(in);
+    Event out = enricher.process(in);
 
-    assertEquals("bar", out.getFlowVariable("foo"));
-    assertThat(out.getFlowVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, UTF_16));
+    assertEquals("bar", out.getVariable("foo"));
+    assertThat(out.getVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, UTF_16));
   }
 }

@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.component;
 
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
@@ -265,7 +265,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter {
   }
 
   @Override
-  public Object invoke(MuleEvent event, MuleEvent.Builder eventBuilder) throws MuleException {
+  public Object invoke(Event event, Event.Builder eventBuilder) throws MuleException {
     // Invoke method
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     Object result;

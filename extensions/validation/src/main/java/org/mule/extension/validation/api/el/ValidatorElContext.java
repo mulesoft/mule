@@ -8,7 +8,7 @@ package org.mule.extension.validation.api.el;
 
 import static org.mule.extension.validation.api.ValidationExtension.DEFAULT_LOCALE;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.extension.validation.api.Validator;
 import org.mule.extension.validation.internal.ValidationContext;
 import org.mule.extension.validation.api.ValidationExtension;
@@ -45,10 +45,10 @@ import java.util.Locale;
  */
 public final class ValidatorElContext {
 
-  private final MuleEvent event;
+  private final Event event;
   private final ValidationContext validationContext;
 
-  public ValidatorElContext(MuleEvent event) {
+  public ValidatorElContext(Event event) {
     this.event = event;
     validationContext = new ValidationContext(new ValidationMessages(), new ValidationOptions(), event);
   }

@@ -20,7 +20,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.functional.listener.SystemExceptionListener;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -71,7 +71,7 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
     exceptionListener.waitUntilAllNotificationsAreReceived();
     stopFlowConstruct(SINGLE_TRANSACTION_BEHAVIOR_FLOW);
     systemExceptionListener.waitUntilAllNotificationsAreReceived();
-    MuleMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT).getRight().get();
+    InternalMessage request = client.request(IN_1_JMS_ENDPOINT, SHORT_TIMEOUT).getRight().get();
     assertThat(request, notNullValue());
   }
 
@@ -83,11 +83,11 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
     client.dispatch(IN_2_JMS_ENDPOINT, MESSAGE, null);
     exceptionListener.waitUntilAllNotificationsAreReceived();
     stopFlowConstruct(XA_TRANSACTION_BEHAVIOR_FLOW);
-    MuleMessage outMessage = client.request(OUT_2_JMS_ENDPOINT, TIMEOUT).getRight().get();
+    InternalMessage outMessage = client.request(OUT_2_JMS_ENDPOINT, TIMEOUT).getRight().get();
     assertThat(outMessage, notNullValue());
     assertThat(getPayloadAsString(outMessage), is(MESSAGE));
     assertThat(client.request(IN_2_JMS_ENDPOINT, SHORT_TIMEOUT).getRight().isPresent(), is(false));
-    MuleMessage inVmMessage = client.request(IN_2_VM_ENDPOINT, TIMEOUT).getRight().get();
+    InternalMessage inVmMessage = client.request(IN_2_VM_ENDPOINT, TIMEOUT).getRight().get();
     assertThat(inVmMessage, notNullValue());
     assertThat(getPayloadAsString(inVmMessage), is(MESSAGE));
   }
@@ -99,12 +99,12 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
 
   @Test
   public void transactionCommitFailureTriggersExceptionStrategyUsingFilter() throws Exception {
-    final MuleMessage muleMessage =
-        MuleMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("filterMessage", true).build();
+    final InternalMessage muleMessage =
+        InternalMessage.builder().payload(TEST_PAYLOAD).addOutboundProperty("filterMessage", true).build();
     transactionCommitFailureExecutesExceptionStrategy(muleMessage);
   }
 
-  private void transactionCommitFailureExecutesExceptionStrategy(MuleMessage muleMessage) throws Exception {
+  private void transactionCommitFailureExecutesExceptionStrategy(InternalMessage muleMessage) throws Exception {
     getFunctionalTestComponent(TRANSACTION_COMMIT_FAILS_FLOW).setEventCallback(replaceTransactionWithMock());
     ExceptionListener exceptionListener = new ExceptionListener(muleContext);
     muleContext.getClient().dispatch(IN_3_VM_ENDPOINT, muleMessage);

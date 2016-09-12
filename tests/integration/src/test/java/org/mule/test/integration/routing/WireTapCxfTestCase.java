@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -39,7 +39,7 @@ public class WireTapCxfTestCase extends AbstractIntegrationTestCase {
         + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    MuleMessage response = client.send(url, getTestMuleMessage(msg), newOptions().method(POST.name()).build()).getRight();
+    InternalMessage response = client.send(url, getTestMuleMessage(msg), newOptions().method(POST.name()).build()).getRight();
     assertNotNull(response);
 
     String responseString = getPayloadAsString(response);

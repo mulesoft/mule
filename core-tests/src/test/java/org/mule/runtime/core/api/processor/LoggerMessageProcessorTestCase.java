@@ -18,8 +18,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -67,7 +67,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   // Verifies if the right call to the logger was made depending on the level enabled
   private void verifyLogCall(LoggerMessageProcessor loggerMessageProcessor, String logLevel, String enabledLevel,
-                             MuleEvent muleEvent, String message) {
+                             Event muleEvent, String message) {
     when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn("TRACE".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn("DEBUG".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
@@ -83,7 +83,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   // Verifies if the Mule expression is called or not depending on the logging level enabled
   private void verifyExpressionEvaluation(LoggerMessageProcessor loggerMessageProcessor, String level, String enabledLevel,
-                                          MuleEvent muleEvent, VerificationMode timesEvaluateExpression) {
+                                          Event muleEvent, VerificationMode timesEvaluateExpression) {
     when(loggerMessageProcessor.logger.isTraceEnabled()).thenReturn("TRACE".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isDebugEnabled()).thenReturn("DEBUG".equals(enabledLevel));
     when(loggerMessageProcessor.logger.isInfoEnabled()).thenReturn("INFO".equals(enabledLevel));
@@ -106,7 +106,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
   // Orchestrates the verifications for a call with a MuleEvent
   private void verifyMuleEventByLevel(String level) {
     LoggerMessageProcessor loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
-    MuleEvent muleEvent = buildMuleEvent();
+    Event muleEvent = buildMuleEvent();
     verifyLogCall(loggerMessageProcessor, level, level, muleEvent, muleEvent.getMessage().toString()); // Level is enabled
     loggerMessageProcessor = buildLoggerMessageProcessorWithLevel(level);
     // Level is disabled by prepending it with "not"
@@ -115,7 +115,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   // Orchestrates the verifications for a call with a 'message' set on the logger
   private void verifyLoggerMessageByLevel(String level) {
-    MuleEvent muleEvent = buildMuleEvent();
+    Event muleEvent = buildMuleEvent();
     // Level is enabled
     verifyLogCall(buildLoggerMessageProcessorForExpressionEvaluation(level), level, level, muleEvent, "text to log".toString());
     // Level is disabled by prepending it with "not"
@@ -163,9 +163,9 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
     return loggerMessageProcessor;
   }
 
-  private MuleEvent buildMuleEvent() {
-    MuleEvent event = mock(MuleEvent.class);
-    MuleMessage message = mock(MuleMessage.class);
+  private Event buildMuleEvent() {
+    Event event = mock(Event.class);
+    InternalMessage message = mock(InternalMessage.class);
     when(message.toString()).thenReturn("text to log");
     when(event.getMessage()).thenReturn(message);
     return event;
@@ -173,7 +173,7 @@ public class LoggerMessageProcessorTestCase extends AbstractMuleTestCase {
 
   private ExpressionLanguage buildExpressionLanguage() {
     ExpressionLanguage expressionLanguage = mock(ExpressionLanguage.class);
-    when(expressionLanguage.parse(anyString(), any(MuleEvent.class), eq(flow))).thenReturn("text to log");
+    when(expressionLanguage.parse(anyString(), any(Event.class), eq(flow))).thenReturn("text to log");
     return expressionLanguage;
   }
 

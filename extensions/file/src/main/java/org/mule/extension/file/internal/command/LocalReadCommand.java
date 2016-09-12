@@ -9,7 +9,7 @@ package org.mule.extension.file.internal.command;
 import org.mule.extension.file.api.LocalFileAttributes;
 import org.mule.extension.file.internal.FileInputStream;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -40,7 +40,7 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
    * {@inheritDoc}
    */
   @Override
-  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, MuleMessage message, String filePath,
+  public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
                                                            boolean lock) {
     Path path = resolveExistingPath(config, filePath);
     if (Files.isDirectory(path)) {
@@ -57,7 +57,8 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
 
     InputStream payload = new FileInputStream(path, pathLock);
     FileAttributes fileAttributes = new LocalFileAttributes(path);
-    MediaType fileMediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), fileAttributes);
+    MediaType fileMediaType =
+        fileSystem.getFileMessageMediaType(message.getPayload().getDataType().getMediaType(), fileAttributes);
     return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(fileMediaType)
         .attributes(fileAttributes).build();
   }

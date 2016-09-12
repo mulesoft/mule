@@ -22,7 +22,7 @@ import org.mule.runtime.core.api.processor.ProcessingStrategy;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.serialization.internal.JavaObjectSerializer;
 
 import java.util.List;
@@ -76,7 +76,7 @@ public class MuleConfigurationConfigurator implements MuleContextAware, SmartFac
 
       return configuration;
     } else {
-      throw new ConfigurationException(MessageFactory
+      throw new ConfigurationException(I18nMessageFactory
           .createStaticMessage("Unable to set properties on read-only MuleConfiguration: " + configuration.getClass()));
     }
   }

@@ -12,12 +12,11 @@ import static javax.mail.Part.ATTACHMENT;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
-import org.mule.runtime.api.message.MuleMessage;
-import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.message.DefaultMultiPartPayload;
-import org.mule.runtime.core.util.IOUtils;
 
-import com.icegreen.greenmail.util.ServerSetup;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -34,6 +32,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import com.icegreen.greenmail.util.ServerSetup;
 
 public class EmailTestUtils {
 
@@ -81,20 +81,20 @@ public class EmailTestUtils {
     return message;
   }
 
-  public static Message getSinglePartTestMessage() throws IOException, MessagingException {
-    Message message = new MimeMessage(testSession);
+  public static javax.mail.Message getSinglePartTestMessage() throws IOException, MessagingException {
+    javax.mail.Message message = new MimeMessage(testSession);
     message.setText(EMAIL_CONTENT);
     message.setSubject(EMAIL_SUBJECT);
     message.setRecipient(TO, new InternetAddress(ESTEBAN_EMAIL));
     return message;
   }
 
-  public static void assertAttachmentContent(List<MuleMessage> attachments, String attachmentKey, Object expectedResult)
+  public static void assertAttachmentContent(List<Message> attachments, String attachmentKey, Object expectedResult)
       throws IOException {
-    final MultiPartPayload multiPartPayload = new DefaultMultiPartPayload(attachments);
+    final MultiPartContent multiPartPayload = new DefaultMultiPartContent(attachments);
 
-    MuleMessage attachment = multiPartPayload.getPart(attachmentKey);
-    String attachmentAsString = IOUtils.toString((InputStream) attachment.getPayload());
+    Message attachment = multiPartPayload.getPart(attachmentKey);
+    String attachmentAsString = IOUtils.toString((InputStream) attachment.getPayload().getValue());
     assertThat(attachmentAsString, is(expectedResult));
   }
 

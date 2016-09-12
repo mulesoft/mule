@@ -8,7 +8,7 @@ package org.mule.tck.processor;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
@@ -27,7 +27,7 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, In
   private ExecutorService executor;
 
   @Override
-  public MuleEvent process(final MuleEvent event) throws MuleException {
+  public Event process(final Event event) throws MuleException {
     if (event.isAllowNonBlocking() && event.getReplyToHandler() != null) {
       executor.execute(() -> {
         try {

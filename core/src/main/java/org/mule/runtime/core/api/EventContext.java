@@ -10,21 +10,21 @@ import java.time.OffsetTime;
 
 /**
  * Context representing a message that is received by a Mule Runtime via a connector source. This context is immutable and
- * maintained during all execution originating from a given source message and all instances of {@link MuleEvent} created as part
- * of the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow
- * this {@link MessageContext} will be maintained, while whenever there is a connector boundary a new instance will be created by
- * the receiving source.
+ * maintained during all execution originating from a given source message and all instances of {@link Event} created as part of
+ * the processing of the source message will maintain a reference to this instance. Wherever a Flow references another Flow this
+ * {@link EventContext} will be maintained, while whenever there is a connector boundary a new instance will be created by the
+ * receiving source.
  *
- * @see MuleEvent
+ * @see Event
  * @since 4.0
  */
-public interface MessageContext {
+public interface EventContext {
 
 
   /**
-   * Unique time-based id (UUID) for this {@link MessageContext}.
+   * Unique time-based id (UUID) for this {@link EventContext}.
    *
-   * @return the UUID for this {@link MessageContext}
+   * @return the UUID for this {@link EventContext}
    */
   String getId();
 
@@ -32,7 +32,7 @@ public interface MessageContext {
    * The correlation ID is used to correlate messages between different flows and systems.
    * <p>
    * If the connector that receives the source message supports the concept of a correlation ID then the connector should create
-   * an instance of {@link MessageContext} using this value. If on the other hand, no correlation ID is received by the source
+   * an instance of {@link EventContext} using this value. If on the other hand, no correlation ID is received by the source
    * connector then a time-based UUID, also available via {@link #getId()} is used.
    *
    * @return the correlation id.

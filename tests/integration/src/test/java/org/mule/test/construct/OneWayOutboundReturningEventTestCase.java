@@ -8,7 +8,7 @@ package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 
 public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase {
 
@@ -18,12 +18,12 @@ public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
   }
 
   @Override
-  protected void assertOneWayOutboundResponse(MuleMessage response) {
-    assertEquals("TEST", response.getPayload());
+  protected void assertOneWayOutboundResponse(InternalMessage response) {
+    assertEquals("TEST", response.getPayload().getValue());
   }
 
   @Override
-  protected void assertOneWayOutboundAfterComponentResponse(MuleMessage response) {
-    assertEquals("TEST processed", response.getPayload());
+  protected void assertOneWayOutboundAfterComponentResponse(InternalMessage response) {
+    assertEquals("TEST processed", response.getPayload().getValue());
   }
 }

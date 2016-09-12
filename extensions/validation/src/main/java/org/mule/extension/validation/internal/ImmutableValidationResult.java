@@ -7,12 +7,12 @@
 package org.mule.extension.validation.internal;
 
 import static org.mule.runtime.core.util.StringUtils.EMPTY;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.extension.validation.api.ValidationResult;
 
 /**
  * An immutable implementation of {@link ValidationResult}. It provides a series of static factory methods for creating a result
- * in which the validation succeeded ({@link #ok()}), and other two for validations that failed ({@link #error(Message)} and
+ * in which the validation succeeded ({@link #ok()}), and other two for validations that failed ({@link #error(I18nMessage)} and
  * {@link #error(String)}).
  *
  * @since 3.7.0
@@ -43,7 +43,7 @@ public class ImmutableValidationResult implements ValidationResult {
    * @param message a message
    * @return a new instance of {@link ImmutableValidationResult}
    */
-  public static ValidationResult error(Message message) {
+  public static ValidationResult error(I18nMessage message) {
     return error(message.getMessage());
   }
 

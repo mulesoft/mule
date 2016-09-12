@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.processor.MessageProcessor;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>EncryptionNotSupportedException</code> is thrown if an algorithm is set in the MULE_USER header but it doesn't match the
@@ -22,12 +22,12 @@ public class EncryptionNotSupportedException extends SecurityException {
    */
   private static final long serialVersionUID = -1661059380853528624L;
 
-  public EncryptionNotSupportedException(Message message, MuleEvent event) {
+  public EncryptionNotSupportedException(I18nMessage message, Event event) {
     super(message, event);
   }
 
-  public EncryptionNotSupportedException(Message message, MuleEvent event, Throwable cause,
-                                         MessageProcessor failingMessageProcessor) {
+  public EncryptionNotSupportedException(I18nMessage message, Event event, Throwable cause,
+                                         Processor failingMessageProcessor) {
     super(message, event, cause, failingMessageProcessor);
   }
 }

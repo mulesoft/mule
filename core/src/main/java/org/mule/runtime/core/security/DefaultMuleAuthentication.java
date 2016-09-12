@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.security;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.Credentials;
 
@@ -18,24 +18,24 @@ public class DefaultMuleAuthentication implements Authentication {
   private char[] credentials;
   private String user;
   private Map<String, Object> properties;
-  transient private MuleEvent event;
+  transient private Event event;
 
   public DefaultMuleAuthentication(Credentials credentials) {
     this(credentials, null);
   }
 
-  public DefaultMuleAuthentication(Credentials credentials, MuleEvent event) {
+  public DefaultMuleAuthentication(Credentials credentials, Event event) {
     this.event = event;
     this.user = credentials.getUsername();
     this.credentials = credentials.getPassword();
   }
 
   @Override
-  public MuleEvent getEvent() {
+  public Event getEvent() {
     return event;
   }
 
-  public void setEvent(MuleEvent muleEvent) {
+  public void setEvent(Event muleEvent) {
     this.event = muleEvent;
   }
 

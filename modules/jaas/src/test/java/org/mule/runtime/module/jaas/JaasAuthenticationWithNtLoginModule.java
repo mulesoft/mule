@@ -8,7 +8,7 @@ package org.mule.runtime.module.jaas;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.SystemUtils;
 
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class JaasAuthenticationWithNtLoginModule extends AbstractJaasFunctionalT
   @Test
   public void testCaseAuthentication() throws Exception {
     SecurityHeader securityHeader = createSecurityHeader("Marie.Rizzo", "dragon");
-    MuleMessage message =
+    InternalMessage message =
         flowRunner(TEST_FLOW_NAME).withInboundProperty(securityHeader.getKey(), securityHeader.getValue()).run().getMessage();
     assertNotNull(message);
     assertTrue(getPayloadAsString(message).equals("Test Received"));

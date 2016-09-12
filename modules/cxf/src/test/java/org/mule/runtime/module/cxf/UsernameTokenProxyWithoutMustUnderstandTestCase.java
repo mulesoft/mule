@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.cxf.wssec.ClientPasswordCallback;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -51,14 +51,14 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
 
   @Test
   public void testProxyServiceWithoutMustUnderstand() throws Exception {
-    MuleMessage replyMessage = sendRequest("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope", request);
+    InternalMessage replyMessage = sendRequest("http://localhost:" + httpPortProxy.getNumber() + "/proxy-envelope", request);
     assertNotNull(replyMessage);
     String payload = getPayloadAsString(replyMessage);
     assertFalse(payload.contains("Fault"));
     assertTrue(XMLUnit.compareXML(response, payload).identical());
   }
 
-  protected MuleMessage sendRequest(String url, String payload) throws MuleException {
+  protected InternalMessage sendRequest(String url, String payload) throws MuleException {
     return muleContext.getClient().send(url, getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS).getRight();
   }
 }

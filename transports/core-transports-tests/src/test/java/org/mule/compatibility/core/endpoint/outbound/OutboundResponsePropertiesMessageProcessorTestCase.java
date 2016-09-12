@@ -15,9 +15,9 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.DefaultMessageContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.construct.Flow;
 
@@ -36,19 +36,21 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
       // return event with same payload but no properties
       try {
         Flow flow = getTestFlow();
-        return MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR))
-            .message(MuleMessage.builder().payload(event.getMessage().getPayload()).build()).exchangePattern(REQUEST_RESPONSE)
+        return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+            .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue()).build())
+            .exchangePattern(REQUEST_RESPONSE)
             .flow(flow).session(getTestSession(null, muleContext)).build();
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     });
 
-    MuleEvent event = createTestOutboundEvent();
-    event = MuleEvent.builder(event)
-        .message(MuleMessage.builder(event.getMessage()).addOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL).build()).build();
+    Event event = createTestOutboundEvent();
+    event = Event.builder(event)
+        .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL).build())
+        .build();
 
-    MuleEvent result = mp.process(event);
+    Event result = mp.process(event);
 
     assertNotNull(result);
     assertThat(result.getMessageAsString(muleContext), is(TEST_MESSAGE));

@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.runtime.module.xml.util.XMLUtils;
@@ -154,7 +154,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
       try {
         result = new DOMResult(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
       } catch (Exception e) {
-        throw new MuleRuntimeException(MessageFactory.createStaticMessage("Could not create result document"), e);
+        throw new MuleRuntimeException(I18nMessageFactory.createStaticMessage("Could not create result document"), e);
       }
 
       return new ResultHolder() {

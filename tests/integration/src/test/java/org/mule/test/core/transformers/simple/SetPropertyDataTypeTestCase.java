@@ -14,8 +14,8 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import org.junit.Test;
 
@@ -28,9 +28,9 @@ public class SetPropertyDataTypeTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void setsPropertyDataType() throws Exception {
-    final MuleEvent muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
+    final Event muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
-    MuleMessage response = muleEvent.getMessage();
+    InternalMessage response = muleEvent.getMessage();
     DataType dataType = response.getOutboundPropertyDataType("testProperty");
 
     assertThat(dataType, like(String.class, MediaType.XML, UTF_16));

@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.internal.artifact;
 
 import static org.mule.runtime.module.deployment.internal.descriptor.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.module.artifact.Artifact;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class ArtifactFactoryUtils {
    */
   public static File getDeploymentFile(File artifactDir) {
     if (!artifactDir.exists()) {
-      throw new MuleRuntimeException(MessageFactory
+      throw new MuleRuntimeException(I18nMessageFactory
           .createStaticMessage(String.format("Artifact directory does not exist: '%s'", artifactDir)));
     }
     File deployFile = new File(artifactDir, DEFAULT_DEPLOY_PROPERTIES_RESOURCE);

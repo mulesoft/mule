@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -69,8 +69,9 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase 
   @Test
   public void testProxyWSDLRewriteAllSchemaLocations() throws Exception {
     String proxyAddress = "http://localhost:" + httpPortProxy.getNumber() + "/localServicePath";
-    MuleMessage response =
-        muleContext.getClient().send(proxyAddress + "?wsdl", MuleMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
+    InternalMessage response =
+        muleContext.getClient()
+            .send(proxyAddress + "?wsdl", InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
             .getRight();
 
     Set<String> expectedParametersValues = new HashSet<String>();
@@ -90,7 +91,7 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase 
     assertTrue(expectedParametersValues.isEmpty());
   }
 
-  private Document getWsdl(MuleMessage response) throws Exception {
+  private Document getWsdl(InternalMessage response) throws Exception {
     return XMLUnit.buildTestDocument(new InputSource(new StringReader(getPayloadAsString(response))));
   }
 

@@ -12,7 +12,7 @@ import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
 
@@ -37,13 +37,13 @@ public class SelectNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
 
   @Test
   public void usesParamOverriddenByName() throws Exception {
-    MuleMessage response = flowRunner("overriddenParamsByName").run().getMessage();
+    Message response = flowRunner("overriddenParamsByName").run().getMessage();
     assertMessageContains(response, getMarsRecord());
   }
 
   @Test
   public void usesInlineParamOverriddenByName() throws Exception {
-    MuleMessage response = flowRunner("inlineOverriddenParamsByName").run().getMessage();
+    Message response = flowRunner("inlineOverriddenParamsByName").run().getMessage();
     assertMessageContains(response, getVenusRecord());
   }
 }

@@ -11,7 +11,7 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.client.RequestCacheKey;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * Provider for operations of the Test Connector.
@@ -21,7 +21,7 @@ public class TestConnectorMessageProcessorProvider extends AbstractConnectorMess
   public static final String TEST_URL_PREFIX = "test://";
 
   @Override
-  protected MessageProcessor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException {
+  protected Processor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException {
     final String queueName = cacheKey.getUrl().substring(TEST_URL_PREFIX.length());
     final OperationOptions operationOptions = cacheKey.getOperationOptions();
 

@@ -8,8 +8,8 @@ package org.mule.runtime.module.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import static org.mule.runtime.api.metadata.MediaType.XML;
-import static org.mule.runtime.core.DefaultMessageContext.create;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.DefaultEventContext.create;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -17,16 +17,16 @@ import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.OutputHandler;
@@ -133,13 +133,13 @@ public class MuleUniversalConduit extends AbstractConduit {
       message.getInterceptorChain().doIntercept(message);
     };
 
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
     // are we sending an out of band response for a server side request?
     boolean decoupled = event != null && message.getExchange().getInMessage() != null;
 
     if (event == null || VoidMuleEvent.getInstance().equals(event) || decoupled) {
       // we've got an out of band WS-RM message or a message from a standalone client
-      MuleMessage muleMsg = MuleMessage.builder().payload(handler).build();
+      InternalMessage muleMsg = InternalMessage.builder().payload(handler).build();
 
       String url = setupURL(message);
 
@@ -171,13 +171,13 @@ public class MuleUniversalConduit extends AbstractConduit {
             return null;
           }
         };
-        event = MuleEvent.builder(event == null ? create(flowConstruct, "MuleUniversalConduit") : event.getContext())
+        event = Event.builder(event == null ? create(flowConstruct, "MuleUniversalConduit") : event.getContext())
             .message(muleMsg).flow(flowConstruct).build();
       } catch (Exception e) {
         throw new Fault(e);
       }
     } else {
-      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build())
+      event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(handler).mediaType(XML).build())
           .build();
     }
 
@@ -191,7 +191,7 @@ public class MuleUniversalConduit extends AbstractConduit {
       @Override
       public void handleMessage(Message m) throws Fault {
         try {
-          dispatchMuleMessage(m, (MuleEvent) m.getExchange().get(CxfConstants.MULE_EVENT));
+          dispatchMuleMessage(m, (Event) m.getExchange().get(CxfConstants.MULE_EVENT));
         } catch (MuleException e) {
           throw new Fault(e);
         }
@@ -226,17 +226,17 @@ public class MuleUniversalConduit extends AbstractConduit {
     return result;
   }
 
-  protected void dispatchMuleMessage(final Message m, MuleEvent reqEvent) throws MuleException {
+  protected void dispatchMuleMessage(final Message m, Event reqEvent) throws MuleException {
     try {
       if (reqEvent.isAllowNonBlocking()) {
         final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
 
-        reqEvent = MuleEvent.builder(reqEvent).replyToHandler(new NonBlockingReplyToHandler() {
+        reqEvent = Event.builder(reqEvent).replyToHandler(new NonBlockingReplyToHandler() {
 
           @Override
-          public MuleEvent processReplyTo(MuleEvent event, MuleMessage returnMessage, Object replyTo) throws MuleException {
+          public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
             try {
-              Holder<MuleEvent> holder = (Holder<MuleEvent>) m.getExchange().get("holder");
+              Holder<Event> holder = (Holder<Event>) m.getExchange().get("holder");
               holder.value = event;
               sendResultBackToCxf(m, event);
             } catch (IOException e) {
@@ -254,7 +254,7 @@ public class MuleUniversalConduit extends AbstractConduit {
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(reqEvent);
 
-      MuleEvent resEvent = processNext(reqEvent, m.getExchange());
+      Event resEvent = processNext(reqEvent, m.getExchange());
 
       if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
         sendResultBackToCxf(m, resEvent);
@@ -262,23 +262,23 @@ public class MuleUniversalConduit extends AbstractConduit {
     } catch (MuleException me) {
       throw me;
     } catch (Exception e) {
-      throw new DefaultMuleException(MessageFactory.createStaticMessage("Could not send message to Mule."), e);
+      throw new DefaultMuleException(I18nMessageFactory.createStaticMessage("Could not send message to Mule."), e);
     }
   }
 
-  protected void sendResultBackToCxf(Message m, MuleEvent resEvent) throws TransformerException, IOException {
+  protected void sendResultBackToCxf(Message m, Event resEvent) throws TransformerException, IOException {
     if (resEvent != null && !VoidMuleEvent.getInstance().equals(resEvent)) {
       m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
 
       // If we have a result, send it back to CXF
-      MuleMessage result = resEvent.getMessage();
+      InternalMessage result = resEvent.getMessage();
       InputStream is = getResponseBody(m, resEvent);
       if (is != null) {
         DataType dataType;
-        if (MediaType.ANY.matches(result.getDataType().getMediaType())) {
-          dataType = DataType.builder(result.getDataType()).mediaType(MediaType.XML).build();
+        if (MediaType.ANY.matches(result.getPayload().getDataType().getMediaType())) {
+          dataType = DataType.builder(result.getPayload().getDataType()).mediaType(MediaType.XML).build();
         } else {
-          dataType = result.getDataType();
+          dataType = result.getPayload().getDataType();
         }
 
         Message inMessage = new MessageImpl();
@@ -297,18 +297,18 @@ public class MuleUniversalConduit extends AbstractConduit {
     m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
   }
 
-  protected InputStream getResponseBody(Message m, MuleEvent result) throws TransformerException, IOException {
+  protected InputStream getResponseBody(Message m, Event result) throws TransformerException, IOException {
     boolean response = result != null
-        && result.getMessage().getPayload() != null && !isOneway(m.getExchange());
+        && result.getMessage().getPayload().getValue() != null && !isOneway(m.getExchange());
 
     if (response) {
       // Sometimes there may not actually be a body, in which case
       // we want to act appropriately. E.g. one way invocations over a proxy
       InputStream is = (InputStream) configuration.getMuleContext().getTransformationService()
-          .transform(result.getMessage(), DataType.INPUT_STREAM).getPayload();
+          .transform(result.getMessage(), DataType.INPUT_STREAM).getPayload().getValue();
       PushbackInputStream pb = new PushbackInputStream(is);
       result =
-          MuleEvent.builder(result).message(MuleMessage.builder(result.getMessage()).payload(pb).mediaType(XML).build()).build();
+          Event.builder(result).message(InternalMessage.builder(result.getMessage()).payload(pb).mediaType(XML).build()).build();
 
       int b = pb.read();
       if (b != -1) {
@@ -337,13 +337,13 @@ public class MuleUniversalConduit extends AbstractConduit {
     // template method
   }
 
-  protected MuleEvent processNext(MuleEvent event, Exchange exchange) throws MuleException {
+  protected Event processNext(Event event, Exchange exchange) throws MuleException {
     CxfOutboundMessageProcessor processor =
         (CxfOutboundMessageProcessor) exchange.get(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR);
-    MuleEvent response;
+    Event response;
     response = processor.processNext(event);
 
-    Holder<MuleEvent> holder = (Holder<MuleEvent>) exchange.get("holder");
+    Holder<Event> holder = (Holder<Event>) exchange.get("holder");
     holder.value = response;
 
     return response;

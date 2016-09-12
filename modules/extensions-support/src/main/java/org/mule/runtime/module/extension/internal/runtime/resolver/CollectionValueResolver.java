@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.hasAnyDynamic;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(MuleEvent)} it
- * return a {@link Collection} of values with the outcome of each original resolver.
+ * A {@link ValueResolver} that takes a list of {@link ValueResolver}s and upon invocation of {@link #resolve(Event)} it return a
+ * {@link Collection} of values with the outcome of each original resolver.
  * <p/>
  * This class implements {@link Lifecycle} and propagates those events to each of the {@code resolvers}
  *
@@ -62,12 +62,12 @@ public final class CollectionValueResolver<T> implements ValueResolver<Collectio
   /**
    * Passes the given {@code event} to each resolvers and outputs a collection of type {@code collectionType} with each result
    *
-   * @param event a {@link MuleEvent} the event to evaluate
+   * @param event a {@link Event} the event to evaluate
    * @return a {@link Collection} of type {@code collectionType}
    * @throws MuleException
    */
   @Override
-  public Collection<T> resolve(MuleEvent event) throws MuleException {
+  public Collection<T> resolve(Event event) throws MuleException {
     Collection<T> collection = instantiateCollection();
     for (ValueResolver<T> resolver : resolvers) {
       collection.add(resolver.resolve(event));

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
@@ -26,9 +26,9 @@ import java.util.Set;
  * it. The entrypoint is discovered using the event payload type(s) as the argument using reflection. An entry point will try and
  * match for different argument types, so it's possible to have multiple entry points on a single service.
  * <p/>
- * For multiple parameters the payload of context.getResult().getPayload() should be an Array of objects. If the message payload
- * is of type {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument method to call that
- * doesn't match the set of ignoredMethods on the resolver.
+ * For multiple parameters the payload of context.getResult().getPayload().getValue() should be an Array of objects. If the
+ * message payload is of type {@link org.mule.runtime.api.message.NullPayload} the resolver will look for a no-argument method to
+ * call that doesn't match the set of ignoredMethods on the resolver.
  * <p/>
  * Also a set of 'ignored' methods are available (and the use can add others) to tell the resolver to not resolve to these
  * methods. The default ones are:
@@ -98,7 +98,7 @@ public class ReflectionEntryPointResolver extends AbstractEntryPointResolver {
    *
    * @throws Exception
    */
-  public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
+  public InvocationResult invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
     Object[] payload = getPayloadFromMessage(context);
 
     Method method;

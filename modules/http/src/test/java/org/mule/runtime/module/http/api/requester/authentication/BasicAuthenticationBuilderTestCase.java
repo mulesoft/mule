@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestAuthentication;
 import org.mule.runtime.module.http.internal.request.DefaultHttpAuthentication;
@@ -29,7 +29,7 @@ public class BasicAuthenticationBuilderTestCase extends AbstractMuleTestCase {
   private static final String PREEMPTIVE = "preemptiveExpression";
 
   private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
-  private MuleEvent mockMuleEvent = mock(MuleEvent.class, Answers.RETURNS_DEEP_STUBS.get());
+  private Event mockMuleEvent = mock(Event.class, Answers.RETURNS_DEEP_STUBS.get());
   private BasicAuthenticationBuilder builder = new BasicAuthenticationBuilder(mockMuleContext);
 
   @Test

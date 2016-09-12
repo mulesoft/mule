@@ -8,7 +8,7 @@ package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -67,13 +67,13 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContext() throws Exception {
-    MuleEvent event = getTestEvent("123");
+    Event event = getTestEvent("123");
     assertEquals("123appended", el.evaluate("appendPayload()", event, getTestFlow()));
   }
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContextAndImport() throws Exception {
-    MuleEvent event = getTestEvent("123");
+    Event event = getTestEvent("123");
     assertEquals("321", el.evaluate("reversePayload()", event, getTestFlow()));
   }
 

@@ -13,9 +13,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.source.polling.MessageProcessorPollingOverride.NullOverride;
 import org.mule.runtime.core.source.polling.schedule.FixedFrequencySchedulerFactory;
@@ -44,7 +44,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
   public void nullPayloadResponseFromNestedMP() throws Exception {
 
     PollingMessageSource pollingMessageSource =
-        createMessageSource(event -> MuleEvent.builder(event).message(MuleMessage.builder().nullPayload().build()).build());
+        createMessageSource(event -> Event.builder(event).message(InternalMessage.builder().nullPayload().build()).build());
 
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
     pollingMessageSource.setListener(flow);
@@ -58,7 +58,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
   public void emptyStringResponseFromNestedMP() throws Exception {
 
     PollingMessageSource pollingMessageSource =
-        createMessageSource(event -> MuleEvent.builder(event).message(MuleMessage.builder().payload("").build()).build());
+        createMessageSource(event -> Event.builder(event).message(InternalMessage.builder().payload("").build()).build());
 
     SensingNullMessageProcessor flow = getSensingNullMessageProcessor();
     pollingMessageSource.setListener(flow);
@@ -89,7 +89,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
     return muleContext.getRegistry().lookupObjects(Scheduler.class);
   }
 
-  private PollingMessageSource createMessageSource(MessageProcessor processor) throws Exception {
+  private PollingMessageSource createMessageSource(Processor processor) throws Exception {
     PollingMessageSource pollingMessageSource =
         new PollingMessageSource(muleContext, processor, new NullOverride(), schedulerFactory());
     pollingMessageSource.setFlowConstruct(getTestFlow());

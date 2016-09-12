@@ -14,7 +14,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -34,7 +34,7 @@ public final class DefaultImplicitConnectionProviderFactory implements ImplicitC
   @Override
   public <Connector> ConnectionProvider<Connector> createImplicitConnectionProvider(String configName,
                                                                                     RuntimeConfigurationModel configurationModel,
-                                                                                    MuleEvent event, MuleContext muleContext) {
+                                                                                    Event event, MuleContext muleContext) {
     RuntimeConnectionProviderModel implicitModel =
         (RuntimeConnectionProviderModel) getFirstImplicit(getAllConnectionProviders(configurationModel));
 

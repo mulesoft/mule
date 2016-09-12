@@ -13,10 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
@@ -32,7 +32,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
 
   protected Foreach simpleForeach;
   protected Foreach nestedForeach;
-  protected ArrayList<MuleEvent> processedEvents;
+  protected ArrayList<Event> processedEvents;
 
   private static String ERR_NUMBER_MESSAGES = "Not a correct number of messages processed";
   private static String ERR_PAYLOAD_TYPE = "Type error on processed payloads";
@@ -45,11 +45,11 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     nestedForeach = createForeach(getNestedMessageProcessors());
   }
 
-  private List<MessageProcessor> getSimpleMessageProcessors() {
-    List<MessageProcessor> lmp = new ArrayList<>();
+  private List<Processor> getSimpleMessageProcessors() {
+    List<Processor> lmp = new ArrayList<>();
     lmp.add(event -> {
-      String payload = event.getMessage().getPayload().toString();
-      event = MuleEvent.builder(event).message(MuleMessage.builder(event.getMessage()).payload(payload + ":foo").build()).build();
+      String payload = event.getMessage().getPayload().getValue().toString();
+      event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(payload + ":foo").build()).build();
       return event;
     });
     lmp.add(new TestMessageProcessor("zas"));
@@ -60,15 +60,15 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     return lmp;
   }
 
-  private List<MessageProcessor> getNestedMessageProcessors() throws MuleException {
-    List<MessageProcessor> lmp = new ArrayList<>();
+  private List<Processor> getNestedMessageProcessors() throws MuleException {
+    List<Processor> lmp = new ArrayList<>();
     Foreach internalForeach = new Foreach();
     internalForeach.setMessageProcessors(getSimpleMessageProcessors());
     lmp.add(internalForeach);
     return lmp;
   }
 
-  private Foreach createForeach(List<MessageProcessor> mps) throws MuleException {
+  private Foreach createForeach(List<Processor> mps) throws MuleException {
     Foreach foreachMp = new Foreach();
     foreachMp.setMessageProcessors(mps);
     foreachMp.setMuleContext(muleContext);
@@ -98,10 +98,10 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void muleMessageCollectionPayload() throws Exception {
-    List<MuleMessage> list = new ArrayList<>();
-    list.add(MuleMessage.builder().payload("bar").build());
-    list.add(MuleMessage.builder().payload("zip").build());
-    MuleMessage msgCollection = MuleMessage.builder().payload(list).build();
+    List<InternalMessage> list = new ArrayList<>();
+    list.add(InternalMessage.builder().payload("bar").build());
+    list.add(InternalMessage.builder().payload("zip").build());
+    InternalMessage msgCollection = InternalMessage.builder().payload(list).build();
     simpleForeach.process(getTestEvent(msgCollection));
 
     assertSimpleProcessedMessages();
@@ -160,21 +160,21 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   @Test
   public void nestedMuleMessageCollectionPayload() throws Exception {
 
-    List<MuleMessage> parentList = new ArrayList<>();
-    List<MuleMessage> list1 = new ArrayList<>();
-    List<MuleMessage> list2 = new ArrayList<>();
+    List<InternalMessage> parentList = new ArrayList<>();
+    List<InternalMessage> list1 = new ArrayList<>();
+    List<InternalMessage> list2 = new ArrayList<>();
 
-    list1.add(MuleMessage.builder().payload("a1").build());
-    list1.add(MuleMessage.builder().payload("a2").build());
-    list1.add(MuleMessage.builder().payload("a3").build());
+    list1.add(InternalMessage.builder().payload("a1").build());
+    list1.add(InternalMessage.builder().payload("a2").build());
+    list1.add(InternalMessage.builder().payload("a3").build());
 
-    list2.add(MuleMessage.builder().payload("b1").build());
-    list2.add(MuleMessage.builder().payload("b2").build());
-    list2.add(MuleMessage.builder().payload("c1").build());
+    list2.add(InternalMessage.builder().payload("b1").build());
+    list2.add(InternalMessage.builder().payload("b2").build());
+    list2.add(InternalMessage.builder().payload("c1").build());
 
-    parentList.add(MuleMessage.builder().payload(list1).build());
-    parentList.add(MuleMessage.builder().payload(list2).build());
-    MuleMessage parentCollection = MuleMessage.builder().payload(parentList).build();
+    parentList.add(InternalMessage.builder().payload(list1).build());
+    parentList.add(InternalMessage.builder().payload(list2).build());
+    InternalMessage parentCollection = InternalMessage.builder().payload(parentList).build();
 
     nestedForeach.process(getTestEvent(parentCollection));
     assertNestedProcessedMessages();
@@ -200,7 +200,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void addProcessorPathElementsBeforeInit() throws MuleException {
     Foreach foreachMp = new Foreach();
     foreachMp.setMuleContext(muleContext);
-    List<MessageProcessor> processors = getSimpleMessageProcessors();
+    List<Processor> processors = getSimpleMessageProcessors();
     foreachMp.setMessageProcessors(processors);
 
     MessageProcessorPathElement mpPathElement = mock(MessageProcessorPathElement.class);
@@ -209,28 +209,28 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     assertAddedPathElements(processors, mpPathElement);
   }
 
-  protected void assertAddedPathElements(List<MessageProcessor> processors, MessageProcessorPathElement mpPathElement) {
-    verify(mpPathElement, times(processors.size())).addChild(any(MessageProcessor.class));
+  protected void assertAddedPathElements(List<Processor> processors, MessageProcessorPathElement mpPathElement) {
+    verify(mpPathElement, times(processors.size())).addChild(any(Processor.class));
     verify(mpPathElement).addChild(processors.get(0));
     verify(mpPathElement).addChild(processors.get(1));
   }
 
   private void assertSimpleProcessedMessages() {
     assertEquals(ERR_NUMBER_MESSAGES, 2, processedEvents.size());
-    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(0).getMessage().getPayload() instanceof String);
-    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(1).getMessage().getPayload() instanceof String);
-    assertEquals(ERR_OUTPUT, "bar:foo:zas", processedEvents.get(0).getMessage().getPayload());
-    assertEquals(ERR_OUTPUT, "zip:foo:zas", processedEvents.get(1).getMessage().getPayload());
+    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(0).getMessage().getPayload().getValue() instanceof String);
+    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(1).getMessage().getPayload().getValue() instanceof String);
+    assertEquals(ERR_OUTPUT, "bar:foo:zas", processedEvents.get(0).getMessage().getPayload().getValue());
+    assertEquals(ERR_OUTPUT, "zip:foo:zas", processedEvents.get(1).getMessage().getPayload().getValue());
   }
 
   private void assertNestedProcessedMessages() {
     String[] expectedOutputs = {"a1:foo:zas", "a2:foo:zas", "a3:foo:zas", "b1:foo:zas", "b2:foo:zas", "c1:foo:zas"};
     assertEquals(ERR_NUMBER_MESSAGES, 6, processedEvents.size());
     for (int i = 0; i < processedEvents.size(); i++) {
-      assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(i).getMessage().getPayload() instanceof String);
+      assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(i).getMessage().getPayload().getValue() instanceof String);
     }
     for (int i = 0; i < processedEvents.size(); i++) {
-      assertEquals(ERR_OUTPUT, expectedOutputs[i], processedEvents.get(i).getMessage().getPayload());
+      assertEquals(ERR_OUTPUT, expectedOutputs[i], processedEvents.get(i).getMessage().getPayload().getValue());
     }
   }
 

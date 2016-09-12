@@ -6,13 +6,13 @@
  */
 package org.mule.test.integration.transaction.xa;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FailureGeneratorMessageProcessor implements MessageProcessor {
+public class FailureGeneratorMessageProcessor implements Processor {
 
   private static int maximumNumberOfFailures = 5;
   private static double failureRange = 0;
@@ -28,7 +28,7 @@ public class FailureGeneratorMessageProcessor implements MessageProcessor {
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (numberOfFailures.get() < maximumNumberOfFailures) {
       if (Math.random() < failureRange) {
         numberOfFailures.incrementAndGet();

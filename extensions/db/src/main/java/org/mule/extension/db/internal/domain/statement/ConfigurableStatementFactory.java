@@ -13,25 +13,22 @@ package org.mule.extension.db.internal.domain.statement;
 public interface ConfigurableStatementFactory extends StatementFactory {
 
   /**
-   * Sets the maximum numbers of rows that will be returned by any resultSet
-   * returned by a statement created by this factory
+   * Sets the maximum numbers of rows that will be returned by any resultSet returned by a statement created by this factory
    *
    * @param max the new max rows limit; zero means there is no limit
    */
   void setMaxRows(int max);
 
   /**
-   * Indicates how many rows should fetched from the database any time more
-   * rows are requested on any resultSet returned by a statement created by
-   * this factory
+   * Indicates how many rows should fetched from the database any time more rows are requested on any resultSet returned by a
+   * statement created by this factory
    *
    * @param size the number of rows to fetch
    */
   void setFetchSize(int size);
 
   /**
-   * Indicates the minimum amount of time in seconds before the JDBC driver
-   * attempts to cancel a running statement.
+   * Indicates the minimum amount of time in seconds before the JDBC driver attempts to cancel a running statement.
    *
    * @param queryTimeout number of seconds to wait. Non negative. Zero means no timeout.
    */

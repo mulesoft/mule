@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.cxf.support;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class ProxyGZIPInInterceptor extends AbstractProxyGZIPInterceptor {
 
   @Override
   public void handleMessage(Message message) throws Fault {
-    MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+    Event event = (Event) message.getExchange().get(CxfConstants.MULE_EVENT);
 
     if (event == null || event.getMessage() == null) {
       return;

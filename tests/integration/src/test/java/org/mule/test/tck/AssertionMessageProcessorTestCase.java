@@ -17,8 +17,8 @@ import static org.mockito.Mockito.when;
 
 import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -42,20 +42,20 @@ public class AssertionMessageProcessorTestCase extends AbstractMuleTestCase {
   protected MuleContext muleContext;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  protected MuleEvent mockEvent;
+  protected Event mockEvent;
 
   @Mock
-  protected MuleMessage muleMessage;
+  protected InternalMessage muleMessage;
 
   @Before
   public void initialise() {
     when(mockEvent.getMessage()).thenReturn(muleMessage);
     expressionLanguage = mock(ExpressionLanguage.class);
     when(expressionLanguage.isValid(anyString())).thenReturn(true);
-    when(expressionLanguage.evaluateBoolean(eq(TRUE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
+    when(expressionLanguage.evaluateBoolean(eq(TRUE_EXPRESSION), any(Event.class), any(FlowConstruct.class), anyBoolean(),
                                             anyBoolean()))
                                                 .thenReturn(true);
-    when(expressionLanguage.evaluateBoolean(eq(FALSE_EXPRESSION), any(MuleEvent.class), any(FlowConstruct.class), anyBoolean(),
+    when(expressionLanguage.evaluateBoolean(eq(FALSE_EXPRESSION), any(Event.class), any(FlowConstruct.class), anyBoolean(),
                                             anyBoolean()))
                                                 .thenReturn(false);
 

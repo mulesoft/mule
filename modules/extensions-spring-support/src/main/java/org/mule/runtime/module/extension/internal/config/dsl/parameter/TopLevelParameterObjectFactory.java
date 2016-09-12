@@ -14,7 +14,7 @@ import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
@@ -30,7 +30,7 @@ import java.lang.reflect.Field;
  * placed in the mule registry.
  * <p>
  * The objects are parsed as a {@link ValueResolver}. If that resolver is not static, then a value is obtained using a default
- * {@link MuleEvent} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
+ * {@link Event} and that value is returned. Otherwise, the dynamic {@link ValueResolver} is returned instead.
  *
  * @since 4.0
  */
@@ -74,7 +74,7 @@ public class TopLevelParameterObjectFactory extends AbstractExtensionObjectFacto
   }
 
   private void resolveParameters(Class<?> objectClass, ObjectBuilder builder) {
-    //TODO: MULE-9453 this needs to not depend on fields exclusively
+    // TODO: MULE-9453 this needs to not depend on fields exclusively
     for (Field field : getAllFields(objectClass)) {
       String key = getAliasName(field);
       if (getParameters().containsKey(key)) {

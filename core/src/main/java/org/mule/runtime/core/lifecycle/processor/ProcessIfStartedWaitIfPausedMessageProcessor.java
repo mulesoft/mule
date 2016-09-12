@@ -8,8 +8,8 @@ package org.mule.runtime.core.lifecycle.processor;
 
 import static org.mule.runtime.core.config.i18n.CoreMessages.interruptedWaitingForPaused;
 
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleState;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -23,8 +23,8 @@ public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStart
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
-    Builder builder = MuleEvent.builder(event);
+  public Event process(Event event) throws MuleException {
+    Builder builder = Event.builder(event);
     if (accept(event, builder)) {
       if (isPaused()) {
         try {
@@ -46,7 +46,7 @@ public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStart
   }
 
   @Override
-  protected boolean accept(MuleEvent event, MuleEvent.Builder builder) {
+  protected boolean accept(Event event, Event.Builder builder) {
     return lifecycleState.isStarted() || isPaused();
   }
 

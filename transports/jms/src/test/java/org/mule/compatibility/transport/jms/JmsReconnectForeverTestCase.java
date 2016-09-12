@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MessageReceiver;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -94,7 +94,7 @@ public class JmsReconnectForeverTestCase extends AbstractBrokerFunctionalTestCas
 
   private void assertMessageRouted(String entryFlow) throws Exception {
     flowRunner(entryFlow).withPayload(TEST_MESSAGE).run();
-    MuleMessage message = muleContext.getClient().request("vm://out" + entryFlow, RECEIVE_TIMEOUT).getRight().get();
+    InternalMessage message = muleContext.getClient().request("vm://out" + entryFlow, RECEIVE_TIMEOUT).getRight().get();
     assertThat(message, notNullValue());
     assertThat(getPayloadAsString(message), is(TEST_MESSAGE));
   }

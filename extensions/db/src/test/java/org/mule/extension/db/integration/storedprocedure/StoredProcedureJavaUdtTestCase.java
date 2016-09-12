@@ -15,7 +15,7 @@ import static org.mule.extension.db.integration.model.RegionManager.SOUTHWEST_MA
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
-import org.mule.runtime.api.message.MuleMessage;
+import org.mule.runtime.api.message.Message;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class StoredProcedureJavaUdtTestCase extends AbstractDbIntegrationTestCas
 
   @Test
   public void returnsObject() throws Exception {
-    MuleMessage response = flowRunner("returnsObject").run().getMessage();
-    assertThat(response.getPayload(), equalTo(SOUTHWEST_MANAGER.getContactDetails()));
+    Message response = flowRunner("returnsObject").run().getMessage();
+    assertThat(response.getPayload().getValue(), equalTo(SOUTHWEST_MANAGER.getContactDetails()));
   }
 }

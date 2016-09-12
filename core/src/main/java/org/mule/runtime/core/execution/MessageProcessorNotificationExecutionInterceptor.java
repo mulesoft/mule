@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.core.execution;
 
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.core.context.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.MessageProcessorNotification;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
@@ -45,15 +45,15 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
 
 
   @Override
-  public MuleEvent execute(final MessageProcessor messageProcessor, final MuleEvent event) throws MessagingException {
+  public Event execute(final Processor messageProcessor, final Event event) throws MessagingException {
     final ServerNotificationManager notificationManager = muleContext.getNotificationManager();
     final boolean fireNotification = event.isNotificationsEnabled();
     if (fireNotification) {
       fireNotification(notificationManager, flowConstruct, event, messageProcessor, null, MESSAGE_PROCESSOR_PRE_INVOKE);
     }
 
-    MuleEvent eventToProcess = event;
-    MuleEvent result = null;
+    Event eventToProcess = event;
+    Event result = null;
     MessagingException exceptionThrown = null;
 
     boolean nonBlocking = event.isAllowNonBlocking() && event.getReplyToHandler() != null;
@@ -62,10 +62,10 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
 
     if (nonBlocking && responseProcessing) {
       final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-      eventToProcess = MuleEvent.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
+      eventToProcess = Event.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
 
         @Override
-        public MuleEvent processReplyTo(MuleEvent result, MuleMessage returnMessage, Object replyTo) throws MuleException {
+        public Event processReplyTo(Event result, InternalMessage returnMessage, Object replyTo) throws MuleException {
 
           if (fireNotification) {
             fireNotification(notificationManager, flowConstruct, result != null ? result : event, messageProcessor, null,
@@ -77,7 +77,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
         @Override
         public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
           if (fireNotification) {
-            MuleEvent result = exception.getEvent();
+            Event result = exception.getEvent();
             fireNotification(notificationManager, flowConstruct, result != null ? result : event, messageProcessor, null,
                              MESSAGE_PROCESSOR_POST_INVOKE);
           }
@@ -111,7 +111,7 @@ class MessageProcessorNotificationExecutionInterceptor implements MessageProcess
   }
 
   protected void fireNotification(ServerNotificationManager serverNotificationManager, FlowConstruct flowConstruct,
-                                  MuleEvent event, MessageProcessor processor, MessagingException exceptionThrown, int action) {
+                                  Event event, Processor processor, MessagingException exceptionThrown, int action) {
     if (serverNotificationManager != null
         && serverNotificationManager.isNotificationEnabled(MessageProcessorNotification.class)) {
       if (flowConstruct instanceof MessageProcessorPathResolver

@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.mule.runtime.core.config.i18n.MessageFactory.createStaticMessage;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
@@ -28,7 +28,7 @@ import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -240,7 +240,7 @@ public abstract class ExtensionComponent
   }
 
   protected MetadataContext getMetadataContext() throws MetadataResolvingException {
-    MuleEvent fakeEvent = getInitialiserEvent(muleContext);
+    Event fakeEvent = getInitialiserEvent(muleContext);
 
     Optional<ConfigurationInstance> configuration = getConfiguration(fakeEvent);
 
@@ -262,10 +262,10 @@ public abstract class ExtensionComponent
   }
 
   /**
-   * @param event a {@link MuleEvent}
-   * @return a configuration instance for the current component with a given {@link MuleEvent}
+   * @param event a {@link Event}
+   * @return a configuration instance for the current component with a given {@link Event}
    */
-  protected Optional<ConfigurationInstance> getConfiguration(MuleEvent event) {
+  protected Optional<ConfigurationInstance> getConfiguration(Event event) {
     if (!requiresConfig(componentModel)) {
       return empty();
     }

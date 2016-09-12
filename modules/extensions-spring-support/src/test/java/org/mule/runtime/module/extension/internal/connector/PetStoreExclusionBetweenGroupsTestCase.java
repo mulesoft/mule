@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.connector;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.ExclusiveCashier;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -28,7 +29,7 @@ public class PetStoreExclusionBetweenGroupsTestCase extends ExtensionFunctionalT
 
   @Test
   public void ExclusiveGroupWithNestedParameters() throws Exception {
-    ExclusiveCashier cashier = flowRunner("getCashierNestedParams").run().getMessage().getPayload();
+    ExclusiveCashier cashier = (ExclusiveCashier) flowRunner("getCashierNestedParams").run().getMessage().getPayload().getValue();
     assertThat(cashier.getAccount().getCash(), is(100));
     assertThat(cashier.getAccount().getDebt(), is(-100));
   }

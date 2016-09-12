@@ -10,8 +10,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.List;
@@ -38,16 +38,17 @@ public class HttpRequestRecipientListTestCase extends FunctionalTestCase {
 
   @Test
   public void recipientListWithHttpUrlsWithResponse() throws Exception {
-    final MuleEvent response = flowRunner("recipientListFlow").withPayload(TEST_MESSAGE)
+    final Event response = flowRunner("recipientListFlow").withPayload(TEST_MESSAGE)
         .withInboundProperty("urls", new String[] {getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)}).run();
 
     assertThat(response, notNullValue());
-    assertThat(response.getMessage().getPayload(), IsInstanceOf.instanceOf(List.class));
-    MuleMessage aggregatedResponse = response.getMessage();
-    assertThat(((List<MuleMessage>) aggregatedResponse.getPayload()).size(), is(3));
-    final MuleMessage[] messages = (MuleMessage[]) ((List<MuleMessage>) aggregatedResponse.getPayload()).toArray();
+    assertThat(response.getMessage().getPayload().getValue(), IsInstanceOf.instanceOf(List.class));
+    InternalMessage aggregatedResponse = response.getMessage();
+    assertThat(((List<InternalMessage>) aggregatedResponse.getPayload().getValue()).size(), is(3));
+    final InternalMessage[] messages =
+        (InternalMessage[]) ((List<InternalMessage>) aggregatedResponse.getPayload().getValue()).toArray();
     for (int i = 0; i < messages.length; i++) {
-      MuleMessage message = messages[i];
+      InternalMessage message = messages[i];
       assertThat(message, notNullValue());
       assertThat(getPayloadAsString(message), is("inXFlowResponse".replace("X", String.valueOf(i + 1))));
     }

@@ -8,7 +8,7 @@ package org.mule.functional.functional;
 
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -16,13 +16,13 @@ import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class AssertionMessageProcessor implements MessageProcessor, FlowConstructAware, Startable {
+public class AssertionMessageProcessor implements Processor, FlowConstructAware, Startable {
 
   protected String expression = "#[true]";
   protected String message = "?";
@@ -36,7 +36,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
 
   protected int timeout = AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 
-  private MuleEvent event;
+  private Event event;
   private CountDownLatch latch;
 
   protected FlowConstruct flowConstruct;
@@ -52,7 +52,7 @@ public class AssertionMessageProcessor implements MessageProcessor, FlowConstruc
   }
 
   @Override
-  public MuleEvent process(MuleEvent event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     if (event == null) {
       return null;
     }

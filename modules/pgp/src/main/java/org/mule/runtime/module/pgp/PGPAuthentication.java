@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.pgp;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.security.Authentication;
 
 import java.util.Map;
@@ -17,15 +17,15 @@ public class PGPAuthentication implements Authentication {
 
   private boolean authenticated;
   private String userName;
-  private Message message;
+  private PgpMessage message;
   private PGPPublicKey publicKey;
-  transient private MuleEvent event;
+  transient private Event event;
 
-  public PGPAuthentication(String userName, Message message) {
+  public PGPAuthentication(String userName, PgpMessage message) {
     this(userName, message, null);
   }
 
-  public PGPAuthentication(String userName, Message message, MuleEvent event) {
+  public PGPAuthentication(String userName, PgpMessage message, Event event) {
     this.authenticated = false;
     this.userName = userName;
     this.message = message;
@@ -71,11 +71,11 @@ public class PGPAuthentication implements Authentication {
   }
 
   @Override
-  public MuleEvent getEvent() {
+  public Event getEvent() {
     return event;
   }
 
-  public void setEvent(MuleEvent muleEvent) {
+  public void setEvent(Event muleEvent) {
     this.event = muleEvent;
   }
 }

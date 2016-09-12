@@ -6,7 +6,7 @@
  */
 package org.mule.tck.testmodels.mule;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.routing.AbstractCorrelationAggregator;
 import org.mule.runtime.core.routing.AggregationException;
 import org.mule.runtime.core.routing.EventGroup;
@@ -19,7 +19,7 @@ public class TestCorrelationAggregator extends AbstractCorrelationAggregator {
   private String testProperty;
 
   @Override
-  protected MuleEvent aggregateEvents(EventGroup events) throws AggregationException {
+  protected Event aggregateEvents(EventGroup events) throws AggregationException {
     return events.getMessageCollectionEvent();
   }
 

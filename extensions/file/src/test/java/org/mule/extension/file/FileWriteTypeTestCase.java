@@ -9,7 +9,7 @@ package org.mule.extension.file;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.extension.file.common.api.FileWriteMode;
@@ -68,7 +68,7 @@ public class FileWriteTypeTestCase extends FileConnectorTestCase {
   private static class TestOutputHandler implements OutputHandler {
 
     @Override
-    public void write(MuleEvent event, OutputStream out) throws IOException {
+    public void write(Event event, OutputStream out) throws IOException {
       IOUtils.write(HELLO_WORLD, out);
     }
   }

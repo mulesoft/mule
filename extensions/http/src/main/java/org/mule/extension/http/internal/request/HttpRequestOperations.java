@@ -23,7 +23,7 @@ import org.mule.extension.http.internal.HttpConnector;
 import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -67,7 +67,7 @@ public class HttpRequestOperations {
    * @param responseValidator Configures error handling of the response.
    * @param config the {@link HttpConnector} configuration for this operation. All parameters not configured will be taken from
    *        it.
-   * @param muleEvent the current {@link MuleEvent}
+   * @param muleEvent the current {@link Event}
    * @return an {@link OperationResult} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
@@ -92,7 +92,7 @@ public class HttpRequestOperations {
                                                                      group = "Status Code Settings") ResponseValidator responseValidator,
                                                                  @Optional HttpRequesterRequestBuilder requestBuilder,
                                                                  @MetadataKeyId String key, @Connection HttpClient client,
-                                                                 @UseConfig HttpRequesterConfig config, MuleEvent muleEvent)
+                                                                 @UseConfig HttpRequesterConfig config, Event muleEvent)
       throws MuleException {
     HttpRequesterRequestBuilder resolvedBuilder = requestBuilder != null ? requestBuilder : new HttpRequesterRequestBuilder();
     UriParameters uriParameters = client.getDefaultUriParameters();
@@ -125,7 +125,7 @@ public class HttpRequestOperations {
         .build();
   }
 
-  private <T> T resolveIfNecessary(T value, Function<MuleEvent, T> function, MuleEvent event) {
+  private <T> T resolveIfNecessary(T value, Function<Event, T> function, Event event) {
     return value != null ? value : function.apply(event);
   }
 
@@ -136,7 +136,7 @@ public class HttpRequestOperations {
     return String.format("%s://%s:%s%s", scheme.getScheme(), host, port, resolvedPath);
   }
 
-  private int resolveResponseTimeout(MuleEvent muleEvent, HttpRequesterConfig config, Integer responseTimeout) {
+  private int resolveResponseTimeout(Event muleEvent, HttpRequesterConfig config, Integer responseTimeout) {
     if (responseTimeout == null && config.getResponseTimeout() != null) {
       responseTimeout = config.getResponseTimeout().apply(muleEvent);
     }

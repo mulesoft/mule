@@ -12,11 +12,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -47,8 +47,8 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   public static final String NULL_EXPRESSION = "#[string:someValueNull]";
   public static final String NULL_EXPRESSION_VALUE = null;
 
-  private MuleMessage message;
-  private MuleEvent event;
+  private InternalMessage message;
+  private Event event;
   private MuleSession mockSession = mock(MuleSession.class);
   private MuleContext mockMuleContext = mock(MuleContext.class);
   private ExpressionLanguage mockExpressionLanguage = mock(ExpressionLanguage.class);
@@ -63,14 +63,14 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
   public void setUpTest() throws Exception {
     when(mockMuleContext.getConfiguration()).thenReturn(mock(MuleConfiguration.class));
     when(mockMuleContext.getExpressionLanguage()).thenReturn(mockExpressionLanguage);
-    when(mockExpressionLanguage.parse(anyString(), any(MuleEvent.class), any(FlowConstruct.class)))
+    when(mockExpressionLanguage.parse(anyString(), any(Event.class), any(FlowConstruct.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
     when(mockExpressionLanguage.evaluate(EXPRESSION, event, null)).thenReturn(EXPRESSION_VALUE);
     removeVariableProcessor.setMuleContext(mockMuleContext);
 
-    message = MuleMessage.builder().payload("").build();
+    message = InternalMessage.builder().payload("").build();
     Flow flow = getTestFlow();
-    event = MuleEvent.builder(DefaultMessageContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).session(mockSession)
+    event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).session(mockSession)
         .build();
   }
 
@@ -117,10 +117,10 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     verifyNotRemoved(event, "SomeVar");
   }
 
-  protected abstract void addMockedPropeerties(MuleEvent event, HashSet properties);
+  protected abstract void addMockedPropeerties(Event event, HashSet properties);
 
-  protected abstract void verifyRemoved(MuleEvent mockEvent, String key);
+  protected abstract void verifyRemoved(Event mockEvent, String key);
 
-  protected abstract void verifyNotRemoved(MuleEvent mockEvent, String somevar);
+  protected abstract void verifyNotRemoved(Event mockEvent, String somevar);
 
 }

@@ -11,13 +11,13 @@ import static java.util.Collections.emptyMap;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.NoReceiverForEndpointException;
-import org.mule.compatibility.core.message.MuleCompatibilityMessage;
+import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.compatibility.transport.vm.i18n.VMMessages;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -46,20 +46,20 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected void doDispatch(final MuleEvent event) throws Exception {
+  protected void doDispatch(final Event event) throws Exception {
     EndpointURI endpointUri = endpoint.getEndpointURI();
 
     if (endpointUri == null) {
       throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), getEndpoint());
     }
-    MuleEvent eventToDispatch =
-        MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).flowVariables(emptyMap()).build();
+    Event eventToDispatch =
+        Event.builder(event).session(new DefaultMuleSession(event.getSession())).variables(emptyMap()).build();
     final MuleCompatibilityMessageBuilder builder =
         new MuleCompatibilityMessageBuilder(createInboundMessage(eventToDispatch.getMessage()));
     builder.correlationId(eventToDispatch.getCorrelationId());
-    builder.correlationSequence(eventToDispatch.getCorrelation().getSequence().orElse(null));
-    builder.correlationGroupSize(eventToDispatch.getCorrelation().getGroupSize().orElse(null));
-    final MuleCompatibilityMessage message = builder.build();
+    builder.correlationSequence(eventToDispatch.getGroupCorrelation().getSequence().orElse(null));
+    builder.correlationGroupSize(eventToDispatch.getGroupCorrelation().getGroupSize().orElse(null));
+    final CompatibilityMessage message = builder.build();
 
     QueueSession session = getQueueSession();
     Queue queue = session.getQueue(endpointUri.getAddress());
@@ -77,8 +77,8 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   @Override
-  protected MuleMessage doSend(final MuleEvent event) throws Exception {
-    MuleMessage retMessage;
+  protected InternalMessage doSend(final Event event) throws Exception {
+    InternalMessage retMessage;
     final VMMessageReceiver receiver = connector.getReceiver(endpoint.getEndpointURI());
     // Apply any outbound transformers on this event before we dispatch
 
@@ -86,18 +86,18 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
       throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(), endpoint.getEndpointURI()));
     }
 
-    MuleEvent eventToSend =
-        MuleEvent.builder(event).session(new DefaultMuleSession(event.getSession())).build();
+    Event eventToSend =
+        Event.builder(event).session(new DefaultMuleSession(event.getSession())).build();
     final MuleCompatibilityMessageBuilder builder =
         new MuleCompatibilityMessageBuilder(createInboundMessage(eventToSend.getMessage()));
     builder.correlationId(eventToSend.getCorrelationId());
-    builder.correlationSequence(eventToSend.getCorrelation().getSequence().orElse(null));
-    builder.correlationGroupSize(eventToSend.getCorrelation().getGroupSize().orElse(null));
-    final MuleCompatibilityMessage message = builder.build();
+    builder.correlationSequence(eventToSend.getGroupCorrelation().getSequence().orElse(null));
+    builder.correlationGroupSize(eventToSend.getGroupCorrelation().getGroupSize().orElse(null));
+    final CompatibilityMessage message = builder.build();
 
-    ExecutionTemplate<MuleMessage> executionTemplate = TransactionalExecutionTemplate
+    ExecutionTemplate<InternalMessage> executionTemplate = TransactionalExecutionTemplate
         .createTransactionalExecutionTemplate(endpoint.getMuleContext(), receiver.getEndpoint().getTransactionConfig());
-    ExecutionCallback<MuleMessage> processingCallback = () -> receiver.onCall(message);
+    ExecutionCallback<InternalMessage> processingCallback = () -> receiver.onCall(message);
     retMessage = executionTemplate.execute(processingCallback);
 
     if (logger.isDebugEnabled()) {
@@ -128,7 +128,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     // template method
   }
 
-  private MuleMessage createInboundMessage(MuleMessage message) {
+  private InternalMessage createInboundMessage(InternalMessage message) {
     Map<String, Serializable> outboundProperties = new HashMap<>();
     Map<String, DataHandler> outboundAttachments = new HashMap<>();
 
@@ -136,7 +136,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher {
     message.getOutboundAttachmentNames().stream()
         .forEach(key -> outboundAttachments.put(key, message.getOutboundAttachment(key)));
 
-    return MuleMessage.builder(message).inboundProperties(outboundProperties).inboundAttachments(outboundAttachments)
+    return InternalMessage.builder(message).inboundProperties(outboundProperties).inboundAttachments(outboundAttachments)
         .outboundProperties(emptyMap()).outboundAttachments(emptyMap()).build();
   }
 

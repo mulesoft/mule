@@ -7,8 +7,8 @@
 package org.mule.runtime.core.el.context;
 
 import static java.util.Collections.emptyMap;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.InternalMessage;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,11 +17,11 @@ import java.util.Set;
 
 class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
-  private MuleEvent event;
-  private MuleEvent.Builder eventBuilder;
+  private Event event;
+  private Event.Builder eventBuilder;
 
   // TODO MULE-10471 Immutable event used in MEL/Scripting should be shared for consistency
-  public OutboundPropertiesMapContext(MuleEvent event, MuleEvent.Builder eventBuilder) {
+  public OutboundPropertiesMapContext(Event event, Event.Builder eventBuilder) {
     this.event = event;
     this.eventBuilder = eventBuilder;
   }
@@ -33,13 +33,13 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public void doPut(String key, Serializable value) {
-    eventBuilder.message(MuleMessage.builder(event.getMessage()).addOutboundProperty(key, value).build());
+    eventBuilder.message(InternalMessage.builder(event.getMessage()).addOutboundProperty(key, value).build());
     event = eventBuilder.build();
   }
 
   @Override
   public void doRemove(String key) {
-    eventBuilder.message(MuleMessage.builder(event.getMessage()).removeOutboundProperty(key).build());
+    eventBuilder.message(InternalMessage.builder(event.getMessage()).removeOutboundProperty(key).build());
     event = eventBuilder.build();
   }
 
@@ -50,7 +50,7 @@ class OutboundPropertiesMapContext extends AbstractMapContext<Serializable> {
 
   @Override
   public void clear() {
-    eventBuilder.message(MuleMessage.builder(event.getMessage()).outboundProperties(emptyMap()).build());
+    eventBuilder.message(InternalMessage.builder(event.getMessage()).outboundProperties(emptyMap()).build());
     event = eventBuilder.build();
   }
 

@@ -9,8 +9,8 @@ package org.mule.runtime.core.api;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.config.i18n.Message;
-import org.mule.runtime.core.config.i18n.MessageFactory;
+import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.SystemUtils;
 
@@ -34,12 +34,12 @@ public abstract class MuleException extends Exception {
   private final Map info = new HashMap();
   private int errorCode = -1;
   private String message = null;
-  private Message i18nMessage;
+  private I18nMessage i18nMessage;
 
   /**
    * @param message the exception message
    */
-  public MuleException(Message message) {
+  public MuleException(I18nMessage message) {
     super();
     setMessage(message);
   }
@@ -48,7 +48,7 @@ public abstract class MuleException extends Exception {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  public MuleException(Message message, Throwable cause) {
+  public MuleException(I18nMessage message, Throwable cause) {
     super(ExceptionHelper.unwrap(cause));
     setMessage(message);
   }
@@ -56,7 +56,7 @@ public abstract class MuleException extends Exception {
   public MuleException(Throwable cause) {
     super(ExceptionHelper.unwrap(cause));
     if (cause != null) {
-      setMessage(MessageFactory.createStaticMessage(cause.getMessage() + " (" + cause.getClass().getName() + ")"));
+      setMessage(I18nMessageFactory.createStaticMessage(cause.getMessage() + " (" + cause.getClass().getName() + ")"));
     } else {
       initialise();
     }
@@ -67,7 +67,7 @@ public abstract class MuleException extends Exception {
     initialise();
   }
 
-  protected void setMessage(Message message) {
+  protected void setMessage(I18nMessage message) {
     initialise();
     this.message = message.getMessage();
     i18nMessage = message;
@@ -77,7 +77,7 @@ public abstract class MuleException extends Exception {
     initialise();
     this.message = message;
     if (i18nMessage == null) {
-      i18nMessage = MessageFactory.createStaticMessage(message);
+      i18nMessage = I18nMessageFactory.createStaticMessage(message);
     }
   }
 
@@ -85,7 +85,7 @@ public abstract class MuleException extends Exception {
     return errorCode;
   }
 
-  public Message getI18nMessage() {
+  public I18nMessage getI18nMessage() {
     return i18nMessage;
   }
 

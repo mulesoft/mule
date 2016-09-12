@@ -8,7 +8,7 @@ package org.mule.compatibility.core.session;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.message.SessionHandler;
 
@@ -18,12 +18,12 @@ import org.mule.runtime.core.message.SessionHandler;
 public class NullSessionHandler implements SessionHandler {
 
   @Override
-  public MuleSession retrieveSessionInfoFromMessage(MuleMessage message, MuleContext muleContext) throws MuleException {
+  public MuleSession retrieveSessionInfoFromMessage(InternalMessage message, MuleContext muleContext) throws MuleException {
     return null;
   }
 
   @Override
-  public MuleMessage storeSessionInfoToMessage(MuleSession session, MuleMessage message, MuleContext context)
+  public InternalMessage storeSessionInfoToMessage(MuleSession session, InternalMessage message, MuleContext context)
       throws MuleException {
     return message;
   }

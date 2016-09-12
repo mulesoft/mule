@@ -9,7 +9,7 @@ package org.mule.test.xml.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.MessageFilter;
@@ -41,7 +41,7 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractIntegrationTestCa
     Object serviceFlow = muleContext.getRegistry().lookupObject("test for xml");
 
     MessageProcessorChain notXmlSubFlow;
-    List<MessageProcessor> outEndpoints = new ArrayList<MessageProcessor>(2);
+    List<Processor> outEndpoints = new ArrayList<Processor>(2);
 
     outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(0));
     notXmlSubFlow = muleContext.getRegistry().lookupObject("notXml");

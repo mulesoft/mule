@@ -12,11 +12,11 @@ package org.mule.runtime.core.api.source;
  * different thread freeing up the request thread.
  * <p/>
  * Implementations must support both blocking and non-blocking and therefore need to test the response
- * {@link org.mule.runtime.core.api.MuleEvent} returned when invoking
- * {@link org.mule.runtime.core.api.processor.MessageProcessor#process(org.mule.runtime.core.api.MuleEvent)} on the listener. If
- * the event returned is an instance of {@link org.mule.runtime.core.NonBlockingVoidMuleEvent} then the {@link MessageSource}
- * should wait for the {@link org.mule.runtime.core.api.connector.ReplyToHandler} to be invoked before sending a response,
- * otherwise the response should be sent immediatly.
+ * {@link org.mule.runtime.core.api.Event} returned when invoking
+ * {@link org.mule.runtime.core.api.processor.Processor#process(org.mule.runtime.core.api.Event)} on the listener. If the event
+ * returned is an instance of {@link org.mule.runtime.core.NonBlockingVoidMuleEvent} then the {@link MessageSource} should wait
+ * for the {@link org.mule.runtime.core.api.connector.ReplyToHandler} to be invoked before sending a response, otherwise the
+ * response should be sent immediatly.
  * <p/>
  * <b>Note:</b> If {@link org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhase} is used then non-blocking will be
  * supported, it is still necessary that the MessageSource implements this interface though.

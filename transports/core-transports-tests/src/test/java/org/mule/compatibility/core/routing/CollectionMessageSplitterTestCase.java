@@ -17,14 +17,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleEvent;
-import org.mule.runtime.core.api.MuleEvent.Builder;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
@@ -122,11 +122,11 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     Object payload = Collections.emptySet();
     Flow fc = getTestFlow();
     MuleSession session = getTestSession(fc, muleContext);
-    MuleMessage toSplit = MuleMessage.builder().payload(payload).build();
+    InternalMessage toSplit = InternalMessage.builder().payload(payload).build();
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
-    MuleEvent event =
-        MuleEvent.builder(DefaultMessageContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session).build();
+    Event event =
+        Event.builder(DefaultEventContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session).build();
     event = populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
   }
@@ -160,21 +160,21 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
       expectedSequences.add(i);
     }
 
-    MuleMessage toSplit =
-        MuleMessage.builder().payload(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
+    InternalMessage toSplit =
+        InternalMessage.builder().payload(payload).inboundProperties(inboundProps).outboundProperties(outboundProps).build();
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
     Grabber grabber = new Grabber();
     splitter.setListener(grabber);
     final Builder builder =
-        MuleEvent.builder(DefaultMessageContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session);
+        Event.builder(DefaultEventContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session);
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
-      builder.addFlowVariable(entry.getKey(), entry.getValue());
+      builder.addVariable(entry.getKey(), entry.getValue());
     }
-    MuleEvent event = builder.build();
+    Event event = builder.build();
     event = populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     splitter.process(event);
-    List<MuleEvent> splits = grabber.getEvents();
+    List<Event> splits = grabber.getEvents();
     assertEquals(count, splits.size());
 
     Set<Object> actualSequences = new HashSet<>();
@@ -184,18 +184,18 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
 
   private void assertSplitParts(int count, boolean counted, Map<String, Serializable> inboundProps,
                                 Map<String, Serializable> outboundProps, Map<String, Object> invocationProps,
-                                List<MuleEvent> splits, Set<Object> actualSequences) {
-    for (MuleEvent event : splits) {
-      MuleMessage msg = event.getMessage();
-      assertTrue(msg.getPayload() instanceof String);
-      assertTrue(msg.getPayload() instanceof String);
+                                List<Event> splits, Set<Object> actualSequences) {
+    for (Event event : splits) {
+      InternalMessage msg = event.getMessage();
+      assertTrue(msg.getPayload().getValue() instanceof String);
+      assertTrue(msg.getPayload().getValue() instanceof String);
       if (counted) {
-        assertThat(event.getCorrelation().getGroupSize().get(), is(count));
+        assertThat(event.getGroupCorrelation().getGroupSize().get(), is(count));
       } else {
-        assertThat(event.getCorrelation().getGroupSize().isPresent(), is(false));
+        assertThat(event.getGroupCorrelation().getGroupSize().isPresent(), is(false));
       }
-      actualSequences.add(event.getCorrelation().getSequence().get());
-      String str = (String) msg.getPayload();
+      actualSequences.add(event.getGroupCorrelation().getSequence().get());
+      String str = (String) msg.getPayload().getValue();
       assertTrue(TEST_LIST_MULTIPLE.contains(str));
       for (String key : inboundProps.keySet()) {
         assertEquals(msg.getInboundProperty(key), inboundProps.get(key));
@@ -204,22 +204,22 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
         assertEquals(msg.getOutboundProperty(key), outboundProps.get(key));
       }
       for (String key : invocationProps.keySet()) {
-        assertEquals(event.getFlowVariable(key), invocationProps.get(key));
+        assertEquals(event.getVariable(key), invocationProps.get(key));
       }
     }
   }
 
-  private static class Grabber implements MessageProcessor {
+  private static class Grabber implements Processor {
 
-    private List<MuleEvent> events = new ArrayList<>();
+    private List<Event> events = new ArrayList<>();
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       events.add(event);
       return null;
     }
 
-    public List<MuleEvent> getEvents() {
+    public List<Event> getEvents() {
       return events;
     }
   }

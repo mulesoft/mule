@@ -8,25 +8,25 @@ package org.mule.tck;
 
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.DefaultMuleEvent.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultMessageContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.object.SingletonObjectFactory;
@@ -67,22 +67,22 @@ public final class MuleTestUtils {
   /**
    * Supply no service, no endpoint
    */
-  public static MuleEvent getTestEvent(Object data, MuleContext context) throws Exception {
+  public static Event getTestEvent(Object data, MuleContext context) throws Exception {
     return getTestEvent(data, getTestFlow(context), MessageExchangePattern.REQUEST_RESPONSE, context);
   }
 
-  public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
+  public static Event getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
       throws Exception {
     return getTestEvent(data, getTestFlow(context), mep, context);
   }
 
-  public static MuleEvent getTestEvent(Object data,
-                                       FlowConstruct flowConstruct,
-                                       MessageExchangePattern mep,
-                                       MuleContext context)
+  public static Event getTestEvent(Object data,
+                                   FlowConstruct flowConstruct,
+                                   MessageExchangePattern mep,
+                                   MuleContext context)
       throws Exception {
-    return MuleEvent.builder(DefaultMessageContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(MuleMessage.builder().payload(data).build()).exchangePattern(mep).flow(flowConstruct)
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload(data).build()).exchangePattern(mep).flow(flowConstruct)
         .session(getTestSession(flowConstruct, context)).build();
   }
 
@@ -92,7 +92,7 @@ public final class MuleTestUtils {
                                                      MuleContext context)
       throws Exception {
     try {
-      final MuleEvent event = getTestEvent(data, mep, context);
+      final Event event = getTestEvent(data, mep, context);
       setCurrentEvent(event);
       return new DefaultMuleEventContext(getTestFlow(context), event);
     } finally {
@@ -153,9 +153,9 @@ public final class MuleTestUtils {
   public static Flow getTestFlow(String name, Object component, boolean initialize, MuleContext context)
       throws Exception {
     final Flow flow = new Flow(name, context);
-    flow.setMessageProcessors(new ArrayList<MessageProcessor>());
+    flow.setMessageProcessors(new ArrayList<Processor>());
     if (component instanceof Component) {
-      flow.getMessageProcessors().add((MessageProcessor) component);
+      flow.getMessageProcessors().add((Processor) component);
     } else {
       flow.getMessageProcessors().add(new DefaultJavaComponent(new SingletonObjectFactory(component)));
 

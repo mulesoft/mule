@@ -16,11 +16,11 @@ import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.SimpleEndpointCache;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleMessage;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.RequestCacheKey;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 import org.mule.runtime.core.client.DefaultLocalMuleClient.MuleClientFlowConstruct;
@@ -71,7 +71,7 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
   }
 
   @Override
-  protected MessageProcessor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException {
+  protected Processor buildMessageProcessor(RequestCacheKey cacheKey) throws MuleException {
     if (cacheKey.getOperationOptions().isOutbound()) {
       return endpointCache.getOutboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern(), null);
     } else {
@@ -79,14 +79,14 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
       return event -> {
         final InboundEndpoint inboundEndpoint =
             endpointCache.getInboundEndpoint(cacheKey.getUrl(), cacheKey.getExchangePattern());
-        MuleMessage message;
+        InternalMessage message;
         try {
           message = inboundEndpoint.request(timeout);
         } catch (Exception e) {
           throw new ReceiveException(inboundEndpoint, timeout, e);
         }
         MuleClientFlowConstruct flowConstruct = new MuleClientFlowConstruct(muleContext);
-        return message != null ? MuleEvent.builder(event.getContext()).message(message).flow(flowConstruct).build() : null;
+        return message != null ? Event.builder(event.getContext()).message(message).flow(flowConstruct).build() : null;
       };
     }
   }

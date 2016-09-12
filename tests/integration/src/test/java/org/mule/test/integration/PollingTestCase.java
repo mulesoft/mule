@@ -11,35 +11,34 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.DefaultMuleEvent.getCurrentEvent;
-import org.mule.runtime.core.DefaultMuleEvent;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.MuleEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.MessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 public class PollingTestCase extends AbstractIntegrationTestCase {
 
   private static List<String> foo;
   private static List<String> bar;
-  private static List<MuleEvent> events;
+  private static List<Event> events;
   private static List<String> eventIds;
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
     super.doSetUpBeforeMuleContextCreation();
-    foo = new ArrayList<String>();
-    bar = new ArrayList<String>();
-    events = new ArrayList<MuleEvent>();
+    foo = new ArrayList<>();
+    bar = new ArrayList<>();
+    events = new ArrayList<>();
     eventIds = new ArrayList<>();
   }
 
@@ -105,10 +104,10 @@ public class PollingTestCase extends AbstractIntegrationTestCase {
     }
   }
 
-  public static class EventWireTrap implements MessageProcessor {
+  public static class EventWireTrap implements Processor {
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException {
+    public Event process(Event event) throws MuleException {
       synchronized (events) {
         events.add(getCurrentEvent());
         eventIds.add(event.getContext().getId());

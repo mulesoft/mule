@@ -34,9 +34,8 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 /**
- * Implementation of {@link DslResolvingContext} that
- * scans the Classpath looking for the {@link Class} associated to the
- * provided Extension {@code name}
+ * Implementation of {@link DslResolvingContext} that scans the Classpath looking for the {@link Class} associated to the provided
+ * Extension {@code name}
  *
  * @since 4.0
  */

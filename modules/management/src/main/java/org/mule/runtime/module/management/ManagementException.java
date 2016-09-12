@@ -7,7 +7,7 @@
 package org.mule.runtime.module.management;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.config.i18n.Message;
+import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>ManagementException</code> is a general exception thrown by management extensions.
@@ -17,7 +17,7 @@ public abstract class ManagementException extends MuleException {
   /**
    * @param message the exception message
    */
-  protected ManagementException(Message message) {
+  protected ManagementException(I18nMessage message) {
     super(message);
   }
 
@@ -25,7 +25,7 @@ public abstract class ManagementException extends MuleException {
    * @param message the exception message
    * @param cause the exception that cause this exception to be thrown
    */
-  protected ManagementException(Message message, Throwable cause) {
+  protected ManagementException(I18nMessage message, Throwable cause) {
     super(message, cause);
   }
 

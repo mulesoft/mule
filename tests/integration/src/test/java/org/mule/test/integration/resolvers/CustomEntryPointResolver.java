@@ -6,15 +6,15 @@
  */
 package org.mule.test.integration.resolvers;
 
-import org.mule.runtime.core.api.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.model.EntryPointResolver;
 import org.mule.runtime.core.api.model.InvocationResult;
 
 public class CustomEntryPointResolver implements EntryPointResolver {
 
-  public InvocationResult invoke(Object component, MuleEventContext context, MuleEvent.Builder eventBuilder) throws Exception {
-    return new InvocationResult(this, ((Target) component).custom(context.getMessage().getPayload()),
+  public InvocationResult invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
+    return new InvocationResult(this, ((Target) component).custom(context.getMessage().getPayload().getValue()),
                                 Target.class.getMethod("custom", new Class[] {Object.class}));
   }
 

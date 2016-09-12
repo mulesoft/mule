@@ -17,11 +17,11 @@ import java.sql.ResultSet;
 public interface StreamingResultSetCloser {
 
   /**
-   * Closes the given {@code resultset}. It also must invoke {@link DbConnection#endStreaming()}
-   * and {@link DbConnection#release()} even if the operation fails
+   * Closes the given {@code resultset}. It also must invoke {@link DbConnection#endStreaming()} and
+   * {@link DbConnection#release()} even if the operation fails
    *
    * @param connection the connection to the DB
-   * @param resultSet  the {@link ResultSet}
+   * @param resultSet the {@link ResultSet}
    */
   void close(DbConnection connection, ResultSet resultSet);
 }
