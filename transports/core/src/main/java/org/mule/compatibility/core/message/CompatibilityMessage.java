@@ -106,7 +106,7 @@ public class CompatibilityMessage implements InternalMessage {
   }
 
   @Override
-  public <T> TypedValue<T> getPayload() {
+  public TypedValue getPayload() {
     return inner.getPayload();
   }
 
