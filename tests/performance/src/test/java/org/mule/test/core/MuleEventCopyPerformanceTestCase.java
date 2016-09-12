@@ -21,7 +21,9 @@ import java.io.IOException;
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
+import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -37,6 +39,9 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   private Event muleEventWith50Properties;
   private Event muleEventWith100Properties;
   private static final int repetitions = 1000;
+
+  @Rule
+  public ContiPerfRule rule = new ContiPerfRule();
 
   @Override
   public int getTestTimeoutSecs() {
@@ -91,7 +96,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
     for (int i = 0; i < repetitions; i++) {
       events[i] = Event.builder(original).session(new DefaultMuleSession(original.getSession()))
           .addVariable("newKey", "val")
-          .message(InternalMessage.builder(events[i].getMessage()).addInboundProperty("newKey", "val")
+          .message(InternalMessage.builder(original.getMessage()).addInboundProperty("newKey", "val")
               .addOutboundProperty("newKey", "val").build())
           .build();
     }
@@ -105,7 +110,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
     for (int i = 0; i < repetitions; i++) {
       final Builder eventBuilder = Event.builder(original);
       eventBuilder.session(new DefaultMuleSession(original.getSession())).build();
-      InternalMessage.Builder builder = InternalMessage.builder(events[i].getMessage());
+      InternalMessage.Builder builder = InternalMessage.builder(original.getMessage());
       for (int j = 1; j <= 5; j++) {
         eventBuilder.addVariable("newKey" + j, "val");
         builder.addInboundProperty("newKey", "val").addOutboundProperty("newKey", "val").build();
@@ -122,7 +127,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
     for (int i = 0; i < repetitions; i++) {
       events[i] = Event.builder(original).session(new DefaultMuleSession(original.getSession()))
           .addVariable("newKey", "val")
-          .message(InternalMessage.builder(events[i].getMessage()).addInboundProperty("newKey", "val")
+          .message(InternalMessage.builder(original.getMessage()).addInboundProperty("newKey", "val")
               .addOutboundProperty("newKey", "val").build())
           .build();
     }
@@ -136,7 +141,7 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
     for (int i = 0; i < repetitions; i++) {
       final Builder eventBuilder = Event.builder(original);
       eventBuilder.session(new DefaultMuleSession(original.getSession())).build();
-      InternalMessage.Builder builder = InternalMessage.builder(events[i].getMessage());
+      InternalMessage.Builder builder = InternalMessage.builder(original.getMessage());
       for (int j = 1; j <= 25; j++) {
         eventBuilder.addVariable("newKey" + j, "val");
         builder.addInboundProperty("newKey", "val").addOutboundProperty("newKey", "val").build();
