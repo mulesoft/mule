@@ -12,8 +12,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.message.Message;
-import static org.junit.runners.Parameterized.Parameters;
-import org.mule.runtime.api.message.MuleMessage;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;

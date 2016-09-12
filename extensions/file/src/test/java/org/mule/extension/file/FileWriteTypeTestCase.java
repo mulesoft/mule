@@ -8,6 +8,7 @@ package org.mule.extension.file;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
