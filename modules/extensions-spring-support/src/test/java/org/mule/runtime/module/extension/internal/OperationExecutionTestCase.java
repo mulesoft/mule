@@ -6,24 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
-import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
-import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
-import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
-import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
-
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -38,6 +24,7 @@ import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -48,10 +35,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
+import static org.junit.Assert.assertThat;
+import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
+import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
+import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
+import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -363,6 +364,17 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     assertThat(carWash.getInvestmentInfo().getValuation(), equalTo(100L));
     assertThat(carWash.getCarsPerMinute(), is(5));
     assertThat(carWash.isApproved(), is(true));
+  }
+
+  @Test
+  public void operationWithMapOfComplexType() throws Exception {
+    final String dean = "Dean";
+    final Map<String, SaleInfo> salesInfo =
+        (Map<String, SaleInfo>) flowRunner("processSale").run().getMessage().getPayload().getValue();
+    assertThat(salesInfo, hasKey(dean));
+    final SaleInfo saleInfo = salesInfo.get(dean);
+    assertThat(saleInfo.getAmount(), is(500));
+    assertThat(saleInfo.getDetails(), is("Some detail"));
   }
 
   private void assertDynamicDoor(String flowName) throws Exception {
