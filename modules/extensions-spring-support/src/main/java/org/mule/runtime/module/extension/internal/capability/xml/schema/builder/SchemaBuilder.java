@@ -131,7 +131,7 @@ public final class SchemaBuilder {
   private final ConfigurationSchemaDelegate configurationSchemaDelegate = new ConfigurationSchemaDelegate(this);
   private final ConnectionProviderSchemaDelegate connectionProviderSchemaDelegate = new ConnectionProviderSchemaDelegate(this);
   private final OperationSchemaDelegate operationSchemaDelegate = new OperationSchemaDelegate(this);
-  private final SourceSchemaDelegate sourceSchemaDelegate = new SourceSchemaDelegate(this);
+  private final SourceSchemaDelegate sourceSchemaDelegate = new SourceSchemaDelegate(this, objectFactory);
   private final CollectionSchemaDelegate collectionDelegate = new CollectionSchemaDelegate(this);
   private final ObjectTypeSchemaDelegate objectTypeDelegate = new ObjectTypeSchemaDelegate(this);
   private final MapSchemaDelegate mapDelegate = new MapSchemaDelegate(this);

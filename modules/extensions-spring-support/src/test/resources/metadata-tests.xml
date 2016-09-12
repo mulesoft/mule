@@ -111,7 +111,9 @@
     </flow>
 
     <flow name="sourceMetadata" initialState="stopped">
-        <metadata:metadata-source config-ref="config" type="PERSON"/>
+        <metadata:metadata-source config-ref="config" type="PERSON">
+            <redelivery-policy useSecureHash="true" maxRedeliveryCount="3"/>
+        </metadata:metadata-source>
         <logger/>
     </flow>
 

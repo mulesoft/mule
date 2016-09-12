@@ -231,6 +231,7 @@
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
                 <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
                 </xs:sequence>
                 <xs:attribute type="mule:expressionString" use="optional" name="mammals"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="optional" name="birds"></xs:attribute>

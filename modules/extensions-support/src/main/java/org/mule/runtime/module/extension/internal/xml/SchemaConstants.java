@@ -65,6 +65,8 @@ public final class SchemaConstants {
   public static final QName MULE_MESSAGE_PROCESSOR_TYPE =
       new QName(MULE_NAMESPACE, "messageProcessorOrMixedContentMessageProcessor", MULE_PREFIX);
   public static final QName TLS_CONTEXT_TYPE = new QName(MULE_TLS_NAMESPACE, "context", "tls");
+  public static final QName MULE_ABSTRACT_REDELIVERY_POLICY =
+      new QName(MULE_NAMESPACE, "abstract-redelivery-policy", MULE_PREFIX);
 
   // TYPES
   public static final QName SUBSTITUTABLE_INT = new QName(MULE_NAMESPACE, "substitutableInt", MULE_PREFIX);
