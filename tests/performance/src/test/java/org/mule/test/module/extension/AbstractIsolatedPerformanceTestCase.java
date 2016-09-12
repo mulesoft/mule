@@ -8,7 +8,7 @@
 package org.mule.test.module.extension;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
 
 @ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-ftp", "org.mule.modules:mule-module-file"})
 public abstract class AbstractIsolatedPerformanceTestCase extends MuleArtifactFunctionalTestCase {

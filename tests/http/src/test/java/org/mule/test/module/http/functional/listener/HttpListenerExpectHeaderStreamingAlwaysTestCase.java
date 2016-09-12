@@ -6,7 +6,7 @@
  */
 package org.mule.test.module.http.functional.listener;
 
-import org.mule.test.runner.RunnerDelegateTo;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 
 import org.junit.runners.Parameterized;
 

@@ -27,6 +27,8 @@ import org.mule.extension.db.integration.model.Record;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -43,8 +45,6 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

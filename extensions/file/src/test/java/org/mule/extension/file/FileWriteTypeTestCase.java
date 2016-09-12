@@ -8,11 +8,11 @@ package org.mule.extension.file;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.runner.RunnerDelegateTo;
+import org.mule.extension.file.common.api.FileWriteMode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -21,8 +21,8 @@ import static org.mule.extension.email.internal.commands.EmailIdConsumerExecutor
 
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.Message;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;

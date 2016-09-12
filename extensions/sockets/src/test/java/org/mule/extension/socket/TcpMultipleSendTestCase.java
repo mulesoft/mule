@@ -7,8 +7,8 @@
 package org.mule.extension.socket;
 
 import static org.junit.Assert.assertEquals;
+import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.InputStream;
 
