@@ -16,16 +16,14 @@ import java.sql.SQLException;
 public class StructuredDbType extends ResolvedDbType {
 
   private final int id;
-  private final String internalName;
 
-  public StructuredDbType(int id, String name, String internalName) {
+  public StructuredDbType(int id, String name) {
     super(id, name);
     this.id = id;
-    this.internalName = internalName;
   }
 
   @Override
   public void registerOutParameter(CallableStatement statement, int index) throws SQLException {
-    statement.registerOutParameter(index, id, internalName);
+    statement.registerOutParameter(index, id, name);
   }
 }

@@ -28,7 +28,7 @@ public class OracleXmlType extends StructuredDbType {
   public static final String ORACLE_XMLTYPE_CLASS = "oracle.xdb.XMLType";
 
   public OracleXmlType() {
-    super(OPAQUE_TYPE_ID, XML_TYPE_NAME, XML_TYPE_INTERNAL_NAME);
+    super(OPAQUE_TYPE_ID, XML_TYPE_NAME);
   }
 
   @Override

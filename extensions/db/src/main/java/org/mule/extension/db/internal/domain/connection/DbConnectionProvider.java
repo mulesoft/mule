@@ -19,6 +19,7 @@ import org.mule.extension.db.internal.domain.type.ArrayResolvedDbType;
 import org.mule.extension.db.internal.domain.type.DbType;
 import org.mule.extension.db.internal.domain.type.MappedStructResolvedDbType;
 import org.mule.extension.db.internal.domain.type.ResolvedDbType;
+import org.mule.extension.db.internal.domain.type.StructuredDbType;
 import org.mule.extension.db.internal.domain.xa.XADbConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -192,7 +193,7 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
           }
           return new MappedStructResolvedDbType<>(id, name, mappedClass);
         } else {
-          return new ResolvedDbType(id, name);
+          return new StructuredDbType(id, name);
         }
       } else {
         return new ResolvedDbType(id, name);

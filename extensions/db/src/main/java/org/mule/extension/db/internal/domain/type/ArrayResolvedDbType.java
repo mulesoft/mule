@@ -15,7 +15,7 @@ import java.sql.SQLException;
 /**
  * Defines a structured data type for {@link Array}
  */
-public class ArrayResolvedDbType extends ResolvedDbType {
+public class ArrayResolvedDbType extends StructuredDbType {
 
   /**
    * Creates a new instance
