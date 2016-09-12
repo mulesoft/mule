@@ -15,11 +15,11 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.EXPECT;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CONTINUE;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

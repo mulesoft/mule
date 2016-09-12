@@ -8,9 +8,9 @@ package org.mule.test.module.http.functional.requester;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
 import java.util.Arrays;
