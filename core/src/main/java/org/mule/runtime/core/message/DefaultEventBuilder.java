@@ -110,7 +110,7 @@ public class DefaultEventBuilder implements Event.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     event.getVariableNames().forEach(key -> this.flowVariables
-        .put(key, new DefaultTypedValue<>(event.getVariable(key), event.getVariable(key).getDataType())));
+        .put(key, (DefaultTypedValue<Object>) event.getVariable(key)));
   }
 
   @Override

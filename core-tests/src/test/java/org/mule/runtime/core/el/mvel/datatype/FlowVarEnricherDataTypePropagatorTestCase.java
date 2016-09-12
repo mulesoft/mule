@@ -21,7 +21,7 @@ public class FlowVarEnricherDataTypePropagatorTestCase extends AbstractScopedVar
 
   @Override
   protected DataType getVariableDataType(Event event) {
-    return getVariableValueOrNull(PROPERTY_NAME, event);
+    return event.getVariable(PROPERTY_NAME).getDataType();
   }
 
   @Override
