@@ -34,7 +34,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
   public static final String MEL_EXPRESSION = "foo = bar";
 
   private Event event;
-  private final DefaultTypedValue typedValue = new DefaultTypedValue(TEST_MESSAGE, DataType.STRING);
+  private final DefaultTypedValue typedValue = new DefaultTypedValue<>(TEST_MESSAGE, DataType.STRING);
   private final EnricherDataTypePropagator propagator1 = mock(EnricherDataTypePropagator.class);
   private final EnricherDataTypePropagator propagator2 = mock(EnricherDataTypePropagator.class);
 

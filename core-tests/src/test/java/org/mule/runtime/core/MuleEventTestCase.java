@@ -170,7 +170,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarDataTypeNonexistent() throws Exception {
     Event event = getTestEvent("whatever");
-    event.getVariableDataType("foo");
+    event.getVariable("foo").getDataType();
   }
 
   private static class TestEventTransformer extends AbstractTransformer {

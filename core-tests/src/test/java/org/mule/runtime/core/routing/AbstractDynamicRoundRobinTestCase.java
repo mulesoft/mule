@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing;
 
 
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableValueOrNull;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.message.DefaultEventBuilder;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -55,7 +57,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
 
       @Override
       public String getRouteIdentifier(Event event) throws MessagingException {
-        return event.getVariable(ID_PROPERTY_NAME);
+        return (String) event.getVariable(ID_PROPERTY_NAME).getValue();
       }
 
       @Override

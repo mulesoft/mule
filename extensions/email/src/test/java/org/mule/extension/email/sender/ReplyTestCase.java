@@ -18,13 +18,13 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.MG_EMAIL;
 import static org.mule.runtime.core.api.InternalMessage.builder;
-import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.CollectionUtils.singletonList;
 
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 
 import javax.activation.DataHandler;
@@ -78,7 +78,7 @@ public class ReplyTestCase extends SMTPTestCase {
         .attributes(new PartAttributes("json", "attachment.json", 123, emptyMap())).build();
 
     flowRunner(REPLY_EMAIL_WITH_ATTACHMENTS)
-        .withPayload(new DefaultMultiPartContent(contentPart, attachmentPart))
+        .withPayload(new DefaultMultiPartPayload(contentPart, attachmentPart))
         .withAttributes(attributes).run();
 
     javax.mail.Message repliedMessage = getReceivedMessagesAndAssertCount(1)[0];

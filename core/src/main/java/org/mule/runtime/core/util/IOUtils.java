@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.util;
 
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.InternalMessage.Builder;
@@ -255,12 +255,12 @@ public class IOUtils extends org.apache.commons.io.IOUtils {
   }
 
   /**
-   * Transforms an Object into a {@link Message} to be used in a {@link MultiPartContent}.
+   * Transforms an Object into a {@link org.mule.runtime.api.message.Message} to be used in a {@link MultiPartPayload}.
    *
    * @param name the name of the attachment being handled
    * @param object the attachment to be handled
    * @param contentType the Content-Type of the attachment that is being handled
-   * @return a {@link Message} of the corresponding attachment
+   * @return a {@link org.mule.runtime.api.message.Message} of the corresponding attachment
    * @throws IOException if the transformation fails.
    */
   public static InternalMessage toMuleMessagePart(String name, Object object, MediaType contentType) throws IOException {

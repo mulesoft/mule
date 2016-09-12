@@ -163,7 +163,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         protected void propagateFlowVars(Event previousResult, final Builder builder) {
           for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
             builder.addVariable(flowVarName, previousResult.getVariable(flowVarName),
-                                previousResult.getVariableDataType(flowVarName));
+                                previousResult.getVariable(flowVarName).getDataType());
           }
         }
 
@@ -236,7 +236,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     protected void propagateFlowVars(Event previousResult, final Builder builder) {
       for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
         builder.addVariable(flowVarName, previousResult.getVariable(flowVarName),
-                            previousResult.getVariableDataType(flowVarName));
+                            previousResult.getVariable(flowVarName).getDataType());
       }
     }
 

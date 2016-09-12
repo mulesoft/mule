@@ -55,7 +55,7 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
   @Test
   public void responseBodyToCustomTarget() throws Exception {
     Event event = flowRunner("customTargetFlow").withPayload(TEST_MESSAGE).run();
-    InternalMessage customTarget = event.getVariable("customTarget");
+    InternalMessage customTarget = (InternalMessage) event.getVariable("customTarget").getValue();
     assertThat(customTarget, notNullValue());
     assertThat(IOUtils.toString((InputStream) customTarget.getPayload().getValue()), equalTo(DEFAULT_RESPONSE));
     assertThat(getPayloadAsString(event.getMessage()), equalTo(TEST_MESSAGE));

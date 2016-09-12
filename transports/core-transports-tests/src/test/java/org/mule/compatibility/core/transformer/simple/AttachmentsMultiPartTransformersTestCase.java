@@ -15,8 +15,8 @@ import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
-import org.mule.runtime.api.message.MultiPartContent;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
@@ -24,7 +24,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -76,7 +76,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
         .attributes(new PartAttributes("attachment")).build();
 
     InternalMessage message = InternalMessage.builder()
-        .payload(new DefaultMultiPartContent(InternalMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
+        .payload(new DefaultMultiPartPayload(InternalMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
                                              attachmentPart))
         .build();
 
@@ -96,7 +96,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
         .attributes(new PartAttributes("attachment2")).build();
 
     InternalMessage message =
-        InternalMessage.builder().payload(new DefaultMultiPartContent(attachment1Part, attachment2Part)).build();
+        InternalMessage.builder().payload(new DefaultMultiPartPayload(attachment1Part, attachment2Part)).build();
 
     final InternalMessage response =
         (InternalMessage) mp2a.transform(message, Event.builder(context).message(message).flow(flow).build());
@@ -117,10 +117,10 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     final InternalMessage response =
         (InternalMessage) a2mp.transform(message, Event.builder(context).message(message).flow(flow).build());
 
-    assertThat(response.getPayload().getValue(), instanceOf(MultiPartContent.class));
-    assertThat(((MultiPartContent) response.getPayload().getValue()).getParts(), hasSize(2));
-    assertThat(((DefaultMultiPartContent) response.getPayload().getValue()).hasBodyPart(), is(true));
-    assertThat(((MultiPartContent) response.getPayload().getValue()).getPartNames(), hasItem("attachment"));
+    assertThat(response.getPayload().getValue(), instanceOf(MultiPartPayload.class));
+    assertThat(((MultiPartPayload) response.getPayload().getValue()).getParts(), hasSize(2));
+    assertThat(((DefaultMultiPartPayload) response.getPayload().getValue()).hasBodyPart(), is(true));
+    assertThat(((MultiPartPayload) response.getPayload().getValue()).getPartNames(), hasItem("attachment"));
   }
 
   @Test
@@ -132,10 +132,10 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     final InternalMessage response =
         (InternalMessage) a2mp.transform(message, Event.builder(context).message(message).flow(flow).build());
 
-    assertThat(response.getPayload().getValue(), instanceOf(MultiPartContent.class));
-    assertThat(((MultiPartContent) response.getPayload().getValue()).getParts(), hasSize(1));
-    assertThat(((DefaultMultiPartContent) response.getPayload().getValue()).hasBodyPart(), is(false));
-    assertThat(((MultiPartContent) response.getPayload().getValue()).getPartNames(), hasItem("attachment"));
+    assertThat(response.getPayload().getValue(), instanceOf(MultiPartPayload.class));
+    assertThat(((MultiPartPayload) response.getPayload().getValue()).getParts(), hasSize(1));
+    assertThat(((DefaultMultiPartPayload) response.getPayload().getValue()).hasBodyPart(), is(false));
+    assertThat(((MultiPartPayload) response.getPayload().getValue()).getPartNames(), hasItem("attachment"));
   }
 
 }

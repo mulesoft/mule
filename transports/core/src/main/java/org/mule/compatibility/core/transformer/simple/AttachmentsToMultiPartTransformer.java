@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transformer.simple;
 
-import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
@@ -25,7 +25,7 @@ import java.util.List;
 import javax.activation.DataHandler;
 
 /**
- * Transforms the message, putting all inbound attachments of the source message as parts in a {@link DefaultMultiPartContent} of
+ * Transforms the message, putting all inbound attachments of the source message as parts in a {@link DefaultMultiPartPayload} of
  * the returning message.
  *
  * @since 4.0
@@ -56,7 +56,7 @@ public class AttachmentsToMultiPartTransformer extends AbstractMessageTransforme
             .mediaType(MediaType.parse(attachment.getContentType())).attributes(new PartAttributes(attachmentName)).build());
       }
 
-      return builder.payload(new DefaultMultiPartContent(parts)).build();
+      return builder.payload(new DefaultMultiPartPayload(parts)).build();
     } catch (Exception e) {
       throw new TransformerException(this, e);
     }

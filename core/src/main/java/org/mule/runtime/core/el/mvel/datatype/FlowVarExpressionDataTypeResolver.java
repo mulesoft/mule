@@ -23,6 +23,6 @@ public class FlowVarExpressionDataTypeResolver extends AbstractVariableExpressio
 
   @Override
   protected DataType getVariableDataType(Event event, String propertyName) {
-    return event.getVariableDataType(propertyName);
+    return event.getVariable(propertyName).getDataType();
   }
 }

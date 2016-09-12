@@ -19,13 +19,13 @@ public class DefaultTypedValue<T> implements TypedValue<T>, Serializable {
 
   private static final long serialVersionUID = -2533879516750283994L;
 
-  private final T content;
+  private final T value;
   private final DataType dataType;
 
-  public DefaultTypedValue(T content, DataType dataType) {
-    this.content = content;
+  public DefaultTypedValue(T value, DataType dataType) {
+    this.value = value;
     if (dataType == null) {
-      this.dataType = DataType.fromObject(content);
+      this.dataType = DataType.fromObject(value);
     } else {
       this.dataType = dataType;
     }
@@ -38,7 +38,7 @@ public class DefaultTypedValue<T> implements TypedValue<T>, Serializable {
 
   @Override
   public T getValue() {
-    return content;
+    return value;
   }
 
 }

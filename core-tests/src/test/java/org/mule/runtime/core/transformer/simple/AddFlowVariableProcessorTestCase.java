@@ -48,7 +48,7 @@ public class AddFlowVariableProcessorTestCase extends AbstractAddVariablePropert
 
   @Override
   protected DataType getVariableDataType(Event event, String key) {
-    return event.getVariableDataType(key);
+    return event.getVariable(key).getDataType();
   }
 
 }

@@ -35,7 +35,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @Override
   protected Message getOutputMessage(org.mule.runtime.api.message.MuleEvent result) {
-    Message message = result.getVariable(TARGET);
+    Message message = (Message) result.getVariable(TARGET).getValue();
 
     assertThat(message, is(notNullValue()));
     return message;

@@ -59,7 +59,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
     CompiledExpression compiledExpression = compileMelExpression(expression, testEvent, builder);
     testEvent = builder.build();
 
-    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
     testEvent = builder.build();
 
     assertThat(getVariableDataType(testEvent), like(String.class, JSON, CUSTOM_ENCODING));
@@ -78,7 +78,7 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
     testEvent = builder.build();
 
     // Attempts to propagate a different dataType, which should be ignored
-    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(propertyValue, DataType.STRING), compiledExpression);
+    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue<>(propertyValue, DataType.STRING), compiledExpression);
     testEvent = builder.build();
 
     assertThat(getVariableDataType(testEvent), like(Map.class, UNKNOWN, CUSTOM_ENCODING));

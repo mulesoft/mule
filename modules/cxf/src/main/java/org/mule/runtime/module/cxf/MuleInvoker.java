@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableValueOrNull;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.module.cxf.CxfConstants.UNWRAP_MULE_EXCEPTIONS;
 
@@ -100,7 +100,7 @@ public class MuleInvoker implements Invoker {
         Throwable cause = e;
 
         // See MULE-6329
-        String unwrapMuleExceptions = getFlowVariableOrNull(UNWRAP_MULE_EXCEPTIONS, event);
+        String unwrapMuleExceptions = getFlowVariableValueOrNull(UNWRAP_MULE_EXCEPTIONS, event);
         if (Boolean.valueOf(unwrapMuleExceptions)) {
           cause = ExceptionHelper.getNonMuleException(e);
           // Exceptions thrown from a ScriptComponent or a ScriptTransformer are going to be wrapped on a

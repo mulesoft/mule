@@ -69,8 +69,10 @@ public class FlowAsyncBeforeAfterOutboundTestCase extends AbstractIntegrationTes
 
     @Override
     public Event process(Event event) throws MuleException {
-      return Event.builder(event).message(InternalMessage.builder(event.getMessage())
-          .addOutboundProperty(event.getVariable("property-name"), currentThread().getName()).build()).build();
+      return Event.builder(event)
+          .message(InternalMessage.builder(event.getMessage())
+              .addOutboundProperty((String) event.getVariable("property-name").getValue(), currentThread().getName()).build())
+          .build();
     }
   }
 }

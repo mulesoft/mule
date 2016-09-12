@@ -127,7 +127,7 @@ public abstract class AbstractMessageSequenceSplitter extends AbstractIntercepti
       for (String flowVarName : payloadAsEvent.getVariableNames()) {
         if (!flowVarsFromLastResult.contains(flowVarName)) {
           builder.addVariable(flowVarName, payloadAsEvent.getVariable(flowVarName),
-                              payloadAsEvent.getVariableDataType(flowVarName));
+                              payloadAsEvent.getVariable(flowVarName).getDataType());
         }
       }
     } else if (payload instanceof InternalMessage) {

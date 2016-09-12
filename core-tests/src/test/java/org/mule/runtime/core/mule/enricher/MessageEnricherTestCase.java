@@ -335,6 +335,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     Event out = enricher.process(in);
 
     assertEquals("bar", out.getVariable("foo"));
-    assertThat(out.getVariableDataType("foo"), DataTypeMatcher.like(String.class, JSON, UTF_16));
+    assertThat(out.getVariable("foo").getDataType(), DataTypeMatcher.like(String.class, JSON, UTF_16));
   }
 }

@@ -97,7 +97,7 @@ public class XPath3TestCase extends FunctionalTestCase {
   @Test
   public void payloadConsumed() throws Exception {
     Event event = flowRunner("payloadConsumed").withPayload(getOthello()).run();
-    assertThat((String) event.getVariable("result"), equalTo("3556"));
+    assertThat((String) event.getVariable("result").getValue(), equalTo("3556"));
     assertThat(event.getMessage().getPayload().getValue(), instanceOf(Node.class));
   }
 

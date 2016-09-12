@@ -93,7 +93,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
     MuleEvent event = flowRunner("interceptingWithTarget").withPayload(payload).run();
     assertThat(event.getMessage().getPayload().getValue(), is(payload));
 
-    Message message = event.getVariable("banana");
+    Message message = (Message) event.getVariable("banana").getValue();
     assertThat(message.getPayload().getValue(), is(instanceOf(Banana.class)));
     final Banana banana = (Banana) message.getPayload().getValue();
 
@@ -110,7 +110,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
     MuleEvent event = flowRunner("nestedInterceptingWithTarget").run();
     assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(Banana.class)));
 
-    Message targetMessage = event.getVariable("banana");
+    Message targetMessage = (Message) event.getVariable("banana").getValue();
     assertThat(targetMessage.getPayload().getValue(), is(instanceOf(Banana.class)));
 
     assertThat(event.getMessage().getPayload().getValue(), is(not(sameInstance(targetMessage.getPayload().getValue()))));

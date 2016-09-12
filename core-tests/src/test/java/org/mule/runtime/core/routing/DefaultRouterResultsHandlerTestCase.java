@@ -121,7 +121,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
     assertEquals("value1", result.getVariable("key1"));
-    assertTrue(simpleDateType1.equals(result.getVariableDataType("key1")));
+    assertTrue(simpleDateType1.equals(result.getVariable("key1").getDataType()));
     assertThat(result.getVariableNames(), not(contains("key2")));
     assertThat(result.getVariableNames(), not(contains("key3")));
 

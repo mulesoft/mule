@@ -231,7 +231,7 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
 
   private void xpath(Object payload) throws Exception {
     Event result = flowRunner("process-order-update").withPayload(payload).run();
-    int total = result.getVariable("total");
+    int total = (int) result.getVariable("total").getValue();
     assertThat(total, is(greaterThan(0)));
   }
 
