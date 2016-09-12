@@ -75,7 +75,7 @@ public class HeisenbergSource extends Source<Void, Attributes> implements Initia
 
       @Override
       protected void doOnCompletion(MuleEvent event) {
-        Long payment = (Long) ((org.mule.runtime.core.api.Event) event).getMessage().getPayload();
+        Long payment = (Long) ((org.mule.runtime.core.api.Event) event).getMessage().getPayload().getValue();
         heisenberg.setMoney(heisenberg.getMoney().add(BigDecimal.valueOf(payment)));
       }
 

@@ -33,7 +33,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
 
   @Override
   public Object transformMessage(Event event, Charset encoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
     try {
       Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
       if (sourceDoc == null) {

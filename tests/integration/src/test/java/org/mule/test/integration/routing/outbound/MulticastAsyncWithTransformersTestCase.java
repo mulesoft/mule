@@ -44,15 +44,15 @@ public class MulticastAsyncWithTransformersTestCase extends AbstractIntegrationT
     // We have to wait a lot longer here since groovy takes an age to compile the first time
     InternalMessage result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add(result.getPayload());
+    results.add(result.getPayload().getValue());
 
     result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add(result.getPayload());
+    results.add(result.getPayload().getValue());
 
     result = client.request("test://collector.queue", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    results.add(result.getPayload());
+    results.add(result.getPayload().getValue());
 
     assertTrue(results.contains(apple));
     assertTrue(results.contains(banana));

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.model.resolvers;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;

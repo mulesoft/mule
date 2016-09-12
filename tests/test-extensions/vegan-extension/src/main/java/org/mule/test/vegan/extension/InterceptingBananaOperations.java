@@ -60,7 +60,7 @@ public class InterceptingBananaOperations {
 
     @Override
     public void onSuccess(Message resultMessage) {
-      if (resultMessage.getPayload() instanceof Banana) {
+      if (resultMessage.getPayload().getValue() instanceof Banana) {
         config.onBanana();
       } else {
         config.onNotBanana();

@@ -36,7 +36,7 @@ public class PayloadTypeFilter implements Filter {
 
   @Override
   public boolean accept(InternalMessage message, Event.Builder builder) {
-    return (expectedType != null ? expectedType.isAssignableFrom(message.getDataType().getType()) : false);
+    return (expectedType != null ? expectedType.isAssignableFrom(message.getPayload().getDataType().getType()) : false);
   }
 
   public Class getExpectedType() {

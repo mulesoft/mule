@@ -36,7 +36,7 @@ public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter {
   @Override
   protected String getIdForEvent(Event event) throws MuleException {
     try {
-      Object payload = event.getMessage().getPayload();
+      Object payload = event.getMessage().getPayload().getValue();
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
       byte[] digestedBytes = md.digest(bytes);

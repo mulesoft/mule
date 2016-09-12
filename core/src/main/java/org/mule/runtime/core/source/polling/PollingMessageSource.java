@@ -7,7 +7,7 @@
 package org.mule.runtime.core.source.polling;
 
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.config.i18n.CoreMessages.pollSourceReturnedNull;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
@@ -311,7 +311,7 @@ public class PollingMessageSource
   protected boolean isNewMessage(Event event) {
     if (event != null && !VoidMuleEvent.getInstance().equals(event) && event.getMessage() != null) {
       InternalMessage message = event.getMessage();
-      return message.getPayload() != null;
+      return message.getPayload().getValue() != null;
     }
     return false;
   }

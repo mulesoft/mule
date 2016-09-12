@@ -58,12 +58,12 @@ public class StoredProcedureJavaArrayUdtTestCase extends AbstractDbIntegrationTe
   @Test
   public void returnsDefaultArray() throws Exception {
     Message response = flowRunner("returnsDefaultArrayValue").run().getMessage();
-    assertThat(response.getPayload(), equalTo(SOUTHWEST.getZips()));
+    assertThat(response.getPayload().getValue(), equalTo(SOUTHWEST.getZips()));
   }
 
   @Test
   public void returnsCustomArray() throws Exception {
     Message response = flowRunner("returnsCustomArrayValue").run().getMessage();
-    assertThat(response.getPayload(), equalTo(CONTACT1.getDetails()));
+    assertThat(response.getPayload().getValue(), equalTo(CONTACT1.getDetails()));
   }
 }

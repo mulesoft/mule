@@ -125,7 +125,7 @@ public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase {
   @Test
   public void sendsRequest() throws Exception {
     Event response = flowRunner("client").withPayload("PEPE").run();
-    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload()), is("WOW"));
+    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload().getValue()), is("WOW"));
     assertThat(method, is("GET"));
     assertThat(headers, hasEntry("X-Custom", "custom-value"));
     assertThat(query, is("query=param"));
@@ -153,7 +153,7 @@ public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase {
     @Override
     public Event process(Event event) throws MuleException {
       Message message = event.getMessage();
-      Object payload = message.getPayload();
+      Object payload = message.getPayload().getValue();
       assertThat(payload, is(nullValue()));
       assertThat(message.getAttributes(), instanceOf(HttpRequestAttributes.class));
       HttpRequestAttributes requestAttributes = (HttpRequestAttributes) message.getAttributes();

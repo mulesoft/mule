@@ -42,7 +42,7 @@ public class PagedOperationMessageProcessor extends OperationMessageProcessor {
       throws MuleException {
 
     Event resultEvent = (Event) super.doProcess(event, operationContext);
-    PagingProvider pagingProvider = resultEvent.getMessage().getPayload();
+    PagingProvider pagingProvider = (PagingProvider) resultEvent.getMessage().getPayload().getValue();
 
     if (pagingProvider == null) {
       throw new IllegalStateException("Obtained paging delegate cannot be null");

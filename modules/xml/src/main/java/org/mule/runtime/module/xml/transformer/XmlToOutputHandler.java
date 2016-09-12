@@ -44,7 +44,7 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
 
   @Override
   public Object transformMessage(Event event, final Charset encoding) {
-    final Object src = event.getMessage().getPayload();
+    final Object src = event.getMessage().getPayload().getValue();
     return new OutputHandler() {
 
       @Override

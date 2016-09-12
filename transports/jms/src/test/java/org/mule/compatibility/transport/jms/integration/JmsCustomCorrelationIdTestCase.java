@@ -30,6 +30,6 @@ public class JmsCustomCorrelationIdTestCase extends AbstractJmsFunctionalTestCas
                         .build())
             .getRight();
     // We get the original message back, not the result from the remote component
-    assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
+    assertEquals(TEST_MESSAGE + " TestService1", response.getPayload().getValue());
   }
 }

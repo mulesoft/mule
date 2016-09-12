@@ -33,9 +33,10 @@ public class MulticasterMixedSyncAsyncTestCase extends AbstractIntegrationTestCa
     InternalMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
+    assertTrue(result.getPayload().getValue() instanceof List);
     List<Apple> results =
-        ((List<InternalMessage>) result.getPayload()).stream().map(msg -> (Apple) msg.getPayload()).collect(toList());
+        ((List<InternalMessage>) result.getPayload().getValue()).stream().map(msg -> (Apple) msg.getPayload().getValue())
+            .collect(toList());
     assertEquals(2, results.size());
 
     FlowAssert.verify();

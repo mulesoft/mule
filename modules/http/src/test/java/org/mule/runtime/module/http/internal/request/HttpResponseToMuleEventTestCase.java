@@ -77,7 +77,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
   @Test
   public void responseBodyIsSetAsPayload() throws MessagingException {
     Event result = httpResponseToMuleEvent.convert(event, httpResponse, null);
-    InputStream responseStream = result.getMessage().getPayload();
+    InputStream responseStream = (InputStream) result.getMessage().getPayload().getValue();
     assertThat(IOUtils.toString(responseStream), equalTo(TEST_MESSAGE));
   }
 

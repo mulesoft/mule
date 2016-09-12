@@ -33,9 +33,10 @@ public class MulticastSyncTestCase extends AbstractIntegrationTestCase {
     InternalMessage result = flowRunner("Distributor").withPayload(apple).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
+    assertTrue(result.getPayload().getValue() instanceof List);
     List<Fruit> results =
-        ((List<InternalMessage>) result.getPayload()).stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+        ((List<InternalMessage>) result.getPayload().getValue()).stream().map(msg -> (Fruit) msg.getPayload().getValue())
+            .collect(toList());
     assertEquals(3, results.size());
 
     assertTrue(results.contains(apple));

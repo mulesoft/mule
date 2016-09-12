@@ -50,7 +50,8 @@ public final class SocketUtils {
       throw new IOException("Streaming is not allowed with this configuration");
     } else if (data instanceof Message) {
       if (payloadOnly) {
-        return getByteArray(((Message) data).getPayload(), payloadOnly, streamingIsAllowed, encoding, objectSerializer);
+        return getByteArray(((Message) data).getPayload().getValue(), payloadOnly, streamingIsAllowed, encoding,
+                            objectSerializer);
       } else {
         return objectSerializer.serialize(data);
       }

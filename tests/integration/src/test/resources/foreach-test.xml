@@ -104,7 +104,7 @@
             <script:component>
                 <script:script engine="groovy">
                     <![CDATA[
-                    def root = flowVars.rootMessage.payload
+                    def root = flowVars.rootMessage.payload.value
                     def key = "key3-" + flowVars.counter
                     root.order.items << [(key) : "je"]
                     ]]>

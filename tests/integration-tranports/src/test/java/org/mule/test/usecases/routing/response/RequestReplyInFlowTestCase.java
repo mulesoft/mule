@@ -32,7 +32,7 @@ public class RequestReplyInFlowTestCase extends FunctionalTestCase {
     client.dispatch(getDispatchUrl(), InternalMessage.builder().payload("Message went").build());
     InternalMessage reply = client.request(getDestinationUrl(), 10000).getRight().get();
     assertNotNull(reply);
-    assertEquals("Message went-out-and-back-in", reply.getPayload());
+    assertEquals("Message went-out-and-back-in", reply.getPayload().getValue());
   }
 
   protected String getDispatchUrl() {

@@ -27,7 +27,7 @@ public abstract class AbstractStreamingDownloadMule1389TestCase extends Function
         client.send(((InboundEndpoint) muleContext.getRegistry().lookupObject("inTestComponent")).getAddress(), "request", null)
             .getRight();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
+    assertNotNull(result.getPayload().getValue());
     assertEquals(InputStreamSource.SIZE, getPayloadAsBytes(result).length);
     long then = System.currentTimeMillis();
     double speed = InputStreamSource.SIZE / (double) (then - now) * 1000 / AbstractStreamingCapacityTestCase.ONE_MB;

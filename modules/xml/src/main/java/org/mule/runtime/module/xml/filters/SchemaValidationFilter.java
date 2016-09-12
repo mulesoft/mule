@@ -159,7 +159,7 @@ public class SchemaValidationFilter extends AbstractJaxpFilter implements Filter
    * @return The source
    */
   protected Source loadSource(InternalMessage msg) throws Exception {
-    Object payload = msg.getPayload();
+    Object payload = msg.getPayload().getValue();
     if (returnResult) {
       // Validation requires that a DOM goes in for a DOM to go out
       payload = toDOMNode(payload);

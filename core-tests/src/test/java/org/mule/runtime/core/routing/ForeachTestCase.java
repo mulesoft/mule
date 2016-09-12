@@ -48,7 +48,7 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   private List<Processor> getSimpleMessageProcessors() {
     List<Processor> lmp = new ArrayList<>();
     lmp.add(event -> {
-      String payload = event.getMessage().getPayload().toString();
+      String payload = event.getMessage().getPayload().getValue().toString();
       event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(payload + ":foo").build()).build();
       return event;
     });
@@ -217,20 +217,20 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
 
   private void assertSimpleProcessedMessages() {
     assertEquals(ERR_NUMBER_MESSAGES, 2, processedEvents.size());
-    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(0).getMessage().getPayload() instanceof String);
-    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(1).getMessage().getPayload() instanceof String);
-    assertEquals(ERR_OUTPUT, "bar:foo:zas", processedEvents.get(0).getMessage().getPayload());
-    assertEquals(ERR_OUTPUT, "zip:foo:zas", processedEvents.get(1).getMessage().getPayload());
+    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(0).getMessage().getPayload().getValue() instanceof String);
+    assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(1).getMessage().getPayload().getValue() instanceof String);
+    assertEquals(ERR_OUTPUT, "bar:foo:zas", processedEvents.get(0).getMessage().getPayload().getValue());
+    assertEquals(ERR_OUTPUT, "zip:foo:zas", processedEvents.get(1).getMessage().getPayload().getValue());
   }
 
   private void assertNestedProcessedMessages() {
     String[] expectedOutputs = {"a1:foo:zas", "a2:foo:zas", "a3:foo:zas", "b1:foo:zas", "b2:foo:zas", "c1:foo:zas"};
     assertEquals(ERR_NUMBER_MESSAGES, 6, processedEvents.size());
     for (int i = 0; i < processedEvents.size(); i++) {
-      assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(i).getMessage().getPayload() instanceof String);
+      assertTrue(ERR_PAYLOAD_TYPE, processedEvents.get(i).getMessage().getPayload().getValue() instanceof String);
     }
     for (int i = 0; i < processedEvents.size(); i++) {
-      assertEquals(ERR_OUTPUT, expectedOutputs[i], processedEvents.get(i).getMessage().getPayload());
+      assertEquals(ERR_OUTPUT, expectedOutputs[i], processedEvents.get(i).getMessage().getPayload().getValue());
     }
   }
 

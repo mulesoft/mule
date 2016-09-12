@@ -43,8 +43,8 @@ public class CollectionAggregatorRouterSerializationTestCase extends AbstractInt
     MuleClient client = muleContext.getClient();
     InternalMessage request = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(request);
-    assertThat(request.getPayload(), instanceOf(List.class));
-    assertThat(((List<InternalMessage>) request.getPayload()), hasSize(list.size()));
+    assertThat(request.getPayload().getValue(), instanceOf(List.class));
+    assertThat(((List<InternalMessage>) request.getPayload().getValue()), hasSize(list.size()));
   }
 
   private class EventGroupSerializerObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<Serializable> {

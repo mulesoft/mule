@@ -31,6 +31,6 @@ public class DynamicEndpointWithConnectorTestCase extends FunctionalTestCase {
     assertNotNull(test);
 
     InternalMessage response = client.request("jms://test.out", 5000).getRight().get();
-    assertEquals(TEST_PAYLOAD, response.getPayload());
+    assertEquals(TEST_PAYLOAD, response.getPayload().getValue());
   }
 }

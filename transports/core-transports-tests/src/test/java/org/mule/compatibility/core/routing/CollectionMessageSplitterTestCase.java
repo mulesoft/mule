@@ -187,15 +187,15 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
                                 List<Event> splits, Set<Object> actualSequences) {
     for (Event event : splits) {
       InternalMessage msg = event.getMessage();
-      assertTrue(msg.getPayload() instanceof String);
-      assertTrue(msg.getPayload() instanceof String);
+      assertTrue(msg.getPayload().getValue() instanceof String);
+      assertTrue(msg.getPayload().getValue() instanceof String);
       if (counted) {
         assertThat(event.getGroupCorrelation().getGroupSize().get(), is(count));
       } else {
         assertThat(event.getGroupCorrelation().getGroupSize().isPresent(), is(false));
       }
       actualSequences.add(event.getGroupCorrelation().getSequence().get());
-      String str = (String) msg.getPayload();
+      String str = (String) msg.getPayload().getValue();
       assertTrue(TEST_LIST_MULTIPLE.contains(str));
       for (String key : inboundProps.keySet()) {
         assertEquals(msg.getInboundProperty(key), inboundProps.get(key));

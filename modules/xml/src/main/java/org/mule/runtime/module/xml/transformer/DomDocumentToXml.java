@@ -26,7 +26,7 @@ public class DomDocumentToXml extends AbstractXmlTransformer implements Discover
 
   @Override
   public Object transformMessage(Event event, Charset encoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
     try {
       // We now offer XML in byte OR String form.
       // String remains the default like before.

@@ -41,7 +41,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
     InternalMessage message = client.request("vm://receive", FIVE_SECONDS_TIMEOUT).getRight().get();
 
     assertThat(message, not(nullValue()));
-    assertThat(message.getDataType().getMediaType().getCharset().get(), is(ENCODING));
+    assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), is(ENCODING));
     assertThat(getPayloadAsString(message), is(TEST_MESSAGE_EUC_JP_ENCODED));
   }
 }

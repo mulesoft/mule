@@ -54,10 +54,10 @@ public class JMSMessageToObject extends AbstractJmsTransformer {
     final InternalMessage message = event.getMessage();
     try {
       if (logger.isDebugEnabled()) {
-        logger.debug("Source object is " + ClassUtils.getSimpleName(message.getDataType().getType()));
+        logger.debug("Source object is " + ClassUtils.getSimpleName(message.getPayload().getDataType().getType()));
       }
 
-      Object result = transformFromMessage((Message) message.getPayload(), outputEncoding);
+      Object result = transformFromMessage((Message) message.getPayload().getValue(), outputEncoding);
 
       // We need to handle String / byte[] explicitly since this transformer does not define
       // a single return type

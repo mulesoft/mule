@@ -39,7 +39,7 @@ public class OneWayHttpRequesterAdapter implements Processor, FlowConstructAware
   }
 
   private void consumePayload(Event event, Event result) throws MessagingException {
-    final Object payload = result.getMessage().getPayload();
+    final Object payload = result.getMessage().getPayload().getValue();
     if (payload instanceof InputStream) {
       try {
         IOUtils.toByteArray((InputStream) payload);

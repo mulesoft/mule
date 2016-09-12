@@ -54,7 +54,7 @@ public class SelectJavaUdtTestCase extends AbstractDbIntegrationTestCase {
   public void returnsMappedObject() throws Exception {
     Message response = flowRunner("returnsUDT").run().getMessage();
 
-    assertRecords(response.getPayload(),
+    assertRecords(response.getPayload().getValue(),
                   new Record(new Field("REGION_NAME", SOUTHWEST_MANAGER.getRegionName()),
                              new Field("MANAGER_NAME", SOUTHWEST_MANAGER.getName()),
                              new Field("DETAILS", SOUTHWEST_MANAGER.getContactDetails())),

@@ -148,7 +148,7 @@ public class XsltTransformer extends AbstractXmlTransformer {
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     InternalMessage message = event.getMessage();
-    Object src = message.getPayload();
+    Object src = message.getPayload().getValue();
     try {
       Source sourceDoc = XMLUtils.toXmlSource(getXMLInputFactory(), isUseStaxSource(), src);
       if (sourceDoc == null) {

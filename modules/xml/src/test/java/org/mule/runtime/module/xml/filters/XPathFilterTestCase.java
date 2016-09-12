@@ -92,7 +92,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
     assertTrue(filter.accept(event, builder));
     assertEquals("null", filter.getExpectedValue());
     assertEquals("/some/pattern", filter.getPattern().trim());
-    assertSame(document, builder.build().getMessage().getPayload());
+    assertSame(document, builder.build().getMessage().getPayload().getValue());
 
     event = getTestEvent(new Object(), muleContext);
     builder = Event.builder(event);
@@ -100,7 +100,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
     assertTrue(filter.accept(event, builder));
     assertEquals("true", filter.getExpectedValue());
     assertEquals("/some/pattern", filter.getPattern().trim());
-    assertSame(document, builder.build().getMessage().getPayload());
+    assertSame(document, builder.build().getMessage().getPayload().getValue());
   }
 
   /**

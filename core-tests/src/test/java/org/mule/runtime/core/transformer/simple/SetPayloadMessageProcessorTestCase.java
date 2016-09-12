@@ -74,7 +74,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     Event response = setPayloadMessageProcessor.process(muleEvent);
 
-    assertThat(response.getMessage().getPayload(), is(nullValue()));
+    assertThat(response.getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
@@ -86,7 +86,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     Event response = setPayloadMessageProcessor.process(muleEvent);
 
-    assertThat(response.getMessage().getPayload(), is(PLAIN_TEXT));
+    assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }
 
   @Test
@@ -101,7 +101,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     Event response = setPayloadMessageProcessor.process(muleEvent);
 
-    assertThat(response.getMessage().getPayload(), is(PLAIN_TEXT));
+    assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     Event response = setPayloadMessageProcessor.process(muleEvent);
 
-    assertThat(response.getMessage().getDataType(), like(Object.class, MediaType.ANY, null));
+    assertThat(response.getMessage().getPayload().getDataType(), like(Object.class, MediaType.ANY, null));
   }
 
   @Test
@@ -121,7 +121,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     setPayloadMessageProcessor.process(muleEvent);
 
-    assertThat(muleEvent.getMessage().getDataType(), like(String.class, MediaType.ANY, null));
+    assertThat(muleEvent.getMessage().getPayload().getDataType(), like(String.class, MediaType.ANY, null));
   }
 
   @Test
@@ -132,7 +132,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     Event response = setPayloadMessageProcessor.process(muleEvent);
 
-    assertThat(response.getMessage().getDataType(), like(String.class, MediaType.ANY, CUSTOM_ENCODING));
+    assertThat(response.getMessage().getPayload().getDataType(), like(String.class, MediaType.ANY, CUSTOM_ENCODING));
   }
 
   @Test
@@ -143,6 +143,6 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     Event response = setPayloadMessageProcessor.process(muleEvent);
 
-    assertThat(response.getMessage().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
+    assertThat(response.getMessage().getPayload().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
   }
 }

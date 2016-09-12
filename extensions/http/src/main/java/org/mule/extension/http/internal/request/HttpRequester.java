@@ -108,7 +108,7 @@ public class HttpRequester {
   }
 
   private void consumePayload(final Event event, MuleContext muleContext) {
-    if (event.getMessage().getPayload() instanceof InputStream) {
+    if (event.getMessage().getPayload().getValue() instanceof InputStream) {
       try {
         event.getMessageAsBytes(muleContext);
       } catch (Exception e) {

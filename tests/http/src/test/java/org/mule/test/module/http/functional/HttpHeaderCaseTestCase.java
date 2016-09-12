@@ -43,7 +43,7 @@ public class HttpHeaderCaseTestCase extends AbstractHttpTestCase {
   @Test
   public void worksPreservingHeaders() throws Exception {
     Event response = runFlow("client");
-    Object payload = response.getMessage().getPayload();
+    Object payload = response.getMessage().getPayload().getValue();
     assertThat(payload, is(instanceOf(ParameterMap.class)));
     assertThat(((ParameterMap) payload).keySet(), hasItem("CustomValue"));
     assertThat(((ParameterMap) payload).get("CustomValue"), is("value"));

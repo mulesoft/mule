@@ -26,7 +26,7 @@ public class ManySendsMule1758TestCase extends AbstractIntegrationTestCase {
   public void testSingleSend() throws Exception {
     InternalMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
     assertNotNull("Response is null", response);
-    assertEquals("Polo", response.getPayload());
+    assertEquals("Polo", response.getPayload().getValue());
   }
 
   @Test
@@ -36,7 +36,7 @@ public class ManySendsMule1758TestCase extends AbstractIntegrationTestCase {
       logger.debug("Message " + i);
       InternalMessage response = flowRunner("mySynchService").withPayload("Marco").run().getMessage();
       assertNotNull("Response is null", response);
-      assertEquals("Polo", response.getPayload());
+      assertEquals("Polo", response.getPayload().getValue());
     }
     long now = System.currentTimeMillis();
     logger.info("Total time " + ((now - then) / 1000.0) + "s; per message " + ((now - then) / (1.0 * NUM_MESSAGES)) + "ms");

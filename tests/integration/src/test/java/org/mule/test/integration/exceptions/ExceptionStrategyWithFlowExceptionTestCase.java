@@ -33,7 +33,7 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends AbstractIntegrat
     InternalMessage message = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull("request returned no message", message);
-    assertTrue(message.getPayload() instanceof ExceptionMessage);
+    assertTrue(message.getPayload().getValue() instanceof ExceptionMessage);
   }
 
   public static class ExceptionThrower implements Processor {

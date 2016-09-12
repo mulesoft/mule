@@ -12,14 +12,14 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.runtime.api.message.MultiPartContent;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.util.ClassUtils;
@@ -213,7 +213,8 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
 
   private Charset getEncoding(Object src) {
     if (src instanceof InternalMessage) {
-      return ((InternalMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
+      return ((InternalMessage) src).getPayload().getDataType().getMediaType().getCharset()
+          .orElse(getDefaultEncoding(muleContext));
     } else {
       return getDefaultEncoding(muleContext);
     }
@@ -225,8 +226,8 @@ public abstract class AbstractTransformer extends AbstractAnnotatedObject implem
     if (src instanceof InternalMessage) {
       InternalMessage message = (InternalMessage) src;
       if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true) && !(this instanceof AbstractMessageTransformer))) {
-        src = ((InternalMessage) src).getPayload();
-        payload = message.getPayload();
+        src = ((InternalMessage) src).getPayload().getValue();
+        payload = message.getPayload().getValue();
       }
     }
 

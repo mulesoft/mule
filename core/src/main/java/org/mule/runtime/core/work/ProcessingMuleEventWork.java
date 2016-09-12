@@ -23,8 +23,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of {@link AbstractMuleEventWork} that executes a {@link Processor} using this work's event. Instances of
- * this class can be used in a "fire and forget" fashion or the {@link #getResult(long, TimeUnit)} method can be used to wait for
+ * Implementation of {@link AbstractMuleEventWork} that executes a {@link Processor} using this work's event. Instances of this
+ * class can be used in a "fire and forget" fashion or the {@link #getResult(long, TimeUnit)} method can be used to wait for
  * background processing to finish. For cases when used in this latter manner, this class provides semmantics similar to
  * {@link Future#get(long, TimeUnit)} but with some differences around exception handling, cancellation, etc (see
  * {@link #getResult(long, TimeUnit)}).
@@ -49,9 +49,9 @@ public class ProcessingMuleEventWork extends AbstractMuleEventWork {
   }
 
   /**
-   * Invokes {@link Processor#process(Event)} using {@link #messageProcessor and AbstractMuleEventWork#event}. if
-   * processing is sucessful the result is stored in {@link #resultEvent} or if it throws exception, it will be stored in
-   * {@link #exception} Storing the result/exception allows {@link #getResult(long, TimeUnit)} to return the values
+   * Invokes {@link Processor#process(Event)} using {@link #messageProcessor and AbstractMuleEventWork#event}. if processing is
+   * sucessful the result is stored in {@link #resultEvent} or if it throws exception, it will be stored in {@link #exception}
+   * Storing the result/exception allows {@link #getResult(long, TimeUnit)} to return the values
    */
   @Override
   protected void doRun() {

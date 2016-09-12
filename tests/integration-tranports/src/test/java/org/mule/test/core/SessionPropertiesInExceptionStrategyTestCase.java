@@ -35,7 +35,7 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
     Event event = flowRunner("test").withPayload(list).run();
 
     assertThat(event.getError().isPresent(), is(false));
-    assertThat(event.getMessage().getPayload(), is(notNullValue()));
+    assertThat(event.getMessage().getPayload().getValue(), is(notNullValue()));
     assertThat(event.getSession().getProperty("ErrorCount"), is(list.size()));
   }
 }

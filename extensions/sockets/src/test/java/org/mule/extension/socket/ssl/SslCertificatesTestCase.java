@@ -49,7 +49,7 @@ public class SslCertificatesTestCase extends SocketExtensionTestCase {
       org.mule.runtime.core.api.InternalMessage muleMessage =
           flowRunner("ssl-send-and-receive").withPayload(TEST_STRING).run().getMessage();
 
-      String payload = IOUtils.toString((InputStream) muleMessage.getPayload());
+      String payload = IOUtils.toString((InputStream) muleMessage.getPayload().getValue());
       assertThat(payload, is(notNullValue()));
       SocketAttributes attributes = (SocketAttributes) muleMessage.getAttributes();
       assertThat(attributes.getLocalCertificates(), is(notNullValue()));
@@ -58,7 +58,7 @@ public class SslCertificatesTestCase extends SocketExtensionTestCase {
   }
 
   protected void assertCertificate(Message message) throws Exception {
-    String payload = IOUtils.toString((InputStream) message.getPayload());
+    String payload = IOUtils.toString((InputStream) message.getPayload().getValue());
     assertThat(payload, is(notNullValue()));
     SocketAttributes attributes = (SocketAttributes) message.getAttributes();
     assertThat(attributes.getLocalCertificates(), is(notNullValue()));

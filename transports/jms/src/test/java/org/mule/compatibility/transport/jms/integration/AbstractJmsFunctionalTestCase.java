@@ -427,15 +427,15 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase {
   protected InternalMessage receiveMessage(Object expected) throws Exception {
     InternalMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
-    assertEquals(expected, result.getPayload());
+    assertNotNull(result.getPayload().getValue());
+    assertEquals(expected, result.getPayload().getValue());
     return result;
   }
 
   protected InternalMessage receiveMessage(byte[] expected) throws Exception {
     InternalMessage result = client.request(getOutboundEndpoint(), getTimeout()).getRight().get();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
+    assertNotNull(result.getPayload().getValue());
     byte[] bytes = getPayloadAsBytes(result);
     assertEquals("Wrong number of bytes", expected.length, bytes.length);
     for (int i = 0; i < expected.length; ++i) {

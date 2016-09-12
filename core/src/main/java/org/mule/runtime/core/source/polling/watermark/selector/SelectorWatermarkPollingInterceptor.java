@@ -60,7 +60,7 @@ public class SelectorWatermarkPollingInterceptor extends WatermarkPollingInterce
   @Override
   public Event prepareRouting(Event sourceEvent, Event event) throws ConfigurationException {
     event = super.prepareRouting(sourceEvent, event);
-    Object payload = event.getMessage().getPayload();
+    Object payload = event.getMessage().getPayload().getValue();
     final WatermarkSelector selector = new WatermarkSelectorWrapper(this.selector, this.selectorExpression, event, muleContext);
 
     if (payload instanceof Iterable) {

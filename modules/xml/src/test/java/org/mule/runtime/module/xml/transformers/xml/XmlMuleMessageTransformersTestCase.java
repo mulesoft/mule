@@ -66,7 +66,7 @@ public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestC
     assertNull(msg.getInboundProperty("number"));
     assertNull(msg.getOutboundProperty("number"));
 
-    assertThat(msg.getDataType().getMediaType().getCharset().get(), is(UTF_8));
+    assertThat(msg.getPayload().getDataType().getMediaType().getCharset().get(), is(UTF_8));
 
     Set<String> outboundProps = msg.getOutboundPropertyNames();
     assertThat(outboundProps, hasSize(2));

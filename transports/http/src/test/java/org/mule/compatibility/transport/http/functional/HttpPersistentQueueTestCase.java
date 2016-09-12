@@ -95,9 +95,10 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase {
       Object httpMethod = message.getInboundProperty("http.method");
       if (HttpConstants.METHOD_GET.equals(httpMethod)) {
         assertEquals("/services/Echo?foo=bar",
-                     muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
+                     muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue());
       } else if (HttpConstants.METHOD_POST.equals(httpMethod)) {
-        assertEquals("foo=bar", muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
+        assertEquals("foo=bar",
+                     muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue());
       } else {
         fail("invalid HTTP method : " + httpMethod);
       }

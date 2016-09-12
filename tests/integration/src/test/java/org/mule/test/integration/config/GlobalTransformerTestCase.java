@@ -25,6 +25,6 @@ public class GlobalTransformerTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testNormal() throws Exception {
     InternalMessage msg = flowRunner("Test").withPayload(getTestMuleMessage("HELLO!")).run().getMessage();
-    assertTrue(msg.getPayload() instanceof byte[]);
+    assertTrue(msg.getPayload().getValue() instanceof byte[]);
   }
 }

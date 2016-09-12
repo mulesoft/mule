@@ -63,7 +63,7 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase {
   public void dispatchRequestUseNewConnectorByDefault() throws MuleException {
     muleContext.getClient().dispatch(getUrl(), getTestMuleMessage());
     final InternalMessage receivedMessage = getMessageReceivedByFlow();
-    assertThat(receivedMessage.getPayload(), is(Objects.toString(null)));
+    assertThat(receivedMessage.getPayload().getValue(), is(Objects.toString(null)));
   }
 
   @Ignore("See MULE-8049")

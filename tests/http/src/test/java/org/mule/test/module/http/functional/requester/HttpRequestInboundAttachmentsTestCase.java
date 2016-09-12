@@ -41,9 +41,9 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
   public void processInboundAttachments() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
-    assertThat(event.getMessage().getPayload(), instanceOf(MultiPartContent.class));
+    assertThat(event.getMessage().getPayload().getValue(), instanceOf(MultiPartContent.class));
 
-    MultiPartContent payload = event.getMessage().getPayload();
+    MultiPartContent payload = (MultiPartContent) event.getMessage().getPayload().getValue();
     assertThat(payload.getParts(), hasSize(2));
     assertAttachment(payload, "partName1", "Test part 1", MediaType.TEXT);
     assertAttachment(payload, "partName2", "Test part 2", MediaType.HTML);
@@ -54,9 +54,9 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
     assertTrue(payload.getPartNames().contains(attachmentName));
 
     org.mule.runtime.api.message.Message attachment = payload.getPart(attachmentName);
-    assertThat(attachment.getDataType().getMediaType(), equalTo(contentType));
+    assertThat(attachment.getPayload().getDataType().getMediaType(), equalTo(contentType));
 
-    assertThat(IOUtils.toString((InputStream) attachment.getPayload()), equalTo(attachmentContents));
+    assertThat(IOUtils.toString((InputStream) attachment.getPayload().getValue()), equalTo(attachmentContents));
   }
 
   @Override

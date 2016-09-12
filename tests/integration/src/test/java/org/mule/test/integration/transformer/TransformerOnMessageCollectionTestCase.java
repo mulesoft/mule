@@ -30,7 +30,7 @@ public class TransformerOnMessageCollectionTestCase extends AbstractIntegrationT
     values.add("Two");
 
     InternalMessage response = flowRunner("test").withPayload(values).run().getMessage();
-    assertEquals("foo", response.getPayload());
-    assertFalse(response.getPayload() instanceof List);
+    assertEquals("foo", response.getPayload().getValue());
+    assertFalse(response.getPayload().getValue() instanceof List);
   }
 }

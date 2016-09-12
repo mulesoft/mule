@@ -72,7 +72,7 @@ public class DynamicAllTestCase extends DynamicRouterTestCase {
     Event resultEvent = flowRunner(flowName).withPayload(payload).run();
     InternalMessage messageCollection = resultEvent.getMessage();
     for (int i = 0; i < letters.length; i++) {
-      InternalMessage message = ((List<InternalMessage>) messageCollection.getPayload()).get(i);
+      InternalMessage message = ((List<InternalMessage>) messageCollection.getPayload().getValue()).get(i);
       assertThat(getPayloadAsString(message), is(letters[i]));
     }
     return resultEvent;

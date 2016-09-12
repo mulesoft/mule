@@ -44,7 +44,7 @@ public class ObjectToJMSMessage extends AbstractJmsTransformer {
     final InternalMessage message = event.getMessage();
     try {
       if (logger.isDebugEnabled()) {
-        logger.debug("Source object is " + ClassUtils.getSimpleName(message.getDataType().getType()));
+        logger.debug("Source object is " + ClassUtils.getSimpleName(message.getPayload().getDataType().getType()));
       }
 
       Object result = transformToMessage(message);

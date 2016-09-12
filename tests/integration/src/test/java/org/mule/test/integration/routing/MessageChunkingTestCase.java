@@ -69,7 +69,7 @@ public class MessageChunkingTestCase extends AbstractIntegrationTestCase {
         // listener we supply the ComponentName as the subscription filter
         assertEquals("ChunkingObjectReceiver", notification.getResourceIdentifier());
         // Test that we have received all chunks in the correct order
-        Object reply = ((FunctionalTestNotification) notification).getEventContext().getMessage().getPayload();
+        Object reply = ((FunctionalTestNotification) notification).getEventContext().getMessage().getPayload().getValue();
         // Check if Object is of Correct Type
         assertTrue(reply instanceof SimpleSerializableObject);
         SimpleSerializableObject replySimpleSerializableObject = (SimpleSerializableObject) reply;

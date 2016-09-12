@@ -43,7 +43,7 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase {
   }
 
   private void assertExpected(Event event) throws Exception {
-    assertThat(XMLUnit.compareXML(event.getMessage().getPayload().toString(), EXPECTED).similar(), is(true));
+    assertThat(XMLUnit.compareXML(event.getMessage().getPayload().getValue().toString(), EXPECTED).similar(), is(true));
   }
 
 

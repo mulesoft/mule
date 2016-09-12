@@ -95,7 +95,7 @@ public class MuleEventToHttpRequest {
       }
     }
 
-    DataType dataType = event.getMessage().getDataType();
+    DataType dataType = event.getMessage().getPayload().getDataType();
     if (!MediaType.ANY.matches(dataType.getMediaType())) {
       builder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
     }
@@ -152,7 +152,7 @@ public class MuleEventToHttpRequest {
 
     boolean emptyBody;
 
-    if (event.getMessage().getPayload() == null && event.getMessage().getOutboundAttachmentNames().isEmpty()) {
+    if (event.getMessage().getPayload().getValue() == null && event.getMessage().getOutboundAttachmentNames().isEmpty()) {
       emptyBody = true;
     } else {
       emptyBody = DEFAULT_EMPTY_BODY_METHODS.contains(method);
@@ -167,7 +167,7 @@ public class MuleEventToHttpRequest {
 
   private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent)
       throws MessagingException {
-    Object payload = muleEvent.getMessage().getPayload();
+    Object payload = muleEvent.getMessage().getPayload().getValue();
 
     if (!muleEvent.getMessage().getOutboundAttachmentNames().isEmpty() || payload instanceof MultiPartContent) {
       try {
@@ -194,8 +194,8 @@ public class MuleEventToHttpRequest {
 
       if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.startsWith(APPLICATION_JAVA)) {
-        if (muleEvent.getMessage().getPayload() instanceof Map) {
-          String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset()
+        if (muleEvent.getMessage().getPayload().getValue() instanceof Map) {
+          String body = HttpParser.encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
               .orElse(getDefaultEncoding(muleContext)), (Map) payload);
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());
@@ -217,10 +217,11 @@ public class MuleEventToHttpRequest {
       attachments.put(outboundAttachmentName, msg.getOutboundAttachment(outboundAttachmentName));
     }
 
-    if (msg.getPayload() instanceof MultiPartContent) {
-      for (org.mule.runtime.api.message.Message part : ((MultiPartContent) msg.getPayload()).getParts()) {
+    if (msg.getPayload().getValue() instanceof MultiPartContent) {
+      for (org.mule.runtime.api.message.Message part : ((MultiPartContent) msg.getPayload().getValue()).getParts()) {
         final String partName = ((PartAttributes) part.getAttributes()).getName();
-        attachments.put(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType()));
+        attachments.put(partName,
+                        toDataHandler(partName, part.getPayload().getValue(), part.getPayload().getDataType().getMediaType()));
       }
     }
 
@@ -234,7 +235,7 @@ public class MuleEventToHttpRequest {
 
     HttpStreamingType requestStreamingMode = resolveStreamingType(event);
 
-    Object payload = event.getMessage().getPayload();
+    Object payload = event.getMessage().getPayload().getValue();
 
     if (requestStreamingMode == HttpStreamingType.AUTO) {
       if (contentLengthHeader != null) {

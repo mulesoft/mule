@@ -75,6 +75,6 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
   }
 
   protected boolean isLocked(Message message) {
-    return ((AbstractFileInputStream) message.getPayload()).isLocked();
+    return ((AbstractFileInputStream) message.getPayload().getValue()).isLocked();
   }
 }

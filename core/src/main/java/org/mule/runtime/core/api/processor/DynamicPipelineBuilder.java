@@ -56,8 +56,8 @@ public interface DynamicPipelineBuilder {
 
   /**
    * Injects the message processors added with {@link #injectBefore(org.mule.runtime.core.api.processor.Processor...)} and
-   * {@link #injectAfter(org.mule.runtime.core.api.processor.Processor...)} If none were added the effect is the same as
-   * calling {@link #reset()}
+   * {@link #injectAfter(org.mule.runtime.core.api.processor.Processor...)} If none were added the effect is the same as calling
+   * {@link #reset()}
    *
    * @return pipeline ID for future updates
    * @throws org.mule.runtime.core.api.MuleException if the update fails

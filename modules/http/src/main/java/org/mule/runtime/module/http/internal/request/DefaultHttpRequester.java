@@ -8,7 +8,7 @@ package org.mule.runtime.module.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
 import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.debug.FieldDebugInfoFactory.createFieldDebugInfo;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
@@ -390,7 +390,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
   }
 
   private void consumePayload(final Event event) {
-    if (event.getMessage().getPayload() instanceof InputStream) {
+    if (event.getMessage().getPayload().getValue() instanceof InputStream) {
       try {
         event.getMessageAsBytes(muleContext);
       } catch (Exception e) {

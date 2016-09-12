@@ -55,7 +55,7 @@ public class JsonXsltTransformer extends XsltTransformer {
   public Object transformMessage(Event event, Charset enc) throws TransformerException {
     XMLInputFactory inputFactory = new JsonXMLInputFactory();
     inputFactory.setProperty(JsonXMLInputFactory.PROP_MULTIPLE_PI, false);
-    TransformerInputs inputs = new TransformerInputs(this, event.getMessage().getPayload());
+    TransformerInputs inputs = new TransformerInputs(this, event.getMessage().getPayload().getValue());
     Source source;
     try {
       if (inputs.getInputStream() != null) {

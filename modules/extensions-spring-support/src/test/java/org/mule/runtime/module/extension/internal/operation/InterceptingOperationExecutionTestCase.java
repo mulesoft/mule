@@ -15,8 +15,8 @@ import static org.junit.Assert.fail;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -48,15 +48,15 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
   @Test
   public void interceptingWithoutNext() throws Exception {
     Message message = flowRunner("interceptingWithoutNext").run().getMessage();
-    assertThat(message.getPayload(), is(instanceOf(Banana.class)));
+    assertThat(message.getPayload().getValue(), is(instanceOf(Banana.class)));
     assertThat(message.getAttributes(), is(instanceOf(VeganAttributes.class)));
   }
 
   @Test
   public void interceptChain() throws Exception {
     Message message = flowRunner("interceptingBanana").run().getMessage();
-    assertThat(message.getPayload(), is(instanceOf(Banana.class)));
-    final Banana banana = message.getPayload();
+    assertThat(message.getPayload().getValue(), is(instanceOf(Banana.class)));
+    final Banana banana = (Banana) message.getPayload().getValue();
 
     assertThat(banana.isPeeled(), is(true));
     assertThat(banana.isBitten(), is(true));
@@ -70,7 +70,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
   public void interceptInvalidPayload() throws Exception {
     Message message = flowRunner("interceptingNotBanana").run().getMessage();
 
-    assertThat(message.getPayload(), is(not(instanceOf(Fruit.class))));
+    assertThat(message.getPayload().getValue(), is(not(instanceOf(Fruit.class))));
 
     assertThat(config.getBananasCount(), is(0));
     assertThat(config.getNonBananasCount(), is(1));
@@ -91,11 +91,11 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
   public void interceptingWithTarget() throws Exception {
     final String payload = "Hello!";
     MuleEvent event = flowRunner("interceptingWithTarget").withPayload(payload).run();
-    assertThat(event.getMessage().getPayload(), is(payload));
+    assertThat(event.getMessage().getPayload().getValue(), is(payload));
 
     Message message = event.getVariable("banana");
-    assertThat(message.getPayload(), is(instanceOf(Banana.class)));
-    final Banana banana = message.getPayload();
+    assertThat(message.getPayload().getValue(), is(instanceOf(Banana.class)));
+    final Banana banana = (Banana) message.getPayload().getValue();
 
     assertThat(banana.isPeeled(), is(true));
     assertThat(banana.isBitten(), is(true));
@@ -108,12 +108,12 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
   @Test
   public void nestedInterceptingWithTarget() throws Exception {
     MuleEvent event = flowRunner("nestedInterceptingWithTarget").run();
-    assertThat(event.getMessage().getPayload(), is(instanceOf(Banana.class)));
+    assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(Banana.class)));
 
     Message targetMessage = event.getVariable("banana");
-    assertThat(targetMessage.getPayload(), is(instanceOf(Banana.class)));
+    assertThat(targetMessage.getPayload().getValue(), is(instanceOf(Banana.class)));
 
-    assertThat(event.getMessage().getPayload(), is(not(sameInstance(targetMessage.getPayload()))));
+    assertThat(event.getMessage().getPayload().getValue(), is(not(sameInstance(targetMessage.getPayload().getValue()))));
 
     assertThat(config.getBananasCount(), is(2));
     assertThat(config.getNonBananasCount(), is(0));
@@ -123,6 +123,6 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
   @Test
   public void interceptingWithoutGenerics() throws Exception {
     MuleEvent event = flowRunner("InterceptingWithoutGenerics").run();
-    assertThat(event.getMessage().getPayload(), is(instanceOf(Banana.class)));
+    assertThat(event.getMessage().getPayload().getValue(), is(instanceOf(Banana.class)));
   }
 }

@@ -16,7 +16,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -29,6 +28,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +88,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void dataType() throws Exception {
-    when(message.getDataType()).thenReturn(DataType.STRING);
+    when(message.getPayload()).thenReturn(new DefaultTypedValue<Object>("", DataType.STRING));
     assertThat(evaluate("message.dataType", event), is(DataType.STRING));
     assertFinalProperty("message.mimType=2", event);
   }
@@ -98,7 +98,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
     InternalMessage message = mock(InternalMessage.class);
     when(event.getMessage()).thenReturn(message);
     Object payload = new Object();
-    when(message.getPayload()).thenReturn(payload);
+    when(message.getPayload()).thenReturn(new DefaultTypedValue<>(payload, DataType.OBJECT));
     assertSame(payload, evaluate("message.payload", event));
   }
 
@@ -107,7 +107,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
     message = InternalMessage.builder().payload("").build();
     Event.Builder eventBuilder = Event.builder(event);
     evaluate("message.payload = 'foo'", event, eventBuilder);
-    assertThat(eventBuilder.build().getMessage().getPayload(), equalTo("foo"));
+    assertThat(eventBuilder.build().getMessage().getPayload().getValue(), equalTo("foo"));
   }
 
   @Test
@@ -116,7 +116,8 @@ public class MessageContextTestCase extends AbstractELTestCase {
     TransformationService transformationService = mock(TransformationService.class);
     muleContext.setTransformationService(transformationService);
     when(transformationService.transform(any(InternalMessage.class), any(DataType.class))).thenReturn(transformedMessage);
-    assertSame(transformedMessage.getPayload(), evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", event));
+    assertSame(transformedMessage.getPayload().getValue(),
+               evaluate("message.payloadAs(org.mule.tck.testmodels.fruit.Banana)", event));
   }
 
   @Test
@@ -124,7 +125,7 @@ public class MessageContextTestCase extends AbstractELTestCase {
     String payload = TEST_PAYLOAD;
     InternalMessage transformedMessage = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
     TransformationService transformationService = mock(TransformationService.class);
-    when(transformedMessage.getPayload()).thenReturn(TEST_PAYLOAD);
+    when(transformedMessage.getPayload().getValue()).thenReturn(TEST_PAYLOAD);
     muleContext.setTransformationService(transformationService);
     when(transformationService.transform(event.getMessage(), DataType.STRING)).thenReturn(transformedMessage);
     Object result = evaluate("message.payloadAs(" + DataType.class.getName() + ".STRING)", event);

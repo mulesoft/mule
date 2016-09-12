@@ -51,12 +51,12 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
 
     try {
       if (isReturnResult()) {
-        TransformerInputs transformerInputs = new TransformerInputs(null, msg.getPayload());
+        TransformerInputs transformerInputs = new TransformerInputs(null, msg.getPayload().getValue());
         Writer jsonWriter = new StringWriter();
         if (transformerInputs.getInputStream() != null) {
           jsonWriter = new StringWriter();
           IOUtils.copy(transformerInputs.getInputStream(), jsonWriter,
-                       msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+                       msg.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
         } else {
           IOUtils.copy(transformerInputs.getReader(), jsonWriter);
         }
@@ -65,7 +65,8 @@ public class JsonSchemaXsdValidationFilter extends SchemaValidationFilter implem
         builder.message(msg);
       }
       String xmlString = (String) jToX
-          .transform(msg.getPayload(), msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+          .transform(msg.getPayload().getValue(),
+                     msg.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
       InternalMessage xmlMessage = InternalMessage.builder().payload(xmlString).build();
       boolean accepted =
           super.accept(Event.builder(event.getContext()).message(xmlMessage).flow(flowConstruct).build(), builder);

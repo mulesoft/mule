@@ -24,7 +24,7 @@ public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTest
   public void testLifecycle() throws Exception {
     final InternalMessage result = flowRunner("EchoService").withPayload("foo").run().getMessage();
 
-    final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload();
+    final LifecycleTrackerTransformer ltt = (LifecycleTrackerTransformer) result.getPayload().getValue();
 
     muleContext.dispose();
 

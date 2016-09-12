@@ -153,12 +153,12 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
     assertNotNull(message);
     assertEquals(inFile.getName(), message.getInboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
 
-    assertNotNull(message.getPayload());
+    assertNotNull(message.getPayload().getValue());
     if (streaming) {
       // We can't check ReceiverFileInputStream is received because it is
       // wrapped in a DelegatingInputStream
-      assertTrue(message.getPayload() instanceof DelegatingInputStream);
-      InputStream fis = (InputStream) message.getPayload();
+      assertTrue(message.getPayload().getValue() instanceof DelegatingInputStream);
+      InputStream fis = (InputStream) message.getPayload().getValue();
       ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
       IOUtils.copy(fis, byteOut);
 
@@ -169,8 +169,8 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
       String result = new String(byteOut.toByteArray());
       assertEquals(TEST_MESSAGE, result);
     } else {
-      assertTrue(message.getPayload() instanceof byte[]);
-      assertEquals(TEST_MESSAGE, new String((byte[]) message.getPayload()));
+      assertTrue(message.getPayload().getValue() instanceof byte[]);
+      assertEquals(TEST_MESSAGE, new String((byte[]) message.getPayload().getValue()));
     }
   }
 

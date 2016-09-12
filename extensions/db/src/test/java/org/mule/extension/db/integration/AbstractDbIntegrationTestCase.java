@@ -19,6 +19,7 @@ import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
@@ -176,9 +177,8 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
     }
 
     Message response = runner.run().getMessage();
-    assertThat(response.getPayload(), is(instanceOf(Map.class)));
-    return response.getPayload();
-
+    assertThat(response.getPayload().getValue(), is(instanceOf(Map.class)));
+    return (Map<String, Object>) response.getPayload().getValue();
   }
 
   protected MetadataResult<ComponentMetadataDescriptor> getMetadata(String flow, String query) throws RegistrationException {

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.transport.tcp.protocols;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
@@ -33,7 +33,7 @@ class MuleMessageWorker {
     InternalMessage msg = getCurrentEvent().getMessage();
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
-      wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(null));
+      wireFormat.write(baos, msg, msg.getPayload().getDataType().getMediaType().getCharset().orElse(null));
     } catch (MuleException e) {
       throw new IOException(e.getDetailedMessage());
     }

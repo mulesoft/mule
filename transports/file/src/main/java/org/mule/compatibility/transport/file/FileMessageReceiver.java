@@ -310,7 +310,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
 
     ExecutionTemplate<Event> executionTemplate = createExecutionTemplate();
     final CompatibilityMessage finalMessage = messageBuilder.build();
-    final Object originalPayload = finalMessage.getPayload();
+    final Object originalPayload = finalMessage.getPayload().getValue();
 
 
     if (fileConnector.isStreaming()) {

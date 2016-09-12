@@ -8,6 +8,7 @@ package org.mule.compatibility.core.message;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.ExceptionPayload;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.message.GroupCorrelation;
@@ -37,11 +38,6 @@ public class CompatibilityMessage implements InternalMessage {
   @Override
   public Attributes getAttributes() {
     return inner.getAttributes();
-  }
-
-  @Override
-  public DataType getDataType() {
-    return inner.getDataType();
   }
 
   @Override
@@ -110,13 +106,8 @@ public class CompatibilityMessage implements InternalMessage {
   }
 
   @Override
-  public <T> T getPayload() {
+  public <T> TypedValue<T> getPayload() {
     return inner.getPayload();
-  }
-
-  @Override
-  public Object getValue() {
-    return inner.getValue();
   }
 
   public GroupCorrelation getCorrelation() {

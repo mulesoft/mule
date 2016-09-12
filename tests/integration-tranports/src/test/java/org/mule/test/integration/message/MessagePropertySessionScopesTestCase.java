@@ -39,6 +39,6 @@ public class MessagePropertySessionScopesTestCase extends FunctionalTestCase {
   public void testInvocationProperty() throws Exception {
     InternalMessage response = flowRunner("InService2").withPayload("Hello World").run().getMessage();
     // scope = "invocation" should not propagate the property on to the next service
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
   }
 }

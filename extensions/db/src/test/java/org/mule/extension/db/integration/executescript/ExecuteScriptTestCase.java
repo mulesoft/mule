@@ -44,13 +44,13 @@ public class ExecuteScriptTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void updatesDataRequestResponse() throws Exception {
     Message response = flowRunner("executeScript").run().getMessage();
-    assertBulkModeResult(response.getPayload());
+    assertBulkModeResult(response.getPayload().getValue());
   }
 
   @Test
   public void executeScriptFromFile() throws Exception {
     Message response = flowRunner("executeScriptFromFile").run().getMessage();
-    assertBulkModeResult(response.getPayload());
+    assertBulkModeResult(response.getPayload().getValue());
   }
 
   private void assertBulkModeResult(Object payload) throws SQLException {

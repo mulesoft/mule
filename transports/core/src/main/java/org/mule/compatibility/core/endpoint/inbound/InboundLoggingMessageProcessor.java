@@ -35,7 +35,7 @@ public class InboundLoggingMessageProcessor implements Processor {
     if (logger.isTraceEnabled()) {
       try {
         logger.trace("Message Payload: \n"
-            + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload()), 200, false));
+            + StringMessageUtils.truncate(StringMessageUtils.toString(message.getPayload().getValue()), 200, false));
         logger.trace("Message detail: \n" + StringMessageUtils.headersToString(message));
       } catch (Exception e) {
         // ignore

@@ -50,7 +50,7 @@ public class EndpointReplyToHandler extends DefaultReplyToHandler {
     String replyToEndpoint = replyTo.toString();
 
     // Create a new copy of the message so that response MessageProcessors don't end up screwing up the reply
-    returnMessage = InternalMessage.builder(returnMessage).payload(returnMessage.getPayload()).build();
+    returnMessage = InternalMessage.builder(returnMessage).payload(returnMessage.getPayload().getValue()).build();
 
     // Create the replyTo event asynchronous
     Event replyToEvent = Event.builder(event).message(returnMessage).build();

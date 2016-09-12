@@ -26,7 +26,7 @@ public class ResponseTransformerOnMessageCollectionTestCase extends AbstractInte
   public void transformedDataIsNotLost() throws Exception {
     InternalMessage response = flowRunner("Distributor").withPayload(TEST_MESSAGE).run().getMessage();
 
-    assertEquals("foo", response.getPayload());
-    assertFalse(response.getPayload() instanceof List);
+    assertEquals("foo", response.getPayload().getValue());
+    assertFalse(response.getPayload().getValue() instanceof List);
   }
 }

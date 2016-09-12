@@ -107,7 +107,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     assertNotNull(result);
     InternalMessage resultMessage = result.getMessage();
     assertNotNull(resultMessage);
-    assertEquals(2, ((List<InternalMessage>) resultMessage.getPayload()).size());
+    assertEquals(2, ((List<InternalMessage>) resultMessage.getPayload().getValue()).size());
   }
 
   @Test
@@ -192,7 +192,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
   }
 
   private String getPayload(InternalMessage message) throws Exception {
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     if (payload instanceof List) {
       payload = ((List<?>) payload).get(0);
     }

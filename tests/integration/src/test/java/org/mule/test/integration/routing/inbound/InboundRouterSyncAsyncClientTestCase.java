@@ -27,7 +27,7 @@ public class InboundRouterSyncAsyncClientTestCase extends AbstractIntegrationTes
     InternalMessage result =
         flowRunner("SyncAsync").withPayload("testSync").withInboundProperty("messageType", "sync").run().getMessage();
 
-    assertThat(result.getPayload(), is("OK"));
+    assertThat(result.getPayload().getValue(), is("OK"));
   }
 
   @Test
@@ -37,6 +37,6 @@ public class InboundRouterSyncAsyncClientTestCase extends AbstractIntegrationTes
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("test://asyncResponse", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    assertThat(result.getPayload(), is("Response sent to asyncResponse"));
+    assertThat(result.getPayload().getValue(), is("Response sent to asyncResponse"));
   }
 }

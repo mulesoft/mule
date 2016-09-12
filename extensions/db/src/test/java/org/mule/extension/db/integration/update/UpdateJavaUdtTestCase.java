@@ -52,7 +52,7 @@ public class UpdateJavaUdtTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void updatesObject() throws Exception {
     Message response = flowRunner("updatesObject").run().getMessage();
-    assertThat(response.getPayload(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
+    assertThat(response.getPayload().getValue(), Matchers.<Object>equalTo(SOUTHWEST_MANAGER.getContactDetails()));
   }
 
 }

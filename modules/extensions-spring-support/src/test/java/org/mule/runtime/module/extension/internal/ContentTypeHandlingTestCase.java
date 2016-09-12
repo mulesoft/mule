@@ -54,7 +54,7 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void setsContentTypeOnXml() throws Exception {
     Event response = runFlow("setsContentTypeOnXml");
-    DataType dataType = response.getMessage().getDataType();
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertCustomEncoding(dataType);
     assertThat(dataType.getMediaType().getPrimaryType(), is(MediaType.TEXT.getPrimaryType()));
     assertThat(dataType.getMediaType().getSubType(), is(MediaType.TEXT.getSubType()));
@@ -63,7 +63,7 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void onlySetEncodingOnXml() throws Exception {
     Event response = runFlow("onlySetEncodingOnXml");
-    DataType dataType = response.getMessage().getDataType();
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertCustomEncoding(dataType);
     assertCustomMimeType(dataType);
   }
@@ -71,7 +71,7 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void onlySetMimeTypeOnXml() throws Exception {
     Event response = runFlow("onlySetMimeTypeOnXml");
-    DataType dataType = response.getMessage().getDataType();
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertDefaultEncoding(dataType);
     assertCustomMimeType(dataType);
   }
@@ -79,7 +79,7 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void maintainsContentType() throws Exception {
     Event response = flowRunner("defaultContentType").withPayload("").run();
-    final DataType responseDataType = response.getMessage().getDataType();
+    final DataType responseDataType = response.getMessage().getPayload().getDataType();
 
     assertDefaultEncoding(responseDataType);
     assertDefaultMimeType(responseDataType);
@@ -88,7 +88,7 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void setEncodingInMimeTypeAndParam() throws Exception {
     Event response = runFlow("setEncodingInMimeTypeAndParam");
-    DataType dataType = response.getMessage().getDataType();
+    DataType dataType = response.getMessage().getPayload().getDataType();
     assertThat(dataType.getMediaType().getPrimaryType(), is("application"));
     assertThat(dataType.getMediaType().getSubType(), is("json"));
     assertThat(dataType.getMediaType().getCharset().get(), is(StandardCharsets.UTF_16));
@@ -99,7 +99,7 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
     Charset lastSupportedEncoding = availableCharsets().values().stream().reduce((first, last) -> last).get();
     Event response = runFlow("setsContentTypeProgrammatically");
 
-    final DataType dataType = response.getMessage().getDataType();
+    final DataType dataType = response.getMessage().getPayload().getDataType();
     assertCustomMimeType(dataType);
     assertThat(dataType.getMediaType().getCharset().get(), is(lastSupportedEncoding));
   }
@@ -124,6 +124,6 @@ public class ContentTypeHandlingTestCase extends ExtensionFunctionalTestCase {
 
   private DataType getDefaultDataType() {
     FlowRunner runner = flowRunner("defaultContentType").withPayload("");
-    return runner.buildEvent().getMessage().getDataType();
+    return runner.buildEvent().getMessage().getPayload().getDataType();
   }
 }

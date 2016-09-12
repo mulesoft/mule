@@ -92,10 +92,10 @@ public class RegExFilter implements Filter, ObjectFilter, MuleContextAware, Init
         // If the payload is a stream and we've consumed it, then we should set the payload on the message. This is the only time
         // this method will alter the payload on the message.
         // TODO MULE-9142 See how this API can be improved to not need the builder.
-        if (event.getMessage().getDataType().isStreamType()) {
+        if (event.getMessage().getPayload().getDataType().isStreamType()) {
           builder.message(transformedMessage);
         }
-        return accept(transformedMessage.getPayload());
+        return accept(transformedMessage.getPayload().getValue());
       }
     } catch (Exception e) {
       throw new IllegalArgumentException(e);

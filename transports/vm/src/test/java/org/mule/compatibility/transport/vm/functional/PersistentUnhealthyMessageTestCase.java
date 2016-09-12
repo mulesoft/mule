@@ -41,7 +41,7 @@ public class PersistentUnhealthyMessageTestCase extends FunctionalTestCase {
     client.dispatch("vm://flowIn", "echo", null);
     InternalMessage result = client.request("vm://" + OUTPUT_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    assertEquals("echo", result.getPayload());
+    assertEquals("echo", result.getPayload().getValue());
   }
 }
 

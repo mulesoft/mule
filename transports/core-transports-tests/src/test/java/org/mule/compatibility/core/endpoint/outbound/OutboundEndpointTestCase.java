@@ -24,7 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
@@ -110,8 +110,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     Event response = endpoint.process(event);
     assertThat(response, equalTo(NonBlockingVoidMuleEvent.getInstance()));
 
-    assertThat(getNonBlockingResponse(nullReplyToHandler, response).getMessage().getPayload(),
-               equalTo(event.getMessage().getPayload()));
+    assertThat(getNonBlockingResponse(nullReplyToHandler, response).getMessage().getPayload().getValue(),
+               equalTo(event.getMessage().getPayload().getValue()));
     verify(reqTransformer, times(1)).process(any());
     verify(resTransformer, times(1)).process(any());
   }
@@ -233,10 +233,10 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
                  listener.messageNotificationList.get(1).getEndpoint());
     assertTrue(listener.messageNotificationList.get(0).getSource() instanceof InternalMessage);
     assertTrue(listener.messageNotificationList.get(1).getSource() instanceof InternalMessage);
-    assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-               equalTo(outboundEvent.getMessage().getPayload()));
+    assertThat(listener.messageNotificationList.get(0).getSource().getPayload().getValue(),
+               equalTo(outboundEvent.getMessage().getPayload().getValue()));
     assertEquals(RESPONSE_MESSAGE,
-                 listener.messageNotificationList.get(1).getSource().getPayload());
+                 listener.messageNotificationList.get(1).getSource().getPayload().getValue());
   }
 
   @Test
@@ -258,10 +258,10 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
                  listener.messageNotificationList.get(1).getEndpoint());
     assertTrue(listener.messageNotificationList.get(0).getSource() instanceof InternalMessage);
     assertTrue(listener.messageNotificationList.get(1).getSource() instanceof InternalMessage);
-    assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-               equalTo(outboundEvent.getMessage().getPayload()));
-    assertThat(listener.messageNotificationList.get(1).getSource().getPayload(),
-               equalTo(outboundEvent.getMessage().getPayload()));
+    assertThat(listener.messageNotificationList.get(0).getSource().getPayload().getValue(),
+               equalTo(outboundEvent.getMessage().getPayload().getValue()));
+    assertThat(listener.messageNotificationList.get(1).getSource().getPayload().getValue(),
+               equalTo(outboundEvent.getMessage().getPayload().getValue()));
   }
 
   @Test
@@ -337,8 +337,8 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   }
 
   protected void assertEqualMessages(InternalMessage expect, InternalMessage actual) {
-    assertThat(actual.getPayload(), equalTo(expect.getPayload()));
-    assertEquals(expect.getDataType(), actual.getDataType());
+    assertThat(actual.getPayload().getValue(), equalTo(expect.getPayload().getValue()));
+    assertEquals(expect.getPayload().getDataType(), actual.getPayload().getDataType());
   }
 
   protected OutboundEndpoint createOutboundEndpoint(String uri, Filter filter,

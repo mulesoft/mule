@@ -119,7 +119,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
     public Object onCall(MuleEventContext context) throws Exception {
       // there should not be any transformers configured by default, so the
       // return message should be a byte[]
-      super.setReturnData(context.getMessage().getPayload());
+      super.setReturnData(context.getMessage().getPayload().getValue());
       return super.onCall(context);
     }
   }

@@ -32,7 +32,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
     flowRunner("inlineScript").withPayload("hello").asynchronously().run();
     InternalMessage response = client.request("test://inlineScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertEquals("hexxo", response.getPayload());
+    assertEquals("hexxo", response.getPayload().getValue());
   }
 
   @Test
@@ -41,7 +41,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
     flowRunner("fileBasedScript").withPayload("hello").asynchronously().run();
     InternalMessage response = client.request("test://fileBasedScriptTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertEquals("hexxo", response.getPayload());
+    assertEquals("hexxo", response.getPayload().getValue());
   }
 
   @Test
@@ -50,7 +50,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
     flowRunner("referencedTransformer").withPayload("hello").asynchronously().run();
     InternalMessage response = client.request("test://referencedTransformerTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertEquals("hexxo", response.getPayload());
+    assertEquals("hexxo", response.getPayload().getValue());
   }
 
   @Test
@@ -60,21 +60,21 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
     InternalMessage response =
         client.request("test://referencedTransformerWithParametersTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertEquals("hexxo", response.getPayload());
+    assertEquals("hexxo", response.getPayload().getValue());
   }
 
   @Test
   public void transformByAssigningPayload() throws Exception {
     InternalMessage response = flowRunner("transformByAssigningPayload").withPayload("hello").run().getMessage();
     assertNotNull(response);
-    assertEquals("bar", response.getPayload());
+    assertEquals("bar", response.getPayload().getValue());
   }
 
   @Test
   public void transformByAssigningHeader() throws Exception {
     InternalMessage response = flowRunner("transformByAssigningProperty").withPayload("hello").run().getMessage();
     assertNotNull(response);
-    assertEquals("hello", response.getPayload());
+    assertEquals("hello", response.getPayload().getValue());
     assertEquals("bar", response.getOutboundProperty("foo"));
   }
 

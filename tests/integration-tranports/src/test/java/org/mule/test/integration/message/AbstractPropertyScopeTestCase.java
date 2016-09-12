@@ -27,7 +27,7 @@ public abstract class AbstractPropertyScopeTestCase extends FunctionalTestCase {
     InternalMessage result =
         flowRunner("foo").withPayload(TEST_PAYLOAD).withInboundProperty("foo", "fooValue").run().getMessage();
 
-    assertThat(result.getPayload(), is("test bar"));
+    assertThat(result.getPayload().getValue(), is("test bar"));
     assertThat(result.getOutboundProperty("foo"), is("fooValue"));
   }
 

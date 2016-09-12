@@ -112,7 +112,7 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase {
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      return eventContext.getMessage().getDataType().getMediaType().toRfcString();
+      return eventContext.getMessage().getPayload().getDataType().getMediaType().toRfcString();
     }
   }
 }

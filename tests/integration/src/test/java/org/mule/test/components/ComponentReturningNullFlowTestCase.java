@@ -30,7 +30,7 @@ public class ComponentReturningNullFlowTestCase extends AbstractIntegrationTestC
     final String payload = getPayloadAsString(msg);
     assertNotNull(payload);
     assertFalse("ERROR".equals(payload));
-    assertThat(msg.getPayload(), is(nullValue()));
+    assertThat(msg.getPayload().getValue(), is(nullValue()));
   }
 
   public static final class ComponentReturningNull {

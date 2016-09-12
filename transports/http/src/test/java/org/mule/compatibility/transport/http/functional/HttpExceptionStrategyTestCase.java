@@ -44,7 +44,7 @@ public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
     String url = String.format("http://localhost:%d/flowWithoutExceptionStrategySync", port1.getNumber());
     InternalMessage response = muleContext.getClient().send(url, TEST_MESSAGE, null, TIMEOUT).getRight();
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), not(nullValue()));
+    assertThat(response.getPayload().getValue(), not(nullValue()));
     assertThat(getPayloadAsString(response), not(TEST_MESSAGE));
     assertThat(response.getExceptionPayload(), notNullValue()); // to be fixed
     assertThat(response.getExceptionPayload(), instanceOf(ExceptionPayload.class)); // to be review/fixed

@@ -46,7 +46,7 @@ public class OneWayOutboundTestCase extends FunctionalTestCase {
   }
 
   private void assertOneWayResponse(Event event) throws Exception {
-    assertThat(event.getMessage().getPayload(), is(nullValue()));
+    assertThat(event.getMessage().getPayload().getValue(), is(nullValue()));
     assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(ACCEPTED.getStatusCode()));
 
     AsyncService component = (AsyncService) getComponent("asyncService");

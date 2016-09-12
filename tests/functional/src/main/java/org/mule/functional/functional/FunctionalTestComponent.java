@@ -6,7 +6,7 @@
  */
 package org.mule.functional.functional;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -134,7 +134,7 @@ public class FunctionalTestComponent
 
   private Object getMessageFromContext(MuleEventContext context) throws MuleException {
     if (isDoInboundTransform()) {
-      Object o = context.getMessage().getPayload();
+      Object o = context.getMessage().getPayload().getValue();
       if (getAppendString() != null && !(o instanceof String)) {
         o = context.transformMessageToString(muleContext);
       }
@@ -142,7 +142,7 @@ public class FunctionalTestComponent
     } else if (getAppendString() != null) {
       return context.getMessageAsString(muleContext);
     } else {
-      return context.getMessage().getPayload();
+      return context.getMessage().getPayload().getValue();
     }
   }
 
@@ -229,7 +229,7 @@ public class FunctionalTestComponent
       StringBuilder sb = new StringBuilder();
 
       sb.append("Full Message payload: ").append(SystemUtils.LINE_SEPARATOR);
-      sb.append(message.getPayload().toString()).append(SystemUtils.LINE_SEPARATOR);
+      sb.append(message.getPayload().getValue().toString()).append(SystemUtils.LINE_SEPARATOR);
       sb.append(StringMessageUtils.headersToString(message));
       logger.info(sb.toString());
     }

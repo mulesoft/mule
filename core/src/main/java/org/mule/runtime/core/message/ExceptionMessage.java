@@ -44,7 +44,7 @@ public class ExceptionMessage implements Serializable {
   private Date timeStamp;
 
   public ExceptionMessage(Event event, Throwable exception, String componentName, String connectorName) {
-    this.payload = event.getMessage().getPayload();
+    this.payload = event.getMessage().getPayload().getValue();
     properties = new HashMap<>();
     this.exception = exception;
     timeStamp = new Date();

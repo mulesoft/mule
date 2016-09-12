@@ -28,19 +28,19 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFilterFalse() throws Exception {
     assertFalse(filter
-        .accept(Message.builder().payload("This is definitely not JSON.").build().getPayload()));
+        .accept(Message.builder().payload("This is definitely not JSON.").build().getPayload().getValue()));
   }
 
   @Test
   public void testFilterFalse2() throws Exception {
     assertFalse(filter.accept(Message.builder()
-        .payload("{name=\"This may be JSON\",bool:}").build().getPayload()));
+        .payload("{name=\"This may be JSON\",bool:}").build().getPayload().getValue()));
   }
 
   @Test
   public void testFilterFalse3() throws Exception {
     assertFalse(filter.accept(Message.builder()
-        .payload("[name=\"This may be JSON\",bool:]").build().getPayload()));
+        .payload("[name=\"This may be JSON\",bool:]").build().getPayload().getValue()));
   }
 
   @Test
@@ -49,17 +49,17 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
                              org.mule.runtime.core.api.InternalMessage.builder()
                                  .payload("{\n" + "        \"in_reply_to_user_id\":null,\n"
                                      + "        \"text\":\"test from Mule: " + "6ffca02b-9d52-475e-8b17-946acdb01492\"}")
-                                 .build().getPayload()));
+                                 .build().getPayload().getValue()));
   }
 
   @Test
   public void testFilterNull() throws Exception {
-    assertFalse(filter.accept(Message.builder().nullPayload().build().getPayload()));
+    assertFalse(filter.accept(Message.builder().nullPayload().build().getPayload().getValue()));
   }
 
   @Test
   public void testFilterWithObject() throws Exception {
-    assertFalse(filter.accept(Message.builder().payload(new Object()).build().getPayload()));
+    assertFalse(filter.accept(Message.builder().payload(new Object()).build().getPayload().getValue()));
   }
 
 }

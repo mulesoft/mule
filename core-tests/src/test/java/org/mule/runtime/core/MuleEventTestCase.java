@@ -10,7 +10,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -112,7 +112,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
 
-    assertArrayEquals((byte[]) testEvent.getMessage().getPayload(), payload.toString().getBytes());
+    assertArrayEquals((byte[]) testEvent.getMessage().getPayload().getValue(), payload.toString().getBytes());
   }
 
   private void createAndRegisterTransformersEndpointBuilderService() throws Exception {

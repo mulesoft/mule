@@ -84,12 +84,12 @@ public class DefaultEntryPointResolverSetMultithreadingTestCase extends Abstract
           Event event = flowRunner("flowTestSync").withPayload(payload).run();
           final InternalMessage outbound = event.getMessage();
           assertThat(event.getError().isPresent(), is(false));
-          assertNotNull(outbound.getPayload());
+          assertNotNull(outbound.getPayload().getValue());
           byte[] bytes = null;
-          if (outbound.getPayload() instanceof byte[]) {
-            bytes = (byte[]) outbound.getPayload();
-          } else if (outbound.getPayload() instanceof List) {
-            final List<?> list = (List<?>) outbound.getPayload();
+          if (outbound.getPayload().getValue() instanceof byte[]) {
+            bytes = (byte[]) outbound.getPayload().getValue();
+          } else if (outbound.getPayload().getValue() instanceof List) {
+            final List<?> list = (List<?>) outbound.getPayload().getValue();
             assertEquals(1, list.size());
             assertTrue(list.get(0) instanceof byte[]);
             bytes = (byte[]) list.get(0);

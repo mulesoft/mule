@@ -38,7 +38,7 @@ public class TestRecordUtil {
   }
 
   public static void assertMessageContains(Message message, Record... records) {
-    assertRecords(message.getPayload(), records);
+    assertRecords(message.getPayload().getValue(), records);
   }
 
   public static void assertRecords(Object value, Record... records) {

@@ -76,6 +76,6 @@ public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
   }
 
   private void verifyRequest(String flowName) throws Exception {
-    assertThat(IOUtils.toString((InputStream) runFlow(flowName).getMessage().getPayload()), is(DEFAULT_RESPONSE));
+    assertThat(IOUtils.toString((InputStream) runFlow(flowName).getMessage().getPayload().getValue()), is(DEFAULT_RESPONSE));
   }
 }

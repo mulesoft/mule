@@ -34,12 +34,12 @@ public class TransformersInvokedFromResponseTestCase extends FunctionalTestCase 
     InternalMessage test = client.send("jms://testQueue", "TEST1", null).getRight();
     assertNotNull(test);
     assertEquals(1, counter1);
-    assertEquals("TEST1 transformed", test.getPayload());
+    assertEquals("TEST1 transformed", test.getPayload().getValue());
 
     test = client.send("jms://testQueue", "TEST2", null).getRight();
     assertNotNull(test);
     assertEquals(2, counter1);
-    assertEquals("TEST2 transformed", test.getPayload());
+    assertEquals("TEST2 transformed", test.getPayload().getValue());
   }
 
   public static class InvocationCounterTransformer1 extends AbstractTransformer {

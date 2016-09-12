@@ -74,8 +74,8 @@ public class EventMetaDataPropagationTestCase extends AbstractIntegrationTestCas
         assertEquals(12345, msg.<Integer>getInboundProperty("integerParam", 0).intValue());
         assertEquals(123456789, msg.<Long>getInboundProperty("longParam", 0L).longValue());
         assertEquals(Boolean.TRUE, msg.getInboundProperty("booleanParam", Boolean.FALSE));
-        assertThat(msg.getPayload(), instanceOf(DefaultMultiPartContent.class));
-        assertThat(((MultiPartContent) msg.getPayload()).getPart("test1"), not(nullValue()));
+        assertThat(msg.getPayload().getValue(), instanceOf(DefaultMultiPartContent.class));
+        assertThat(((MultiPartContent) msg.getPayload().getValue()).getPart("test1"), not(nullValue()));
       }
       return null;
     }

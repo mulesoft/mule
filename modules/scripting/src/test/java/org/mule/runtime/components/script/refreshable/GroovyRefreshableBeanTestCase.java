@@ -18,7 +18,7 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
   public static final String NAME_BEAN = "groovy-dynamic-script-bean.groovy";
   public static final String NAME_CHANGE_INTERFACE = "groovy-dynamic-script.groovy";
   public static final String ON_CALL_RECEIVED =
-      "import org.mule.runtime.core.api.MuleEventContext; import org.mule.runtime.core.api.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(MuleEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayload() + \""
+      "import org.mule.runtime.core.api.MuleEventContext; import org.mule.runtime.core.api.lifecycle.Callable; public class GroovyDynamicScript implements Callable { public Object onCall(MuleEventContext eventContext) throws Exception{ return eventContext.getMessage().getPayload().getValue() + \""
           + RECEIVED + "\"; }}";
   public static final String ON_CALL_RECEIVED2 = ON_CALL_RECEIVED.replaceAll(RECEIVED, RECEIVED2);
   public static final String RECEIVE_RECEIVED =

@@ -46,7 +46,7 @@ public class MuleHttpServletResponse implements HttpServletResponse {
 
   @Override
   public String getCharacterEncoding() {
-    return event.getMessage().getDataType().getMediaType().getCharset().get().name();
+    return event.getMessage().getPayload().getDataType().getMediaType().getCharset().get().name();
   }
 
   @Override
@@ -67,7 +67,8 @@ public class MuleHttpServletResponse implements HttpServletResponse {
   @Override
   public void setCharacterEncoding(String charset) {
     message =
-        InternalMessage.builder(message).mediaType(message.getDataType().getMediaType().withCharset(Charset.forName(charset)))
+        InternalMessage.builder(message)
+            .mediaType(message.getPayload().getDataType().getMediaType().withCharset(Charset.forName(charset)))
             .build();
   }
 

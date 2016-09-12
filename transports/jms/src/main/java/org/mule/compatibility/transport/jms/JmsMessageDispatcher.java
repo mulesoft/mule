@@ -294,7 +294,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
   }
 
   private Message getJmsMessagePayload(Event event) throws DispatchException {
-    Object message = event.getMessage().getPayload();
+    Object message = event.getMessage().getPayload().getValue();
     if (!(message instanceof Message)) {
       throw new DispatchException(JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()),
                                   getEndpoint());

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.xml.el;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 
@@ -157,7 +157,7 @@ public class XPath3Function implements ExpressionLanguageFunction {
       Object result = xpathEvaluatorSupplier.get().evaluate(xpathExpression, node, returnType, event);
 
       InternalMessage message = event.getMessage();
-      if (input == message.getPayload() && message.getDataType().isStreamType()) {
+      if (input == message.getPayload().getValue() && message.getPayload().getDataType().isStreamType()) {
         ctx.setPayload(node);
       }
 
@@ -203,7 +203,7 @@ public class XPath3Function implements ExpressionLanguageFunction {
       return params[1];
     }
 
-    return event.getMessage().getPayload();
+    return event.getMessage().getPayload().getValue();
   }
 
   private void validateParams(Object[] params) {

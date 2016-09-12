@@ -57,6 +57,6 @@ public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleConte
     dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
     testEvent = builder.build();
 
-    assertThat(testEvent.getMessage().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(testEvent.getMessage().getPayload().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
   }
 }

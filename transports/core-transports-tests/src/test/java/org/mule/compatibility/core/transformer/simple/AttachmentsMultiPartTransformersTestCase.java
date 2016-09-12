@@ -85,7 +85,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
 
     assertThat(response.getOutboundAttachmentNames(), hasSize(1));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment"));
-    assertThat(response.getPayload(), equalTo(TEST_PAYLOAD));
+    assertThat(response.getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
@@ -104,7 +104,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     assertThat(response.getOutboundAttachmentNames(), hasSize(2));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment1"));
     assertThat(response.getOutboundAttachmentNames(), hasItem("attachment2"));
-    assertThat(response.getPayload(), nullValue());
+    assertThat(response.getPayload().getValue(), nullValue());
   }
 
   @Test
@@ -117,10 +117,10 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     final InternalMessage response =
         (InternalMessage) a2mp.transform(message, Event.builder(context).message(message).flow(flow).build());
 
-    assertThat(response.getPayload(), instanceOf(MultiPartContent.class));
-    assertThat(((MultiPartContent) response.getPayload()).getParts(), hasSize(2));
-    assertThat(((DefaultMultiPartContent) response.getPayload()).hasBodyPart(), is(true));
-    assertThat(((MultiPartContent) response.getPayload()).getPartNames(), hasItem("attachment"));
+    assertThat(response.getPayload().getValue(), instanceOf(MultiPartContent.class));
+    assertThat(((MultiPartContent) response.getPayload().getValue()).getParts(), hasSize(2));
+    assertThat(((DefaultMultiPartContent) response.getPayload().getValue()).hasBodyPart(), is(true));
+    assertThat(((MultiPartContent) response.getPayload().getValue()).getPartNames(), hasItem("attachment"));
   }
 
   @Test
@@ -132,10 +132,10 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     final InternalMessage response =
         (InternalMessage) a2mp.transform(message, Event.builder(context).message(message).flow(flow).build());
 
-    assertThat(response.getPayload(), instanceOf(MultiPartContent.class));
-    assertThat(((MultiPartContent) response.getPayload()).getParts(), hasSize(1));
-    assertThat(((DefaultMultiPartContent) response.getPayload()).hasBodyPart(), is(false));
-    assertThat(((MultiPartContent) response.getPayload()).getPartNames(), hasItem("attachment"));
+    assertThat(response.getPayload().getValue(), instanceOf(MultiPartContent.class));
+    assertThat(((MultiPartContent) response.getPayload().getValue()).getParts(), hasSize(1));
+    assertThat(((DefaultMultiPartContent) response.getPayload().getValue()).hasBodyPart(), is(false));
+    assertThat(((MultiPartContent) response.getPayload().getValue()).getPartNames(), hasItem("attachment"));
   }
 
 }

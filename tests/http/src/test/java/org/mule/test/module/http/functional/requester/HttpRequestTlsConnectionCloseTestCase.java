@@ -42,6 +42,6 @@ public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTe
   @Test
   public void handlesRequest() throws Exception {
     Event response = flowRunner("testFlowHttps").withPayload(TEST_PAYLOAD).run();
-    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload()), is(DEFAULT_RESPONSE));
+    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload().getValue()), is(DEFAULT_RESPONSE));
   }
 }

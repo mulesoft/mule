@@ -90,7 +90,7 @@ public class HttpMessageProcessTemplateTestCase {
     InternalMessage retMessage = template.createMessageFromSource(PAYLOAD);
 
     assertThat(retMessage, is(notNullValue()));
-    assertThat(retMessage.getPayload(), is(notNullValue()));
+    assertThat(retMessage.getPayload().getValue(), is(notNullValue()));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS), is(equalTo(CLIENT_ADDRESS)));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_PROXY_ADDRESS), is(nullValue()));
   }
@@ -104,7 +104,7 @@ public class HttpMessageProcessTemplateTestCase {
 
     InternalMessage retMessage = template.createMessageFromSource(PAYLOAD);
     assertThat(retMessage, is(notNullValue()));
-    assertThat(retMessage.getPayload(), is(notNullValue()));
+    assertThat(retMessage.getPayload().getValue(), is(notNullValue()));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS), is(equalTo(CLIENT_ADDRESS)));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_PROXY_ADDRESS), is(equalTo(PROXY_1_ADDRESS)));
   }
@@ -118,7 +118,7 @@ public class HttpMessageProcessTemplateTestCase {
 
     InternalMessage retMessage = template.createMessageFromSource(PAYLOAD);
     assertThat(retMessage, is(notNullValue()));
-    assertThat(retMessage.getPayload(), is(notNullValue()));
+    assertThat(retMessage.getPayload().getValue(), is(notNullValue()));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS), is(equalTo(CLIENT_ADDRESS)));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_PROXY_ADDRESS), is(equalTo(PROXY_1_ADDRESS)));
   }
@@ -132,7 +132,7 @@ public class HttpMessageProcessTemplateTestCase {
 
     InternalMessage retMessage = template.createMessageFromSource(PAYLOAD);
     assertThat(retMessage, is(notNullValue()));
-    assertThat(retMessage.getPayload(), is(notNullValue()));
+    assertThat(retMessage.getPayload().getValue(), is(notNullValue()));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS), is(equalTo(CLIENT_ADDRESS)));
     assertThat(retMessage.<String>getInboundProperty(MuleProperties.MULE_PROXY_ADDRESS), is(equalTo(PROXY_2_ADDRESS)));
   }

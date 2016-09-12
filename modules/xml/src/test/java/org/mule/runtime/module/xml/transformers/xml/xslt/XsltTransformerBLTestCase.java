@@ -41,7 +41,7 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase {
   public void enabled() throws Exception {
     String input = makeInput();
     Object payload = input.getBytes();
-    String output = (String) flowRunner("flowBLEnabled").withPayload(payload).run().getMessage().getPayload();
+    String output = (String) flowRunner("flowBLEnabled").withPayload(payload).run().getMessage().getPayload().getValue();
     assertThat(output, containsString("010101010101010101010101010101010101010101010101"));
   }
 
@@ -49,7 +49,7 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase {
   public void disabled() throws Exception {
     String input = makeInput();
     Object payload = input.getBytes();
-    String output = (String) flowRunner("flowBLDisabled").withPayload(payload).run().getMessage().getPayload();
+    String output = (String) flowRunner("flowBLDisabled").withPayload(payload).run().getMessage().getPayload().getValue();
     assertThat(output, not(containsString("010101010101010101010101010101010101010101010101")));
   }
 }

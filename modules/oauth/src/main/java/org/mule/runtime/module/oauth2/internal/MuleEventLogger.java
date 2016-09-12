@@ -32,7 +32,7 @@ public class MuleEventLogger {
    * @param muleEvent event to log.
    */
   public void logContent(Event muleEvent) {
-    logger.error("Message content type is " + muleEvent.getMessage().getDataType().getType());
+    logger.error("Message content type is " + muleEvent.getMessage().getPayload().getDataType().getType());
     logger.error("Message content is " + muleEvent.getMessage());
     try {
       String payloadAsString = muleContext.getTransformationService().getPayloadForLogging(muleEvent.getMessage());

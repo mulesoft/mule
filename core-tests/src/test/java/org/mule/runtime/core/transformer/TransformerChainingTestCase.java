@@ -44,7 +44,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
     Transformer messageTransformer = new TransformerChain(validTransformer);
     message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
 
-    Object transformedMessage = message.getPayload();
+    Object transformedMessage = message.getPayload().getValue();
     assertNotNull(transformedMessage);
     assertEquals(new Integer(1), transformedMessage);
   }
@@ -58,7 +58,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
     Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
     message = transformationService.applyTransformers(message, getTestEvent(0), singletonList(messageTransformer));
 
-    Object transformedMessage = message.getPayload();
+    Object transformedMessage = message.getPayload().getValue();
     assertNotNull(transformedMessage);
     assertEquals(new Integer(2), transformedMessage);
   }
@@ -72,7 +72,7 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
     Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
     message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
 
-    Object transformedMessage = message.getPayload();
+    Object transformedMessage = message.getPayload().getValue();
     assertNotNull(transformedMessage);
     assertEquals(new Integer(3), transformedMessage);
   }

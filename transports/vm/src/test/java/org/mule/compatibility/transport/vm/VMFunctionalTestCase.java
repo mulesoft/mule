@@ -48,7 +48,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase {
     client.dispatch("vm://in", "Marco", null);
     InternalMessage response = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull("Response is null", response);
-    assertEquals("Polo", response.getPayload());
+    assertEquals("Polo", response.getPayload().getValue());
   }
 
   @Test
@@ -57,7 +57,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase {
     client.dispatch("vm://in", "Marco", null);
     InternalMessage response = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull("Response is null", response);
-    assertEquals("Polo", response.getPayload());
+    assertEquals("Polo", response.getPayload().getValue());
   }
 
   @Test
@@ -70,7 +70,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase {
     for (int i = 0; i < 3; ++i) {
       response = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
       assertNotNull("Response is null", response);
-      assertEquals("Polo", response.getPayload());
+      assertEquals("Polo", response.getPayload().getValue());
     }
 
     assertThat(client.request("vm://out", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
@@ -82,7 +82,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase {
     client.dispatch("vm://in1", "Marco", null);
     InternalMessage response = client.request("vm://out1", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull("Response is null", response);
-    assertEquals("Polo", response.getPayload());
+    assertEquals("Polo", response.getPayload().getValue());
     assertTrue(CustomObjectStore.count > 0); // ensure custom store was used
   }
 
@@ -91,7 +91,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.send("vm://in2", "Marco", null).getRight();
     assertNotNull("Response is null", response);
-    assertEquals("Polo", response.getPayload());
+    assertEquals("Polo", response.getPayload().getValue());
   }
 
   @Test
@@ -100,7 +100,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase {
     client.dispatch("vm://in", "Marco", null);
     InternalMessage response = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull("Response is null", response);
-    assertEquals("Polo", response.getPayload());
+    assertEquals("Polo", response.getPayload().getValue());
     assertThat(client.request("vm://out", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));
   }
 

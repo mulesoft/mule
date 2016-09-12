@@ -92,7 +92,7 @@ public class JmsReconnectionActiveMQTestCase extends AbstractBrokerFunctionalTes
     flowRunner("put").withPayload(TEST_MESSAGE).run();
     InternalMessage message = muleContext.getClient().request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
-    assertEquals(TEST_MESSAGE, message.getPayload());
+    assertEquals(TEST_MESSAGE, message.getPayload().getValue());
   }
 
 

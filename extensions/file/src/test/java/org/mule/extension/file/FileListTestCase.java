@@ -110,7 +110,7 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   @Test
   public void listWithoutPath() throws Exception {
-    TreeNode node = (TreeNode) flowRunner("listWithoutPath").run().getMessage().getPayload();
+    TreeNode node = (TreeNode) flowRunner("listWithoutPath").run().getMessage().getPayload().getValue();
 
     assertThat(node.getAttributes().getPath(), is(equalTo(temporaryFolder.getRoot().getAbsolutePath())));
     assertThat(node.getChilds(), hasSize(6));
@@ -141,7 +141,7 @@ public class FileListTestCase extends FileConnectorTestCase {
 
   private TreeNode doList(String flowName, String path, boolean recursive) throws Exception {
     TreeNode node = (TreeNode) flowRunner(flowName).withFlowVariable("path", path).withFlowVariable("recursive", recursive).run()
-        .getMessage().getPayload();
+        .getMessage().getPayload().getValue();
 
     assertThat(node, is(notNullValue()));
     assertThat(node.getContent(), is(nullValue()));

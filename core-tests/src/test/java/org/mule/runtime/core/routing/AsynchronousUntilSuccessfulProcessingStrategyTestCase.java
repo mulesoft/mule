@@ -244,7 +244,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
       @Override
       public boolean matches(Object argument) {
         Event argEvent = (Event) argument;
-        assertThat(argEvent.getMessage().getPayload(), sameInstance(event.getMessage().getPayload()));
+        assertThat(argEvent.getMessage().getPayload().getValue(), sameInstance(event.getMessage().getPayload().getValue()));
         assertThat(argEvent.getMessage().getExceptionPayload().getException().getMessage(),
                    containsString("until-successful retries exhausted. Last exception message was: " + EXPECTED_FAILURE_MSG));
 
@@ -300,7 +300,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstr
     verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage(), times(1))
         .evaluate(eq(ackExpression), any(Event.class), eq(null));
 
-    assertThat(result.getMessage().getPayload(), is(expressionEvalutaionResult));
+    assertThat(result.getMessage().getPayload().getValue(), is(expressionEvalutaionResult));
     verify(mockFlow.getExceptionListener(), never()).handleException(any(MessagingException.class), eq(event));
   }
 

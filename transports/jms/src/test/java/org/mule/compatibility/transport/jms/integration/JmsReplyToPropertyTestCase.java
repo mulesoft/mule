@@ -44,6 +44,6 @@ public class JmsReplyToPropertyTestCase extends AbstractJmsFunctionalTestCase {
     // Check that the reply message was generated
     output = client.request("middle", 2000).getRight().get();
     assertNotNull(output);
-    assertEquals(DEFAULT_OUTPUT_MESSAGE, output.getPayload());
+    assertEquals(DEFAULT_OUTPUT_MESSAGE, output.getPayload().getValue());
   }
 }

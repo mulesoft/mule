@@ -30,16 +30,17 @@ public class MapSplitter extends AbstractSplitter {
   @Override
   protected List<Event> splitMessage(Event event) {
     InternalMessage message = event.getMessage();
-    if (message.getPayload() instanceof Map<?, ?>) {
+    if (message.getPayload().getValue() instanceof Map<?, ?>) {
       List<Event> list = new LinkedList<>();
-      Set<Map.Entry<?, ?>> set = ((Map) message.getPayload()).entrySet();
+      Set<Map.Entry<?, ?>> set = ((Map) message.getPayload().getValue()).entrySet();
       for (Entry<?, ?> entry : set) {
         // TODO MULE-9502 Support "key" flowVar with MapSplitter in Mule 4
         list.add(Event.builder(event).message(InternalMessage.builder().payload(entry.getValue()).build()).build());
       }
       return list;
     } else {
-      throw new IllegalArgumentException(objectNotOfCorrectType(message.getDataType().getType(), Map.class).getMessage());
+      throw new IllegalArgumentException(objectNotOfCorrectType(message.getPayload().getDataType().getType(), Map.class)
+          .getMessage());
     }
   }
 }

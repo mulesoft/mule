@@ -39,7 +39,7 @@ public class HttpPostWithMapPayloadTestCase extends FunctionalTestCase {
     client.dispatch("vm://testInput", mapPayload, null);
 
     InternalMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
-    assertEquals(mapPayload, response.getPayload());
+    assertEquals(mapPayload, response.getPayload().getValue());
   }
 
 }

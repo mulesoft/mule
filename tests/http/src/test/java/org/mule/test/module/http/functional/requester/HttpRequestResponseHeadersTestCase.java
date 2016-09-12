@@ -72,6 +72,6 @@ public class HttpRequestResponseHeadersTestCase extends AbstractHttpRequestTestC
 
   private void testHeaders(String flowName, String expectedResponse) throws Exception {
     InternalMessage response = flowRunner(flowName).run().getMessage();
-    assertThat(response.getPayload(), is(expectedResponse));
+    assertThat(response.getPayload().getValue(), is(expectedResponse));
   }
 }

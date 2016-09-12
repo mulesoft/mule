@@ -72,7 +72,7 @@ public class CustomRouteResolver implements DynamicRouteResolver {
             .builder(event).message(
                                     InternalMessage.builder(event.getMessage())
                                         .payload(muleContext.getTransformationService()
-                                            .transform(event.getMessage(), DataType.STRING).getPayload() + letter)
+                                            .transform(event.getMessage(), DataType.STRING).getPayload().getValue() + letter)
                                         .build())
             .build();
       } catch (Exception e) {

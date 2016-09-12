@@ -135,7 +135,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
         bindParameters(transformer, event);
 
-        bindDocument(event.getMessage().getPayload(), transformer);
+        bindDocument(event.getMessage().getPayload().getValue(), transformer);
         XQResultSequence result = transformer.executeQuery();
         // No support for return Arrays yet
         List<Object> results = new ArrayList<>();

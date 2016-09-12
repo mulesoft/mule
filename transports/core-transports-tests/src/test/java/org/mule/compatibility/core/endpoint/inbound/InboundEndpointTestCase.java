@@ -24,7 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
@@ -246,7 +246,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     result = mpChain.process(requestEvent);
 
     assertMessageSentSame(true);
-    assertThat(result.getMessage().getPayload(), equalTo(responseEvent.getMessage().getPayload()));
+    assertThat(result.getMessage().getPayload().getValue(), equalTo(responseEvent.getMessage().getPayload().getValue()));
     final int status = result.getMessage().getOutboundProperty("status", 0);
     assertEquals(500, status);
   }
@@ -297,7 +297,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     assertEquals(endpoint.getEndpointURI().getUri().toString(),
                  listener.messageNotification.getEndpoint());
     assertTrue(listener.messageNotification.getSource() instanceof InternalMessage);
-    assertThat(listener.messageNotification.getSource().getPayload(), equalTo(inMessage.getPayload()));
+    assertThat(listener.messageNotification.getSource().getPayload().getValue(), equalTo(inMessage.getPayload().getValue()));
   }
 
   @Test
@@ -370,7 +370,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   protected Event assertMessageSentSame(boolean sync) throws MuleException {
     assertMessageSent(sync);
     Event event = inboundListener.sensedEvent;
-    assertThat(event.getMessage().getPayload(), equalTo(requestEvent.getMessage().getPayload()));
+    assertThat(event.getMessage().getPayload().getValue(), equalTo(requestEvent.getMessage().getPayload().getValue()));
     assertEquals(TEST_MESSAGE, event.getMessageAsString(muleContext));
     assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
     return event;

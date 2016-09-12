@@ -34,6 +34,6 @@ public class TCPTimeoutsTest extends FunctionalTestCase {
 
     final InternalMessage result = client.send("vm://testIn", TEST_MESSAGE, null).getRight();
 
-    assertThat(result.getPayload(), is(nullValue()));
+    assertThat(result.getPayload().getValue(), is(nullValue()));
   }
 }

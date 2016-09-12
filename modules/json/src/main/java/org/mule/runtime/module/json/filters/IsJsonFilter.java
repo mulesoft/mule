@@ -40,11 +40,11 @@ public class IsJsonFilter implements Filter, MuleContextAware {
 
   @Override
   public boolean accept(InternalMessage obj, Event.Builder builder) {
-    if (MediaType.APPLICATION_JSON.matches(obj.getDataType().getMediaType())) {
+    if (MediaType.APPLICATION_JSON.matches(obj.getPayload().getDataType().getMediaType())) {
       return true;
     }
     try {
-      return accept(muleContext.getTransformationService().transform(obj, DataType.STRING).getPayload());
+      return accept(muleContext.getTransformationService().transform(obj, DataType.STRING).getPayload().getValue());
     } catch (Exception e) {
       logger.warn("Failed to read object payload as string for isJsonFilter", e);
       return false;

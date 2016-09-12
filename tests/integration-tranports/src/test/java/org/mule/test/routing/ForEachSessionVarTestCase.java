@@ -60,8 +60,8 @@ public class ForEachSessionVarTestCase extends FunctionalTestCase {
     payload.add("mozart");
 
     InternalMessage result = flowRunner("counter-config").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(3));
     assertSame(payload, resultPayload);
 

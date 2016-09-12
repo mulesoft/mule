@@ -8,9 +8,9 @@ package org.mule.runtime.core.el.context;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.io.Serializable;
@@ -58,11 +58,11 @@ public class MessageContext {
   }
 
   public DataType getDataType() {
-    return event.getMessage().getDataType();
+    return event.getMessage().getPayload().getDataType();
   }
 
   public Object getPayload() {
-    return event.getMessage().getPayload();
+    return event.getMessage().getPayload() != null ? event.getMessage().getPayload().getValue() : null;
   }
 
   /**
@@ -75,7 +75,7 @@ public class MessageContext {
   public <T> T payloadAs(Class<T> type) throws TransformerException {
     eventBuilder.message(muleContext.getTransformationService().transform(event.getMessage(), DataType.fromType(type)));
     event = eventBuilder.build();
-    return (T) event.getMessage().getPayload();
+    return (T) event.getMessage().getPayload().getValue();
   }
 
   /**
@@ -88,7 +88,7 @@ public class MessageContext {
   public Object payloadAs(DataType dataType) throws TransformerException {
     eventBuilder.message(muleContext.getTransformationService().transform(event.getMessage(), dataType));
     event = eventBuilder.build();
-    return event.getMessage().getPayload();
+    return event.getMessage().getPayload().getValue();
   }
 
   public void setPayload(Object payload) {

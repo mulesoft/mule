@@ -90,11 +90,12 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     queueTransactionRecoverer.recover();
     Event muleEvent = (Event) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
-    assertThat(muleEvent.getMessage().getPayload().toString(), is(MESSAGE_CONTENT_2)); // recovered element should be last
+    assertThat(muleEvent.getMessage().getPayload().getValue().toString(), is(MESSAGE_CONTENT_2)); // recovered element should be
+                                                                                                  // last
 
     muleEvent = (Event) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
-    assertThat(muleEvent.getMessage().getPayload().toString(), is(MESSAGE_CONTENT)); // recovered element
+    assertThat(muleEvent.getMessage().getPayload().getValue().toString(), is(MESSAGE_CONTENT)); // recovered element
   }
 
   @Test

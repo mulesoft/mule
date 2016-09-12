@@ -42,8 +42,8 @@ public class CustomByteProtocolTestCase extends FunctionalTestCase {
 
     for (int i = 0; i < messages; i++) {
       InternalMessage msg = client.request("vm://out", 30000).getRight().get();
-      assertTrue(msg.getPayload() instanceof NonSerializableMessageObject);
-      NonSerializableMessageObject received = (NonSerializableMessageObject) msg.getPayload();
+      assertTrue(msg.getPayload().getValue() instanceof NonSerializableMessageObject);
+      NonSerializableMessageObject received = (NonSerializableMessageObject) msg.getPayload().getValue();
       assertEquals("Hello", received.s);
       assertEquals(1, received.i);
       assertEquals(true, received.b);

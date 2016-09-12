@@ -32,7 +32,7 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements Processo
     MediaType endpointMimeType = endpoint.getMimeType();
     if (endpointMimeType != null) {
       InternalMessage message = event.getMessage();
-      final DataType dataType = message.getDataType();
+      final DataType dataType = message.getPayload().getDataType();
       if (DataType.OBJECT.getMediaType().matches(dataType.getMediaType())) {
         event =
             Event.builder(event).message(InternalMessage.builder(event.getMessage()).mediaType(endpointMimeType).build()).build();

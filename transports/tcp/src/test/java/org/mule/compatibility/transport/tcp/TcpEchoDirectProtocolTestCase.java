@@ -41,6 +41,6 @@ public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase {
         .getRight();
 
     assertNotNull(response);
-    assertEquals(TEST_MESSAGE, response.getPayload());
+    assertEquals(TEST_MESSAGE, response.getPayload().getValue());
   }
 }

@@ -75,7 +75,8 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
     assertThat(listener.messageNotification.getAction(), equalTo(action));
     assertThat(listener.messageNotification.getEndpoint(), equalTo(endpoint.getEndpointURI().getUri().toString()));
     assertThat(listener.messageNotification.getSource(), instanceOf(InternalMessage.class));
-    assertThat(listener.messageNotification.getSource().getPayload(), equalTo(event.getMessage().getPayload()));
+    assertThat(listener.messageNotification.getSource().getPayload().getValue(),
+               equalTo(event.getMessage().getPayload().getValue()));
   }
 
 }

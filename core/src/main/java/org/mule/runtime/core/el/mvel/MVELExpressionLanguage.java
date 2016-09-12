@@ -373,7 +373,7 @@ public class MVELExpressionLanguage implements ExpressionLanguage, Initialisable
     return parser.parse((TemplateParser.TemplateCallback) token -> {
       Object result = evaluate(token, event, eventBuilder, flowConstruct);
       if (result instanceof InternalMessage) {
-        return ((InternalMessage) result).getPayload();
+        return ((InternalMessage) result).getPayload().getValue();
       } else {
         return result;
       }

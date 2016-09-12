@@ -10,7 +10,7 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -285,7 +285,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     final InternalMessage muleReqMsg = event.getMessage();
     String method = muleReqMsg.getInboundProperty(HTTP_METHOD_PROPERTY);
 
-    MediaType ct = muleReqMsg.getDataType().getMediaType();
+    MediaType ct = muleReqMsg.getPayload().getDataType().getMediaType();
     if (!ct.matches(ANY)) {
       m.put(Message.CONTENT_TYPE, ct.toRfcString());
     }
@@ -305,7 +305,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     }
 
     if (!"GET".equals(method)) {
-      Object payload = event.getMessage().getPayload();
+      Object payload = event.getMessage().getPayload().getValue();
 
       setPayload(event, m, payload);
     }
@@ -412,7 +412,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       builder.addOutboundProperty(HTTP_STATUS_PROPERTY, ACCEPTED.getStatusCode());
       builder.nullPayload();
     } else {
-      final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
+      final Optional<Charset> charset = message.getPayload().getDataType().getMediaType().getCharset();
       if (charset.isPresent()) {
         builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
       } else {
@@ -424,7 +424,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     Message faultMsg = exchange.getOutFaultMessage();
     if (faultMsg != null) {
       if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
-        final Optional<Charset> charset = message.getDataType().getMediaType().getCharset();
+        final Optional<Charset> charset = message.getPayload().getDataType().getMediaType().getCharset();
         if (charset.isPresent()) {
           builder.payload(getResponseOutputHandler(exchange)).mediaType(XML.withCharset(charset.get()));
         } else {
@@ -507,7 +507,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       DOMSource source = new DOMSource((Node) payload);
       m.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(source));
     } else {
-      ctx.getMessage().getDataType().getMediaType().getCharset().ifPresent(encoding -> {
+      ctx.getMessage().getPayload().getDataType().getMediaType().getCharset().ifPresent(encoding -> {
         m.put(Message.ENCODING, encoding.name());
       });
 
@@ -529,7 +529,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
    */
   protected InputStream getMessageStream(Event context) throws MuleException {
     InputStream is;
-    Object eventMsgPayload = context.getMessage().getPayload();
+    Object eventMsgPayload = context.getMessage().getPayload().getValue();
 
     if (eventMsgPayload instanceof InputStream) {
       is = (InputStream) eventMsgPayload;

@@ -15,6 +15,7 @@ import static org.mule.extension.file.api.FileEventType.CREATE;
 import static org.mule.extension.file.api.FileEventType.DELETE;
 import static org.mule.extension.file.api.FileEventType.UPDATE;
 import static org.mule.runtime.core.util.FileUtils.deleteTree;
+
 import org.mule.extension.file.api.FileEventType;
 import org.mule.extension.file.api.ListenerFileAttributes;
 import org.mule.runtime.api.message.Message;
@@ -158,7 +159,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
     write(file, "");
     Message message = listen(CREATE, file);
 
-    assertThat(message.getPayload(), equalTo(DR_MANHATTAN));
+    assertThat(message.getPayload().getValue(), equalTo(DR_MANHATTAN));
   }
 
   @Test
@@ -183,7 +184,7 @@ public class DirectoryListenerFunctionalTestCase extends FileConnectorTestCase {
   }
 
   private void assertEvent(Message message, Object expectedContent) throws Exception {
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     if (payload instanceof InputStream) {
       payload = IOUtils.toString((InputStream) payload);
       assertThat((String) payload, not(containsString(DR_MANHATTAN)));

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.emptyMap;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.VoidMuleEvent;
@@ -41,9 +41,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Processes {@link Event}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of
- * MessageProcessor delegate configured the next {@link Processor}. The next {@link Processor} is therefore be
- * executed in a different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is
- * present then an exception is thrown.
+ * MessageProcessor delegate configured the next {@link Processor}. The next {@link Processor} is therefore be executed in a
+ * different thread regardless of the exchange-pattern configured on the inbound endpoint. If a transaction is present then an
+ * exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     implements Processor, Initialisable, Startable, Stoppable, NonBlockingSupported {
@@ -114,10 +114,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     }
 
     final InternalMessage message = event.getMessage();
-    if (consumablePayloadWarned.compareAndSet(false, true) && message.getDataType().isStreamType()) {
+    if (consumablePayloadWarned.compareAndSet(false, true) && message.getPayload().getDataType().isStreamType()) {
       logger.warn(String.format("Using 'async' router with consumable payload (%s) may lead to unexpected results." +
           " Please ensure that only one of the branches actually consumes the payload, or transform it by using an <object-to-byte-array-transformer>.",
-                                message.getPayload().getClass().getName()));
+                                message.getPayload().getValue().getClass().getName()));
     }
 
     if (target != null) {

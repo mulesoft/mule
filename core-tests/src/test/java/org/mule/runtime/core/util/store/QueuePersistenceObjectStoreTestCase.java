@@ -177,7 +177,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     Event newEvent = (Event) item;
     InternalMessage newMessage = newEvent.getMessage();
     assertNotNull(newMessage);
-    assertEquals("Hello", newMessage.getPayload());
+    assertEquals("Hello", newMessage.getPayload().getValue());
   }
 
   @Test

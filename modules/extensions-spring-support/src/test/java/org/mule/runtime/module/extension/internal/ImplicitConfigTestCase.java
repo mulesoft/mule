@@ -50,7 +50,7 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase {
   public void getImplicitConfig() throws Exception {
     final Integer defaultValue = 42;
     ImplicitConfigExtension config = (ImplicitConfigExtension) flowRunner("implicitConfig").withPayload("")
-        .withFlowVariable("optionalWithDefault", defaultValue).run().getMessage().getPayload();
+        .withFlowVariable("optionalWithDefault", defaultValue).run().getMessage().getPayload().getValue();
 
 
     assertThat(config, is(notNullValue()));
@@ -63,7 +63,7 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void getImplicitConnection() throws Exception {
-    Object connection = flowRunner("implicitConnection").run().getMessage().getPayload();
+    Object connection = flowRunner("implicitConnection").run().getMessage().getPayload().getValue();
     assertThat(connection, is(instanceOf(Apple.class)));
   }
 

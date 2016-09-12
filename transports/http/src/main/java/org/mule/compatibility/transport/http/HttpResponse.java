@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
@@ -224,7 +224,7 @@ public class HttpResponse {
     // return;
     // }
 
-    Object payload = msg.getPayload();
+    Object payload = msg.getPayload().getValue();
     if (payload instanceof String) {
       setBody(payload.toString());
     } else if (payload == null) {
@@ -233,7 +233,7 @@ public class HttpResponse {
       setBody((byte[]) payload);
     } else {
       setBody((OutputHandler) muleContext.getTransformationService().transform(msg, DataType.fromType(OutputHandler.class))
-          .getPayload());
+          .getPayload().getValue());
     }
   }
 
@@ -306,7 +306,7 @@ public class HttpResponse {
   // try
   // {
   // Message msg = event.getResult();
-  // if (!(msg.getPayload() instanceof NullPayload))
+  // if (!(msg.getPayload().getValue() instanceof NullPayload))
   // {
   // String contentType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, MimeTypes.BINARY);
   // partStream.startPart(contentType);

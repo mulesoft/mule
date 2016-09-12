@@ -31,6 +31,6 @@ public class SetPayloadDataTypeTestCase extends AbstractIntegrationTestCase {
   private void doSetPayloadTest(String flowName) throws Exception {
     InternalMessage response = flowRunner(flowName).withPayload(TEST_MESSAGE).run().getMessage();
 
-    assertThat(response.getDataType(), like(String.class, MediaType.XML, UTF_16));
+    assertThat(response.getPayload().getDataType(), like(String.class, MediaType.XML, UTF_16));
   }
 }

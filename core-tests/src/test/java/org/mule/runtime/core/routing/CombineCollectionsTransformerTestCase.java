@@ -45,8 +45,8 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
     Event response = merger.process(event);
 
-    assertTrue(response.getMessage().getPayload() instanceof List);
-    assertEquals(7, ((List) response.getMessage().getPayload()).size());
+    assertTrue(response.getMessage().getPayload().getValue() instanceof List);
+    assertEquals(7, ((List) response.getMessage().getPayload().getValue()).size());
   }
 
   @Test
@@ -61,7 +61,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
     Event response = merger.process(event);
 
-    assertTrue(response.getMessage().getPayload() instanceof List);
-    assertEquals(7, ((List) response.getMessage().getPayload()).size());
+    assertTrue(response.getMessage().getPayload().getValue() instanceof List);
+    assertEquals(7, ((List) response.getMessage().getPayload().getValue()).size());
   }
 }

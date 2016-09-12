@@ -84,7 +84,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   public void testTemporaryReplyEnabledNonBlockingTimeout() throws Exception {
     InternalMessage response =
         flowRunner("JMSService1NonBlockingTimeout").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
   }
 
   @Test
@@ -96,7 +96,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   @Test
   public void testDisableTemporaryReplyOnTheConnector() throws Exception {
     InternalMessage response = flowRunner("JMSService3").withPayload(TEST_MESSAGE).run().getMessage();
-    assertEquals(TEST_MESSAGE, response.getPayload());
+    assertEquals(TEST_MESSAGE, response.getPayload().getValue());
   }
 
   @Test
@@ -104,15 +104,15 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   public void testExplicitReplyToAsyncSet() throws Exception {
     InternalMessage response = flowRunner("JMSService4").withPayload(TEST_MESSAGE).run().getMessage();
     // We get the original message back, not the result from the remote component
-    assertEquals(TEST_MESSAGE + " TestService1", response.getPayload());
+    assertEquals(TEST_MESSAGE + " TestService1", response.getPayload().getValue());
   }
 
   private void assertEchoResponse(InternalMessage response) throws Exception {
-    assertThat(response.getPayload(), equalTo(TEST_MESSAGE + " " + ECHO_FLOW_NAME));
+    assertThat(response.getPayload().getValue(), equalTo(TEST_MESSAGE + " " + ECHO_FLOW_NAME));
   }
 
   private void assertNullPayloadResponse(InternalMessage response) {
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
   }
 
   public static class SetReplyTo extends AbstractMessageTransformer {

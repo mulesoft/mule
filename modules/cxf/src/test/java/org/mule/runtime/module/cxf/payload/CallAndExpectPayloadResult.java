@@ -33,7 +33,7 @@ class CallAndExpectPayloadResult implements CallAndExpect {
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.send(outputEndpointName, payload, null).getRight();
 
-    assertEquals(here(), expectedPayloadResult, result.getPayload());
+    assertEquals(here(), expectedPayloadResult, result.getPayload().getValue());
   }
 
   private String here() {

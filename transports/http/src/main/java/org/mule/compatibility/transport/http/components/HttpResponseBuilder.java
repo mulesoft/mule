@@ -110,7 +110,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
     try {
       // If the payload is already HttpResponse then it already has the body set
-      if (!(message.getPayload() instanceof HttpResponse)) {
+      if (!(message.getPayload().getValue() instanceof HttpResponse)) {
         response.setBody(message, muleContext);
       }
     } catch (Exception e) {
@@ -184,8 +184,8 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
   private HttpResponse getHttpResponse(InternalMessage message) {
     HttpResponse httpResponse;
 
-    if (message.getPayload() instanceof HttpResponse) {
-      httpResponse = (HttpResponse) message.getPayload();
+    if (message.getPayload().getValue() instanceof HttpResponse) {
+      httpResponse = (HttpResponse) message.getPayload().getValue();
     } else {
       httpResponse = new HttpResponse();
     }
@@ -289,7 +289,7 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
 
 
   private String getDefaultContentType(InternalMessage message) {
-    final MediaType mediaType = message.getDataType().getMediaType();
+    final MediaType mediaType = message.getPayload().getDataType().getMediaType();
     String contentType;
     if (MediaType.ANY.matches(mediaType)) {
       contentType = HttpConstants.DEFAULT_CONTENT_TYPE;

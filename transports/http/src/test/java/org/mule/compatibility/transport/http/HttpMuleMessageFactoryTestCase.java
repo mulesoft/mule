@@ -75,7 +75,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     Object payload = getValidTransportMessage();
     InternalMessage message = factory.create(payload, encoding);
     assertNotNull(message);
-    assertEquals("/services/Echo", message.getPayload());
+    assertEquals("/services/Echo", message.getPayload().getValue());
     // note that on this level it's only message factory, and it adds messages from http request to the inbound scope
     assertEquals(HttpConstants.METHOD_GET, message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY));
     assertEquals("foo-value", message.getInboundProperty("foo-header"));
@@ -95,8 +95,8 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     HttpRequest request = createPostHttpRequest();
     InternalMessage message = factory.create(request, encoding);
     assertNotNull(message);
-    assertEquals(byte[].class, message.getDataType().getType());
-    byte[] payload = (byte[]) message.getPayload();
+    assertEquals(byte[].class, message.getPayload().getDataType().getType());
+    byte[] payload = (byte[]) message.getPayload().getValue();
     assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
   }
 
@@ -115,8 +115,8 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     HttpRequest request = createMultiPartHttpRequest();
     InternalMessage message = factory.create(request, encoding);
     assertNotNull(message);
-    assertEquals(byte[].class, message.getDataType().getType());
-    byte[] payload = (byte[]) message.getPayload();
+    assertEquals(byte[].class, message.getPayload().getDataType().getType());
+    byte[] payload = (byte[]) message.getPayload().getValue();
     assertTrue(Arrays.equals(MULTIPART_MESSAGE.getBytes(), payload));
   }
 

@@ -33,14 +33,14 @@ public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
         flowRunner("refServiceOne").withPayload("a request").withInboundProperty("method", "retrieveReferenceData").run();
     InternalMessage response = responseEvent
         .getMessage();
-    Object payload = response.getPayload();
+    Object payload = response.getPayload().getValue();
 
     assertThat(payload, instanceOf(String.class));
     assertThat(payload, is("ServiceOne"));
 
     response = flowRunner("refServiceTwo").withPayload("another request").withInboundProperty("method", "retrieveReferenceData")
         .run().getMessage();
-    payload = response.getPayload();
+    payload = response.getPayload().getValue();
     if ((payload == null) || (responseEvent.getError().isPresent())) {
       Throwable exception = responseEvent.getError().get().getException();
       if (exception != null) {

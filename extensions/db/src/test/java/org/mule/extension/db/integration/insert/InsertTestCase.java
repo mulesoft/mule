@@ -8,6 +8,7 @@ package org.mule.extension.db.integration.insert;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
@@ -39,7 +40,7 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void insert() throws Exception {
     Message response = flowRunner("insert").run().getMessage();
-    StatementResult result = response.getPayload();
+    StatementResult result = (StatementResult) response.getPayload().getValue();
     assertThat(result.getAffectedRows(), is(1));
     assertThat(result.getGeneratedKeys().isEmpty(), is(true));
   }
@@ -48,14 +49,14 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
   public void insertDynamic() throws Exception {
     final String planet = "'Mercury'";
     Message response = flowRunner("insertDynamic").withPayload(planet).run().getMessage();
-    assertInsert(response.getPayload(), planet);
+    assertInsert((StatementResult) response.getPayload().getValue(), planet);
   }
 
   @Test
   public void usesParameterizedQuery() throws Exception {
     final String planet = "Pluto";
     Message response = flowRunner("insertParameterized").withPayload(planet).run().getMessage();
-    assertInsert(response.getPayload(), planet);
+    assertInsert((StatementResult) response.getPayload().getValue(), planet);
   }
 
   private void assertInsert(StatementResult result, String planetName) throws SQLException {

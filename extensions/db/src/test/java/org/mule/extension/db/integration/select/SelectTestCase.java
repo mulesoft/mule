@@ -18,14 +18,15 @@ import static org.mule.extension.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import static org.mule.extension.db.integration.model.Planet.MARS;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Planet;
 import org.mule.extension.db.integration.model.Record;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.message.MuleEvent;
 
 import java.util.Iterator;
 import java.util.List;
@@ -96,7 +97,7 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
   public void chunksStreamedRecords() throws Exception {
     Message response = flowRunner("selectStreamingChunks").run().getMessage();
 
-    List<Planet> chunks = response.getPayload();
+    List<Planet> chunks = (List<Planet>) response.getPayload().getValue();
     assertThat(chunks, hasSize(2));
     assertThat(chunks.get(0), is(instanceOf(List.class)));
     assertRecords(chunks.get(0), getVenusRecord(), getEarthRecord());
@@ -109,7 +110,7 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
     MuleEvent event = flowRunner("selectStreaming").run();
     Message response = event.getMessage();
 
-    assertThat(response.getPayload(), CoreMatchers.is(instanceOf(Iterator.class)));
+    assertThat(response.getPayload().getValue(), CoreMatchers.is(instanceOf(Iterator.class)));
     assertRecords(event.getVariable("records"), getAllPlanetRecords());
   }
 

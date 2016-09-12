@@ -94,7 +94,7 @@ public class EmailTestUtils {
     final MultiPartContent multiPartPayload = new DefaultMultiPartContent(attachments);
 
     Message attachment = multiPartPayload.getPart(attachmentKey);
-    String attachmentAsString = IOUtils.toString((InputStream) attachment.getPayload());
+    String attachmentAsString = IOUtils.toString((InputStream) attachment.getPayload().getValue());
     assertThat(attachmentAsString, is(expectedResult));
   }
 

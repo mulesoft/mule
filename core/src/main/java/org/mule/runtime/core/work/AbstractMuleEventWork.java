@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.work;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.session.DefaultMuleSession;

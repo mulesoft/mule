@@ -66,6 +66,6 @@ public class DatabindingTestCase extends FunctionalTestCase {
         muleContext.getClient().send(format("http://localhost:%d/services/%s?wsdl", dynamicPort.getNumber(), service),
                                      InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
             .getRight();
-    assertNotNull(result.getPayload());
+    assertNotNull(result.getPayload().getValue());
   }
 }

@@ -49,7 +49,7 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase {
     InternalMessage result = flowRunner("clientFlow").withPayload("Dan").withOutboundProperty("operation", "greetMe")
         .withOutboundProperty("FOO", "BAR").run().getMessage();
 
-    assertEquals("Hello Dan Received", result.getPayload());
+    assertEquals("Hello Dan Received", result.getPayload().getValue());
 
     GreeterImpl impl = getGreeter();
     assertEquals(1, impl.getInvocationCount());

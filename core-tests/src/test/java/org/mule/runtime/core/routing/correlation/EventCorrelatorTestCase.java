@@ -79,7 +79,7 @@ public class EventCorrelatorTestCase extends AbstractMuleTestCase {
   public void setup() {
     when(mockEventGroup.getMessageCollectionEvent()).thenReturn(mockMuleEvent);
     when(mockMuleEvent.getMessage()).thenReturn(mockMessageCollection);
-    when(mockMessageCollection.getDataType()).thenReturn(DataType.OBJECT);
+    when(mockMessageCollection.getPayload().getDataType()).thenReturn(DataType.OBJECT);
   }
 
 

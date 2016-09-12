@@ -54,7 +54,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter {
     for (Object recipient : recipients) {
       // Make a copy of the message. Question is do we do a proper clone? in
       // which case there would potentially be multiple messages with the same id...
-      InternalMessage request = InternalMessage.builder(message).payload(message.getPayload()).build();
+      InternalMessage request = InternalMessage.builder(message).payload(message.getPayload().getValue()).build();
       try {
         endpoint = getRecipientEndpoint(request, recipient);
 

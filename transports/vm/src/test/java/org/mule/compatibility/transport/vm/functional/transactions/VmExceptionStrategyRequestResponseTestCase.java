@@ -62,7 +62,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     }
     assertThat(outboundComponentReached, is(false));
     assertThat(response, IsNull.<Object>notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
     assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     assertThat(muleClient.request("vm://out1", TINY_TIMEOUT).getRight().isPresent(), is(false));
@@ -78,7 +78,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
      * if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) { fail("dead letter queue must be reached"); }
      */
     assertThat(response, IsNull.<Object>notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
     assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     assertThat(muleClient.request("vm://out2", TINY_TIMEOUT).getRight().isPresent(), is(false));
@@ -96,7 +96,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     }
     assertThat(outboundComponentReached, Is.is(false));
     assertThat(response, IsNull.<Object>notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
     assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     assertThat(muleClient.request("vm://out3", TINY_TIMEOUT).getRight().isPresent(), is(false));
@@ -111,7 +111,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     }
     assertThat(outboundComponentReached, Is.is(false));
     assertThat(response, IsNull.<Object>notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue());
     assertThat(response.getExceptionPayload(), IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
     assertThat(muleClient.request("vm://out4", TINY_TIMEOUT).getRight().isPresent(), is(false));
@@ -124,7 +124,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
     // TODO PLG - ES - fix this issue, the response must have an exception since there was a failire in the flow. It seems that
     // response chain was not executed
     /*
-     * assertThat(response, IsNull.<Object>notNullValue()); assertThat(response.getPayload(), is(nullValue()));
+     * assertThat(response, IsNull.<Object>notNullValue()); assertThat(response.getPayload().getValue(), is(nullValue()));
      * assertThat(response.getExceptionPayload(), IsNull.<Object>notNullValue()); assertThat(response.getExceptionPayload(),
      * IsInstanceOf.instanceOf(DefaultExceptionPayload.class));
      */
@@ -153,7 +153,7 @@ public class VmExceptionStrategyRequestResponseTestCase extends FunctionalTestCa
       deadLetterQueueLatch.release();
       InternalMessage message = eventContext.getMessage();
       assertThat(message, IsNull.<Object>notNullValue());
-      assertThat(message.getPayload(), IsInstanceOf.instanceOf(ExceptionMessage.class));
+      assertThat(message.getPayload().getValue(), IsInstanceOf.instanceOf(ExceptionMessage.class));
       return eventContext.getMessage();
     }
   }

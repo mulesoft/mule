@@ -21,7 +21,7 @@ public class PayloadExpressionDataTypeResolver extends AbstractExpressionDataTyp
   @Override
   protected DataType getDataType(Event event, ASTNode node) {
     if (node.isIdentifier() && (PAYLOAD.equals(node.getName()) || MESSAGE_PAYLOAD.equals(node.getName()))) {
-      return event.getMessage().getDataType();
+      return event.getMessage().getPayload().getDataType();
     } else {
       return null;
     }

@@ -40,7 +40,7 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
     assertSame(event, primaryOutput);
 
     assertNotNull(tapListener.event);
-    assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
+    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(event.getMessage().getPayload().getValue()));
   }
 
   @Test
@@ -53,7 +53,7 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
     assertSame(event, primaryOutput);
 
     assertNotNull(tapListener.event);
-    assertThat(tapListener.event.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
+    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(event.getMessage().getPayload().getValue()));
   }
 
   @Test

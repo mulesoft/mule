@@ -73,7 +73,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     flowRunner("synchronousFlow").withPayload("0").run();
     InternalMessage message = muleContext.getClient().request("test://synchronous-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
-    Thread thread = (Thread) message.getPayload();
+    Thread thread = (Thread) message.getPayload().getValue();
     assertNotNull(thread);
     assertEquals(Thread.currentThread(), thread);
   }
@@ -83,7 +83,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     flowRunner("asynchronousFlow").withPayload("0").asynchronously().run();
     InternalMessage message = muleContext.getClient().request("test://asynchronous-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
-    Thread thread = (Thread) message.getPayload();
+    Thread thread = (Thread) message.getPayload().getValue();
     assertNotNull(thread);
     assertNotSame(Thread.currentThread(), thread);
   }
@@ -93,7 +93,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     flowRunner("asynchronousAsync").withPayload("0").asynchronously().run();
     InternalMessage message = muleContext.getClient().request("test://asynchronous-async-out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
-    Thread thread = (Thread) message.getPayload();
+    Thread thread = (Thread) message.getPayload().getValue();
     assertNotNull(thread);
     assertNotSame(Thread.currentThread(), thread);
   }
@@ -141,10 +141,10 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
         muleContext.getClient().request("test://split-aggregate-out", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload();
+    assertTrue(result.getPayload().getValue() instanceof List);
+    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload().getValue();
     assertEquals(3, coll.size());
-    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload().getValue()).collect(toList());
 
     assertTrue(apple.isBitten());
     assertTrue(banana.isBitten());
@@ -161,7 +161,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     InternalMessage result = flowRunner("split-no-parts").withPayload(MESSAGE).run().getMessage();
 
     assertNotNull(result);
-    assertEquals(result.getPayload(), MESSAGE);
+    assertEquals(result.getPayload().getValue(), MESSAGE);
   }
 
   @Test
@@ -179,10 +179,10 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
         muleContext.getClient().request("test://split-aggregate-list-out", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload();
+    assertTrue(result.getPayload().getValue() instanceof List);
+    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload().getValue();
     assertEquals(3, coll.size());
-    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload().getValue()).collect(toList());
 
     assertTrue(apple.isBitten());
     assertTrue(banana.isBitten());
@@ -206,10 +206,10 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     final InternalMessage result = client.request("test://split-aggregate-singleton-list-out", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload();
+    assertTrue(result.getPayload().getValue() instanceof List);
+    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload().getValue();
     assertEquals(1, coll.size());
-    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload().getValue()).collect(toList());
 
     assertTrue(apple.isBitten());
 
@@ -229,10 +229,10 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
         flowRunner("split-aggregate-response-list").withPayload(fruitBowl.getFruit()).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload();
+    assertTrue(result.getPayload().getValue() instanceof List);
+    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload().getValue();
     assertEquals(3, coll.size());
-    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload().getValue()).collect(toList());
 
     assertTrue(apple.isBitten());
     assertTrue(banana.isBitten());
@@ -254,10 +254,10 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
         flowRunner("split-aggregate-response-singleton-list").withPayload(fruitBowl.getFruit()).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload();
+    assertTrue(result.getPayload().getValue() instanceof List);
+    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload().getValue();
     assertEquals(1, coll.size());
-    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload().getValue()).collect(toList());
 
     assertTrue(apple.isBitten());
     assertTrue(results.contains(apple));
@@ -277,9 +277,9 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     Event result = flowRunner("split-aggregate-map").withPayload(map).run();
 
     assertNotNull(result);
-    assertTrue(result.getMessage().getPayload() instanceof List);
+    assertTrue(result.getMessage().getPayload().getValue() instanceof List);
     final InternalMessage[] results = new InternalMessage[3];
-    ((List<InternalMessage>) result.getMessage().getPayload()).toArray(results);
+    ((List<InternalMessage>) result.getMessage().getPayload().getValue()).toArray(results);
     assertEquals(3, results.length);
 
     assertTrue(apple.isBitten());
@@ -301,10 +301,10 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     final InternalMessage result = client.request("test://split-filter-aggregate-out", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload();
+    assertTrue(result.getPayload().getValue() instanceof List);
+    final List<InternalMessage> coll = (List<InternalMessage>) result.getPayload().getValue();
     assertEquals(1, coll.size());
-    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload()).collect(toList());
+    final List<Fruit> results = coll.stream().map(msg -> (Fruit) msg.getPayload().getValue()).collect(toList());
 
     assertTrue(results.contains(apple));
     assertFalse(results.contains(banana));
@@ -324,7 +324,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     final InternalMessage result = client.request("test://message-chunk-split-aggregate-out", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(result);
-    assertNotSame(payload, result.getPayload());
+    assertNotSame(payload, result.getPayload().getValue());
     assertEquals(payload, getPayloadAsString(result));
   }
 
@@ -333,7 +333,7 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     final InternalMessage result = flowRunner("components").withPayload("0").run().getMessage();
 
     assertNotNull(result);
-    assertNotSame(TEST_MESSAGE + "test", result.getPayload());
+    assertNotSame(TEST_MESSAGE + "test", result.getPayload().getValue());
   }
 
   @Test
@@ -412,9 +412,9 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     assertNotNull(result2);
     assertNotNull(result3);
 
-    assertEquals(TEST_MESSAGE, result1.getPayload());
-    assertEquals(TEST_MESSAGE, result1.getPayload());
-    assertEquals(TEST_MESSAGE, result1.getPayload());
+    assertEquals(TEST_MESSAGE, result1.getPayload().getValue());
+    assertEquals(TEST_MESSAGE, result1.getPayload().getValue());
+    assertEquals(TEST_MESSAGE, result1.getPayload().getValue());
 
   }
 
@@ -511,7 +511,8 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
   public void testCustomMessageRouter() throws Exception {
     InternalMessage result = flowRunner("customRouter").withPayload("").run().getMessage();
     assertEquals("abc",
-                 ((List<InternalMessage>) result.getPayload()).stream().map(msg -> (String) msg.getPayload()).collect(joining()));
+                 ((List<InternalMessage>) result.getPayload().getValue()).stream()
+                     .map(msg -> (String) msg.getPayload().getValue()).collect(joining()));
   }
 
   @Test

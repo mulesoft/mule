@@ -49,7 +49,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
     Processor mpChain = builder.build();
 
     result = mpChain.process(requestEvent);
-    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload().getValue());
   }
 
   @Test
@@ -58,7 +58,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
     Processor mpChain = builder.build();
 
     result = mpChain.process(requestEvent);
-    assertEquals(TEST_MESSAGE, result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE, result.getMessage().getPayload().getValue());
   }
 
   protected InternalMessage createTestRequestMessage() {

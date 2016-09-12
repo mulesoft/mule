@@ -34,7 +34,7 @@ public class JmsPropertyScopeTestCase extends AbstractPropertyScopeTestCase {
     InternalMessage result = client.request("jms://reply", 10000).getRight().get();
 
     assertNotNull(result);
-    assertEquals("test bar", result.getPayload());
+    assertEquals("test bar", result.getPayload().getValue());
     assertEquals("fooValue", result.getInboundProperty("foo"));
   }
 }

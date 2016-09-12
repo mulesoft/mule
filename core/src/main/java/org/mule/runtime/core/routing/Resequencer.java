@@ -61,7 +61,7 @@ public class Resequencer extends AbstractAggregator {
       return result;
     }
     Event last = null;
-    for (Event muleEvent : (Event[]) result.getMessage().getPayload()) {
+    for (Event muleEvent : (Event[]) result.getMessage().getPayload().getValue()) {
       last = processNext(muleEvent);
     }
     // Respect existing behaviour by returning last event

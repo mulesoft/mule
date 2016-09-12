@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
- * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an
- * expression, generating a message for each element.
+ * The {@code foreach} {@link Processor} allows iterating over a collection payload, or any collection obtained by an expression,
+ * generating a message for each element.
  * <p>
  * The number of the message being processed is stored in {@code #[variable:counter]} and the root message is store in
  * {@code #[flowVars.rootMessage]}. Both variables may be renamed by means of {@link #setCounterVariableName(String)} and
@@ -127,7 +127,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   }
 
   private InternalMessage transformPayloadIfNeeded(InternalMessage message) throws TransformerException {
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     if (payload instanceof Document || payload.getClass().getName().startsWith("org.dom4j.")) {
       return message;
     } else {
@@ -219,7 +219,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
 
     @Override
     protected MessageSequence<?> splitMessageIntoSequence(Event event) {
-      Object payload = event.getMessage().getPayload();
+      Object payload = event.getMessage().getPayload().getValue();
       if (payload instanceof Map<?, ?>) {
         List<Event> list = new LinkedList<>();
         Set<Map.Entry<?, ?>> set = ((Map) payload).entrySet();

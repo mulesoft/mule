@@ -34,21 +34,21 @@ public class CombineCollectionsTransformer implements Processor {
 
     List<Object> payload = new ArrayList<>();
     Class<?> itemType = Object.class;
-    if (MULE_MESSAGE_COLLECTION.isCompatibleWith(msg.getDataType())) {
+    if (MULE_MESSAGE_COLLECTION.isCompatibleWith(msg.getPayload().getDataType())) {
       itemType = InternalMessage.class;
-      for (InternalMessage child : (Collection<InternalMessage>) msg.getPayload()) {
-        Object childPayload = child.getPayload();
+      for (InternalMessage child : (Collection<InternalMessage>) msg.getPayload().getValue()) {
+        Object childPayload = child.getPayload().getValue();
         if (childPayload instanceof Collection) {
           payload.addAll((Collection) childPayload);
         } else {
           payload.add(childPayload);
         }
       }
-    } else if (msg.getPayload() instanceof Collection) {
-      add(payload, (Collection) msg.getPayload());
+    } else if (msg.getPayload().getValue() instanceof Collection) {
+      add(payload, (Collection) msg.getPayload().getValue());
     } else {
-      itemType = msg.getDataType().getType();
-      payload.add(msg.getPayload());
+      itemType = msg.getPayload().getDataType().getType();
+      payload.add(msg.getPayload().getValue());
     }
 
     InternalMessage listMessage = InternalMessage.builder(msg).collectionPayload(payload, itemType).build();

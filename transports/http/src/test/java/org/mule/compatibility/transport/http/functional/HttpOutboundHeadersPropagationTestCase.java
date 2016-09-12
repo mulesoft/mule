@@ -43,7 +43,7 @@ public class HttpOutboundHeadersPropagationTestCase extends HttpFunctionalTestCa
         .addOutboundProperty("custom-header", "value-custom-header").build());
 
     InternalMessage reply = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
-    Map<String, Object> headers = (Map<String, Object>) reply.getPayload();
+    Map<String, Object> headers = (Map<String, Object>) reply.getPayload().getValue();
 
     for (String header : HttpConstants.REQUEST_HEADER_NAMES.values()) {
       // TODO: the Expect header should be sent on the request, it seems the apache commons HttpClient 3.1 has

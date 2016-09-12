@@ -46,13 +46,13 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void dynamicBulkInsert() throws Exception {
     Message response = flowRunner("bulkInsert").withPayload(values()).run().getMessage();
-    assertBulkInsert(response.getPayload());
+    assertBulkInsert(response.getPayload().getValue());
   }
 
   @Test
   public void bulkInsertWithOverriddenType() throws Exception {
     Message response = flowRunner("bulkInsertWithOverriddenType").withPayload(values()).run().getMessage();
-    assertBulkInsert(response.getPayload());
+    assertBulkInsert(response.getPayload().getValue());
   }
 
   private List<Map<String, Object>> values() {

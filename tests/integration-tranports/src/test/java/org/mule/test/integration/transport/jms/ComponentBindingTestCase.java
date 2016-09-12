@@ -30,6 +30,6 @@ public class ComponentBindingTestCase extends FunctionalTestCase {
     client.dispatch("jms://invoker.in", message, null);
     InternalMessage reply = client.request("jms://invoker.out", 10000).getRight().get();
     assertNotNull(reply);
-    assertEquals("Received: Hello " + message + " " + 0xC0DE, reply.getPayload());
+    assertEquals("Received: Hello " + message + " " + 0xC0DE, reply.getPayload().getValue());
   }
 }

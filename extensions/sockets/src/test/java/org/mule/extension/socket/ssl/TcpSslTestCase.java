@@ -58,7 +58,7 @@ public class TcpSslTestCase extends SocketExtensionTestCase {
   private Message sendStringAndAssertResponse(String flowName) throws Exception {
     org.mule.runtime.core.api.InternalMessage muleMessage = flowRunner(flowName).withPayload(TEST_STRING).run().getMessage();
 
-    InputStream inputStream = (InputStream) muleMessage.getPayload();
+    InputStream inputStream = (InputStream) muleMessage.getPayload().getValue();
 
     String response = IOUtils.toString(inputStream);
     assertThat(RESPONSE_TEST_STRING, is(response));

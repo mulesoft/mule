@@ -66,7 +66,7 @@ public class FunctionalStreamingTestComponent implements Callable, MuleContextAw
 
   @Override
   public Object onCall(MuleEventContext context) throws Exception {
-    InputStream in = (InputStream) context.getMessage().getPayload();
+    InputStream in = (InputStream) context.getMessage().getPayload().getValue();
     try {
       logger.debug("arrived at " + toString());
       byte[] startData = new byte[STREAM_SAMPLE_SIZE];

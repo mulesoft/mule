@@ -56,9 +56,8 @@ import java.util.List;
 import org.apache.commons.collections.Predicate;
 
 /**
- * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to
- * process messages to be configured. These MessageProcessors are chained together using the
- * {@link DefaultMessageProcessorChainBuilder}.
+ * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link Processor}s that will be used to process
+ * messages to be configured. These MessageProcessors are chained together using the {@link DefaultMessageProcessorChainBuilder}.
  * <p/>
  * If no message processors are configured then the source message is simply returned.
  */
@@ -98,8 +97,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
    * The default implementation of this methods uses a {@link DefaultMessageProcessorChainBuilder} and allows a chain of
    * {@link Processor}s to be configured using the
    * {@link #configureMessageProcessors(org.mule.runtime.core.api.processor.MessageProcessorChainBuilder)} method but if you wish
-   * to use another {@link MessageProcessorBuilder} or just a single {@link Processor} then this method can be overridden
-   * and return a single {@link Processor} instead.
+   * to use another {@link MessageProcessorBuilder} or just a single {@link Processor} then this method can be overridden and
+   * return a single {@link Processor} instead.
    */
   protected Processor createPipeline() throws MuleException {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(this);

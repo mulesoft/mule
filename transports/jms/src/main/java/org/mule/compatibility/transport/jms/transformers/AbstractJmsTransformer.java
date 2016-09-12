@@ -58,7 +58,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer
     try {
       Message result;
 
-      Object src = message.getPayload();
+      Object src = message.getPayload().getValue();
       if (src instanceof Message) {
         result = (Message) src;
         result.clearProperties();

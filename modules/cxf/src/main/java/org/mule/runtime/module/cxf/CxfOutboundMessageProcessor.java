@@ -7,7 +7,7 @@
 package org.mule.runtime.module.cxf;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
@@ -85,7 +85,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
   }
 
   protected Object[] getArgs(Event event) throws TransformerException {
-    Object payload = event.getMessage().getPayload();
+    Object payload = event.getMessage().getPayload().getValue();
 
     if (proxy) {
       return new Object[] {event.getMessage()};
@@ -99,10 +99,11 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     }
 
     try {
-      if (event.getMessage().getPayload() instanceof MultiPartContent) {
-        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) event.getMessage().getPayload()).getParts()) {
-          attachments.add(toDataHandler(((PartAttributes) part.getAttributes()).getName(), part.getPayload(),
-                                        part.getDataType().getMediaType()));
+      if (event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
+        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) event.getMessage().getPayload().getValue())
+            .getParts()) {
+          attachments.add(toDataHandler(((PartAttributes) part.getAttributes()).getName(), part.getPayload().getValue(),
+                                        part.getPayload().getDataType().getMediaType()));
         }
       }
     } catch (IOException e) {

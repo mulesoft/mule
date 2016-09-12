@@ -30,8 +30,8 @@ public class ContainsMessage extends TypeSafeMatcher<List<Message>> {
   @Override
   public boolean matchesSafely(List<Message> messages) {
     for (Message message : messages) {
-      if (message.getPayload() instanceof Map) {
-        if (((Map) message.getPayload()).get(key).equals(value)) {
+      if (message.getPayload().getValue() instanceof Map) {
+        if (((Map) message.getPayload().getValue()).get(key).equals(value)) {
           return true;
         }
       }

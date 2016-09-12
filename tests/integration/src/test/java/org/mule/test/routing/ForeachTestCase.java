@@ -67,18 +67,18 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     payload.add("sosa");
 
     InternalMessage result = flowRunner("minimal-config").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(2));
     assertSame(payload, resultPayload);
 
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    assertThat(out.getPayload(), is("julio"));
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    assertThat(out.getPayload().getValue(), is("julio"));
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    assertThat(out.getPayload(), is("sosa"));
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    assertThat(out.getPayload().getValue(), is("sosa"));
   }
 
   @Test
@@ -88,18 +88,18 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     payload.add("barrett");
 
     InternalMessage result = flowRunner("minimal-config-plus-mp").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(3));
     assertSame(payload, resultPayload);
 
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    assertThat(out.getPayload(), is("syd"));
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    assertThat(out.getPayload().getValue(), is("syd"));
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    assertThat(out.getPayload(), is("barrett"));
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    assertThat(out.getPayload().getValue(), is("barrett"));
   }
 
   @Test
@@ -112,16 +112,16 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     InternalMessage result = flowRunner("minimal-config-expression").withPayload("message payload")
         .withInboundProperty("names", names).run().getMessage();
 
-    assertThat(result.getPayload(), instanceOf(String.class));
+    assertThat(result.getPayload().getValue(), instanceOf(String.class));
     assertThat((message.getOutboundProperty("names")), hasSize(names.size()));
 
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    assertThat(out.getPayload(), is("residente"));
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    assertThat(out.getPayload().getValue(), is("residente"));
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    assertThat(out.getPayload(), is("visitante"));
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    assertThat(out.getPayload().getValue(), is("visitante"));
   }
 
   @Test
@@ -134,19 +134,19 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     payload.add("la mosca");
 
     InternalMessage result = flowRunner("partitioned-config").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(5));
     assertSame(payload, resultPayload);
 
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(Collection.class));
-    Collection<?> outPayload = (Collection<?>) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> outPayload = (Collection<?>) out.getPayload().getValue();
     assertThat(outPayload, hasSize(3));
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(Collection.class));
-    outPayload = (Collection<?>) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(Collection.class));
+    outPayload = (Collection<?>) out.getPayload().getValue();
     assertThat(outPayload, hasSize(2));
   }
 
@@ -157,12 +157,12 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     payload.add("ilych");
 
     InternalMessage result = flowRunner("parent-message-config").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(2));
     assertSame(payload, resultPayload);
 
-    assertSame(payload, ((InternalMessage) result.getOutboundProperty("parent")).getPayload());
+    assertSame(payload, ((InternalMessage) result.getOutboundProperty("parent")).getPayload().getValue());
   }
 
   @Test
@@ -175,7 +175,7 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     InternalMessage msgCollection = InternalMessage.builder().payload(list).build();
     InternalMessage result = flowRunner("message-collection-config").withPayload(list).run().getMessage();
     assertThat(result.getOutboundProperty("totalMessages"), is(10));
-    assertThat(result.getPayload(), equalTo(msgCollection.getPayload()));
+    assertThat(result.getPayload().getValue(), equalTo(msgCollection.getPayload().getValue()));
     FlowAssert.verify("message-collection-config");
   }
 
@@ -197,8 +197,8 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     payload.put("surname", "bowie");
 
     InternalMessage result = flowRunner("map-config").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Map.class));
-    Map<?, ?> resultPayload = (Map<?, ?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Map.class));
+    Map<?, ?> resultPayload = (Map<?, ?>) result.getPayload().getValue();
     assertThat(resultPayload.entrySet(), hasSize(payload.size()));
     assertThat(result.getOutboundProperty("totalMessages"), is(payload.size()));
     assertSame(payload, resultPayload);
@@ -215,7 +215,7 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     InternalMessage result =
         flowRunner("map-expression-config").withPayload("message payload").withInboundProperty("names", names).run().getMessage();
 
-    assertThat(result.getPayload(), instanceOf(String.class));
+    assertThat(result.getPayload().getValue(), instanceOf(String.class));
     assertThat(((Collection<?>) message.getOutboundProperty("names")), hasSize(names.size()));
     assertThat(result.getOutboundProperty("totalMessages"), is(names.size()));
   }
@@ -254,8 +254,8 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     String[] payload = {"uno", "dos", "tres"};
 
     InternalMessage result = flowRunner("array-expression-config").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(String[].class));
-    String[] resultPayload = (String[]) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(String[].class));
+    String[] resultPayload = (String[]) result.getPayload().getValue();
     assertThat(resultPayload, arrayWithSize(payload.length));
     assertSame(payload, resultPayload);
     FlowAssert.verify("array-expression-config");
@@ -281,8 +281,8 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     payload.add("florencia");
 
     InternalMessage result = flowRunner("counter-two-foreach-independence").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(3));
     assertSame(payload, resultPayload);
 
@@ -294,8 +294,8 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     final List<List<String>> payload = createNestedPayload();
 
     InternalMessage result = flowRunner("nested-foreach").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(3));
     assertSame(payload, resultPayload);
 
@@ -303,8 +303,8 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     for (int i = 0; i < payload.size(); i++) {
       for (int j = 0; j < payload.get(i).size(); j++) {
         out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-        assertThat(out.getPayload(), instanceOf(String.class));
-        assertThat(out.getPayload(), is(payload.get(i).get(j)));
+        assertThat(out.getPayload().getValue(), instanceOf(String.class));
+        assertThat(out.getPayload().getValue(), is(payload.get(i).get(j)));
       }
     }
   }
@@ -314,8 +314,8 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     final List<List<String>> payload = createNestedPayload();
 
     InternalMessage result = flowRunner("nested-foreach-counters").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(Collection.class));
-    Collection<?> resultPayload = (Collection<?>) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(Collection.class));
+    Collection<?> resultPayload = (Collection<?>) result.getPayload().getValue();
     assertThat(resultPayload, hasSize(3));
     assertSame(payload, resultPayload);
 
@@ -353,8 +353,8 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     String[] payload = {"uno", "dos", "tres"};
 
     InternalMessage result = flowRunner("foreach-properties-restored").withPayload(payload).run().getMessage();
-    assertThat(result.getPayload(), instanceOf(String[].class));
-    String[] resultPayload = (String[]) result.getPayload();
+    assertThat(result.getPayload().getValue(), instanceOf(String[].class));
+    String[] resultPayload = (String[]) result.getPayload().getValue();
     assertThat(resultPayload, arrayWithSize(payload.length));
     assertSame(payload, resultPayload);
     FlowAssert.verify("foreach-properties-restored");
@@ -365,13 +365,13 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     runFlow("mvel-list");
 
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    String outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    String outPayload = (String) out.getPayload().getValue();
     assertThat(outPayload, is("foo"));
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    outPayload = (String) out.getPayload().getValue();
     assertThat(outPayload, is("bar"));
   }
 
@@ -384,13 +384,13 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     m.put("key2", "val2");
 
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    String outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    String outPayload = (String) out.getPayload().getValue();
     assertTrue(m.containsValue(outPayload));
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    outPayload = (String) out.getPayload().getValue();
     assertTrue(m.containsValue(outPayload));
   }
 
@@ -403,13 +403,13 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     m.put("key2", "val2");
 
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    String outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    String outPayload = (String) out.getPayload().getValue();
     assertTrue(m.containsValue(outPayload));
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    outPayload = (String) out.getPayload().getValue();
     assertTrue(m.containsValue(outPayload));
   }
 
@@ -422,15 +422,15 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
 
   private void assertIterable(String flowName) throws Exception {
     InternalMessage out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    String outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    String outPayload = (String) out.getPayload().getValue();
 
     assertThat(outPayload, is("foo"));
     FlowAssert.verify(flowName);
 
     out = client.request("test://out", getTestTimeoutSecs()).getRight().get();
-    assertThat(out.getPayload(), instanceOf(String.class));
-    outPayload = (String) out.getPayload();
+    assertThat(out.getPayload().getValue(), instanceOf(String.class));
+    outPayload = (String) out.getPayload().getValue();
     assertThat(outPayload, is("bar"));
   }
 

@@ -39,17 +39,18 @@ public class MultiPartToAttachmentsTransformer extends AbstractMessageTransforme
     try {
       final Builder builder = InternalMessage.builder(message);
 
-      final DefaultMultiPartContent multiPartPayload = (DefaultMultiPartContent) message.getPayload();
+      final DefaultMultiPartContent multiPartPayload = (DefaultMultiPartContent) message.getPayload().getValue();
       if (multiPartPayload.hasBodyPart()) {
-        builder.payload(multiPartPayload.getBodyPart().getPayload());
+        builder.payload(multiPartPayload.getBodyPart().getPayload().getValue());
       } else {
         builder.nullPayload();
       }
 
       for (org.mule.runtime.api.message.Message muleMessage : multiPartPayload.getNonBodyParts()) {
         final PartAttributes attributes = (PartAttributes) muleMessage.getAttributes();
-        builder.addOutboundAttachment(attributes.getName(), toDataHandler(attributes.getName(), muleMessage.getPayload(),
-                                                                          muleMessage.getDataType().getMediaType()));
+        builder.addOutboundAttachment(attributes.getName(),
+                                      toDataHandler(attributes.getName(), muleMessage.getPayload().getValue(),
+                                                    muleMessage.getPayload().getDataType().getMediaType()));
       }
 
       return builder.build();

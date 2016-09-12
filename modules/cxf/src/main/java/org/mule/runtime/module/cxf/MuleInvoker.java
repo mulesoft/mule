@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.cxf;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.module.cxf.CxfConstants.UNWRAP_MULE_EXCEPTIONS;
 
@@ -150,13 +150,13 @@ public class MuleInvoker implements Invoker {
         }
 
         throw new Fault(cause);
-      } else if (resMessage.getPayload() == null) {
+      } else if (resMessage.getPayload().getValue() == null) {
         return new MessageContentsList((Object) null);
       } else if (cxfMmessageProcessor.isProxy()) {
-        resMessage.getPayload();
+        resMessage.getPayload().getValue();
         return new Object[] {resMessage};
       } else {
-        return new Object[] {resMessage.getPayload()};
+        return new Object[] {resMessage.getPayload().getValue()};
       }
     } else {
       exchange.getInMessage().getInterceptorChain().abort();

@@ -17,10 +17,9 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 
 /**
- * ExecutionTemplate created by this method should be used on the beginning of the execution of a chain of
- * {@link Processor}s that should manage exceptions. Should be used when: An asynchronous MessageProcessor chain is being
- * executed Because of an {@code <async>} element Because of an asynchronous processing strategy A Flow is called using a
- * {@code <flow-ref>} element.
+ * ExecutionTemplate created by this method should be used on the beginning of the execution of a chain of {@link Processor}s that
+ * should manage exceptions. Should be used when: An asynchronous MessageProcessor chain is being executed Because of an
+ * {@code <async>} element Because of an asynchronous processing strategy A Flow is called using a {@code <flow-ref>} element.
  * <p>
  * Instance of ErrorHandlingExecutionTemplate will: Route any exception to exception strategy.
  */

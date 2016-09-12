@@ -45,7 +45,7 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessagePr
     Processor mpChain = builder.build();
 
     result = mpChain.process(testOutboundEvent);
-    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload().getValue());
   }
 
   @Test
@@ -54,7 +54,7 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessagePr
     Processor mpChain = builder.build();
 
     result = mpChain.process(testOutboundEvent);
-    assertEquals(TEST_MESSAGE, result.getMessage().getPayload());
+    assertEquals(TEST_MESSAGE, result.getMessage().getPayload().getValue());
   }
 
   protected OutboundEndpoint createOutboundEndpoint(Filter filter, EndpointSecurityFilter securityFilter, Transformer in,

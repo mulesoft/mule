@@ -36,8 +36,8 @@ public class ExpressionSplitterSyncTestCase extends AbstractIntegrationTestCase 
     InternalMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    assertEquals(3, ((List) result.getPayload()).size());
+    assertTrue(result.getPayload().getValue() instanceof List);
+    assertEquals(3, ((List) result.getPayload().getValue()).size());
 
     FlowAssert.verify();
   }

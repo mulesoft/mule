@@ -52,7 +52,7 @@ public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
   public void returnsDefaultArray() throws Exception {
     Message response = flowRunner("returnsDefaultArray").run().getMessage();
 
-    assertRecords(response.getPayload(),
+    assertRecords(response.getPayload().getValue(),
                   new Record(new Field("REGION_NAME", NORTHWEST.getName()), new Field("ZIPS", NORTHWEST.getZips())),
                   new Record(new Field("REGION_NAME", SOUTHWEST.getName()), new Field("ZIPS", SOUTHWEST.getZips())));
   }
@@ -61,7 +61,7 @@ public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
   public void returnsMappedObjectArray() throws Exception {
     Message response = flowRunner("returnsCustomArray").run().getMessage();
 
-    assertRecords(response.getPayload(),
+    assertRecords(response.getPayload().getValue(),
                   new Record(new Field("CONTACT_NAME", CONTACT1.getName()), new Field("DETAILS", CONTACT1.getDetails())),
                   new Record(new Field("CONTACT_NAME", CONTACT2.getName()), new Field("DETAILS", CONTACT2.getDetails())));
   }

@@ -31,7 +31,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractInteg
     InternalMessage message = flowRunner("test").withPayload(getMatchMessage()).run().getMessage();
 
     assertNotNull(message);
-    assertThat(message.getPayload(), is("match"));
+    assertThat(message.getPayload().getValue(), is("match"));
   }
 
   @Test

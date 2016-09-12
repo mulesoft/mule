@@ -64,8 +64,8 @@ public class DefaultMultiPartContent implements Serializable, MultiPartContent {
         throw new IllegalArgumentException("Body parts may only have 'PartAttributes' as attributes.");
       }
 
-      if (part.getPayload() instanceof MultiPartContent) {
-        builder.addAll(((MultiPartContent) part.getPayload()).getParts());
+      if (part.getPayload().getValue() instanceof MultiPartContent) {
+        builder.addAll(((MultiPartContent) part.getPayload().getValue()).getParts());
       } else {
         builder.add(part);
       }

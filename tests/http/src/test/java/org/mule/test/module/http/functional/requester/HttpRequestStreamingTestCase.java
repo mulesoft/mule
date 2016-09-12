@@ -149,14 +149,14 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
   private void assertNoStreaming(Event response) throws Exception {
     assertNull(transferEncodingHeader);
     assertThat(Integer.parseInt(contentLengthHeader), equalTo(TEST_MESSAGE.length()));
-    assertTrue(response.getMessage().getPayload() instanceof InputStream);
+    assertTrue(response.getMessage().getPayload().getValue() instanceof InputStream);
     assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 
   private void assertStreaming(Event response) throws Exception {
     assertThat(transferEncodingHeader, equalTo(CHUNKED));
     assertNull(contentLengthHeader);
-    assertTrue(response.getMessage().getPayload() instanceof InputStream);
+    assertTrue(response.getMessage().getPayload().getValue() instanceof InputStream);
     assertThat(getPayloadAsString(response.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 

@@ -13,7 +13,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -68,7 +68,7 @@ public class XPath3FunctionTestCase extends AbstractELTestCase {
     Event event = getTestEvent(new ByteArrayInputStream(ROOT_FOO_BAR.getBytes()));
     final Builder builder = Event.builder(event);
     assertThat((String) doEvaluate("xpath3('/root/@foo')", event, builder), equalTo(BAR));
-    assertThat(builder.build().getMessage().getPayload(), instanceOf(Node.class));
+    assertThat(builder.build().getMessage().getPayload().getValue(), instanceOf(Node.class));
   }
 
   @Test

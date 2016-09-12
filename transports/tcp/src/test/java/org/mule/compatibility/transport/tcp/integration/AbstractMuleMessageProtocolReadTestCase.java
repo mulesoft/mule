@@ -37,7 +37,7 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
     MuleClient client = muleContext.getClient();
     safeProtocolSend("localhost", port.getNumber(), InternalMessage.builder().payload(TEST_MESSAGE).build());
     InternalMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
-    assertEquals(TEST_MESSAGE, response.getPayload());
+    assertEquals(TEST_MESSAGE, response.getPayload().getValue());
   }
 
   private void safeProtocolSend(String host, int port, InternalMessage msg) throws IOException, MuleException {
@@ -47,7 +47,8 @@ public abstract class AbstractMuleMessageProtocolReadTestCase extends Functional
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     WireFormat wireFormat = new SerializedMuleMessageWireFormat();
     wireFormat.setMuleContext(muleContext);
-    wireFormat.write(baos, msg, msg.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+    wireFormat.write(baos, msg,
+                     msg.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
     TcpProtocol delegate = createMuleMessageProtocol();
     delegate.write(outToServer, baos.toByteArray());
     clientSocket.close();

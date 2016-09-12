@@ -13,6 +13,7 @@ import static org.mule.extension.db.integration.DbTestUtil.assertExpectedUpdateC
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.model.Planet.MARS;
 import static org.mule.extension.db.integration.model.Planet.VENUS;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
@@ -69,8 +70,8 @@ public class BulkDeleteTestCase extends AbstractDbIntegrationTestCase {
   }
 
   private void assertBulkDelete(Message response) throws SQLException {
-    assertTrue(response.getPayload() instanceof int[]);
-    int[] counters = response.getPayload();
+    assertTrue(response.getPayload().getValue() instanceof int[]);
+    int[] counters = (int[]) response.getPayload().getValue();
     assertEquals(2, counters.length);
     assertExpectedUpdateCount(1, counters[0]);
     assertExpectedUpdateCount(1, counters[1]);

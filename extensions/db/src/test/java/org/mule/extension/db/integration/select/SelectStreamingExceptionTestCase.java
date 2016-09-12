@@ -63,6 +63,6 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
   @Test
   public void selectExceptionClosesPreviousResultSets() throws Exception {
     InternalMessage response = flowRunner("selectExceptionClosesPreviousResultSets").run().getMessage();
-    assertThat(response.getPayload(), is((Object) FALSE));
+    assertThat(response.getPayload().getValue(), is((Object) FALSE));
   }
 }

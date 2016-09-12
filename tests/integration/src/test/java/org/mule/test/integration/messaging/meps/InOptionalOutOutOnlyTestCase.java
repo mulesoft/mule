@@ -29,12 +29,12 @@ public class InOptionalOutOutOnlyTestCase extends AbstractIntegrationTestCase {
     InternalMessage result = baseRunner.run().getMessage();
 
     assertNotNull(result);
-    assertThat(result.getPayload(), is(nullValue()));
+    assertThat(result.getPayload().getValue(), is(nullValue()));
 
     baseRunner.reset();
     result = baseRunner.withInboundProperty("foo", "bar").run().getMessage();
 
     assertNotNull(result);
-    assertThat(result.getPayload(), is("foo header received"));
+    assertThat(result.getPayload().getValue(), is("foo header received"));
   }
 }

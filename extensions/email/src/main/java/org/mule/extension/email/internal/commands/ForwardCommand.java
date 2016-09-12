@@ -66,7 +66,7 @@ public final class ForwardCommand {
       subject = "Fwd: " + attributes.getSubject();
     }
 
-    String body = muleMessage.getPayload().toString();
+    String body = muleMessage.getPayload().getValue().toString();
     String forwardBody = content != null ? format("%s\r\n\r\n%s", content.getBody(), body) : body;
 
     EmailContent forwardContent = content != null ? new EmailContent(forwardBody, content.getContentType(), content.getCharset())
@@ -74,7 +74,7 @@ public final class ForwardCommand {
 
     ImmutableList<EmailAttachment> emailAttachments =
         ImmutableList.<EmailAttachment>builder()
-            .addAll(mapToEmailAttachments(muleMessage.getPayload()))
+            .addAll(mapToEmailAttachments(muleMessage.getPayload().getValue()))
             .addAll(attachments)
             .build();
 

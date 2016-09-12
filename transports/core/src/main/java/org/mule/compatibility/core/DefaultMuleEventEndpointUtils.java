@@ -24,9 +24,11 @@ public class DefaultMuleEventEndpointUtils {
   public static Event populateFieldsFromInboundEndpoint(Event event, InboundEndpoint endpoint) {
     Builder builder = Event.builder(event);
 
-    if (!event.getMessage().getDataType().getMediaType().getCharset().isPresent() && endpoint.getEncoding() != null) {
+    if (!event.getMessage().getPayload().getDataType().getMediaType().getCharset().isPresent()
+        && endpoint.getEncoding() != null) {
       builder.message(InternalMessage.builder(event.getMessage())
-          .mediaType(DataType.builder(event.getMessage().getDataType()).charset(endpoint.getEncoding()).build().getMediaType())
+          .mediaType(DataType.builder(event.getMessage().getPayload().getDataType()).charset(endpoint.getEncoding()).build()
+              .getMediaType())
           .build());
     }
 

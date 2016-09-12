@@ -44,7 +44,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
     CxfOutboundMessageProcessor processor = builder.build();
 
     Processor messageProcessor = event -> {
-      payload = event.getMessage().getPayload();
+      payload = event.getMessage().getPayload().getValue();
       try {
         System.out.println(getPayloadAsString(event.getMessage()));
       } catch (Exception e) {
@@ -59,7 +59,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
     Event response = processor.process(event);
     assertThat(processor.getClient().getRequestContext().isEmpty(), is(true));
     assertThat(processor.getClient().getResponseContext().isEmpty(), is(true));
-    Object payload = response.getMessage().getPayload();
+    Object payload = response.getMessage().getPayload().getValue();
     assertThat(payload, instanceOf(String.class));
     assertThat((String) payload, is("hello"));
     assertThat(gotEvent, is(true));

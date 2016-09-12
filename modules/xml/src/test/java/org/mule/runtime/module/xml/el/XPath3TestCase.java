@@ -89,7 +89,7 @@ public class XPath3TestCase extends FunctionalTestCase {
 
   @Test
   public void countLines() throws Exception {
-    Object result = flowRunner("countLines").withPayload(getOthello()).run().getMessage().getPayload();
+    Object result = flowRunner("countLines").withPayload(getOthello()).run().getMessage().getPayload().getValue();
     assertThat(result, instanceOf(Double.class));
     assertThat((Double) result, equalTo(LINES_COUNT));
   }
@@ -98,7 +98,7 @@ public class XPath3TestCase extends FunctionalTestCase {
   public void payloadConsumed() throws Exception {
     Event event = flowRunner("payloadConsumed").withPayload(getOthello()).run();
     assertThat((String) event.getVariable("result"), equalTo("3556"));
-    assertThat(event.getMessage().getPayload(), instanceOf(Node.class));
+    assertThat(event.getMessage().getPayload().getValue(), instanceOf(Node.class));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class XPath3TestCase extends FunctionalTestCase {
 
   private Object findLines(String word, XPathReturnType type) throws Exception {
     return flowRunner("shakespeareLines").withPayload(getOthello()).withFlowVariable("word", word)
-        .withFlowVariable("returnType", type.name()).run().getMessage().getPayload();
+        .withFlowVariable("returnType", type.name()).run().getMessage().getPayload().getValue();
   }
 
   private InputStream getOthello() throws IOException {

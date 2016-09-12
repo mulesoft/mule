@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.transport;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
@@ -260,7 +260,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
   }
 
   protected Charset resolveEncoding(Event event) {
-    return event.getMessage().getDataType().getMediaType().getCharset().orElseGet(() -> {
+    return event.getMessage().getPayload().getDataType().getMediaType().getCharset().orElseGet(() -> {
       Charset encoding = getEndpoint().getEncoding();
       if (encoding == null) {
         encoding = getDefaultEncoding(getEndpoint().getMuleContext());

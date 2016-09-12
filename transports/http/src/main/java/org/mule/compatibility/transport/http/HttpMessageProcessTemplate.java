@@ -30,7 +30,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_TRACE;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_BAD_REQUEST;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_CONTINUE;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROXY_ADDRESS;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_CLIENT_ADDRESS;
 
@@ -95,7 +95,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
 
       Object tempResponse;
       if (returnMessage != null) {
-        tempResponse = returnMessage.getPayload();
+        tempResponse = returnMessage.getPayload().getValue();
       } else {
         tempResponse = null;
       }
@@ -255,7 +255,7 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     // class
     return (HttpResponse) getMuleContext().getTransformationService().applyTransformers(message, null, getMessageReceiver()
         .getResponseTransportTransformers())
-        .getPayload();
+        .getPayload().getValue();
   }
 
   @Override

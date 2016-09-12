@@ -34,7 +34,7 @@ public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWire
     // Message rather than just the payload
 
     assertTrue(outMessage instanceof InternalMessage);
-    assertEquals("testMessage", ((InternalMessage) outMessage).getPayload());
+    assertEquals("testMessage", ((InternalMessage) outMessage).getPayload().getValue());
     assertEquals("val1", ((InternalMessage) outMessage).getOutboundProperty("key1"));
   }
 

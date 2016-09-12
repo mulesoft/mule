@@ -8,7 +8,7 @@ package org.mule.compatibility.core.transport;
 
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DEFAULT_MESSAGE_PROCESSING_MANAGER;
@@ -65,8 +65,8 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
   protected FlowConstruct flowConstruct;
 
   /**
-   * {@link Processor} chain used to process messages once the transport specific {@link MessageReceiver} has received
-   * transport message and created the {@link Event}
+   * {@link Processor} chain used to process messages once the transport specific {@link MessageReceiver} has received transport
+   * message and created the {@link Event}
    */
   protected Processor listener;
 

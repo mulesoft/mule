@@ -65,7 +65,8 @@ public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrati
 
     // should receive only the first part
     assertThat("Aggregator received wrong number of messages.", aggregator.getReceivedMessagesCount(), is(1));
-    assertThat("Wrong message received", ((List<InternalMessage>) aggregator.getLastReceivedMessage()).get(0).getPayload(),
+    assertThat("Wrong message received",
+               ((List<InternalMessage>) aggregator.getLastReceivedMessage()).get(0).getPayload().getValue(),
                is("first"));
 
     // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator

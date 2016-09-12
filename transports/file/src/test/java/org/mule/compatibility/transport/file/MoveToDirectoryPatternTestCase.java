@@ -40,7 +40,7 @@ public class MoveToDirectoryPatternTestCase extends FunctionalTestCase {
     writeTestMessageToInputDirectory();
     InternalMessage msg = client.request("vm://file.outbox", 3000).getRight().get();
     assertNotNull(msg);
-    assertEquals(TEST_MESSAGE, msg.getPayload());
+    assertEquals(TEST_MESSAGE, msg.getPayload().getValue());
   }
 
   private void writeTestMessageToInputDirectory() throws IOException {

@@ -52,15 +52,18 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     Event resultEvent = splitter.process(inEvent);
 
     assertEquals(3, listener.events.size());
-    assertTrue(listener.events.get(0).getMessage().getPayload() instanceof Fruit);
-    assertTrue(listener.events.get(1).getMessage().getPayload() instanceof Fruit);
-    assertTrue(listener.events.get(2).getMessage().getPayload() instanceof Fruit);
+    assertTrue(listener.events.get(0).getMessage().getPayload().getValue() instanceof Fruit);
+    assertTrue(listener.events.get(1).getMessage().getPayload().getValue() instanceof Fruit);
+    assertTrue(listener.events.get(2).getMessage().getPayload().getValue() instanceof Fruit);
 
-    assertThat(resultEvent.getMessage().getPayload(), instanceOf(List.class));
-    assertEquals(3, ((List<InternalMessage>) resultEvent.getMessage().getPayload()).size());
-    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload()).get(0).getPayload() instanceof Fruit);
-    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload()).get(1).getPayload() instanceof Fruit);
-    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload()).get(2).getPayload() instanceof Fruit);
+    assertThat(resultEvent.getMessage().getPayload().getValue(), instanceOf(List.class));
+    assertEquals(3, ((List<InternalMessage>) resultEvent.getMessage().getPayload().getValue()).size());
+    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload().getValue()).get(0).getPayload()
+        .getValue() instanceof Fruit);
+    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload().getValue()).get(1).getPayload()
+        .getValue() instanceof Fruit);
+    assertTrue(((List<InternalMessage>) resultEvent.getMessage().getPayload().getValue()).get(2).getPayload()
+        .getValue() instanceof Fruit);
   }
 
   @Test
@@ -99,7 +102,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
 
     @Override
     protected List<Event> splitMessage(Event event) {
-      FruitBowl bowl = (FruitBowl) event.getMessage().getPayload();
+      FruitBowl bowl = (FruitBowl) event.getMessage().getPayload().getValue();
       List<Event> parts = new ArrayList<>();
       for (Fruit fruit : bowl.getFruit()) {
         parts.add(Event.builder(event).message(InternalMessage.builder().payload(fruit).build()).build());

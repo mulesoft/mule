@@ -14,7 +14,7 @@ import org.mule.runtime.core.api.model.InvocationResult;
 public class CustomEntryPointResolver implements EntryPointResolver {
 
   public InvocationResult invoke(Object component, MuleEventContext context, Event.Builder eventBuilder) throws Exception {
-    return new InvocationResult(this, ((Target) component).custom(context.getMessage().getPayload()),
+    return new InvocationResult(this, ((Target) component).custom(context.getMessage().getPayload().getValue()),
                                 Target.class.getMethod("custom", new Class[] {Object.class}));
   }
 

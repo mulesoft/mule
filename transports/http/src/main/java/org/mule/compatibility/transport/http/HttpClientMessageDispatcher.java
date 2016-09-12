@@ -179,7 +179,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
     InternalMessage msg = event.getMessage();
 
     HttpMethod httpMethod;
-    Object body = event.getMessage().getPayload();
+    Object body = event.getMessage().getPayload().getValue();
 
     if (body instanceof HttpMethod) {
       httpMethod = (HttpMethod) body;
@@ -216,8 +216,10 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher imple
       httpMethod = (HttpMethod) sendTransformer.transform(body.toString());
     } else if (body instanceof byte[]) {
       byte[] buffer = (byte[]) event.transformMessage(DataType.BYTE_ARRAY, muleContext);
-      postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, event.getMessage().getDataType().getMediaType().getCharset()
-          .get().name()));
+      postMethod
+          .setRequestEntity(new ByteArrayRequestEntity(buffer,
+                                                       event.getMessage().getPayload().getDataType().getMediaType().getCharset()
+                                                           .get().name()));
       httpMethod = postMethod;
     } else {
       if (!(body instanceof OutputHandler)) {

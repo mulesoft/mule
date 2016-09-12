@@ -102,7 +102,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
       }
     }
 
-    DataType dataType = event.getMessage().getDataType();
+    DataType dataType = event.getMessage().getPayload().getDataType();
     if (!MediaType.ANY.matches(dataType.getMediaType())) {
       httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
     }
@@ -127,7 +127,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     HttpEntity httpEntity;
 
     if (!event.getMessage().getOutboundAttachmentNames().isEmpty()
-        || event.getMessage().getPayload() instanceof MultiPartContent) {
+        || event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
       if (configuredContentType == null) {
         httpResponseHeaderBuilder.addContentType(createMultipartFormDataContentType());
       } else if (!configuredContentType.startsWith(MULTIPART)) {
@@ -137,7 +137,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding(event),
                       (ByteArrayHttpEntity) httpEntity);
     } else {
-      final Object payload = event.getMessage().getPayload();
+      final Object payload = event.getMessage().getPayload().getValue();
       if (payload == null) {
         setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
         httpEntity = new EmptyHttpEntity();
@@ -278,7 +278,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     HttpEntity entity = new EmptyHttpEntity();
     if (!mapPayload.isEmpty()) {
       String encodedBody;
-      final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
+      final Charset encoding = event.getMessage().getPayload().getDataType().getMediaType().getCharset().get();
       if (mapPayload instanceof ParameterMap) {
         encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
       } else {
@@ -317,10 +317,12 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     }
 
     try {
-      if (event.getMessage().getPayload() instanceof MultiPartContent) {
-        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) event.getMessage().getPayload()).getParts()) {
+      if (event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
+        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) event.getMessage().getPayload().getValue())
+            .getParts()) {
           final String partName = ((PartAttributes) part.getAttributes()).getName();
-          parts.put(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType()));
+          parts.put(partName,
+                    toDataHandler(partName, part.getPayload().getValue(), part.getPayload().getDataType().getMediaType()));
         }
       }
 

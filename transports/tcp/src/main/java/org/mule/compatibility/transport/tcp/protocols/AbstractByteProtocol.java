@@ -70,7 +70,7 @@ public abstract class AbstractByteProtocol implements TcpProtocol {
         throw new IOException("TCP protocol " + ClassUtils.getSimpleName(getClass()) + " cannot handle streaming");
       }
     } else if (data instanceof InternalMessage) {
-      write(os, ((InternalMessage) data).getPayload());
+      write(os, ((InternalMessage) data).getPayload().getValue());
     } else if (data instanceof byte[]) {
       writeByteArray(os, (byte[]) data);
     } else if (data instanceof String) {

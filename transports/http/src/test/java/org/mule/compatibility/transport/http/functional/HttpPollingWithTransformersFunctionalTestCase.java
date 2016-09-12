@@ -52,7 +52,7 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
 
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.request("vm://toclient", 50000).getRight().get();
-    assertNotNull(result.getPayload());
+    assertNotNull(result.getPayload().getValue());
     assertTrue("Callback called", latch.await(1000, TimeUnit.MILLISECONDS));
     assertEquals("/foo toClient-only", getPayloadAsString(result));
     // The transform should not have been propagated to the outbound endpoint

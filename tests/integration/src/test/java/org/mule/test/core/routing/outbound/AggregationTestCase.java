@@ -55,10 +55,11 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
     flowRunner("SplitterFlow").withPayload(PAYLOAD).asynchronously().run();
     InternalMessage msg = client.request("test://collectionCreated", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
-    assertTrue(msg.getPayload() instanceof List);
+    assertTrue(msg.getPayload().getValue() instanceof List);
 
     List<byte[]> chunks =
-        ((List<InternalMessage>) msg.getPayload()).stream().map(muleMessage -> (byte[]) muleMessage.getPayload())
+        ((List<InternalMessage>) msg.getPayload().getValue()).stream()
+            .map(muleMessage -> (byte[]) muleMessage.getPayload().getValue())
             .collect(toList());
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     for (byte[] chunk : chunks) {
@@ -74,15 +75,15 @@ public class AggregationTestCase extends AbstractIntegrationTestCase {
     flowRunner("SplitterFlow2").withPayload(PAYLOAD).asynchronously().run();
     InternalMessage msg = client.request("test://collectionCreated2", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
-    assertNotNull(msg.getPayload());
-    assertTrue(msg.getPayload() instanceof List);
+    assertNotNull(msg.getPayload().getValue());
+    assertTrue(msg.getPayload().getValue() instanceof List);
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    for (Object obj : (List<?>) msg.getPayload()) {
+    for (Object obj : (List<?>) msg.getPayload().getValue()) {
       assertTrue(obj instanceof Event);
       Event event = (Event) obj;
-      assertTrue(event.getMessage().getPayload() instanceof byte[]);
-      baos.write((byte[]) event.getMessage().getPayload());
+      assertTrue(event.getMessage().getPayload().getValue() instanceof byte[]);
+      baos.write((byte[]) event.getMessage().getPayload().getValue());
     }
     String aggregated = baos.toString();
     assertEquals(PAYLOAD, aggregated);

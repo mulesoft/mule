@@ -51,7 +51,7 @@ public class SafeProtocolTestCase extends FunctionalTestCase {
 
   private void assertResponseOk(InternalMessage message) {
     assertNotNull("Null message", message);
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     assertNotNull("Null payload", payload);
     assertTrue("Payload not byte[]", payload instanceof byte[]);
     assertEquals(TEST_MESSAGE + " Received", new String((byte[]) payload));

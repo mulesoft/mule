@@ -45,7 +45,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
 
     InternalMessage message = factory.create(null, encoding);
     assertNotNull(message);
-    assertEquals(null, message.getPayload());
+    assertEquals(null, message.getPayload().getValue());
   }
 
   @Test
@@ -55,7 +55,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleCon
     Object payload = getValidTransportMessage();
     InternalMessage message = factory.create(payload, encoding);
     assertNotNull(message);
-    assertEquals(payload, message.getPayload());
+    assertEquals(payload, message.getPayload().getValue());
   }
 
   @Test // this test cannot use expected=MessageTypeNotSupportedException as it is not always exectued

@@ -59,7 +59,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
     assertTrue(result instanceof InternalMessage);
     InternalMessage transformedMessage = (InternalMessage) result;
 
-    assertEquals("Test", transformedMessage.getPayload());
+    assertEquals("Test", transformedMessage.getPayload().getValue());
 
   }
 

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.connector;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.petstore.extension.PetCage;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -32,21 +33,21 @@ public class PetStoreComplexParameterTestCase extends ExtensionFunctionalTestCas
 
   @Test
   public void configWithConfigReferences() throws Exception {
-    PetCage cage = flowRunner("getCageWithReferences").run().getMessage().getPayload();
+    PetCage cage = (PetCage) flowRunner("getCageWithReferences").run().getMessage().getPayload().getValue();
     assertBirds(cage.getBirds());
     assertAmmenities(cage.getAmmenities());
   }
 
   @Test
   public void configWithConfigMELReferences() throws Exception {
-    PetCage cage = flowRunner("getCageWithMELReferences").run().getMessage().getPayload();
+    PetCage cage = (PetCage) flowRunner("getCageWithMELReferences").run().getMessage().getPayload().getValue();
     assertBirds(cage.getBirds());
     assertAmmenities(cage.getAmmenities());
   }
 
   @Test
   public void configWithConfigChildElements() throws Exception {
-    PetCage cage = flowRunner("getCageWithChildElements").run().getMessage().getPayload();
+    PetCage cage = (PetCage) flowRunner("getCageWithChildElements").run().getMessage().getPayload().getValue();
     assertBirds(cage.getBirds());
     assertAmmenities(cage.getAmmenities());
   }

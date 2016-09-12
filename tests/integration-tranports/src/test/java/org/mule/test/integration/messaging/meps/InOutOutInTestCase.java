@@ -38,6 +38,6 @@ public class InOutOutInTestCase extends FunctionalTestCase {
     props.put("foo", "bar");
     InternalMessage result = client.send("inboundEndpoint", "some data", props).getRight();
     assertNotNull(result);
-    assertEquals("bar header received", result.getPayload());
+    assertEquals("bar header received", result.getPayload().getValue());
   }
 }

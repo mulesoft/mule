@@ -30,7 +30,7 @@ public class SpringPrototypesLifecycleTestCase extends AbstractIntegrationTestCa
     final Event muleEvent = flowRunner("testFlow").withPayload(new A(TEST_MESSAGE)).run();
     final InternalMessage response = muleEvent.getMessage();
 
-    assertThat(response.getPayload(), is(instanceOf(B.class)));
+    assertThat(response.getPayload().getValue(), is(instanceOf(B.class)));
   }
 
   @Test
@@ -39,6 +39,6 @@ public class SpringPrototypesLifecycleTestCase extends AbstractIntegrationTestCa
         flowRunner("testExceptionHandlerWithTransformerInEndpointFlow").withPayload(new A(TEST_MESSAGE)).run();
     final InternalMessage response = muleEvent.getMessage();
 
-    assertThat(response.getPayload(), is(instanceOf(B.class)));
+    assertThat(response.getPayload().getValue(), is(instanceOf(B.class)));
   }
 }

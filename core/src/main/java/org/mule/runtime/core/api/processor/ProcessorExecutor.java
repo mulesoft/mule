@@ -10,8 +10,8 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 
 /**
- * Iterates over a list of {@link org.mule.runtime.core.api.processor.Processor}s executing them one by one using the
- * result of the first processor to invoke the second and so on. {@link org.mule.runtime.core.api.processor.ProcessorExecutor}
+ * Iterates over a list of {@link org.mule.runtime.core.api.processor.Processor}s executing them one by one using the result of
+ * the first processor to invoke the second and so on. {@link org.mule.runtime.core.api.processor.ProcessorExecutor}
  * implementations aside from simply iterating over processors implement rules regarding if and when iteration should stop early
  * or even stop temporarily and be continued later.
  *
@@ -20,14 +20,12 @@ import org.mule.runtime.core.api.Event;
 public interface ProcessorExecutor {
 
   /**
-   * Executes a list of {@link org.mule.runtime.core.api.processor.Processor}s. Execution may or may not return the result
-   * of executing all of the {@link org.mule.runtime.core.api.processor.Processor}'s or not depending on the
-   * implementation. For example processing may be cut short in certain circumstance or be continued in another thread at a later
-   * point in time.
+   * Executes a list of {@link org.mule.runtime.core.api.processor.Processor}s. Execution may or may not return the result of
+   * executing all of the {@link org.mule.runtime.core.api.processor.Processor}'s or not depending on the implementation. For
+   * example processing may be cut short in certain circumstance or be continued in another thread at a later point in time.
    *
    * @return result of processing zero or more {@link org.mule.runtime.core.api.processor.Processor}'s synchronously.
-   * @throws MessagingException exception thrown doing {@link org.mule.runtime.core.api.processor.Processor execution}, if
-   *         any.
+   * @throws MessagingException exception thrown doing {@link org.mule.runtime.core.api.processor.Processor execution}, if any.
    */
   public Event execute() throws MessagingException;
 

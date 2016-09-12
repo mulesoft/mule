@@ -34,7 +34,7 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
       flowRunner("InputService2").withPayload("Test Message").run();
     } catch (MessagingException e) {
       assertThat(e.getCause(), is(instanceOf(ComponentException.class)));
-      assertThat(e.getEvent().getMessage().getPayload(), is(nullValue()));
+      assertThat(e.getEvent().getMessage().getPayload().getValue(), is(nullValue()));
     }
   }
 
@@ -47,8 +47,8 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
     assertThat(event.getError().isPresent(), is(true));
     assertEquals("Functional Test Service Exception", event.getError().get().getDescription());
 
-    assertNotNull(msg.getPayload());
-    assertEquals("Ka-boom!", msg.getPayload());
+    assertNotNull(msg.getPayload().getValue());
+    assertEquals("Ka-boom!", msg.getPayload().getValue());
   }
 
   public static class TestExceptionStrategy extends AbstractMessagingExceptionStrategy {

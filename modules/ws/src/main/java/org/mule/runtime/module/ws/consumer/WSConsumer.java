@@ -9,7 +9,7 @@ package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
 import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -406,11 +406,12 @@ public class WSConsumer
     }
 
     try {
-      if (message.getPayload() instanceof MultiPartContent) {
-        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) message.getPayload()).getParts()) {
+      if (message.getPayload().getValue() instanceof MultiPartContent) {
+        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) message.getPayload().getValue()).getParts()) {
           final String partName = ((PartAttributes) part.getAttributes()).getName();
           attachments
-              .add(new AttachmentImpl(partName, toDataHandler(partName, part.getPayload(), part.getDataType().getMediaType())));
+              .add(new AttachmentImpl(partName, toDataHandler(partName, part.getPayload().getValue(),
+                                                              part.getPayload().getDataType().getMediaType())));
         }
         builder.nullPayload();
       }
@@ -437,7 +438,8 @@ public class WSConsumer
 
       if (!attachments.isEmpty()) {
         List<org.mule.runtime.api.message.Message> parts = new ArrayList<>();
-        parts.add(InternalMessage.builder().payload(message.getPayload()).mediaType(message.getDataType().getMediaType())
+        parts.add(InternalMessage.builder().payload(message.getPayload().getValue())
+            .mediaType(message.getPayload().getDataType().getMediaType())
             .attributes(BODY_ATTRIBUTES).build());
 
         for (Attachment attachment : attachments) {

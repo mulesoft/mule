@@ -21,7 +21,7 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -63,7 +63,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage result = enricher.process(getTestEvent("")).getMessage();
     assertEquals("test", result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -79,7 +79,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage result = enricher.process(getTestEvent("")).getMessage();
     assertEquals("test", result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -106,7 +106,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     assertEquals("test2", result.getOutboundProperty("myHeader2"));
     assertEquals("test3", result.getOutboundProperty("myHeader3"));
 
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -118,7 +118,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage result = enricher.process(getTestEvent("")).getMessage();
     assertNull(result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload());
+    assertEquals("", result.getPayload().getValue());
   }
 
   @Test
@@ -152,7 +152,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     Event out = enricher.process(in);
     assertThat(out.getCorrelationId(), equalTo(in.getCorrelationId()));
     assertThat(out.getMessage().getOutboundProperty("foo"), equalTo("bar"));
-    assertThat(out.getMessage().getPayload(), equalTo(in.getMessage().getPayload()));
+    assertThat(out.getMessage().getPayload().getValue(), equalTo(in.getMessage().getPayload().getValue()));
   }
 
   @Test
@@ -185,7 +185,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Event out = enricher.process(in);
 
-    assertEquals("", out.getMessage().getPayload());
+    assertEquals("", out.getMessage().getPayload().getValue());
   }
 
   @Test

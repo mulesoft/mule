@@ -47,7 +47,7 @@ public class TransformationServiceNullTransformationTestCase extends AbstractMul
     InternalMessage message = InternalMessage.builder().payload("").build();
     message = transformationService.applyTransformers(message, null, transformer1, transformer2);
 
-    assertEquals("foo", message.getPayload());
+    assertEquals("foo", message.getPayload().getValue());
     verify(transformer1, never()).transform(null);
     verify(transformer1, never()).isAcceptNull();
     verify(transformer2, never()).transform(null);

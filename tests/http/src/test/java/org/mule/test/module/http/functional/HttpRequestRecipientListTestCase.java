@@ -42,10 +42,11 @@ public class HttpRequestRecipientListTestCase extends FunctionalTestCase {
         .withInboundProperty("urls", new String[] {getUrlForPort(port1), getUrlForPort(port2), getUrlForPort(port3)}).run();
 
     assertThat(response, notNullValue());
-    assertThat(response.getMessage().getPayload(), IsInstanceOf.instanceOf(List.class));
+    assertThat(response.getMessage().getPayload().getValue(), IsInstanceOf.instanceOf(List.class));
     InternalMessage aggregatedResponse = response.getMessage();
-    assertThat(((List<InternalMessage>) aggregatedResponse.getPayload()).size(), is(3));
-    final InternalMessage[] messages = (InternalMessage[]) ((List<InternalMessage>) aggregatedResponse.getPayload()).toArray();
+    assertThat(((List<InternalMessage>) aggregatedResponse.getPayload().getValue()).size(), is(3));
+    final InternalMessage[] messages =
+        (InternalMessage[]) ((List<InternalMessage>) aggregatedResponse.getPayload().getValue()).toArray();
     for (int i = 0; i < messages.length; i++) {
       InternalMessage message = messages[i];
       assertThat(message, notNullValue());

@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -91,7 +92,7 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
 
   @Test
   public void testSerializablePayload() throws Exception {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("key1", "value1");
     map.put("key2", "value2");
 
@@ -100,8 +101,8 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
 
     InternalMessage message = client.request("test://out6", RECEIVE_TIMEOUT).getRight().get();
 
-    assertTrue(message.getPayload() instanceof ExceptionMessage);
-    Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
+    assertTrue(message.getPayload().getValue() instanceof ExceptionMessage);
+    Object payload = ((ExceptionMessage) message.getPayload().getValue()).getPayload();
     assertTrue("payload shoud be a Map, but is " + payload.getClass().getName(), payload instanceof Map<?, ?>);
     Map<?, ?> payloadMap = (Map<?, ?>) payload;
     assertEquals("value1", payloadMap.get("key1"));
@@ -133,8 +134,8 @@ public class DefaultServiceExceptionStrategyTestCase extends AbstractIntegration
   }
 
   private void assertExceptionMessage(InternalMessage out) {
-    assertThat(out.getPayload(), is(instanceOf(ExceptionMessage.class)));
-    ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
+    assertThat(out.getPayload().getValue(), is(instanceOf(ExceptionMessage.class)));
+    ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload().getValue();
     assertThat(exceptionMessage.getException().getCause().getCause(), is(instanceOf(FunctionalTestException.class)));
     assertThat(exceptionMessage.getPayload(), is("test"));
   }

@@ -56,7 +56,7 @@ public class MulticastRouterTestCase extends AbstractIntegrationTestCase {
    */
   private void assertRoutingExceptionReceived(InternalMessage message) {
     assertThat(message, is(notNullValue()));
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     assertThat(payload, is(notNullValue()));
     assertThat(payload, is(instanceOf(ExceptionMessage.class)));
     ExceptionMessage exceptionMessage = (ExceptionMessage) payload;

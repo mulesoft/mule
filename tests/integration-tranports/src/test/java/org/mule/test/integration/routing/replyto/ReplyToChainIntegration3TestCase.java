@@ -36,7 +36,7 @@ public class ReplyToChainIntegration3TestCase extends FunctionalTestCase {
     client.dispatch("vm://pojo1", message, null);
     InternalMessage result = client.request("jms://response", 10000).getRight().get();
     assertNotNull(result);
-    assertEquals("Received: " + message, result.getPayload());
+    assertEquals("Received: " + message, result.getPayload().getValue());
   }
 
   public static class SetReplyTo extends AbstractMessageTransformer {

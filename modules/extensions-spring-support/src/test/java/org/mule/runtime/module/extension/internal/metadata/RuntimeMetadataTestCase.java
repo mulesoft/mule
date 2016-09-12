@@ -13,6 +13,7 @@ import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.N
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.test.metadata.extension.LocationKey;
 
@@ -27,7 +28,7 @@ public class RuntimeMetadataTestCase extends MetadataExtensionFunctionalTestCase
 
   @Test
   public void injectComposedMetadataKeyIdInstanceInOperation() throws Exception {
-    LocationKey payload = flowRunner(SIMPLE_MULTILEVEL_KEY_RESOLVER).run().getMessage().getPayload();
+    LocationKey payload = (LocationKey) flowRunner(SIMPLE_MULTILEVEL_KEY_RESOLVER).run().getMessage().getPayload().getValue();
     LocationKey expected = new LocationKey();
     expected.setContinent(AMERICA);
     expected.setCountry(USA);
@@ -37,21 +38,21 @@ public class RuntimeMetadataTestCase extends MetadataExtensionFunctionalTestCase
 
   @Test
   public void injectSimpleMetadataKeyIdInOperation() throws Exception {
-    final String metadataKey = flowRunner(OUTPUT_ONLY_WITHOUT_CONTENT_PARAM).run().getMessage().getPayload();
+    final String metadataKey = (String) flowRunner(OUTPUT_ONLY_WITHOUT_CONTENT_PARAM).run().getMessage().getPayload().getValue();
     assertThat(metadataKey, is(PERSON));
   }
 
   @Test
   public void injectTranslatedNativeQuery() throws Exception {
     Event event = flowRunner(QUERY_FLOW).run();
-    String nativeQuery = event.getMessage().getPayload();
+    String nativeQuery = (String) event.getMessage().getPayload().getValue();
     assertThat(nativeQuery, is(NATIVE_QUERY));
   }
 
   @Test
   public void injectNonTranslatedNativeQuery() throws Exception {
     Event event = flowRunner(NATIVE_QUERY_FLOW).run();
-    String nativeQuery = event.getMessage().getPayload();
+    String nativeQuery = (String) event.getMessage().getPayload().getValue();
     assertThat(nativeQuery.trim(), is(NATIVE_QUERY));
   }
 }

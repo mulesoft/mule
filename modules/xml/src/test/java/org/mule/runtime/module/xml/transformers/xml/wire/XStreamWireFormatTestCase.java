@@ -52,8 +52,8 @@ public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTest
     // MULE-3118
     // See test implementation in AbstractMuleMessageWireFormatTestCase.
     assertTrue(outObject instanceof InternalMessage);
-    assertEquals("Walmart", ((Orange) ((InternalMessage) outObject).getPayload()).getBrand());
-    assertEquals("val1", ((Orange) ((InternalMessage) outObject).getPayload()).getMapProperties().get("key1"));
+    assertEquals("Walmart", ((Orange) ((InternalMessage) outObject).getPayload().getValue()).getBrand());
+    assertEquals("val1", ((Orange) ((InternalMessage) outObject).getPayload().getValue()).getMapProperties().get("key1"));
   }
 
 }

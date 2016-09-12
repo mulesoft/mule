@@ -106,7 +106,7 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
     try {
       final InternalMessage message = event.getMessage();
       if (message instanceof InternalMessage) {
-        if (message.getDataType().isStreamType()) {
+        if (message.getPayload().getDataType().isStreamType()) {
           event.getMessageAsBytes(muleContext);
         } else {
           ensureSerializable(message);
@@ -121,8 +121,8 @@ public abstract class AbstractUntilSuccessfulProcessingStrategy implements Until
   }
 
   protected void ensureSerializable(InternalMessage message) throws NotSerializableException {
-    if (!(message.getPayload() instanceof Serializable)) {
-      throw new NotSerializableException(message.getDataType().getType().getCanonicalName());
+    if (!(message.getPayload().getValue() instanceof Serializable)) {
+      throw new NotSerializableException(message.getPayload().getDataType().getType().getCanonicalName());
     }
   }
 

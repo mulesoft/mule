@@ -55,7 +55,7 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase {
     if (ok) {
       InternalMessage response = client.send(endpoint, message, null).getRight();
       assertNotNull(response);
-      assertNotNull(response.getPayload());
+      assertNotNull(response.getPayload().getValue());
       assertTrue(Arrays.equals(message, getPayloadAsBytes(response)));
     } else {
       assertResponseBad(client.send(endpoint, message, null).getRight());

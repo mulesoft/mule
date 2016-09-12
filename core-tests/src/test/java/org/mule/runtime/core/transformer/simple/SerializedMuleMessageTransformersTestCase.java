@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.transformer.simple;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -127,8 +127,8 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
   }
 
   private boolean comparePayloads(InternalMessage src, InternalMessage result) {
-    Object sourcePayload = src.getPayload();
-    Object resultPayload = result.getPayload();
+    Object sourcePayload = src.getPayload().getValue();
+    Object resultPayload = result.getPayload().getValue();
     return sourcePayload.equals(resultPayload);
   }
 

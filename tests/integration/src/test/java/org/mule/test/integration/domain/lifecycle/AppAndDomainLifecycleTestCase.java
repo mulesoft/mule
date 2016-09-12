@@ -47,7 +47,7 @@ public class AppAndDomainLifecycleTestCase extends AbstractMuleTestCase {
                                             InternalMessage.builder().payload("test").build())
               .getRight();
       assertThat(response, notNullValue());
-      assertThat(secondAppContext.getTransformationService().transform(response, DataType.STRING).getPayload(),
+      assertThat(secondAppContext.getTransformationService().transform(response, DataType.STRING).getPayload().getValue(),
                  is("hello world"));
       assertThat((domainContext.getRegistry().<DefaultHttpListenerConfig>get("sharedListenerConfig")).isStarted(), is(true));
     } finally {

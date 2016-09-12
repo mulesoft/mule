@@ -131,7 +131,7 @@ public class HolderNonBlockingTestCase extends FunctionalTestCase {
   }
 
   private static <T> T deserializeResponse(InternalMessage received) throws Exception {
-    ObjectInputStream objectInputStream = new ObjectInputStream((InputStream) received.getPayload());
+    ObjectInputStream objectInputStream = new ObjectInputStream((InputStream) received.getPayload().getValue());
     Object objectPayload = objectInputStream.readObject();
     return (T) objectPayload;
   }

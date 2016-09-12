@@ -52,7 +52,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
     Event event = getTestEvent("foo");
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("message.payload", event, eventBuilder, flowConstruct, "bar");
-    assertThat(eventBuilder.build().getMessage().getPayload(), is("bar"));
+    assertThat(eventBuilder.build().getMessage().getPayload().getValue(), is("bar"));
   }
 
   @Test

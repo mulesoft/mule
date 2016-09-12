@@ -67,6 +67,6 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
     Event response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
     Serializable attributes = response.getMessage().getAttributes();
     assertThat(attributes, instanceOf(HttpResponseAttributes.class));
-    assertThat(((MultiPartContent) response.getMessage().getPayload()).getParts(), hasSize(1));
+    assertThat(((MultiPartContent) response.getMessage().getPayload().getValue()).getParts(), hasSize(1));
   }
 }

@@ -90,9 +90,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(attributes)));
-    assertThat(message.getDataType().getMediaType(), is(mediaType));
+    assertThat(message.getPayload().getDataType().getMediaType(), is(mediaType));
   }
 
   @Test
@@ -110,9 +110,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     InternalMessage message = messageProcessor.process(event).getVariable(TARGET_VAR);
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(attributes)));
-    assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
+    assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
   @Test
@@ -129,9 +129,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-    assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
+    assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
   @Test
@@ -145,9 +145,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-    assertThat(message.getDataType().getType().equals(String.class), is(true));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   @Test
@@ -161,9 +161,9 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(attributes)));
-    assertThat(message.getDataType().getType().equals(String.class), is(true));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   @Test
@@ -173,7 +173,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     InternalMessage message = messageProcessor.process(event).getMessage();
     assertThat(message, is(notNullValue()));
-    assertThat(message.getPayload(), is(sameInstance(value)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(value)));
   }
 
   @Test
@@ -186,7 +186,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
 
     InternalMessage message = messageProcessor.process(event).getVariable(TARGET_VAR);
     assertThat(message, is(notNullValue()));
-    assertThat(message.getPayload(), is(sameInstance(value)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(value)));
   }
 
   @Test

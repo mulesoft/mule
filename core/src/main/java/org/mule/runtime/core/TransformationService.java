@@ -114,7 +114,7 @@ public class TransformationService {
   }
 
   protected Charset resolveEncoding(InternalMessage message) {
-    return message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
+    return message.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext));
   }
 
   /**
@@ -127,7 +127,7 @@ public class TransformationService {
    * @return message payload as a String or message with the payload type if payload can't be converted to a String
    */
   public String getPayloadForLogging(InternalMessage message, Charset encoding) {
-    DataType dataType = message.getDataType();
+    DataType dataType = message.getPayload().getDataType();
     if (!dataType.isStreamType()) {
       try {
         return getPayload(message, DataType.STRING, encoding);
@@ -146,7 +146,7 @@ public class TransformationService {
       for (int index = 0; index < transformers.size(); index++) {
         Transformer transformer = transformers.get(index);
 
-        Class<?> srcCls = result.getDataType().getType();
+        Class<?> srcCls = result.getPayload().getDataType().getType();
         DataType originalSourceType = DataType.fromType(srcCls);
 
         if (transformer.isSourceDataTypeSupported(originalSourceType)) {
@@ -190,7 +190,7 @@ public class TransformationService {
     if (transformer instanceof Converter) {
       if (index == transformers.size() - 1) {
         try {
-          TransformerUtils.checkTransformerReturnClass(transformer, message.getPayload());
+          TransformerUtils.checkTransformerReturnClass(transformer, message.getPayload().getValue());
           skipConverter = true;
         } catch (TransformerException e) {
           // Converter cannot be skipped
@@ -230,10 +230,10 @@ public class TransformationService {
   }
 
   private MediaType mergeMediaType(InternalMessage message, DataType transformed) {
-    DataType original = message.getDataType();
+    DataType original = message.getPayload().getDataType();
     MediaType mimeType = ANY.matches(transformed.getMediaType()) ? original.getMediaType() : transformed.getMediaType();
     Charset encoding = transformed.getMediaType().getCharset()
-        .orElse(message.getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
+        .orElse(message.getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding(muleContext)));
 
     return DataType.builder().mediaType(mimeType).charset(encoding).build().getMediaType();
   }
@@ -257,11 +257,11 @@ public class TransformationService {
       throw new IllegalArgumentException(CoreMessages.objectIsNull("resultType").getMessage());
     }
 
-    DataType dataType = DataType.builder(resultType).type(message.getDataType().getType()).build();
+    DataType dataType = DataType.builder(resultType).type(message.getPayload().getDataType().getType()).build();
 
     // If no conversion is necessary, just return the payload as-is
     if (resultType.isCompatibleWith(dataType)) {
-      return (T) message.getPayload();
+      return (T) message.getPayload().getValue();
     }
 
     // The transformer to execute on this message

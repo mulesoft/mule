@@ -205,7 +205,7 @@ public class InvokerMessageProcessor extends AbstractAnnotatedObject
 
       // If expression evaluates to a Message then use it's payload
       if (arg instanceof InternalMessage) {
-        arg = ((InternalMessage) arg).getPayload();
+        arg = ((InternalMessage) arg).getPayload().getValue();
       }
       return arg;
     } else {

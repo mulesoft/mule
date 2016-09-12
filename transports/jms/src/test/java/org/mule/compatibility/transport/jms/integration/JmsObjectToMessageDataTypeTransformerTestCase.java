@@ -45,7 +45,7 @@ public class JmsObjectToMessageDataTypeTransformerTestCase extends AbstractJmsFu
 
     @Override
     public Event process(Event event) throws MuleException {
-      assertThat(event.getMessage().getDataType().getType(), typeCompatibleWith(TextMessage.class));
+      assertThat(event.getMessage().getPayload().getDataType().getType(), typeCompatibleWith(TextMessage.class));
       return event;
     }
   }

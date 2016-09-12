@@ -31,7 +31,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase {
     InternalMessage response = flowRunner("test for xml").withPayload(STRING_MESSAGE).run().getMessage();
 
     assertNotNull(response);
-    assertNotNull(response.getPayload());
+    assertNotNull(response.getPayload().getValue());
     assertEquals(STRING_MESSAGE, getPayloadAsString(response));
   }
 
@@ -50,7 +50,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase {
   public void doTestXml(String endpoint, String xml) throws Exception {
     InternalMessage response = flowRunner("test for xml").withPayload(xml).run().getMessage();
     assertNotNull(response);
-    assertNotNull(response.getPayload());
+    assertNotNull(response.getPayload().getValue());
     assertEquals(xml, getPayloadAsString(response));
   }
 

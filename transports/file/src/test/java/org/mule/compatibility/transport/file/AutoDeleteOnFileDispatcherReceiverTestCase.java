@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
@@ -61,12 +61,12 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
     setCurrentEvent(event);
 
     InternalMessage message = muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName, 50000).getRight().get();
-    assertNotNull(message.getPayload());
-    assertTrue(message.getPayload() instanceof InputStream);
+    assertNotNull(message.getPayload().getValue());
+    assertTrue(message.getPayload().getValue() instanceof InputStream);
 
     // Auto-delete happens after FileInputStream.close() when streaming. Streaming is default.
     assertTrue(tempDir.listFiles().length > 0);
-    ((InputStream) message.getPayload()).close();
+    ((InputStream) message.getPayload().getValue()).close();
     // Give file-system some time (annoying but necessary wait apparently due to OS caching?)
     Prober prober = new PollingProber(1000, 100);
     prober.check(new Probe() {

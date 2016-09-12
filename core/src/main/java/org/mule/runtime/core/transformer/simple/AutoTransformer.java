@@ -39,6 +39,6 @@ public class AutoTransformer extends AbstractMessageTransformer {
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
     return muleContext.getTransformationService().transform(event.getMessage(), DataType.fromType(getReturnDataType().getType()))
-        .getPayload();
+        .getPayload().getValue();
   }
 }

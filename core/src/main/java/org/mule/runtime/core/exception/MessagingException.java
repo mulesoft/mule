@@ -135,18 +135,18 @@ public class MessagingException extends MuleException {
 
     if (muleMessage != null) {
       if (DefaultMuleConfiguration.isVerboseExceptions()) {
-        Object payload = muleMessage.getPayload();
+        Object payload = muleMessage.getPayload().getValue();
 
-        if (muleMessage.getDataType().isStreamType()) {
+        if (muleMessage.getPayload().getDataType().isStreamType()) {
           addInfo(PAYLOAD_INFO_KEY, abbreviate(payload.toString(), 1000));
         } else {
           if (payload != null) {
-            addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getDataType().getType().getName());
+            addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getPayload().getDataType().getType().getName());
             if (muleContext != null) {
               // TODO MULE-10266 review how the transformationService is obtained when building an exception.
               try {
                 addInfo(PAYLOAD_INFO_KEY,
-                        muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload());
+                        muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload().getValue());
               } catch (Exception e) {
                 addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
               }

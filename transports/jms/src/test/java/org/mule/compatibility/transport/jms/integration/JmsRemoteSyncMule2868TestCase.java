@@ -25,6 +25,6 @@ public class JmsRemoteSyncMule2868TestCase extends AbstractJmsFunctionalTestCase
   public void testMule2868() throws MuleException {
     MuleClient muleClient = muleContext.getClient();
     InternalMessage response = muleClient.send("vm://in", "test", null).getRight();
-    assertEquals("test Received", response.getPayload());
+    assertEquals("test Received", response.getPayload().getValue());
   }
 }

@@ -175,8 +175,8 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
       assertThat(listener.messageNotificationList, hasSize(1));
       assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_SEND_BEGIN));
       assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(InternalMessage.class));
-      assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                 equalTo(outboundEvent.getMessage().getPayload()));
+      assertThat(listener.messageNotificationList.get(0).getSource().getPayload().getValue(),
+                 equalTo(outboundEvent.getMessage().getPayload().getValue()));
     };
 
     endpoint.process(outboundEvent);
@@ -188,9 +188,9 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_SEND_END));
     assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(InternalMessage.class));
     assertThat(listener.messageNotificationList.get(1).getSource(), instanceOf(InternalMessage.class));
-    assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-               equalTo(outboundEvent.getMessage().getPayload()));
-    assertThat(listener.messageNotificationList.get(1).getSource().getPayload(), is((Object) RESPONSE_MESSAGE));
+    assertThat(listener.messageNotificationList.get(0).getSource().getPayload().getValue(),
+               equalTo(outboundEvent.getMessage().getPayload().getValue()));
+    assertThat(listener.messageNotificationList.get(1).getSource().getPayload().getValue(), is((Object) RESPONSE_MESSAGE));
   }
 
   @Test
@@ -210,8 +210,8 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
       assertThat(listener.messageNotificationList, hasSize(1));
       assertThat(listener.messageNotificationList.get(0).getAction(), is(MESSAGE_DISPATCH_BEGIN));
       assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(InternalMessage.class));
-      assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-                 equalTo(outboundEvent.getMessage().getPayload()));
+      assertThat(listener.messageNotificationList.get(0).getSource().getPayload().getValue(),
+                 equalTo(outboundEvent.getMessage().getPayload().getValue()));
     };
 
     endpoint.process(outboundEvent);
@@ -223,10 +223,10 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     assertThat(listener.messageNotificationList.get(1).getAction(), is(MESSAGE_DISPATCH_END));
     assertThat(listener.messageNotificationList.get(0).getSource(), instanceOf(InternalMessage.class));
     assertThat(listener.messageNotificationList.get(1).getSource(), instanceOf(InternalMessage.class));
-    assertThat(listener.messageNotificationList.get(0).getSource().getPayload(),
-               equalTo(outboundEvent.getMessage().getPayload()));
-    assertThat(listener.messageNotificationList.get(1).getSource().getPayload(),
-               equalTo(outboundEvent.getMessage().getPayload()));
+    assertThat(listener.messageNotificationList.get(0).getSource().getPayload().getValue(),
+               equalTo(outboundEvent.getMessage().getPayload().getValue()));
+    assertThat(listener.messageNotificationList.get(1).getSource().getPayload().getValue(),
+               equalTo(outboundEvent.getMessage().getPayload().getValue()));
   }
 
   @Test
@@ -282,8 +282,8 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
   }
 
   protected void assertEqualMessages(InternalMessage expect, InternalMessage actual) {
-    assertThat(actual.getPayload(), equalTo(expect.getPayload()));
-    assertEquals(expect.getDataType(), actual.getDataType());
+    assertThat(actual.getPayload().getValue(), equalTo(expect.getPayload().getValue()));
+    assertEquals(expect.getPayload().getDataType(), actual.getPayload().getDataType());
   }
 
   private void assertEventDispatched() {

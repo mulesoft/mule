@@ -15,14 +15,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -137,9 +137,9 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
   public void dynamicFlowRefWithScatterGather() throws Exception {
     List<InternalMessage> messageList =
         (List<InternalMessage>) flowRunner("flow2").withPayload("0").withFlowVariable("letter", "SG").run().getMessage()
-            .getPayload();
+            .getPayload().getValue();
 
-    List payloads = messageList.stream().map(InternalMessage::getPayload).collect(toList());
+    List payloads = messageList.stream().map(msg -> msg.getPayload().getValue()).collect(toList());
     assertEquals("0A", payloads.get(0));
     assertEquals("0B", payloads.get(1));
   }

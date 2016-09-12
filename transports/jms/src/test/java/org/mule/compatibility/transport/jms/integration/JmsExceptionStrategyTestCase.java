@@ -71,7 +71,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase 
     assertThat(muleMessage, IsNull.<Object>notNullValue());
     // This is currently expected
     /*
-     * assertThat(muleMessage, notNullValue()); assertThat((String) muleMessage.getPayload(), Is.is(MESSAGE));
+     * assertThat(muleMessage, notNullValue()); assertThat((String) muleMessage.getPayload().getValue(), Is.is(MESSAGE));
      */
 
     // Check outbound-endpoint was not executed
@@ -125,7 +125,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase 
     // Check exception notification was sent
     InternalMessage exceptionMessage = muleClient.request("jms://exception4", TIMEOUT).getRight().get();
     assertThat(exceptionMessage, IsNull.<Object>notNullValue());
-    assertThat(exceptionMessage.getPayload(), IsNull.<Object>notNullValue());
+    assertThat(exceptionMessage.getPayload().getValue(), IsNull.<Object>notNullValue());
 
     // Check outbound-endpoint was not executed
     assertThat(muleClient.request("jms://out4", SHORT_TIMEOUT).getRight().isPresent(), is(false));
@@ -145,7 +145,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase 
     // Check exception notification was sent
     InternalMessage deadLetter = muleClient.request("jms://DLQ5", TIMEOUT).getRight().get();
     assertThat(deadLetter, IsNull.<Object>notNullValue());
-    assertThat(deadLetter.getPayload(), IsNull.<Object>notNullValue());
+    assertThat(deadLetter.getPayload().getValue(), IsNull.<Object>notNullValue());
 
     // Check outbound-endpoint was not executed
     assertThat(muleClient.request("jms://out5", SHORT_TIMEOUT).getRight().isPresent(), is(false));
@@ -165,7 +165,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase 
     // Check exception notification was sent
     InternalMessage deadLetter = muleClient.request("jms://DLQ6", TIMEOUT).getRight().get();
     assertThat(deadLetter, IsNull.<Object>notNullValue());
-    assertThat(deadLetter.getPayload(), IsNull.<Object>notNullValue());
+    assertThat(deadLetter.getPayload().getValue(), IsNull.<Object>notNullValue());
 
     // Check outbound-endpoint was not executed
     assertThat(muleClient.request("jms://out6", SHORT_TIMEOUT).getRight().isPresent(), is(false));

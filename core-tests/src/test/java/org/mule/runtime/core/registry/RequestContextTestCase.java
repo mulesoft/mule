@@ -9,7 +9,7 @@ package org.mule.runtime.core.registry;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
 import org.mule.runtime.core.DefaultEventContext;

@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -62,7 +63,7 @@ public class XmlHintsFunctionalTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void eatPealed() throws Exception {
-    Banana banana = flowRunner("eatPealedBanana").run().getMessage().getPayload();
+    Banana banana = (Banana) flowRunner("eatPealedBanana").run().getMessage().getPayload().getValue();
     assertThat(banana.isBitten(), is(true));
   }
 

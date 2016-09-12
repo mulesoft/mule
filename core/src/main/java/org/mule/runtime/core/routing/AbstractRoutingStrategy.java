@@ -109,8 +109,8 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
    * @throws MuleException if the payload is consumable
    */
   public static void validateMessageIsNotConsumable(Event event, InternalMessage message) throws MuleException {
-    if (message.getDataType().isStreamType()) {
-      throw new DefaultMuleException(cannotCopyStreamPayload(message.getDataType().getType().getName()));
+    if (message.getPayload().getDataType().isStreamType()) {
+      throw new DefaultMuleException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
     }
   }
 
@@ -126,8 +126,8 @@ public abstract class AbstractRoutingStrategy implements RoutingStrategy {
    * @throws MuleException If the payload of the message is consumable.
    */
   protected static void assertNonConsumableMessage(InternalMessage message) throws MuleException {
-    if (message.getDataType().isStreamType()) {
-      throw new DefaultMuleException(cannotCopyStreamPayload(message.getDataType().getType().getName()));
+    if (message.getPayload().getDataType().isStreamType()) {
+      throw new DefaultMuleException(cannotCopyStreamPayload(message.getPayload().getDataType().getType().getName()));
     }
   }
 }

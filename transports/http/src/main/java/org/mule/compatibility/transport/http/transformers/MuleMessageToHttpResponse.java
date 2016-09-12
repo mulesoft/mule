@@ -81,7 +81,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
 
     // Note this transformer excepts Null as we must always return a result
     // from the Http
@@ -177,9 +177,9 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer {
       version = HttpConstants.HTTP11;
     }
 
-    String contentType = msg.getDataType().getMediaType().toRfcString();
+    String contentType = msg.getPayload().getDataType().getMediaType().toRfcString();
     if (contentType == null) {
-      DataType dataType = msg.getDataType();
+      DataType dataType = msg.getPayload().getDataType();
       if (!MediaType.ANY.matches(dataType.getMediaType())) {
         contentType = dataType.getMediaType().toRfcString();
       }

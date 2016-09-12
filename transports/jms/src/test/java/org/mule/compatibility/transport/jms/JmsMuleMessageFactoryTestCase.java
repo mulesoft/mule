@@ -61,7 +61,7 @@ public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTes
     Object payload = getValidTransportMessage();
     InternalMessage message = factory.create(payload, encoding);
     assertNotNull(message);
-    assertEquals(payload, message.getPayload());
+    assertEquals(payload, message.getPayload().getValue());
     // message factory populates the inbound scope
     assertEquals("bar", message.getInboundProperty("foo"));
   }

@@ -84,10 +84,10 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase 
 
   protected void checkReceivedMessage(InternalMessage message) throws Exception {
     assertNotNull(message);
-    assertNotNull(message.getPayload());
-    assertTrue(message.getPayload() instanceof InputStream);
+    assertNotNull(message.getPayload().getValue());
+    assertTrue(message.getPayload().getValue() instanceof InputStream);
 
-    InputStream fis = (InputStream) message.getPayload();
+    InputStream fis = (InputStream) message.getPayload().getValue();
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
     IOUtils.copy(fis, byteOut);
     fis.close();

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.enricher;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -80,7 +80,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
     if (typedValue.getValue() instanceof InternalMessage) {
       InternalMessage muleMessage = (InternalMessage) typedValue.getValue();
-      typedValue = new DefaultTypedValue(muleMessage.getPayload(), muleMessage.getDataType());
+      typedValue = new DefaultTypedValue(muleMessage.getPayload().getValue(), muleMessage.getPayload().getDataType());
     }
 
     if (!StringUtils.isEmpty(targetExpressionArg)) {

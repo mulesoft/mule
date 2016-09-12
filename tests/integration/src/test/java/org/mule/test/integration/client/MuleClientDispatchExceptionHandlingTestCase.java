@@ -9,7 +9,7 @@ package org.mule.test.integration.client;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -119,7 +119,8 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
       // that invocatioeventPropagated = getCurrentEvent().equals(eventFromMainFlow);
       // Checking if message is still the same on on-error-continue
-      isSameMessage = Objects.equals(getCurrentEvent().getMessage().getPayload(), messageFromMainFlow.getPayload());
+      isSameMessage =
+          Objects.equals(getCurrentEvent().getMessage().getPayload().getValue(), messageFromMainFlow.getPayload().getValue());
       return eventContext.getMessage();
     }
   }
@@ -133,7 +134,8 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
       // eventContext.dispatchEvent() on main-flow java component where the exception happened right after
       // that invocatioeventPropagated = getCurrentEvent().equals(eventFromMainFlow);
       // Checking if message is still the same on on-error-continue
-      isSameMessage = Objects.equals(getCurrentEvent().getMessage().getPayload(), messageFromMainFlow.getPayload());
+      isSameMessage =
+          Objects.equals(getCurrentEvent().getMessage().getPayload().getValue(), messageFromMainFlow.getPayload().getValue());
       return event;
     }
   }

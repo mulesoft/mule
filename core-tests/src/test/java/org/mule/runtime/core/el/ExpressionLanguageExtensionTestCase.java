@@ -120,7 +120,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.evaluate("p='bar'", event, eventBuilder, flowConstruct);
-    assertThat(eventBuilder.build().getMessage().getPayload(), is("bar"));
+    assertThat(eventBuilder.build().getMessage().getPayload().getValue(), is("bar"));
   }
 
   @Test

@@ -22,7 +22,7 @@ public class InterceptorFlowTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.request("test://out", 3000).getRight().get();
     assertNotNull(message);
-    String payload = (String) message.getPayload();
+    String payload = (String) message.getPayload().getValue();
     assertNotNull(payload);
     // note that there is an exclamation mark on the end that was added by the interceptor
     assertEquals(TEST_PAYLOAD + "!", payload);

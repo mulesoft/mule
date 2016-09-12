@@ -36,8 +36,8 @@ public class IdempotentRouterWithFilterTestCase extends AbstractIntegrationTestC
     InternalMessage response = myClient.request("test://ToTestCase", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull(response);
-    assertNotNull(response.getPayload());
-    assertThat(response.getPayload(), is("Mule is the best!"));
+    assertNotNull(response.getPayload().getValue());
+    assertThat(response.getPayload().getValue(), is("Mule is the best!"));
   }
 
   /**

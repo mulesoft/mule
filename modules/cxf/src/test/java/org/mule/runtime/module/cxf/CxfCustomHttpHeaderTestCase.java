@@ -86,7 +86,7 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
         .getRight();
 
     assertNotNull(reply);
-    assertNotNull(reply.getPayload());
+    assertNotNull(reply.getPayload().getValue());
     assertEquals(SOAP_RESPONSE, getPayloadAsString(reply));
 
     latch.await(3000, SECONDS);

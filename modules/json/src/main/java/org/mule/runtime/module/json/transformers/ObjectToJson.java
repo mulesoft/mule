@@ -69,7 +69,7 @@ public class ObjectToJson extends AbstractJsonTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
     if (src instanceof String && isJsonFilter.accept(src)) {
       // Nothing to transform
       return src;

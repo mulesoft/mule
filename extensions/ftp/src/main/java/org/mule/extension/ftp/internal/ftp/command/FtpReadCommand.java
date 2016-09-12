@@ -70,7 +70,7 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
 
     try {
       InputStream payload = ClassicFtpInputStream.newInstance((FtpConnector) config, attributes, pathLock);
-      MediaType mediaType = fileSystem.getFileMessageMediaType(message.getDataType().getMediaType(), attributes);
+      MediaType mediaType = fileSystem.getFileMessageMediaType(message.getPayload().getDataType().getMediaType(), attributes);
       return OperationResult.<InputStream, FileAttributes>builder().output(payload).mediaType(mediaType).attributes(attributes)
           .build();
     } catch (ConnectionException e) {

@@ -32,7 +32,7 @@ public class IsXmlFilter implements Filter {
 
   @Override
   public boolean accept(InternalMessage obj, Event.Builder builder) {
-    return accept(obj.getPayload());
+    return accept(obj.getPayload().getValue());
   }
 
   private boolean accept(Object obj) {

@@ -73,7 +73,7 @@ public class MessageRootIdPropagationTestCase extends AbstractIntegrationTestCas
     @Override
     public Object transformMessage(Event event, Charset outputEncoding) {
       process(event.getMessage());
-      return event.getMessage().getPayload();
+      return event.getMessage().getPayload().getValue();
     }
 
     public static Set<InternalMessage> getIds() {

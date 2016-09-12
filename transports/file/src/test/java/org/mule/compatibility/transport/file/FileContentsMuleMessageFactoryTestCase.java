@@ -72,7 +72,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
 
   private void assertPayload(InternalMessage message) {
     byte[] expected = TEST_MESSAGE.getBytes();
-    byte[] result = (byte[]) message.getPayload();
+    byte[] result = (byte[]) message.getPayload().getValue();
     assertTrue(Arrays.equals(expected, result));
   }
 }

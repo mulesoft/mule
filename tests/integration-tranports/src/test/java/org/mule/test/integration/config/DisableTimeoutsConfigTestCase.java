@@ -38,6 +38,6 @@ public class DisableTimeoutsConfigTestCase extends FunctionalTestCase {
   public void socketReadWriteResponseTimeout() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send("vm://tcpTimeout", "hi", null).getRight();
-    assertEquals("hiho", message.getPayload());
+    assertEquals("hiho", message.getPayload().getValue());
   }
 }

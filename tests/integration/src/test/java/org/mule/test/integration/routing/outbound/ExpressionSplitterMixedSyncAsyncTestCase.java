@@ -36,8 +36,8 @@ public class ExpressionSplitterMixedSyncAsyncTestCase extends AbstractIntegratio
     InternalMessage result = flowRunner("Distributor").withPayload(fruitBowl).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
-    List<InternalMessage> coll = (List<InternalMessage>) result.getPayload();
+    assertTrue(result.getPayload().getValue() instanceof List);
+    List<InternalMessage> coll = (List<InternalMessage>) result.getPayload().getValue();
     assertEquals(2, coll.size());
 
     FlowAssert.verify();

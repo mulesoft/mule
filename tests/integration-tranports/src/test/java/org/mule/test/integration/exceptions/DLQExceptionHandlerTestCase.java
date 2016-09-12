@@ -9,16 +9,14 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.message.ExceptionMessage;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class DLQExceptionHandlerTestCase extends FunctionalTestCase {
@@ -43,7 +41,7 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase {
     }
     assertNotNull(message);
 
-    ExceptionMessage em = (ExceptionMessage) message.getPayload();
+    ExceptionMessage em = (ExceptionMessage) message.getPayload().getValue();
     assertEquals("testing 1 2 3", em.getPayload());
   }
 }

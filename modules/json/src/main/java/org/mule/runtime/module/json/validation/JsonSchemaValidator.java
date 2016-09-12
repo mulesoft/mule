@@ -235,7 +235,7 @@ public class JsonSchemaValidator {
    */
   public Event validate(Event event, MuleContext muleContext) throws MuleException {
     final org.mule.runtime.core.api.Event.Builder builder = Event.builder(event);
-    Object input = event.getMessage().getPayload();
+    Object input = event.getMessage().getPayload().getValue();
     ProcessingReport report;
     JsonNode jsonNode = null;
 

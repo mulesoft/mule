@@ -41,7 +41,7 @@ public class CxfContentTypeNonBlockingTestCase extends FunctionalTestCase {
     InternalMessage received = client.send("http://localhost:" + dynamicPort.getNumber() + "/hello", request,
                                            newOptions().method(POST.name()).disableStatusCodeValidation().build())
         .getRight();
-    String contentType = received.getDataType().getMediaType().toRfcString();
+    String contentType = received.getPayload().getDataType().getMediaType().toRfcString();
     assertNotNull(contentType);
     assertTrue(contentType.contains("charset"));
   }

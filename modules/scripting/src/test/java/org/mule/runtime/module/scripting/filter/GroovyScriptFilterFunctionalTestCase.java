@@ -38,7 +38,7 @@ public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase {
     flowRunner("filterService").withPayload("hello").asynchronously().run();
     InternalMessage response = client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertEquals("hello", response.getPayload());
+    assertEquals("hello", response.getPayload().getValue());
 
     flowRunner("filterService").withPayload("1").asynchronously().run();
     assertThat(client.request("test://filterServiceTestOut", RECEIVE_TIMEOUT).getRight().isPresent(), is(false));

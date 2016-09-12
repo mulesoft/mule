@@ -43,7 +43,7 @@ public class EventToMessageSequenceSplittingStrategyTestCase extends AbstractMul
   public void copiableCollection() {
     Copiable<Collection<String>> collection = mock(Copiable.class, withSettings().extraInterfaces(Collection.class));
     when(collection.copy()).thenReturn(testCollection);
-    when(event.getMessage().getPayload()).thenReturn(collection);
+    when(event.getMessage().getPayload().getValue()).thenReturn(collection);
 
     assertCollectionSequence();
     verify(collection).copy();
@@ -51,7 +51,7 @@ public class EventToMessageSequenceSplittingStrategyTestCase extends AbstractMul
 
   @Test
   public void nonCopiableCollection() {
-    when(event.getMessage().getPayload()).thenReturn(testCollection);
+    when(event.getMessage().getPayload().getValue()).thenReturn(testCollection);
     assertCollectionSequence();
   }
 

@@ -13,14 +13,14 @@ package org.mule.runtime.core.api;
  * Unsupported implementations will cause Mule to fall back to synchronous blocking processing. <br />
  *
  * Supporting non blocking means that i) This components does not require synchronous processing ii) That any response processing
- * (processing done on the result after invoking a child/next {@link org.mule.runtime.core.api.processor.Processor} will
- * also be processed when running non-blocking. <br />
+ * (processing done on the result after invoking a child/next {@link org.mule.runtime.core.api.processor.Processor} will also be
+ * processed when running non-blocking. <br />
  *
  * One easy way of supporting non-blocking if a components needs to do response processing is to extend
  * {@link org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor}
  * <p/>
- * Note: All standard {@link org.mule.runtime.core.api.processor.Processor} implementations that aren't one of the two
- * types mentioned above are implicitly supported.
+ * Note: All standard {@link org.mule.runtime.core.api.processor.Processor} implementations that aren't one of the two types
+ * mentioned above are implicitly supported.
  *
  * @since 3.7
  */

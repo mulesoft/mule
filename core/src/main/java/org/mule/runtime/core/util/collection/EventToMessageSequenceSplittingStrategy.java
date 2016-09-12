@@ -28,7 +28,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
   @SuppressWarnings({"unchecked", "rawtypes"})
   public MessageSequence<?> split(Event event) {
     InternalMessage msg = event.getMessage();
-    Object payload = msg.getPayload();
+    Object payload = msg.getPayload().getValue();
     if (payload instanceof MessageSequence<?>) {
       return ((MessageSequence<?>) payload);
     }

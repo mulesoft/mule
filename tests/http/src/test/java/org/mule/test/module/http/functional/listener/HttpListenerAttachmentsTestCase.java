@@ -136,21 +136,21 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
   @Test
   public void respondWithSeveralAttachments() throws Exception {
     InternalMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage()).getRight();
-    assertThat(response.getPayload(), instanceOf(MultiPartContent.class));
-    assertThat(((MultiPartContent) response.getPayload()).getParts(), hasSize(2));
+    assertThat(response.getPayload().getValue(), instanceOf(MultiPartContent.class));
+    assertThat(((MultiPartContent) response.getPayload().getValue()).getParts(), hasSize(2));
 
     org.mule.runtime.api.message.Message attachment1 =
-        ((MultiPartContent) response.getPayload()).getPart(FILE_BODY_FIELD_NAME);
+        ((MultiPartContent) response.getPayload().getValue()).getPart(FILE_BODY_FIELD_NAME);
     assertThat(attachment1.getAttributes(), instanceOf(PartAttributes.class));
     assertThat(((PartAttributes) attachment1.getAttributes()).getName(), is(FILE_BODY_FIELD_NAME));
     assertThat(((PartAttributes) attachment1.getAttributes()).getFileName(), is(FILE_BODY_FIELD_FILENAME));
-    assertThat(attachment1.getDataType().getMediaType(), is(MediaType.BINARY));
-    assertThat(IOUtils.toString((InputStream) attachment1.getPayload()), is(FILE_BODY_FIELD_VALUE));
+    assertThat(attachment1.getPayload().getDataType().getMediaType(), is(MediaType.BINARY));
+    assertThat(IOUtils.toString((InputStream) attachment1.getPayload().getValue()), is(FILE_BODY_FIELD_VALUE));
 
     org.mule.runtime.api.message.Message attachment2 =
-        ((MultiPartContent) response.getPayload()).getPart(TEXT_BODY_FIELD_NAME);
-    assertThat(IOUtils.toString((InputStream) attachment2.getPayload()), is(TEXT_BODY_FIELD_VALUE));
-    assertThat(attachment2.getDataType().getMediaType().toRfcString(), is(TEXT_PLAIN.toString()));
+        ((MultiPartContent) response.getPayload().getValue()).getPart(TEXT_BODY_FIELD_NAME);
+    assertThat(IOUtils.toString((InputStream) attachment2.getPayload().getValue()), is(TEXT_BODY_FIELD_VALUE));
+    assertThat(attachment2.getPayload().getDataType().getMediaType().toRfcString(), is(TEXT_PLAIN.toString()));
   }
 
   @Test
@@ -191,8 +191,8 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
       final CloseableHttpResponse response = httpClient.execute(httpPost);
       try {
         final InternalMessage receivedMessage = muleContext.getClient().request("test://out", 1000).getRight().get();
-        assertThat(receivedMessage.getPayload(), instanceOf(MultiPartContent.class));
-        MultiPartContent receivedParts = ((MultiPartContent) receivedMessage.getPayload());
+        assertThat(receivedMessage.getPayload().getValue(), instanceOf(MultiPartContent.class));
+        MultiPartContent receivedParts = ((MultiPartContent) receivedMessage.getPayload().getValue());
         assertThat(receivedParts.getParts().size(), is(2));
         assertThat(receivedParts.getPartNames(), hasItem(TEXT_BODY_FIELD_NAME));
         assertThat(receivedParts.getPartNames(), hasItem(FILE_BODY_FIELD_NAME));
@@ -284,13 +284,14 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
     @Override
     public Event process(Event event) throws MuleException {
       List<org.mule.extension.http.api.HttpPart> parts = new LinkedList<>();
-      ((MultiPartContent) event.getMessage().getPayload()).getParts().forEach(m -> {
+      ((MultiPartContent) event.getMessage().getPayload().getValue()).getParts().forEach(m -> {
         String filename = null;
         final PartAttributes attributes = (PartAttributes) m.getAttributes();
         if (!attributes.getName().equals(attributes.getFileName())) {
           filename = ((PartAttributes) m.getAttributes()).getFileName();
         }
-        parts.add(new org.mule.extension.http.api.HttpPart(attributes.getName(), m.getPayload(), m.getDataType().getMediaType(),
+        parts.add(new org.mule.extension.http.api.HttpPart(attributes.getName(), m.getPayload().getValue(),
+                                                           m.getPayload().getDataType().getMediaType(),
                                                            filename));
       });
       return Event.builder(event).addVariable("parts", parts).build();

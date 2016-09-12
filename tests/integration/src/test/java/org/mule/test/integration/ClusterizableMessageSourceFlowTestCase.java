@@ -36,7 +36,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
-    assertEquals("TEST", response.getPayload());
+    assertEquals("TEST", response.getPayload().getValue());
   }
 
   @Test
@@ -68,7 +68,7 @@ public class ClusterizableMessageSourceFlowTestCase extends AbstractIntegrationT
 
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
-    assertEquals("TEST", response.getPayload());
+    assertEquals("TEST", response.getPayload().getValue());
   }
 
   private class TestPollingController implements PollingController {

@@ -91,7 +91,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     configureXaTransactionAndSingleResourceTransaction();
 
     Event resultEvent = onErrorContinueHandler.handleException(mockException, muleEvent);
-    assertThat(resultEvent.getMessage().getPayload(), equalTo(muleEvent.getMessage().getPayload()));
+    assertThat(resultEvent.getMessage().getPayload().getValue(), equalTo(muleEvent.getMessage().getPayload().getValue()));
 
     verify(mockTransaction, times(0)).setRollbackOnly();
     verify(mockTransaction, times(0)).commit();
@@ -109,7 +109,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     onErrorContinueHandler.initialise();
     final Event result = onErrorContinueHandler.handleException(mockException, muleEvent);
 
-    assertThat(result.getMessage().getPayload(), is("B"));
+    assertThat(result.getMessage().getPayload().getValue(), is("B"));
     assertThat(result.getError().isPresent(), is(false));
   }
 

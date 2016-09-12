@@ -59,7 +59,7 @@ public class JsonSchemaJsonValidationFilter implements JsonSchemaFilter {
   @Override
   public boolean accept(Event event, Event.Builder builder) {
     JsonNode data;
-    Object input = event.getMessage().getPayload();
+    Object input = event.getMessage().getPayload().getValue();
     Object output = input;
 
     try {

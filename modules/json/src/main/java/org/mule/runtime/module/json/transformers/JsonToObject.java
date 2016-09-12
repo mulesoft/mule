@@ -62,7 +62,7 @@ public class JsonToObject extends AbstractJsonTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
     Object returnValue;
     InputStream is = null;
     Reader reader = null;

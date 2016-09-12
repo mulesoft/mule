@@ -232,8 +232,8 @@ public class HttpListenerHttpMessagePropertiesTestCase extends AbstractHttpTestC
   }
 
   public HttpRequestAttributes getAttributes(InternalMessage message) {
-    assertThat(message.getPayload(), is(instanceOf(HttpRequestAttributes.class)));
-    return (HttpRequestAttributes) message.getPayload();
+    assertThat(message.getPayload().getValue(), is(instanceOf(HttpRequestAttributes.class)));
+    return (HttpRequestAttributes) message.getPayload().getValue();
   }
 
   public String buildQueryString(Map<String, Object> queryParams) throws UnsupportedEncodingException {

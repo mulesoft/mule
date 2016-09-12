@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
+
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
@@ -58,24 +59,24 @@ public class UpdateTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void update() throws Exception {
     Message response = flowRunner("update").run().getMessage();
-    verifyUpdatedRecord(response.getPayload());
+    verifyUpdatedRecord((StatementResult) response.getPayload().getValue());
   }
 
   @Test
   public void updateDynamic() throws Exception {
     Message response = flowRunner("updateDynamic").run().getMessage();
-    verifyUpdatedRecord(response.getPayload());
+    verifyUpdatedRecord((StatementResult) response.getPayload().getValue());
   }
 
   @Test
   public void updateParameterized() throws Exception {
     Message response = flowRunner("updateParameterized").withPayload(PLUTO).run().getMessage();
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     assertPlanetRecordsFromQuery(PLUTO);
   }
 
   private void assertMergeResult(Message response) throws SQLException {
-    StatementResult result = response.getPayload();
+    StatementResult result = (StatementResult) response.getPayload().getValue();
     assertThat(result.getAffectedRows(), is(3));
 
     List<Map<String, String>> data = selectData("select * from PLANET order by ID", getDefaultDataSource());

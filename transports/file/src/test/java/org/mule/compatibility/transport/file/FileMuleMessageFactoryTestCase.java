@@ -77,8 +77,8 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     ReceiverFileInputStream mockStream = new ReceiverFileInputStream(file, false, null);
 
     InternalMessage message = factory.create(mockStream, encoding);
-    assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
-    assertThat(message.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
+    assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+    assertThat(message.getPayload().getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
   }
 
   private void assertMessageProperties(InternalMessage message) {

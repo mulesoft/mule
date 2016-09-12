@@ -63,8 +63,8 @@ public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
   protected void assertMessageInDlq() throws MuleException {
     InternalMessage dl = client.request(JMS_DEAD_LETTER, 1000).getRight().get();
     assertNotNull(dl);
-    assertTrue(dl.getPayload() instanceof ExceptionMessage);
-    ExceptionMessage em = (ExceptionMessage) dl.getPayload();
+    assertTrue(dl.getPayload().getValue() instanceof ExceptionMessage);
+    ExceptionMessage em = (ExceptionMessage) dl.getPayload().getValue();
     assertNotNull(em.getException());
     assertTrue(em.getException() instanceof MessageRedeliveredException);
   }

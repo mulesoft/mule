@@ -75,7 +75,8 @@ public class ExceptionStrategyCommonScenariosTestCase extends AbstractIntegratio
     @Override
     public Event handleException(MessagingException e, Event event) {
       return Event.builder(super.handleException(e, event))
-          .message(InternalMessage.builder(event.getMessage()).payload(event.getMessage().getPayload()).build()).build();
+          .message(InternalMessage.builder(event.getMessage()).payload(event.getMessage().getPayload().getValue()).build())
+          .build();
     }
   }
 }

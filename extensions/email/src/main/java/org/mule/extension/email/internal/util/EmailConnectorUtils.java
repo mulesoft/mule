@@ -135,7 +135,8 @@ public final class EmailConnectorUtils {
     return payload instanceof DefaultMultiPartContent
         ? ((DefaultMultiPartContent) payload)
             .getNonBodyParts().stream().map(p -> new EmailAttachment(((PartAttributes) p.getAttributes()).getName(),
-                                                                     p.getPayload(), p.getDataType().getMediaType()))
+                                                                     p.getPayload().getValue(),
+                                                                     p.getPayload().getDataType().getMediaType()))
             .collect(toList())
         : emptyList();
   }

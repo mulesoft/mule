@@ -70,7 +70,7 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
 
     InternalMessage message = client.request("test://error.queue", 2000).getRight().get();
     assertNotNull(message);
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     assertTrue(payload instanceof ExceptionMessage);
 
     assertNotificationsArrived();

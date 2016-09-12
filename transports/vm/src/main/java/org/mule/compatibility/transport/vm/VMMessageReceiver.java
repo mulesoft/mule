@@ -81,7 +81,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver {
   public void onMessage(InternalMessage message) throws MuleException {
     // Rewrite the message to treat it as a new message
     CompatibilityMessage newMessage =
-        (CompatibilityMessage) new MuleCompatibilityMessageBuilder(message).payload(message.getPayload()).build();
+        (CompatibilityMessage) new MuleCompatibilityMessageBuilder(message).payload(message.getPayload().getValue()).build();
     routeMessage(newMessage);
   }
 

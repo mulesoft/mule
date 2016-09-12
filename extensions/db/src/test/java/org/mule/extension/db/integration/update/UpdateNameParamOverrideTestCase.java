@@ -9,6 +9,8 @@ package org.mule.extension.db.integration.update;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
+
+import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
@@ -41,7 +43,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
   public void usesDefaultParams() throws Exception {
     Message response = flowRunner("defaultParams").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
   }
@@ -50,7 +52,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
   public void usesOverriddenParams() throws Exception {
     Message response = flowRunner("overriddenParams").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=2", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 2)));
   }
@@ -58,7 +60,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
   public void usesInlineOverriddenParams() throws Exception {
     Message response = flowRunner("inlineOverriddenParams").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=3", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 3)));
   }
@@ -67,7 +69,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
   public void usesParamsInInlineQuery() throws Exception {
     Message response = flowRunner("inlineQuery").run().getMessage();
 
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=4", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 4)));
   }
@@ -75,7 +77,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
   @Test
   public void usesExpressionParam() throws Exception {
     Message response = flowRunner("expressionParam").withFlowVariable("type", 3).run().getMessage();
-    assertAffectedRows(response.getPayload(), 1);
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
 
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=3", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 3)));

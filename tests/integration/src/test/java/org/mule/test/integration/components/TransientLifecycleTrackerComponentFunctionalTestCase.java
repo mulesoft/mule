@@ -106,7 +106,7 @@ public class TransientLifecycleTrackerComponentFunctionalTestCase extends Abstra
 
   private AbstractLifecycleTracker exerciseComponent(final String serviceName) throws Exception {
     final InternalMessage message = flowRunner(serviceName).run().getMessage();
-    final AbstractLifecycleTracker ltc = (AbstractLifecycleTracker) message.getPayload();
+    final AbstractLifecycleTracker ltc = (AbstractLifecycleTracker) message.getPayload().getValue();
     assertNotNull(ltc);
     return ltc;
   }

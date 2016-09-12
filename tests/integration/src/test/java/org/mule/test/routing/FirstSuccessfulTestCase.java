@@ -62,6 +62,6 @@ public class FirstSuccessfulTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://output4.out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(response);
-    assertThat(response.getPayload(), is(TEST_MESSAGE));
+    assertThat(response.getPayload().getValue(), is(TEST_MESSAGE));
   }
 }

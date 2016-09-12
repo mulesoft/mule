@@ -71,7 +71,7 @@ public abstract class AbstractObjectSerializerContractTestCase extends AbstractM
     byte[] bytes = serializer.serialize(event.getMessage());
 
     InternalMessage message = serializer.deserialize(bytes);
-    DateTime deserealized = (DateTime) message.getPayload();
+    DateTime deserealized = (DateTime) message.getPayload().getValue();
 
     assertEquals(calendar, deserealized.toCalendar());
     assertEquals(dateTime.format(), deserealized.format());

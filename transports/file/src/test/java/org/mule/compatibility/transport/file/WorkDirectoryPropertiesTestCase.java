@@ -51,8 +51,8 @@ public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase {
 
     InternalMessage response = muleContext.getClient().request("vm://testOut", RECEIVE_TIMEOUT * 6).getRight().get();
 
-    assertTrue(response.getPayload() instanceof Map);
-    Map<String, String> payload = (Map<String, String>) response.getPayload();
+    assertTrue(response.getPayload().getValue() instanceof Map);
+    Map<String, String> payload = (Map<String, String>) response.getPayload().getValue();
     assertEquals(dataFolder.getCanonicalPath(), payload.get(FileConnector.PROPERTY_SOURCE_DIRECTORY));
     assertEquals(testfile.getName(), payload.get(FileConnector.PROPERTY_SOURCE_FILENAME));
   }

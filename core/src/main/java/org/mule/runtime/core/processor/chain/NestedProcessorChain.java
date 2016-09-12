@@ -54,25 +54,25 @@ public class NestedProcessorChain implements NestedProcessor {
 
   @Override
   public Object process() throws Exception {
-    return chain.process(event).getMessage().getPayload();
+    return chain.process(event).getMessage().getPayload().getValue();
   }
 
   @Override
   public Object process(Object payload) throws Exception {
     Event muleEvent = Event.builder(event).message(InternalMessage.builder().payload(payload).build()).build();
-    return chain.process(muleEvent).getMessage().getPayload();
+    return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 
   @Override
   public Object processWithExtraProperties(Map<String, Object> properties) throws Exception {
     Event muleEvent = Event.builder(event).variables(properties).build();
-    return chain.process(muleEvent).getMessage().getPayload();
+    return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 
   @Override
   public Object process(Object payload, Map<String, Object> properties) throws Exception {
     Event muleEvent =
         Event.builder(event).message(InternalMessage.builder().payload(payload).build()).variables(properties).build();
-    return chain.process(muleEvent).getMessage().getPayload();
+    return chain.process(muleEvent).getMessage().getPayload().getValue();
   }
 }

@@ -113,10 +113,10 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     Event result = resultsHandler.aggregateResults(events, event1);
     assertNotNull(result);
-    assertEquals(2, ((List<InternalMessage>) result.getMessage().getPayload()).size());
-    assertTrue(result.getMessage().getPayload() instanceof List<?>);
-    assertEquals(message2, ((List<InternalMessage>) result.getMessage().getPayload()).get(0));
-    assertEquals(message3, ((List<InternalMessage>) result.getMessage().getPayload()).get(1));
+    assertEquals(2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).size());
+    assertTrue(result.getMessage().getPayload().getValue() instanceof List<?>);
+    assertEquals(message2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(0));
+    assertEquals(message3, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(1));
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
@@ -206,10 +206,10 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     Event result = resultsHandler.aggregateResults(events, event1);
     assertNotNull(result);
-    assertEquals(2, ((List<InternalMessage>) result.getMessage().getPayload()).size());
-    assertTrue(result.getMessage().getPayload() instanceof List<?>);
-    assertEquals(messageCollection, ((List<InternalMessage>) result.getMessage().getPayload()).get(0));
-    assertEquals(messageCollection2, ((List<InternalMessage>) result.getMessage().getPayload()).get(1));
+    assertEquals(2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).size());
+    assertTrue(result.getMessage().getPayload().getValue() instanceof List<?>);
+    assertEquals(messageCollection, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(0));
+    assertEquals(messageCollection2, ((List<InternalMessage>) result.getMessage().getPayload().getValue()).get(1));
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event

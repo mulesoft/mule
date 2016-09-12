@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.processor;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
@@ -18,8 +18,8 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.exception.MessagingException;
 
 /**
- * Base implementation of a {@link org.mule.runtime.core.api.processor.Processor} that may performs processing during both
- * the request and response processing phases while supporting non-blocking execution.
+ * Base implementation of a {@link org.mule.runtime.core.api.processor.Processor} that may performs processing during both the
+ * request and response processing phases while supporting non-blocking execution.
  * <p>
  * In order to define the process during the request phase you should override the
  * {@link #processRequest(org.mule.runtime.core.api.Event)} method. Symmetrically, if you need to define a process to be executed

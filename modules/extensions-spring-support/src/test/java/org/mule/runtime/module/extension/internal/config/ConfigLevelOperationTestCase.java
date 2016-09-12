@@ -50,7 +50,7 @@ public class ConfigLevelOperationTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void execute() throws Exception {
-    Fruit fruit = (Fruit) flowRunner(fruitType.getSimpleName().toLowerCase() + "Ok").run().getMessage().getPayload();
+    Fruit fruit = (Fruit) flowRunner(fruitType.getSimpleName().toLowerCase() + "Ok").run().getMessage().getPayload().getValue();
     assertThat(fruit.getClass(), equalTo(fruitType));
     assertThat(fruit.isBitten(), is(true));
   }

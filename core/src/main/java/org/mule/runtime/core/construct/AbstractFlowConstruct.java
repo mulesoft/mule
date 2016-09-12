@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * <li>Is constructed with unique name and {@link MuleContext}.
  * <li>Uses a {@link MessageSource} as the source of messages.
  * <li>Uses a chain of {@link Processor}s to process messages.
- * <li>Has lifecycle and propagates this lifecycle to both {@link MessageSource} and {@link Processor}s in the correct
- * order depending on the lifecycle phase.
+ * <li>Has lifecycle and propagates this lifecycle to both {@link MessageSource} and {@link Processor}s in the correct order
+ * depending on the lifecycle phase.
  * <li>Allows an {@link ExceptionListener} to be set.
  * </ul>
  * Implementations of <code>AbstractFlowConstuct</code> should implement {@link #validateConstruct()} validate the resulting

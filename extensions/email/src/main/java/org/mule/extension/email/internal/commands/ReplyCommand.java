@@ -81,7 +81,7 @@ public final class ReplyCommand {
 
     ImmutableList<EmailAttachment> emailAttachments =
         ImmutableList.<EmailAttachment>builder()
-            .addAll(mapToEmailAttachments(muleMessage.getPayload()))
+            .addAll(mapToEmailAttachments(muleMessage.getPayload().getValue()))
             .addAll(attachments)
             .build();
 

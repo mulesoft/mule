@@ -48,6 +48,6 @@ public class POP3TestCase extends AbstractEmailRetrieverTestCase {
   public void retrieveAndRead() throws Exception {
     List<Message> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(messages, hasSize(10));
-    messages.forEach(m -> assertBodyContent((String) m.getPayload()));
+    messages.forEach(m -> assertBodyContent((String) m.getPayload().getValue()));
   }
 }

@@ -27,13 +27,13 @@ public class SharedInterceptorStackTestCase extends AbstractIntegrationTestCase 
   @Test
   public void testSharedInterceptorOnServiceOne() throws Exception {
     InternalMessage response = flowRunner("serviceOne").withPayload(TEST_MESSAGE).run().getMessage();
-    assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
+    assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload().getValue());
   }
 
   @Test
   public void testSharedInterceptorOnServiceTwo() throws Exception {
     InternalMessage response = flowRunner("serviceTwo").withPayload(TEST_MESSAGE).run().getMessage();
-    assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload());
+    assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload().getValue());
   }
 
   public static class CustomInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor {
@@ -41,7 +41,7 @@ public class SharedInterceptorStackTestCase extends AbstractIntegrationTestCase 
     @Override
     public Event process(Event event) throws MuleException {
       return processNext(Event.builder(event).message(InternalMessage.builder(event.getMessage())
-          .payload(event.getMessage().getPayload().toString() + " CustomInterceptor").build()).build());
+          .payload(event.getMessage().getPayload().getValue().toString() + " CustomInterceptor").build()).build());
     }
   }
 

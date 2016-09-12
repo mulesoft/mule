@@ -98,7 +98,7 @@ public class MuleEventToHttpResponse {
     }
 
     if (httpResponseHeaderBuilder.getContentType() == null) {
-      DataType dataType = event.getMessage().getDataType();
+      DataType dataType = event.getMessage().getPayload().getDataType();
       if (!MediaType.ANY.matches(dataType.getMediaType())) {
         httpResponseHeaderBuilder.addHeader(CONTENT_TYPE, dataType.getMediaType().toString());
       }
@@ -122,7 +122,7 @@ public class MuleEventToHttpResponse {
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                       (ByteArrayHttpEntity) httpEntity);
     } else {
-      final Object payload = event.getMessage().getPayload();
+      final Object payload = event.getMessage().getPayload().getValue();
       if (payload == null) {
         setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
         httpEntity = new EmptyHttpEntity();
@@ -232,7 +232,7 @@ public class MuleEventToHttpResponse {
     HttpEntity entity = new EmptyHttpEntity();
     if (!mapPayload.isEmpty()) {
       String encodedBody;
-      final Charset encoding = event.getMessage().getDataType().getMediaType().getCharset().get();
+      final Charset encoding = event.getMessage().getPayload().getDataType().getMediaType().getCharset().get();
       if (mapPayload instanceof ParameterMap) {
         encodedBody = HttpParser.encodeString(encoding, ((ParameterMap) mapPayload).toListValuesMap());
       } else {

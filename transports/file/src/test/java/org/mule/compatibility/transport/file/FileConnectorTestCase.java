@@ -159,7 +159,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase {
     InternalMessage message = connector.createMuleMessageFactory().create(payload, encoding);
     assertNotNull(message);
 
-    byte[] messagePayload = (byte[]) message.getPayload();
+    byte[] messagePayload = (byte[]) message.getPayload().getValue();
     assertTrue(Arrays.equals(VALID_MESSAGE.getBytes(), messagePayload));
   }
 }

@@ -40,7 +40,7 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
 
   @Override
   public Object transformMessage(Event event, Charset encoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
     try {
       XMLStreamReader xsr = XMLUtils.toXMLStreamReader(getXMLInputFactory(), src);
       if (xsr == null) {

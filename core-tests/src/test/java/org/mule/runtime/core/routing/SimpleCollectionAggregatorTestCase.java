@@ -15,8 +15,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.GroupCorrelation;
@@ -70,11 +70,11 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
     InternalMessage nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
-    assertTrue(nextMessage.getPayload() instanceof List<?>);
-    List<InternalMessage> list = nextMessage.getPayload();
+    assertTrue(nextMessage.getPayload().getValue() instanceof List<?>);
+    List<InternalMessage> list = (List<InternalMessage>) nextMessage.getPayload().getValue();
     assertEquals(3, list.size());
     String[] results = new String[3];
-    list.stream().map(InternalMessage::getPayload).collect(toList()).toArray(results);
+    list.stream().map(msg -> msg.getPayload().getValue()).collect(toList()).toArray(results);
     // Need to sort result because of MULE-5998
     Arrays.sort(results);
     assertEquals("test event A", results[0]);
@@ -107,10 +107,10 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
     InternalMessage nextMessage = sensingMessageProcessor.event.getMessage();
     assertNotNull(nextMessage);
-    assertTrue(nextMessage.getPayload() instanceof List<?>);
-    List<InternalMessage> payload = nextMessage.getPayload();
+    assertTrue(nextMessage.getPayload().getValue() instanceof List<?>);
+    List<InternalMessage> payload = (List<InternalMessage>) nextMessage.getPayload().getValue();
     assertEquals(1, payload.size());
-    assertEquals("test event A", payload.get(0).getPayload());
+    assertEquals("test event A", payload.get(0).getPayload().getValue());
   }
 
   @Test
@@ -150,13 +150,13 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
     assertNotNull(resultEvent);
     InternalMessage resultMessage = resultEvent.getMessage();
     assertNotNull(resultMessage);
-    List<InternalMessage> payload = (List<InternalMessage>) resultMessage.getPayload();
+    List<InternalMessage> payload = (List<InternalMessage>) resultMessage.getPayload().getValue();
     assertEquals(2, payload.size());
 
-    assertEquals("test event A", ((List<InternalMessage>) payload.get(0).getPayload()).get(0).getPayload());
-    assertEquals("test event B", ((List<InternalMessage>) payload.get(0).getPayload()).get(1).getPayload());
-    assertEquals("test event C", ((List<InternalMessage>) payload.get(1).getPayload()).get(0).getPayload());
-    assertEquals("test event D", ((List<InternalMessage>) payload.get(1).getPayload()).get(1).getPayload());
+    assertEquals("test event A", ((List<InternalMessage>) payload.get(0).getPayload().getValue()).get(0).getPayload().getValue());
+    assertEquals("test event B", ((List<InternalMessage>) payload.get(0).getPayload().getValue()).get(1).getPayload().getValue());
+    assertEquals("test event C", ((List<InternalMessage>) payload.get(1).getPayload().getValue()).get(0).getPayload().getValue());
+    assertEquals("test event D", ((List<InternalMessage>) payload.get(1).getPayload().getValue()).get(1).getPayload().getValue());
 
   }
 

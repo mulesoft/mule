@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 import java.util.List;
 
 /**
- * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from
- * it's {@link MessageSource}
+ * A pipeline has an ordered list of {@link Processor}'s that are invoked in order to processor new messages received from it's
+ * {@link MessageSource}
  */
 public interface Pipeline extends FlowConstruct, MessageProcessorContainer, ProcessingDescriptor, MessageProcessorPathResolver {
 

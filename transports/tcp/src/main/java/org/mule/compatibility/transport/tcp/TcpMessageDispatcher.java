@@ -97,7 +97,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher {
 
   // Socket management (get and release) is handled outside this method
   private void dispatchToSocket(Socket socket, Event event) throws Exception {
-    Object payload = event.getMessage().getPayload();
+    Object payload = event.getMessage().getPayload().getValue();
     write(socket, payload);
   }
 

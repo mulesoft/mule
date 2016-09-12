@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf.transport;
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.core.DefaultEventContext.create;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -275,10 +275,10 @@ public class MuleUniversalConduit extends AbstractConduit {
       InputStream is = getResponseBody(m, resEvent);
       if (is != null) {
         DataType dataType;
-        if (MediaType.ANY.matches(result.getDataType().getMediaType())) {
-          dataType = DataType.builder(result.getDataType()).mediaType(MediaType.XML).build();
+        if (MediaType.ANY.matches(result.getPayload().getDataType().getMediaType())) {
+          dataType = DataType.builder(result.getPayload().getDataType()).mediaType(MediaType.XML).build();
         } else {
-          dataType = result.getDataType();
+          dataType = result.getPayload().getDataType();
         }
 
         Message inMessage = new MessageImpl();
@@ -299,13 +299,13 @@ public class MuleUniversalConduit extends AbstractConduit {
 
   protected InputStream getResponseBody(Message m, Event result) throws TransformerException, IOException {
     boolean response = result != null
-        && result.getMessage().getPayload() != null && !isOneway(m.getExchange());
+        && result.getMessage().getPayload().getValue() != null && !isOneway(m.getExchange());
 
     if (response) {
       // Sometimes there may not actually be a body, in which case
       // we want to act appropriately. E.g. one way invocations over a proxy
       InputStream is = (InputStream) configuration.getMuleContext().getTransformationService()
-          .transform(result.getMessage(), DataType.INPUT_STREAM).getPayload();
+          .transform(result.getMessage(), DataType.INPUT_STREAM).getPayload().getValue();
       PushbackInputStream pb = new PushbackInputStream(is);
       result =
           Event.builder(result).message(InternalMessage.builder(result.getMessage()).payload(pb).mediaType(XML).build()).build();

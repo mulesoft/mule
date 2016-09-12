@@ -33,7 +33,7 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTest
     flowRunner("WrapperUMO").withPayload("test").asynchronously().run();
     InternalMessage reply = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
-    assertThat(reply.getPayload(), is("Just an apple."));
+    assertThat(reply.getPayload().getValue(), is("Just an apple."));
   }
 
   @Test
@@ -43,6 +43,6 @@ public class NoArgsCallWrapperFunctionalTestCase extends AbstractIntegrationTest
     InternalMessage reply = client.request("test://outWithInjected", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
     // same as original input
-    assertThat(reply.getPayload(), is("test"));
+    assertThat(reply.getPayload().getValue(), is("test"));
   }
 }

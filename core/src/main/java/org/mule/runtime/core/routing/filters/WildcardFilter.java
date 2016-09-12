@@ -50,7 +50,7 @@ public class WildcardFilter implements Filter, ObjectFilter, MuleContextAware {
   @Override
   public boolean accept(InternalMessage message, Event.Builder builder) {
     try {
-      return accept(muleContext.getTransformationService().transform(message, DataType.STRING).getPayload());
+      return accept(muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue());
     } catch (Exception e) {
       logger.warn("An exception occurred while filtering", e);
       return false;

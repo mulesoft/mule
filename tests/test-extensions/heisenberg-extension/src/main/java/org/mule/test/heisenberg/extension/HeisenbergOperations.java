@@ -134,7 +134,7 @@ public class HeisenbergOperations {
   }
 
   public void getPaymentFromEvent(@UseConfig HeisenbergExtension config, Event event) {
-    Long payment = (Long) event.getMessage().getPayload();
+    Long payment = (Long) event.getMessage().getPayload().getValue();
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 
@@ -143,7 +143,7 @@ public class HeisenbergOperations {
   }
 
   public void getPaymentFromMessage(@UseConfig HeisenbergExtension config, Message message) {
-    Long payment = (Long) message.getPayload();
+    Long payment = (Long) message.getPayload().getValue();
     config.setMoney(config.getMoney().add(BigDecimal.valueOf(payment)));
   }
 

@@ -122,7 +122,7 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
   private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception {
     InternalMessage response = muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS).getRight();
     assertThat((Integer) response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), is(expectedStatus));
-    return IOUtils.toString((InputStream) response.getPayload());
+    return IOUtils.toString((InputStream) response.getPayload().getValue());
   }
 
   private HttpResponse callAndAssertStatus(String url, int expectedStatus) throws IOException {

@@ -69,8 +69,8 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
     Message message = getOutputMessage(result);
 
-    assertThat(message.getPayload(), is(sameInstance(value)));
-    assertThat(message.getDataType().getType().equals(byte[].class), is(true));
+    assertThat(message.getPayload().getValue(), is(sameInstance(value)));
+    assertThat(message.getPayload().getDataType().getType().equals(byte[].class), is(true));
   }
 
   @Test
@@ -83,9 +83,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
     Message message = getOutputMessage(result);
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-    assertThat(message.getDataType().getMediaType(), equalTo(mediaType));
+    assertThat(message.getPayload().getDataType().getMediaType(), equalTo(mediaType));
   }
 
   @Test
@@ -97,9 +97,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
     Message message = getOutputMessage(result);
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(NULL_ATTRIBUTES));
-    assertThat(message.getDataType().getType().equals(String.class), is(true));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   @Test
@@ -112,9 +112,9 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
     Message message = getOutputMessage(result);
 
-    assertThat(message.getPayload(), is(sameInstance(payload)));
+    assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
     assertThat(message.getAttributes(), is(sameInstance(newAttributes)));
-    assertThat(message.getDataType().getType().equals(String.class), is(true));
+    assertThat(message.getPayload().getDataType().getType().equals(String.class), is(true));
   }
 
   protected abstract ReturnDelegate createReturnDelegate();

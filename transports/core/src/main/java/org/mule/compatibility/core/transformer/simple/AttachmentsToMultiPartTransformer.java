@@ -45,8 +45,8 @@ public class AttachmentsToMultiPartTransformer extends AbstractMessageTransforme
 
       List<org.mule.runtime.api.message.Message> parts = new ArrayList<>();
 
-      if (message.getPayload() != null) {
-        parts.add(InternalMessage.builder().payload(message.getPayload()).attributes(BODY_ATTRIBUTES).build());
+      if (message.getPayload().getValue() != null) {
+        parts.add(InternalMessage.builder().payload(message.getPayload().getValue()).attributes(BODY_ATTRIBUTES).build());
       }
 
       for (String attachmentName : message.getInboundAttachmentNames()) {

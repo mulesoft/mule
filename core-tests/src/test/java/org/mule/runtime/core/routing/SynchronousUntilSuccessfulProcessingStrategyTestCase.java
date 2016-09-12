@@ -18,8 +18,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
@@ -112,7 +112,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(Event.class))).thenAnswer(invocation -> (Event) invocation.getArguments()[0]);
     Event response = processingStrategy.route(event, getTestFlow());
-    assertThat(response.getMessage().getPayload(), equalTo(event.getMessage().getPayload()));
+    assertThat(response.getMessage().getPayload().getValue(), equalTo(event.getMessage().getPayload().getValue()));
     verify(mockRoute).process(any(Event.class));
     assertThat(getCurrentEvent(), sameInstance(response));
   }
@@ -148,7 +148,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     when(mockRoute.process(any(Event.class))).thenAnswer(invocation -> (Event) invocation.getArguments()[0]);
     Event response = processingStrategy.route(event, getTestFlow());
-    assertThat(response.getMessage().getPayload(), equalTo(expressionEvalutaionResult));
+    assertThat(response.getMessage().getPayload().getValue(), equalTo(expressionEvalutaionResult));
     verify(mockRoute).process(any(Event.class));
     verify(mockUntilSuccessfulConfiguration.getMuleContext().getExpressionLanguage()).evaluate(eq(ackExpression),
                                                                                                any(Event.class), eq(null));

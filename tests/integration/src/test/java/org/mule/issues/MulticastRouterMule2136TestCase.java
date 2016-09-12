@@ -86,10 +86,10 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
     InternalMessage message = client.request(endpoint, TIMEOUT * 2).getRight().get();
     assertNotNull(message);
-    assertNotNull(message.getPayload());
+    assertNotNull(message.getPayload().getValue());
 
-    assertThat(message.getPayload(), instanceOf(clazz));
-    return message.getPayload();
+    assertThat(message.getPayload().getValue(), instanceOf(clazz));
+    return message.getPayload().getValue();
   }
 
   public static class Parent {

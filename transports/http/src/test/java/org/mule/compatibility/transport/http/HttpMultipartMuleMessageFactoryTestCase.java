@@ -64,7 +64,7 @@ public class HttpMultipartMuleMessageFactoryTestCase extends AbstractMuleMessage
     HttpRequest request = createMultiPartHttpRequest(MULTIPART_MESSAGE);
     InternalMessage message = factory.create(request, encoding);
     assertNotNull(message);
-    assertTrue(message.getPayload() instanceof InputStream);
+    assertTrue(message.getPayload().getValue() instanceof InputStream);
   }
 
   @Test
@@ -74,7 +74,7 @@ public class HttpMultipartMuleMessageFactoryTestCase extends AbstractMuleMessage
     HttpRequest request = createMultiPartHttpRequest(MULTIPART_MESSAGE_NO_PAYLOAD);
     InternalMessage message = factory.create(request, encoding);
     assertNotNull(message);
-    assertThat(message.getPayload(), is(nullValue()));
+    assertThat(message.getPayload().getValue(), is(nullValue()));
   }
 
   private HttpRequest createMultiPartHttpRequest(String message) throws Exception {

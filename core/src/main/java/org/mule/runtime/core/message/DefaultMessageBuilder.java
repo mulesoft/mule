@@ -11,7 +11,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang.SystemUtils.LINE_SEPARATOR;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 import static org.mule.runtime.core.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.util.ObjectUtils.getByte;
@@ -26,11 +26,12 @@ import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.InternalMessage.CollectionBuilder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -102,8 +103,8 @@ public class DefaultMessageBuilder
 
   public DefaultMessageBuilder(org.mule.runtime.api.message.Message message) {
     requireNonNull(message);
-    this.payload = message.getPayload();
-    this.dataType = message.getDataType();
+    this.payload = message.getPayload().getValue();
+    this.dataType = message.getPayload().getDataType();
     this.attributes = message.getAttributes();
 
     if (message instanceof InternalMessage) {
@@ -280,9 +281,9 @@ public class DefaultMessageBuilder
 
   @Override
   public InternalMessage build() {
-    return new MuleMessageImplementation(new DefaultTypedValue(payload, resolveDataType()), attributes,
-                                         inboundProperties, outboundProperties, inboundAttachments,
-                                         outboundAttachments, exceptionPayload);
+    return new MessageImplementation(new DefaultTypedValue(payload, resolveDataType()), attributes,
+                                     inboundProperties, outboundProperties, inboundAttachments,
+                                     outboundAttachments, exceptionPayload);
   }
 
   private DataType resolveDataType() {
@@ -296,12 +297,12 @@ public class DefaultMessageBuilder
   /**
    * <code>MuleMessageImplementation</code> is a wrapper that contains a payload and properties associated with the payload.
    */
-  public static class MuleMessageImplementation implements InternalMessage, DeserializationPostInitialisable {
+  public static class MessageImplementation implements InternalMessage, DeserializationPostInitialisable {
 
     private static final String NOT_SET = "<not set>";
 
     private static final long serialVersionUID = 1541720810851984845L;
-    private static final Logger logger = LoggerFactory.getLogger(MuleMessageImplementation.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageImplementation.class);
 
     /**
      * If an exception occurs while processing this message an exception payload will be attached here
@@ -324,11 +325,11 @@ public class DefaultMessageBuilder
     private Map<String, DefaultTypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
     private Map<String, DefaultTypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>(HashMap.class);
 
-    private MuleMessageImplementation(DefaultTypedValue typedValue, Attributes attributes,
-                                      Map<String, DefaultTypedValue<Serializable>> inboundProperties,
-                                      Map<String, DefaultTypedValue<Serializable>> outboundProperties,
-                                      Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
-                                      ExceptionPayload exceptionPayload) {
+    private MessageImplementation(DefaultTypedValue typedValue, Attributes attributes,
+                                  Map<String, DefaultTypedValue<Serializable>> inboundProperties,
+                                  Map<String, DefaultTypedValue<Serializable>> outboundProperties,
+                                  Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments,
+                                  ExceptionPayload exceptionPayload) {
       this.typedValue = typedValue;
       this.attributes = attributes;
       this.inboundMap.putAll(inboundProperties);
@@ -356,9 +357,9 @@ public class DefaultMessageBuilder
       buf.append(LINE_SEPARATOR);
       buf.append("{");
       buf.append(LINE_SEPARATOR);
-      buf.append("  payload=").append(getDataType().getType().getName());
+      buf.append("  payload=").append(getPayload().getDataType().getType().getName());
       buf.append(LINE_SEPARATOR);
-      buf.append("  mediaType=").append(getDataType().getMediaType());
+      buf.append("  mediaType=").append(getPayload().getDataType().getMediaType());
       buf.append(LINE_SEPARATOR);
       buf.append("  exceptionPayload=").append(ObjectUtils.defaultIfNull(exceptionPayload, NOT_SET));
       buf.append(LINE_SEPARATOR);
@@ -389,13 +390,8 @@ public class DefaultMessageBuilder
     }
 
     @Override
-    public Object getPayload() {
-      return getValue();
-    }
-
-    @Override
-    public Object getValue() {
-      return typedValue.getValue();
+    public TypedValue getPayload() {
+      return typedValue;
     }
 
     public static class SerializedDataHandler implements Serializable {
@@ -470,7 +466,7 @@ public class DefaultMessageBuilder
         out.writeBoolean(false);
         // TODO MULE-10013 remove this logic from here
         byte[] valueAsByteArray = (byte[]) getCurrentEvent().getMuleContext().getTransformationService()
-            .transform(this, DataType.BYTE_ARRAY).getPayload();
+            .transform(this, DataType.BYTE_ARRAY).getPayload().getValue();
         out.writeInt(valueAsByteArray.length);
         new DataOutputStream(out).write(valueAsByteArray);
         out.writeObject(DataType.BYTE_ARRAY);
@@ -534,10 +530,10 @@ public class DefaultMessageBuilder
       return attributes;
     }
 
-    @Override
-    public DataType getDataType() {
-      return typedValue.getDataType();
-    }
+    // @Override
+    // public DataType getDataType() {
+    // return typedValue.getDataType();
+    // }
 
     @Override
     public Serializable getInboundProperty(String name) {

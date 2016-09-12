@@ -95,7 +95,7 @@ public class DefaultEndpointAwareTransformer implements EndpointAwareTransformer
 
   protected Charset resolveEncoding(Object src) {
     if (src instanceof InternalMessage) {
-      return ((InternalMessage) src).getDataType().getMediaType().getCharset().orElse(getDefaultEncoding());
+      return ((InternalMessage) src).getPayload().getDataType().getMediaType().getCharset().orElse(getDefaultEncoding());
     } else {
       return getDefaultEncoding();
     }

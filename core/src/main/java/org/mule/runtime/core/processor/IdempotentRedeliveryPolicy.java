@@ -223,7 +223,7 @@ public class IdempotentRedeliveryPolicy extends AbstractRedeliveryPolicy {
 
   private String getIdForEvent(Event event) throws Exception {
     if (useSecureHash) {
-      Object payload = event.getMessage().getPayload();
+      Object payload = event.getMessage().getPayload().getValue();
       byte[] bytes = (byte[]) objectToByteArray.transform(payload);
       if (payload instanceof InputStream) {
         // We've consumed the stream.

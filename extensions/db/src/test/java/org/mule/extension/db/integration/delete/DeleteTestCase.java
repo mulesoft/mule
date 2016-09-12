@@ -47,7 +47,7 @@ public class DeleteTestCase extends AbstractDbIntegrationTestCase {
 
   private void doDelete(String flowName, String payload) throws Exception {
     Message response = flowRunner(flowName).withPayload(payload).run().getMessage();
-    assertThat(response.getPayload(), is(1));
+    assertThat(response.getPayload().getValue(), is(1));
     assertDeletedPlanetRecords(payload);
   }
 }

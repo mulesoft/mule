@@ -142,7 +142,7 @@ public class RestServiceWrapper extends AbstractComponent {
     Object requestBody;
 
     InternalMessage message = event.getMessage();
-    Object request = message.getPayload();
+    Object request = message.getPayload().getValue();
     String tempUrl = serviceUrl;
     if (muleContext.getExpressionLanguage().isExpression(serviceUrl)) {
       muleContext.getExpressionLanguage().validate(serviceUrl);
@@ -159,7 +159,7 @@ public class RestServiceWrapper extends AbstractComponent {
     }
     // if post
     else {
-      if (MediaType.ANY.matches(message.getDataType().getMediaType())) {
+      if (MediaType.ANY.matches(message.getPayload().getDataType().getMediaType())) {
         message = InternalMessage.builder(message).mediaType(MediaType.parse(CONTENT_TYPE_VALUE)).build();
       }
 

@@ -33,38 +33,38 @@ public class ImplicitTransformationTestCase extends AbstractIntegrationTestCase 
   public void testImplicitInputStreamToStringConversion() throws Exception {
     InputStream inputStream = new StringInputStream("TEST");
     InternalMessage response = flowRunner("StringEchoService").withPayload(inputStream).run().getMessage();
-    assertThat(response.getPayload(), is("TSET"));
+    assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitByteArrayToStringConversion() throws Exception {
     InternalMessage response = flowRunner("StringEchoService").withPayload("TEST".getBytes()).run().getMessage();
-    assertThat(response.getPayload(), is("TSET"));
+    assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitInputStreamToByteArrayConversion() throws Exception {
     InputStream inputStream = new StringInputStream("TEST");
     InternalMessage response = flowRunner("ByteArrayEchoService").withPayload(inputStream).run().getMessage();
-    assertThat(response.getPayload(), is("TSET"));
+    assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitStringToByteArrayConversion() throws Exception {
     InternalMessage response = flowRunner("ByteArrayEchoService").withPayload("TEST").run().getMessage();
-    assertThat(response.getPayload(), is("TSET"));
+    assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitStringToInputStreamConversion() throws Exception {
     InternalMessage response = flowRunner("InputStreamEchoService").withPayload("TEST").run().getMessage();
-    assertThat(response.getPayload(), is("TSET"));
+    assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   @Test
   public void testImplicitByteArrayToInputStreamConversion() throws Exception {
     InternalMessage response = flowRunner("InputStreamEchoService").withPayload("TEST".getBytes()).run().getMessage();
-    assertThat(response.getPayload(), is("TSET"));
+    assertThat(response.getPayload().getValue(), is("TSET"));
   }
 
   public static class TestStringTransformer extends AbstractTransformer {

@@ -48,7 +48,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
         client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
             .getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
@@ -57,7 +57,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
     InternalMessage response =
         client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
@@ -67,7 +67,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
         client.send("vm://in2?connector=vm-in2", InternalMessage.builder().payload("OK").mediaType(MediaType.XML).build())
             .getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
@@ -76,7 +76,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
     InternalMessage response =
         client.send("vm://in2?connector=vm-in2", InternalMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   public static class EchoComponent implements Callable {
@@ -86,7 +86,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase {
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
       InternalMessage message = eventContext.getMessage();
-      String contentType = message.getDataType().getMediaType().withoutParameters().toRfcString();
+      String contentType = message.getPayload().getDataType().getMediaType().withoutParameters().toRfcString();
       assertThat(contentType, is(expectedMimeType));
       return message;
     }

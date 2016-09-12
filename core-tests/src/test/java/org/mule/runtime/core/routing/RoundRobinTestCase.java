@@ -123,7 +123,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      payloads.add(event.getMessage().getPayload());
+      payloads.add(event.getMessage().getPayload().getValue());
       count++;
       if (count % 3 == 0) {
         throw new DefaultMuleException("Mule Exception!");

@@ -42,7 +42,7 @@ public class EmailIdConsumerExecutor {
    */
   public void execute(Message muleMessage, Integer emailId, Consumer<Integer> consumer) {
     if (emailId == null) {
-      Object payload = muleMessage.getPayload();
+      Object payload = muleMessage.getPayload().getValue();
       if (payload instanceof List) {
         for (Object o : (List) payload) {
           if (o instanceof Message) {

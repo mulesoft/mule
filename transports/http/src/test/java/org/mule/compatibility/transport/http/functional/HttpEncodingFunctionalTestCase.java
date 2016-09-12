@@ -56,8 +56,8 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
             .getRight();
     assertNotNull(reply);
     assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
-    assertEquals("text/baz; charset=UTF-16BE", reply.getDataType().getMediaType().toRfcString());
-    assertThat(reply.getDataType().getMediaType().getCharset().get(), is(UTF_16BE));
+    assertEquals("text/baz; charset=UTF-16BE", reply.getPayload().getDataType().getMediaType().toRfcString());
+    assertThat(reply.getPayload().getDataType().getMediaType().getCharset().get(), is(UTF_16BE));
     assertEquals(TEST_MESSAGE + " Received", getPayloadAsString(reply));
   }
 
@@ -145,10 +145,10 @@ public class HttpEncodingFunctionalTestCase extends HttpFunctionalTestCase {
     assertNotNull(reply);
     assertEquals("200", reply.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
 
-    Object contentTypeHeader = reply.getDataType().getMediaType().toRfcString();
+    Object contentTypeHeader = reply.getPayload().getDataType().getMediaType().toRfcString();
     assertEquals("text/plain; charset=" + encoding.name(), contentTypeHeader);
 
-    assertThat(reply.getDataType().getMediaType().getCharset().get(), is(encoding));
+    assertThat(reply.getPayload().getDataType().getMediaType().getCharset().get(), is(encoding));
 
     return reply;
   }

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.transaction;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.test.transactional.TestTransactionalConnection;
 import org.mule.test.transactional.TransactionalExtension;
@@ -38,7 +39,8 @@ public class TransactionalConnectorTestCase extends ExtensionFunctionalTestCase 
 
   @Test
   public void executeTransactionless() throws Exception {
-    TestTransactionalConnection connection = flowRunner("executeTransactionless").withPayload("").run().getMessage().getPayload();
+    TestTransactionalConnection connection = (TestTransactionalConnection) flowRunner("executeTransactionless").withPayload("")
+        .run().getMessage().getPayload().getValue();
     assertThat(connection.isTransactionBegun(), is(false));
     assertThat(connection.isTransactionCommited(), is(false));
     assertThat(connection.isTransactionRolledback(), is(false));

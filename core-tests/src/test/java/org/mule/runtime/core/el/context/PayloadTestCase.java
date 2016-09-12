@@ -8,26 +8,21 @@ package org.mule.runtime.core.el.context;
 
 import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.metadata.DefaultTypedValue;
 
-import java.util.Optional;
-
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 public class PayloadTestCase extends AbstractELTestCase {
 
@@ -52,7 +47,7 @@ public class PayloadTestCase extends AbstractELTestCase {
   @Test
   public void payload() throws Exception {
     Object payload = new Object();
-    when(message.getPayload()).thenReturn(payload);
+    when(message.getPayload()).thenReturn(new DefaultTypedValue<>(payload, DataType.OBJECT));
     assertSame(payload, evaluate("payload", event));
   }
 
@@ -63,7 +58,7 @@ public class PayloadTestCase extends AbstractELTestCase {
     evaluate("payload = 'foo'", event, eventBuilder);
     ArgumentCaptor<InternalMessage> argument = ArgumentCaptor.forClass(InternalMessage.class);
     verify(eventBuilder).message(argument.capture());
-    assertThat(argument.getValue().getPayload(), equalTo("foo"));
+    assertThat(argument.getValue().getPayload().getValue(), equalTo("foo"));
   }
 
 }

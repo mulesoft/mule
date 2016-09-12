@@ -176,7 +176,8 @@ public class BasicValidationTestCase extends ValidationTestCase {
     FlowRunner runner = flowRunner("all");
     cofigureGetAllRunner(runner, VALID_EMAIL, VALID_URL);
 
-    assertThat(runner.buildEvent().getMessage().getPayload(), is(sameInstance(runner.run().getMessage().getPayload())));
+    assertThat(runner.buildEvent().getMessage().getPayload().getValue(),
+               is(sameInstance(runner.run().getMessage().getPayload().getValue())));
   }
 
   @Test

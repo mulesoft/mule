@@ -47,9 +47,10 @@ public class ExpressionSplitterXPathTestCase extends AbstractIntegrationTestCase
     InternalMessage result = flowRunner("Distributor").withPayload(MESSAGE).run().getMessage();
 
     assertNotNull(result);
-    assertTrue(result.getPayload() instanceof List);
+    assertTrue(result.getPayload().getValue() instanceof List);
     List<String> results =
-        ((List<InternalMessage>) result.getPayload()).stream().map(msg -> (String) msg.getPayload()).collect(toList());
+        ((List<InternalMessage>) result.getPayload().getValue()).stream().map(msg -> (String) msg.getPayload().getValue())
+            .collect(toList());
     assertEquals(2, results.size());
 
     assertTrue(XMLUnit.compareXML(EXPECTED_MESSAGE_1, results.get(0).toString()).identical());

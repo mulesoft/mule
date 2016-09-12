@@ -65,8 +65,8 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase {
     Date beforeCall = new Date();
     InternalMessage result = muleClient.send("vm://decreaseTimeoutRequest", getTestMessage()).getRight();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
-    assertEquals(DispatchException.class, result.getPayload().getClass());
+    assertNotNull(result.getPayload().getValue());
+    assertEquals(DispatchException.class, result.getPayload().getValue().getClass());
 
     // If everything is good the connection will timeout after 5s and throw an
     // exception. The original unprocessed message is returned in the response

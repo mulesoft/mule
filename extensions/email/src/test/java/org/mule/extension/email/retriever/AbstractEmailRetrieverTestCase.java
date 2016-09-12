@@ -112,12 +112,12 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     List<Message> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
     assertThat(messages, hasSize(1));
-    assertThat(messages.get(0).getPayload(), instanceOf(MultiPartContent.class));
-    List<Message> emailAttachments = ((MultiPartContent) messages.get(0).getPayload()).getParts();
+    assertThat(messages.get(0).getPayload().getValue(), instanceOf(MultiPartContent.class));
+    List<Message> emailAttachments = ((MultiPartContent) messages.get(0).getPayload().getValue()).getParts();
 
     assertThat(emailAttachments, hasSize(3));
-    assertThat(((DefaultMultiPartContent) messages.get(0).getPayload()).hasBodyPart(), is(true));
-    assertThat(((MultiPartContent) messages.get(0).getPayload()).getPartNames(),
+    assertThat(((DefaultMultiPartContent) messages.get(0).getPayload().getValue()).hasBodyPart(), is(true));
+    assertThat(((MultiPartContent) messages.get(0).getPayload().getValue()).getPartNames(),
                hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
     assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
     assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
@@ -161,7 +161,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   }
 
   protected List<Message> runFlowAndGetMessages(String flowName) throws Exception {
-    return flowRunner(flowName).run().getMessage().getPayload();
+    return (List<Message>) flowRunner(flowName).run().getMessage().getPayload().getValue();
   }
 
   protected void assertFlag(MimeMessage m, Flag flag, boolean contains) {

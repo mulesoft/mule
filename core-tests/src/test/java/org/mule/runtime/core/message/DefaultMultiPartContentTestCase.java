@@ -14,7 +14,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
@@ -55,8 +55,8 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
                                              attachmentPart))
         .build();
 
-    assertThat(((MultiPartContent) message.getPayload()).getPartNames(), hasItem("attachment"));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("attachment"), sameInstance(attachmentPart));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPartNames(), hasItem("attachment"));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("attachment"), sameInstance(attachmentPart));
   }
 
   @Test
@@ -69,11 +69,12 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
                                              attachmentPart))
         .build();
 
-    assertThat(((MultiPartContent) message.getPayload()).getParts(), hasSize(2));
-    assertThat(((MultiPartContent) message.getPayload()).getPartNames(), hasItem("spi-props"));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("spi-props"), sameInstance(attachmentPart));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getParts(), hasSize(2));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPartNames(), hasItem("spi-props"));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("spi-props"), sameInstance(attachmentPart));
 
-    assertThat(((MultiPartContent) message.getPayload()).getPart("spi-props").getDataType().getMediaType(), is(MediaType.TEXT));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("spi-props").getPayload().getDataType()
+        .getMediaType(), is(MediaType.TEXT));
   }
 
   @Test
@@ -87,8 +88,8 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
                                              attachmentPart1, attachmentPart2))
         .build();
 
-    assertThat(((MultiPartContent) message.getPayload()).getParts(), hasSize(3));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("dummy").getDataType().getMediaType(),
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getParts(), hasSize(3));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("dummy").getPayload().getDataType().getMediaType(),
                is(MediaType.APPLICATION_XML));
   }
 
@@ -101,8 +102,8 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
 
     InternalMessage message = InternalMessage.builder().payload(new DefaultMultiPartContent(bodyPart, attachmentPart)).build();
 
-    assertThat(((DefaultMultiPartContent) message.getPayload()).hasBodyPart(), is(true));
-    assertThat(((DefaultMultiPartContent) message.getPayload()).getBodyPart(), sameInstance(bodyPart));
+    assertThat(((DefaultMultiPartContent) message.getPayload().getValue()).hasBodyPart(), is(true));
+    assertThat(((DefaultMultiPartContent) message.getPayload().getValue()).getBodyPart(), sameInstance(bodyPart));
   }
 
   @Test
@@ -115,7 +116,7 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
     InternalMessage message =
         InternalMessage.builder().payload(new DefaultMultiPartContent(attachmentPart1, attachmentPart2)).build();
 
-    assertThat(((DefaultMultiPartContent) message.getPayload()).hasBodyPart(), is(false));
+    assertThat(((DefaultMultiPartContent) message.getPayload().getValue()).hasBodyPart(), is(false));
   }
 
   @Test
@@ -137,9 +138,10 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
     message = (InternalMessage) ois.readObject();
 
-    assertThat(((MultiPartContent) message.getPayload()).getPartNames(), hasItem("attachment"));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("attachment").getPayload(), is("this is the attachment"));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("attachment").getAttributes(),
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPartNames(), hasItem("attachment"));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("attachment").getPayload().getValue(),
+               is("this is the attachment"));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("attachment").getAttributes(),
                equalTo(attachmentPart.getAttributes()));
   }
 
@@ -147,7 +149,7 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
   public void multiPartPayloadStreamsSerialization() throws Exception {
     final InternalMessage attachmentPart =
         toMuleMessagePart("spi-props", getResourceAsUrl("test-spi.properties", getClass()), MediaType.TEXT);
-    assertThat(attachmentPart.getPayload(), instanceOf(InputStream.class));
+    assertThat(attachmentPart.getPayload().getValue(), instanceOf(InputStream.class));
 
     InternalMessage message = InternalMessage.builder()
         .payload(new DefaultMultiPartContent(InternalMessage.builder().payload(TEST_PAYLOAD).attributes(BODY_ATTRIBUTES).build(),
@@ -163,9 +165,10 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
     message = (InternalMessage) ois.readObject();
 
-    assertThat(((MultiPartContent) message.getPayload()).getPartNames(), hasItem("spi-props"));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("spi-props").getPayload(), instanceOf(byte[].class));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("spi-props").getAttributes(),
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPartNames(), hasItem("spi-props"));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("spi-props").getPayload().getValue(),
+               instanceOf(byte[].class));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("spi-props").getAttributes(),
                equalTo(attachmentPart.getAttributes()));
   }
 
@@ -216,10 +219,10 @@ public class DefaultMultiPartContentTestCase extends AbstractMuleContextTestCase
     InternalMessage message =
         InternalMessage.builder().payload(new DefaultMultiPartContent(attachmentPart2, messageInner)).build();
 
-    assertThat(((MultiPartContent) message.getPayload()).getParts(), hasSize(3));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("attachment1"), not(nullValue()));
-    assertThat(((MultiPartContent) message.getPayload()).getPart("attachment2"), not(nullValue()));
-    assertThat(((DefaultMultiPartContent) message.getPayload()).getBodyPart(), not(nullValue()));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getParts(), hasSize(3));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("attachment1"), not(nullValue()));
+    assertThat(((MultiPartContent) message.getPayload().getValue()).getPart("attachment2"), not(nullValue()));
+    assertThat(((DefaultMultiPartContent) message.getPayload().getValue()).getBodyPart(), not(nullValue()));
   }
 
   @Test

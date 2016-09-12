@@ -65,7 +65,7 @@ public class HttpResponseToMuleMessage {
 
   public Message convert(Event muleEvent, HttpResponse response, String uri) throws MessagingException {
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
-    DataType dataType = muleEvent.getMessage().getDataType();
+    DataType dataType = muleEvent.getMessage().getPayload().getDataType();
     if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType())) {
       responseContentType = dataType.getMediaType().toRfcString();
     }

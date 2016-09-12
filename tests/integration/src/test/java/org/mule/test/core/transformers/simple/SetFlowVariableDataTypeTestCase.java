@@ -33,7 +33,7 @@ public class SetFlowVariableDataTypeTestCase extends AbstractIntegrationTestCase
     final Event muleEvent = flowRunner("main").withPayload(TEST_MESSAGE).run();
 
     InternalMessage response = muleEvent.getMessage();
-    DataType dataType = (DataType) response.getPayload();
+    DataType dataType = (DataType) response.getPayload().getValue();
     assertThat(dataType, like(String.class, MediaType.XML, UTF_16));
   }
 

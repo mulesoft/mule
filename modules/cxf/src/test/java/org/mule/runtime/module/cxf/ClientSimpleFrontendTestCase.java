@@ -30,8 +30,8 @@ public class ClientSimpleFrontendTestCase extends FunctionalTestCase {
   public void testEchoWsdl() throws Exception {
     InternalMessage result = flowRunner("PopulateData").withPayload("some payload").run().getMessage();
 
-    assertNotNull(result.getPayload());
-    assertEquals("Hello some payload", result.getPayload());
+    assertNotNull(result.getPayload().getValue());
+    assertEquals("Hello some payload", result.getPayload().getValue());
   }
 }
 

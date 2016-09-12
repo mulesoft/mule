@@ -107,10 +107,10 @@ public class CxfDataTypeTestCase extends FunctionalTestCase {
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      if (!eventContext.getMessage().getDataType().getMediaType().matches(mimeType)) {
+      if (!eventContext.getMessage().getPayload().getDataType().getMediaType().matches(mimeType)) {
         throw new RuntimeException();
       }
-      return eventContext.getMessage().getPayload();
+      return eventContext.getMessage().getPayload().getValue();
     }
   }
 

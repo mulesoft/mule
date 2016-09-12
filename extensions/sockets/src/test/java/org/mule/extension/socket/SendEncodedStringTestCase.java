@@ -40,7 +40,7 @@ public class SendEncodedStringTestCase extends SocketExtensionTestCase {
     flowRunner("tcp-send").withFlowVariable("encoding", customEncoding).withPayload(WEIRD_CHAR_MESSAGE).run();
 
     Message message = receiveConnection();
-    byte[] byteArray = IOUtils.toByteArray((InputStream) message.getPayload());
+    byte[] byteArray = IOUtils.toByteArray((InputStream) message.getPayload().getValue());
     assertThat(Arrays.equals(byteArray, WEIRD_CHAR_MESSAGE.getBytes(customEncoding)), is(true));
   }
 }

@@ -475,9 +475,8 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   protected Event createMockEvent(String payload, DataType dataType) {
     Event event = mock(Event.class);
     InternalMessage message = mock(InternalMessage.class);
-    when(message.getPayload()).thenReturn(payload);
+    when(message.getPayload()).thenReturn(new DefaultTypedValue<Object>(payload, dataType));
     when(event.getMessage()).thenReturn(message);
-    when(message.getDataType()).thenReturn(dataType);
     when(event.getFlowCallStack()).thenReturn(new DefaultFlowCallStack());
     when(event.getError()).thenReturn(empty());
     return event;

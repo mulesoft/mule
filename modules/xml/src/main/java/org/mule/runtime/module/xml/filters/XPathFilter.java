@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.xml.filters;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.util.ClassUtils.equal;
 import static org.mule.runtime.core.util.ClassUtils.hash;
 
@@ -99,7 +99,7 @@ public class XPathFilter extends AbstractJaxpFilter implements Filter, Initialis
 
   @Override
   public boolean accept(Event event, Event.Builder builder) {
-    Object payload = event.getMessage().getPayload();
+    Object payload = event.getMessage().getPayload().getValue();
     if (payload == null) {
       if (logger.isWarnEnabled()) {
         logger.warn("Applying {} to null object.", ClassUtils.getSimpleName(getClass()));

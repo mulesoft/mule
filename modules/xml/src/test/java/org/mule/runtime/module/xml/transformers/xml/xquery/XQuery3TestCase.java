@@ -49,7 +49,7 @@ public class XQuery3TestCase extends FunctionalTestCase {
 
   @Test
   public void tryCatch() throws Exception {
-    List<Element> elements = (List<Element>) flowRunner("tryCatch").withPayload(input).run().getMessage().getPayload();
+    List<Element> elements = (List<Element>) flowRunner("tryCatch").withPayload(input).run().getMessage().getPayload().getValue();
     assertThat(elements, hasSize(1));
     assertThat(elements.get(0).getTagName(), equalTo("error"));
     assertThat(elements.get(0).getTextContent(), containsString("Caught error"));
@@ -57,7 +57,7 @@ public class XQuery3TestCase extends FunctionalTestCase {
 
   @Test
   public void switchStatement() throws Exception {
-    List<Element> elements = (List<Element>) flowRunner("switch").withPayload(input).run().getMessage().getPayload();
+    List<Element> elements = (List<Element>) flowRunner("switch").withPayload(input).run().getMessage().getPayload().getValue();
 
     assertThat(elements, hasSize(1));
     assertThat(elements.get(0).getTagName(), equalTo("Quack"));
@@ -65,7 +65,7 @@ public class XQuery3TestCase extends FunctionalTestCase {
 
   @Test
   public void groupBy() throws Exception {
-    List<Element> elements = (List<Element>) flowRunner("groupBy").withPayload(input).run().getMessage().getPayload();
+    List<Element> elements = (List<Element>) flowRunner("groupBy").withPayload(input).run().getMessage().getPayload().getValue();
 
     assertThat(elements, hasSize(2));
     assertThat(elements.get(0).getTagName(), equalTo("odd"));
@@ -76,7 +76,7 @@ public class XQuery3TestCase extends FunctionalTestCase {
 
   @Test
   public void books() throws Exception {
-    List<Node> nodes = (List<Node>) flowRunner("books").withPayload(getBooks()).run().getMessage().getPayload();
+    List<Node> nodes = (List<Node>) flowRunner("books").withPayload(getBooks()).run().getMessage().getPayload().getValue();
     assertThat(nodes, hasSize(6));
     assertThat(nodes.get(0).getLastChild().getTextContent(), equalTo("The Eyre Affair"));
   }
@@ -105,7 +105,7 @@ public class XQuery3TestCase extends FunctionalTestCase {
 
   private void assertMultipleInputs(String flowName, Object books, Object cities) throws Exception {
     List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(input).withFlowVariable("books", books)
-        .withFlowVariable("cities", cities).run().getMessage().getPayload();
+        .withFlowVariable("cities", cities).run().getMessage().getPayload().getValue();
 
     assertThat(elements, hasSize(1));
 

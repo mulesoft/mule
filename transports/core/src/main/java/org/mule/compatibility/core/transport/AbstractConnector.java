@@ -1833,8 +1833,8 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
    */
   protected InternalMessage setupRequestReturn(final InboundEndpoint endpoint, final MessageRequester requester,
                                                InternalMessage result) {
-    if (result != null && result.getPayload() instanceof InputStream) {
-      DelegatingInputStream is = new DelegatingInputStream((InputStream) result.getPayload()) {
+    if (result != null && result.getPayload().getValue() instanceof InputStream) {
+      DelegatingInputStream is = new DelegatingInputStream((InputStream) result.getPayload().getValue()) {
 
         @Override
         public void close() throws IOException {
@@ -1845,7 +1845,7 @@ public abstract class AbstractConnector extends AbstractAnnotatedObject implemen
           }
         }
       };
-      return InternalMessage.builder(result).payload(is).mediaType(result.getDataType().getMediaType()).build();
+      return InternalMessage.builder(result).payload(is).mediaType(result.getPayload().getDataType().getMediaType()).build();
     } else {
       returnRequester(endpoint, requester);
       return result;

@@ -38,7 +38,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer {
 
     try {
       String httpMethod = event.getMessage().getInboundProperty("http.method");
-      MediaType contentType = event.getMessage().getDataType().getMediaType();
+      MediaType contentType = event.getMessage().getPayload().getDataType().getMediaType();
 
       boolean isGet = METHOD_GET.equalsIgnoreCase(httpMethod);
       boolean isFormUrlEncoded = MediaType.parse(FORM_URLENCODED_CONTENT_TYPE).matches(contentType);

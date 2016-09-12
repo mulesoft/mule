@@ -27,7 +27,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
         .withPayload("Test").run().getMessage();
 
     assertNotNull(message);
-    assertTrue(message.getPayload() instanceof String);
+    assertTrue(message.getPayload().getValue() instanceof String);
     assertEquals("Test Received", getPayloadAsString(message));
   }
 
@@ -38,7 +38,7 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFun
         .withPayload("Test").run().getMessage();
 
     assertNotNull(message);
-    assertTrue(message.getPayload() instanceof String);
+    assertTrue(message.getPayload().getValue() instanceof String);
     assertEquals("Test Received", getPayloadAsString(message));
   }
 

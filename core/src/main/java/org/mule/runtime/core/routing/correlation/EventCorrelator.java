@@ -12,8 +12,8 @@ import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.cre
 import static org.mule.runtime.core.message.GroupCorrelation.NOT_SET;
 
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -128,7 +128,8 @@ public class EventCorrelator implements Startable, Stoppable, Disposable {
       try {
         logger.trace(String.format("Received async reply message for correlationID: %s%n%s%n%s",
                                    groupId, StringMessageUtils
-                                       .truncate(StringMessageUtils.toString(event.getMessage().getPayload()), 200, false),
+                                       .truncate(StringMessageUtils.toString(event.getMessage().getPayload().getValue()), 200,
+                                                 false),
                                    StringMessageUtils.headersToString(event.getMessage())));
       } catch (Exception e) {
         // ignore

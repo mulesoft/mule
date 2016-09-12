@@ -57,7 +57,7 @@ public class NotificationHelperTestCase extends AbstractMuleTestCase {
   public void before() {
     when(muleContext.getNotificationManager()).thenReturn(eventNotificationHandler);
     when(event.getMessage()).thenReturn(message);
-    when((Class<String>) message.getDataType().getType()).thenReturn(String.class);
+    when((Class<String>) message.getPayload().getDataType().getType()).thenReturn(String.class);
     initMocks(eventNotificationHandler);
     initMocks(defaultNotificationHandler);
 

@@ -63,7 +63,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
     muleContext.start();
     MuleClient client = muleContext.getClient();
     InternalMessage result = flowRunner("input").withPayload("Hello").run().getMessage();
-    assertEquals("Hello", result.getPayload());
+    assertEquals("Hello", result.getPayload().getValue());
     assertTrue(latch.await(5000, TimeUnit.MILLISECONDS));
   }
 
@@ -144,7 +144,7 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
         if (payloads.size() == 4) {
           latch.countDown();
         }
-        return eventContext.getMessage().getPayload();
+        return eventContext.getMessage().getPayload().getValue();
       }
     }
   }

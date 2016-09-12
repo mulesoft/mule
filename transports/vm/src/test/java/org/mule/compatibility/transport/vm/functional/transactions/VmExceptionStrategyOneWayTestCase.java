@@ -60,7 +60,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
     }
     assertThat(outboundComponentReached, is(false));
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
   }
@@ -74,7 +74,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
      * if (!deadLetterQueueLatch.await(TIMEOUT, MILLISECONDS)) { fail("dead letter queue must be reached"); }
      */
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
     if (!outboundComponentLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
@@ -91,7 +91,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
     }
     assertThat(outboundComponentReached, is(false));
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
   }
@@ -105,7 +105,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
     }
     assertThat(outboundComponentReached, is(false));
     assertThat(response, notNullValue());
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     assertThat(response.getExceptionPayload(), notNullValue());
     assertThat(response.getExceptionPayload(), instanceOf(DefaultExceptionPayload.class));
   }
@@ -126,7 +126,7 @@ public class VmExceptionStrategyOneWayTestCase extends FunctionalTestCase {
       InternalMessage message = eventContext.getMessage();
       assertThat(message, notNullValue());
       assertThat(message.getExceptionPayload(), nullValue());
-      assertThat(message.getPayload(), instanceOf(ExceptionMessage.class));
+      assertThat(message.getPayload().getValue(), instanceOf(ExceptionMessage.class));
       return eventContext.getMessage();
     }
   }

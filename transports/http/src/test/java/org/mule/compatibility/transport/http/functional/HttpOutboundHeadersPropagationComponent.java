@@ -27,7 +27,7 @@ public class HttpOutboundHeadersPropagationComponent implements Callable {
     for (String s : m.getInboundPropertyNames()) {
       headers.put(s, m.getInboundProperty(s));
     }
-    headers.put("Content-Type", m.getDataType().getMediaType().toRfcString());
+    headers.put("Content-Type", m.getPayload().getDataType().getMediaType().toRfcString());
     return headers;
   }
 }

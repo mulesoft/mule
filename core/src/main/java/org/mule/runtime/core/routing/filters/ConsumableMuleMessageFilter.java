@@ -20,6 +20,6 @@ public class ConsumableMuleMessageFilter implements Filter {
 
   @Override
   public boolean accept(InternalMessage message, Event.Builder builder) {
-    return !message.getDataType().isStreamType();
+    return !message.getPayload().getDataType().isStreamType();
   }
 }

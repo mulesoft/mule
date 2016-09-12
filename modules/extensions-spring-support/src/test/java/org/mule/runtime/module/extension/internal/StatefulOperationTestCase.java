@@ -70,10 +70,11 @@ public class StatefulOperationTestCase extends ExtensionFunctionalTestCase {
   }
 
   private long doDynamicLaunder(String name, long amount) throws Exception {
-    return (Long) flowRunner("laundry").withPayload(amount).withFlowVariable("myName", name).run().getMessage().getPayload();
+    return (Long) flowRunner("laundry").withPayload(amount).withFlowVariable("myName", name).run().getMessage().getPayload()
+        .getValue();
   }
 
   private long staticLounder(long amount) throws Exception {
-    return (Long) flowRunner("staticLaundry").withPayload(amount).run().getMessage().getPayload();
+    return (Long) flowRunner("staticLaundry").withPayload(amount).run().getMessage().getPayload().getValue();
   }
 }

@@ -79,10 +79,10 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase {
     InternalMessage result = flowRunner("SINGLE").withPayload("").run().getMessage();
 
     assertThat(result, is(notNullValue()));
-    assertThat(result.getPayload(), instanceOf(Set.class));
+    assertThat(result.getPayload().getValue(), instanceOf(Set.class));
 
     // expect SINGLE attachment from SINGLE service
-    assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE"));
+    assertThat((Set<String>) result.getPayload().getValue(), containsInAnyOrder("SINGLE"));
 
     DataHandler attachment = result.getOutboundAttachment("SINGLE");
     assertThat(attachment, is(notNullValue()));
@@ -94,11 +94,11 @@ public class AttachmentsPropagationTestCase extends FunctionalTestCase {
     InternalMessage result = flowRunner("CHAINED").withPayload("").run().getMessage();
 
     assertThat(result, is(notNullValue()));
-    assertThat(result.getPayload(), instanceOf(Set.class));
+    assertThat(result.getPayload().getValue(), instanceOf(Set.class));
 
     // expect CHAINED attachment from CHAINED service
     // and SINGLE attachment from SINGLE service
-    assertThat((Set<String>) result.getPayload(), containsInAnyOrder("SINGLE", "CHAINED"));
+    assertThat((Set<String>) result.getPayload().getValue(), containsInAnyOrder("SINGLE", "CHAINED"));
 
     // don't check the attachments now - it seems they're not copied properly from inbound
     // to outbound on flow boundaries

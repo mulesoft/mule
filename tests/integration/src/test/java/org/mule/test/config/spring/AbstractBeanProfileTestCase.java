@@ -24,6 +24,6 @@ public abstract class AbstractBeanProfileTestCase extends AbstractIntegrationTes
     MuleClient client = muleContext.getClient();
     InternalMessage response = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull("Response is null", response);
-    assertEquals("Homero" + appended, response.getPayload());
+    assertEquals("Homero" + appended, response.getPayload().getValue());
   }
 }

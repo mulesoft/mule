@@ -9,8 +9,8 @@ package org.mule.runtime.core.api.processor;
 import org.mule.runtime.core.api.MuleException;
 
 /**
- * A {@link Processor} that routes messages to zero or more destination message processors. Implementations determine
- * exactly how this is done by making decisions about which route(s) should be used and if the message should be copied or not.
+ * A {@link Processor} that routes messages to zero or more destination message processors. Implementations determine exactly how
+ * this is done by making decisions about which route(s) should be used and if the message should be copied or not.
  */
 public interface MessageRouter extends Processor {
 

@@ -16,12 +16,12 @@ import static org.mule.extension.FtpTestHarness.HELLO_WORLD;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 
 import org.mule.extension.FtpTestHarness;
+import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 
 import java.io.InputStream;
 
@@ -48,10 +48,10 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
   public void read() throws Exception {
     Message message = readHelloWorld().getMessage();
 
-    assertThat(message.getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
-    assertThat(message.getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
+    assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), is(JSON.getPrimaryType()));
+    assertThat(message.getPayload().getDataType().getMediaType().getSubType(), is(JSON.getSubType()));
 
-    AbstractFileInputStream payload = message.getPayload();
+    AbstractFileInputStream payload = (AbstractFileInputStream) message.getPayload().getValue();
     assertThat(payload.isLocked(), is(false));
     assertThat(getPayloadAsString(message), is(HELLO_WORLD));
   }
@@ -62,10 +62,10 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
     Message response = readPath(BINARY_FILE_NAME);
 
-    assertThat(response.getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
-    assertThat(response.getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
+    assertThat(response.getPayload().getDataType().getMediaType().getPrimaryType(), is(MediaType.BINARY.getPrimaryType()));
+    assertThat(response.getPayload().getDataType().getMediaType().getSubType(), is(MediaType.BINARY.getSubType()));
 
-    AbstractFileInputStream payload = response.getPayload();
+    AbstractFileInputStream payload = (AbstractFileInputStream) response.getPayload().getValue();
     assertThat(payload.isLocked(), is(false));
 
     byte[] readContent = new byte[new Long(HELLO_WORLD.length()).intValue()];
@@ -76,8 +76,8 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
   @Test
   public void readWithForcedMimeType() throws Exception {
     Event event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
-    assertThat(event.getMessage().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
-    assertThat(event.getMessage().getDataType().getMediaType().getSubType(), equalTo("test"));
+    assertThat(event.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
+    assertThat(event.getMessage().getPayload().getDataType().getMediaType().getSubType(), equalTo("test"));
   }
 
   @Test
@@ -103,7 +103,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
   @Test
   public void readLockReleasedOnEarlyClose() throws Exception {
     Message message = readWithLock();
-    ((InputStream) message.getPayload()).close();
+    ((InputStream) message.getPayload().getValue()).close();
 
     assertThat(isLocked(message), is(false));
   }

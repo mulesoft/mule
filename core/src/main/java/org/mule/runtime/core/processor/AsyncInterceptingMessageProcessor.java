@@ -35,8 +35,8 @@ import org.mule.runtime.core.work.MuleWorkManager;
 
 /**
  * Processes {@link Event}'s asynchronously using a {@link MuleWorkManager} to schedule asynchronous processing of the next
- * {@link Processor}. The next {@link Processor} is therefore be executed in a different thread regardless of the
- * exchange-pattern configured on the inbound endpoint. If a transaction is present then an exception is thrown.
+ * {@link Processor}. The next {@link Processor} is therefore be executed in a different thread regardless of the exchange-pattern
+ * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
     implements Startable, Stoppable, MessagingExceptionHandlerAware, NonBlockingSupported {

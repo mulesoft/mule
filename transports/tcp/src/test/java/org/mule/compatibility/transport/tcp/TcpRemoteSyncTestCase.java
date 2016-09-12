@@ -54,7 +54,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase {
             .getRight();
 
     assertNotNull(reply);
-    assertNotNull(reply.getPayload());
+    assertNotNull(reply.getPayload().getValue());
     assertEquals("Received: " + message, getPayloadAsString(reply));
   }
 
@@ -72,7 +72,7 @@ public class TcpRemoteSyncTestCase extends FunctionalTestCase {
             .getRight();
 
     assertNotNull(reply);
-    assertNotNull(reply.getPayload());
+    assertNotNull(reply.getPayload().getValue());
     assertEquals("Received: " + message, getPayloadAsString(reply));
   }
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.component;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
@@ -117,10 +117,11 @@ public class BindingInvocationHandler implements InvocationHandler {
   private Object determineReply(InternalMessage reply, Method bindingMethod) {
     if (InternalMessage.class.isAssignableFrom(bindingMethod.getReturnType())) {
       return reply;
-    } else if (reply.getPayload() == null && !bindingMethod.getReturnType().isInstance(reply.getPayload())) {
+    } else if (reply.getPayload().getValue() == null
+        && !bindingMethod.getReturnType().isInstance(reply.getPayload().getValue())) {
       return null;
     } else {
-      return reply.getPayload();
+      return reply.getPayload().getValue();
     }
   }
 

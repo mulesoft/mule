@@ -50,7 +50,7 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     GZipUncompressTransformer gu = new GZipUncompressTransformer();
     gu.setMuleContext(muleContext);
     gu.setReturnDataType(DataType.STRING);
-    assertNotNull(message.getPayload());
+    assertNotNull(message.getPayload().getValue());
     String result = (String) gu.transform(getPayloadAsBytes(message));
     assertThat(result, is("<string>payload</string>"));
   }
@@ -67,8 +67,8 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     assertNotNull(message);
     ByteArrayToSerializable bas = new ByteArrayToSerializable();
     bas.setMuleContext(muleContext);
-    assertNotNull(message.getPayload());
-    Object result = bas.transform(message.getPayload());
+    assertNotNull(message.getPayload().getValue());
+    Object result = bas.transform(message.getPayload().getValue());
     assertThat(result, is(payload));
   }
 
@@ -80,8 +80,8 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
     assertNotNull(message);
     ByteArrayToSerializable bas = new ByteArrayToSerializable();
     bas.setMuleContext(muleContext);
-    assertNotNull(message.getPayload());
-    Object result = bas.transform(message.getPayload());
+    assertNotNull(message.getPayload().getValue());
+    Object result = bas.transform(message.getPayload().getValue());
     assertThat(result, is(payload));
   }
 }

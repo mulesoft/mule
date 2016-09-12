@@ -41,7 +41,7 @@ public class XmlToObject extends AbstractXStreamTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
     Object result;
     if (src instanceof byte[]) {
       Reader xml = new InputStreamReader(new ByteArrayInputStream((byte[]) src), outputEncoding);

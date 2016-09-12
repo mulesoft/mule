@@ -35,7 +35,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase {
 
     InternalMessage message = client.send(getDispatchUrl(), "Test Client Send message", null);
     assertNotNull(message);
-    assertEquals("Received: Test Client Send message", message.getPayload());
+    assertEquals("Received: Test Client Send message", message.getPayload().getValue());
   }
 
   @Test
@@ -45,7 +45,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase {
     for (int i = 0; i < INTERATIONS; i++) {
       InternalMessage message = client.send(getDispatchUrl(), "Test Client Send message " + i, null);
       assertNotNull(message);
-      assertEquals("Received: Test Client Send message " + i, message.getPayload());
+      assertEquals("Received: Test Client Send message " + i, message.getPayload().getValue());
     }
   }
 

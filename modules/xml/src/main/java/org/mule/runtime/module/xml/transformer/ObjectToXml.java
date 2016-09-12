@@ -41,7 +41,7 @@ public class ObjectToXml extends AbstractXStreamTransformer {
 
   @Override
   public Object transformMessage(Event event, Charset outputEncoding) throws TransformerException {
-    Object src = event.getMessage().getPayload();
+    Object src = event.getMessage().getPayload().getValue();
     /*
      * If the Message source type has been registered that we can assume that the whole message is to be serialised to Xml, not
      * just the payload. This can be useful for protocols such as tcp where the protocol does not support headers, thus the whole

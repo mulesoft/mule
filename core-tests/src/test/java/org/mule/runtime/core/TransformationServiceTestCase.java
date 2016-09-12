@@ -91,7 +91,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     message = transformationService.applyTransformers(message, null, converter1);
 
-    assertTrue(message.getPayload() instanceof D);
+    assertTrue(message.getPayload().getValue() instanceof D);
     verifyTransformerExecuted(converter1);
     verifyTransformerExecuted(converter2);
   }
@@ -104,7 +104,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new B()).build();
     message = transformationService.applyTransformers(message, null, converter1);
 
-    assertTrue(message.getPayload() instanceof C);
+    assertTrue(message.getPayload().getValue() instanceof C);
     verifyTransformerExecuted(converter1);
   }
 
@@ -116,7 +116,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new C()).build();
     message = transformationService.applyTransformers(message, null, converter1);
 
-    assertTrue(message.getPayload() instanceof C);
+    assertTrue(message.getPayload().getValue() instanceof C);
     verifyTransformerNotExecuted(converter1);
   }
 
@@ -145,7 +145,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new B()).build();
     message = transformationService.applyTransformers(message, null, converter1, converter2);
 
-    assertTrue(message.getPayload() instanceof D);
+    assertTrue(message.getPayload().getValue() instanceof D);
     verifyTransformerExecuted(converter1);
     verifyTransformerExecuted(converter2);
   }
@@ -159,7 +159,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new C()).build();
     message = transformationService.applyTransformers(message, null, converter1, converter2);
 
-    assertTrue(message.getPayload() instanceof D);
+    assertTrue(message.getPayload().getValue() instanceof D);
     verifyTransformerNotExecuted(converter1);
     verifyTransformerExecuted(converter2);
   }
@@ -174,7 +174,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new D()).build();
     message = transformationService.applyTransformers(message, null, converter1, converter2);
 
-    assertTrue(message.getPayload() instanceof D);
+    assertTrue(message.getPayload().getValue() instanceof D);
     verifyTransformerNotExecuted(converter1);
     verifyTransformerNotExecuted(converter2);
   }
@@ -205,7 +205,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new B()).build();
     message = transformationService.applyTransformers(message, null, transformer1, converter2);
 
-    assertTrue(message.getPayload() instanceof D);
+    assertTrue(message.getPayload().getValue() instanceof D);
     verifyTransformerExecuted(transformer1);
     verifyTransformerNotExecuted(converter2);
   }
@@ -284,7 +284,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new C()).build();
     message = transformationService.applyTransformers(message, null, converter1, transformer2);
 
-    assertTrue(message.getPayload() instanceof D);
+    assertTrue(message.getPayload().getValue() instanceof D);
     verifyTransformerNotExecuted(converter1);
     verifyTransformerExecuted(transformer2);
   }
@@ -396,7 +396,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
     InternalMessage message = InternalMessage.builder().payload(new B()).build();
     message = transformationService.applyTransformers(message, null, transformer1);
 
-    assertTrue(message.getPayload() instanceof C);
+    assertTrue(message.getPayload().getValue() instanceof C);
     verifyTransformerExecuted(transformer1);
   }
 
@@ -442,7 +442,7 @@ public class TransformationServiceTestCase extends AbstractMuleTestCase {
 
     message = transformationService.applyTransformers(message, null, transformer);
 
-    assertEquals("bar", message.getPayload());
+    assertEquals("bar", message.getPayload().getValue());
     verifyTransformerExecuted(transformer);
     verifyTransformerExecuted(converter);
   }

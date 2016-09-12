@@ -53,7 +53,7 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
         client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").mediaType(MediaType.TEXT).build())
             .getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
@@ -62,7 +62,7 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
     InternalMessage response =
         client.send("vm://in1?connector=vm-in1", InternalMessage.builder().payload("OK").build()).getRight();
     assertNotNull(response);
-    assertEquals("OK", response.getPayload());
+    assertEquals("OK", response.getPayload().getValue());
   }
 
   @Test
@@ -83,8 +83,8 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase {
     public Object onCall(MuleEventContext eventContext) throws Exception {
       InternalMessage message = eventContext.getMessage();
       final MediaType parse = MediaType.parse(expectedContentType);
-      assertThat(message.getDataType().getMediaType().getPrimaryType(), is(parse.getPrimaryType()));
-      assertThat(message.getDataType().getMediaType().getSubType(), is(parse.getSubType()));
+      assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), is(parse.getPrimaryType()));
+      assertThat(message.getPayload().getDataType().getMediaType().getSubType(), is(parse.getSubType()));
       return message;
     }
 

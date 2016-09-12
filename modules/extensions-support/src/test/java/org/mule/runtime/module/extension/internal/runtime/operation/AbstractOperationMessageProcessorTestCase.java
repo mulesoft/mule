@@ -240,8 +240,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   }
 
   protected Event configureEvent() throws Exception {
-    when(message.getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
-    when(message.getPayload()).thenReturn(TEST_PAYLOAD);
+    when(message.getPayload().getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
+    when(message.getPayload().getValue()).thenReturn(TEST_PAYLOAD);
     Event event = Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
     return event;
   }

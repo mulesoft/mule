@@ -90,7 +90,7 @@ public class OnErrorContinueTransportTestCase extends FunctionalTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      NewsRequest newsRequest = (NewsRequest) event.getMessage().getPayload();
+      NewsRequest newsRequest = (NewsRequest) event.getMessage().getPayload().getValue();
       NewsResponse newsResponse = new NewsResponse();
       newsResponse.setUserId(newsRequest.getUserId());
       newsResponse.setTitle("News title");
@@ -102,7 +102,7 @@ public class OnErrorContinueTransportTestCase extends FunctionalTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      ((NewsResponse) event.getMessage().getPayload()).setErrorMessage(ERROR_PROCESSING_NEWS);
+      ((NewsResponse) event.getMessage().getPayload().getValue()).setErrorMessage(ERROR_PROCESSING_NEWS);
       return event;
     }
   }

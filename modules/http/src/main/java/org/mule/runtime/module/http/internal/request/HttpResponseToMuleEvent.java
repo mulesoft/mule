@@ -71,7 +71,7 @@ public class HttpResponseToMuleEvent {
   public Event convert(Event muleEvent, HttpResponse response, String uri) throws MessagingException {
     Event.Builder eventBuilder = Event.builder(muleEvent);
     String responseContentType = response.getHeaderValueIgnoreCase(CONTENT_TYPE);
-    DataType dataType = muleEvent.getMessage().getDataType();
+    DataType dataType = muleEvent.getMessage().getPayload().getDataType();
     if (StringUtils.isEmpty(responseContentType) && !MediaType.ANY.matches(dataType.getMediaType())) {
       responseContentType = dataType.getMediaType().toRfcString();
     }
@@ -95,10 +95,10 @@ public class HttpResponseToMuleEvent {
     }
 
     final Builder builder =
-        InternalMessage.builder().payload(muleEvent.getMessage().getPayload()).inboundProperties(inboundProperties);
+        InternalMessage.builder().payload(muleEvent.getMessage().getPayload().getValue()).inboundProperties(inboundProperties);
 
     if (StringUtils.isEmpty(responseContentType)) {
-      builder.mediaType(muleEvent.getMessage().getDataType().getMediaType());
+      builder.mediaType(muleEvent.getMessage().getPayload().getDataType().getMediaType());
     } else {
       builder.mediaType(MediaType.parse(responseContentType));
     }
@@ -145,7 +145,7 @@ public class HttpResponseToMuleEvent {
   private void setResponsePayload(Object payload, Event muleEvent, Event.Builder eventBuilder) {
     if (StringUtils.isEmpty(requester.getTarget()) || DEFAULT_PAYLOAD_EXPRESSION.equals(requester.getTarget())) {
       eventBuilder.message(InternalMessage.builder(muleEvent.getMessage()).payload(payload)
-          .mediaType(muleEvent.getMessage().getDataType().getMediaType()).build());
+          .mediaType(muleEvent.getMessage().getPayload().getDataType().getMediaType()).build());
     } else {
       muleContext.getExpressionLanguage().enrich(requester.getTarget(), muleEvent, eventBuilder, null, payload);
     }

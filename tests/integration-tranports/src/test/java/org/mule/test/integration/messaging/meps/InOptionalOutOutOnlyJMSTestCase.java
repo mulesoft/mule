@@ -60,7 +60,7 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase {
 
     InternalMessage result = client.send("inboundEndpoint", "some data", null).getRight();
     assertNotNull(result);
-    assertThat(result.getPayload(), is(nullValue()));
+    assertThat(result.getPayload().getValue(), is(nullValue()));
 
     Map<String, Serializable> props = new HashMap<>();
     props.put("foo", "bar");
@@ -76,6 +76,6 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase {
 
     assertNotNull(result);
 
-    assertEquals("foo header received", result.getPayload());
+    assertEquals("foo header received", result.getPayload().getValue());
   }
 }

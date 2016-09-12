@@ -8,7 +8,7 @@ package org.mule.runtime.module.xml.transformers.xml.xquery;
 
 import static java.lang.Runtime.getRuntime;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;

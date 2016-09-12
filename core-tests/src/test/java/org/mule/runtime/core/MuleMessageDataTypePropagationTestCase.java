@@ -79,7 +79,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void usesCustomEncodingWithNoProperty() throws Exception {
     InternalMessage message = InternalMessage.builder().payload(TEST).mediaType(ANY.withCharset(CUSTOM_ENCODING)).build();
 
-    assertThat(message.getDataType().getMediaType().getCharset().get(), equalTo(CUSTOM_ENCODING));
+    assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), equalTo(CUSTOM_ENCODING));
     assertCustomEncoding(message);
   }
 
@@ -87,7 +87,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void setsDataTypeFromPreviousMessageOnCreation() throws Exception {
     InternalMessage message = InternalMessage.builder().payload(1).mediaType(APPLICATION_XML_CUSTOM).build();
 
-    assertDataType(InternalMessage.builder(message).build(), message.getDataType());
+    assertDataType(InternalMessage.builder(message).build(), message.getPayload().getDataType());
   }
 
   @Test
@@ -199,9 +199,9 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.transform(anyObject(), anyObject())).thenReturn(TEST);
     when(muleRegistry.lookupTransformer(any(), any())).thenReturn(transformer);
 
-    assertThat(message.getDataType().getMediaType().getPrimaryType(), equalTo(APPLICATION_XML.getPrimaryType()));
-    assertThat(message.getDataType().getMediaType().getSubType(), equalTo(APPLICATION_XML.getSubType()));
-    assertThat(message.getDataType().getMediaType().getCharset().get(), equalTo(CUSTOM_ENCODING));
+    assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), equalTo(APPLICATION_XML.getPrimaryType()));
+    assertThat(message.getPayload().getDataType().getMediaType().getSubType(), equalTo(APPLICATION_XML.getSubType()));
+    assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), equalTo(CUSTOM_ENCODING));
   }
 
   @Test
@@ -301,19 +301,19 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   }
 
   private void assertEmptyDataType(InternalMessage muleMessage) {
-    assertThat(muleMessage.getDataType().getMediaType().getCharset().isPresent(), is(false));
+    assertThat(muleMessage.getPayload().getDataType().getMediaType().getCharset().isPresent(), is(false));
   }
 
   private void assertCustomEncoding(InternalMessage muleMessage) {
-    assertThat(muleMessage.getDataType().getMediaType().getCharset().get(), is(CUSTOM_ENCODING));
+    assertThat(muleMessage.getPayload().getDataType().getMediaType().getCharset().get(), is(CUSTOM_ENCODING));
   }
 
   private void assertDataType(InternalMessage muleMessage, Class<?> type, MediaType mimeType, Charset encoding) {
-    assertThat(muleMessage.getDataType(), like(type, mimeType, encoding));
+    assertThat(muleMessage.getPayload().getDataType(), like(type, mimeType, encoding));
   }
 
   private void assertDataType(InternalMessage muleMessage, DataType dataType) {
-    assertThat(muleMessage.getDataType(), like(dataType));
+    assertThat(muleMessage.getPayload().getDataType(), like(dataType));
   }
 
   private void assertDefaultInboundPropertyDataType(InternalMessage muleMessage) {

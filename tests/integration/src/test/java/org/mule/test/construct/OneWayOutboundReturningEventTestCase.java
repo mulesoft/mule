@@ -19,11 +19,11 @@ public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase
 
   @Override
   protected void assertOneWayOutboundResponse(InternalMessage response) {
-    assertEquals("TEST", response.getPayload());
+    assertEquals("TEST", response.getPayload().getValue());
   }
 
   @Override
   protected void assertOneWayOutboundAfterComponentResponse(InternalMessage response) {
-    assertEquals("TEST processed", response.getPayload());
+    assertEquals("TEST processed", response.getPayload().getValue());
   }
 }

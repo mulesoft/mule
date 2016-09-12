@@ -51,6 +51,6 @@ public class HttpContentTypeTestCase extends FunctionalTestCase {
   }
 
   private void assertContentType(InternalMessage response) {
-    assertThat(response.getDataType().getMediaType().toRfcString(), equalTo(EXPECTED_CONTENT_TYPE));
+    assertThat(response.getPayload().getDataType().getMediaType().toRfcString(), equalTo(EXPECTED_CONTENT_TYPE));
   }
 }

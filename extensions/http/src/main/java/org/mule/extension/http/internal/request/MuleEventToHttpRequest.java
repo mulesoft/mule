@@ -104,7 +104,7 @@ public class MuleEventToHttpRequest {
     builder.setQueryParams(toParameterMap(requestBuilder.getQueryParams()));
 
     if (!builder.getHeaders().containsKey(CONTENT_TYPE)) {
-      DataType dataType = event.getMessage().getDataType();
+      DataType dataType = event.getMessage().getPayload().getDataType();
       if (!MediaType.ANY.matches(dataType.getMediaType())) {
         builder.addHeader(CONTENT_TYPE, dataType.getMediaType().toRfcString());
       }
@@ -165,7 +165,7 @@ public class MuleEventToHttpRequest {
     boolean emptyBody;
 
     // TODO MULE-9986 Use multi-part payload
-    if (event.getMessage().getPayload() == null && parts.isEmpty()) {
+    if (event.getMessage().getPayload().getValue() == null && parts.isEmpty()) {
       emptyBody = true;
     } else {
       emptyBody = DEFAULT_EMPTY_BODY_METHODS.contains(method);
@@ -181,7 +181,7 @@ public class MuleEventToHttpRequest {
   private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent,
                                                     Map<String, DataHandler> parts, MuleContext muleContext)
       throws MessagingException {
-    Object payload = muleEvent.getMessage().getPayload();
+    Object payload = muleEvent.getMessage().getPayload().getValue();
 
     if (!parts.isEmpty()) {
       try {
@@ -208,8 +208,8 @@ public class MuleEventToHttpRequest {
 
       if (contentType == null || contentType.startsWith(APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())
           || contentType.startsWith(APPLICATION_JAVA)) {
-        if (muleEvent.getMessage().getPayload() instanceof Map) {
-          String body = HttpParser.encodeString(muleEvent.getMessage().getDataType().getMediaType().getCharset()
+        if (muleEvent.getMessage().getPayload().getValue() instanceof Map) {
+          String body = HttpParser.encodeString(muleEvent.getMessage().getPayload().getDataType().getMediaType().getCharset()
               .orElse(getDefaultEncoding(muleContext)), (Map) payload);
           requestBuilder.addHeader(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
           return new ByteArrayHttpEntity(body.getBytes());
@@ -228,7 +228,7 @@ public class MuleEventToHttpRequest {
     String transferEncodingHeader = requestBuilder.getHeaders().get(TRANSFER_ENCODING);
     String contentLengthHeader = requestBuilder.getHeaders().get(CONTENT_LENGTH);
 
-    Object payload = event.getMessage().getPayload();
+    Object payload = event.getMessage().getPayload().getValue();
 
     if (streamingMode == HttpStreamingType.AUTO) {
       if (contentLengthHeader != null) {

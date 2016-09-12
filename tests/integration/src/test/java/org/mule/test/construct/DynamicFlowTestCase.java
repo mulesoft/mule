@@ -228,7 +228,8 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
     @Override
     public Event process(Event event) throws MuleException {
       steps.append("P");
-      return Event.builder(event).message(InternalMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build())
+      return Event.builder(event)
+          .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue() + "(pre)").build())
           .build();
     }
 
@@ -254,7 +255,8 @@ public class DynamicFlowTestCase extends AbstractIntegrationTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      return Event.builder(event).message(InternalMessage.builder().payload(event.getMessage().getPayload() + "(pre)").build())
+      return Event.builder(event)
+          .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue() + "(pre)").build())
           .build();
     }
 

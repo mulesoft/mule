@@ -43,7 +43,7 @@ public class JmsTransactionalCachingTestCase extends FunctionalTestCase {
     InternalMessage response = client.send("vm://testInput", TEST_MESSAGE_1, null).getRight();
     assertThat(TEST_MESSAGE_1, equalTo(getPayloadAsString(response)));
     response = client.send("vm://testInput", TEST_MESSAGE_2, null).getRight();
-    assertThat(response.getPayload(), is(nullValue()));
+    assertThat(response.getPayload().getValue(), is(nullValue()));
     response = client.send("vm://testInput", TEST_MESSAGE_3, null).getRight();
     assertThat(TEST_MESSAGE_3, equalTo(getPayloadAsString(response)));
 

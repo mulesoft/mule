@@ -45,10 +45,11 @@ public class AggregationTimeoutTestCase extends AbstractIntegrationTestCase {
       flowRunner("main").withPayload(inputData).asynchronously().run();
 
       InternalMessage response = client.request("test://testOut", RECEIVE_TIMEOUT).getRight().get();
-      assertThat(response.getPayload(), instanceOf(List.class));
+      assertThat(response.getPayload().getValue(), instanceOf(List.class));
 
       List<String> payloads =
-          ((List<InternalMessage>) response.getPayload()).stream().map(m -> (String) m.getPayload()).collect(toList());
+          ((List<InternalMessage>) response.getPayload().getValue()).stream().map(m -> (String) m.getPayload().getValue())
+              .collect(toList());
       assertThat(payloads.size(), equalTo(1));
       assertThat(payloads, hasItem(PROCESSED_EVENT));
     } finally {

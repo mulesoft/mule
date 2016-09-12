@@ -206,7 +206,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       return;
     }
     if (message != null) {
-      muleContext.getStreamCloserService().closeStream(message.getPayload());
+      muleContext.getStreamCloserService().closeStream(message.getPayload().getValue());
     }
   }
 

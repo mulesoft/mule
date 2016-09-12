@@ -69,7 +69,7 @@ public class TransformerChain extends AbstractMessageTransformer {
     if (lastTransformer != null && InternalMessage.class.isAssignableFrom(lastTransformer.getReturnDataType().getType())) {
       return result;
     } else {
-      return result.getPayload();
+      return result.getPayload().getValue();
     }
   }
 

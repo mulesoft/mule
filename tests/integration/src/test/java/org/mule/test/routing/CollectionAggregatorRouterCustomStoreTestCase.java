@@ -39,7 +39,7 @@ public class CollectionAggregatorRouterCustomStoreTestCase extends AbstractInteg
 
     InternalMessage request = client.request("test://out", 10000).getRight().get();
     assertNotNull(request);
-    assertEquals(list.size(), ((List) request.getPayload()).size());
+    assertEquals(list.size(), ((List) request.getPayload().getValue()).size());
 
     assertThat(CustomPartitionableObjectStore.askedForKey, not(nullValue()));
     assertThat(CustomPartitionableObjectStore.askedForPartition, not(nullValue()));

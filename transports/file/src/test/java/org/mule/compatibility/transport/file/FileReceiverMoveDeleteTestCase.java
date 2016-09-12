@@ -244,11 +244,11 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
 
     @Override
     public Object transformMessage(Event event, Charset outputEncoding) {
-      assertEquals(expectedPayload, event.getMessage().getDataType().getType());
+      assertEquals(expectedPayload, event.getMessage().getPayload().getDataType().getType());
 
       // If we are streaming, copy/delete shouldn't have happened yet
       if (expectedPayload.equals(ReceiverFileInputStream.class)) {
-        File file = ((ReceiverFileInputStream) event.getMessage().getPayload()).getCurrentFile();
+        File file = ((ReceiverFileInputStream) event.getMessage().getPayload().getValue()).getCurrentFile();
         assertFilesUntouched(file);
       }
       return event.getMessage();

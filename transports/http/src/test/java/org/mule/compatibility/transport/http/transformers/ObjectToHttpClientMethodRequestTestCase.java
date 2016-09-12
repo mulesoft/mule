@@ -22,7 +22,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_ENDPOINT_PROPERTY;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.setCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpRequest;
@@ -260,7 +260,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContext
     final HttpMethod httpMethod = (HttpMethod) response;
     assertEquals(null, httpMethod.getQueryString());
     final byte[] byteArrayContent = ((ByteArrayRequestEntity) ((PostMethod) httpMethod).getRequestEntity()).getContent();
-    final byte[] expectedByteArrayContent = SerializationUtils.serialize((Serializable) message.getPayload());
+    final byte[] expectedByteArrayContent = SerializationUtils.serialize((Serializable) message.getPayload().getValue());
     assertArrayEquals(expectedByteArrayContent, byteArrayContent);
   }
 

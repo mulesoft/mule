@@ -224,9 +224,9 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
     bindings.put(BINDING_MESSAGE, event.getMessage());
     // This will get overwritten if populateBindings(Bindings bindings, MuleEvent event) is called
     // and not this method directly.
-    bindings.put(BINDING_PAYLOAD, message.getPayload());
+    bindings.put(BINDING_PAYLOAD, message.getPayload().getValue());
     // For backward compatability
-    bindings.put(BINDING_SRC, message.getPayload());
+    bindings.put(BINDING_SRC, message.getPayload().getValue());
 
     populateHeadersVariablesAndException(bindings, event, eventBuilder);
   }

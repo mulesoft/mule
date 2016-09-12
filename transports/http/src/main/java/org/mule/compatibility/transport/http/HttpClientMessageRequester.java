@@ -68,7 +68,7 @@ public class HttpClientMessageRequester extends AbstractMessageRequester {
 
       if (httpMethod.getStatusCode() == HttpStatus.SC_OK) {
         InternalMessage res = (InternalMessage) receiveTransformer.transform(httpMethod);
-        if (StringUtils.EMPTY.equals(res.getPayload())) {
+        if (StringUtils.EMPTY.equals(res.getPayload().getValue())) {
           releaseConn = true;
         }
         return res;

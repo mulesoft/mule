@@ -58,8 +58,8 @@ public class GraphTransformerResolutionTestCase extends AbstractIntegrationTestC
   public void resolvesNonDirectTransformation() throws Exception {
     final Event muleEvent = flowRunner("stringEchoService").withPayload(new A("Hello")).run();
     InternalMessage response = muleEvent.getMessage();
-    assertTrue(response.getPayload() instanceof C);
-    assertEquals("HelloAFromB", ((C) response.getPayload()).value);
+    assertTrue(response.getPayload().getValue() instanceof C);
+    assertEquals("HelloAFromB", ((C) response.getPayload().getValue()).value);
   }
 
   public static class AtoBConverter extends AbstractTransformer implements DiscoverableTransformer {

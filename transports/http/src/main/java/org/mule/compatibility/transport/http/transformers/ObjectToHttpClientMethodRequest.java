@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.transformers;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.compatibility.transport.http.HttpConnector.HTTP_PARAMS_PROPERTY;
 import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT_TYPE;
-import static org.mule.runtime.core.message.DefaultEventBuilder.MuleEventImplementation.getCurrentEvent;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.transformer.EndpointAwareTransformer;
@@ -142,7 +142,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
   }
 
   protected HttpMethod createGetMethod(InternalMessage msg, Charset outputEncoding) throws Exception {
-    final Object src = msg.getPayload();
+    final Object src = msg.getPayload().getValue();
     // TODO It makes testing much harder if we use the endpoint on the
     // transformer since we need to create correct message types and endpoints
     // URI uri = getEndpoint().getEndpointURI().getUri();
@@ -181,7 +181,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     PostMethod postMethod = new PostMethod(uri.toString());
 
     String bodyParameterName = getBodyParameterName(msg);
-    Object src = msg.getPayload();
+    Object src = msg.getPayload().getValue();
     if (src instanceof Map) {
       for (Map.Entry<?, ?> entry : ((Map<?, ?>) src).entrySet()) {
         postMethod.addParameter(entry.getKey().toString(), entry.getValue().toString());
@@ -201,7 +201,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     // TODO MULE-9986 need Message to support multipart payload
     if (!msg.getInboundPropertyNames().contains("multipart_" + HEADER_CONTENT_TYPE)) {
       // if a content type was specified on the endpoint, use it
-      final MediaType mediaType = msg.getDataType().getMediaType();
+      final MediaType mediaType = msg.getPayload().getDataType().getMediaType();
       if (!MediaType.ANY.matches(mediaType)) {
         method.setRequestHeader(HEADER_CONTENT_TYPE, mediaType.toRfcString());
       }
@@ -217,7 +217,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     URI uri = getURI(msg);
     PutMethod putMethod = new PutMethod(uri.toString());
 
-    Object payload = msg.getPayload();
+    Object payload = msg.getPayload().getValue();
     setupEntityMethod(payload, outputEncoding, event, putMethod);
     checkForContentType(msg, putMethod);
     return putMethod;
@@ -248,7 +248,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     URI uri = getURI(message);
     PatchMethod patchMethod = new PatchMethod(uri.toString());
 
-    Object payload = message.getPayload();
+    Object payload = message.getPayload().getValue();
     setupEntityMethod(payload, outputEncoding, event, patchMethod);
     checkForContentType(message, patchMethod);
     return patchMethod;
@@ -272,15 +272,15 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     final InternalMessage msg = event.getMessage();
     // Dont set a POST payload if the body is a Null Payload.
     // This way client calls can control if a POST body is posted explicitly
-    if (msg.getPayload() != null) {
-      String outboundMimeType = msg.getDataType().getMediaType().toRfcString();
+    if (msg.getPayload().getValue() != null) {
+      String outboundMimeType = msg.getPayload().getDataType().getMediaType().toRfcString();
       if (outboundMimeType == null) {
         outboundMimeType =
             (getEndpoint() != null && getEndpoint().getMimeType() != null ? getEndpoint().getMimeType().toRfcString() : null);
       }
       if (outboundMimeType == null) {
-        if (!msg.getDataType().getMediaType().equals(MediaType.ANY)) {
-          outboundMimeType = msg.getDataType().getMediaType().toRfcString();
+        if (!msg.getPayload().getDataType().getMediaType().equals(MediaType.ANY)) {
+          outboundMimeType = msg.getPayload().getDataType().getMediaType().toRfcString();
         } else {
           outboundMimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
           if (logger.isDebugEnabled()) {
@@ -364,7 +364,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer 
     final InternalMessage msg = event.getMessage();
     Part[] parts;
     int i = 0;
-    if (msg.getPayload() == null) {
+    if (msg.getPayload().getValue() == null) {
       parts = new Part[msg.getOutboundAttachmentNames().size()];
     } else {
       parts = new Part[msg.getOutboundAttachmentNames().size() + 1];

@@ -26,13 +26,13 @@ public abstract class OneWayOutboundTestCase extends AbstractIntegrationTestCase
   @Test
   public void noOutbound() throws Exception {
     InternalMessage response = flowRunner("noOutbound").withPayload("TEST").run().getMessage();
-    assertEquals("TEST processed", response.getPayload());
+    assertEquals("TEST processed", response.getPayload().getValue());
   }
 
   @Test
   public void noOutboundEndpointAsync() throws Exception {
     InternalMessage response = flowRunner("noOutboundAsync").withPayload("TEST").run().getMessage();
-    assertEquals("TEST", response.getPayload());
+    assertEquals("TEST", response.getPayload().getValue());
   }
 
   @Test
@@ -54,7 +54,7 @@ public abstract class OneWayOutboundTestCase extends AbstractIntegrationTestCase
   @Test
   public void oneWayOutboundBeforeComponent() throws Exception {
     InternalMessage response = flowRunner("oneWayOutboundBeforeComponent").withPayload("TEST").run().getMessage();
-    assertEquals("TEST processed", response.getPayload());
+    assertEquals("TEST processed", response.getPayload().getValue());
   }
 }
 

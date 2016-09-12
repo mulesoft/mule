@@ -98,7 +98,7 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher {
       logger.debug("Is socket closed? " + (socket != null && socket.isClosed()));
     }
     try {
-      write(event.getMessage().getPayload());
+      write(event.getMessage().getPayload().getValue());
       return;
     } catch (IOException ioEx) {
       closeSocket();

@@ -90,9 +90,9 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.request(endpoint, TIMEOUT).getRight().get();
     assertNotNull(message);
-    assertNotNull(message.getPayload());
-    assertThat(message.getPayload(), instanceOf(clazz));
-    return message.getPayload();
+    assertNotNull(message.getPayload().getValue());
+    assertThat(message.getPayload().getValue(), instanceOf(clazz));
+    return message.getPayload().getValue();
   }
 
   public static class Parent {

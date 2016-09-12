@@ -39,7 +39,7 @@ public class NoArgsCallComponentTestCase extends AbstractIntegrationTestCase {
     flowRunner(INPUT_DC_FLOW_NAME).withPayload(TEST_PAYLOAD).asynchronously().run();
     InternalMessage message = client.request(OUTPUT_DC_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(message);
-    assertEquals(message.getPayload(), DEFAULT_OUTPUT_MESSAGE);
+    assertEquals(message.getPayload().getValue(), DEFAULT_OUTPUT_MESSAGE);
   }
 
   @Test
@@ -49,6 +49,6 @@ public class NoArgsCallComponentTestCase extends AbstractIntegrationTestCase {
     InternalMessage reply = client.request(OUTPUT_DI_QUEUE_NAME, RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(reply);
     // same as original input
-    assertEquals(TEST_PAYLOAD, reply.getPayload());
+    assertEquals(TEST_PAYLOAD, reply.getPayload().getValue());
   }
 }

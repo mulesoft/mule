@@ -82,18 +82,18 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
   }
 
   private void assertAttachmentInResponse(InternalMessage message, String fileName) throws Exception {
-    final MultiPartContent multiPartPayload = (MultiPartContent) message.getPayload();
+    final MultiPartContent multiPartPayload = (MultiPartContent) message.getPayload().getValue();
     assertThat(multiPartPayload.getParts(), hasSize(1));
 
     String attachmentId = extractAttachmentId(getPayloadAsString(message));
 
     final org.mule.runtime.api.message.Message part = multiPartPayload.getPart(attachmentId);
 
-    assertNotNull(part.getPayload());
+    assertNotNull(part.getPayload().getValue());
 
     InputStream expected = IOUtils.getResourceAsStream(fileName, getClass());
 
-    assertTrue(IOUtils.contentEquals(expected, part.getPayload()));
+    assertTrue(IOUtils.contentEquals(expected, (InputStream) part.getPayload().getValue()));
   }
 
 

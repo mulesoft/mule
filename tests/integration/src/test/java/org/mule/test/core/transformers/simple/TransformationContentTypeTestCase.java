@@ -36,8 +36,8 @@ public class TransformationContentTypeTestCase extends AbstractIntegrationTestCa
     InternalMessage message = InternalMessage.builder().payload(inputMessage).build();
     List<Transformer> transformers = Arrays.asList(new Transformer[] {trans});
     message = muleContext.getTransformationService().applyTransformers(message, null, transformers);
-    assertThat(message.getDataType().getMediaType().getPrimaryType(), is("text"));
-    assertThat(message.getDataType().getMediaType().getSubType(), is("plain"));
-    assertThat(message.getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
+    assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), is("text"));
+    assertThat(message.getPayload().getDataType().getMediaType().getSubType(), is("plain"));
+    assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), is(ISO_8859_1));
   }
 }

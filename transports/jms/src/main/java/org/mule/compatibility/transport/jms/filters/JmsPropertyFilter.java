@@ -61,9 +61,9 @@ public class JmsPropertyFilter implements Filter {
       return false;
     }
 
-    if (message.getPayload() instanceof javax.jms.Message) {
+    if (message.getPayload().getValue() instanceof javax.jms.Message) {
       try {
-        Message m = (javax.jms.Message) message.getPayload();
+        Message m = (javax.jms.Message) message.getPayload().getValue();
 
         if (StringUtils.isBlank(propertyClass)) {
           Object object = m.getObjectProperty(propertyName);
@@ -104,7 +104,7 @@ public class JmsPropertyFilter implements Filter {
       }
     } else {
       logger.warn("Expected a payload of javax.jms.Message but instead received "
-          + ClassUtils.getSimpleName(message.getDataType().getType()));
+          + ClassUtils.getSimpleName(message.getPayload().getDataType().getType()));
     }
 
     return false;

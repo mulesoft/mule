@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mule.extension.db.integration.TestDbConfig.getOracleResource;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.ContactDetails;
@@ -49,15 +50,15 @@ public class UpdateJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void updatesStringArray() throws Exception {
     Message response = flowRunner("updatesStringArray").run().getMessage();
-    assertThat(response.getPayload(), Matchers.<Object>equalTo(new Object[] {"93101", "97201", "99210"}));
+    assertThat(response.getPayload().getValue(), Matchers.<Object>equalTo(new Object[] {"93101", "97201", "99210"}));
   }
 
   @Test
   public void updatesMappedObjectArray() throws Exception {
     Message response = flowRunner("updatesStructArray").run().getMessage();
 
-    assertThat(response.getPayload(), instanceOf(Object[].class));
-    final Object[] arrayPayload = response.getPayload();
+    assertThat(response.getPayload().getValue(), instanceOf(Object[].class));
+    final Object[] arrayPayload = (Object[]) response.getPayload().getValue();
 
     assertThat(arrayPayload.length, is(1));
     assertThat(arrayPayload[0], equalTo(new ContactDetails("work", "2-222-222", "2@2222.com")));

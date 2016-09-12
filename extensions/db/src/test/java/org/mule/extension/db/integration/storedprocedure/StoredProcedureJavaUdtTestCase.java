@@ -59,6 +59,6 @@ public class StoredProcedureJavaUdtTestCase extends AbstractDbIntegrationTestCas
   @Test
   public void returnsObject() throws Exception {
     Message response = flowRunner("returnsObject").run().getMessage();
-    assertThat(response.getPayload(), equalTo(SOUTHWEST_MANAGER.getContactDetails()));
+    assertThat(response.getPayload().getValue(), equalTo(SOUTHWEST_MANAGER.getContactDetails()));
   }
 }

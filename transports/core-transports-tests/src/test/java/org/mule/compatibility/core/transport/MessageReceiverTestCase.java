@@ -81,7 +81,7 @@ public class MessageReceiverTestCase extends AbstractMuleTestCase {
     MessageReceiver receiver = createMessageReciever(REQUEST_RESPONSE);
     CompatibilityMessage request = createRequestMessage();
 
-    assertEquals(request.getPayload(), receiver.routeMessage(request).getMessage().getPayload().toString());
+    assertEquals(request.getPayload().getValue(), receiver.routeMessage(request).getMessage().getPayload().getValue().toString());
   }
 
   protected CompatibilityMessage createRequestMessage() {

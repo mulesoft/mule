@@ -28,7 +28,7 @@ public class EqualsFilter implements Filter, ObjectFilter {
 
   @Override
   public boolean accept(InternalMessage message, Event.Builder builder) {
-    return accept(message.getPayload());
+    return accept(message.getPayload().getValue());
   }
 
   @Override

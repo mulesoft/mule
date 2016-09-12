@@ -65,7 +65,7 @@ public class CxfBasicTestCase extends FunctionalTestCase {
                                          HTTP_REQUEST_OPTIONS)
         .getRight();
     assertTrue(getPayloadAsString(result).contains("Hello!"));
-    String ct = result.getDataType().getMediaType().toRfcString();
+    String ct = result.getPayload().getDataType().getMediaType().toRfcString();
     assertEquals("text/xml; charset=UTF-8", ct);
   }
 
@@ -75,7 +75,7 @@ public class CxfBasicTestCase extends FunctionalTestCase {
     InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/Echo" + "?wsdl",
                                          InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
         .getRight();
-    assertNotNull(result.getPayload());
+    assertNotNull(result.getPayload().getValue());
     XMLUnit.compareXML(echoWsdl, getPayloadAsString(result));
   }
 }

@@ -72,8 +72,8 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
         .bodyForm(new BasicNameValuePair(PARAM_1_NAME, PARAM_1_VALUE), new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE))
         .execute();
     final InternalMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
-    assertThat(receivedMessage.getPayload(), instanceOf(ParameterMap.class));
-    ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
+    assertThat(receivedMessage.getPayload().getValue(), instanceOf(ParameterMap.class));
+    ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload().getValue();
     assertThat(payloadAsMap.size(), is(2));
     assertThat(payloadAsMap.get(PARAM_1_NAME), is(PARAM_1_VALUE));
     assertThat(payloadAsMap.get(PARAM_2_NAME), is(PARAM_2_VALUE));
@@ -101,8 +101,8 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
                   new BasicNameValuePair(PARAM_2_NAME, PARAM_2_VALUE_2))
         .execute();
     final InternalMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
-    assertThat(receivedMessage.getPayload(), instanceOf(ParameterMap.class));
-    ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload();
+    assertThat(receivedMessage.getPayload().getValue(), instanceOf(ParameterMap.class));
+    ParameterMap payloadAsMap = (ParameterMap) receivedMessage.getPayload().getValue();
     assertThat(payloadAsMap.size(), is(2));
     assertThat(payloadAsMap.get(PARAM_1_NAME), is(PARAM_1_VALUE));
     assertThat(payloadAsMap.getAll(PARAM_2_NAME).size(), is(2));
@@ -156,7 +156,7 @@ public class HttpListenerUrlEncodedTestCase extends AbstractHttpTestCase {
 
   private void assertNullPayloadAndEmptyResponse(Response response) throws Exception {
     final InternalMessage receivedMessage = muleContext.getClient().request(OUT_QUEUE_URL, 1000).getRight().get();
-    assertThat(receivedMessage.getPayload(), is(nullValue()));
+    assertThat(receivedMessage.getPayload().getValue(), is(nullValue()));
 
     final HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getFirstHeader(CONTENT_LENGTH).getValue(), Is.is("0"));

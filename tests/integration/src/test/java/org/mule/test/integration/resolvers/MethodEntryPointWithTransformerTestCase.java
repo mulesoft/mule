@@ -28,7 +28,7 @@ public class MethodEntryPointWithTransformerTestCase extends AbstractIntegration
   public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception {
     InternalMessage response = flowRunner("testService").withPayload("payload").run().getMessage();
     assertNotNull(response);
-    assertNotNull(response.getPayload());
+    assertNotNull(response.getPayload().getValue());
     assertEquals("Transformed payload", getPayloadAsString(response));
   }
 }

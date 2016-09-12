@@ -56,7 +56,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher implements 
       }
       event = Event.builder(event).message(messageBuilder.build()).build();
 
-      Object data = event.getMessage().getPayload();
+      Object data = event.getMessage().getPayload().getValue();
       if (data instanceof byte[]) {
         fos.write((byte[]) data);
       } else if (data instanceof String) {

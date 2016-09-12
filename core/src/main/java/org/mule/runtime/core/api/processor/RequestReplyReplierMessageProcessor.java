@@ -11,8 +11,8 @@ import org.mule.runtime.core.api.source.MessageSource;
 
 /**
  * <p>
- * Processes a {@link Event}'s by invoking the next {@link Processor} and then rather than returning the result to this
- * processors {@link MessageSource} sending it via a seperate reply {@link Processor},
+ * Processes a {@link Event}'s by invoking the next {@link Processor} and then rather than returning the result to this processors
+ * {@link MessageSource} sending it via a seperate reply {@link Processor},
  * <p>
  * Some implementations may not use the replyTo messageProcessor but rather use a message property to determine what should be
  * used for processing the async reply

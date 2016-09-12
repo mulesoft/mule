@@ -35,6 +35,6 @@ public class FileNameFilterTestCase extends AbstractFileFunctionalTestCase {
     InternalMessage response = client.request("vm://testOut", RECEIVE_TIMEOUT).getRight().get();
 
     assertNotNull("Did not processed the file", response);
-    assertEquals(TEST_MESSAGE, response.getPayload());
+    assertEquals(TEST_MESSAGE, response.getPayload().getValue());
   }
 }

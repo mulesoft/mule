@@ -51,9 +51,9 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase {
         .getRight();
 
     assertNotNull(reply);
-    assertNotNull(reply.getPayload());
+    assertNotNull(reply.getPayload().getValue());
 
-    String ct = reply.getDataType().getMediaType().toRfcString();
+    String ct = reply.getPayload().getDataType().getMediaType().toRfcString();
     assertEquals("text/xml; charset=UTF-8", ct);
 
     Document document = DocumentHelper.parseText(getPayloadAsString(reply));

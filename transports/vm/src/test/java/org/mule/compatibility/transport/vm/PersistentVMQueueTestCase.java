@@ -34,8 +34,8 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase {
     client.dispatch("vm://receiver", input, null);
     InternalMessage result = client.request("vm://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
-    String[] payload = (String[]) result.getPayload();
+    assertNotNull(result.getPayload().getValue());
+    String[] payload = (String[]) result.getPayload().getValue();
     assertEquals(output.length, payload.length);
     for (int i = 0; i < output.length; i++) {
       assertEquals(output[i], payload[i]);
@@ -51,8 +51,8 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase {
     client.dispatch("vm://flowReceiver", input, null);
     InternalMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(result);
-    assertNotNull(result.getPayload());
-    String[] payload = (String[]) result.getPayload();
+    assertNotNull(result.getPayload().getValue());
+    String[] payload = (String[]) result.getPayload().getValue();
     assertEquals(output.length, payload.length);
     for (int i = 0; i < output.length; i++) {
       assertEquals(output[i], payload[i]);

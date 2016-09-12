@@ -37,7 +37,8 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
       try {
         Flow flow = getTestFlow();
         return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-            .message(InternalMessage.builder().payload(event.getMessage().getPayload()).build()).exchangePattern(REQUEST_RESPONSE)
+            .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue()).build())
+            .exchangePattern(REQUEST_RESPONSE)
             .flow(flow).session(getTestSession(null, muleContext)).build();
       } catch (Exception e) {
         throw new RuntimeException(e);

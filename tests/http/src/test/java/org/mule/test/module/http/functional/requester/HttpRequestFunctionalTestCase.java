@@ -87,7 +87,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void responseBodyIsMappedToPayload() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
-    assertTrue(event.getMessage().getPayload() instanceof InputStream);
+    assertTrue(event.getMessage().getPayload().getValue() instanceof InputStream);
     assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
   }
 
@@ -97,7 +97,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void blockingResponseBodyIsMappedToPayload() throws Exception {
     Event event = flowRunner("blockingRequestFlow").withPayload(TEST_MESSAGE).run();
-    assertTrue(event.getMessage().getPayload() instanceof String);
+    assertTrue(event.getMessage().getPayload().getValue() instanceof String);
     assertThat(getPayloadAsString(event.getMessage()), equalTo("value"));
   }
 

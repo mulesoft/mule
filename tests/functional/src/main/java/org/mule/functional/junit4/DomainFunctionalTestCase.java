@@ -107,7 +107,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
    * @throws Exception if there is an unexpected error obtaining the payload representation
    */
   protected String getPayloadAsString(InternalMessage message, MuleContext muleContext) throws Exception {
-    return (String) muleContext.getTransformationService().transform(message, DataType.STRING).getPayload();
+    return (String) muleContext.getTransformationService().transform(message, DataType.STRING).getPayload().getValue();
   }
 
 }

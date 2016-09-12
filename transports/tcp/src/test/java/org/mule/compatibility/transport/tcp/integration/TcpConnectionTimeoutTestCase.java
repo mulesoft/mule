@@ -43,7 +43,7 @@ public class TcpConnectionTimeoutTestCase extends FunctionalTestCase {
       fail("Connection timeout not honored.");
     }
 
-    assertThat(message.getPayload(), is(nullValue()));
+    assertThat(message.getPayload().getValue(), is(nullValue()));
     assertThat(message.getExceptionPayload(), notNullValue());
   }
 }

@@ -46,9 +46,9 @@ public class HttpOutboundDataTypeTestCase extends FunctionalTestCase {
 
     InternalMessage response = client.request("vm://testOutput", 120000).getRight().get();
 
-    assertThat(response.getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
-    assertThat(response.getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
-    assertThat(response.getDataType().getMediaType().getCharset().get(), equalTo(UTF_16));
+    assertThat(response.getPayload().getDataType().getMediaType().getPrimaryType(), equalTo(MediaType.TEXT.getPrimaryType()));
+    assertThat(response.getPayload().getDataType().getMediaType().getSubType(), equalTo(MediaType.TEXT.getSubType()));
+    assertThat(response.getPayload().getDataType().getMediaType().getCharset().get(), equalTo(UTF_16));
   }
 
   public static class SetMediaTypeTransformer extends AbstractMessageTransformer {

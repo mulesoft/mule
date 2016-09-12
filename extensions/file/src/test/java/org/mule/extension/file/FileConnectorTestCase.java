@@ -75,7 +75,7 @@ public abstract class FileConnectorTestCase extends MuleArtifactFunctionalTestCa
   }
 
   protected String readPathAsString(String path) throws Exception {
-    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload());
+    return IOUtils.toString((AbstractFileInputStream) readPath(path).getPayload().getValue());
   }
 
   protected void doWrite(String path, Object content, FileWriteMode mode, boolean createParent) throws Exception {

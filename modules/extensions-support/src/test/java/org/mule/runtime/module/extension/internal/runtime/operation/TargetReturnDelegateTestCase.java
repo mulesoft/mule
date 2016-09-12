@@ -30,7 +30,7 @@ public class TargetReturnDelegateTestCase extends ValueReturnDelegateTestCase {
 
   @After
   public void after() {
-    assertThat(event.getMessage().getPayload(), is(""));
+    assertThat(event.getMessage().getPayload().getValue(), is(""));
   }
 
   @Override
