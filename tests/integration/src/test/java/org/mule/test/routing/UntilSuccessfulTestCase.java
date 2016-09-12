@@ -14,7 +14,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.functional.functional.InvocationCountMessageProcessor.getNumberOfInvocationsFor;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -28,6 +27,7 @@ import org.mule.runtime.core.util.store.AbstractPartitionedObjectStore;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.test.AbstractIntegrationTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
