@@ -21,6 +21,7 @@ import java.util.List;
  * @since 4.0
  */
 public class PluginClassificationNode {
+
   private final List<URL> urls;
   private final String name;
   private final List<Class> exportClasses;

@@ -28,8 +28,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -251,12 +253,35 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @return {@link PluginUrlClassification}
    */
   private List<PluginUrlClassification> toPluginUrlClassification(Collection<PluginClassificationNode> classificationNodes) {
-    return classificationNodes.stream()
-        .map(node -> pluginResourcesResolver.resolvePluginResourcesFor(
-            new PluginUrlClassification(node.getName(), node.getUrls(), node.getExportClasses(),
-                                                 node.getPluginDependencies().stream()
-                                                     .map(dependency -> dependency.getName()).collect(toList()))))
-        .collect(toList());
+
+    Map<String, PluginUrlClassification> classifiedPluginUrls = new HashMap<>();
+
+    for (PluginClassificationNode node : classificationNodes) {
+      final PluginUrlClassification pluginUrlClassification =
+          pluginResourcesResolver.resolvePluginResourcesFor(
+                                                            new PluginUrlClassification(node.getName(), node.getUrls(),
+                                                                                        node.getExportClasses(),
+                                                                                        node.getPluginDependencies().stream().map(
+                                                                                                                                  dependency -> dependency
+                                                                                                                                      .getName())
+                                                                                            .collect(toList())));
+
+      classifiedPluginUrls.put(node.getName(), pluginUrlClassification);
+    }
+
+    for (PluginUrlClassification pluginUrlClassification : classifiedPluginUrls.values()) {
+      for (String dependency : pluginUrlClassification.getPluginDependencies()) {
+        final PluginUrlClassification dependencyPlugin = classifiedPluginUrls.get(dependency);
+        if (dependencyPlugin == null) {
+          throw new IllegalStateException("Unable to find a plugin dependency: " + dependency);
+        }
+
+        pluginUrlClassification.getExportedPackages().removeAll(dependencyPlugin.getExportedPackages());
+      }
+
+    }
+
+    return new ArrayList<>(classifiedPluginUrls.values());
   }
 
   private boolean isMulePlugin(Artifact artifact) {
@@ -274,8 +299,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param pluginsClassified {@link Map} that contains already classified plugins
    */
   private void buildPluginUrlClassification(Artifact pluginArtifact, ClassPathClassifierContext context,
-                                                               ExtensionPluginMetadataGenerator extensionPluginGenerator,
-                                                               Map<Artifact, PluginClassificationNode> pluginsClassified) {
+                                            ExtensionPluginMetadataGenerator extensionPluginGenerator,
+                                            Map<Artifact, PluginClassificationNode> pluginsClassified) {
     List<URL> urls;
     try {
       List<Dependency> managedDependencies = dependencyResolver.readArtifactDescriptor(pluginArtifact).getManagedDependencies();
@@ -328,9 +353,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     // TODO(gfernandes): MULE-10484 How could I check if exported classes belong to this plugin?
     PluginClassificationNode pluginUrlClassification = new PluginClassificationNode(toClassifierLessId(pluginArtifact),
-                                                                                  urls,
-                                                                                  newArrayList(context.getExportPluginClasses()),
-                                                                                  pluginDependencies);
+                                                                                    urls,
+                                                                                    newArrayList(context
+                                                                                        .getExportPluginClasses()),
+                                                                                    pluginDependencies);
     pluginsClassified.put(pluginArtifact, pluginUrlClassification);
   }
 
