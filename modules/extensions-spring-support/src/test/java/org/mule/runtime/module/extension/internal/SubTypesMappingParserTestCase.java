@@ -158,27 +158,13 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
   @Test
   public void subtypedAndConcreteParametersAsAttributes() throws Exception {
     MuleEvent responseEvent = flowRunner("subtypedAndConcreteParametersAsAttributes").withPayload("").run();
-
     assertThat(responseEvent.getMessage().getPayload(), notNullValue());
 
     List<Object> payload = responseEvent.getMessage().getPayload();
     assertThat(payload, hasSize(7));
 
-    assertThat(payload.get(0), instanceOf(ParentShape.class));
-    assertThat(((ParentShape) payload.get(0)).getArea(), is(9));
-
     assertThat(payload.get(1), instanceOf(CarDoor.class));
     assertThat(((CarDoor) payload.get(1)).getColor(), is("white"));
-
-    assertThat(payload.get(2), instanceOf(FinalPojo.class));
-    assertThat(((FinalPojo) payload.get(2)).getSomeString(), is("globalString"));
-
-    assertThat(payload.get(3), instanceOf(VeganCookBook.class));
-    assertThat(((VeganCookBook) payload.get(3)).getNumberOfPages(), is(10));
-
-    assertThat(payload.get(4), instanceOf(Square.class));
-    assertThat(((Square) payload.get(4)).getSide(), is(3));
-    assertThat(((Square) payload.get(4)).getArea(), is(9));
 
     assertThat(payload.get(5), instanceOf(Triangle.class));
     assertThat(((Triangle) payload.get(5)).getHeight(), is(6));

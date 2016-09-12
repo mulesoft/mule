@@ -8,6 +8,7 @@ package org.mule.extension.socket.api.connection.tcp.protocol;
 
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 /**
  * This protocol is an application level {@link TcpProtocol} that does nothing. Reading is terminated by the stream being closed
@@ -17,6 +18,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
  * @since 4.0
  */
 @Alias("eof-protocol")
+@XmlHints(allowTopLevelDefinition = true)
 public class EOFProtocol extends DirectProtocol {
 
   /**

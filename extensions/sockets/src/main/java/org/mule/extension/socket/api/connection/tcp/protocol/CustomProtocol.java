@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
@@ -27,12 +28,10 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @since 4.0
  */
+@XmlHints(allowTopLevelDefinition = true)
 public class CustomProtocol implements TcpProtocol, Initialisable {
 
   private static final Log LOGGER = LogFactory.getLog(CustomProtocol.class);
-
-  private TcpProtocol delegate;
-
   /**
    * Reference to full qualifier class name that should extend {@link TcpProtocol} that will be used as a custom protocol
    */
@@ -41,6 +40,7 @@ public class CustomProtocol implements TcpProtocol, Initialisable {
   @Summary("Full qualifier class name that must implement 'TcpProtocol' that will be used as a custom protocol")
   @DisplayName("Protocol Class Name")
   public String clazz;
+  private TcpProtocol delegate;
 
   public CustomProtocol() {}
 

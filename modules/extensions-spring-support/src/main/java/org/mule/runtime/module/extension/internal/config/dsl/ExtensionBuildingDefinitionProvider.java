@@ -58,6 +58,8 @@ import org.mule.runtime.module.extension.internal.config.dsl.source.SourceDefini
 import org.mule.runtime.module.extension.internal.runtime.DynamicConfigPolicy;
 import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -172,7 +174,6 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
         @Override
         public void onParameter(ParameterModel model) {
-          registerSubTypes(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
           registerTopLevelParameter(model.getType(), definitionBuilder, extensionClassLoader, dslSyntaxResolver, parsingContext);
         }
 
@@ -235,7 +236,9 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (elementDsl.supportsTopLevelDeclaration()) {
+        if (elementDsl.supportsTopLevelDeclaration() || (elementDsl.supportsChildDeclaration() && elementDsl.isWrapped())
+            || parsingContext.getAllSubTypes().contains(objectType)) {
+
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
                                                   parsingContext, muleContext));
         }
@@ -280,7 +283,13 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                 ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                 ExtensionParsingContext parsingContext) {
 
-    registerTopLevelParameters(parsingContext.getAllSubTypes().stream(), definitionBuilder, extensionClassLoader,
+
+    ImmutableList<MetadataType> mappedTypes = new ImmutableList.Builder<MetadataType>()
+        .addAll(parsingContext.getAllSubTypes())
+        .addAll(parsingContext.getAllBaseTypes())
+        .build();
+
+    registerTopLevelParameters(mappedTypes.stream(), definitionBuilder, extensionClassLoader,
                                dslSyntaxResolver,
                                parsingContext);
   }

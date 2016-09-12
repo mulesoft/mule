@@ -7,9 +7,11 @@
 package org.mule.test.subtypes.extension;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.heisenberg.extension.model.Weapon;
 
+@XmlHints(allowTopLevelDefinition = true)
 public final class Revolver implements Weapon {
 
   @Parameter

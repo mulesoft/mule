@@ -6,8 +6,10 @@
  */
 package org.mule.test.subtypes.extension;
 
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
+@XmlHints(allowTopLevelDefinition = true)
 public class CarDoor implements Door {
 
   private String color;

@@ -23,17 +23,8 @@ import java.util.Map;
  *
  * @since 4.0
  */
+@XmlHints(allowTopLevelDefinition = true)
 public class StoredProcedureCall extends ParameterizedStatementDefinition<StoredProcedureCall> {
-
-  /**
-   * A list of output parameters to be set on the JDBC prepared
-   * statement. Each parameter should be referenced in the sql
-   * text using a semicolon prefix (E.g: {@code call multiply(:value, :result)})
-   */
-  @Parameter
-  @Optional
-  @DisplayName("Output Parameters")
-  private List<OutputParameter> outputParameters = new LinkedList<>();
 
   /**
    * A {@link Map} which keys are the name of a parameter to be set on
@@ -48,7 +39,15 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
   @Optional
   @DisplayName("Input - Output Parameters")
   protected LinkedHashMap<String, Object> inOutParameters = new LinkedHashMap<>();
-
+  /**
+   * A list of output parameters to be set on the JDBC prepared
+   * statement. Each parameter should be referenced in the sql
+   * text using a semicolon prefix (E.g: {@code call multiply(:value, :result)})
+   */
+  @Parameter
+  @Optional
+  @DisplayName("Output Parameters")
+  private List<OutputParameter> outputParameters = new LinkedList<>();
   /**
    * A reference to a globally defined call
    * to be used as a template

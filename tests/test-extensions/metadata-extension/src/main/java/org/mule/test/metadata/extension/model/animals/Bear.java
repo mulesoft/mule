@@ -6,6 +6,9 @@
  */
 package org.mule.test.metadata.extension.model.animals;
 
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
+
+@XmlHints(allowTopLevelDefinition = true)
 public class Bear implements Animal {
 
   private String bearName;

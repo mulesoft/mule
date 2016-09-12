@@ -49,24 +49,9 @@ public final class SubtypesModelValidator implements ModelValidator {
     if (typesMapping.isPresent()) {
       validateBaseTypeNotFinal(model, typesMapping.get());
       validateNonAbstractSubtypes(model, typesMapping.get());
-      validateSubtypesSupportGlobalDeclaration(model, typesMapping.get());
       validateSubtypesExtendOrImplementBaseType(model, typesMapping.get());
       validateSubtypesNameClashing(model, typesMapping.get());
     }
-  }
-
-  private void validateSubtypesSupportGlobalDeclaration(ExtensionModel model,
-                                                        Map<MetadataType, List<MetadataType>> typesMapping) {
-    List<MetadataType> nonGlobalTypes = typesMapping.values().stream().flatMap(Collection::stream)
-        .filter(type -> !supportsTopLevelDeclaration(type))
-        .collect(toList());
-
-    if (!nonGlobalTypes.isEmpty()) {
-      throw new IllegalModelDefinitionException(format("All the declared SubtypesMapping in extension %s must support to be declared"
-          + " as global types, but [%s] do not support it",
-                                                       model.getName(), Arrays.toString(nonGlobalTypes.toArray())));
-    }
-
   }
 
   private void validateBaseTypeNotFinal(ExtensionModel model, Map<MetadataType, List<MetadataType>> typesMapping) {

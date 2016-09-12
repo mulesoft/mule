@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
+@XmlHints(allowTopLevelDefinition = true)
 public class SafeProtocol extends AbstractByteProtocol {
 
   public static final String COOKIE = "You are using SafeProtocol";
