@@ -21,6 +21,7 @@ import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -51,6 +52,7 @@ import javax.inject.Inject;
 public class MuleMetadataManager implements MetadataManager, Initialisable {
 
   private static final String PROCESSOR_NOT_FOUND = "Processor doesn't exist in the given index [%s]";
+  private static final String FLOW_NOT_FOUND = "Flow [%s] doesn't exist";
   private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
   private static final String COMPONENT_NOT_METADATA_PROVIDER =
       "Component [%s] is not a MetadataProvider or MetadataEntityProvider, no information available";
@@ -104,8 +106,6 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
    */
   @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentId componentId) {
-
-
     return exceptionHandledMetadataFetch(() -> findMetadataKeyProvider(componentId).getMetadataKeys(),
                                          EXCEPTION_RESOLVING_METADATA_KEYS);
   }
@@ -170,7 +170,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     try {
       return producer.get();
     } catch (InvalidComponentIdException e) {
-      return failure(e);
+      return failure(null, e.getMessage(), FailureCode.COMPONENT_NOT_FOUND, e.getDetailedMessage());
     } catch (Exception e) {
       return failure(null, format("%s: %s", failureMessage, e.getMessage()), e);
     }
@@ -205,7 +205,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     // FIXME MULE-9496 : Use flow paths to obtain Processors
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName().get());
     if (flow == null) {
-      throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
+      throw new InvalidComponentIdException(createStaticMessage(format(FLOW_NOT_FOUND, componentId.getFlowName().get())));
     }
     if (!componentId.getComponentPath().equals("-1")) {
       try {
