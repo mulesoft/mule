@@ -401,7 +401,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     try {
-      List<Dependency> managedDependencies = dependencyResolver.readArtifactDescriptor(rootArtifact).getManagedDependencies();
+      List<Dependency> managedDependencies =
+          newArrayList(dependencyResolver.readArtifactDescriptor(rootArtifact).getManagedDependencies());
       managedDependencies.addAll(directDependencies.stream()
           .filter(directDependency -> !directDependency.getScope().equals(TEST))
           .collect(toList()));
