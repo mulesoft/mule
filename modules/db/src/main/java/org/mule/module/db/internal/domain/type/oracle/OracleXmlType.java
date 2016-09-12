@@ -22,14 +22,13 @@ import java.sql.SQLException;
 public class OracleXmlType extends StructuredDbType
 {
     private static final int OPAQUE_TYPE_ID = 2007;
-    private static final String XML_TYPE_INTERNAL_NAME = "SYS.XMLTYPE";
     private static final String XML_TYPE_NAME = "XMLTYPE";
 
     public static final String ORACLE_XMLTYPE_CLASS = "oracle.xdb.XMLType";
 
     public OracleXmlType()
     {
-        super(OPAQUE_TYPE_ID, XML_TYPE_NAME, XML_TYPE_INTERNAL_NAME);
+        super(OPAQUE_TYPE_ID, XML_TYPE_NAME);
     }
 
     @Override
