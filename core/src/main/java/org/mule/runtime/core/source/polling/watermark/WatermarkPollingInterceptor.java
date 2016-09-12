@@ -46,7 +46,7 @@ public class WatermarkPollingInterceptor extends MessageProcessorPollingIntercep
     }
 
     String variableName = this.watermark.resolveVariable(event);
-    return Event.builder(event).addVariable(variableName, sourceEvent.getVariable(variableName)).build();
+    return Event.builder(event).addVariable(variableName, sourceEvent.getVariable(variableName).getValue()).build();
   }
 
   /**

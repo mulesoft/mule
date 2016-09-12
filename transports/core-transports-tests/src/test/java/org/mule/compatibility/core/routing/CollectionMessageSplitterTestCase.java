@@ -204,7 +204,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
         assertEquals(msg.getOutboundProperty(key), outboundProps.get(key));
       }
       for (String key : invocationProps.keySet()) {
-        assertEquals(event.getVariable(key), invocationProps.get(key));
+        assertEquals(event.getVariable(key).getValue(), invocationProps.get(key));
       }
     }
   }

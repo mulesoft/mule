@@ -170,7 +170,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     Event out = enricher.process(in);
 
     assertEquals("bar", out.getSession().getProperty("sessionFoo"));
-    assertEquals("bar", out.getVariable("flowFoo"));
+    assertEquals("bar", out.getVariable("flowFoo").getValue());
   }
 
   @Test
@@ -247,7 +247,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Event out = enricher.process(in);
 
-    assertEquals("bar", out.getVariable("foo"));
+    assertEquals("bar", out.getVariable("foo").getValue());
   }
 
   @Test
@@ -334,7 +334,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
 
     Event out = enricher.process(in);
 
-    assertEquals("bar", out.getVariable("foo"));
+    assertEquals("bar", out.getVariable("foo").getValue());
     assertThat(out.getVariable("foo").getDataType(), DataTypeMatcher.like(String.class, JSON, UTF_16));
   }
 }

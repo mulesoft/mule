@@ -7,7 +7,6 @@
 package org.mule.runtime.core.routing;
 
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableValueOrNull;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -16,7 +15,6 @@ import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.message.DefaultEventBuilder;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

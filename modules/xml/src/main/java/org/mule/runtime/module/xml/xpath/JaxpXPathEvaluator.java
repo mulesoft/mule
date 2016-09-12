@@ -117,7 +117,7 @@ public abstract class JaxpXPathEvaluator implements XPathEvaluator, XPathVariabl
   public Object resolveVariable(QName variableName) {
     Event event = evaluationEvent.get();
     if (event != null) {
-      return event.getVariable(variableName.getLocalPart());
+      return event.getVariable(variableName.getLocalPart()).getValue();
     }
 
     return null;

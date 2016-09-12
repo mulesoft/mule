@@ -76,10 +76,10 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     Object previousCounterVar = null;
     Object previousRootMessageVar = null;
     if (event.getVariableNames().contains(counterVariableName)) {
-      previousCounterVar = event.getVariable(counterVariableName);
+      previousCounterVar = event.getVariable(counterVariableName).getValue();
     }
     if (event.getVariableNames().contains(parentMessageProp)) {
-      previousRootMessageVar = event.getVariable(parentMessageProp);
+      previousRootMessageVar = event.getVariable(parentMessageProp).getValue();
     }
     InternalMessage message = event.getMessage();
     final Builder requestBuilder = Event.builder(event);
@@ -162,7 +162,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
         @Override
         protected void propagateFlowVars(Event previousResult, final Builder builder) {
           for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
-            builder.addVariable(flowVarName, previousResult.getVariable(flowVarName),
+            builder.addVariable(flowVarName, previousResult.getVariable(flowVarName).getValue(),
                                 previousResult.getVariable(flowVarName).getDataType());
           }
         }
@@ -235,7 +235,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     @Override
     protected void propagateFlowVars(Event previousResult, final Builder builder) {
       for (String flowVarName : resolvePropagatedFlowVars(previousResult)) {
-        builder.addVariable(flowVarName, previousResult.getVariable(flowVarName),
+        builder.addVariable(flowVarName, previousResult.getVariable(flowVarName).getValue(),
                             previousResult.getVariable(flowVarName).getDataType());
       }
     }

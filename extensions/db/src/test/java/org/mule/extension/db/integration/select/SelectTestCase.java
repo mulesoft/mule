@@ -111,7 +111,7 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
     Message response = event.getMessage();
 
     assertThat(response.getPayload().getValue(), CoreMatchers.is(instanceOf(Iterator.class)));
-    assertRecords(event.getVariable("records"), getAllPlanetRecords());
+    assertRecords(event.getVariable("records").getValue(), getAllPlanetRecords());
   }
 
   @Test

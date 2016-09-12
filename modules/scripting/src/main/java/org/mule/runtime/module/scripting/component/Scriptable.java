@@ -248,7 +248,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
       bindings.put(key, event.getSession().getProperty(key));
     }
     for (String key : event.getVariableNames()) {
-      bindings.put(key, event.getVariable(key));
+      bindings.put(key, event.getVariable(key).getValue());
     }
   }
 

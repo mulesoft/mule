@@ -7,7 +7,7 @@
 package org.mule.runtime.module.cxf;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableValueOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
@@ -339,9 +339,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     // People can specify a CXF operation, which may in fact be different
     // than the method name. If that's not found, we'll default back to the
     // mule method property.
-    String method = getFlowVariableValueOrNull(OPERATION, event);
+    String method = getVariableValueOrNull(OPERATION, event);
     if (method == null) {
-      Object muleMethodProperty = getFlowVariableValueOrNull(MULE_METHOD_PROPERTY, event);
+      Object muleMethodProperty = getVariableValueOrNull(MULE_METHOD_PROPERTY, event);
       if (muleMethodProperty != null) {
         if (muleMethodProperty instanceof Method) {
           method = ((Method) muleMethodProperty).getName();

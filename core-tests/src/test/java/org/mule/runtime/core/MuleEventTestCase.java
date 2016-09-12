@@ -144,7 +144,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     Event event = getTestEvent("whatever");
     event = Event.builder(event).addVariable("test", "val").build();
     event.getVariableNames().remove("test");
-    assertNull(event.getVariable("test"));
+    assertNull(event.getVariable("test").getValue());
   }
 
   @Test
@@ -156,15 +156,15 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
     copy = Event.builder(copy).addVariable("foo", "bar2").build();
 
-    assertEquals("bar", event.getVariable("foo"));
+    assertEquals("bar", event.getVariable("foo").getValue());
 
-    assertEquals("bar2", copy.getVariable("foo"));
+    assertEquals("bar2", copy.getVariable("foo").getValue());
   }
 
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarNonexistent() throws Exception {
     Event event = getTestEvent("whatever");
-    event.getVariable("foo");
+    event.getVariable("foo").getValue();
   }
 
   @Test(expected = NoSuchElementException.class)

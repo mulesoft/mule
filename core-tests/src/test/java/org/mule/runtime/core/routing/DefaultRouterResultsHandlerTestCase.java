@@ -81,7 +81,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
     assertThat(result.getVariableNames(), not(contains("key1")));
-    assertThat(result.getVariable("key2"), equalTo("value2"));
+    assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
 
     assertThat(result.getSession().getProperty("key"), equalTo("valueNEW"));
     assertThat(result.getSession().getProperty("key1"), equalTo("value1"));
@@ -120,7 +120,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
-    assertEquals("value1", result.getVariable("key1"));
+    assertEquals("value1", result.getVariable("key1").getValue());
     assertTrue(simpleDateType1.equals(result.getVariable("key1").getDataType()));
     assertThat(result.getVariableNames(), not(contains("key2")));
     assertThat(result.getVariableNames(), not(contains("key3")));
@@ -151,7 +151,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
     assertThat(result.getVariableNames(), not(contains("key1")));
-    assertThat(result.getVariable("key2"), equalTo("value2"));
+    assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
   }
 
   @Test
@@ -174,7 +174,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     // Because same event instance is returned rather than MessageCollection
     // don't copy invocation properties
     assertThat(result.getVariableNames(), not(contains("key1")));
-    assertThat(result.getVariable("key2"), equalTo("value2"));
+    assertThat(result.getVariable("key2").getValue(), equalTo("value2"));
   }
 
   @Test
@@ -213,7 +213,7 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Because a new MuleMessageCollection is created, propagate properties from
     // original event
-    assertThat(result.getVariable("key1"), equalTo("value1"));
+    assertThat(result.getVariable("key1").getValue(), equalTo("value1"));
     assertThat(result.getVariableNames(), not(contains("key2")));
     assertThat(result.getVariableNames(), not(contains("key3")));
 

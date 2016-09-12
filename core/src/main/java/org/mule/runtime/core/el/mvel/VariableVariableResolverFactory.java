@@ -79,7 +79,7 @@ public class VariableVariableResolverFactory extends MuleBaseVariableResolverFac
 
     @Override
     public Object getValue() {
-      return event.getVariable(name);
+      return event.getVariable(name).getValue();
     }
 
     @Override

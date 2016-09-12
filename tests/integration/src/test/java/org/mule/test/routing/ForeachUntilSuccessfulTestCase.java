@@ -24,13 +24,13 @@ public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase {
   @Test
   public void flowVariableSyncNoForeach() throws Exception {
     Event event = runAndAssert("flowVarSyncNoForEach", 3);
-    assertThat(event.getVariable("until"), is(3));
+    assertThat(event.getVariable("until").getValue(), is(3));
   }
 
   @Test
   public void flowVariablesSyncArePropagated() throws Exception {
     Event event = runAndAssert("flowVarSync");
-    assertThat(event.getVariable("until"), is(3));
+    assertThat(event.getVariable("until").getValue(), is(3));
   }
 
   @Test
@@ -44,8 +44,8 @@ public class ForeachUntilSuccessfulTestCase extends FunctionalTestCase {
 
   private Event runAndAssert(String flowName, Object payload) throws Exception {
     Event event = flowRunner(flowName).withPayload(payload).run();
-    assertThat(event.getVariable("count"), is(6));
-    assertThat(event.getVariable("current"), is(3));
+    assertThat(event.getVariable("count").getValue(), is(6));
+    assertThat(event.getVariable("current").getValue(), is(3));
     return event;
   }
 }

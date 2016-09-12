@@ -10,7 +10,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableValueOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -34,7 +34,7 @@ public class RoundRobinRoutingStrategyTestCase extends AbstractDynamicRoundRobin
 
       @Override
       public String getRouteIdentifier(Event event) throws MessagingException {
-        return getFlowVariableValueOrNull(ID_PROPERTY_NAME, event);
+        return getVariableValueOrNull(ID_PROPERTY_NAME, event);
       }
 
       @Override

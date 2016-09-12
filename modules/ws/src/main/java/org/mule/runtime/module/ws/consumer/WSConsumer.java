@@ -9,7 +9,7 @@ package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableValueOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
@@ -216,7 +216,7 @@ public class WSConsumer
 
       @Override
       protected Event processRequest(Event event) throws MuleException {
-        propertyValue = getFlowVariableValueOrNull(propertyName, event);
+        propertyValue = getVariableValueOrNull(propertyName, event);
         event = Event.builder(event).removeVariable(propertyName).build();
         return super.processRequest(event);
       }
@@ -432,7 +432,7 @@ public class WSConsumer
   private Event copyAttachmentsResponse(Event event) throws MessagingException {
     InternalMessage message = event.getMessage();
 
-    if (event.getVariable(CxfConstants.ATTACHMENTS) != null) {
+    if (event.getVariable(CxfConstants.ATTACHMENTS).getValue() != null) {
       Collection<Attachment> attachments = (Collection<Attachment>) event.getVariable(CxfConstants.ATTACHMENTS).getValue();
       InternalMessage.Builder builder = InternalMessage.builder(message);
 

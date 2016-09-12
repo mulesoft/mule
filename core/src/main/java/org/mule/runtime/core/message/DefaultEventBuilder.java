@@ -604,14 +604,14 @@ public class DefaultEventBuilder implements Event.Builder {
       return this.legacyCorrelationId;
     }
 
-    public static <T> T getFlowVariableValueOrNull(String key, Event event) {
+    public static <T> T getVariableValueOrNull(String key, Event event) {
       TypedValue<T> value = null;
       try {
         value = event.getVariable(key);
       } catch (NoSuchElementException nsse) {
         // Ignore
       }
-      return value.getValue();
+      return value != null ? value.getValue() : null;
     }
 
   }
