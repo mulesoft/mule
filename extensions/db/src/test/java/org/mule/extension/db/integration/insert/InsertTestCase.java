@@ -7,8 +7,9 @@
 package org.mule.extension.db.integration.insert;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-
+import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
@@ -17,6 +18,7 @@ import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -55,8 +57,23 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
   @Test
   public void usesParameterizedQuery() throws Exception {
     final String planet = "Pluto";
-    Message response = flowRunner("insertParameterized").withPayload(planet).run().getMessage();
+    Message response = doInsertParameterized(777, planet);
     assertInsert((StatementResult) response.getPayload().getValue(), planet);
+  }
+
+  @Test
+  public void insertMany() throws Exception {
+    for (int i = 0; i < 10; i++) {
+      int id = 1000 + i;
+      doInsertParameterized(id, "Planet-" + id);
+    }
+
+    List<Map<String, Object>> planets = selectData("select * from PLANET", getDefaultDataSource());
+    assertThat(planets, hasSize(13));
+  }
+
+  private Message doInsertParameterized(int id, String planet) throws Exception {
+    return flowRunner("insertParameterized").withPayload(planet).withFlowVariable("id", id).run().getMessage();
   }
 
   private void assertInsert(StatementResult result, String planetName) throws SQLException {

@@ -6,17 +6,17 @@
  */
 package org.mule.extension.db.internal.domain.connection;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
-
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
  * Base class for a vendor specific connection provider. Connection can be specified through a URL, or through convenience
@@ -58,7 +58,7 @@ public abstract class AbstractVendorConnectionProvider extends DbConnectionProvi
   @Parameter
   @Optional
   @Placement(tab = ADVANCED)
-  private Map<String, String> connectionProperties;
+  private Map<String, String> connectionProperties = new HashMap<>();
 
   protected abstract String getUrlPrefix();
 
