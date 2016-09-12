@@ -7,22 +7,17 @@
 
 package org.mule.functional.classloading.isolation.classloader;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
+import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.module.artifact.classloader.ClassLoaderLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import static org.springframework.util.ReflectionUtils.findMethod;
 import org.mule.functional.api.classloading.isolation.ArtifactClassLoaderHolder;
 import org.mule.functional.api.classloading.isolation.ArtifactUrlClassification;
 import org.mule.functional.api.classloading.isolation.PluginUrlClassification;
 import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.MuleModule;
-import org.mule.runtime.core.util.PropertiesUtils;
-import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
@@ -40,19 +35,14 @@ import org.mule.runtime.module.artifact.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +63,10 @@ import org.slf4j.LoggerFactory;
  */
 public class IsolatedClassLoaderFactory {
 
-  private static final String PLUGIN_PROPERTIES = "plugin.properties";
-
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private DefaultExtensionManager extensionManager = new DefaultExtensionManager();
+  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver(extensionManager);
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
@@ -115,7 +104,7 @@ public class IsolatedClassLoaderFactory {
                                                                        regionClassLoader, childClassLoaderLookupPolicy);
         pluginsArtifactClassLoaders.add(pluginCL);
 
-        ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification, pluginCL);
+        ArtifactClassLoaderFilter filter = createArtifactClassLoaderFilter(pluginUrlClassification);
 
         pluginArtifactClassLoaderFilters.add(filter);
         filteredPluginsArtifactClassLoaders.add(new FilteringArtifactClassLoader(pluginCL, filter));
@@ -203,37 +192,11 @@ public class IsolatedClassLoaderFactory {
                                        new MuleClassLoaderLookupPolicy(Collections.emptyMap(), Collections.<String>emptySet()));
   }
 
-  private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification,
-                                                                    MuleArtifactClassLoader pluginCL) {
-    Collection<String> exportedPackagesProperty;
-    Collection<String> exportedResourcesProperty;
-    URL manifestUrl = pluginCL.findResource("META-INF/" + EXTENSION_MANIFEST_FILE_NAME);
-    if (manifestUrl != null) {
-      logger.debug("Plugin '{}' has extension descriptor therefore it will be handled as an extension",
-                   pluginUrlClassification.getName());
-      ExtensionManifest extensionManifest = extensionManager.parseExtensionManifestXml(manifestUrl);
-      exportedPackagesProperty = extensionManifest.getExportedPackages();
-      exportedResourcesProperty = extensionManifest.getExportedResources();
-    } else {
-      logger.debug("Plugin '{}' will be handled as standard plugin", pluginUrlClassification.getName());
-      ClassLoader pluginArtifactClassLoader =
-          new URLClassLoader(pluginUrlClassification.getUrls().toArray(new URL[0]), null);
-      URL pluginPropertiesUrl = pluginArtifactClassLoader.getResource(PLUGIN_PROPERTIES);
-      if (pluginPropertiesUrl == null) {
-        throw new IllegalStateException(PLUGIN_PROPERTIES + " couldn't be found for plugin: " +
-            pluginUrlClassification.getName());
-      }
-      Properties pluginProperties;
-      try {
-        pluginProperties = PropertiesUtils.loadProperties(pluginPropertiesUrl);
-      } catch (IOException e) {
-        throw new RuntimeException("Error while reading plugin properties: " + pluginPropertiesUrl);
-      }
-      exportedPackagesProperty = newArrayList(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY));
-      exportedResourcesProperty = newArrayList(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY));
-    }
-    String exportedPackages = exportedPackagesProperty.stream().collect(Collectors.joining(", "));
-    final String exportedResources = exportedResourcesProperty.stream().collect(Collectors.joining(", "));
+  private ArtifactClassLoaderFilter createArtifactClassLoaderFilter(PluginUrlClassification pluginUrlClassification) {
+    final PluginResourcedClassification pluginResourcedClassification =
+        pluginResourcesResolver.resolvePluginResources(pluginUrlClassification);
+    String exportedPackages = pluginResourcedClassification.getExportedPackages().stream().collect(joining(", "));
+    final String exportedResources = pluginResourcedClassification.getExportedResources().stream().collect(joining(", "));
     ArtifactClassLoaderFilter artifactClassLoaderFilter =
         classLoaderFilterFactory.create(exportedPackages, exportedResources);
 
