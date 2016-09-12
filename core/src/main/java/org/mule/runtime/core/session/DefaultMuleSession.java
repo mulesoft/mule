@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.security.SecurityContext;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.util.UUID;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -127,7 +128,7 @@ public final class DefaultMuleSession implements MuleSession {
     Iterator<Entry<String, DefaultTypedValue>> propertyIterator = properties.entrySet().iterator();
     while (propertyIterator.hasNext()) {
       final Entry<String, DefaultTypedValue> entry = propertyIterator.next();
-      if (entry.getValue().getContent() instanceof Serializable) {
+      if (entry.getValue().getValue() instanceof Serializable) {
         propertyIterator.remove();
       }
     }
@@ -140,7 +141,7 @@ public final class DefaultMuleSession implements MuleSession {
     Map<String, Object> result = new HashMap<>();
     for (String key : properties.keySet()) {
       DefaultTypedValue typedValue = properties.get(key);
-      result.put(key, typedValue.getContent());
+      result.put(key, typedValue.getValue());
     }
 
     return result;
@@ -154,7 +155,7 @@ public final class DefaultMuleSession implements MuleSession {
     Iterator<Entry<String, DefaultTypedValue>> propertyIterator = properties.entrySet().iterator();
     while (propertyIterator.hasNext()) {
       final Entry<String, DefaultTypedValue> entry = propertyIterator.next();
-      if (!(entry.getValue().getContent() instanceof Serializable)) {
+      if (!(entry.getValue().getValue() instanceof Serializable)) {
         logger.warn(CoreMessages.propertyNotSerializableWasDropped(entry.getKey()).toString());
         propertyIterator.remove();
       }
@@ -174,7 +175,7 @@ public final class DefaultMuleSession implements MuleSession {
   @Override
   public Object getProperty(String key) {
     DefaultTypedValue typedValue = properties.get(key);
-    return typedValue == null ? null : typedValue.getContent();
+    return typedValue == null ? null : typedValue.getValue();
   }
 
   @Override

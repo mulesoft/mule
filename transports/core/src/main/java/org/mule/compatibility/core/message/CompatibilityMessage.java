@@ -110,13 +110,13 @@ public class CompatibilityMessage implements InternalMessage {
   }
 
   @Override
-  public Object getContent() {
-    return inner.getContent();
+  public <T> T getPayload() {
+    return inner.getPayload();
   }
 
   @Override
-  public <T> T getPayload() {
-    return inner.getPayload();
+  public Object getValue() {
+    return inner.getValue();
   }
 
   public GroupCorrelation getCorrelation() {

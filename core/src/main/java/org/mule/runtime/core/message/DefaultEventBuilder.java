@@ -13,15 +13,14 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
+import org.mule.runtime.core.api.EventContext;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.EventContext;
-import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -314,7 +313,7 @@ public class DefaultEventBuilder implements Event.Builder {
       this.session = session;
       this.message = message;
       flowVariables
-          .forEach((s, value) -> this.flowVariables.put(s, new DefaultTypedValue<>(value.getContent(), value.getDataType())));
+          .forEach((s, value) -> this.flowVariables.put(s, new DefaultTypedValue<>(value.getValue(), value.getDataType())));
 
       this.exchangePattern = exchangePattern;
       this.replyToHandler = replyToHandler;
@@ -531,18 +530,18 @@ public class DefaultEventBuilder implements Event.Builder {
 
     @Override
     public <T> T getVariable(String key) {
-      TypedValue typedValue = flowVariables.get(key);
+      DefaultTypedValue typedValue = flowVariables.get(key);
 
       if (typedValue == null) {
         throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");
       } else {
-        return (T) typedValue.getContent();
+        return (T) typedValue.getValue();
       }
     }
 
     @Override
     public DataType getVariableDataType(String key) {
-      TypedValue typedValue = flowVariables.get(key);
+      DefaultTypedValue typedValue = flowVariables.get(key);
 
       if (typedValue == null) {
         throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");

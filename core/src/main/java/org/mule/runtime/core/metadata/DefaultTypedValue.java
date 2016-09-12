@@ -37,7 +37,7 @@ public class DefaultTypedValue<T> implements TypedValue<T>, Serializable {
   }
 
   @Override
-  public T getContent() {
+  public T getValue() {
     return content;
   }
 
