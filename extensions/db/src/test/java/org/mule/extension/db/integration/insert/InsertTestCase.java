@@ -68,8 +68,8 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
       doInsertParameterized(id, "Planet-" + id);
     }
 
-      List<Map<String, Object>> planets = selectData("select * from PLANET", getDefaultDataSource());
-      assertThat(planets, hasSize(13));
+    List<Map<String, Object>> planets = selectData("select * from PLANET", getDefaultDataSource());
+    assertThat(planets, hasSize(13));
   }
 
   private Message doInsertParameterized(int id, String planet) throws Exception {
