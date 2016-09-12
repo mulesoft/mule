@@ -6,6 +6,7 @@
  */
 package org.mule.extension.email.api;
 
+import static java.util.Collections.list;
 import static javax.mail.Flags.Flag.ANSWERED;
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.DRAFT;
@@ -14,7 +15,6 @@ import static javax.mail.Flags.Flag.SEEN;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
-
 import org.mule.extension.email.api.exception.EmailException;
 
 import java.time.LocalDateTime;
@@ -28,10 +28,12 @@ import java.util.Map;
 
 import javax.mail.Address;
 import javax.mail.Flags;
+import javax.mail.Header;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
- * an implementation of the builder design pattern to create a new {@link EmailAttributes} instance.
+ * an implementation of the builder design pattern to create a new {@link ReceivedEmailAttributes} instance.
  *
  * @since 4.0
  */
@@ -59,22 +61,36 @@ public final class EmailAttributesBuilder {
   private EmailAttributesBuilder() {}
 
   /**
-   * builds the new {@link EmailAttributes} instance from a given {@link Message} extracting all its attributes including the
+   * builds the new {@link ReceivedEmailAttributes} instance from a given {@link Message} extracting all its attributes including the
    * attachments.
    *
    * @param msg the {@link Message} to extract attributes from.
-   * @return a new {@link EmailAttributes} instance.
+   * @return a new {@link ReceivedEmailAttributes} instance.
    */
-  public static EmailAttributes fromMessage(javax.mail.Message msg) {
+  public static ReceivedEmailAttributes fromMessage(Message msg) {
     try {
       Flags flags = msg.getFlags();
 
+      Map<String, String> headers = new HashMap<>();
+      list(msg.getAllHeaders()).forEach(h -> headers.put(((Header) h).getName(), ((Header) h).getValue()));
+
       EmailAttributesBuilder builder =
-          EmailAttributesBuilder.newAttributes().withId(msg.getMessageNumber()).withSubject(msg.getSubject())
-              .fromAddresses(msg.getFrom()).toAddresses(msg.getRecipients(TO)).ccAddresses(msg.getRecipients(CC))
-              .bccAddresses(msg.getRecipients(BCC)).seen(flags.contains(SEEN)).replyToAddress(msg.getReplyTo())
-              .recent(flags.contains(RECENT)).sentDate(msg.getSentDate()).receivedDate(msg.getReceivedDate())
-              .draft(flags.contains(DRAFT)).answered(flags.contains(ANSWERED)).deleted(flags.contains(DELETED));
+          EmailAttributesBuilder.newAttributes()
+              .withId(msg.getMessageNumber())
+              .withSubject(msg.getSubject())
+              .fromAddresses(msg.getFrom())
+              .toAddresses(msg.getRecipients(TO))
+              .ccAddresses(msg.getRecipients(CC))
+              .bccAddresses(msg.getRecipients(BCC))
+              .seen(flags.contains(SEEN))
+              .replyToAddress(msg.getReplyTo())
+              .recent(flags.contains(RECENT))
+              .sentDate(msg.getSentDate())
+              .receivedDate(msg.getReceivedDate())
+              .draft(flags.contains(DRAFT))
+              .answered(flags.contains(ANSWERED))
+              .setHeaders(headers)
+              .deleted(flags.contains(DELETED));
 
       return builder.build();
     } catch (MessagingException mse) {
@@ -255,13 +271,22 @@ public final class EmailAttributesBuilder {
   }
 
   /**
-   * builds the new {@link EmailAttributes} instance.
+   * builds the new {@link ReceivedEmailAttributes} instance.
    *
-   * @return a new {@link EmailAttributes} instance.
+   * @return a new {@link ReceivedEmailAttributes} instance.
    */
-  public EmailAttributes build() {
-    return new EmailAttributes(id, subject, from, to, bcc, cc, replyTo, headers, receivedDate, sentDate,
-                               new EmailFlags(answered, deleted, draft, recent, seen));
+  public ReceivedEmailAttributes build() {
+    return new ReceivedEmailAttributes(id,
+                                       subject,
+                                       from,
+                                       to,
+                                       bcc,
+                                       cc,
+                                       replyTo,
+                                       headers,
+                                       receivedDate,
+                                       sentDate,
+                                       new EmailFlags(answered, deleted, draft, recent, seen));
   }
 
   private void addArrayAddresses(Address[] toAddresses, List<String> addresses) {

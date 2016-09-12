@@ -7,12 +7,12 @@
 package org.mule.extension.email.api.exception;
 
 /**
- * This {@link EmailRetrieverException} is the base {@link RuntimeException} type for operations that retrieves emails any other
+ * This {@link EmailRetrieveException} is the base {@link RuntimeException} type for operations that retrieves emails any other
  * exceptions thrown by operations that retrieves emails will be wrapped into one of this.
  *
  * @since 4.0
  */
-public class EmailRetrieverException extends EmailException {
+public class EmailRetrieveException extends EmailException {
 
   public static final String ERROR = "Error while retrieving emails: ";
 
@@ -21,7 +21,7 @@ public class EmailRetrieverException extends EmailException {
    *
    * @param message the detail message
    */
-  public EmailRetrieverException(String message) {
+  public EmailRetrieveException(String message) {
     super(ERROR + message);
   }
 
@@ -30,7 +30,7 @@ public class EmailRetrieverException extends EmailException {
    *
    * @param cause the exception's cause
    */
-  public EmailRetrieverException(Throwable cause) {
+  public EmailRetrieveException(Throwable cause) {
     super(ERROR + cause.getMessage(), cause);
   }
 
@@ -40,7 +40,7 @@ public class EmailRetrieverException extends EmailException {
    * @param message the detail message
    * @param cause the exception's cause
    */
-  public EmailRetrieverException(String message, Throwable cause) {
+  public EmailRetrieveException(String message, Throwable cause) {
     super(ERROR + message, cause);
   }
 }

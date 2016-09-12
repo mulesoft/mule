@@ -19,17 +19,14 @@ import java.util.Map;
 import javax.mail.Folder;
 
 /**
- * Contains all the metadata of an email, it carries information such as the subject of the email, the id in the mailbox and the
- * recipients between others.
+ * Contains all the metadata of a received email, it carries information such as the subject of the email,
+ * the id in the mailbox and the recipients between others.
  * <p>
  * This class aims to be returned as attributes in a {@link Message} for every retriever operation.
- * <p>
- * The attachments of the email are also carried in an {@link EmailAttributes} instance and separated from the original multipart
- * {@link javax.mail.Message}.
  *
  * @since 4.0
  */
-public class EmailAttributes extends BaseAttributes {
+public class ReceivedEmailAttributes extends BaseAttributes {
 
   /**
    * The id is the relative position of the email in its Folder. Note that the id for a particular email can change during a
@@ -112,9 +109,10 @@ public class EmailAttributes extends BaseAttributes {
    * @param receivedDate the received date of the email.
    * @param flags the {@link EmailFlags} setted on the email.
    */
-  public EmailAttributes(int id, String subject, List<String> fromAddresses, List<String> toAddresses, List<String> bccAddresses,
-                         List<String> ccAddresses, List<String> replyToAddresses, Map<String, String> headers,
-                         LocalDateTime receivedDate, LocalDateTime sentDate, EmailFlags flags) {
+  public ReceivedEmailAttributes(int id, String subject, List<String> fromAddresses, List<String> toAddresses,
+                                 List<String> bccAddresses,
+                                 List<String> ccAddresses, List<String> replyToAddresses, Map<String, String> headers,
+                                 LocalDateTime receivedDate, LocalDateTime sentDate, EmailFlags flags) {
     this.id = id;
     this.subject = subject;
     this.sentDate = sentDate;

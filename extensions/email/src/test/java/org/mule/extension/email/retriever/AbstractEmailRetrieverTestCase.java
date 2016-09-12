@@ -80,7 +80,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void sendInitialEmailBatch() throws MessagingException {
     for (int i = 0; i < 10; i++) {
       user.deliver(newMessage(testSession).to(singletonList(JUANI_EMAIL)).fromAddresses(ESTEBAN_EMAIL)
-          .cc(singletonList(ALE_EMAIL)).withContent(EMAIL_CONTENT).withSubject(EMAIL_SUBJECT).build());
+          .cc(singletonList(ALE_EMAIL)).withBody(EMAIL_CONTENT).withSubject(EMAIL_SUBJECT).build());
     }
   }
 
@@ -97,7 +97,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     for (int i = 0; i < 5; i++) {
       String fromEmail = format("address.%s@enterprise.com", i);
       user.deliver(newMessage(testSession).to(singletonList(ESTEBAN_EMAIL)).cc(singletonList(ALE_EMAIL))
-          .withContent(EMAIL_CONTENT).withSubject("Non Matching Subject").fromAddresses(fromEmail).build());
+          .withBody(EMAIL_CONTENT).withSubject("Non Matching Subject").fromAddresses(fromEmail).build());
     }
 
     List<Message> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);

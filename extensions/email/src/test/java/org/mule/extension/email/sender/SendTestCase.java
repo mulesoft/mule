@@ -11,8 +11,8 @@ import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.email.api.EmailContentProcessor.process;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT;
+import org.mule.extension.email.api.EmailContentProcessor;
 
 import javax.activation.DataHandler;
 import javax.mail.Message;
@@ -34,7 +34,7 @@ public class SendTestCase extends SMTPTestCase {
     Message[] messages = getReceivedMessagesAndAssertCount(1);
     Message sentMessage = messages[0];
     assertSubject(sentMessage.getSubject());
-    assertBodyContent(process(sentMessage).getBody());
+    assertBodyContent(EmailContentProcessor.getInstance(sentMessage).getBody());
   }
 
   @Test
@@ -43,7 +43,7 @@ public class SendTestCase extends SMTPTestCase {
     Message[] messages = getReceivedMessagesAndAssertCount(1);
     Message sentMessage = messages[0];
     assertSubject(sentMessage.getSubject());
-    assertBodyContent(process(sentMessage).getBody());
+    assertBodyContent(EmailContentProcessor.getInstance(sentMessage).getBody());
 
     assertThat(sentMessage.getHeader("CustomConfigHeader"), arrayWithSize(1));
     assertThat(sentMessage.getHeader("CustomConfigHeader")[0], is("Dummy"));
