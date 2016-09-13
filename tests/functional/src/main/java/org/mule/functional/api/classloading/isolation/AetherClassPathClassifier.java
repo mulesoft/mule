@@ -229,7 +229,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     if (isMulePlugin(rootArtifact)) {
       logger.debug("rootArtifact '{}' identified as Mule plugin", rootArtifact);
-      //TODO(pablo.kraan): isoaltion - ac� est� bien que pase el context posta
       buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, pluginsClassified);
 
       pluginsArtifacts = pluginsArtifacts.stream()
