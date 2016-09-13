@@ -40,7 +40,7 @@ public final class LocalListCommand extends LocalFileCommand implements ListComm
   @Override
   public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
                        Predicate<FileAttributes> matcher) {
-    Path path = resolveExistingPath(config, directoryPath);
+    Path path = resolveExistingPath(directoryPath);
     if (!Files.isDirectory(path)) {
       throw cannotListFileException(path);
     }

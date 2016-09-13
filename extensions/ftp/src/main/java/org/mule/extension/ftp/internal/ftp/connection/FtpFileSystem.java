@@ -6,23 +6,33 @@
  */
 package org.mule.extension.ftp.internal.ftp.connection;
 
-import org.mule.runtime.api.connection.ConnectionValidationResult;
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import org.mule.extension.file.common.api.AbstractFileSystem;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileSystem;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
 
 import java.io.InputStream;
 
 /**
- * Specialization of the {@link FileSystem} contract for file systems mounted on FTP/SFTP servers
+ * Specialization of the {@link AbstractFileSystem} contract for file systems mounted on FTP/SFTP servers
  *
  * @since 4.0
  */
-public interface FtpFileSystem extends FileSystem {
+public abstract class FtpFileSystem extends AbstractFileSystem {
+
+  /**
+   * {@inheritDoc}
+   */
+  public FtpFileSystem(String basePath) {
+    super(basePath);
+  }
 
   /**
    * Severs the underlying connection to the remote server
    */
-  void disconnect();
+  public abstract void disconnect();
 
   /**
    * Returns an InputStream which obtains the content for the file of the given {@code filePayload}.
@@ -32,12 +42,25 @@ public interface FtpFileSystem extends FileSystem {
    * @param filePayload a {@link FileAttributes} referencing to a FTP file
    * @return an {@link InputStream}
    */
-  InputStream retrieveFileContent(FileAttributes filePayload);
+  public abstract InputStream retrieveFileContent(FileAttributes filePayload);
 
   /**
    * Validates the underlying connection to the remote server
    *
    * @return a {@link ConnectionValidationResult}
    */
-  ConnectionValidationResult validateConnection();
+  public ConnectionValidationResult validateConnection() {
+    if (!isConnected()) {
+      return failure("Connection is stale", UNKNOWN, null);
+    }
+
+    try {
+      changeToBaseDir();
+    } catch (Exception e) {
+      failure("Configured workingDir is unavailable", UNKNOWN, e);
+    }
+    return success();
+  }
+
+  protected abstract boolean isConnected();
 }

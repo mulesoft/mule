@@ -19,10 +19,9 @@ public interface RenameCommand {
   /**
    * Renames a file under the considerations of {@link FileSystem#rename(FileConnectorConfig, String, String, boolean)}
    *
-   * @param config the config that is parameterizing this operation
    * @param filePath the path to the file to be renamed
    * @param newName the file's new name
    * @param overwrite whether to overwrite the target file if it already exists
    */
-  void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite);
+  void rename(String filePath, String newName, boolean overwrite);
 }

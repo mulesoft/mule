@@ -6,9 +6,8 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.RenameCommand;
+import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -30,7 +29,7 @@ public final class FtpRenameCommand extends ClassicFtpCommand implements RenameC
    * {@inheritDoc}
    */
   @Override
-  public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite) {
-    super.rename(config, filePath, newName, overwrite);
+  public void rename(String filePath, String newName, boolean overwrite) {
+    super.rename(filePath, newName, overwrite);
   }
 }

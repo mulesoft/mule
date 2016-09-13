@@ -9,9 +9,8 @@ package org.mule.extension.file.internal.command;
 import static java.lang.String.format;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.RenameCommand;
+import org.mule.extension.file.internal.LocalFileSystem;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,8 +33,8 @@ public final class LocalRenameCommand extends LocalFileCommand implements Rename
    * {@inheritDoc}
    */
   @Override
-  public void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite) {
-    Path source = resolveExistingPath(config, filePath);
+  public void rename(String filePath, String newName, boolean overwrite) {
+    Path source = resolveExistingPath(filePath);
     Path target = source.getParent().resolve(newName);
 
     if (Files.exists(target)) {
@@ -44,7 +43,7 @@ public final class LocalRenameCommand extends LocalFileCommand implements Rename
       }
 
       try {
-        fileSystem.delete(config, target.toString());
+        fileSystem.delete(target.toString());
       } catch (Exception e) {
         throw exception(format("Exception was found deleting '%s' as part of renaming '%s'", target, source), e);
       }

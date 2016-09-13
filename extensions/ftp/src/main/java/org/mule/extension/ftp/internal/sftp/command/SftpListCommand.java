@@ -8,22 +8,21 @@ package org.mule.extension.ftp.internal.sftp.command;
 
 import static org.mule.extension.file.common.api.TreeNode.Builder.forDirectory;
 import static org.mule.extension.file.common.api.TreeNode.Builder.forFile;
-
-import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.runtime.api.message.Message;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.TreeNode;
 import org.mule.extension.file.common.api.command.ListCommand;
+import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
+import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
+import org.mule.runtime.api.message.Message;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link SftpCommand} which implements the {@link ListCommand} contract
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class SftpListCommand extends SftpCommand implements ListCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SftpListCommand.class);
+  private static final Logger LOGGER = getLogger(SftpListCommand.class);
 
   /**
    * {@inheritDoc}
@@ -47,7 +46,7 @@ public final class SftpListCommand extends SftpCommand implements ListCommand {
   @Override
   public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
                        Predicate<FileAttributes> matcher) {
-    FileAttributes directoryAttributes = getExistingFile(config, directoryPath);
+    FileAttributes directoryAttributes = getExistingFile(directoryPath);
     Path path = Paths.get(directoryAttributes.getPath());
 
     if (!directoryAttributes.isDirectory()) {

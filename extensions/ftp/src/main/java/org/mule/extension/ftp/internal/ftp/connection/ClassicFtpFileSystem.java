@@ -10,23 +10,8 @@ import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
-import org.mule.extension.ftp.api.ftp.FtpTransferMode;
-import org.mule.extension.ftp.internal.ftp.command.FtpCopyCommand;
-import org.mule.extension.ftp.internal.ftp.command.FtpCreateDirectoryCommand;
-import org.mule.extension.ftp.internal.ftp.command.FtpDeleteCommand;
-import org.mule.extension.ftp.internal.ftp.command.FtpListCommand;
-import org.mule.extension.ftp.internal.ftp.command.FtpMoveCommand;
-import org.mule.extension.ftp.internal.ftp.command.FtpReadCommand;
-import org.mule.extension.ftp.internal.ftp.command.FtpRenameCommand;
-import org.mule.extension.ftp.internal.ftp.command.FtpWriteCommand;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.file.common.api.AbstractFileSystem;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -37,6 +22,18 @@ import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.extension.file.common.api.lock.URLPathLock;
+import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
+import org.mule.extension.ftp.api.ftp.FtpTransferMode;
+import org.mule.extension.ftp.internal.ftp.command.FtpCopyCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpCreateDirectoryCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpDeleteCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpListCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpMoveCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpReadCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpRenameCommand;
+import org.mule.extension.ftp.internal.ftp.command.FtpWriteCommand;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -50,16 +47,15 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link FtpFileSystem} for files residing on a FTP server
  *
  * @since 4.0
  */
-public final class ClassicFtpFileSystem extends AbstractFileSystem implements FtpFileSystem {
+public final class ClassicFtpFileSystem extends FtpFileSystem {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ClassicFtpFileSystem.class);
+  private static final Logger LOGGER = getLogger(ClassicFtpFileSystem.class);
 
   private final MuleContext muleContext;
   private final FTPClient client;
@@ -78,7 +74,8 @@ public final class ClassicFtpFileSystem extends AbstractFileSystem implements Ft
    *
    * @param client a ready to use {@link FTPClient}
    */
-  ClassicFtpFileSystem(FTPClient client, MuleContext muleContext) {
+  ClassicFtpFileSystem(FTPClient client, String basePath, MuleContext muleContext) {
+    super(basePath);
     this.client = client;
     this.muleContext = muleContext;
 
@@ -117,22 +114,11 @@ public final class ClassicFtpFileSystem extends AbstractFileSystem implements Ft
   }
 
   /**
-   * Validates the connection by sending a {@code NoOp} command
-   *
-   * @return a {@link ConnectionValidationResult}
+   * {@inheritDoc}
    */
   @Override
-  public ConnectionValidationResult validateConnection() {
-    try {
-      if (client.sendNoOp()) {
-        return ConnectionValidationResult.success();
-      } else {
-        return ConnectionValidationResult.failure("NoOp did not complete", ConnectionExceptionCode.UNKNOWN, null);
-      }
-    } catch (IOException e) {
-      return ConnectionValidationResult.failure("Found exception trying to perform validation", ConnectionExceptionCode.UNKNOWN,
-                                                e);
-    }
+  protected boolean isConnected() {
+    return client.isConnected();
   }
 
   /**
@@ -233,16 +219,17 @@ public final class ClassicFtpFileSystem extends AbstractFileSystem implements Ft
   }
 
   /**
-   * Changes the {@link #client}'s current working directory to the {@code config}'s {@link FileConnectorConfig#getWorkingDir()}
+   * Changes the {@link #client}'s current working directory to the base path
    */
   @Override
-  public void changeToBaseDir(FileConnectorConfig config) {
-    if (config.getWorkingDir() != null) {
+  public void changeToBaseDir() {
+    String basePath = getBasePath();
+    if (basePath != null) {
       try {
-        client.changeWorkingDirectory(Paths.get(config.getWorkingDir()).toString());
+        client.changeWorkingDirectory(Paths.get(basePath).toString());
       } catch (IOException e) {
         throw new MuleRuntimeException(createStaticMessage(format("Failed to perform CWD to the base directory '%s'",
-                                                                  config.getWorkingDir())),
+                                                                  basePath)),
                                        e);
       }
     }

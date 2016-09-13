@@ -5,7 +5,9 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
 
-    <file:config name="file" workingDir="${workingDir}" />
+    <file:config name="file">
+        <file:connection workingDir="${workingDir}" />
+    </file:config>
 
     <flow name="delete">
         <file:delete path="#[delete]" />

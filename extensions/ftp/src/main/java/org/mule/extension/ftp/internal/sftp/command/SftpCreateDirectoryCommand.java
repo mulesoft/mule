@@ -6,10 +6,9 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
+import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 
 /**
  * A {@link SftpCommand} which implements the {@link CreateDirectoryCommand} contract
@@ -29,7 +28,7 @@ public final class SftpCreateDirectoryCommand extends SftpCommand implements Cre
    * {@inheritDoc}
    */
   @Override
-  public void createDirectory(FileConnectorConfig config, String directoryName) {
-    super.createDirectory(config, directoryName);
+  public void createDirectory(String directoryName) {
+    super.createDirectory(directoryName);
   }
 }

@@ -7,6 +7,7 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
+import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
@@ -26,10 +27,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for {@link FileCommand} implementations that target a FTP/SFTP server
  *
- * @param <Connection> the generic type of the connection object
+ * @param <C> the generic type of the connection object
  * @since 4.0
  */
-public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileCommand<Connection> {
+public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FtpCommand.class);
 
@@ -38,49 +39,47 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
    *
    * @param fileSystem a {@link FtpFileSystem} used as the connection object
    */
-  public FtpCommand(Connection fileSystem) {
+  public FtpCommand(C fileSystem) {
     super(fileSystem);
   }
 
   /**
-   * Similar to {@link #getFile(FileConnectorConfig, String)} but throwing an {@link IllegalArgumentException} if the
+   * Similar to {@link #getFile(String)} but throwing an {@link IllegalArgumentException} if the
    * {@code filePath} doesn't exists
    *
-   * @param config the config that is parameterizing this operation
    * @param filePath the path to the file you want
    * @return a {@link FtpFileAttributes}
    * @throws IllegalArgumentException if the {@code filePath} doesn't exists
    */
-  protected FtpFileAttributes getExistingFile(FileConnectorConfig config, String filePath) {
-    return getFile(config, filePath, true);
+  protected FtpFileAttributes getExistingFile(String filePath) {
+    return getFile(filePath, true);
   }
 
   /**
    * Obtains a {@link FtpFileAttributes} for the given {@code filePath} by using the {@link FTPClient#mlistFile(String)} FTP
    * command
    *
-   * @param config the config that is parameterizing this operation
    * @param filePath the path to the file you want
    * @return a {@link FtpFileAttributes} or {@code null} if it doesn't exists
    */
-  public FtpFileAttributes getFile(FileConnectorConfig config, String filePath) {
-    return getFile(config, filePath, false);
+  public FtpFileAttributes getFile(String filePath) {
+    return getFile(filePath, false);
   }
 
-  protected abstract FtpFileAttributes getFile(FileConnectorConfig config, String filePath, boolean requireExistence);
+  protected abstract FtpFileAttributes getFile(String filePath, boolean requireExistence);
 
   /**
    * {@inheritDoc}
    */
-  protected boolean exists(FileConnectorConfig config, Path path) {
-    return getFile(config, path.toString()) != null;
+  protected boolean exists(Path path) {
+    return getFile(path.toString()) != null;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected Path getBasePath(FileConnectorConfig config) {
+  protected Path getBasePath(FileSystem fileSystem) {
     return Paths.get(getCurrentWorkingDirectory());
   }
 
@@ -123,22 +122,21 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
    * This method performs path resolution and validation and eventually delegates into {@link #doRename(String, String)}, in which
    * the actual renaming implementation is.
    *
-   * @param config the config that is parameterizing this operation
    * @param filePath the path of the file to be renamed
    * @param newName the new name
    * @param overwrite whether to overwrite the target file if it already exists
    */
-  protected void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite) {
-    Path source = resolveExistingPath(config, filePath);
+  protected void rename(String filePath, String newName, boolean overwrite) {
+    Path source = resolveExistingPath(filePath);
     Path target = source.getParent().resolve(newName);
 
-    if (exists(config, target)) {
+    if (exists(target)) {
       if (!overwrite) {
         throw new IllegalArgumentException(format("'%s' cannot be renamed because '%s' already exists", source, target));
       }
 
       try {
-        fileSystem.delete(config, target.toString());
+        fileSystem.delete(target.toString());
       } catch (Exception e) {
         throw exception(format("Exception was found deleting '%s' as part of renaming '%s'", target, source), e);
       }
@@ -153,7 +151,7 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
   }
 
   /**
-   * Template method which works in tandem with {@link #rename(FileConnectorConfig, String, String, boolean)}.
+   * Template method which works in tandem with {@link #rename(String, String, boolean)}.
    * <p>
    * Implementations are to perform the actual renaming logic here
    *
@@ -163,15 +161,15 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
    */
   protected abstract void doRename(String filePath, String newName) throws Exception;
 
-  protected void createDirectory(FileConnectorConfig config, String directoryPath) {
-    final Path path = Paths.get(config.getWorkingDir()).resolve(directoryPath);
-    FileAttributes targetFile = getFile(config, directoryPath);
+  protected void createDirectory(String directoryPath) {
+    final Path path = Paths.get(fileSystem.getBasePath()).resolve(directoryPath);
+    FileAttributes targetFile = getFile(directoryPath);
 
     if (targetFile != null) {
       throw new IllegalArgumentException(format("Directory '%s' already exists", directoryPath));
     }
 
-    mkdirs(config, path);
+    mkdirs(path);
   }
 
   /**
@@ -188,9 +186,9 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
    */
   protected final void copy(FileConnectorConfig config, String sourcePath, String target, boolean overwrite,
                             boolean createParentDirectory, MuleEvent event, FtpCopyDelegate delegate) {
-    FileAttributes sourceFile = getExistingFile(config, sourcePath);
-    Path targetPath = resolvePath(config, target);
-    FileAttributes targetFile = getFile(config, targetPath.toString());
+    FileAttributes sourceFile = getExistingFile(sourcePath);
+    Path targetPath = resolvePath(target);
+    FileAttributes targetFile = getFile(targetPath.toString());
 
     if (targetFile != null) {
       if (targetFile.isDirectory()) {
@@ -204,7 +202,7 @@ public abstract class FtpCommand<Connection extends FtpFileSystem> extends FileC
       }
     } else {
       if (createParentDirectory) {
-        mkdirs(config, targetPath);
+        mkdirs(targetPath);
         targetPath = targetPath.resolve(sourceFile.getName());
       } else {
         throw new IllegalArgumentException(String

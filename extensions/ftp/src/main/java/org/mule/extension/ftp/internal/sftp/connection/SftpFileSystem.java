@@ -9,23 +9,7 @@ package org.mule.extension.ftp.internal.sftp.connection;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
-import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
-import org.mule.extension.ftp.internal.sftp.command.SftpCopyCommand;
-import org.mule.extension.ftp.internal.sftp.command.SftpCreateDirectoryCommand;
-import org.mule.extension.ftp.internal.sftp.command.SftpDeleteCommand;
-import org.mule.extension.ftp.internal.sftp.command.SftpListCommand;
-import org.mule.extension.ftp.internal.sftp.command.SftpMoveCommand;
-import org.mule.extension.ftp.internal.sftp.command.SftpReadCommand;
-import org.mule.extension.ftp.internal.sftp.command.SftpRenameCommand;
-import org.mule.extension.ftp.internal.sftp.command.SftpWriteCommand;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.extension.file.common.api.AbstractFileSystem;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -36,6 +20,18 @@ import org.mule.extension.file.common.api.command.RenameCommand;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.extension.file.common.api.lock.URLPathLock;
+import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
+import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
+import org.mule.extension.ftp.internal.sftp.command.SftpCopyCommand;
+import org.mule.extension.ftp.internal.sftp.command.SftpCreateDirectoryCommand;
+import org.mule.extension.ftp.internal.sftp.command.SftpDeleteCommand;
+import org.mule.extension.ftp.internal.sftp.command.SftpListCommand;
+import org.mule.extension.ftp.internal.sftp.command.SftpMoveCommand;
+import org.mule.extension.ftp.internal.sftp.command.SftpReadCommand;
+import org.mule.extension.ftp.internal.sftp.command.SftpRenameCommand;
+import org.mule.extension.ftp.internal.sftp.command.SftpWriteCommand;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -49,7 +45,7 @@ import org.apache.commons.net.ftp.FTPClient;
  *
  * @since 4.0
  */
-public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem {
+public class SftpFileSystem extends FtpFileSystem {
 
   private final MuleContext muleContext;
   protected final SftpClient client;
@@ -68,7 +64,8 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem 
    *
    * @param client a ready to use {@link FTPClient}
    */
-  public SftpFileSystem(SftpClient client, MuleContext muleContext) {
+  public SftpFileSystem(SftpClient client, String basePath, MuleContext muleContext) {
+    super(basePath);
     this.client = client;
     this.muleContext = muleContext;
 
@@ -94,8 +91,10 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem 
    * {@inheritDoc}
    */
   @Override
-  public void changeToBaseDir(FileConnectorConfig config) {
-    client.changeWorkingDirectory(config.getWorkingDir());
+  public void changeToBaseDir() {
+    if (getBasePath() != null) {
+      client.changeWorkingDirectory(getBasePath());
+    }
   }
 
   /**
@@ -110,9 +109,8 @@ public class SftpFileSystem extends AbstractFileSystem implements FtpFileSystem 
    * {@inheritDoc}
    */
   @Override
-  public ConnectionValidationResult validateConnection() {
-    return client.isConnected() ? ConnectionValidationResult.success()
-        : ConnectionValidationResult.failure("Connection is stale", ConnectionExceptionCode.UNKNOWN, null);
+  protected boolean isConnected() {
+    return client.isConnected();
   }
 
   /**

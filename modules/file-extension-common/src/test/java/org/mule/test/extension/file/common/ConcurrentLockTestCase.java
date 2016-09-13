@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.extension.file.common.api.AbstractFileSystem;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.CopyCommand;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.common.api.command.DeleteCommand;
@@ -45,7 +44,7 @@ public class ConcurrentLockTestCase {
   private static final int TIMEOUT = 5;
   private static final TimeUnit TIMEOUT_UNIT = SECONDS;
 
-  private AbstractFileSystem fileSystem = new TestFileSystem();
+  private AbstractFileSystem fileSystem = new TestFileSystem("");
   private Latch mainThreadLatch = new Latch();
   private Latch secondaryThreadLatch = new Latch();
   private CountDownLatch assertionLatch = new CountDownLatch(2);
@@ -90,6 +89,10 @@ public class ConcurrentLockTestCase {
   private class TestFileSystem extends AbstractFileSystem {
 
     private boolean locked = false;
+
+    public TestFileSystem(String basePath) {
+      super(basePath);
+    }
 
     @Override
     protected ListCommand getListCommand() {
@@ -144,7 +147,7 @@ public class ConcurrentLockTestCase {
     }
 
     @Override
-    public void changeToBaseDir(FileConnectorConfig config) {}
+    public void changeToBaseDir() {}
 
     @Override
     public Class<? extends FileAttributes> getAttributesType() {

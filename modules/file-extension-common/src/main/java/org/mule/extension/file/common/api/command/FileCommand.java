@@ -8,17 +8,17 @@ package org.mule.extension.file.common.api.command;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleRuntimeException;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.MuleRuntimeException;
 
 import java.nio.file.Path;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for implementations of the Command design pattern which performs operations on a file system
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class FileCommand<F extends FileSystem> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FileCommand.class);
+  private static final Logger LOGGER = getLogger(FileCommand.class);
 
   protected final F fileSystem;
 
@@ -44,21 +44,20 @@ public abstract class FileCommand<F extends FileSystem> {
   /**
    * Returns true if the given {@code path} exists
    *
-   * @param config the config which is parameterizing this operation
    * @param path the {@link Path} to test
    * @return whether the {@code path} exists
    */
-  protected abstract boolean exists(FileConnectorConfig config, Path path);
+  protected abstract boolean exists(Path path);
 
-  protected void assureParentFolderExists(FileConnectorConfig config, Path path, boolean createParentFolder) {
-    if (exists(config, path)) {
+  protected void assureParentFolderExists(Path path, boolean createParentFolder) {
+    if (exists(path)) {
       return;
     }
 
     Path parentFolder = path.getParent();
-    if (!exists(config, parentFolder)) {
+    if (!exists(parentFolder)) {
       if (createParentFolder) {
-        mkdirs(config, parentFolder);
+        mkdirs(parentFolder);
       } else {
         throw new IllegalArgumentException(format("Cannot write to file '%s' because path to it doesn't exist. Consider setting the 'createParentFolder' attribute to 'true'",
                                                   path));
@@ -71,15 +70,15 @@ public abstract class FileCommand<F extends FileSystem> {
    *
    * @param directoryPath the {@link Path} to the directory you want to create
    */
-  protected final void mkdirs(FileConnectorConfig config, Path directoryPath) {
+  protected final void mkdirs(Path directoryPath) {
     Lock lock = fileSystem.createMuleLock(String.format("%s-mkdirs-%s", getClass().getName(), directoryPath));
     lock.lock();
     try {
       // verify no other thread beat us to it
-      if (exists(config, directoryPath)) {
+      if (exists(directoryPath)) {
         return;
       }
-      doMkDirs(config, directoryPath);
+      doMkDirs(directoryPath);
     } finally {
       lock.unlock();
     }
@@ -87,7 +86,7 @@ public abstract class FileCommand<F extends FileSystem> {
     LOGGER.debug("Directory '{}' created", directoryPath);
   }
 
-  protected abstract void doMkDirs(FileConnectorConfig config, Path directoryPath);
+  protected abstract void doMkDirs(Path directoryPath);
 
   /**
    * Returns an absolute {@link Path} to the given {@code filePath}
@@ -95,8 +94,8 @@ public abstract class FileCommand<F extends FileSystem> {
    * @param filePath the path to a file or directory
    * @return an absolute {@link Path}
    */
-  protected Path resolvePath(FileConnectorConfig config, String filePath) {
-    Path path = getBasePath(config);
+  protected Path resolvePath(String filePath) {
+    Path path = getBasePath(fileSystem);
     if (filePath != null) {
       path = path.resolve(filePath);
     }
@@ -107,24 +106,23 @@ public abstract class FileCommand<F extends FileSystem> {
   /**
    * Returns a {@link Path} to which all non absolute paths are relative to
    *
-   * @param config the config on which is parameterizing this operation
+   * @param fileSystem the file system that we're connecting to
    * @return a not {@code null} {@link Path}
    */
-  protected abstract Path getBasePath(FileConnectorConfig config);
+  protected abstract Path getBasePath(FileSystem fileSystem);
 
   /**
-   * Similar to {@link #resolvePath(FileConnectorConfig, String)} only that it throws a {@link IllegalArgumentException} if the
+   * Similar to {@link #resolvePath(String)} only that it throws a {@link IllegalArgumentException} if the
    * given path doesn't exists.
    * <p>
-   * The existence of the obtained path is verified by delegating into {@link #exists(FileConnectorConfig, Path)}
+   * The existence of the obtained path is verified by delegating into {@link #exists(Path)}
    *
-   * @param config the config on which is parameterizing this operation
    * @param filePath the path to a file or directory
    * @return an absolute {@link Path}
    */
-  protected Path resolveExistingPath(FileConnectorConfig config, String filePath) {
-    Path path = resolvePath(config, filePath);
-    if (!exists(config, path)) {
+  protected Path resolveExistingPath(String filePath) {
+    Path path = resolvePath(filePath);
+    if (!exists(path)) {
       throw pathNotFoundException(path);
     }
 

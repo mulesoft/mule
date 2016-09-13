@@ -43,6 +43,12 @@ public abstract class AbstractFileSystem implements FileSystem {
   @Inject
   private MuleContext muleContext;
 
+  private final String basePath;
+
+  public AbstractFileSystem(String basePath) {
+    this.basePath = basePath;
+  }
+
   /**
    * @return a {@link ListCommand}
    */
@@ -105,9 +111,9 @@ public abstract class AbstractFileSystem implements FileSystem {
    * {@inheritDoc}
    */
   @Override
-  public void write(FileConnectorConfig config, String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
                     boolean lock, boolean createParentDirectories, String encoding) {
-    getWriteCommand().write(config, filePath, content, mode, event, lock, createParentDirectories, encoding);
+    getWriteCommand().write(filePath, content, mode, event, lock, createParentDirectories, encoding);
   }
 
   /**
@@ -132,24 +138,24 @@ public abstract class AbstractFileSystem implements FileSystem {
    * {@inheritDoc}
    */
   @Override
-  public void delete(FileConnectorConfig config, String filePath) {
-    getDeleteCommand().delete(config, filePath);
+  public void delete(String filePath) {
+    getDeleteCommand().delete(filePath);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public final void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite) {
-    getRenameCommand().rename(config, filePath, newName, overwrite);
+  public final void rename(String filePath, String newName, boolean overwrite) {
+    getRenameCommand().rename(filePath, newName, overwrite);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void createDirectory(FileConnectorConfig config, String directoryName) {
-    getCreateDirectoryCommand().createDirectory(config, directoryName);
+  public void createDirectory(String directoryName) {
+    getCreateDirectoryCommand().createDirectory(directoryName);
   }
 
   /**
@@ -206,5 +212,13 @@ public abstract class AbstractFileSystem implements FileSystem {
   @Override
   public Lock createMuleLock(String lockId) {
     return muleContext.getLockFactory().createLock(lockId);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getBasePath() {
+    return basePath;
   }
 }

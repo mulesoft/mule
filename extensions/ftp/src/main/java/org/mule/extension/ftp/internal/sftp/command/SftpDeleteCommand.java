@@ -6,17 +6,16 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.DeleteCommand;
+import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link SftpCommand} which implements the {@link DeleteCommand} contract
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class SftpDeleteCommand extends SftpCommand implements DeleteCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SftpDeleteCommand.class);
+  private static final Logger LOGGER = getLogger(SftpDeleteCommand.class);
 
   /**
    * {@inheritDoc}
@@ -38,8 +37,8 @@ public final class SftpDeleteCommand extends SftpCommand implements DeleteComman
    * {@inheritDoc}
    */
   @Override
-  public void delete(FileConnectorConfig config, String filePath) {
-    FileAttributes fileAttributes = getExistingFile(config, filePath);
+  public void delete(String filePath) {
+    FileAttributes fileAttributes = getExistingFile(filePath);
     final boolean isDirectory = fileAttributes.isDirectory();
     final String path = fileAttributes.getPath();
 

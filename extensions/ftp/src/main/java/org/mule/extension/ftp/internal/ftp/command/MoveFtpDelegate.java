@@ -28,15 +28,15 @@ public class MoveFtpDelegate implements FtpCopyDelegate {
   @Override
   public void doCopy(FileConnectorConfig config, FileAttributes source, Path targetPath, boolean overwrite, MuleEvent event) {
     try {
-      if (command.exists(config, targetPath)) {
+      if (command.exists(targetPath)) {
         if (overwrite) {
-          fileSystem.delete(config, targetPath.toString());
+          fileSystem.delete(targetPath.toString());
         } else {
           command.alreadyExistsException(targetPath);
         }
       }
 
-      command.rename(config, source.getPath(), targetPath.toString(), overwrite);
+      command.rename(source.getPath(), targetPath.toString(), overwrite);
     } catch (Exception e) {
       throw command.exception(format("Found exception copying file '%s' to '%s'", source, targetPath), e);
     }

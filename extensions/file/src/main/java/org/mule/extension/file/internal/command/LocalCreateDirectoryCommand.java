@@ -7,9 +7,8 @@
 package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
+import org.mule.extension.file.internal.LocalFileSystem;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,13 +31,13 @@ public final class LocalCreateDirectoryCommand extends LocalFileCommand implemen
    * {@inheritDoc}
    */
   @Override
-  public void createDirectory(FileConnectorConfig config, String directoryPath) {
-    Path target = resolvePath(config, directoryPath);
+  public void createDirectory(String directoryPath) {
+    Path target = resolvePath(directoryPath);
 
     if (Files.exists(target)) {
       throw new IllegalArgumentException(format("Directory '%s' already exists", target));
     }
 
-    mkdirs(config, target);
+    mkdirs(target);
   }
 }
