@@ -190,7 +190,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
         formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
         formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_AUTHENTICATION_CODE);
-        formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
+        formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getExternalRedirectionUrl());
         event.getMessage().setPayload(formData);
     }
 
@@ -201,7 +201,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
         formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
         formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
         formData.put(GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_REFRESH_TOKEN);
-        formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
+        formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getExternalRedirectionUrl());
         event.getMessage().setPayload(formData);
     }
 

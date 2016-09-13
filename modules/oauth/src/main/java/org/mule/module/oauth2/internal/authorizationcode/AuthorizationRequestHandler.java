@@ -132,7 +132,7 @@ public class AuthorizationRequestHandler implements MuleContextAware
                         .setClientId(oauthConfig.getClientId())
                         .setClientSecret(oauthConfig.getClientSecret())
                         .setCustomParameters(customParameters)
-                        .setRedirectUrl(oauthConfig.getRedirectionUrl())
+                        .setRedirectUrl(oauthConfig.getExternalRedirectionUrl())
                         .setState(stateEncoder.getEncodedState())
                         .setScope(scopes).buildUrl();
 
