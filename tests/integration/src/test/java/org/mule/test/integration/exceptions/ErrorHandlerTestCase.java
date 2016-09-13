@@ -16,7 +16,7 @@ import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ResolverException;

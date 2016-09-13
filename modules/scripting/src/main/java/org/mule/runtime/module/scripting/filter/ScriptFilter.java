@@ -11,7 +11,7 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.module.scripting.component.Scriptable.BINDING_MESSAGE;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

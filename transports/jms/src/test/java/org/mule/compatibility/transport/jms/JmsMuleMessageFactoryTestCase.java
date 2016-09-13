@@ -13,8 +13,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactoryTestCase;
-import org.mule.compatibility.transport.jms.JmsMuleMessageFactory;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import javax.jms.TextMessage;
 

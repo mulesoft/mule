@@ -13,7 +13,7 @@ import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageFunction;

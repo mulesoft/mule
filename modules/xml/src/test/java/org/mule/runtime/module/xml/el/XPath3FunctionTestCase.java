@@ -17,7 +17,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.runtime.module.xml.xpath.XPathReturnType;

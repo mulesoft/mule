@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_ORIGINATING_E
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;

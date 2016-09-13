@@ -12,11 +12,11 @@ import static org.mule.runtime.core.context.notification.ExceptionStrategyNotifi
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Stoppable;

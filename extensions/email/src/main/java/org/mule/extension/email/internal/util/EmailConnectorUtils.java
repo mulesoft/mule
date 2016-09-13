@@ -15,7 +15,7 @@ import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 

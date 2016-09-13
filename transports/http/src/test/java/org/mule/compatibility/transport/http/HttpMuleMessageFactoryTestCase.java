@@ -22,7 +22,7 @@ import org.mule.compatibility.core.api.transport.MessageTypeNotSupportedExceptio
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

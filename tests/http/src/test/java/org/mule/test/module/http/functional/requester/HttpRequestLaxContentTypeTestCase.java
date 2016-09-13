@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;

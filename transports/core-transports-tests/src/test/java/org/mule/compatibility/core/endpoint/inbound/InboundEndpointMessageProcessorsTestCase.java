@@ -14,7 +14,7 @@ import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;

@@ -21,7 +21,7 @@ import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsTransactionFactory;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.transaction.Transaction;

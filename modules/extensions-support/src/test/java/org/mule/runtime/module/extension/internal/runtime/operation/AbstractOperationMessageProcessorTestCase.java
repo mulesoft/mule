@@ -40,7 +40,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;

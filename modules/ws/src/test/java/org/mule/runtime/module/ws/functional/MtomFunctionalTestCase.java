@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;

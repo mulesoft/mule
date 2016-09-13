@@ -9,7 +9,7 @@ package org.mule.compatibility.core.endpoint.inbound;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringMessageUtils;

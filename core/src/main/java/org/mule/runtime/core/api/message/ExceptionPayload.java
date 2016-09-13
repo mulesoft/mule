@@ -4,14 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.runtime.core.api.message;
 
 import java.io.Serializable;
 import java.util.Map;
 
 /**
  * <code>ExceptionPayload</code> is a message payload that contains exception information that occurred during message processing.
+ *
+ * @Deprecated Use {@link org.mule.runtime.api.message.Error} with {@link org.mule.runtime.api.message.MuleEvent} instead.
  */
+@Deprecated
 public interface ExceptionPayload extends Serializable {
 
   int getCode();

@@ -24,6 +24,7 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -57,7 +58,7 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
     FlowConstruct flow = mock(FlowConstruct.class);
     when(flow.getMuleContext()).thenReturn(muleContext);
     event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(org.mule.runtime.core.api.InternalMessage.builder().payload("").attributes(attributes).build()).build();
+        .message(InternalMessage.builder().payload("").attributes(attributes).build()).build();
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);
   }

@@ -9,7 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.mule.runtime.core.config.i18n.CoreMessages.objectNotOfCorrectType;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.LinkedList;
 import java.util.List;

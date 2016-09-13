@@ -17,7 +17,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.tck.size.SmallTest;

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MessageReceiver;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;

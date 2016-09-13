@@ -15,7 +15,7 @@ import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;

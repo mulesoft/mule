@@ -8,7 +8,7 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.Matchers.instanceOf;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;
 import org.mule.test.AbstractIntegrationTestCase;

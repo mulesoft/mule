@@ -17,7 +17,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;

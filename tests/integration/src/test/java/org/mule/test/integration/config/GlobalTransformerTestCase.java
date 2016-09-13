@@ -8,7 +8,7 @@ package org.mule.test.integration.config;
 
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 

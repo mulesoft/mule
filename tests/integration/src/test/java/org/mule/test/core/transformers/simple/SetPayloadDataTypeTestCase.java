@@ -11,7 +11,7 @@ import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;

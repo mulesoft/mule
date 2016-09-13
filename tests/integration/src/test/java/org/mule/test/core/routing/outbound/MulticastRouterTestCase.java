@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.exception.MessagingException;

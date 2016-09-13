@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf.support;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.util.Collection;

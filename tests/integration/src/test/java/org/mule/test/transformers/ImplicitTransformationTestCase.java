@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.util.IOUtils;

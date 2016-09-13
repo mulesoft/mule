@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPE
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.session.DefaultMuleSession;

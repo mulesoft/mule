@@ -16,7 +16,7 @@ import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.compatibility.transport.ssl.MockSslSocket;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.construct.Flow;

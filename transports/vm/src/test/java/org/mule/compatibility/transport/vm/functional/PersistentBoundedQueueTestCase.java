@@ -13,13 +13,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class PersistentBoundedQueueTestCase extends FunctionalTestCase {

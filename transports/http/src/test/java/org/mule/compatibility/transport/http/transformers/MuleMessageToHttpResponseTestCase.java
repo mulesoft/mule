@@ -21,7 +21,7 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -30,7 +30,6 @@ import org.mule.tck.size.SmallTest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;

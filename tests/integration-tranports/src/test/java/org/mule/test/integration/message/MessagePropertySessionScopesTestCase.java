@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;

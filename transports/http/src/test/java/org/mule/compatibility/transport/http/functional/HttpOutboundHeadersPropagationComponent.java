@@ -7,7 +7,7 @@
 package org.mule.compatibility.transport.http.functional;
 
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import java.util.Map;

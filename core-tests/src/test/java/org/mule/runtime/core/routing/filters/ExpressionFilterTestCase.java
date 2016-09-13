@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;

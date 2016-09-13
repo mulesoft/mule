@@ -17,10 +17,9 @@ import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.AUTHORIZATION;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.config.i18n.I18nMessage;

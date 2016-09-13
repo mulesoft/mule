@@ -13,7 +13,7 @@ import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;

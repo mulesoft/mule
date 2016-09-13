@@ -12,7 +12,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.exception.MessagingException;

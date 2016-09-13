@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.module.ws.consumer.SoapFaultException;
 

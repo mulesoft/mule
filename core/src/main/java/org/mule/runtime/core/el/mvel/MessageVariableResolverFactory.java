@@ -10,7 +10,7 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.mvel2.integration.VariableResolver;
 import org.mule.mvel2.integration.VariableResolverFactory;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.el.context.FlowVariableMapContext;
 import org.mule.runtime.core.el.context.MessageContext;

@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 

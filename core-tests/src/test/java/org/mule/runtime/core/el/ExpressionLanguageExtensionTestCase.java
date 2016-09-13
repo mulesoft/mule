@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import org.mule.mvel2.compiler.AbstractParser;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;

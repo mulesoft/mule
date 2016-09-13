@@ -9,7 +9,7 @@ package org.mule.runtime.core.retry.async;
 import java.util.Map;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 
 /**

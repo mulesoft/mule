@@ -11,7 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.expression.transformers.BeanBuilderTransformer;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;

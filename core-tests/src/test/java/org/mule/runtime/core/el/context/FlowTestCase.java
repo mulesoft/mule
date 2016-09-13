@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 

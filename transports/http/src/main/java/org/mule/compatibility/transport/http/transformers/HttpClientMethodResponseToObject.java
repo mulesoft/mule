@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.transformers;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.ReleasingInputStream;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 

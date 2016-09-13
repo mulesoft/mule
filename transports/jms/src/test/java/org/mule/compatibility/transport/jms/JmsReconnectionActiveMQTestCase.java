@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.listener.ConnectionListener;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ConnectionNotification;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;

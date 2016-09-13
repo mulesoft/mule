@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.retry;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.Map;
 

@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.file.filters;
 
 import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 
 import java.io.File;

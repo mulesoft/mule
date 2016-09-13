@@ -8,12 +8,13 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 
 /**
  * <code>AbstractCorrelationAggregatingMessageProcessor</code> uses the CorrelationID and CorrelationGroupSize properties of the
- * {@link org.mule.runtime.core.api.InternalMessage} to manage message groups.
+ * {@link InternalMessage} to manage message groups.
  */
 public abstract class AbstractCorrelationAggregator extends AbstractAggregator {
 

@@ -37,6 +37,7 @@
         <scripting:component>
             <scripting:script engine="groovy"><![CDATA[
                     import org.mule.runtime.core.api.*;
+                    import org.mule.runtime.core.api.message.*;
 
                      String jmsUrl = "jms://fcs.cache.update.queue?connector=jmsConnector";
                     long timeout = 100L;

@@ -28,7 +28,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.extension.api.introspection.ImmutableOutputModel;

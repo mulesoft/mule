@@ -21,7 +21,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPE
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;

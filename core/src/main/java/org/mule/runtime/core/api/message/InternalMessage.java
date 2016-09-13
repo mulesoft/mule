@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.runtime.core.api.message;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.message.Message;

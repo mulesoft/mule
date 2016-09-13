@@ -29,7 +29,7 @@ import org.mule.compatibility.transport.http.HttpRequest;
 import org.mule.compatibility.transport.http.RequestLine;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.Serializable;

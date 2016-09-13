@@ -14,7 +14,7 @@ import org.mule.compatibility.core.transport.TransactedPollingMessageReceiver;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
 import org.mule.compatibility.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;

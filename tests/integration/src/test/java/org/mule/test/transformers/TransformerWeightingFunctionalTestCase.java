@@ -8,7 +8,7 @@ package org.mule.test.transformers;
 
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;

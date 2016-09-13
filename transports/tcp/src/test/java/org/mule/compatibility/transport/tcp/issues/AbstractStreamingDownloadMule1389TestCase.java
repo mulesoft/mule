@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;

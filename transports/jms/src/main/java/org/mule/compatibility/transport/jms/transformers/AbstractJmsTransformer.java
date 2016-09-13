@@ -13,7 +13,7 @@ import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.JmsConstants;
 import org.mule.compatibility.transport.jms.JmsMessageUtils;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;

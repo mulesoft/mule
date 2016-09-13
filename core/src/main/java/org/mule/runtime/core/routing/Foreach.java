@@ -14,7 +14,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;

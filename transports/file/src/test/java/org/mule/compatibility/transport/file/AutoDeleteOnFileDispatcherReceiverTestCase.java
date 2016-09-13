@@ -13,7 +13,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 import org.mule.tck.probe.PollingProber;

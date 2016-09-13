@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.tcp.protocols;
 
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.runtime.core.ResponseOutputStream;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.util.ClassUtils;

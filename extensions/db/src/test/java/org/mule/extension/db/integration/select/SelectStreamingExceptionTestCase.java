@@ -16,7 +16,7 @@ import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.List;
 

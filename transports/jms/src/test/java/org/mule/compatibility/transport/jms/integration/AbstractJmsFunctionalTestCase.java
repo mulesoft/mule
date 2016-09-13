@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -50,7 +50,6 @@ import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
-import org.hamcrest.core.Is;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

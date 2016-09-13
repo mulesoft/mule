@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;

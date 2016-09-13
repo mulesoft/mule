@@ -14,11 +14,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import org.hamcrest.core.Is;
 import org.junit.Rule;
 import org.junit.Test;
 

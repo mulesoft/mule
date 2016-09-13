@@ -7,9 +7,9 @@
 package org.mule.runtime.core.routing.filters;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.ClassUtils;
 
 import java.util.Optional;

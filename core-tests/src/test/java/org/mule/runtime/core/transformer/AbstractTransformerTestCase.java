@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.IOUtils;

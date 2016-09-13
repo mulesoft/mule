@@ -10,7 +10,7 @@ package org.mule.test.module.http.functional.requester;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;

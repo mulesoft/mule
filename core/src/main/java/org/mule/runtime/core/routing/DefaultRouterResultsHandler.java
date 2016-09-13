@@ -13,7 +13,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ import java.util.List;
 /**
  * The default results handler for all outbound endpoint. Depending on the number of messages passed it the returning message will
  * be different. If the 'results' param is null or empty, null is returned. If the 'results' param contains a single
- * {@link org.mule.runtime.core.api.InternalMessage}, than that message is returned.
+ * {@link InternalMessage}, than that message is returned.
  * <p/>
  * Note that right now (as of Mule 2.0.1) this SPI is not pluggable and this implementation is the default and only
  * implementation.
  *
- * @see org.mule.runtime.core.api.InternalMessage
+ * @see InternalMessage
  * @see org.mule.runtime.core.DefaultMessageCollection
  */
 public class DefaultRouterResultsHandler implements RouterResultsHandler {

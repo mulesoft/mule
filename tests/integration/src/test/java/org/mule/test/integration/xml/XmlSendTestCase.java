@@ -14,7 +14,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;

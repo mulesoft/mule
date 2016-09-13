@@ -40,7 +40,7 @@ import org.mule.compatibility.core.transformer.simple.ResponseAppendTransformer;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.routing.filter.FilterUnacceptedException;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.json.transformers;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

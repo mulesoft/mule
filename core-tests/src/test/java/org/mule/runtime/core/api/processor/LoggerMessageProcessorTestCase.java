@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleTestCase;

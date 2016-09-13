@@ -15,7 +15,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHOR
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;

@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;

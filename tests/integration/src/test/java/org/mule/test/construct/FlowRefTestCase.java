@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;

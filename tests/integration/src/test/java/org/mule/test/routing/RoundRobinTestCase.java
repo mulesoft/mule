@@ -8,7 +8,7 @@ package org.mule.test.routing;
 
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.ArrayList;

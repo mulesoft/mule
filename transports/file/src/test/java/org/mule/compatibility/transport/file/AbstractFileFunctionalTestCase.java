@@ -12,9 +12,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
-import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 

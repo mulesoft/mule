@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;

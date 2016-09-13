@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -233,7 +234,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                   addThrottlingHeaders(failureResponseBuilder);
                   Event event = messagingException.getEvent();
                   Event exceptionEvent = Event
-                      .builder(event).message(org.mule.runtime.core.api.InternalMessage
+                      .builder(event).message(InternalMessage
                           .builder(event.getMessage()).payload(actualException.getMessage()).build())
                       .build();
 

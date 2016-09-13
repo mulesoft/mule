@@ -8,8 +8,8 @@ package org.mule.compatibility.core.processor.simple;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.api.InternalMessage.Builder;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.simple.SimpleMessageProcessor;

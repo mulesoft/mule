@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.A;
 import org.mule.test.transformers.GraphTransformerResolutionTestCase.B;
 

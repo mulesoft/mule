@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.core.message;
 
-import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.message.DefaultMessageBuilder;
 import org.mule.runtime.core.message.GroupCorrelation;
 

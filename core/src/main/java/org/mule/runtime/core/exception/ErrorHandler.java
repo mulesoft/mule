@@ -8,7 +8,7 @@ package org.mule.runtime.core.exception;
 
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;

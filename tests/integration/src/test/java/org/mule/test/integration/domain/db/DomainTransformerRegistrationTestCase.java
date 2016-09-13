@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 

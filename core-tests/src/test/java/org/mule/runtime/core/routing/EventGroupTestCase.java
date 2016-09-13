@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;

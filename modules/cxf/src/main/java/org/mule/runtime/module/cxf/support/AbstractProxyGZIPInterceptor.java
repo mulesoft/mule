@@ -9,7 +9,7 @@ package org.mule.runtime.module.cxf.support;
 
 import static com.google.common.net.HttpHeaders.CONTENT_ENCODING;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.Arrays;
 import java.util.List;

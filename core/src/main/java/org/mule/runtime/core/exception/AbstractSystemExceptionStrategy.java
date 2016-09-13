@@ -9,9 +9,9 @@ package org.mule.runtime.core.exception;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.connector.ConnectException;

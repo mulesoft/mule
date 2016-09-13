@@ -29,6 +29,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
@@ -103,7 +104,7 @@ public class ExtensionMessageSource extends ExtensionComponent
   public void handle(Message message,
                      CompletionHandler<org.mule.runtime.api.message.MuleEvent, Exception, org.mule.runtime.api.message.MuleEvent> completionHandler) {
     Event event = Event.builder(create(flowConstruct, getConfigurationProviderName()))
-        .message((org.mule.runtime.core.api.InternalMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
+        .message((InternalMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
         .build();
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, downCast(completionHandler)),
@@ -113,7 +114,7 @@ public class ExtensionMessageSource extends ExtensionComponent
   @Override
   public void handle(Message message) {
     Event event = Event.builder(create(flowConstruct, getConfigurationProviderName()))
-        .message((org.mule.runtime.core.api.InternalMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
+        .message((InternalMessage) message).exchangePattern(REQUEST_RESPONSE).flow(flowConstruct)
         .build();
     messageProcessingManager
         .processMessage(new ExtensionFlowProcessingTemplate(event, messageProcessor, new NullCompletionHandler()),

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.api.transport;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 
 import java.io.OutputStream;

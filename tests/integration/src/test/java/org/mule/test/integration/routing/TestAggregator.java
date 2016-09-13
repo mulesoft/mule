@@ -8,7 +8,7 @@ package org.mule.test.integration.routing;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.routing.AbstractAggregator;

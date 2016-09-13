@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.jms.i18n;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.ClassUtils;

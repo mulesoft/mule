@@ -12,7 +12,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.Processor;

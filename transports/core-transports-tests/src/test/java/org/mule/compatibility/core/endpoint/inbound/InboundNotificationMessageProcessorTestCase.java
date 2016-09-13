@@ -14,7 +14,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.concurrent.TimeUnit;

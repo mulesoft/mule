@@ -14,7 +14,7 @@ import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.util.FileUtils;

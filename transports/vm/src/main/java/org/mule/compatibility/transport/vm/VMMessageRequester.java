@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.vm;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.queue.Queue;
 import org.mule.runtime.core.util.queue.QueueSession;
 

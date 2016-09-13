@@ -15,7 +15,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;

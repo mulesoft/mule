@@ -14,7 +14,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

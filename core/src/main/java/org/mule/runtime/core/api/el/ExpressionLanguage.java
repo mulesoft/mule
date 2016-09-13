@@ -10,6 +10,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 import java.util.Map;
@@ -55,7 +56,7 @@ public interface ExpressionLanguage {
    * language implementation should provided access to the message.
    *
    * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link Event} or
-   * {@link org.mule.runtime.core.api.InternalMessage} mutation performed within the expression will impact within the context of
+   * {@link InternalMessage} mutation performed within the expression will impact within the context of
    * expression evaluation but will not mutated the {@code event} parameter.
    * 
    * @param <T> the return type expected
@@ -70,7 +71,7 @@ public interface ExpressionLanguage {
    * Execute the expression returning the result. The expression will be executed with MuleEvent context, meaning the expression
    * language implementation should provided access to the message.
    *
-   * This version of {@code evaluate} allows {@link Event} or {@link org.mule.runtime.core.api.InternalMessage} mutation performed
+   * This version of {@code evaluate} allows {@link Event} or {@link InternalMessage} mutation performed
    * within the expression to be maintained post-evaluation via the use of a result
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
@@ -92,7 +93,7 @@ public interface ExpressionLanguage {
    * provided by the expression language implementation.
    *
    * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link Event} or
-   * {@link org.mule.runtime.core.api.InternalMessage} mutation performed within the expression will impact within the context of
+   * {@link InternalMessage} mutation performed within the expression will impact within the context of
    * expression evaluation but will not mutated the {@code event} parameter.
    *
    * @param <T> the return type expected
@@ -110,7 +111,7 @@ public interface ExpressionLanguage {
    * expression when executed. Variable provided in the map will only be available if there are no conflict with context variables
    * provided by the expression language implementation.
    *
-   * This version of {@code evaluate} allows {@link Event} or {@link org.mule.runtime.core.api.InternalMessage} mutation performed
+   * This version of {@code evaluate} allows {@link Event} or {@link InternalMessage} mutation performed
    * within the expression to be maintained post-evaluation via the use of a result
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
@@ -129,7 +130,7 @@ public interface ExpressionLanguage {
   /**
    * Enriches an event.
    *
-   * This version of {@code enrich} allows {@link Event} or {@link org.mule.runtime.core.api.InternalMessage} mutation performed
+   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed
    * within the expression to be maintained post-evaluation via the use of a result
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
@@ -145,7 +146,7 @@ public interface ExpressionLanguage {
   /**
    * Enriches an event using a typed value.
    *
-   * This version of {@code enrich} allows {@link Event} or {@link org.mule.runtime.core.api.InternalMessage} mutation performed
+   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed
    * within the expression to be maintained post-evaluation via the use of a result
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
@@ -166,13 +167,13 @@ public interface ExpressionLanguage {
 
   /**
    * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link Event} or
-   * {@link org.mule.runtime.core.api.InternalMessage} mutation performed within the expression will impact within the context of
+   * {@link InternalMessage} mutation performed within the expression will impact within the context of
    * expression evaluation but will not mutated the {@code event} parameter.
    */
   DefaultTypedValue evaluateTyped(String expression, Event event, FlowConstruct flowConstruct);
 
   /**
-   * This version of {@code enrich} allows {@link Event} or {@link org.mule.runtime.core.api.InternalMessage} mutation performed
+   * This version of {@code enrich} allows {@link Event} or {@link InternalMessage} mutation performed
    * within the expression to be maintained post-evaluation via the use of a result
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.
@@ -184,7 +185,7 @@ public interface ExpressionLanguage {
    * evaluate a single expression they can use {@link #evaluate(String, Event, FlowConstruct, Map)}.
    *
    * This version of {@code evaluate} performs expression evaulation on an immutable event. Any {@link Event} or
-   * {@link org.mule.runtime.core.api.InternalMessage} mutation performed within the expression will impact within the context of
+   * {@link InternalMessage} mutation performed within the expression will impact within the context of
    * expression evaluation but will not mutated the {@code event} parameter.
    *
    * @param expression one or more expressions ebedded in a literal string i.e. "Value is #[xpath://foo] other value is
@@ -201,7 +202,7 @@ public interface ExpressionLanguage {
    * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If a user needs to
    * evaluate a single expression they can use {@link #evaluate(String, Event, FlowConstruct, Map)}.
    *
-   * This version of {@code parse} allows {@link Event} or {@link org.mule.runtime.core.api.InternalMessage} mutation performed
+   * This version of {@code parse} allows {@link Event} or {@link InternalMessage} mutation performed
    * within the expression to be maintained post-evaluation via the use of a result
    * {@link org.mule.runtime.core.api.Event.Builder} which should be created from the original event before being passed and then
    * used to construct the post-evaluation event.

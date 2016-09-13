@@ -7,7 +7,7 @@
 package org.mule.runtime.core.api.routing.filter;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * The <code>Filter</code> interface allows Message filtering.

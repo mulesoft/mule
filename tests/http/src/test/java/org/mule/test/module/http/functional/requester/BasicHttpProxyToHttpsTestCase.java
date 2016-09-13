@@ -11,7 +11,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.IOException;
 

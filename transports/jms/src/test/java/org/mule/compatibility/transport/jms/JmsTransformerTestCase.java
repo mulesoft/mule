@@ -14,7 +14,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 
 import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

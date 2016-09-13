@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
 
 /**
@@ -44,7 +45,7 @@ final class ValueReturnDelegate extends AbstractReturnDelegate {
   @Override
   public Event asReturnValue(Object value, OperationContextAdapter operationContext) {
     return Event.builder(operationContext.getEvent())
-        .message((org.mule.runtime.core.api.InternalMessage) toMessage(value, operationContext)).build();
+        .message((InternalMessage) toMessage(value, operationContext)).build();
   }
 
 

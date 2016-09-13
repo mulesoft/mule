@@ -7,7 +7,7 @@
 package org.mule.runtime.core.routing.filters;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * Negative version of {@link org.mule.runtime.core.routing.filters.WildcardFilter}

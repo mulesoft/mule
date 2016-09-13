@@ -10,7 +10,7 @@ import static org.mule.runtime.module.xml.filters.SchemaValidationFilter.DEFAULT
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.json.validation.ValidateJsonSchemaMessageProcessor;

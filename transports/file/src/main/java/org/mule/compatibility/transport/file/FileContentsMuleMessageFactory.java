@@ -6,7 +6,6 @@
  */
 package org.mule.compatibility.transport.file;
 
-import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 
 import java.io.File;

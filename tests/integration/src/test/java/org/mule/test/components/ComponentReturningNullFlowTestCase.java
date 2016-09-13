@@ -11,7 +11,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;

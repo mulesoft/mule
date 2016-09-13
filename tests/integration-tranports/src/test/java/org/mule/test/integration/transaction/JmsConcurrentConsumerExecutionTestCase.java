@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.construct.Flow;
@@ -20,7 +20,6 @@ import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
-import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Ignore;
 import org.junit.Test;

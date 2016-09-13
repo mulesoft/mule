@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;

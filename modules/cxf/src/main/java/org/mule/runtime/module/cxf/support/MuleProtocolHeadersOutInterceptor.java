@@ -15,7 +15,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.cxf.CxfConstants;
 
 import java.io.Serializable;

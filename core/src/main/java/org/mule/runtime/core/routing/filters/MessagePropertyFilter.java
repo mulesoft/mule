@@ -14,7 +14,7 @@ import static org.mule.runtime.core.util.ClassUtils.hash;
 
 import org.mule.runtime.core.PropertyScope;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.util.StringUtils;
 

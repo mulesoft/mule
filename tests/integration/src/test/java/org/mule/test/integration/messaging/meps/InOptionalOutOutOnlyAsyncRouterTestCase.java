@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;

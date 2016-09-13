@@ -12,7 +12,7 @@ import org.mule.compatibility.core.api.component.InterfaceBinding;
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.lang.reflect.InvocationHandler;

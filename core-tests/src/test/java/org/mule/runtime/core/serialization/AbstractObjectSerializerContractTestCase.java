@@ -14,7 +14,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.el.datetime.DateTime;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

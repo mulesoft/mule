@@ -23,7 +23,7 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

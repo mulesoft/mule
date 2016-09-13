@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

@@ -21,7 +21,7 @@ import static org.mule.runtime.module.http.internal.util.HttpToMuleMessage.getMe
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.session.DefaultMuleSession;

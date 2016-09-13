@@ -25,7 +25,7 @@ import static org.mule.runtime.core.transaction.TransactionTemplateTestUtils.get
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;

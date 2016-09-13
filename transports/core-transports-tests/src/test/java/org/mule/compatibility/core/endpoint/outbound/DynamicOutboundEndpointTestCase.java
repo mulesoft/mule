@@ -44,7 +44,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.api.routing.filter.Filter;

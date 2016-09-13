@@ -13,7 +13,7 @@ import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.nio.charset.Charset;

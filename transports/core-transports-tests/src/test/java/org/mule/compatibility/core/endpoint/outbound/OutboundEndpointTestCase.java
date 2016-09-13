@@ -43,7 +43,7 @@ import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;

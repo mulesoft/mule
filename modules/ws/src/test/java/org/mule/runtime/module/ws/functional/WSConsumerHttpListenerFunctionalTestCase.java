@@ -10,7 +10,7 @@ package org.mule.runtime.module.ws.functional;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.DynamicPort;
 
