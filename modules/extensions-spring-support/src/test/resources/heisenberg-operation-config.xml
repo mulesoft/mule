@@ -223,4 +223,14 @@
             </heisenberg:investment>
         </heisenberg:approve>
     </flow>
+    
+    <flow name="processSale">
+        <heisenberg:process-sale >
+            <heisenberg:sales>
+                <heisenberg:sale key="Dean" >
+                    <heisenberg:sale-info details="Some detail" amount="500" />
+                </heisenberg:sale>
+            </heisenberg:sales>
+        </heisenberg:process-sale>
+    </flow>
 </mule>

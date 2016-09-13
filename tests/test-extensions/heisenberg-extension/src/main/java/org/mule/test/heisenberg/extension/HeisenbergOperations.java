@@ -6,9 +6,6 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -36,6 +33,7 @@ import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 
@@ -46,6 +44,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 
 public class HeisenbergOperations {
 
@@ -183,6 +185,10 @@ public class HeisenbergOperations {
 
   public int[][] getGramsInStorage(@Optional(defaultValue = PAYLOAD) int[][] grams) {
     return grams;
+  }
+
+  public Map<String, SaleInfo> processSale(Map<String, SaleInfo> sales) {
+    return sales;
   }
 
   @Ignore
