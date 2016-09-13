@@ -229,6 +229,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     if (isMulePlugin(rootArtifact)) {
       logger.debug("rootArtifact '{}' identified as Mule plugin", rootArtifact);
+      //TODO(pablo.kraan): isoaltion - acá está bien que pase el context posta
       buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, pluginsClassified);
 
       pluginsArtifacts = pluginsArtifacts.stream()
@@ -278,7 +279,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
         pluginUrlClassification.getExportedPackages().removeAll(dependencyPlugin.getExportedPackages());
       }
-
     }
 
     return new ArrayList<>(classifiedPluginUrls.values());
@@ -355,7 +355,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     PluginClassificationNode pluginUrlClassification = new PluginClassificationNode(toClassifierLessId(pluginArtifact),
                                                                                     urls,
                                                                                     newArrayList(context
-                                                                                        .getExportPluginClasses()),
+                                                                                        .getExportPluginClasses(pluginArtifact)),
                                                                                     pluginDependencies);
     pluginsClassified.put(pluginArtifact, pluginUrlClassification);
   }

@@ -8,6 +8,7 @@
 package org.mule.functional.api.classloading.isolation;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 
 import java.io.File;
@@ -189,9 +190,15 @@ public class ClassPathClassifierContext {
   /**
    * @return {@link List} of {@link Class}es that are going to be exported in addition to the ones already exported by plugins.
    *         For testing purposes only.
+   * @param pluginArtifact
    */
-  public List<Class> getExportPluginClasses() {
-    return this.exportPluginClasses;
+  public List<Class> getExportPluginClasses(Artifact pluginArtifact) {
+    // Plugin exported classes must come form the root artifact
+    if (pluginArtifact == rootArtifact) {
+      return this.exportPluginClasses;
+    } else {
+      return emptyList();
+    }
   }
 
   /**
