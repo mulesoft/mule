@@ -7,11 +7,11 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.command.DeleteCommand;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.command.DeleteCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,11 +20,10 @@ import java.nio.file.Paths;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class FtpDeleteCommand extends ClassicFtpCommand implements DeleteCommand {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(FtpDeleteCommand.class);
+  private static Logger LOGGER = getLogger(FtpDeleteCommand.class);
 
   /**
    * {@inheritDoc}
@@ -37,8 +36,8 @@ public final class FtpDeleteCommand extends ClassicFtpCommand implements DeleteC
    * {@inheritDoc}
    */
   @Override
-  public void delete(FileConnectorConfig config, String filePath) {
-    FileAttributes fileAttributes = getExistingFile(config, filePath);
+  public void delete(String filePath) {
+    FileAttributes fileAttributes = getExistingFile(filePath);
     boolean isDirectory = fileAttributes.isDirectory();
     Path path = Paths.get(fileAttributes.getPath());
 

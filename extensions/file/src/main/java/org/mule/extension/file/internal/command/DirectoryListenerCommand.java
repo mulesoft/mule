@@ -8,7 +8,6 @@ package org.mule.extension.file.internal.command;
 
 import org.mule.extension.file.internal.DirectoryListener;
 import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,14 +29,13 @@ public class DirectoryListenerCommand extends LocalFileCommand {
   /**
    * Resolves the root path on which the listener needs to be created
    *
-   * @param config the listener's config
    * @param directory the path that the user configured on the listener
    * @return the resolved {@link Path} to listen on
    */
-  public Path resolveRootPath(FileConnectorConfig config, String directory) {
-    Path directoryPath = directory == null ? Paths.get(config.getWorkingDir())
-        : Paths.get(config.getWorkingDir()).resolve(directory).toAbsolutePath();
+  public Path resolveRootPath(String directory) {
+    Path directoryPath = directory == null ? Paths.get(fileSystem.getBasePath())
+        : Paths.get(fileSystem.getBasePath()).resolve(directory).toAbsolutePath();
 
-    return resolveExistingPath(config, directoryPath.toAbsolutePath().toString());
+    return resolveExistingPath(directoryPath.toAbsolutePath().toString());
   }
 }

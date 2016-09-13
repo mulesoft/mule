@@ -10,9 +10,8 @@ import static java.lang.String.format;
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.walkFileTree;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.command.DeleteCommand;
+import org.mule.extension.file.internal.LocalFileSystem;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -45,8 +44,8 @@ public final class LocalDeleteCommand extends LocalFileCommand implements Delete
    * {@inheritDoc}
    */
   @Override
-  public void delete(FileConnectorConfig config, String filePath) {
-    Path path = resolveExistingPath(config, filePath);
+  public void delete(String filePath) {
+    Path path = resolveExistingPath(filePath);
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Preparing to delete '{}'", path);

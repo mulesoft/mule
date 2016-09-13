@@ -8,6 +8,18 @@ package org.mule.extension.file.internal;
 
 import static java.nio.file.StandardOpenOption.WRITE;
 import org.mule.extension.file.api.LocalFileAttributes;
+import org.mule.extension.file.common.api.AbstractFileSystem;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileSystem;
+import org.mule.extension.file.common.api.command.CopyCommand;
+import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
+import org.mule.extension.file.common.api.command.DeleteCommand;
+import org.mule.extension.file.common.api.command.ListCommand;
+import org.mule.extension.file.common.api.command.MoveCommand;
+import org.mule.extension.file.common.api.command.ReadCommand;
+import org.mule.extension.file.common.api.command.RenameCommand;
+import org.mule.extension.file.common.api.command.WriteCommand;
+import org.mule.extension.file.common.api.lock.PathLock;
 import org.mule.extension.file.internal.command.LocalCopyCommand;
 import org.mule.extension.file.internal.command.LocalCreateDirectoryCommand;
 import org.mule.extension.file.internal.command.LocalDeleteCommand;
@@ -19,19 +31,6 @@ import org.mule.extension.file.internal.command.LocalWriteCommand;
 import org.mule.extension.file.internal.lock.LocalPathLock;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.extension.file.common.api.AbstractFileSystem;
-import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.FileSystem;
-import org.mule.extension.file.common.api.command.CopyCommand;
-import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
-import org.mule.extension.file.common.api.command.DeleteCommand;
-import org.mule.extension.file.common.api.command.ListCommand;
-import org.mule.extension.file.common.api.command.MoveCommand;
-import org.mule.extension.file.common.api.command.ReadCommand;
-import org.mule.extension.file.common.api.command.RenameCommand;
-import org.mule.extension.file.common.api.command.WriteCommand;
-import org.mule.extension.file.common.api.lock.PathLock;
 
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -60,7 +59,9 @@ public final class LocalFileSystem extends AbstractFileSystem {
   /**
    * Creates a new instance
    */
-  public LocalFileSystem(MuleContext muleContext) {
+  public LocalFileSystem(String basePath, MuleContext muleContext) {
+    super(basePath);
+
     copyCommand = new LocalCopyCommand(this);
     createDirectoryCommand = new LocalCreateDirectoryCommand(this);
     deleteCommand = new LocalDeleteCommand(this);
@@ -120,7 +121,7 @@ public final class LocalFileSystem extends AbstractFileSystem {
    * No-op implementation.
    */
   @Override
-  public void changeToBaseDir(FileConnectorConfig config) {}
+  public void changeToBaseDir() {}
 
   /**
    * {@inheritDoc}
@@ -129,5 +130,4 @@ public final class LocalFileSystem extends AbstractFileSystem {
   public Class<? extends FileAttributes> getAttributesType() {
     return LocalFileAttributes.class;
   }
-
 }

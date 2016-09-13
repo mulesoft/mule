@@ -7,22 +7,21 @@
 package org.mule.extension.ftp.internal.sftp.command;
 
 import static java.lang.String.format;
-import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
-import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
-import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.MuleContext;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
+import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
+import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.io.OutputStream;
 import java.nio.file.Path;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link SftpCommand} which implements the {@link WriteCommand} contract
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class SftpWriteCommand extends SftpCommand implements WriteCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SftpWriteCommand.class);
+  private static final Logger LOGGER = getLogger(SftpWriteCommand.class);
 
   private final MuleContext muleContext;
 
@@ -47,13 +46,13 @@ public final class SftpWriteCommand extends SftpCommand implements WriteCommand 
    * {@inheritDoc}
    */
   @Override
-  public void write(FileConnectorConfig config, String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
                     boolean lock, boolean createParentDirectory, String encoding) {
-    Path path = resolvePath(config, filePath);
-    FileAttributes file = getFile(config, filePath);
+    Path path = resolvePath(filePath);
+    FileAttributes file = getFile(filePath);
 
     if (file == null) {
-      assureParentFolderExists(config, path, createParentDirectory);
+      assureParentFolderExists(path, createParentDirectory);
     } else {
       if (mode == FileWriteMode.CREATE_NEW) {
         throw new IllegalArgumentException(String.format(

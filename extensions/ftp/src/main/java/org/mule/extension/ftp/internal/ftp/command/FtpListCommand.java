@@ -7,15 +7,15 @@
 package org.mule.extension.ftp.internal.ftp.command;
 
 import static java.lang.String.format;
-
-import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
-import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
-import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.util.ArrayUtils;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.TreeNode;
 import org.mule.extension.file.common.api.command.ListCommand;
+import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
+import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.util.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,7 +27,6 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ClassicFtpCommand} which implements the {@link ListCommand} contract
@@ -36,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class FtpListCommand extends ClassicFtpCommand implements ListCommand {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FtpListCommand.class);
+  private static final Logger LOGGER = getLogger(FtpListCommand.class);
   private static final int FTP_LIST_PAGE_SIZE = 25;
 
   /**
@@ -52,7 +51,7 @@ public final class FtpListCommand extends ClassicFtpCommand implements ListComma
   @Override
   public TreeNode list(FileConnectorConfig config, String directoryPath, boolean recursive, Message message,
                        Predicate<FileAttributes> matcher) {
-    FileAttributes directoryAttributes = getExistingFile(config, directoryPath);
+    FileAttributes directoryAttributes = getExistingFile(directoryPath);
     Path path = Paths.get(directoryAttributes.getPath());
 
     if (!directoryAttributes.isDirectory()) {

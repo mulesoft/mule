@@ -7,10 +7,10 @@
 package org.mule.extension.file.internal.command;
 
 import static java.lang.String.format;
-import org.mule.extension.file.internal.FileConnector;
-import org.mule.extension.file.internal.LocalFileSystem;
 import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FileSystem;
 import org.mule.extension.file.common.api.command.FileCommand;
+import org.mule.extension.file.internal.LocalFileSystem;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -32,18 +32,18 @@ abstract class LocalFileCommand extends FileCommand<LocalFileSystem> {
   }
 
   /**
-   * @return a {@link Path} derived from {@link FileConnector#getWorkingDir()}
+   * {@inheritDoc}
    */
   @Override
-  protected Path getBasePath(FileConnectorConfig config) {
-    return Paths.get(config.getWorkingDir());
+  protected Path getBasePath(FileSystem fileSystem) {
+    return Paths.get(fileSystem.getBasePath());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  protected boolean exists(FileConnectorConfig config, Path path) {
+  protected boolean exists(Path path) {
     return Files.exists(path);
   }
 
@@ -53,7 +53,7 @@ abstract class LocalFileCommand extends FileCommand<LocalFileSystem> {
    * @param directoryPath a {@link Path} pointing to the directory you want to create
    */
   @Override
-  protected void doMkDirs(FileConnectorConfig config, Path directoryPath) {
+  protected void doMkDirs(Path directoryPath) {
     File target = directoryPath.toFile();
     try {
       if (!target.mkdirs()) {

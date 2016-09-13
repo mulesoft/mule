@@ -69,7 +69,7 @@ public class StandardFileSystemOperations {
                        @Optional(defaultValue = "false") boolean recursive, Message message,
                        @Optional @Summary("Matcher to filter the listed files") @Placement(
                            group = FileDisplayConstants.MATCHER) FilePredicateBuilder matchWith) {
-    fileSystem.changeToBaseDir(config);
+    fileSystem.changeToBaseDir();
     return fileSystem.list(config, directoryPath, recursive, message, getPredicate(matchWith));
   }
 
@@ -102,7 +102,7 @@ public class StandardFileSystemOperations {
                                                            @Connection FileSystem fileSystem, Message message,
                                                            @DisplayName("File Path") String path,
                                                            @Optional(defaultValue = "false") boolean lock) {
-    fileSystem.changeToBaseDir(config);
+    fileSystem.changeToBaseDir();
     return fileSystem.read(config, message, path, lock);
   }
 
@@ -161,14 +161,14 @@ public class StandardFileSystemOperations {
       throw new IllegalArgumentException("Cannot write a null content");
     }
 
-    fileSystem.changeToBaseDir(config);
+    fileSystem.changeToBaseDir();
     path = resolvePath(path, event, "path");
 
     if (encoding == null) {
       encoding = config.getDefaultWriteEncoding();
     }
 
-    fileSystem.write(config, path, content, mode, event, lock, createParentDirectories, encoding);
+    fileSystem.write(path, content, mode, event, lock, createParentDirectories, encoding);
   }
 
   /**
@@ -206,7 +206,7 @@ public class StandardFileSystemOperations {
   public void copy(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "false") boolean overwrite,
                    @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
-    fileSystem.changeToBaseDir(config);
+    fileSystem.changeToBaseDir();
     validateTargetPath(targetPath);
     sourcePath = resolvePath(sourcePath, event, "sourcePath");
     fileSystem.copy(config, sourcePath, targetPath, overwrite, createParentDirectories, event);
@@ -253,7 +253,7 @@ public class StandardFileSystemOperations {
   public void move(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String sourcePath,
                    String targetPath, @Optional(defaultValue = "false") boolean overwrite,
                    @Optional(defaultValue = "true") boolean createParentDirectories, Event event) {
-    fileSystem.changeToBaseDir(config);
+    fileSystem.changeToBaseDir();
     validateTargetPath(targetPath);
     sourcePath = resolvePath(sourcePath, event, "sourcePath");
     fileSystem.move(config, sourcePath, targetPath, overwrite, createParentDirectories);
@@ -267,18 +267,16 @@ public class StandardFileSystemOperations {
    * {@link FileAttributes#getPath()} will be used. If that's not the case, then an {@link IllegalArgumentException} will be
    * thrown.
    *
-   * @param config the config that is parameterizing this operation
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path the path to the file to be deleted
    * @param event The current {@link Event}
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
   @Summary("Deletes a file")
-  public void delete(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
-                     Event event) {
-    fileSystem.changeToBaseDir(config);
+  public void delete(@Connection FileSystem fileSystem, @Optional String path, Event event) {
+    fileSystem.changeToBaseDir();
     path = resolvePath(path, event, "path");
-    fileSystem.delete(config, path);
+    fileSystem.delete(path);
   }
 
   /**
@@ -292,7 +290,6 @@ public class StandardFileSystemOperations {
    * {@code to} argument should not contain any path separator. {@link IllegalArgumentException} will be thrown if this
    * precondition is not honored.
    *
-   * @param config the config that is parameterizing this operation
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param path the path to the file to be renamed
    * @param to the file's new name
@@ -301,27 +298,26 @@ public class StandardFileSystemOperations {
    */
   // TODO: MULE-9715
   @Summary("Renames a file")
-  public void rename(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, @Optional String path,
+  public void rename(@Connection FileSystem fileSystem, @Optional String path,
                      @DisplayName("New Name") String to, @Optional(defaultValue = "false") boolean overwrite, Event event) {
     checkArgument(get(to).getNameCount() == 1,
                   format("'to' parameter of rename operation should not contain any file separator character but '%s' was received",
                          to));
-    fileSystem.changeToBaseDir(config);
+    fileSystem.changeToBaseDir();
     path = resolvePath(path, event, "path");
-    fileSystem.rename(config, path, to, overwrite);
+    fileSystem.rename(path, to, overwrite);
   }
 
   /**
    * Creates a new directory on {@code directoryPath}
    *
-   * @param config the config that is parameterizing this operation
    * @param fileSystem a reference to the host {@link FileSystem}
    * @param directoryPath the new directory's name
    */
   @Summary("Creates a new directory")
-  public void createDirectory(@UseConfig FileConnectorConfig config, @Connection FileSystem fileSystem, String directoryPath) {
-    fileSystem.changeToBaseDir(config);
-    fileSystem.createDirectory(config, directoryPath);
+  public void createDirectory(@Connection FileSystem fileSystem, String directoryPath) {
+    fileSystem.changeToBaseDir();
+    fileSystem.createDirectory(directoryPath);
   }
 
   private String resolvePath(String path, Event event, String attributeName) {

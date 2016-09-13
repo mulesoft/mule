@@ -6,6 +6,9 @@
  */
 package org.mule.extension.ftp.internal;
 
+import org.mule.extension.file.common.api.FileConnectorConfig;
+import org.mule.extension.file.common.api.FilePredicateBuilder;
+import org.mule.extension.file.common.api.StandardFileSystemOperations;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.FtpFilePredicateBuilder;
 import org.mule.extension.ftp.api.ftp.ClassicFtpFileAttributes;
@@ -16,16 +19,9 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
-import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.FilePredicateBuilder;
-import org.mule.extension.file.common.api.StandardFileSystemOperations;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
 import javax.inject.Inject;
 
@@ -47,23 +43,6 @@ public class FtpConnector extends FileConnectorConfig {
   @Inject
   private ConnectionManager connectionManager;
 
-  /**
-   * The directory to be considered as the root of every relative path used with this connector. If not provided, it will default
-   * to the remote server default.
-   */
-  @Parameter
-  @Optional
-  @Summary("The directory to be considered as the root of every relative path used with this connector")
-  @DisplayName("Working Directory")
-  private String workingDir = null;
-
-
-  /**
-   * {@inheritDoc}
-   */
-  public String getWorkingDir() {
-    return workingDir;
-  }
 
   public ConnectionManager getConnectionManager() {
     return connectionManager;

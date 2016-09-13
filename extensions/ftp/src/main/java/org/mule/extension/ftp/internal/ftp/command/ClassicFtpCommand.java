@@ -48,8 +48,8 @@ abstract class ClassicFtpCommand extends FtpCommand<ClassicFtpFileSystem> {
    * {@inheritDoc}
    */
   @Override
-  protected FtpFileAttributes getFile(FileConnectorConfig config, String filePath, boolean requireExistence) {
-    Path path = resolvePath(config, filePath);
+  protected FtpFileAttributes getFile(String filePath, boolean requireExistence) {
+    Path path = resolvePath(filePath);
     FTPFile ftpFile;
     try {
       ftpFile = client.mlistFile(filePath);
@@ -74,7 +74,7 @@ abstract class ClassicFtpCommand extends FtpCommand<ClassicFtpFileSystem> {
    * @param directoryPath the {@link Path} to the directory you want to create
    */
   @Override
-  protected void doMkDirs(FileConnectorConfig config, Path directoryPath) {
+  protected void doMkDirs(Path directoryPath) {
     String cwd = getCurrentWorkingDirectory();
     Stack<Path> fragments = new Stack<>();
     try {

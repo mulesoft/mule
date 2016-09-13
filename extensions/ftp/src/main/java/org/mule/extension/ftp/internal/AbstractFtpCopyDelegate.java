@@ -102,10 +102,10 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
    */
   protected void copyFile(FileConnectorConfig config, FileAttributes source, Path target, boolean overwrite,
                           FtpFileSystem writerConnection, MuleEvent event) {
-    FileAttributes targetFile = command.getFile(config, target.toString());
+    FileAttributes targetFile = command.getFile(target.toString());
     if (targetFile != null) {
       if (overwrite) {
-        fileSystem.delete(config, targetFile.getPath());
+        fileSystem.delete(targetFile.getPath());
       } else {
         throw command.exception(format("Cannot copy file '%s' to path '%s' because it already exists", source.getPath(), target));
       }
@@ -128,7 +128,7 @@ public abstract class AbstractFtpCopyDelegate implements FtpCopyDelegate {
                          FtpFileSystem writerConnection, MuleEvent event)
       throws IOException {
     final FileWriteMode mode = overwrite ? FileWriteMode.OVERWRITE : FileWriteMode.CREATE_NEW;
-    writerConnection.write(config, targetPath, inputStream, mode, event, false, true, config.getDefaultWriteEncoding());
+    writerConnection.write(targetPath, inputStream, mode, event, false, true, config.getDefaultWriteEncoding());
   }
 
   private ConnectionHandler<FtpFileSystem> getWriterConnection(FileConnectorConfig config) throws ConnectionException {

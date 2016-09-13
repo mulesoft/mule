@@ -100,7 +100,6 @@ public interface FileSystem {
    * This method also supports locking support depending on the value of the {@code lock} argument, but following the same rules
    * and considerations as described in the {@link #read(FileConnectorConfig, Message, String, boolean)} method
    *
-   * @param config the config on which is parameterizing this operation
    * @param filePath the path of the file to be written
    * @param content the content to be written into the file
    * @param mode a {@link FileWriteMode}
@@ -111,7 +110,7 @@ public interface FileSystem {
    *        not set, then it defaults to {@link FileConnectorConfig#getDefaultWriteEncoding()}
    * @throws IllegalArgumentException if an illegal combination of arguments is supplied
    */
-  void write(FileConnectorConfig config, String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock,
+  void write(String filePath, Object content, FileWriteMode mode, MuleEvent event, boolean lock,
              boolean createParentDirectories, String encoding);
 
   /**
@@ -171,29 +170,26 @@ public interface FileSystem {
   /**
    * Deletes the file pointed by {@code filePath}, provided that it's not locked
    *
-   * @param config the config that is parameterizing this operation
    * @param filePath the path to the file to be deleted
    * @throws IllegalArgumentException if {@code filePath} doesn't exists or is locked
    */
-  void delete(FileConnectorConfig config, String filePath);
+  void delete(String filePath);
 
   /**
    * Renames the file pointed by {@code filePath} to the provided {@code newName}
    *
-   * @param config the config that is parameterizing this operation
    * @param filePath the path to the file to be renamed
    * @param newName the file's new name
    * @param overwrite whether or not overwrite the file if the target destination already exists.
    */
-  void rename(FileConnectorConfig config, String filePath, String newName, boolean overwrite);
+  void rename(String filePath, String newName, boolean overwrite);
 
   /**
    * Creates a new directory
    *
-   * @param config the config that is parameterizing this operation
    * @param directoryPath the new directory's path
    */
-  void createDirectory(FileConnectorConfig config, String directoryPath);
+  void createDirectory(String directoryPath);
 
   /**
    * Acquires and returns lock over the given {@code path}.
@@ -237,10 +233,8 @@ public interface FileSystem {
 
   /**
    * Changes the current working directory to the user base
-   *
-   * @param config the config which is parameterizing this operation
    */
-  void changeToBaseDir(FileConnectorConfig config);
+  void changeToBaseDir();
 
   /**
    * The concrete class that represents the attributes related to the {@link FileSystem} implementation.
@@ -248,5 +242,7 @@ public interface FileSystem {
    * This method is called when handling the dynamic resolution for the output attributes metadata of an operation.
    */
   Class<? extends FileAttributes> getAttributesType();
+
+  String getBasePath();
 
 }

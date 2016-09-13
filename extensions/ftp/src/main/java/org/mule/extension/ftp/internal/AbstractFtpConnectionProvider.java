@@ -9,6 +9,7 @@ package org.mule.extension.ftp.internal;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
+import org.mule.extension.file.common.api.FileSystemProvider;
 import org.mule.extension.ftp.internal.ftp.connection.ClassicFtpFileSystem;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -17,6 +18,7 @@ import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
@@ -28,16 +30,26 @@ import javax.inject.Inject;
  * Base class for {@link ConnectionProvider} implementations which take a {@link FtpConnector} as a config and provides a
  * {@link FtpFileSystem}
  *
- * @param <Connection> the generic type of the connection object
+ * @param <C> the generic type of the connection object
  * @since 4.0
  */
-public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSystem>
-    implements PoolingConnectionProvider<Connection> {
+public abstract class AbstractFtpConnectionProvider<C extends FtpFileSystem>
+    extends FileSystemProvider<C> implements PoolingConnectionProvider<C> {
 
   private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
 
   @Inject
   protected MuleContext muleContext;
+
+  /**
+   * The directory to be considered as the root of every relative path used with this connector. If not provided, it will default
+   * to the remote server default.
+   */
+  @Parameter
+  @Optional
+  @Summary("The directory to be considered as the root of every relative path used with this connector")
+  @DisplayName("Working Directory")
+  private String workingDir = null;
 
   /**
    * The FTP server host, such as www.mulesoft.com, localhost, or 192.168.0.1, etc
@@ -98,7 +110,7 @@ public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSy
    * @param ftpFileSystem a {@link ClassicFtpFileSystem} instance
    */
   @Override
-  public void disconnect(Connection ftpFileSystem) {
+  public void disconnect(C ftpFileSystem) {
     ftpFileSystem.disconnect();
   }
 
@@ -109,8 +121,15 @@ public abstract class AbstractFtpConnectionProvider<Connection extends FtpFileSy
    * @return a {@link ConnectionValidationResult}
    */
   @Override
-  public ConnectionValidationResult validate(Connection ftpFileSystem) {
+  public ConnectionValidationResult validate(C ftpFileSystem) {
     return ftpFileSystem.validateConnection();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public String getWorkingDir() {
+    return workingDir;
   }
 
   protected String getHost() {

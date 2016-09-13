@@ -45,7 +45,7 @@ public final class SftpReadCommand extends SftpCommand implements ReadCommand {
   @Override
   public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
                                                            boolean lock) {
-    FtpFileAttributes attributes = getExistingFile(config, filePath);
+    FtpFileAttributes attributes = getExistingFile(filePath);
     if (attributes.isDirectory()) {
       throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
     }

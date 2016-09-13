@@ -10,16 +10,15 @@ import static java.lang.String.format;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
-import org.mule.extension.file.internal.LocalFileSystem;
-import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileContentWrapper;
 import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.file.common.api.FileWriterVisitor;
 import org.mule.extension.file.common.api.command.WriteCommand;
 import org.mule.extension.file.common.api.lock.NullPathLock;
 import org.mule.extension.file.common.api.lock.PathLock;
+import org.mule.extension.file.internal.LocalFileSystem;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.MuleContext;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,10 +50,10 @@ public final class LocalWriteCommand extends LocalFileCommand implements WriteCo
    * {@inheritDoc}
    */
   @Override
-  public void write(FileConnectorConfig config, String filePath, Object content, FileWriteMode mode, MuleEvent event,
+  public void write(String filePath, Object content, FileWriteMode mode, MuleEvent event,
                     boolean lock, boolean createParentDirectory, String encoding) {
-    Path path = resolvePath(config, filePath);
-    assureParentFolderExists(config, path, createParentDirectory);
+    Path path = resolvePath(filePath);
+    assureParentFolderExists(path, createParentDirectory);
 
     final OpenOption[] openOptions = getOpenOptions(mode);
     PathLock pathLock = lock ? fileSystem.lock(path, openOptions) : new NullPathLock();

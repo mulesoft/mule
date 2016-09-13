@@ -42,16 +42,14 @@ abstract class AbstractLocalCopyCommand extends LocalFileCommand {
    * Performs the base logic and delegates into {@link #doExecute(Path, Path, boolean, CopyOption[])} to perform the actual
    * copying logic
    *
-   * @param config the config that is parameterizing this operation
    * @param sourcePath the path to be copied
    * @param target the path to the target destination
    * @param overwrite whether to overwrite existing target paths
    * @param createParentDirectory whether to create the target's parent directory if it doesn't exists
    */
-  protected final void execute(FileConnectorConfig config, String sourcePath, String target, boolean overwrite,
-                               boolean createParentDirectory) {
-    Path source = resolveExistingPath(config, sourcePath);
-    Path targetPath = resolvePath(config, target);
+  protected final void execute(String sourcePath, String target, boolean overwrite, boolean createParentDirectory) {
+    Path source = resolveExistingPath(sourcePath);
+    Path targetPath = resolvePath(target);
 
     CopyOption copyOption = null;
     if (Files.exists(targetPath)) {

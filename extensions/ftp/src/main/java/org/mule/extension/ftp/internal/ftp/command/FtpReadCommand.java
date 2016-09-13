@@ -47,13 +47,13 @@ public final class FtpReadCommand extends ClassicFtpCommand implements ReadComma
   @Override
   public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
                                                            boolean lock) {
-    FtpFileAttributes attributes = getExistingFile(config, filePath);
+    FtpFileAttributes attributes = getExistingFile(filePath);
     if (attributes.isDirectory()) {
       throw cannotReadDirectoryException(Paths.get(attributes.getPath()));
     }
 
     try {
-      attributes = new ClassicFtpFileAttributes(resolvePath(config, filePath), client.listFiles(filePath)[0]);
+      attributes = new ClassicFtpFileAttributes(resolvePath(filePath), client.listFiles(filePath)[0]);
     } catch (Exception e) {
       throw exception("Found exception while trying to read path " + filePath, e);
     }

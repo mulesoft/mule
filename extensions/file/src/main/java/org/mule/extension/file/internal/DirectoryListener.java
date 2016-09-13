@@ -428,7 +428,7 @@ public class DirectoryListener extends Source<InputStream, ListenerFileAttribute
   }
 
   private Path resolveRootPath() {
-    return new DirectoryListenerCommand((LocalFileSystem) fileSystem).resolveRootPath(config, directory);
+    return new DirectoryListenerCommand((LocalFileSystem) fileSystem).resolveRootPath(directory);
   }
 
   private void calculateEnabledEventTypes() throws ConfigurationException {

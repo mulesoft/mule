@@ -41,8 +41,8 @@ public abstract class SftpCommand extends FtpCommand<SftpFileSystem> {
    * {@inheritDoc}
    */
   @Override
-  protected FtpFileAttributes getFile(FileConnectorConfig config, String filePath, boolean requireExistence) {
-    Path path = resolvePath(config, filePath);
+  protected FtpFileAttributes getFile(String filePath, boolean requireExistence) {
+    Path path = resolvePath(filePath);
     SftpFileAttributes attributes;
     try {
       attributes = client.getAttributes(path);
@@ -67,11 +67,11 @@ public abstract class SftpCommand extends FtpCommand<SftpFileSystem> {
    * @param directoryPath the {@link Path} to the directory you want to create
    */
   @Override
-  protected void doMkDirs(FileConnectorConfig config, Path directoryPath) {
+  protected void doMkDirs(Path directoryPath) {
     Stack<Path> fragments = new Stack<>();
     for (int i = directoryPath.getNameCount(); i >= 0; i--) {
       Path subPath = Paths.get("/").resolve(directoryPath.subpath(0, i));
-      if (exists(config, subPath)) {
+      if (exists(subPath)) {
         break;
       }
       fragments.push(subPath);

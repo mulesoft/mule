@@ -6,7 +6,6 @@
  */
 package org.mule.extension.file.common.api.command;
 
-import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
 
 /**
@@ -17,10 +16,9 @@ import org.mule.extension.file.common.api.FileSystem;
 public interface CreateDirectoryCommand {
 
   /**
-   * Creates a directory under the considerations of {@link FileSystem#createDirectory(FileConnectorConfig, String)}
+   * Creates a directory under the considerations of {@link FileSystem#createDirectory(String)}
    *
-   * @param config the config that is parameterizing this operation
    * @param directoryName the new directory's new name
    */
-  void createDirectory(FileConnectorConfig config, String directoryName);
+  void createDirectory(String directoryName);
 }

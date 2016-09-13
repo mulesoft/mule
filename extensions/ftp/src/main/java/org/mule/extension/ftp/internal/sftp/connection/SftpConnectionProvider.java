@@ -112,7 +112,7 @@ public class SftpConnectionProvider extends AbstractFtpConnectionProvider<SftpFi
       throw new ConnectionException(e);
     }
 
-    return new SftpFileSystem(client, muleContext);
+    return new SftpFileSystem(client, getWorkingDir(), muleContext);
   }
 
 

@@ -42,7 +42,7 @@ public final class LocalReadCommand extends LocalFileCommand implements ReadComm
   @Override
   public OperationResult<InputStream, FileAttributes> read(FileConnectorConfig config, Message message, String filePath,
                                                            boolean lock) {
-    Path path = resolveExistingPath(config, filePath);
+    Path path = resolveExistingPath(filePath);
     if (Files.isDirectory(path)) {
       throw cannotReadDirectoryException(path);
     }
