@@ -12,12 +12,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
 import java.util.Arrays;

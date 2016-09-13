@@ -8,10 +8,10 @@ package org.mule.test.module.http.functional.listener;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;

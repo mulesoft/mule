@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 @ArtifactClassLoaderRunnerConfig(exportPluginClasses = {HttpRequesterProvider.class, HttpRequesterConfig.class},
     plugins = {"org.mule.modules:mule-module-sockets", "org.mule.modules:mule-module-http-ext"},

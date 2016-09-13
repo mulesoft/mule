@@ -7,7 +7,7 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;

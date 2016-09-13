@@ -7,14 +7,13 @@
 
 package org.mule.functional.junit4;
 
-import static org.mule.functional.util.AnnotationUtils.getAnnotationAttributeFrom;
-import org.mule.functional.api.classloading.isolation.ClassPathClassifier;
-import org.mule.functional.api.classloading.isolation.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
-import org.mule.functional.junit4.runners.ArtifactClassLoaderRunner;
-import org.mule.functional.junit4.runners.PluginClassLoadersAware;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
+import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.test.runner.ArtifactClassLoaderRunner;
+import org.mule.test.runner.PluginClassLoadersAware;
+import org.mule.test.runner.RunnerDelegateTo;
+import org.mule.test.runner.api.IsolatedClassLoaderExtensionsManagerConfigurationBuilder;
 
 import java.util.List;
 
