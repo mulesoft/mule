@@ -47,7 +47,7 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFilterTrue() throws Exception {
     assertTrue(filter.accept(
-        InternalMessage.builder()
+                             InternalMessage.builder()
                                  .payload("{\n" + "        \"in_reply_to_user_id\":null,\n"
                                      + "        \"text\":\"test from Mule: " + "6ffca02b-9d52-475e-8b17-946acdb01492\"}")
                                  .build().getPayload().getValue()));
