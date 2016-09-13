@@ -6,6 +6,7 @@
  */
 package org.mule.module.oauth2.internal.authorizationcode;
 
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 
 import org.mule.api.MuleContext;
@@ -38,9 +39,12 @@ import org.apache.commons.lang.StringUtils;
 public class DefaultAuthorizationCodeGrantType extends AbstractGrantType implements Initialisable, AuthorizationCodeGrantType, Startable, MuleContextAware
 {
 
+    public static final String EXTERNAL_REDIRECT_URL_PROPERTY = SYSTEM_PROPERTY_PREFIX + "oauth2.externalRedirectUrl";
+
     private String clientId;
     private String clientSecret;
     private String redirectionUrl;
+    private String externalRedirectionUrl;
     private AuthorizationRequestHandler authorizationRequestHandler;
     private AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler;
     private MuleContext muleContext;
@@ -82,6 +86,11 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     public String getRedirectionUrl()
     {
         return redirectionUrl;
+    }
+
+    public String getExternalRedirectionUrl()
+    {
+        return externalRedirectionUrl;
     }
 
     @Override
@@ -158,6 +167,11 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
                 resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
             }
             resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
+            if (externalRedirectionUrl == null)
+            {
+                String url = System.getProperty(EXTERNAL_REDIRECT_URL_PROPERTY);
+                externalRedirectionUrl = url != null ? url : getRedirectionUrl();
+            }
         }
         catch (Exception e)
         {
