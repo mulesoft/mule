@@ -20,13 +20,19 @@ public class MessageRedeliveredException extends MessagingException
      * Serial version
      */
     private static final long serialVersionUID = 9013890402770563931L;
+    private static final Message REDELIVERED_FAILURE_MESSAGE = CoreMessages.createStaticMessage("Maximum redelivery attempts reached");
 
-    protected final transient ImmutableEndpoint endpoint;
-    String messageId;
-    int redeliveryCount;
-    int maxRedelivery;
+    private final transient ImmutableEndpoint endpoint;
+    private String messageId;
+    private int redeliveryCount;
+    private int maxRedelivery;
 
-    protected MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, MuleEvent event, Message message)
+    public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, MuleEvent event)
+    {
+        this(messageId, redeliveryCount, maxRedelivery, endpoint, event, REDELIVERED_FAILURE_MESSAGE);
+    }
+
+    public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, MuleEvent event, Message message)
     {
         super(message, event);
         this.messageId = messageId;
@@ -46,7 +52,7 @@ public class MessageRedeliveredException extends MessagingException
 
     public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, InboundEndpoint endpoint, MuleEvent event, MessageProcessor failingMessageProcessor)
     {
-        this(messageId, redeliveryCount, maxRedelivery, endpoint, event, CoreMessages.createStaticMessage("Maximum redelivery attempts reached"), failingMessageProcessor);
+        this(messageId, redeliveryCount, maxRedelivery, endpoint, event, REDELIVERED_FAILURE_MESSAGE, failingMessageProcessor);
     }
 
     public String getMessageId()
