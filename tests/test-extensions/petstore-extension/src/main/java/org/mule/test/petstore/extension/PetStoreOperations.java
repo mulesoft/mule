@@ -34,7 +34,7 @@ public class PetStoreOperations {
   }
 
   public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, Event event) throws Exception {
-    CountDownLatch countDownLatch = (Latch) event.getVariable("testLatch").getValue();
+    CountDownLatch countDownLatch = (CountDownLatch) event.getVariable("testLatch").getValue();
     if (countDownLatch != null) {
       countDownLatch.countDown();
     }
