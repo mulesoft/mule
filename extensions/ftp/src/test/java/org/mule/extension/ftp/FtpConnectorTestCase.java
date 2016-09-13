@@ -8,15 +8,15 @@ package org.mule.extension.ftp;
 
 import static org.mule.extension.FtpTestHarness.HELLO_PATH;
 import org.mule.extension.FtpTestHarness;
+import org.mule.extension.file.common.api.FileWriteMode;
+import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
-import org.mule.functional.junit4.runners.ArtifactClassLoaderRunnerConfig;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
-import org.mule.extension.file.common.api.FileWriteMode;
-import org.mule.extension.file.common.api.stream.AbstractFileInputStream;
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;

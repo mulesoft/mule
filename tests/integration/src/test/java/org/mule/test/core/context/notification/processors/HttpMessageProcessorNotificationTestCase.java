@@ -7,7 +7,6 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -15,6 +14,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.core.context.notification.Node;
 import org.mule.test.core.context.notification.RestrictedNode;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;

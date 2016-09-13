@@ -10,15 +10,14 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.BufferedReader;
 import java.io.IOException;

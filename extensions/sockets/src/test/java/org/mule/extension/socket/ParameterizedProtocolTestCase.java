@@ -10,7 +10,7 @@ import org.mule.extension.socket.api.connection.tcp.protocol.DirectProtocol;
 import org.mule.extension.socket.api.connection.tcp.protocol.LengthProtocol;
 import org.mule.extension.socket.api.connection.tcp.protocol.SafeProtocol;
 import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
-import org.mule.functional.junit4.runners.RunnerDelegateTo;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;

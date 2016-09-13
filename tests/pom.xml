@@ -23,6 +23,7 @@
         <module>unit-transports</module>
         <module>functional-transports</module>
         <module>test-services</module>
+        <module>runner</module>
     </modules>
 
     <build>
