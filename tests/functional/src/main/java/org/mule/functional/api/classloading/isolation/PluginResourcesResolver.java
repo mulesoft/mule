@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 public class PluginResourcesResolver {
 
   private static final String PLUGIN_PROPERTIES = "plugin.properties";
+  public static final String COMMA_CHARACTER = ",";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final ExtensionManagerAdapter extensionManager;
 
@@ -79,8 +80,8 @@ public class PluginResourcesResolver {
       } catch (IOException e) {
         throw new RuntimeException("Error while reading plugin properties: " + pluginPropertiesUrl);
       }
-      exportPackages = newHashSet(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY));
-      exportResources = newHashSet(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY));
+      exportPackages = newHashSet(pluginProperties.getProperty(EXPORTED_CLASS_PACKAGES_PROPERTY).split(COMMA_CHARACTER));
+      exportResources = newHashSet(pluginProperties.getProperty(EXPORTED_RESOURCE_PROPERTY).split(COMMA_CHARACTER));
     }
 
     return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),

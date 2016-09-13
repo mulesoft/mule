@@ -188,8 +188,8 @@ public class ClassPathClassifierContext {
   }
 
   /**
-   * @return {@link List} of {@link Class}es that are going to be exported in addition to the ones already exported by plugins.
-   *         For testing purposes only.
+   * @return {@link List} of {@link Class}es that are going to be exported in addition to the ones already exported by
+   * rootArtifact. For testing purposes only.
    * @param pluginArtifact
    */
   public List<Class> getExportPluginClasses(Artifact pluginArtifact) {

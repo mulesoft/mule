@@ -194,10 +194,11 @@ public class ArtifactIsolatedClassLoaderBuilder {
   }
 
   /**
-   * Sets the {@link List} of {@link Class}es to be exported by plugins in addition to their APIs, for testing purposes only.
+   * Sets the {@link List} of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
+   * for testing purposes only.
    *
-   * @param exportPluginClasses {@link List} of {@link Class}es to be exported by plugins in addition to their APIs, for testing
-   *        purposes only.
+   * @param exportPluginClasses of {@link Class}es to be exported by rootArtifact (if it is a Mule plugin) in addition to their APIs,
+   *                            for testing purposes only.
    * @return this
    */
   public ArtifactIsolatedClassLoaderBuilder setExportPluginClasses(final List<Class> exportPluginClasses) {
