@@ -7,13 +7,13 @@
 package org.mule.runtime.module.cxf;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.cxf.CxfConstants.OPERATION;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -99,8 +99,8 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     }
 
     try {
-      if (event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
-        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) event.getMessage().getPayload().getValue())
+      if (event.getMessage().getPayload().getValue() instanceof MultiPartPayload) {
+        for (org.mule.runtime.api.message.Message part : ((MultiPartPayload) event.getMessage().getPayload().getValue())
             .getParts()) {
           attachments.add(toDataHandler(((PartAttributes) part.getAttributes()).getName(), part.getPayload().getValue(),
                                         part.getPayload().getDataType().getMediaType()));
@@ -339,9 +339,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     // People can specify a CXF operation, which may in fact be different
     // than the method name. If that's not found, we'll default back to the
     // mule method property.
-    String method = getFlowVariableOrNull(OPERATION, event);
+    String method = getVariableValueOrNull(OPERATION, event);
     if (method == null) {
-      Object muleMethodProperty = getFlowVariableOrNull(MULE_METHOD_PROPERTY, event);
+      Object muleMethodProperty = getVariableValueOrNull(MULE_METHOD_PROPERTY, event);
       if (muleMethodProperty != null) {
         if (muleMethodProperty instanceof Method) {
           method = ((Method) muleMethodProperty).getName();

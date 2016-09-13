@@ -60,7 +60,7 @@ public class UpdateExpressionWatermark extends Watermark implements Initialisabl
   @Override
   protected Object getUpdatedValue(Event event) {
     try {
-      return StringUtils.isEmpty(this.updateExpression) ? event.getVariable(this.resolveVariable(event))
+      return StringUtils.isEmpty(this.updateExpression) ? event.getVariable(this.resolveVariable(event)).getValue()
           : WatermarkUtils.evaluate(this.updateExpression, event, muleContext);
     } catch (NotSerializableException e) {
       throw new IllegalArgumentException(e);

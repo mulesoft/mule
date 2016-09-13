@@ -9,8 +9,6 @@ package org.mule.runtime.core.message;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 
-import org.mule.runtime.api.message.MultiPartContent;
-
 import com.google.common.collect.ImmutableMap;
 
 import java.util.LinkedList;
@@ -18,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Representation of metadata associated to a part in a {@link MultiPartContent}.
+ * Representation of metadata associated to a part in a {@link org.mule.runtime.api.message.MultiPartPayload}.
  *
  * @since 4.0
  */

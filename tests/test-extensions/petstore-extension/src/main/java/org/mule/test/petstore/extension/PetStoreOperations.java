@@ -34,12 +34,12 @@ public class PetStoreOperations {
   }
 
   public PetStoreClient getClientOnLatch(@Connection PetStoreClient client, Event event) throws Exception {
-    CountDownLatch countDownLatch = event.getVariable("testLatch");
+    CountDownLatch countDownLatch = (CountDownLatch) event.getVariable("testLatch").getValue();
     if (countDownLatch != null) {
       countDownLatch.countDown();
     }
 
-    Latch latch = event.getVariable("connectionLatch");
+    Latch latch = (Latch) event.getVariable("connectionLatch").getValue();
     latch.await();
     return client;
   }

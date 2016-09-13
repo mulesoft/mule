@@ -63,7 +63,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     InternalMessage response = muleEvent.getMessage();
 
     assertNotNull(response);
-    assertTrue(muleEvent.getVariable("expectedHandler"));
+    assertTrue((Boolean) muleEvent.getVariable("expectedHandler").getValue());
     assertTrue(injectedMessagingExceptionHandler instanceof DefaultMessagingExceptionStrategy);
   }
 
@@ -96,7 +96,7 @@ public class ExceptionHandlingTestCase extends AbstractIntegrationTestCase {
     InternalMessage response = muleEvent.getMessage();
 
     assertNotNull(response);
-    assertTrue(muleEvent.getVariable("expectedHandler"));
+    assertTrue((Boolean) muleEvent.getVariable("expectedHandler").getValue());
     assertThat(injectedMessagingExceptionHandler, is(instanceOf(ErrorHandler.class)));
   }
 

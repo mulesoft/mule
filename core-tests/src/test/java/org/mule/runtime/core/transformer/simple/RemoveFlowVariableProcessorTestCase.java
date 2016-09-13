@@ -39,6 +39,6 @@ public class RemoveFlowVariableProcessorTestCase extends AbstractRemoveVariableP
 
   @Override
   protected void verifyNotRemoved(Event mockEvent, String key) {
-    assertThat(mockEvent.getVariable(key), not(nullValue()));
+    assertThat(mockEvent.getVariable(key).getValue(), not(nullValue()));
   }
 }

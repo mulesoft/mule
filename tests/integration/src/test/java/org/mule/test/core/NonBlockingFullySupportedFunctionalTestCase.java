@@ -190,7 +190,7 @@ public class NonBlockingFullySupportedFunctionalTestCase extends AbstractIntegra
   public void enricherFlowVar() throws Exception {
     Event result = flowRunner("enricherFlowVar").withPayload(TEST_MESSAGE).withExchangePattern(getMessageExchnagePattern())
         .nonBlocking().run();
-    assertThat(result.getVariable(FOO), is(equalTo(TEST_MESSAGE)));
+    assertThat(result.getVariable(FOO).getValue(), is(equalTo(TEST_MESSAGE)));
   }
 
   @Test

@@ -216,7 +216,7 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      Throwable exception = event.getVariable("exception");
+      Throwable exception = (Throwable) event.getVariable("exception").getValue();
       if (exception instanceof MuleException) {
         throw (MuleException) exception;
       } else if (exception instanceof RuntimeException) {

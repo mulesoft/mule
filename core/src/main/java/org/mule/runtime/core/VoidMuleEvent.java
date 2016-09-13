@@ -8,6 +8,7 @@ package org.mule.runtime.core;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -129,12 +130,7 @@ public class VoidMuleEvent implements Event {
   }
 
   @Override
-  public <T> T getVariable(String key) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public DataType getVariableDataType(String key) {
+  public <T> TypedValue<T> getVariable(String key) {
     throw new UnsupportedOperationException();
   }
 

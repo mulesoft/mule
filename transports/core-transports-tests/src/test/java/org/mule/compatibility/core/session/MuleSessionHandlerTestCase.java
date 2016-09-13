@@ -185,7 +185,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
 
     Object invocation = null;
     try {
-      invocation = event.getVariable(MULE_SESSION_PROPERTY);
+      invocation = event.getVariable(MULE_SESSION_PROPERTY).getValue();
     } catch (NoSuchElementException nsse) {
       // Ignore
     }

@@ -44,9 +44,9 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     testEvent = Event.builder(testEvent).addVariable("foo", "bar").build();
 
     final Builder builder = Event.builder(testEvent);
-    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
 
-    assertThat(builder.build().getVariableDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(builder.build().getVariable("foo").getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
   @Test

@@ -90,7 +90,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
     assertThat(responseEvent.getMessage().getPayload().getValue(), is(""));
 
-    InternalMessage responseMessage = responseEvent.getVariable("myFace");
+    InternalMessage responseMessage = (InternalMessage) responseEvent.getVariable("myFace").getValue();
     assertThat(responseMessage.getPayload().getValue(), is(HEISENBERG));
   }
 

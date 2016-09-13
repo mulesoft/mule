@@ -9,11 +9,11 @@ package org.mule.runtime.module.ws.consumer;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
-import static org.mule.runtime.core.message.DefaultMultiPartContent.BODY_ATTRIBUTES;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
+import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -33,7 +33,7 @@ import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
@@ -216,7 +216,7 @@ public class WSConsumer
 
       @Override
       protected Event processRequest(Event event) throws MuleException {
-        propertyValue = getFlowVariableOrNull(propertyName, event);
+        propertyValue = getVariableValueOrNull(propertyName, event);
         event = Event.builder(event).removeVariable(propertyName).build();
         return super.processRequest(event);
       }
@@ -406,8 +406,8 @@ public class WSConsumer
     }
 
     try {
-      if (message.getPayload().getValue() instanceof MultiPartContent) {
-        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) message.getPayload().getValue()).getParts()) {
+      if (message.getPayload().getValue() instanceof MultiPartPayload) {
+        for (org.mule.runtime.api.message.Message part : ((MultiPartPayload) message.getPayload().getValue()).getParts()) {
           final String partName = ((PartAttributes) part.getAttributes()).getName();
           attachments
               .add(new AttachmentImpl(partName, toDataHandler(partName, part.getPayload().getValue(),
@@ -432,8 +432,8 @@ public class WSConsumer
   private Event copyAttachmentsResponse(Event event) throws MessagingException {
     InternalMessage message = event.getMessage();
 
-    if (event.getVariable(CxfConstants.ATTACHMENTS) != null) {
-      Collection<Attachment> attachments = event.getVariable(CxfConstants.ATTACHMENTS);
+    if (event.getVariable(CxfConstants.ATTACHMENTS).getValue() != null) {
+      Collection<Attachment> attachments = (Collection<Attachment>) event.getVariable(CxfConstants.ATTACHMENTS).getValue();
       InternalMessage.Builder builder = InternalMessage.builder(message);
 
       if (!attachments.isEmpty()) {
@@ -460,7 +460,7 @@ public class WSConsumer
           }
         }
 
-        builder.payload(new DefaultMultiPartContent(parts));
+        builder.payload(new DefaultMultiPartPayload(parts));
       }
       return Event.builder(event).message(builder.build()).build();
     } else {

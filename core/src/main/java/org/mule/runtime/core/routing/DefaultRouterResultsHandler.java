@@ -104,8 +104,8 @@ public class DefaultRouterResultsHandler implements RouterResultsHandler {
     List<InternalMessage> list = new ArrayList<>();
     for (Event event : nonNullResults) {
       for (String flowVarName : event.getVariableNames()) {
-        resultBuilder.addVariable(flowVarName, event.getVariable(flowVarName),
-                                  event.getVariableDataType(flowVarName));
+        resultBuilder.addVariable(flowVarName, event.getVariable(flowVarName).getValue(),
+                                  event.getVariable(flowVarName).getDataType());
       }
       list.add(event.getMessage());
     }

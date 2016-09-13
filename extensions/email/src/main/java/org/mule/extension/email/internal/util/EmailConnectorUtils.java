@@ -14,9 +14,9 @@ import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 
 import java.util.List;
@@ -126,14 +126,14 @@ public final class EmailConnectorUtils {
   }
 
   /**
-   * Transforms the attachments in a {@link MultiPartContent} into a {@link List} of {@link EmailAttachment}s.
+   * Transforms the attachments in a {@link MultiPartPayload} into a {@link List} of {@link EmailAttachment}s.
    *
-   * @param payload a {@link MultiPartContent} that carries the attachments.
-   * @return a {@link List} of {@link EmailAttachment}, or an empty {@link List} if payload is not a {@link MultiPartContent}.
+   * @param payload a {@link MultiPartPayload} that carries the attachments.
+   * @return a {@link List} of {@link EmailAttachment}, or an empty {@link List} if payload is not a {@link MultiPartPayload}.
    */
   public static List<EmailAttachment> mapToEmailAttachments(Object payload) {
-    return payload instanceof DefaultMultiPartContent
-        ? ((DefaultMultiPartContent) payload)
+    return payload instanceof DefaultMultiPartPayload
+        ? ((DefaultMultiPartPayload) payload)
             .getNonBodyParts().stream().map(p -> new EmailAttachment(((PartAttributes) p.getAttributes()).getName(),
                                                                      p.getPayload().getValue(),
                                                                      p.getPayload().getDataType().getMediaType()))

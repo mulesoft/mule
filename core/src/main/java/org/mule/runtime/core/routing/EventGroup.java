@@ -374,7 +374,7 @@ public class EventGroup implements Comparable<EventGroup>, Serializable, Deseria
     }
 
     private int getEventOrder(Event event) {
-      Integer orderVariable = event.getVariable(MULE_ARRIVAL_ORDER_PROPERTY);
+      Integer orderVariable = (Integer) event.getVariable(MULE_ARRIVAL_ORDER_PROPERTY).getValue();
       return orderVariable != null ? orderVariable : -1;
     }
   }

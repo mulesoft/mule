@@ -60,7 +60,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void setFlowVariableDefaultDataType() throws Exception {
     muleEvent = Event.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE).build();
 
-    DataType dataType = muleEvent.getVariableDataType(PROPERTY_NAME);
+    DataType dataType = muleEvent.getVariable(PROPERTY_NAME).getDataType();
     assertThat(dataType, DataTypeMatcher.like(String.class, MediaType.ANY, null));
   }
 
@@ -70,7 +70,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
     muleEvent = Event.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
-    DataType actualDataType = muleEvent.getVariableDataType(PROPERTY_NAME);
+    DataType actualDataType = muleEvent.getVariable(PROPERTY_NAME).getDataType();
     assertThat(actualDataType, DataTypeMatcher.like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
   }
 

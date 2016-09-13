@@ -19,7 +19,7 @@ public class PropertyExpressionDataTypeResolver extends AbstractExpressionDataTy
   @Override
   protected DataType getDataType(Event event, ASTNode node) {
     if (node.isIdentifier() && event.getVariableNames().contains(node.getName())) {
-      return event.getVariableDataType(node.getName());
+      return event.getVariable(node.getName()).getDataType();
     } else if (node.isIdentifier() && event.getSession().getPropertyNamesAsSet().contains(node.getName())) {
       return event.getSession().getPropertyDataType(node.getName());
     } else {

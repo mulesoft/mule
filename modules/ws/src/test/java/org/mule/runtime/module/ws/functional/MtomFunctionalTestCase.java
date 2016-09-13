@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
@@ -82,7 +82,7 @@ public class MtomFunctionalTestCase extends AbstractWSConsumerFunctionalTestCase
   }
 
   private void assertAttachmentInResponse(InternalMessage message, String fileName) throws Exception {
-    final MultiPartContent multiPartPayload = (MultiPartContent) message.getPayload().getValue();
+    final MultiPartPayload multiPartPayload = (MultiPartPayload) message.getPayload().getValue();
     assertThat(multiPartPayload.getParts(), hasSize(1));
 
     String attachmentId = extractAttachmentId(getPayloadAsString(message));

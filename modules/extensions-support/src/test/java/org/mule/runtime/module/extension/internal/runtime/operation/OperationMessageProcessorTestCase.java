@@ -107,7 +107,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     when(operationExecutor.execute(any(OperationContext.class)))
         .thenReturn(OperationResult.builder().output(payload).mediaType(mediaType).attributes(attributes).build());
 
-    InternalMessage message = messageProcessor.process(event).getVariable(TARGET_VAR);
+    InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
 
     assertThat(message.getPayload().getValue(), is(sameInstance(payload)));
@@ -184,7 +184,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     Object value = new Object();
     when(operationExecutor.execute(any(OperationContext.class))).thenReturn(value);
 
-    InternalMessage message = messageProcessor.process(event).getVariable(TARGET_VAR);
+    InternalMessage message = (InternalMessage) messageProcessor.process(event).getVariable(TARGET_VAR).getValue();
     assertThat(message, is(notNullValue()));
     assertThat(message.getPayload().getValue(), is(sameInstance(value)));
   }

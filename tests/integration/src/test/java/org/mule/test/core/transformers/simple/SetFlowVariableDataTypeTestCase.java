@@ -41,7 +41,7 @@ public class SetFlowVariableDataTypeTestCase extends AbstractIntegrationTestCase
 
     @Override
     public Object onCall(MuleEventContext eventContext) throws Exception {
-      return eventContext.getEvent().getVariableDataType("testVariable");
+      return eventContext.getEvent().getVariable("testVariable").getDataType();
     }
   }
 }

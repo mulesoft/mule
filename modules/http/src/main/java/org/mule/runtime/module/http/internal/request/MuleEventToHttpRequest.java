@@ -20,7 +20,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_EMPTY_BODY_METHODS;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
 
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
@@ -169,7 +169,7 @@ public class MuleEventToHttpRequest {
       throws MessagingException {
     Object payload = muleEvent.getMessage().getPayload().getValue();
 
-    if (!muleEvent.getMessage().getOutboundAttachmentNames().isEmpty() || payload instanceof MultiPartContent) {
+    if (!muleEvent.getMessage().getOutboundAttachmentNames().isEmpty() || payload instanceof MultiPartPayload) {
       try {
         return createMultiPart(muleEvent.getMessage());
       } catch (IOException e) {
@@ -217,8 +217,8 @@ public class MuleEventToHttpRequest {
       attachments.put(outboundAttachmentName, msg.getOutboundAttachment(outboundAttachmentName));
     }
 
-    if (msg.getPayload().getValue() instanceof MultiPartContent) {
-      for (org.mule.runtime.api.message.Message part : ((MultiPartContent) msg.getPayload().getValue()).getParts()) {
+    if (msg.getPayload().getValue() instanceof MultiPartPayload) {
+      for (org.mule.runtime.api.message.Message part : ((MultiPartPayload) msg.getPayload().getValue()).getParts()) {
         final String partName = ((PartAttributes) part.getAttributes()).getName();
         attachments.put(partName,
                         toDataHandler(partName, part.getPayload().getValue(), part.getPayload().getDataType().getMediaType()));

@@ -20,7 +20,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.ALWAYS;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.AUTO;
 
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.exception.MessagingException;
@@ -127,7 +127,7 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     HttpEntity httpEntity;
 
     if (!event.getMessage().getOutboundAttachmentNames().isEmpty()
-        || event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
+        || event.getMessage().getPayload().getValue() instanceof MultiPartPayload) {
       if (configuredContentType == null) {
         httpResponseHeaderBuilder.addContentType(createMultipartFormDataContentType());
       } else if (!configuredContentType.startsWith(MULTIPART)) {
@@ -317,8 +317,8 @@ public class HttpResponseBuilder extends HttpMessageBuilder implements Initialis
     }
 
     try {
-      if (event.getMessage().getPayload().getValue() instanceof MultiPartContent) {
-        for (org.mule.runtime.api.message.Message part : ((MultiPartContent) event.getMessage().getPayload().getValue())
+      if (event.getMessage().getPayload().getValue() instanceof MultiPartPayload) {
+        for (org.mule.runtime.api.message.Message part : ((MultiPartPayload) event.getMessage().getPayload().getValue())
             .getParts()) {
           final String partName = ((PartAttributes) part.getAttributes()).getName();
           parts.put(partName,

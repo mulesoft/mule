@@ -10,7 +10,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -26,7 +26,7 @@ import java.util.List;
  * 
  * @since 4.0
  */
-public class DefaultMultiPartContent implements Serializable, MultiPartContent {
+public class DefaultMultiPartPayload implements Serializable, MultiPartPayload {
 
   private static final long serialVersionUID = -1435622001805748221L;
 
@@ -43,20 +43,20 @@ public class DefaultMultiPartContent implements Serializable, MultiPartContent {
   private List<Message> parts;
 
   /**
-   * Builds a new {@link DefaultMultiPartContent} with the given {@link Message}s as parts.
+   * Builds a new {@link DefaultMultiPartPayload} with the given {@link Message}s as parts.
    * 
    * @param parts
    */
-  public DefaultMultiPartContent(Message... parts) {
+  public DefaultMultiPartPayload(Message... parts) {
     this(asList(parts));
   }
 
   /**
-   * Builds a new {@link DefaultMultiPartContent} with the given {@link Message}s as parts.
+   * Builds a new {@link DefaultMultiPartPayload} with the given {@link Message}s as parts.
    * 
    * @param parts
    */
-  public DefaultMultiPartContent(List<Message> parts) {
+  public DefaultMultiPartPayload(List<Message> parts) {
     final Builder<Message> builder = ImmutableList.builder();
 
     for (Message part : parts) {
@@ -64,8 +64,8 @@ public class DefaultMultiPartContent implements Serializable, MultiPartContent {
         throw new IllegalArgumentException("Body parts may only have 'PartAttributes' as attributes.");
       }
 
-      if (part.getPayload().getValue() instanceof MultiPartContent) {
-        builder.addAll(((MultiPartContent) part.getPayload().getValue()).getParts());
+      if (part.getPayload().getValue() instanceof MultiPartPayload) {
+        builder.addAll(((MultiPartPayload) part.getPayload().getValue()).getParts());
       } else {
         builder.add(part);
       }
@@ -77,7 +77,7 @@ public class DefaultMultiPartContent implements Serializable, MultiPartContent {
   /*
    * (non-Javadoc)
    * 
-   * @see org.mule.runtime.core.message.MultiPartContent#getParts()
+   * @see org.mule.runtime.core.message.MultiPartPayload#getParts()
    */
   @Override
   public List<Message> getParts() {
@@ -87,7 +87,7 @@ public class DefaultMultiPartContent implements Serializable, MultiPartContent {
   /*
    * (non-Javadoc)
    * 
-   * @see org.mule.runtime.core.message.MultiPartContent#getPartsNames()
+   * @see org.mule.runtime.core.message.MultiPartPayload#getPartsNames()
    */
   @Override
   public List<String> getPartNames() {
@@ -97,7 +97,7 @@ public class DefaultMultiPartContent implements Serializable, MultiPartContent {
   /*
    * (non-Javadoc)
    * 
-   * @see org.mule.runtime.core.message.MultiPartContent#getPart(java.lang.String)
+   * @see org.mule.runtime.core.message.MultiPartPayload#getPart(java.lang.String)
    */
   @Override
   public Message getPart(String partName) {

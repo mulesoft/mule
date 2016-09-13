@@ -55,7 +55,7 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
 
       @Override
       public String getRouteIdentifier(Event event) throws MessagingException {
-        return event.getVariable(ID_PROPERTY_NAME);
+        return (String) event.getVariable(ID_PROPERTY_NAME).getValue();
       }
 
       @Override

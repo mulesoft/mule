@@ -97,7 +97,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
         .message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).flow(flow).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("flowVars['foo']", event, eventBuilder, flowConstruct, "bar");
-    assertThat(eventBuilder.build().getVariable("foo"), is("bar"));
+    assertThat(eventBuilder.build().getVariable("foo").getValue(), is("bar"));
     assertThat(eventBuilder.build().getSession().getProperty("foo"), nullValue());
   }
 

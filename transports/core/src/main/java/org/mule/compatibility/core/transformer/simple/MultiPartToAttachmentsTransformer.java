@@ -8,20 +8,20 @@ package org.mule.compatibility.core.transformer.simple;
 
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.core.api.InternalMessage.Builder;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 
 import java.nio.charset.Charset;
 
 /**
- * Transforms the message, putting all attachment parts of the {@link DefaultMultiPartContent} form the source as outbound
+ * Transforms the message, putting all attachment parts of the {@link DefaultMultiPartPayload} form the source as outbound
  * attachments in the returning message. of the returning message.
  *
  * @since 4.0
@@ -29,7 +29,7 @@ import java.nio.charset.Charset;
 public class MultiPartToAttachmentsTransformer extends AbstractMessageTransformer {
 
   public MultiPartToAttachmentsTransformer() {
-    registerSourceType(DataType.builder().type(MultiPartContent.class).build());
+    registerSourceType(DataType.builder().type(MultiPartPayload.class).build());
     setReturnDataType(DataType.OBJECT);
   }
 
@@ -39,7 +39,7 @@ public class MultiPartToAttachmentsTransformer extends AbstractMessageTransforme
     try {
       final Builder builder = InternalMessage.builder(message);
 
-      final DefaultMultiPartContent multiPartPayload = (DefaultMultiPartContent) message.getPayload().getValue();
+      final DefaultMultiPartPayload multiPartPayload = (DefaultMultiPartPayload) message.getPayload().getValue();
       if (multiPartPayload.hasBodyPart()) {
         builder.payload(multiPartPayload.getBodyPart().getPayload().getValue());
       } else {

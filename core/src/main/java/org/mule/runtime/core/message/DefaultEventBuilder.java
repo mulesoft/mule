@@ -13,6 +13,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -109,7 +110,7 @@ public class DefaultEventBuilder implements Event.Builder {
     this.notificationsEnabled = event.isNotificationsEnabled();
 
     event.getVariableNames().forEach(key -> this.flowVariables
-        .put(key, new DefaultTypedValue<>(event.getVariable(key), event.getVariableDataType(key))));
+        .put(key, (DefaultTypedValue<Object>) event.getVariable(key)));
   }
 
   @Override
@@ -528,24 +529,13 @@ public class DefaultEventBuilder implements Event.Builder {
     }
 
     @Override
-    public <T> T getVariable(String key) {
-      DefaultTypedValue typedValue = variables.get(key);
+    public <T> TypedValue<T> getVariable(String key) {
+      DefaultTypedValue<T> typedValue = variables.get(key);
 
       if (typedValue == null) {
         throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");
       } else {
-        return (T) typedValue.getValue();
-      }
-    }
-
-    @Override
-    public DataType getVariableDataType(String key) {
-      DefaultTypedValue typedValue = variables.get(key);
-
-      if (typedValue == null) {
-        throw new NoSuchElementException("The flow variable '" + key + "' does not exist.");
-      } else {
-        return typedValue.getDataType();
+        return typedValue;
       }
     }
 
@@ -614,14 +604,14 @@ public class DefaultEventBuilder implements Event.Builder {
       return this.legacyCorrelationId;
     }
 
-    public static <T> T getFlowVariableOrNull(String key, Event event) {
-      T value = null;
+    public static <T> T getVariableValueOrNull(String key, Event event) {
+      TypedValue<T> value = null;
       try {
         value = event.getVariable(key);
       } catch (NoSuchElementException nsse) {
         // Ignore
       }
-      return value;
+      return value != null ? value.getValue() : null;
     }
 
   }

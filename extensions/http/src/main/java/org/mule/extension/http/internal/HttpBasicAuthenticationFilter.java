@@ -9,7 +9,7 @@ package org.mule.extension.http.internal;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getFlowVariableOrNull;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -99,7 +99,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
-    Map<String, String> headers = getFlowVariableOrNull(headersFlowVar, event);
+    Map<String, String> headers = getVariableValueOrNull(headersFlowVar, event);
     Builder builder = Event.builder(event);
     if (headers == null) {
       headers = new HashMap<>();

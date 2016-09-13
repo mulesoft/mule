@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.api.message.MultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.IOUtils;
@@ -41,15 +41,15 @@ public class HttpRequestInboundAttachmentsTestCase extends AbstractHttpRequestTe
   public void processInboundAttachments() throws Exception {
     Event event = flowRunner("requestFlow").withPayload(TEST_MESSAGE).run();
 
-    assertThat(event.getMessage().getPayload().getValue(), instanceOf(MultiPartContent.class));
+    assertThat(event.getMessage().getPayload().getValue(), instanceOf(MultiPartPayload.class));
 
-    MultiPartContent payload = (MultiPartContent) event.getMessage().getPayload().getValue();
+    MultiPartPayload payload = (MultiPartPayload) event.getMessage().getPayload().getValue();
     assertThat(payload.getParts(), hasSize(2));
     assertAttachment(payload, "partName1", "Test part 1", MediaType.TEXT);
     assertAttachment(payload, "partName2", "Test part 2", MediaType.HTML);
   }
 
-  private void assertAttachment(MultiPartContent payload, String attachmentName, String attachmentContents, MediaType contentType)
+  private void assertAttachment(MultiPartPayload payload, String attachmentName, String attachmentContents, MediaType contentType)
       throws IOException {
     assertTrue(payload.getPartNames().contains(attachmentName));
 

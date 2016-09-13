@@ -8,6 +8,7 @@
 package org.mule.runtime.core.el.mvel.datatype;
 
 import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.FLOW_VARS;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -20,7 +21,7 @@ public class FlowVarEnricherDataTypePropagatorTestCase extends AbstractScopedVar
 
   @Override
   protected DataType getVariableDataType(Event event) {
-    return event.getVariableDataType(PROPERTY_NAME);
+    return event.getVariable(PROPERTY_NAME).getDataType();
   }
 
   @Override

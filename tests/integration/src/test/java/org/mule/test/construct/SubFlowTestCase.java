@@ -30,7 +30,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY).getValue(),
                is(muleContext.getRegistry().lookupFlowConstruct("ProcessorChainViaProcessorRef")));
   }
 
@@ -41,7 +41,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY).getValue(),
                is(muleContext.getRegistry().lookupFlowConstruct("ProcessorChainViaFlowRef")));
   }
 
@@ -52,7 +52,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY).getValue(),
                is(muleContext.getRegistry().lookupFlowConstruct("SubFlowViaProcessorRef")));
   }
 
@@ -63,7 +63,7 @@ public class SubFlowTestCase extends AbstractIntegrationTestCase {
 
     assertThat(result.getMessage().getOutboundProperty(LIFECYCLE_TRACKER_PROCESSOR_PROPERTY),
                is("[setMuleContext, setService, setMuleContext, initialise, start]"));
-    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY),
+    assertThat(result.getVariable(FLOW_CONSRUCT_PROPERTY).getValue(),
                is(muleContext.getRegistry().lookupFlowConstruct("SubFlowViaFlowRef")));
   }
 

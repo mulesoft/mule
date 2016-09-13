@@ -36,8 +36,8 @@ import static org.mule.extension.email.util.EmailTestUtils.testSession;
 
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.message.MultiPartContent;
-import org.mule.runtime.core.message.DefaultMultiPartContent;
+import org.mule.runtime.api.message.MultiPartPayload;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -112,12 +112,12 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     List<Message> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
     assertThat(messages, hasSize(1));
-    assertThat(messages.get(0).getPayload().getValue(), instanceOf(MultiPartContent.class));
-    List<Message> emailAttachments = ((MultiPartContent) messages.get(0).getPayload().getValue()).getParts();
+    assertThat(messages.get(0).getPayload().getValue(), instanceOf(MultiPartPayload.class));
+    List<Message> emailAttachments = ((MultiPartPayload) messages.get(0).getPayload().getValue()).getParts();
 
     assertThat(emailAttachments, hasSize(3));
-    assertThat(((DefaultMultiPartContent) messages.get(0).getPayload().getValue()).hasBodyPart(), is(true));
-    assertThat(((MultiPartContent) messages.get(0).getPayload().getValue()).getPartNames(),
+    assertThat(((DefaultMultiPartPayload) messages.get(0).getPayload().getValue()).hasBodyPart(), is(true));
+    assertThat(((MultiPartPayload) messages.get(0).getPayload().getValue()).getPartNames(),
                hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
     assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
     assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);

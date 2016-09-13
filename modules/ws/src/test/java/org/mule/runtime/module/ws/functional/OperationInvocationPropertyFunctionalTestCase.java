@@ -39,7 +39,7 @@ public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSCon
         flowRunner("echo").withPayload(ECHO_REQUEST).withFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE).run();
 
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
-    assertThat(event.getVariable(CxfConstants.OPERATION), is(OPERATION_VALUE));
+    assertThat(event.getVariable(CxfConstants.OPERATION).getValue(), is(OPERATION_VALUE));
   }
 
 
