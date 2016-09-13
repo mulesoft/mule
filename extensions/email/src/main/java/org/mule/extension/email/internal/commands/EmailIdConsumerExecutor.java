@@ -22,7 +22,7 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-class EmailIdConsumerExecutor {
+public class EmailIdConsumerExecutor {
 
   public static final String NO_ID_ERROR =
       "Expecting an explicit emailId value or email attributes in the incoming mule message in order to store an email.";

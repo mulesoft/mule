@@ -78,8 +78,7 @@ public final class EmailConnectorUtils {
   /**
    * Hide constructor
    */
-  private EmailConnectorUtils() {
-  }
+  private EmailConnectorUtils() {}
 
   /**
    * Converts a simple {@link String} representing an address into an {@link InternetAddress} instance

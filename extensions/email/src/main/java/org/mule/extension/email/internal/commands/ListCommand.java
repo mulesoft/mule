@@ -47,9 +47,9 @@ public final class ListCommand {
    *                          {@link Message} carrying all the emails and it's corresponding attributes.
    */
   public List<Message> list(RetrieverConnection connection,
-                                String folderName,
-                                boolean shouldReadContent,
-                                Predicate<ReceivedEmailAttributes> matcher) {
+                            String folderName,
+                            boolean shouldReadContent,
+                            Predicate<ReceivedEmailAttributes> matcher) {
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);
       List<Message> list = new LinkedList<>();

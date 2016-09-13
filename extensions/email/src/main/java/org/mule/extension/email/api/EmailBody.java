@@ -49,6 +49,8 @@ public class EmailBody {
   /**
    * The character encoding of the body. If not specified, it defaults to the default charset in the mule configuration
    */
+  @Parameter
+  @Optional
   @Placement(order = 3)
   private String charset;
 
