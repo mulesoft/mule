@@ -12,10 +12,7 @@ import org.mule.runtime.core.config.ExceptionHelper;
 
 import java.util.Map;
 
-/**
- * <code>DefaultExceptionPayload</code> TODO
- */
-
+@Deprecated
 public class DefaultExceptionPayload implements ExceptionPayload {
 
   /**
