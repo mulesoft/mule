@@ -16,14 +16,13 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.Base64;
 
 import java.util.List;
 import java.util.Random;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class DefaultEntryPointResolverSetMultithreadingTestCase extends AbstractIntegrationTestCase {

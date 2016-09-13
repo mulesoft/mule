@@ -7,7 +7,7 @@
 package org.mule.runtime.core.message;
 
 import org.mule.runtime.api.message.AbstractMuleMessageBuilderFactory;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  *

@@ -15,7 +15,7 @@ import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
 
 import org.mule.extension.validation.api.NumberType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

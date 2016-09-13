@@ -11,7 +11,7 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;

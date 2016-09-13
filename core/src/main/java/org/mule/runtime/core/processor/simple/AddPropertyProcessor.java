@@ -9,7 +9,7 @@ package org.mule.runtime.core.processor.simple;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.Serializable;
 

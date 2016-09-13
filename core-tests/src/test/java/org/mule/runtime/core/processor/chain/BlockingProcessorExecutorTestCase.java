@@ -21,7 +21,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ProcessorExecutor;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
@@ -34,7 +34,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

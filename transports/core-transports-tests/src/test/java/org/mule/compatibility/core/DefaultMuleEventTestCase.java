@@ -20,7 +20,7 @@ import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleTestCase;

@@ -8,7 +8,7 @@ package org.mule.test.core.context.notification;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNull;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.runtime.core.context.notification.ExceptionNotification;

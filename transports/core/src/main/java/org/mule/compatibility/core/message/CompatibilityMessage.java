@@ -9,8 +9,8 @@ package org.mule.compatibility.core.message;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.GroupCorrelation;
 
 import java.io.Serializable;

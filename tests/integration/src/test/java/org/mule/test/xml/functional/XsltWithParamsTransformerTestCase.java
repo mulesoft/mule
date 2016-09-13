@@ -7,7 +7,7 @@
 package org.mule.test.xml.functional;
 
 import static org.junit.Assert.assertNotNull;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.tck.junit4.rule.ForceXalanTransformerFactory;
 import org.mule.tck.junit4.rule.SystemProperty;

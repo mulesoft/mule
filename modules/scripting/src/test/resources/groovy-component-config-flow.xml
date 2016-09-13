@@ -13,8 +13,9 @@
     <flow name="inlineScriptMutateProperty">
         <script:component>
             <script:script engine="groovy">
-                message = org.mule.runtime.core.api.InternalMessage.builder(message).addOutboundProperty('foo', 'bar-mutated').build()
-             </script:script>
+                message = org.mule.runtime.core.api.message.InternalMessage.builder(message).addOutboundProperty('foo',
+                'bar-mutated').build()
+            </script:script>
         </script:component>
         <test:assert expression="#[message.outboundProperties.foo == 'bar-mutated']"/>
     </flow>
@@ -22,8 +23,9 @@
     <flow name="inlineScriptAddProperty">
         <script:component>
             <script:script engine="groovy">
-                message = org.mule.runtime.core.api.InternalMessage.builder(message).addOutboundProperty('foo', 'bar').build()
-             </script:script>
+                message = org.mule.runtime.core.api.message.InternalMessage.builder(message).addOutboundProperty('foo',
+                'bar').build()
+            </script:script>
         </script:component>
         <test:assert expression="#[message.outboundProperties.foo == 'bar']"/>
     </flow>

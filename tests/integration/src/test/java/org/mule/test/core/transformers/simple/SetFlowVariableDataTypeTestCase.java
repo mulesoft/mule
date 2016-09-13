@@ -16,7 +16,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 
 import org.junit.Test;

@@ -15,7 +15,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.METHOD_N
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;

@@ -16,7 +16,7 @@ import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -291,7 +291,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   /**
-   * @return creates a new {@link org.mule.runtime.core.api.InternalMessage} with a test payload
+   * @return creates a new {@link InternalMessage} with a test payload
    */
   @Deprecated
   protected InternalMessage getTestMuleMessage() {
@@ -300,7 +300,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   /**
    * @param message
-   * @return creates a new {@link org.mule.runtime.core.api.InternalMessage} with message as payload
+   * @return creates a new {@link InternalMessage} with message as payload
    */
   @Deprecated
   protected InternalMessage getTestMuleMessage(Object message) {

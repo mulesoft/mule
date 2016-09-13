@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.xml.ws.soap.SOAPFaultException;

@@ -13,7 +13,7 @@ import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.component.LifecycleAdapter;

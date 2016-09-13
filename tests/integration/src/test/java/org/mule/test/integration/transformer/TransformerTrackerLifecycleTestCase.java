@@ -8,7 +8,7 @@ package org.mule.test.integration.transformer;
 
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;

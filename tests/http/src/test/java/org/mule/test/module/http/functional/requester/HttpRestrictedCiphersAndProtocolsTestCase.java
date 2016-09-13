@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;

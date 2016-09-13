@@ -11,7 +11,7 @@ import static java.lang.String.format;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.source.polling.watermark.WatermarkUtils;
 

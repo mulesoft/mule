@@ -13,7 +13,7 @@ import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.extension.api.annotation.Parameter;

@@ -8,7 +8,7 @@ package org.mule.test.construct;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 public class OneWayOutboundReturningEventTestCase extends OneWayOutboundTestCase {
 

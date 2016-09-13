@@ -8,8 +8,8 @@ package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.api.InternalMessage.Builder;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.routing.correlation.CollectionCorrelatorCallback;

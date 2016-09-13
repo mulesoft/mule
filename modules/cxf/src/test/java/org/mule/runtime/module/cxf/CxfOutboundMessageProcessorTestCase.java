@@ -11,7 +11,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.component.simple.EchoService;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.cxf.builder.SimpleClientMessageProcessorBuilder;

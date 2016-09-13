@@ -12,7 +12,7 @@ import static org.mule.runtime.core.DefaultEventContext.create;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 
 public class MessageRedeliveredException extends org.mule.compatibility.core.api.exception.EndpointMessageRedeliveredException {

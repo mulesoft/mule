@@ -8,7 +8,6 @@ package org.mule.compatibility.transport.http;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
 
 import java.net.URI;
 import java.net.URISyntaxException;

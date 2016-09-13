@@ -13,7 +13,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;

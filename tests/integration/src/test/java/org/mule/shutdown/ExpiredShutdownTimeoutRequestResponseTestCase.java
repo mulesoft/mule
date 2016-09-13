@@ -11,7 +11,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;

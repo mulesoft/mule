@@ -7,7 +7,7 @@
 package org.mule.runtime.core.util;
 
 import org.mule.runtime.core.PropertyScope;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 

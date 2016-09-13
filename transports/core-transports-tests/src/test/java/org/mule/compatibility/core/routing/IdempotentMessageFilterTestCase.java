@@ -14,7 +14,7 @@ import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populate
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.IdempotentMessageFilter;

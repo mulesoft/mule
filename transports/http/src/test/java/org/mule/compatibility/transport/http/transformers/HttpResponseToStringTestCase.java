@@ -12,7 +12,7 @@ import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.compatibility.transport.http.HttpResponse;
 import org.mule.compatibility.transport.http.ResponseWriter;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import org.apache.commons.httpclient.Header;

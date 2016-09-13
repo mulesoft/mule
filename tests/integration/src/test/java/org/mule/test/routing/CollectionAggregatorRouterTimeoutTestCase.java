@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.RoutingNotificationListener;
 import org.mule.runtime.core.context.notification.RoutingNotification;
@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class CollectionAggregatorRouterTimeoutTestCase extends AbstractIntegrationTestCase {

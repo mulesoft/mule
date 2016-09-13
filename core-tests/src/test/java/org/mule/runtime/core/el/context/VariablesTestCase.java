@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.Map;
 

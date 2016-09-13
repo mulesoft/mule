@@ -10,7 +10,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.util.AttributeEvaluator;
 

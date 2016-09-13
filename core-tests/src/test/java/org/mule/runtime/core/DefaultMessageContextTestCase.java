@@ -13,11 +13,9 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.notification.FlowStackElement;
-import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

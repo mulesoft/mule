@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.tcp.protocols;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 
 import java.io.ByteArrayInputStream;

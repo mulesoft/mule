@@ -9,7 +9,7 @@ package org.mule.runtime.module.xml.transformers.xml.wire;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.module.xml.transformer.ObjectToXml;
 import org.mule.runtime.module.xml.transformer.XmlToObject;

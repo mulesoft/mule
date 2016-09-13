@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.core.api.routing;
 
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 
 /**
  * Routes the message to zero or more <code>MatchableMessageProcessor</code>s. Which route(s) are used used is defined by
- * implementations of this interface which use the {@link Matchable#isMatch(org.mule.runtime.core.api.InternalMessage)} method of
+ * implementations of this interface which use the {@link Matchable#isMatch(InternalMessage)} method of
  * the routers to determine if a router accept the event or not.
  * <p>
  * Different implementations may route to the first match, or to all matches or you some other strategy. If the implementation

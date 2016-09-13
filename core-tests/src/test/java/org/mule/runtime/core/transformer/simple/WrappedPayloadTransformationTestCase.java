@@ -8,7 +8,7 @@ package org.mule.runtime.core.transformer.simple;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import org.junit.Test;

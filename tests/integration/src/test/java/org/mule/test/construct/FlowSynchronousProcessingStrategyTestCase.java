@@ -9,7 +9,7 @@ package org.mule.test.construct;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 public class FlowSynchronousProcessingStrategyTestCase extends FlowDefaultProcessingStrategyTestCase {
 

@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.transport.MessageRequester;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;

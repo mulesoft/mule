@@ -24,7 +24,7 @@ import static org.mule.runtime.core.api.LocatedMuleException.INFO_LOCATION_KEY;
 import org.mule.functional.functional.FlowAssert;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.AbstractIntegrationTestCase;

@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.FutureMessageResult;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.concurrent.TimeoutException;
 

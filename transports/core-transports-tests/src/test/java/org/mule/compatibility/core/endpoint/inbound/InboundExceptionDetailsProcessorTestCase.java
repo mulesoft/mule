@@ -13,7 +13,7 @@ import static org.mule.tck.MuleTestUtils.createErrorMock;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 
 import org.junit.Test;

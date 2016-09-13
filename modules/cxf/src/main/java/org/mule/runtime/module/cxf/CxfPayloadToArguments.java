@@ -7,8 +7,6 @@
 package org.mule.runtime.module.cxf;
 
 
-import org.mule.runtime.core.api.InternalMessage;
-
 /**
  * This enum defines the strategies to convert a Payload to an array of arguments that will be used to call the webservice in
  * {@link CxfOutboundMessageProcessor#doSendWithClient(org.mule.runtime.core.api.MuleEvent)} and in

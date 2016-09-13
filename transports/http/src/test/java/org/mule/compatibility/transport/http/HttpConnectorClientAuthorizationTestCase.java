@@ -18,7 +18,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 

@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * Signals that a Notification can have a {@link Message} available through it. The message set will be the one available when the
  * notification was triggered.
  *
- * @see org.mule.runtime.core.api.InternalMessage
+ * @see InternalMessage
  */
 public interface MuleMessageAware {
 

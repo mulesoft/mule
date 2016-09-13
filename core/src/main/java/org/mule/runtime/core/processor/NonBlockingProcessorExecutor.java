@@ -13,7 +13,7 @@ import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;

@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.core.api.transport;
 
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 /**
  * Defines generic methods for receiving events. The exact behaviour of the action is defined by the implementing class.

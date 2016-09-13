@@ -13,7 +13,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 public class DefaultMuleEventEndpointUtils {
 

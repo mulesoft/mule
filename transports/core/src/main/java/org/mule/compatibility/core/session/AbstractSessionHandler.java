@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.session;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.DefaultObjectSerializer;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.serialization.SerializationException;

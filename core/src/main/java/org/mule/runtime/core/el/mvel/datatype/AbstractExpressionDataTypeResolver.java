@@ -8,7 +8,6 @@
 package org.mule.runtime.core.el.mvel.datatype;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.compiler.CompiledExpression;

@@ -8,7 +8,7 @@
 package org.mule.runtime.core.api.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.util.Preconditions;
 

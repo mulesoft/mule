@@ -17,13 +17,13 @@ import static org.mule.extension.email.internal.commands.ReplyCommand.NO_EMAIL_F
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.MG_EMAIL;
-import static org.mule.runtime.core.api.InternalMessage.builder;
+import static org.mule.runtime.core.api.message.InternalMessage.builder;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.CollectionUtils.singletonList;
 
 import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 

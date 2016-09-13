@@ -16,7 +16,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;

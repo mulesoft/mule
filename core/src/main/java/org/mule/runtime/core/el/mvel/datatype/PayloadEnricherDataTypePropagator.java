@@ -13,7 +13,7 @@ import static org.mule.runtime.core.el.mvel.MessageVariableResolverFactory.PAYLO
 import org.mule.mvel2.ast.ASTNode;
 import org.mule.mvel2.ast.Assignment;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 
 /**

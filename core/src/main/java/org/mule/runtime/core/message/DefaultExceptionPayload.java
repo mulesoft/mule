@@ -7,7 +7,7 @@
 package org.mule.runtime.core.message;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.ExceptionPayload;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.config.ExceptionHelper;
 
 import java.util.Map;

@@ -7,7 +7,7 @@
 package org.mule.compatibility.core.context.notification;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 

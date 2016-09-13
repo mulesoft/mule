@@ -13,8 +13,8 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.ExceptionPayload;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.DispatchException;

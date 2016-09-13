@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.introspection.describer.model
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -30,7 +31,7 @@ import java.util.Set;
 public interface ExtensionParameter extends WithType, WithAnnotations, Named, WithAlias, WithOwner {
 
   Set<Class<?>> IMPLICIT_ARGUMENT_TYPES = ImmutableSet.<Class<?>>builder().add(Event.class).add(Message.class)
-      .add(org.mule.runtime.core.api.InternalMessage.class).build();
+      .add(InternalMessage.class).build();
 
   /**
    * @return A {@code boolean} indicating whether the parameter should be advertised and added as a {@link ParameterModel} in the

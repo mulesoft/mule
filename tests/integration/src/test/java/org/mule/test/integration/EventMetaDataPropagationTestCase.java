@@ -18,7 +18,7 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;

@@ -14,7 +14,7 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.tck.junit4.rule.DynamicPort;

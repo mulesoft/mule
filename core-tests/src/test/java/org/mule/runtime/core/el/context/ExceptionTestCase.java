@@ -16,7 +16,7 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
 

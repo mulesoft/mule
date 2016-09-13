@@ -16,7 +16,7 @@ import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.math.BigInteger;
 import java.util.List;

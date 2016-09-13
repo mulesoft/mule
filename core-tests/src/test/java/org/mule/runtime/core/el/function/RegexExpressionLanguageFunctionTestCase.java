@@ -20,7 +20,7 @@ import org.mule.mvel2.ParserConfiguration;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionExecutor;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;

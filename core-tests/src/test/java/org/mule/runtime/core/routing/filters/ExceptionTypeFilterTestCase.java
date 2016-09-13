@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

@@ -18,13 +18,12 @@ import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.EntryPointNotFoundException;
 import org.mule.runtime.core.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -37,8 +36,6 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
 import java.util.Arrays;
-
-import javax.naming.event.EventContext;
 
 import org.junit.Test;
 

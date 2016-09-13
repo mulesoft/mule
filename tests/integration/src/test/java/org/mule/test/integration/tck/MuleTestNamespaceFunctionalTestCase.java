@@ -14,12 +14,11 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.ExceptionUtils;
 
 import java.io.FileNotFoundException;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 public class MuleTestNamespaceFunctionalTestCase extends AbstractIntegrationTestCase {

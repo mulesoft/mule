@@ -12,7 +12,7 @@ import static org.mule.runtime.core.context.notification.TransactionNotification
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageRequester;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;

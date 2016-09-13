@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.construct.Flow;

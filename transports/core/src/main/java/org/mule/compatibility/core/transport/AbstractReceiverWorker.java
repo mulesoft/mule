@@ -16,7 +16,7 @@ import org.mule.compatibility.core.message.CompatibilityMessage;
 import org.mule.compatibility.core.session.SerializeAndEncodeSessionHandler;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;

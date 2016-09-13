@@ -8,7 +8,6 @@ package org.mule.compatibility.core.api.transport;
 
 import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
 
 /**
  * <code>MessageTypeNotSupportedException</code> is thrown when a {@link Message} instance is to be created with an payload type

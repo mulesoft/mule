@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mule.compatibility.transport.file.FileTestUtils.createDataFile;
 
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import org.junit.Test;

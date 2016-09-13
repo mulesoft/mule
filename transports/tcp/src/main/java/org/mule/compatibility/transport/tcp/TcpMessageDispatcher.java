@@ -12,7 +12,7 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.transport.AbstractMessageDispatcher;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.transformer.TransformerException;
 

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.MethodHeaderPropertyEntryPointResolver;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;

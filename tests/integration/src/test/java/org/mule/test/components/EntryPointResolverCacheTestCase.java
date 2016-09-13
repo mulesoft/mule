@@ -12,8 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.Event;
 import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 

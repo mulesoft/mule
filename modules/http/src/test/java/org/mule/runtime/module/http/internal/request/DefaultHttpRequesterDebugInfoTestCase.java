@@ -35,7 +35,7 @@ import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.construct.Flow;

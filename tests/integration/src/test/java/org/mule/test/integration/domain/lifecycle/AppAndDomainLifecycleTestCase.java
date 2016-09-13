@@ -13,7 +13,7 @@ import org.mule.functional.junit4.ApplicationContextBuilder;
 import org.mule.functional.junit4.DomainContextBuilder;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.internal.listener.DefaultHttpListenerConfig;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;

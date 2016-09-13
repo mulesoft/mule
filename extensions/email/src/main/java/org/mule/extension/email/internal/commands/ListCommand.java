@@ -16,7 +16,7 @@ import org.mule.extension.email.api.EmailContentProcessor;
 import org.mule.extension.email.api.exception.EmailRetrieverException;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 
 import java.util.ArrayList;

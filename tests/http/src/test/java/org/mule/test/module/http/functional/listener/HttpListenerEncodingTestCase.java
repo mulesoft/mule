@@ -9,7 +9,7 @@ package org.mule.test.module.http.functional.listener;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.runners.RunnerDelegateTo;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 

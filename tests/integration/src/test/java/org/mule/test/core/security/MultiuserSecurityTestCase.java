@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.EncryptionStrategy;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.security.MuleCredentials;
 
 import java.io.Serializable;

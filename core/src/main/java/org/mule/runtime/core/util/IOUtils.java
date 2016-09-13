@@ -8,8 +8,8 @@ package org.mule.runtime.core.util;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.api.InternalMessage.Builder;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.message.PartAttributes;

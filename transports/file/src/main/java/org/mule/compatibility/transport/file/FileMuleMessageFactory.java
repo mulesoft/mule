@@ -13,7 +13,7 @@ import static org.mule.compatibility.transport.file.FileConnector.PROPERTY_ORIGI
 
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.File;
 import java.io.InputStream;

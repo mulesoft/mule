@@ -8,7 +8,7 @@ package org.mule.test.integration.resolvers;
 
 import static java.util.Collections.emptyMap;
 import static org.junit.Assert.assertEquals;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.Map;

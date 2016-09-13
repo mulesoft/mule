@@ -11,7 +11,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.HEADER_CONTENT
 import org.mule.compatibility.transport.http.multipart.MultiPartInputStream;
 import org.mule.compatibility.transport.http.multipart.Part;
 import org.mule.compatibility.transport.http.multipart.PartDataSource;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.IOException;
 import java.io.Serializable;

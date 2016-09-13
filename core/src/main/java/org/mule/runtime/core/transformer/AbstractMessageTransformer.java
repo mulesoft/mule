@@ -12,7 +12,7 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformer;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -31,7 +31,7 @@ import java.nio.charset.Charset;
  * message will be a new {@link Message} with the src as its payload. Transformers should always work on the src object not the
  * message payload.
  *
- * @see org.mule.runtime.core.api.InternalMessage
+ * @see InternalMessage
  */
 
 public abstract class AbstractMessageTransformer extends AbstractTransformer implements MessageTransformer {

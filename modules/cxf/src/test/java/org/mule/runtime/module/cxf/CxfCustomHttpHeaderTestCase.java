@@ -19,7 +19,7 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;

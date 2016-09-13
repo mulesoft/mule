@@ -13,7 +13,7 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.ObjectUtils;

@@ -12,7 +12,7 @@ import static org.junit.Assert.fail;
 
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;

@@ -7,7 +7,7 @@
 package org.mule.test.integration.streaming;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 
 public class ExceptionThrowingFilter implements Filter {

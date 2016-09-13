@@ -12,7 +12,7 @@ import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import org.mule.compatibility.transport.tcp.TcpProtocol;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat;

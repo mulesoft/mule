@@ -7,7 +7,7 @@
 package org.mule.runtime.module.cxf;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 

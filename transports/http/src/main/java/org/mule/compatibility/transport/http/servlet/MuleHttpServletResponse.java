@@ -10,7 +10,7 @@ import static org.mule.compatibility.transport.http.HttpConnector.HTTP_STATUS_PR
 import org.mule.compatibility.transport.http.HttpConnector;
 import org.mule.compatibility.transport.http.HttpConstants;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.IOException;
 import java.io.PrintWriter;

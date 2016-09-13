@@ -26,10 +26,9 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
@@ -42,8 +41,6 @@ import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 

@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.List;
 

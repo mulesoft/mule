@@ -14,7 +14,7 @@ import org.mule.extension.email.internal.commands.DeleteCommand;
 import org.mule.extension.email.internal.commands.ListCommand;
 import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;

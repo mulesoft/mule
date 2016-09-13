@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.File;
 

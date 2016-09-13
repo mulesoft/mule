@@ -7,7 +7,7 @@
 package org.mule.runtime.core.transformer;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.nio.charset.Charset;

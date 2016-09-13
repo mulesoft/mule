@@ -7,7 +7,7 @@
 package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;

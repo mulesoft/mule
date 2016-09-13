@@ -27,8 +27,8 @@ import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.api.InternalMessage.Builder;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.client.OperationOptions;
@@ -43,8 +43,6 @@ import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.functional.Either;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 
-import java.io.Serializable;
-import java.util.Map;
 import java.util.Optional;
 
 public class DefaultLocalMuleClient implements MuleClient {

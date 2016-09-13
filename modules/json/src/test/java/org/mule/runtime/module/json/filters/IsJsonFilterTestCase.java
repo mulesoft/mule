@@ -10,6 +10,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class IsJsonFilterTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testFilterTrue() throws Exception {
     assertTrue(filter.accept(
-                             org.mule.runtime.core.api.InternalMessage.builder()
+        InternalMessage.builder()
                                  .payload("{\n" + "        \"in_reply_to_user_id\":null,\n"
                                      + "        \"text\":\"test from Mule: " + "6ffca02b-9d52-475e-8b17-946acdb01492\"}")
                                  .build().getPayload().getValue()));

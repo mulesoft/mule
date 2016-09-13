@@ -14,15 +14,14 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.InternalMessage;
-import org.mule.runtime.core.api.InternalMessage.CollectionBuilder;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.PartitionableObjectStore;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.ClassUtils;
-import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;

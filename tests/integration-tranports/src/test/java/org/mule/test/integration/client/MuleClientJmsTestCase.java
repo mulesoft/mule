@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsConstants;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.HashMap;
 import java.util.Map;

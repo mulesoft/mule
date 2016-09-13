@@ -10,7 +10,7 @@ import static org.mule.compatibility.transport.jms.JmsConstants.JMS_REPLY_TO;
 
 import org.mule.compatibility.core.message.MuleCompatibilityMessageBuilder;
 import org.mule.compatibility.core.transport.AbstractMuleMessageFactory;
-import org.mule.runtime.core.api.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 
 import java.io.Serializable;
