@@ -25,6 +25,11 @@ public interface AuthorizationCodeGrantType extends ApplicationCredentials
     String getRedirectionUrl();
 
     /**
+     * @return redirect url to be sent to the client, won't start a server there.
+     */
+    String getExternalRedirectionUrl();
+
+    /**
      * @return expression to determine if a call to the resource secured with oauth failed because the access token has expired or was revoked.
      */
     String getRefreshTokenWhen();
