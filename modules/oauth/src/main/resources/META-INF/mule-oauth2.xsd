@@ -84,11 +84,19 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The oauth authentication server will use this url to provide the authentication code to the
-                            Mule server so the mule server can
-                            retrieve the access token. If this attribute is provided mule will automatically create an
-                            endpoint in this url to be able to
-                            store the authentication code unless there’s already an endpoint registered to manually
-                            extract the authorization code
+                            Mule server so it can retrieve the access token.
+                            If this attribute is provided mule will automatically create an endpoint at this url to
+                            be able to store the authentication code unless there’s already an endpoint registered
+                            to manually extract the authorization code.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="externalRedirectionUrl" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This is the redirection url to send to the user, and must match the one configured in the
+                            oauth authentication server. It won't create an endpoint by itself, and should be used
+                            when the external callback address is different from the local one.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

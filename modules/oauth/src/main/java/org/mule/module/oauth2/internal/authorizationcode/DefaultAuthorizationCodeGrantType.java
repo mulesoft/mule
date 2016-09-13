@@ -8,7 +8,6 @@ package org.mule.module.oauth2.internal.authorizationcode;
 
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.config.i18n.MessageFactory.createStaticMessage;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -66,6 +65,11 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
     public void setRedirectionUrl(final String redirectionUrl)
     {
         this.redirectionUrl = redirectionUrl;
+    }
+
+    public void setExternalRedirectionUrl(final String externalRedirectionUrl)
+    {
+        this.externalRedirectionUrl = externalRedirectionUrl;
     }
 
     public void setAuthorizationRequestHandler(final AuthorizationRequestHandler authorizationRequestHandler)
@@ -167,10 +171,15 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType impleme
                 resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
             }
             resourceOwnerIdEvaluator.initialize(muleContext.getExpressionManager());
+
+            String externalRedirectionUrlSystemProperty = System.getProperty(EXTERNAL_REDIRECT_URL_PROPERTY);
+            if (externalRedirectionUrl != null && externalRedirectionUrlSystemProperty != null)
+            {
+                throw new IllegalArgumentException("Can't use both externalRedirectionUrl and " + EXTERNAL_REDIRECT_URL_PROPERTY);
+            }
             if (externalRedirectionUrl == null)
             {
-                String url = System.getProperty(EXTERNAL_REDIRECT_URL_PROPERTY);
-                externalRedirectionUrl = url != null ? url : getRedirectionUrl();
+                externalRedirectionUrl = externalRedirectionUrlSystemProperty != null ? externalRedirectionUrlSystemProperty : getRedirectionUrl();
             }
         }
         catch (Exception e)
