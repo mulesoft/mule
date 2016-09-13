@@ -20,13 +20,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * {@link ConnectionProvider#disconnect(Object)} will be invoked on {@link #connectionProvider} with {@link #connection} as
  * argument.
  *
- * @param <Connection> the generic type of the connections to be handled
+ * @param <C> the generic type of the connections to be handled
  * @since 4.0
  */
-final class PassThroughConnectionHandler<Connection> implements ConnectionHandlerAdapter<Connection> {
+final class PassThroughConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
-  private final Connection connection;
-  private final ConnectionProvider<Connection> connectionProvider;
+  private final C connection;
+  private final ConnectionProvider<C> connectionProvider;
   private final AtomicBoolean released = new AtomicBoolean(false);
 
   /**
@@ -35,7 +35,7 @@ final class PassThroughConnectionHandler<Connection> implements ConnectionHandle
    * @param connection the connection to be returned by {@link #getConnection()}
    * @param connectionProvider the {@link ConnectionProvider} used to manage the connection
    */
-  PassThroughConnectionHandler(Connection connection, ConnectionProvider<Connection> connectionProvider) {
+  PassThroughConnectionHandler(C connection, ConnectionProvider<C> connectionProvider) {
     this.connection = connection;
     this.connectionProvider = connectionProvider;
   }
@@ -44,7 +44,7 @@ final class PassThroughConnectionHandler<Connection> implements ConnectionHandle
    * @return {@link #connection}
    */
   @Override
-  public Connection getConnection() throws ConnectionException {
+  public C getConnection() throws ConnectionException {
     return connection;
   }
 

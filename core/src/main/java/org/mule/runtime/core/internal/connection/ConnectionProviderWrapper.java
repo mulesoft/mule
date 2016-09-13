@@ -16,7 +16,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
@@ -29,50 +28,50 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for wrappers for {@link ConnectionProvider} instances
  *
- * @param <Connection> the generic type of the connections that the {@link #delegate} produces
+ * @param <C> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public abstract class ConnectionProviderWrapper<Connection>
-    implements ConnectionProvider<Connection>, HasPoolingProfile, Lifecycle {
+public abstract class ConnectionProviderWrapper<C>
+    implements ConnectionProvider<C>, HasPoolingProfile, Lifecycle {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionProviderWrapper.class);
 
   @Inject
   protected MuleContext muleContext;
 
-  private final ConnectionProvider<Connection> delegate;
+  private final ConnectionProvider<C> delegate;
 
   /**
    * Creates a new instance which wraps the {@code delegate}
    *
    * @param delegate the {@link ConnectionProvider} to be wrapped
    */
-  ConnectionProviderWrapper(ConnectionProvider<Connection> delegate) {
+  ConnectionProviderWrapper(ConnectionProvider<C> delegate) {
     this.delegate = delegate;
   }
 
   @Override
-  public Connection connect() throws ConnectionException {
+  public C connect() throws ConnectionException {
     return delegate.connect();
   }
 
   /**
    * Delegates the connection validation to the delegated {@link ConnectionProvider}
    *
-   * @param connection a non {@code null} {@link Connection}.
+   * @param connection a non {@code null} {@link C}.
    * @return the {@link ConnectionValidationResult} returned by the delegated {@link ConnectionProvider}
    */
   @Override
-  public ConnectionValidationResult validate(Connection connection) {
+  public ConnectionValidationResult validate(C connection) {
     return delegate.validate(connection);
   }
 
   @Override
-  public void disconnect(Connection connection) {
+  public void disconnect(C connection) {
     delegate.disconnect(connection);
   }
 
-  public ConnectionProvider<Connection> getDelegate() {
+  public ConnectionProvider<C> getDelegate() {
     return delegate;
   }
 

@@ -9,6 +9,8 @@ package org.mule.runtime.core.api.connector;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 /**
  * Manages all the connections opened between the boundaries of an application.
@@ -34,12 +36,11 @@ public interface ConnectionManager {
    * If a binding already exists for the {@code config} then this one replaces the previous one. All connections produced by the
    * previous binding are closed.
    *
-   * @param config the config that acts as the binding key
+   * @param config             the config that acts as the binding key
    * @param connectionProvider the {@link ConnectionProvider} that produces the connections
-   * @param <Config> the generic type of the {@code config}
-   * @param <Connection> the generic type of the connections to be produced
+   * @param <C>       the generic type of the connections to be produced
    */
-  <Config, Connection> void bind(Config config, ConnectionProvider<Connection> connectionProvider);
+  <C> void bind(Object config, ConnectionProvider<C> connectionProvider);
 
   /**
    * @param config the config that acts as the binding key
@@ -72,11 +73,35 @@ public interface ConnectionManager {
    * {@link ConnectionHandler#release()} method on it.
    *
    * @param config a config for which a binding has been established through {@link #bind(Object, ConnectionProvider)}
-   * @param <Config> the generic type of the supplied config
-   * @param <Connection> the generic type of the returned connection
+   * @param <C>    the generic type of the returned connection
    * @return a {@link ConnectionHandler} wrapping the produced connection
    * @throws ConnectionException if the conection could not be established or if no such binding exists for the {@code config}
    */
-  <Config, Connection> ConnectionHandler<Connection> getConnection(Config config) throws ConnectionException;
+  <C> ConnectionHandler<C> getConnection(Object config) throws ConnectionException;
 
+  /**
+   * Tests connectivity of the given {@code connectionProvider}.
+   * <p>
+   * The {@code connectionProvider} is expected to be fully initialised and functional. However,
+   * it is not required for it to have been registered through the {@link #bind(Object, ConnectionProvider)}
+   * method.
+   *
+   * @param connectionProvider a {@link ConnectionProvider}
+   * @param <C>                the generic type of the connections produced by the {@code connectionProvider}
+   * @return a {@link  ConnectionValidationResult}
+   */
+  <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider);
+
+  /**
+   * Tests connectivity for the given {@code configurationInstance}.
+   * <p>
+   * The {@code connectionProvider} is expected to be fully initialised and functional. However,
+   * it is not required for it to have been registered through the {@link #bind(Object, ConnectionProvider)}
+   * method.
+   *
+   * @param configurationInstance a {@link ConfigurationInstance}
+   * @return a {@link ConnectionValidationResult}
+   * @throws IllegalArgumentException if the {@code configurationInstance} doesn't have an associated {@link ConnectionProvider}
+   */
+  ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance) throws IllegalArgumentException;
 }

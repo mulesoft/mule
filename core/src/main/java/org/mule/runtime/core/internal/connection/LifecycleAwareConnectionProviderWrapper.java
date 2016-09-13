@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -22,19 +23,19 @@ import org.mule.runtime.core.lifecycle.phases.NotInLifecyclePhase;
 import java.util.Optional;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConnectionProviderWrapper} which performs lifecycle and dependency injection operations on the generated connections
  *
- * @param <Connection> the generic type of the connections that the {@link #delegate} produces
+ * @param <C> the generic type of the connections that the {@link #delegate} produces
  * @since 4.0
  */
-public class LifecycleAwareConnectionProviderWrapper<Connection> extends ConnectionProviderWrapper<Connection> {
+public class LifecycleAwareConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConnectionProviderWrapper.class);
+  private static final Logger LOGGER = getLogger(LifecycleAwareConnectionProviderWrapper.class);
 
   private final MuleContext muleContext;
+  private final ConnectionManagerAdapter connectionManager;
 
   /**
    * Creates a new instance
@@ -42,9 +43,10 @@ public class LifecycleAwareConnectionProviderWrapper<Connection> extends Connect
    * @param delegate the {@link ConnectionProvider} to be wrapped
    * @param muleContext the owning {@link MuleContext}
    */
-  public LifecycleAwareConnectionProviderWrapper(ConnectionProvider<Connection> delegate, MuleContext muleContext) {
+  public LifecycleAwareConnectionProviderWrapper(ConnectionProvider<C> delegate, MuleContext muleContext) {
     super(delegate);
     this.muleContext = muleContext;
+    connectionManager = muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER);
   }
 
   /**
@@ -55,8 +57,8 @@ public class LifecycleAwareConnectionProviderWrapper<Connection> extends Connect
    * @throws ConnectionException if an exception was found obtaining the connection or managing it
    */
   @Override
-  public Connection connect() throws ConnectionException {
-    Connection connection = super.connect();
+  public C connect() throws ConnectionException {
+    C connection = super.connect();
     try {
       muleContext.getInjector().inject(connection);
       muleContext.getRegistry().applyLifecycle(connection, NotInLifecyclePhase.PHASE_NAME, Startable.PHASE_NAME);
@@ -74,7 +76,7 @@ public class LifecycleAwareConnectionProviderWrapper<Connection> extends Connect
    * @param connection the {@code Connection} to be destroyed
    */
   @Override
-  public void disconnect(Connection connection) {
+  public void disconnect(C connection) {
     try {
       super.disconnect(connection);
     } finally {
@@ -92,17 +94,17 @@ public class LifecycleAwareConnectionProviderWrapper<Connection> extends Connect
    */
   @Override
   public RetryPolicyTemplate getRetryPolicyTemplate() {
-    final ConnectionProvider<Connection> delegate = getDelegate();
+    final ConnectionProvider<C> delegate = getDelegate();
     if (delegate instanceof ConnectionProviderWrapper) {
       return ((ConnectionProviderWrapper) delegate).getRetryPolicyTemplate();
     }
 
-    return ((ConnectionManagerAdapter) muleContext.getRegistry().get(OBJECT_CONNECTION_MANAGER)).getDefaultRetryPolicyTemplate();
+    return connectionManager.getDefaultRetryPolicyTemplate();
   }
 
   @Override
   public Optional<PoolingProfile> getPoolingProfile() {
-    ConnectionProvider<Connection> delegate = getDelegate();
+    ConnectionProvider<C> delegate = getDelegate();
     return delegate instanceof ConnectionProviderWrapper ? ((ConnectionProviderWrapper) delegate).getPoolingProfile()
         : Optional.empty();
   }

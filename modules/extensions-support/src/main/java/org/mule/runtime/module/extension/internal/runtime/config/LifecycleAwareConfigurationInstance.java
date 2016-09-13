@@ -6,18 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
+import static java.lang.String.format;
 import static org.mule.runtime.core.api.config.ConfigurationInstanceNotification.CONFIGURATION_STOPPED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationInstanceNotification;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.retry.RetryCallback;
+import org.mule.runtime.core.api.retry.RetryContext;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.time.TimeSupplier;
 import org.mule.runtime.extension.api.introspection.Interceptable;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
@@ -33,7 +43,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link ConfigurationInstance} which propagates dependency injection and lifecycle phases into the contained
@@ -51,7 +60,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class LifecycleAwareConfigurationInstance extends AbstractInterceptable implements ConfigurationInstance {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleAwareConfigurationInstance.class);
+  private static final Logger LOGGER = getLogger(LifecycleAwareConfigurationInstance.class);
 
   private final String name;
   private final RuntimeConfigurationModel model;
@@ -67,7 +76,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
   private MuleContext muleContext;
 
   @Inject
-  private ConnectionManager connectionManager;
+  private ConnectionManagerAdapter connectionManager;
 
   /**
    * Creates a new instance
@@ -123,9 +132,47 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
       if (!connectionManager.hasBinding(value)) {
         connectionManager.bind(value, connectionProvider.get());
       }
+      testConnectivity();
     }
     startIfNeeded(value);
     super.start();
+  }
+
+  private void testConnectivity() throws MuleException {
+    ConnectionProvider provider = connectionProvider.get();
+    RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
+
+    RetryCallback retryCallback = new RetryCallback() {
+
+      @Override
+      public void doWork(RetryContext context) throws Exception {
+        ConnectionValidationResult result = connectionManager.testConnectivity(provider);
+        if (result.isValid()) {
+          context.setOk();
+        } else {
+          context.setFailed(result.getException());
+          throw new ConnectionException(format("Connectivity test failed for config '%s'", getName()), result.getException());
+        }
+      }
+
+      @Override
+      public String getWorkDescription() {
+        return format("Testing connectivity for config '%s'", getName());
+      }
+
+      @Override
+      public Object getWorkOwner() {
+        return value;
+      }
+    };
+
+    try {
+      retryTemplate.execute(retryCallback, muleContext.getWorkManager());
+    } catch (Exception e) {
+      throw new DefaultMuleException(createStaticMessage(format("Could not perform connectivity testing for config '%s'",
+                                                                getName())),
+                                     e);
+    }
   }
 
   /**

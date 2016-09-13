@@ -6,22 +6,27 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStopping;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.api.connection.ConnectionValidationResult;
+import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +37,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link ConnectionManager} which manages connections opened on a specific application.
@@ -41,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class DefaultConnectionManager implements ConnectionManagerAdapter, Lifecycle {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultConnectionManager.class);
+  private static final Logger LOGGER = getLogger(DefaultConnectionManager.class);
 
   private final Map<Reference<Object>, ConnectionManagementStrategy> connections = new HashMap<>();
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
@@ -71,13 +75,13 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
    * @throws IllegalStateException if invoked while the {@link #muleContext} is stopped or stopping
    */
   @Override
-  public <Config, Connection> void bind(Config owner, ConnectionProvider<Connection> connectionProvider) {
+  public <C> void bind(Object owner, ConnectionProvider<C> connectionProvider) {
     assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
 
     connectionProvider = new LifecycleAwareConnectionProviderWrapper<>(connectionProvider, muleContext);
-    ConnectionManagementStrategy<Connection> managementStrategy = managementStrategyFactory.getStrategy(connectionProvider);
+    ConnectionManagementStrategy<C> managementStrategy = managementStrategyFactory.getStrategy(connectionProvider);
 
-    ConnectionManagementStrategy<Connection> previous = null;
+    ConnectionManagementStrategy<C> previous = null;
 
     writeLock.lock();
     try {
@@ -89,6 +93,47 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
     if (previous != null) {
       close(previous);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <C> RetryPolicyTemplate getRetryTemplateFor(ConnectionProvider<C> connectionProvider) {
+    return connectionProvider instanceof ConnectionProviderWrapper
+        ? ((ConnectionProviderWrapper) connectionProvider).getRetryPolicyTemplate()
+        : getDefaultRetryPolicyTemplate();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider) {
+    ConnectionHandler<C> connectionHandler = null;
+    try {
+      connectionHandler = managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+      return connectionProvider.validate(connectionHandler.getConnection());
+    } catch (Exception e) {
+      return failure("Exception was found trying to test connectivity", UNKNOWN, e);
+    } finally {
+      if (connectionHandler != null) {
+        connectionHandler.release();
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
+      throws IllegalArgumentException {
+    if (configurationInstance.getConnectionProvider().isPresent()) {
+      return testConnectivity(configurationInstance.getConnectionProvider().get());
+    }
+
+    throw new IllegalArgumentException("The component does not support connectivity testing");
   }
 
   /**
@@ -122,8 +167,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
    * {@inheritDoc}
    */
   @Override
-  public <Config, Connection> ConnectionHandler<Connection> getConnection(Config config) throws ConnectionException {
-    ConnectionManagementStrategy<Connection> handlingStrategy = null;
+  public <C> ConnectionHandler<C> getConnection(Object config) throws ConnectionException {
+    ConnectionManagementStrategy<C> handlingStrategy = null;
     readLock.lock();
     try {
       handlingStrategy = connections.get(new Reference<>(config));
