@@ -50,7 +50,7 @@ public class QueryMetadataTestCase extends MetadataExtensionFunctionalTestCase {
     MetadataResult<MetadataKeysContainer> metadataKeysResult = metadataManager.getEntityKeys(QUERY_ID);
     assertThat(metadataKeysResult.isSuccess(), is(true));
     MetadataKeysContainer container = metadataKeysResult.get();
-    Set<MetadataKey> metadataKeys = container.getKeysForCategory(container.getCategories().iterator().next()).get();
+    Set<MetadataKey> metadataKeys = container.getKeys(container.getCategories().iterator().next()).get();
     assertThat(metadataKeys.size(), is(2));
     assertThat(metadataKeys, hasItems(metadataKeyWithId(CIRCLE), metadataKeyWithId(SQUARE)));
   }

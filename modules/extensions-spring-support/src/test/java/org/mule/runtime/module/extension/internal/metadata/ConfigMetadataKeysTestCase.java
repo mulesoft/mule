@@ -66,6 +66,6 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
     return metadataKeysResult.get()
         .getCategories()
         .stream()
-        .collect(Collectors.toMap(resolver -> resolver, resolver -> metadataKeysResult.get().getKeysForCategory(resolver).get()));
+        .collect(Collectors.toMap(resolver -> resolver, resolver -> metadataKeysResult.get().getKeys(resolver).get()));
   }
 }

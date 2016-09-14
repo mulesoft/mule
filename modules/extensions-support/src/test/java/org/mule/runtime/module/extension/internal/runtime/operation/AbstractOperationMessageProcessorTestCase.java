@@ -332,6 +332,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   }
 
   private Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
-    return metadataKeysContainer.getKeysForCategory(metadataKeysContainer.getCategories().iterator().next()).get();
+    return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();
   }
 }
