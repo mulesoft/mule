@@ -26,15 +26,15 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
  * This guarantees that if the application has been created lazily, the requested
  * components exists before the execution of the actual {@link ConnectivityTestingService}.
  */
-public class LazyConnectivityTestingService implements ConnectivityTestingService, Initialisable {
+public class LazyConnectivityTestingService implements ConnectivityTestingService {
 
   private final LazyComponentInitializer lazyComponentInitializer;
-  private final MuleContext muleContext;
-  private ConnectivityTestingService connectivityTestingService;
+  private final ConnectivityTestingService connectivityTestingService;
 
-  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer, MuleContext muleContext) {
+  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer,
+                                        ConnectivityTestingService connectivityTestingService) {
     this.lazyComponentInitializer = lazyComponentInitializer;
-    this.muleContext = muleContext;
+    this.connectivityTestingService = connectivityTestingService;
   }
 
   @Override
@@ -49,8 +49,4 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
     return connectivityTestingService.testConnection(identifier);
   }
 
-  @Override
-  public void initialise() throws InitialisationException {
-    this.connectivityTestingService = muleContext.getRegistry().get(OBJECT_CONNECTIVITY_TESTING_SERVICE);
-  }
 }

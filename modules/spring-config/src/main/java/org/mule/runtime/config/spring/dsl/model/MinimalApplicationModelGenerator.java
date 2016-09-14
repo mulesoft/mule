@@ -48,15 +48,15 @@ public class MinimalApplicationModelGenerator {
   }
 
   /**
-   * Resolves the minimal set of {@link ComponentModel}s for a message processor
+   * Resolves the minimal set of {@link ComponentModel}s for a component
    * within a flow.
    *
-   * @param processorPath the processor path in which the message processor is located.
+   * @param componentPath the component path in which the component is located.
    * @return the generated {@link ApplicationModel} with the minimal set of {@link ComponentModel}s required.
    * @throws NoSuchComponentModelException if the requested component does not exists.
    */
-  public ApplicationModel getMinimalModelByPath(String processorPath) {
-    String[] parts = processorPath.split("/");
+  public ApplicationModel getMinimalModelByPath(String componentPath) {
+    String[] parts = componentPath.split("/");
     String flowName = parts[0];
     ComponentModel flowModel = findRequiredComponentModel(flowName);
     filterFlowModelParts(flowModel, parts);

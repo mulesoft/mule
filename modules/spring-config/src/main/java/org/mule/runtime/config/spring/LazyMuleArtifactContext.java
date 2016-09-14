@@ -16,7 +16,6 @@ import org.mule.runtime.config.spring.dsl.model.MinimalApplicationModelGenerator
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.ConfigResource;
@@ -39,6 +38,8 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
  */
 public class LazyMuleArtifactContext extends MuleArtifactContext implements LazyComponentInitializer {
 
+  private LazyConnectivityTestingService lazyConnectivityTestingService;
+
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
    * registry implementation to wraps the spring ApplicationContext
@@ -55,8 +56,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
       throws BeansException {
     super(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController, artifactProperties,
           artifactType);
-    muleContext.getCustomizationService().registerCustomServiceImpl(MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE,
-                                                                    new LazyConnectivityTestingService(this, muleContext));
   }
 
   private void createComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel, boolean mustBeRoot) {
@@ -116,7 +115,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext implements Lazy
 
   @Override
   public ConnectivityTestingService getConnectivityTestingService() {
-    return muleContext.getRegistry().get(OBJECT_CONNECTIVITY_TESTING_SERVICE);
+    if (lazyConnectivityTestingService == null) {
+      lazyConnectivityTestingService =
+          new LazyConnectivityTestingService(this, muleContext.getRegistry().get(OBJECT_CONNECTIVITY_TESTING_SERVICE));
+    }
+    return lazyConnectivityTestingService;
   }
 
 }
