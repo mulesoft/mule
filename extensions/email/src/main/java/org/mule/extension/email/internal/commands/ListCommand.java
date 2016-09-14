@@ -9,7 +9,7 @@ package org.mule.extension.email.internal.commands;
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.extension.email.api.EmailAttributesBuilder.fromMessage;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-import org.mule.extension.email.api.EmailContentProcessor;
+import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.extension.email.api.ReceivedEmailAttributes;
 import org.mule.extension.email.api.exception.EmailRetrieveException;
 import org.mule.extension.email.internal.retriever.RetrieverConnection;

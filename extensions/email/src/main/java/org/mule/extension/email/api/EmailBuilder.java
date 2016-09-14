@@ -78,6 +78,14 @@ public class EmailBuilder {
   private EmailBody body;
 
   /**
+   * The "From" sender address. The person that is going to send the messages,
+   * if not set, it defaults to the from address specified in the config.
+   */
+  @Optional
+  @Parameter
+  private String fromAddress;
+
+  /**
    * Creates a new instance.
    */
   public EmailBuilder() {}
@@ -129,6 +137,13 @@ public class EmailBuilder {
    */
   public EmailBody getBody() {
     return body == null ? new EmailBody() : body;
+  }
+
+  /**
+   * @return the from address, the address of the sender of the email.
+   */
+  public String getFromAddress() {
+    return fromAddress;
   }
 
   /**

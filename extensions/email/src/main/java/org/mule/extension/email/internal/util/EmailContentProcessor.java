@@ -4,9 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api;
+package org.mule.extension.email.internal.util;
 
-import static java.util.Collections.singletonList;
 import static javax.mail.Part.ATTACHMENT;
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
 import org.mule.extension.email.api.exception.EmailException;
@@ -133,7 +132,9 @@ public class EmailContentProcessor {
     final Enumeration allHeaders = part.getAllHeaders();
     while (allHeaders.hasMoreElements()) {
       Header h = (Header) allHeaders.nextElement();
-      headers.put(h.getName(), new LinkedList<>(singletonList(h.getValue())));
+      LinkedList<String> headerVal = new LinkedList<>();
+      headerVal.add(h.getValue());
+      headers.put(h.getName(), headerVal);
     }
 
     attachmentParts.add(Message.builder()

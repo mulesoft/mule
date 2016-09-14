@@ -18,7 +18,7 @@ import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentConte
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.getSinglePartTestMessage;
 import org.mule.runtime.api.message.Message;
-import org.mule.extension.email.api.EmailContentProcessor;
+import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;

@@ -6,9 +6,10 @@
  */
 package org.mule.extension.email.internal.commands;
 
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import org.mule.extension.email.api.EmailBody;
 import org.mule.extension.email.api.EmailBuilder;
-import org.mule.extension.email.api.MessageBuilder;
+import org.mule.extension.email.internal.MessageBuilder;
 import org.mule.extension.email.api.exception.EmailSendException;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.extension.email.internal.sender.SenderConnection;
@@ -47,7 +48,7 @@ public final class SendCommand {
 
       Message message = MessageBuilder.newMessage(connection.getSession())
           .withSentDate(Calendar.getInstance().getTime())
-          .fromAddresses(configuration.getFrom())
+          .fromAddresses(isNotBlank(emailBuilder.getFromAddress()) ? emailBuilder.getFromAddress() : configuration.getFrom())
           .to(emailBuilder.getToAddresses())
           .cc(emailBuilder.getCcAddresses())
           .bcc(emailBuilder.getBccAddresses())
