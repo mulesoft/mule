@@ -6,21 +6,21 @@
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
     <flow name="retrieveAndRead">
-        <email:list config-ref="config"/>
+        <email:list-pop3 config-ref="config"/>
     </flow>
 
     <flow name="retrieveMatchingSubjectAndFromAddress">
-        <email:list config-ref="config">
-            <email:matcher subjectRegex="Email Subject" fromRegex="@mulesoft"/>
-        </email:list>
+        <email:list-pop3 config-ref="config">
+            <email:pop3-matcher subjectRegex="Email Subject" fromRegex="@mulesoft"/>
+        </email:list-pop3>
     </flow>
 
     <flow name="retrieveWithAttachments">
-        <email:list config-ref="config"/>
+        <email:list-pop3 config-ref="config"/>
     </flow>
 
     <flow name="storeMessages">
-        <email:list config-ref="config"/>
+        <email:list-pop3 config-ref="config"/>
         <email:store config-ref="config" localDirectory="${storePath}"/>
     </flow>
 
@@ -29,12 +29,12 @@
     </flow>
 
     <flow name="retrieveAndDelete">
-        <email:list config-ref="config"/>
+        <email:list-pop3 config-ref="config"/>
         <email:delete config-ref="config"/>
     </flow>
 
     <flow name="retrieveAndDeleteIncomingAndScheduled">
-        <email:list config-ref="config"/>
+        <email:list-pop3 config-ref="config"/>
         <email:delete config-ref="config" emailId="6"/>
     </flow>
 

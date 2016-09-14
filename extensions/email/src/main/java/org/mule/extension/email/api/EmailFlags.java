@@ -6,6 +6,14 @@
  */
 package org.mule.extension.email.api;
 
+import static javax.mail.Flags.Flag.ANSWERED;
+import static javax.mail.Flags.Flag.DELETED;
+import static javax.mail.Flags.Flag.DRAFT;
+import static javax.mail.Flags.Flag.RECENT;
+import static javax.mail.Flags.Flag.SEEN;
+
+import javax.mail.Flags;
+
 /**
  * The {@link EmailFlags} class represents the set of flags on a Message. Flags are composed of predefined system flags that most
  * folder implementations are expected to support.
@@ -39,12 +47,12 @@ public class EmailFlags {
    */
   private final boolean seen;
 
-  public EmailFlags(boolean answered, boolean deleted, boolean draft, boolean recent, boolean seen) {
-    this.answered = answered;
-    this.deleted = deleted;
-    this.draft = draft;
-    this.recent = recent;
-    this.seen = seen;
+  public EmailFlags(Flags flags) {
+    this.answered = flags.contains(ANSWERED);
+    this.deleted = flags.contains(DELETED);
+    this.draft = flags.contains(DRAFT);
+    this.recent = flags.contains(RECENT);
+    this.seen = flags.contains(SEEN);
   }
 
   /**

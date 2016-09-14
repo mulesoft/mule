@@ -37,6 +37,7 @@ import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -87,7 +88,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveNothing() throws Exception {
     server.purgeEmailFromAllMailboxes();
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
-    List<Message> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
+    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_AND_READ);
     assertThat(messages, hasSize(0));
   }
 
@@ -99,7 +100,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
       user.deliver(mimeMessage);
     }
 
-    List<Message> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
+    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(15));
     assertThat(messages, hasSize(10));
   }
@@ -118,15 +119,15 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   public void retrieveEmailWithAttachments() throws Exception {
     server.purgeEmailFromAllMailboxes();
     user.deliver(getMultipartTestMessage());
-    List<Message> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
+    List<OperationResult> messages = runFlowAndGetMessages(RETRIEVE_WITH_ATTACHMENTS);
 
     assertThat(messages, hasSize(1));
-    assertThat(messages.get(0).getPayload().getValue(), instanceOf(MultiPartPayload.class));
-    List<Message> emailAttachments = ((MultiPartPayload) messages.get(0).getPayload().getValue()).getParts();
+    assertThat(messages.get(0).getOutput(), instanceOf(MultiPartPayload.class));
+    List<Message> emailAttachments = ((MultiPartPayload) messages.get(0).getOutput()).getParts();
 
     assertThat(emailAttachments, hasSize(3));
-    assertThat(((DefaultMultiPartPayload) messages.get(0).getPayload().getValue()).hasBodyPart(), is(true));
-    assertThat(((MultiPartPayload) messages.get(0).getPayload().getValue()).getPartNames(),
+    assertThat(((DefaultMultiPartPayload) messages.get(0).getOutput()).hasBodyPart(), is(true));
+    assertThat(((MultiPartPayload) messages.get(0).getOutput()).getPartNames(),
                hasItems(EMAIL_JSON_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME));
     assertAttachmentContent(emailAttachments, EMAIL_JSON_ATTACHMENT_NAME, EMAIL_JSON_ATTACHMENT_CONTENT);
     assertAttachmentContent(emailAttachments, EMAIL_TEXT_PLAIN_ATTACHMENT_NAME, EMAIL_TEXT_PLAIN_ATTACHMENT_CONTENT);
@@ -169,8 +170,8 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     assertThat(fileContent, containsString(EMAIL_CONTENT));
   }
 
-  protected List<Message> runFlowAndGetMessages(String flowName) throws Exception {
-    return (List<Message>) flowRunner(flowName).run().getMessage().getPayload().getValue();
+  protected List<OperationResult> runFlowAndGetMessages(String flowName) throws Exception {
+    return (List<OperationResult>) flowRunner(flowName).run().getMessage().getPayload().getValue();
   }
 
   protected void assertFlag(MimeMessage m, Flag flag, boolean contains) {

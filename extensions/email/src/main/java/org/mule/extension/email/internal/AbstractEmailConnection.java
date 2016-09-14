@@ -17,6 +17,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.net.ssl.SSLContext;
 
@@ -44,15 +46,15 @@ public abstract class AbstractEmailConnection {
   /**
    * Base constructor for {@link AbstractEmailConnection} implementations.
    *
-   * @param protocol the protocol used to send mails.
-   * @param username the username to establish connection with the mail server.
-   * @param password the password corresponding to the {@code username}
-   * @param host the host name of the mail server.
-   * @param port the port number of the mail server.
+   * @param protocol          the protocol used to send mails.
+   * @param username          the username to establish connection with the mail server.
+   * @param password          the password corresponding to the {@code username}
+   * @param host              the host name of the mail server.
+   * @param port              the port number of the mail server.
    * @param connectionTimeout the socket connection timeout
-   * @param readTimeout the socket read timeout
-   * @param writeTimeout the socket write timeout
-   * @param properties the custom properties added to configure the session.
+   * @param readTimeout       the socket read timeout
+   * @param writeTimeout      the socket write timeout
+   * @param properties        the custom properties added to configure the session.
    */
   public AbstractEmailConnection(EmailProtocol protocol, String username, String password, String host, String port,
                                  long connectionTimeout, long readTimeout, long writeTimeout, Map<String, String> properties)
@@ -64,15 +66,15 @@ public abstract class AbstractEmailConnection {
   /**
    * Base constructor for {@link AbstractEmailConnection} implementations that aims to be secured by TLS.
    *
-   * @param protocol the protocol used to send mails.
-   * @param username the username to establish connection with the mail server.
-   * @param password the password corresponding to the {@code username}
-   * @param host the host name of the mail server.
-   * @param port the port number of the mail server.
+   * @param protocol          the protocol used to send mails.
+   * @param username          the username to establish connection with the mail server.
+   * @param password          the password corresponding to the {@code username}
+   * @param host              the host name of the mail server.
+   * @param port              the port number of the mail server.
    * @param connectionTimeout the socket connection timeout
-   * @param readTimeout the socket read timeout
-   * @param writeTimeout the socket write timeout
-   * @param properties the custom properties added to configure the session.
+   * @param readTimeout       the socket read timeout
+   * @param writeTimeout      the socket write timeout
+   * @param properties        the custom properties added to configure the session.
    * @param tlsContextFactory the tls context factory for creating the context to secure the connection
    */
   public AbstractEmailConnection(EmailProtocol protocol, String username, String password, String host, String port,
@@ -103,7 +105,9 @@ public abstract class AbstractEmailConnection {
   /**
    * Creates a new {@link Properties} instance and set all the basic properties required by the specified {@code protocol}.
    */
-  private Properties buildBasicSessionProperties(String host, String port, long connectionTimeout, long readTimeout,
+  private Properties buildBasicSessionProperties(String host, String port,
+                                                 long connectionTimeout,
+                                                 long readTimeout,
                                                  long writeTimeout)
       throws EmailConnectionException {
     Properties props = new Properties();
@@ -184,5 +188,35 @@ public abstract class AbstractEmailConnection {
       throw new EmailException(USERNAME_NO_PASSWORD_ERROR);
     }
     return username != null;
+  }
+
+  /**
+   * An {@link Authenticator} object that knows how to obtain authentication for a network connection using username and password.
+   *
+   * @since 4.0
+   */
+  private final class PasswordAuthenticator extends Authenticator {
+
+    private String user;
+    private String pass;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param user the username to establish connection to.
+     * @param pass the password for the specified {@code username}.
+     */
+    public PasswordAuthenticator(String user, String pass) {
+      this.user = user;
+      this.pass = pass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PasswordAuthentication getPasswordAuthentication() {
+      return new PasswordAuthentication(user, pass);
+    }
   }
 }
