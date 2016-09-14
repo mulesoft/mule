@@ -25,7 +25,7 @@ public class RepositoryServiceFactory {
   /**
    * System property key to specify a custom repository folder. By default the container will use $MULE_HOME/lib/repository
    */
-  protected static final String MULE_REPOSITORY_FOLDER_PROPERTY = "mule.repository.folder";
+  public static final String MULE_REPOSITORY_FOLDER_PROPERTY = "mule.repository.folder";
 
   /**
    * System property key to specify the remote repositories to use. Multiple values must be comma separated.
@@ -33,7 +33,7 @@ public class RepositoryServiceFactory {
    * If no value is provided then the repository will be disabled causing a {@code RepositoryServiceDisabledException} if any
    * method is called.
    */
-  protected static final String MULE_REMOTE_REPOSITORIES_PROPERTY = "mule.repository.repositories";
+  public static final String MULE_REMOTE_REPOSITORIES_PROPERTY = "mule.repository.repositories";
 
   private static final String REPOSITORY_FOLDER = "repository";
   private static final String DEFAULT_REPOSITORY_TYPE = "default";

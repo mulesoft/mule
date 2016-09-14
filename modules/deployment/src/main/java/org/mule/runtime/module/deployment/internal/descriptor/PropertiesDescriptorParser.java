@@ -27,13 +27,18 @@ public class PropertiesDescriptorParser implements DescriptorParser<ApplicationD
   protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
   protected static final String PROPERTY_LOG_CONFIG_FILE = "log.configFile";
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public ApplicationDescriptor parse(File descriptor, String artifactName) throws IOException {
+  public ApplicationDescriptor parse(File location, File descriptor, String artifactName) throws IOException {
     final Properties properties = PropertiesUtils.loadProperties(new FileInputStream(descriptor));
 
     ApplicationDescriptor appDescriptor = new ApplicationDescriptor(artifactName);
     appDescriptor.setEncoding(properties.getProperty(PROPERTY_ENCODING));
     appDescriptor.setDomain(properties.getProperty(PROPERTY_DOMAIN));
+    appDescriptor.setArtifactLocation(location);
+    appDescriptor.setRootFolder(location.getParentFile());
 
     final String resProps = properties.getProperty(PROPERTY_CONFIG_RESOURCES);
     String[] urls;

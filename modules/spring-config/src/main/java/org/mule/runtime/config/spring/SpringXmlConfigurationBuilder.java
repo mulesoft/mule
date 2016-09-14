@@ -36,6 +36,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     implements ParentMuleContextAwareConfigurationBuilder {
 
   private ArtifactConfiguration artifactConfiguration = new ArtifactConfiguration(emptyList());
+  private boolean enableLazyInit = false;
   protected boolean useDefaultConfigResource = true;
   protected boolean useMinimalConfigResource = false;
 
@@ -43,7 +44,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   protected ApplicationContext domainContext;
   protected ApplicationContext parentContext;
-  protected ApplicationContext applicationContext;
+  protected MuleArtifactContext muleArtifactContext;
   private ArtifactType artifactType;
   private final List<MuleContextServiceConfigurator> serviceConfigurators = new ArrayList<>();
 
@@ -69,17 +70,20 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this(configResource, emptyMap(), APP);
   }
 
-  public SpringXmlConfigurationBuilder(String[] configFiles) throws ConfigurationException {
+  public SpringXmlConfigurationBuilder(String[] configFiles, boolean enableLazyInit) throws ConfigurationException {
     super(configFiles, emptyMap());
     this.artifactType = APP;
+    this.enableLazyInit = enableLazyInit;
   }
 
   public SpringXmlConfigurationBuilder(String[] configurationFiles, ArtifactConfiguration artifactConfiguration,
-                                       Map<String, String> artifactProperties, ArtifactType artifactType)
+                                       Map<String, String> artifactProperties, ArtifactType artifactType,
+                                       boolean enableLazyInitialisation)
       throws ConfigurationException {
     this(configurationFiles, artifactProperties, artifactType);
     this.artifactConfiguration = artifactConfiguration;
     this.artifactType = APP;
+    this.enableLazyInit = enableLazyInitialisation;
   }
 
   /**
@@ -94,8 +98,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
-    applicationContext = createApplicationContext(muleContext);
-    createSpringRegistry(muleContext, applicationContext);
+    muleArtifactContext = createApplicationContext(muleContext);
+    createSpringRegistry(muleContext, muleArtifactContext);
   }
 
   /**
@@ -115,7 +119,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     configured = false;
   }
 
-  private ApplicationContext createApplicationContext(MuleContext muleContext) throws Exception {
+  private MuleArtifactContext createApplicationContext(MuleContext muleContext) throws Exception {
     OptionalObjectsController applicationObjectcontroller = new DefaultOptionalObjectsController();
     OptionalObjectsController parentObjectController = null;
     ApplicationContext parentApplicationContext = parentContext != null ? parentContext : domainContext;
@@ -128,17 +132,17 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
       applicationObjectcontroller = new CompositeOptionalObjectsController(applicationObjectcontroller, parentObjectController);
     }
     // TODO MULE-10084 : Refactor to only accept artifactConfiguration and not artifactConfigResources
-    final ApplicationContext applicationContext =
+    final MuleArtifactContext muleArtifactContext =
         doCreateApplicationContext(muleContext, artifactConfigResources, artifactConfiguration, applicationObjectcontroller);
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
-    return applicationContext;
+    return muleArtifactContext;
   }
 
-  protected ApplicationContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
-                                                          ArtifactConfiguration artifactConfiguration,
-                                                          OptionalObjectsController optionalObjectsController) {
+  protected MuleArtifactContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
+                                                           ArtifactConfiguration artifactConfiguration,
+                                                           OptionalObjectsController optionalObjectsController) {
     return new MuleArtifactContext(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType);
+                                   getArtifactProperties(), artifactType, enableLazyInit);
   }
 
 
@@ -155,7 +159,7 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     }
 
     // Note: The SpringRegistry must be created before
-    // applicationContext.refresh() gets called because
+    // muleArtifactContext.refresh() gets called because
     // some beans may try to look up other beans via the Registry during
     // preInstantiateSingletons().
     muleContext.addRegistry(registry);
@@ -184,8 +188,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this.useDefaultConfigResource = useDefaultConfigResource;
   }
 
-  public ApplicationContext getApplicationContext() {
-    return applicationContext;
+  public MuleArtifactContext getMuleArtifactContext() {
+    return muleArtifactContext;
   }
 
   public void setUseMinimalConfigResource(boolean useMinimalConfigResource) {

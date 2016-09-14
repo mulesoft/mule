@@ -63,13 +63,13 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     this.deploymentListener = deploymentListener;
   }
 
-  public Application createArtifact(String appName) throws IOException {
+  public Application createArtifact(File appsDir) throws IOException {
+    String appName = appsDir.getName();
     if (appName.contains(" ")) {
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-    final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
-    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(new File(appsDir, appName));
+    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(appsDir);
 
     return createAppFrom(descriptor);
   }
@@ -99,7 +99,8 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     List<ArtifactPlugin> artifactPlugins = createArtifactPluginList(applicationClassLoader, applicationPluginDescriptors);
 
     DefaultMuleApplication delegate =
-        new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository, serviceRepository);
+        new DefaultMuleApplication(descriptor, applicationClassLoader, artifactPlugins, domainRepository, serviceRepository,
+                                   descriptor.getArtifactLocation());
 
     if (deploymentListener != null) {
       delegate.setDeploymentListener(deploymentListener);

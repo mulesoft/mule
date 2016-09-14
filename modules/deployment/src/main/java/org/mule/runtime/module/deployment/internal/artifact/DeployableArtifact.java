@@ -8,10 +8,13 @@
 package org.mule.runtime.module.deployment.internal.artifact;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.module.artifact.Artifact;
 import org.mule.runtime.module.deployment.api.DeploymentStartException;
 import org.mule.runtime.module.deployment.api.InstallException;
 import org.mule.runtime.module.deployment.internal.descriptor.DeployableArtifactDescriptor;
-import org.mule.runtime.module.artifact.Artifact;
+
+import java.io.File;
 
 /**
  * An Artifact is an abstract representation of a deployable unit within the mule container.
@@ -29,6 +32,11 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
    * Initialise the artifact resources
    */
   void init();
+
+  /**
+   * Initialise the minimal resources required for this artifact to execute components.
+   */
+  void lazyInit();
 
   /**
    * Starts the artifact execution
@@ -49,4 +57,15 @@ public interface DeployableArtifact<D extends DeployableArtifactDescriptor> exte
    * @return MuleContext created from the artifact configurations files.
    */
   MuleContext getMuleContext();
+
+  /**
+   * @return the directory where the artifact content is stored.
+   */
+  File getLocation();
+
+  /**
+   * @return a service to test connection over configuration components.
+   */
+  ConnectivityTestingService getConnectivityTestingService();
+
 }

@@ -63,7 +63,7 @@ public class ApplicationContextBuilder {
   }
 
   protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception {
-    SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(configResource);
+    SpringXmlConfigurationBuilder springXmlConfigurationBuilder = new SpringXmlConfigurationBuilder(configResource, false);
     if (domainContext != null) {
       springXmlConfigurationBuilder.setParentContext(domainContext);
     }

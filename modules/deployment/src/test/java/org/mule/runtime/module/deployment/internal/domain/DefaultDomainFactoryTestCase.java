@@ -61,7 +61,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
 
   private void createAndVerifyDomain(String name, boolean redeployment, Matcher<? super Set<String>> loaderOverridesMatcher)
       throws IOException {
-    Domain domain = domainFactory.createArtifact(name);
+    Domain domain = domainFactory.createArtifact(new File(name));
     assertThat(domain.getArtifactName(), is(name));
     assertThat(domain.getDescriptor().getName(), is(name));
     assertThat(domain.getDescriptor().isRedeploymentEnabled(), is(redeployment));

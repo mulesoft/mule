@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.deployment.internal.descriptor;
 
+import static org.mule.runtime.core.MuleServer.DEFAULT_CONFIGURATION;
+
 import org.mule.runtime.core.MuleServer;
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 
@@ -16,10 +17,17 @@ import java.io.File;
  */
 public class EmptyApplicationDescriptor extends ApplicationDescriptor {
 
-  public EmptyApplicationDescriptor(String appName) {
-    super(appName);
+  /**
+   * Creates an {@link ApplicationDescriptor} with the default values.
+   *
+   * @param appLocation the directory where the application content is stored.
+   */
+  public EmptyApplicationDescriptor(File appLocation) {
+    super(appLocation.getName());
     setConfigResources(new String[] {MuleServer.DEFAULT_CONFIGURATION});
-    File configPathFile = MuleContainerBootstrapUtils.getMuleAppDefaultConfigFile(appName);
+    File configPathFile = new File(appLocation, DEFAULT_CONFIGURATION);
+    setArtifactLocation(appLocation);
+    setRootFolder(appLocation.getParentFile());
     String configPath = String.format(configPathFile.getAbsolutePath());
     setAbsoluteResourcePaths(new String[] {configPath});
     setConfigResourcesFile(new File[] {configPathFile});

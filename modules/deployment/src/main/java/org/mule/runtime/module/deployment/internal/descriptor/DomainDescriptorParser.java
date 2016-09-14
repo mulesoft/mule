@@ -21,12 +21,16 @@ import java.util.Properties;
  */
 public class DomainDescriptorParser implements DescriptorParser<DomainDescriptor> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public DomainDescriptor parse(File descriptor, String artifactName) throws IOException {
+  public DomainDescriptor parse(File location, File descriptor, String artifactName) throws IOException {
     final Properties properties = loadProperties(new FileInputStream(descriptor));
     final DomainDescriptor domainDescriptor = new DomainDescriptor(artifactName);
     domainDescriptor.setRedeploymentEnabled(toBoolean(properties.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, TRUE.toString())));
-
+    domainDescriptor.setArtifactLocation(location);
+    domainDescriptor.setRootFolder(location.getParentFile());
     return domainDescriptor;
   }
 }

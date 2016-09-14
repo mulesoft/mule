@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.api.artifact;
+package org.mule.runtime.module.deployment.internal.connectivity.artifact;
 
 /**
  * Factory for creating instance of {@code ToolingArtifactBuilder}

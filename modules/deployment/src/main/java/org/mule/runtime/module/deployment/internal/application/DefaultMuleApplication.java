@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleProperties;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
@@ -36,7 +37,8 @@ import org.mule.runtime.module.deployment.api.application.Application;
 import org.mule.runtime.module.deployment.api.application.ApplicationStatus;
 import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactMuleContextBuilder;
+import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
+import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
@@ -59,21 +61,23 @@ public class DefaultMuleApplication implements Application {
   private final DomainRepository domainRepository;
   private final List<ArtifactPlugin> artifactPlugins;
   private final ServiceRepository serviceRepository;
+  private final File location;
   private ApplicationStatus status;
 
-  protected MuleContext muleContext;
   protected ArtifactClassLoader deploymentClassLoader;
   protected DeploymentListener deploymentListener;
   private ServerNotificationListener<MuleContextNotification> statusListener;
+  private ArtifactContext artifactContext;
 
   public DefaultMuleApplication(ApplicationDescriptor descriptor, MuleDeployableArtifactClassLoader deploymentClassLoader,
                                 List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
-                                ServiceRepository serviceRepository) {
+                                ServiceRepository serviceRepository, File location) {
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
     this.serviceRepository = serviceRepository;
     this.deploymentListener = new NullDeploymentListener();
     this.artifactPlugins = artifactPlugins;
+    this.location = location;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -124,7 +128,7 @@ public class DefaultMuleApplication implements Application {
     }
 
     try {
-      this.muleContext.start();
+      this.artifactContext.getMuleContext().start();
 
       // null CCL ensures we log at 'system' level
       // TODO getDomainClassLoader a more usable wrapper for any logger to be logged at sys level
@@ -149,17 +153,21 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public void init() {
+    doInit(false);
+  }
+
+  private void doInit(boolean lazy) {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(format("Initializing app '%s'", descriptor.getName())));
     }
 
     try {
-      ArtifactMuleContextBuilder artifactBuilder =
-          new ArtifactMuleContextBuilder().setArtifactProperties(descriptor.getAppProperties()).setArtifactType(APP)
-              .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getArtifactName()))
+      ArtifactContextBuilder artifactBuilder =
+          new ArtifactContextBuilder().setArtifactProperties(descriptor.getAppProperties()).setArtifactType(APP)
+              .setArtifactInstallationDirectory(descriptor.getArtifactLocation())
               .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
-              .setServiceRepository(serviceRepository);
+              .setEnableLazyInit(lazy).setServiceRepository(serviceRepository);
 
       Domain domain = domainRepository.getDomain(descriptor.getDomain());
       if (domain.getMuleContext() != null) {
@@ -168,7 +176,8 @@ public class DefaultMuleApplication implements Application {
       if (deploymentListener != null) {
         artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
       }
-      setMuleContext(artifactBuilder.build());
+      artifactContext = artifactBuilder.build();
+      setMuleContext(artifactContext.getMuleContext());
     } catch (Exception e) {
       setStatusToFailed();
 
@@ -178,7 +187,17 @@ public class DefaultMuleApplication implements Application {
     }
   }
 
-  protected void setMuleContext(final MuleContext muleContext) throws NotificationException {
+  @Override
+  public void lazyInit() {
+    doInit(true);
+  }
+
+  protected void setArtifactContext(final ArtifactContext artifactContext) throws NotificationException {
+    this.artifactContext = artifactContext;
+    setMuleContext(this.artifactContext.getMuleContext());
+  }
+
+  private void setMuleContext(final MuleContext muleContext) throws NotificationException {
     statusListener = new MuleContextNotificationListener<MuleContextNotification>() {
 
       @Override
@@ -192,7 +211,6 @@ public class DefaultMuleApplication implements Application {
     };
 
     muleContext.registerListener(statusListener);
-    this.muleContext = muleContext;
   }
 
   private void updateStatusFor(String phase) {
@@ -200,8 +218,8 @@ public class DefaultMuleApplication implements Application {
   }
 
   private void setStatusToFailed() {
-    if (muleContext != null) {
-      muleContext.unregisterListener(statusListener);
+    if (artifactContext != null) {
+      artifactContext.getMuleContext().unregisterListener(statusListener);
     }
 
     status = ApplicationStatus.DEPLOYMENT_FAILED;
@@ -222,7 +240,17 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public MuleContext getMuleContext() {
-    return muleContext;
+    return artifactContext.getMuleContext();
+  }
+
+  @Override
+  public File getLocation() {
+    return location;
+  }
+
+  @Override
+  public ConnectivityTestingService getConnectivityTestingService() {
+    return artifactContext.getConnectivityTestingService();
   }
 
   @Override
@@ -276,11 +304,12 @@ public class DefaultMuleApplication implements Application {
 
   @Override
   public void stop() {
-    if (this.muleContext == null || !this.muleContext.getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
+    if (this.artifactContext == null
+        || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
       return;
     }
 
-    if (this.muleContext == null) {
+    if (this.artifactContext == null) {
       // app never started, maybe due to a previous error
       if (logger.isInfoEnabled()) {
         logger.info(format("Stopping app '%s' with no mule context", descriptor.getName()));
@@ -290,14 +319,14 @@ public class DefaultMuleApplication implements Application {
       return;
     }
 
-    muleContext.getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
+    artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
 
     try {
       if (logger.isInfoEnabled()) {
         logger.info(miniSplash(format("Stopping app '%s'", descriptor.getName())));
       }
 
-      this.muleContext.stop();
+      this.artifactContext.getMuleContext().stop();
     } catch (MuleException e) {
       throw new DeploymentStopException(createStaticMessage(format("Error stopping application '%s'", descriptor.getName())), e);
     }
@@ -314,14 +343,14 @@ public class DefaultMuleApplication implements Application {
   }
 
   protected void doDispose() {
-    if (muleContext == null) {
+    if (artifactContext == null) {
       if (logger.isInfoEnabled()) {
         logger.info(format("App '%s' never started, nothing to dispose of", descriptor.getName()));
       }
       return;
     }
 
-    if (muleContext.isStarted() && !muleContext.isDisposed()) {
+    if (artifactContext.getMuleContext().isStarted() && !artifactContext.getMuleContext().isDisposed()) {
       try {
         stop();
       } catch (DeploymentStopException e) {
@@ -333,8 +362,8 @@ public class DefaultMuleApplication implements Application {
       logger.info(miniSplash(format("Disposing app '%s'", descriptor.getName())));
     }
 
-    muleContext.dispose();
-    muleContext = null;
+    artifactContext.getMuleContext().dispose();
+    artifactContext = null;
   }
 
 }

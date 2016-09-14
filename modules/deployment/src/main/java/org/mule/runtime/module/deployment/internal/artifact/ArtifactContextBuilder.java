@@ -41,11 +41,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builder for creating a {@code MuleContext}. This is the prefered mechanism to create a {@code MuleContext}
+ * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext}
+ * and a {@link MuleContext} that can be retrieved from the {@link ArtifactContext} by calling {@link ArtifactContext#getMuleContext()}
  *
  * @since 4.0
  */
-public class ArtifactMuleContextBuilder {
+public class ArtifactContextBuilder {
 
   protected static final String EXECUTION_CLASSLOADER_WAS_NOT_SET = "Execution classloader was not set";
   protected static final String MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL =
@@ -68,6 +69,7 @@ public class ArtifactMuleContextBuilder {
   private MuleContextListener muleContextListener;
   private String defaultEncoding;
   private ServiceRepository serviceRepository = Collections::emptyList;
+  private boolean enableLazyInit;
 
   /**
    * The {@code ArtifactType} defines the set of services that will be available in the {@code MuleContext}. For instance
@@ -78,7 +80,7 @@ public class ArtifactMuleContextBuilder {
    * @param artifactType artifact type for which a {@code MuleContext} must be created.
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setArtifactType(ArtifactType artifactType) {
+  public ArtifactContextBuilder setArtifactType(ArtifactType artifactType) {
     this.artifactType = artifactType;
     return this;
   }
@@ -87,7 +89,7 @@ public class ArtifactMuleContextBuilder {
    * @param configurationFiles set of the artifact configuration files. These must be absolute paths.
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setConfigurationFiles(String... configurationFiles) {
+  public ArtifactContextBuilder setConfigurationFiles(String... configurationFiles) {
     this.configurationFiles = configurationFiles;
     return this;
   }
@@ -96,7 +98,7 @@ public class ArtifactMuleContextBuilder {
    * @param artifactConfiguration
    * @return
    */
-  public ArtifactMuleContextBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration) {
+  public ArtifactContextBuilder setArtifactConfiguration(ArtifactConfiguration artifactConfiguration) {
     this.artifactConfiguration = artifactConfiguration;
     return this;
   }
@@ -108,7 +110,7 @@ public class ArtifactMuleContextBuilder {
    * @param parentContext {@code MuleContext} that is parent of the one to be created.
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setParentContext(MuleContext parentContext) {
+  public ArtifactContextBuilder setParentContext(MuleContext parentContext) {
     this.parentContext = parentContext;
     return this;
   }
@@ -119,7 +121,7 @@ public class ArtifactMuleContextBuilder {
    * @param artifactProperties properties use for the artifact configuration
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setArtifactProperties(Map<String, String> artifactProperties) {
+  public ArtifactContextBuilder setArtifactProperties(Map<String, String> artifactProperties) {
     checkArgument(artifactProperties != null, MULE_CONTEXT_ARTIFACT_PROPERTIES_CANNOT_BE_NULL);
     this.artifactProperties = artifactProperties;
     return this;
@@ -131,7 +133,7 @@ public class ArtifactMuleContextBuilder {
    * @param artifactName name to use to identify the artifact.
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setArtifactName(String artifactName) {
+  public ArtifactContextBuilder setArtifactName(String artifactName) {
     this.artifactName = artifactName;
     return this;
   }
@@ -142,7 +144,7 @@ public class ArtifactMuleContextBuilder {
    * @param muleContextListener listener of {@code MuleContext} notifications.
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setMuleContextListener(MuleContextListener muleContextListener) {
+  public ArtifactContextBuilder setMuleContextListener(MuleContextListener muleContextListener) {
     this.muleContextListener = muleContextListener;
     return this;
   }
@@ -153,7 +155,7 @@ public class ArtifactMuleContextBuilder {
    * @param location directory where the artifact is installed
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setArtifactInstallationDirectory(File location) {
+  public ArtifactContextBuilder setArtifactInstallationDirectory(File location) {
     checkArgument(location.isDirectory(), INSTALLATION_DIRECTORY_MUST_BE_A_DIRECTORY);
     this.artifactInstallationDirectory = location;
     return this;
@@ -166,7 +168,7 @@ public class ArtifactMuleContextBuilder {
    * @param classloader classloader to use for executing logic within the {@code MuleContext}
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setExecutionClassloader(ClassLoader classloader) {
+  public ArtifactContextBuilder setExecutionClassloader(ClassLoader classloader) {
     this.executionClassLoader = classloader;
     return this;
   }
@@ -177,7 +179,7 @@ public class ArtifactMuleContextBuilder {
    * @param defaultEncoding default encoding to use within the {@code MuleContext}
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setDefaultEncoding(String defaultEncoding) {
+  public ArtifactContextBuilder setDefaultEncoding(String defaultEncoding) {
     this.defaultEncoding = defaultEncoding;
     return this;
   }
@@ -190,7 +192,7 @@ public class ArtifactMuleContextBuilder {
    *        created.
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins) {
+  public ArtifactContextBuilder setArtifactPlugins(List<ArtifactPlugin> artifactPlugins) {
     this.artifactPlugins = artifactPlugins;
     return this;
   }
@@ -202,9 +204,24 @@ public class ArtifactMuleContextBuilder {
    * @param serviceRepository repository of available services. Non null.
    * @return the builder
    */
-  public ArtifactMuleContextBuilder setServiceRepository(ServiceRepository serviceRepository) {
+  public ArtifactContextBuilder setServiceRepository(ServiceRepository serviceRepository) {
     checkArgument(serviceRepository != null, SERVICE_REPOSITORY_CANNOT_BE_NULL);
     this.serviceRepository = serviceRepository;
+    return this;
+  }
+
+  /**
+   * Allows to lazily create the artifact resources.
+   *
+   * @param enableLazyInit when true the artifact resources from the mule configuration won't be created at startup. The artifact components
+   *                       from the configuration will be created on demand when requested. For instance, when using {@link ArtifactContext#getConnectivityTestingService()}
+   *                       and then invoking {@link org.mule.runtime.core.api.connectivity.ConnectivityTestingService#testConnection(String)} will
+   *                       cause the creation of the component requested to do test connectivity, if it was not already created.
+   *                       when false, the application will be created completely at startup.
+   * @return the builder
+   */
+  public ArtifactContextBuilder setEnableLazyInit(boolean enableLazyInit) {
+    this.enableLazyInit = enableLazyInit;
     return this;
   }
 
@@ -213,7 +230,7 @@ public class ArtifactMuleContextBuilder {
    * @throws ConfigurationException when there's a problem creating the {@code MuleContext}
    * @throws InitialisationException when a certain configuration component failed during initialisation phase
    */
-  public MuleContext build() throws InitialisationException, ConfigurationException {
+  public ArtifactContext build() throws InitialisationException, ConfigurationException {
     checkState(executionClassLoader != null, EXECUTION_CLASSLOADER_WAS_NOT_SET);
     checkState(APP.equals(artifactType) || parentContext == null, ONLY_APPLICATIONS_ARE_ALLOWED_TO_HAVE_A_PARENT_CONTEXT);
     try {
@@ -222,7 +239,8 @@ public class ArtifactMuleContextBuilder {
         builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         SpringXmlConfigurationBuilder mainBuilder =
-            new SpringXmlConfigurationBuilder(configurationFiles, artifactConfiguration, artifactProperties, artifactType);
+            new SpringXmlConfigurationBuilder(configurationFiles, artifactConfiguration, artifactProperties, artifactType,
+                                              enableLazyInit);
         mainBuilder.addServiceConfigurator(new ContainerServicesMuleContextConfigurator(serviceRepository));
         if (parentContext != null) {
           mainBuilder.setParentContext(parentContext);
@@ -239,7 +257,8 @@ public class ArtifactMuleContextBuilder {
         }
         muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
         try {
-          return muleContextFactory.createMuleContext(builders, muleContextBuilder);
+          MuleContext muleContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
+          return new ArtifactContext(muleContext, mainBuilder.getMuleArtifactContext());
         } catch (InitialisationException e) {
           throw new ConfigurationException(e);
         }

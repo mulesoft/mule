@@ -43,10 +43,10 @@ public class ArtifactArchiveInstaller {
    * Created the artifact directory and the anchor file related.
    *
    * @param artifactUrl URL of the artifact to install. It must be present in the artifact directory as a zip file.
-   * @return the name of the installed artifact.
+   * @return the location of the installed artifact.
    * @throws IOException in case there was an error reading from the artifact or writing to the artifact folder.
    */
-  public String installArtifact(final URL artifactUrl) throws IOException {
+  public File installArtifact(final URL artifactUrl) throws IOException {
     if (!artifactUrl.toString().endsWith(".zip")) {
       throw new IllegalArgumentException("Invalid Mule artifact archive: " + artifactUrl);
     }
@@ -94,7 +94,7 @@ public class ArtifactArchiveInstaller {
         FileUtils.deleteTree(artifactDir);
       }
     }
-    return artifactName;
+    return artifactDir;
   }
 
   /**

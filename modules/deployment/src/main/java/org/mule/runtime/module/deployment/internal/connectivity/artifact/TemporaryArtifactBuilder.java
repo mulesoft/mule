@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.api.artifact;
+package org.mule.runtime.module.deployment.internal.connectivity.artifact;
 
 import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
-import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 
 import java.io.File;
 
@@ -17,14 +17,6 @@ import java.io.File;
  * @since 4.0
  */
 public interface TemporaryArtifactBuilder {
-
-  /**
-   * Allows to configure a {@code ConnectivityTestingStrategy} that can be used for connectivity testing.
-   *
-   * @param connectionTestingServiceType class that creates instance of {@code ConnectivityTestingStrategy}
-   * @return the builder
-   */
-  TemporaryArtifactBuilder addConnectivityTestingStrategyType(Class<? extends ConnectivityTestingStrategy> connectionTestingServiceType);
 
   /**
    * Allows to add an extensions to be used in the tooling artifact. The file type must be zip and be an extension.

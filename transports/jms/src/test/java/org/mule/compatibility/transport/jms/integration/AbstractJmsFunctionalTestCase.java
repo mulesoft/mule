@@ -250,7 +250,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase {
       resources = String.format("integration/%s/connector-%s", getJmsConfig().getName(), resources);
 
       String[] configFiles = new String[] {resources, configFile};
-      SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles);
+      SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder(configFiles, false);
       return builder;
     } else {
       return super.getBuilder();

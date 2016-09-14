@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.api.artifact;
+package org.mule.runtime.module.deployment.internal.connectivity.artifact;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Startable;
 
@@ -35,6 +36,11 @@ public interface TemporaryArtifact extends Startable, Disposable {
    * @return true if the artifact has already been created, false otherwise.
    */
   boolean isStarted();
+
+  /**
+   * @return connectivity testing service to test connection over configuration components
+   */
+  ConnectivityTestingService getConnectivityTestingService();
 
   /**
    * @return the {@code MuleContext} created by the artifact.

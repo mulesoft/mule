@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.core.util.SplashScreen.miniSplash;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleAppsDir;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.util.CollectionUtils;
@@ -229,7 +230,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     T artifact;
     try {
-      artifact = artifactFactory.createArtifact(addedApp);
+      artifact = artifactFactory.createArtifact(new File(getMuleAppsDir(), addedApp));
 
       // add to the list of known artifacts first to avoid deployment loop on failure
       trackArtifact(artifact);
@@ -360,8 +361,8 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
   }
 
   private T installFrom(URL url) throws IOException {
-    String artifactName = artifactArchiveInstaller.installArtifact(url);
-    return artifactFactory.createArtifact(artifactName);
+    File artifactLocation = artifactArchiveInstaller.installArtifact(url);
+    return artifactFactory.createArtifact(artifactLocation);
   }
 
   @Override
@@ -381,7 +382,7 @@ public class DefaultArchiveDeployer<T extends DeployableArtifact> implements Arc
 
     deploymentListener.onDeploymentStart(artifact.getArtifactName());
     try {
-      artifact = artifactFactory.createArtifact(artifact.getArtifactName());
+      artifact = artifactFactory.createArtifact(artifact.getLocation());
       trackArtifact(artifact);
 
       deployer.deploy(artifact);

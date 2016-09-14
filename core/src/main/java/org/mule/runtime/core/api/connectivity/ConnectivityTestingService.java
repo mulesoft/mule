@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tooling.api.connectivity;
+package org.mule.runtime.core.api.connectivity;
 
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 
@@ -24,6 +24,7 @@ public interface ConnectivityTestingService {
    * @return connectivity testing result.
    * @throws UnsupportedConnectivityTestingObjectException when it's not possible to do connectivity testing over the mule
    *         component.
+   * @throws ConnectivityTestingObjectNotFoundException when the object to use to do connectivity does not exists
    */
   ConnectionValidationResult testConnection(String identifier);
 
