@@ -7,7 +7,6 @@
 package org.mule.extension.db.internal.domain.metadata;
 
 import static java.sql.Types.VARCHAR;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
@@ -44,15 +43,21 @@ import java.util.Map;
 
 public class BaseDbMetadataResolver implements MetadataContentResolver<String> {
 
-  protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
+  protected BaseTypeBuilder typeBuilder;
   protected ClassTypeLoader typeLoader;
   private Map<Integer, MetadataType> dbToMetaDataType;
+
+  @Override
+  public String getCategoryName() {
+    return "BaseDbCategory";
+  }
 
   @Override
   public MetadataType getContentMetadata(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
 
     this.typeLoader = context.getTypeLoader();
+    this.typeBuilder = context.getTypeBuilder();
 
     QueryTemplate queryTemplate = parseQuery(query);
     List<InputQueryParam> inputParams = queryTemplate.getInputParams();

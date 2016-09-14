@@ -40,4 +40,9 @@ public final class FileAttributesMetadataResolver implements MetadataAttributesR
         connection.orElseThrow(() -> new FileSystemNotFoundException("Could not found file system to retrieve metadata from"));
     return typeLoader.load(fileSystem.getAttributesType());
   }
+
+  @Override
+  public String getCategoryName() {
+    return "FileAttributesCategory";
+  }
 }

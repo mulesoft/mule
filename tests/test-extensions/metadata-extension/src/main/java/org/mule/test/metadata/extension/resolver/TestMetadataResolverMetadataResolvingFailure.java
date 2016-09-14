@@ -20,6 +20,11 @@ import java.util.Set;
 public class TestMetadataResolverMetadataResolvingFailure
     implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String> {
 
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
+
   public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException {
     throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
   }
@@ -31,5 +36,4 @@ public class TestMetadataResolverMetadataResolvingFailure
   public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
     throw new MetadataResolvingException("Failing keysResolver retriever", FailureCode.CONNECTION_FAILURE);
   }
-
 }

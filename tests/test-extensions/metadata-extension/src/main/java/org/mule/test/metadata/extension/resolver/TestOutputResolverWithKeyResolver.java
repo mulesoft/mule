@@ -27,4 +27,9 @@ public class TestOutputResolverWithKeyResolver implements MetadataKeysResolver, 
   public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
     return TestMetadataResolverUtils.getMetadata(key);
   }
+
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
 }

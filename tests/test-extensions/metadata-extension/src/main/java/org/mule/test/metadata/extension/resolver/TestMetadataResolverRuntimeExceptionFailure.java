@@ -19,6 +19,11 @@ import java.util.Set;
 public class TestMetadataResolverRuntimeExceptionFailure
     implements MetadataKeysResolver, MetadataContentResolver<String>, MetadataOutputResolver<String> {
 
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
+
   public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException {
     throw new RuntimeException("Runtime Exception thrown");
   }
@@ -30,5 +35,4 @@ public class TestMetadataResolverRuntimeExceptionFailure
   public MetadataType getOutputMetadata(MetadataContext context, String key) throws MetadataResolvingException {
     throw new RuntimeException("Runtime Exception thrown");
   }
-
 }

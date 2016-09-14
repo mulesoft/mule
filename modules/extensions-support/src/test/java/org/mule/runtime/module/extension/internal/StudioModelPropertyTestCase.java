@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnriche
 import org.mule.runtime.extension.api.introspection.property.StudioModelProperty;
 import org.mule.runtime.module.extension.internal.introspection.DefaultExtensionFactory;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
+import org.mule.runtime.module.extension.internal.introspection.enricher.DynamicMetadataModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.enricher.StudioModelEnricher;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;

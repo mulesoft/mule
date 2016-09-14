@@ -23,4 +23,9 @@ public class AppleKeyResolver implements MetadataKeysResolver {
   public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     return ImmutableSet.of(MetadataKeyBuilder.newKey("APPLE").build());
   }
+
+  @Override
+  public String getCategoryName() {
+    return "AppleKeys";
+  }
 }

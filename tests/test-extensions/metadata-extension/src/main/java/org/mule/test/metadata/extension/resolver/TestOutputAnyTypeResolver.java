@@ -21,4 +21,9 @@ public class TestOutputAnyTypeResolver implements MetadataOutputResolver<String>
       throws MetadataResolvingException, ConnectionException {
     return BaseTypeBuilder.create(JAVA).anyType().build();
   }
+
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
 }

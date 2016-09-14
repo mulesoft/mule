@@ -170,7 +170,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     try {
       return producer.get();
     } catch (InvalidComponentIdException e) {
-      return failure(null, e.getMessage(), FailureCode.COMPONENT_NOT_FOUND, e.getDetailedMessage());
+      return failure(e, FailureCode.COMPONENT_NOT_FOUND);
     } catch (Exception e) {
       return failure(null, format("%s: %s", failureMessage, e.getMessage()), e);
     }

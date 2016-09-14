@@ -32,4 +32,9 @@ public class TestContentAndOutputResolverWithoutKeyResolverAndKeyIdParam
     checkArgument(isBlank(key), KEY_SHOULD_BE_EMPTY);
     return getMetadata(PERSON);
   }
+
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
 }

@@ -28,6 +28,11 @@ public class TestNoConfigMetadataResolver implements MetadataKeysResolver, Metad
     MetadataOutputResolver<Object>, MetadataAttributesResolver<Object> {
 
   @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
+
+  @Override
   public Set<MetadataKey> getMetadataKeys(MetadataContext context) {
     return Arrays.stream(KeyIds.values()).map(e -> MetadataKeyBuilder.newKey(e.name()).build()).collect(Collectors.toSet());
   }
