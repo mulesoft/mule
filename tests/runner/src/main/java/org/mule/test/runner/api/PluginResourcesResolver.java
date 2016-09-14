@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class PluginResourcesResolver {
 
   private static final String PLUGIN_PROPERTIES = "plugin.properties";
-  public static final String COMMA_CHARACTER = ",";
+  private static final String COMMA_CHARACTER = ",";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final ExtensionManagerAdapter extensionManager;
 
