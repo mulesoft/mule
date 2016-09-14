@@ -36,6 +36,7 @@
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <exclusions><exclusion><groupId>org.zaraza</groupId><artifactId>zaraza</artifactId></exclusion></exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
@@ -64,9 +65,14 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Mule Extensions - The ones that are packages as zip (plugins) have to be explicitly added
-            with compile scope in order to be used with the artifact test runner
-        -->
+        <!-- Mule Plugins -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-file-extension-common</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-validation</artifactId>

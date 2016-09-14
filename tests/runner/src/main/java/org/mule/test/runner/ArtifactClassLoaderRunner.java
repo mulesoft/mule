@@ -7,7 +7,7 @@
 package org.mule.test.runner;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_ARTIFACTS;
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_FILE;
@@ -245,8 +245,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     List<E[]> valuesList =
         AnnotationUtils.getAnnotationAttributeFromHierarchy(klass, ArtifactClassLoaderRunnerConfig.class,
                                                             name);
-    return newArrayList(valuesList.stream()
-        .flatMap(Arrays::stream).collect(toSet()));
+    return valuesList.stream().flatMap(Arrays::stream).distinct().collect(toList());
   }
 
   /**
