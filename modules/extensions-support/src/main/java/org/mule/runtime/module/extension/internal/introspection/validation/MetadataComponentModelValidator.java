@@ -79,10 +79,8 @@ public class MetadataComponentModelValidator implements ModelValidator {
   }
 
   private void validateCategories(MetadataResolverFactory metadataResolverFactory) {
-    if (metadataResolverFactory != null) {
-      validateCategoryNames(metadataResolverFactory.getKeyResolver(), metadataResolverFactory.getContentResolver(),
-                            metadataResolverFactory.getOutputAttributesResolver(), metadataResolverFactory.getOutputResolver());
-    }
+    validateCategoryNames(metadataResolverFactory.getKeyResolver(), metadataResolverFactory.getContentResolver(),
+                          metadataResolverFactory.getOutputAttributesResolver(), metadataResolverFactory.getOutputResolver());
   }
 
   private void validateCategoryNames(MetadataResolver... resolvers) {

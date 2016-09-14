@@ -21,6 +21,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import org.mule.common.MuleVersion;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
+import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
 import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
@@ -46,6 +47,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Parameter
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
+import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.operation.ImmutableRuntimeOperationModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.operation.RuntimeOperationModel;
@@ -237,7 +239,8 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                              declaration.getSourceFactory(), declaration.getModelProperties(),
                                                              declaration.getInterceptorFactories(),
                                                              declaration.getExceptionEnricherFactory(),
-                                                             declaration.getMetadataResolverFactory()));
+                                                             getMetadataResolverFactory(declaration
+                                                                 .getMetadataResolverFactory())));
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations) {
@@ -261,7 +264,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                   declaration.getModelProperties(),
                                                   declaration.getInterceptorFactories(),
                                                   declaration.getExceptionEnricherFactory(),
-                                                  declaration.getMetadataResolverFactory());
+                                                  getMetadataResolverFactory(declaration.getMetadataResolverFactory()));
       });
     }
 
@@ -321,6 +324,10 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                          parameter.getExpressionSupport(),
                                          parameter.getDefaultValue(),
                                          parameter.getModelProperties());
+    }
+
+    private MetadataResolverFactory getMetadataResolverFactory(MetadataResolverFactory factory) {
+      return factory != null ? factory : new NullMetadataResolverFactory();
     }
   }
 }
