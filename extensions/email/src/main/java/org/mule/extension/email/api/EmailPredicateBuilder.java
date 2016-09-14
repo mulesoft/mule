@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 /**
- * Builds a {@link Predicate} which verifies that a {@link EmailAttributes} instance is compliant with a number of criteria. This
+ * Builds a {@link Predicate} which verifies that a {@link ReceivedEmailAttributes} instance is compliant with a number of criteria. This
  * builder is stateful and not thread-safe. A new instance should be use per each desired {@link Predicate}.
  * <p>
  * This builder can either be used programmatically or through Mule's SDK since its internal state is annotated with the
@@ -115,8 +115,8 @@ public class EmailPredicateBuilder {
    *
    * @return a {@link Predicate}
    */
-  public Predicate<EmailAttributes> build() {
-    Predicate<EmailAttributes> predicate = emailAttributes -> true;
+  public Predicate<ReceivedEmailAttributes> build() {
+    Predicate<ReceivedEmailAttributes> predicate = emailAttributes -> true;
 
     if (subjectRegex != null) {
       Predicate<String> subjectPredicate = compile(subjectRegex).asPredicate();

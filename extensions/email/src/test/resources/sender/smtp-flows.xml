@@ -7,65 +7,50 @@
 
 
     <flow name="sendEmail">
-        <email:send config-ref="config" subject="Email Subject" content="emailContent">
-            <email:to-addresses>
-                <email:to-address value="juan.desimoni@mulesoft.com"/>
-            </email:to-addresses>
+        <email:send config-ref="config">
+            <email:email-builder subject="Email Subject">
+                <email:to-addresses>
+                    <email:to-address value="juan.desimoni@mulesoft.com"/>
+                </email:to-addresses>
+                <email:body contentType="text/plain">
+                    <email:content>Email Content</email:content>
+                </email:body>
+            </email:email-builder>
         </email:send>
     </flow>
 
     <flow name="sendEmailHeaders">
-        <email:send config-ref="config-custom-headers" subject="Email Subject" content="emailContent">
-            <email:to-addresses>
-                <email:to-address value="juan.desimoni@mulesoft.com"/>
-            </email:to-addresses>
-            <email:headers>
-                <email:header key="CustomOperationHeader" value="Dummy"/>
-            </email:headers>
+        <email:send config-ref="config-custom-headers">
+            <email:email-builder subject="Email Subject">
+                <email:to-addresses>
+                    <email:to-address value="juan.desimoni@mulesoft.com"/>
+                </email:to-addresses>
+                <email:body contentType="text/plain">
+                    <email:content>Email Content</email:content>
+                </email:body>
+                <email:headers>
+                    <email:header key="CustomOperationHeader" value="Dummy"/>
+                </email:headers>
+            </email:email-builder>
         </email:send>
     </flow>
 
     <!--TODO(gfernandes) MULE-10117 remove this when support for accessing resources is added to runner -->
     <spring:bean id="jsonAttachmentResource" class="org.springframework.core.io.UrlResource">
-        <spring:constructor-arg value="classpath:attachment.json" type="java.net.URL" />
+        <spring:constructor-arg value="classpath:attachment.json" type="java.net.URL"/>
     </spring:bean>
 
-    <flow name="replyEmail">
-        <email:reply config-ref="config" content="emailContent"/>
-    </flow>
-
-    <flow name="forwardEmail">
-        <email:forward config-ref="config" subject="Email Subject">
-            <email:to-addresses>
-                <email:to-address value="pablo.musumeci@mulesoft.com"/>
-            </email:to-addresses>
-        </email:forward>
-    </flow>
-
-    <flow name="forwardEmailWithContent">
-        <email:forward config-ref="config" subject="Email Subject">
-            <email:content>
-                <email:body>More Content To Forward</email:body>
-            </email:content>
-            <email:to-addresses>
-                <email:to-address value="pablo.musumeci@mulesoft.com"/>
-            </email:to-addresses>
-        </email:forward>
-    </flow>
-
     <flow name="sendEncodedMessage">
-        <email:send config-ref="config" subject="Email Subject">
-            <email:content charset="#[flowVars.encoding]">
-                <email:body>#[payload]</email:body>
-            </email:content>
-            <email:to-addresses>
-                <email:to-address value="pablo.musumeci@mulesoft.com"/>
-            </email:to-addresses>
+        <email:send config-ref="config">
+            <email:email-builder subject="Email Subject">
+                <email:to-addresses>
+                    <email:to-address value="pablo.musumeci@mulesoft.com"/>
+                </email:to-addresses>
+                <email:body charset="#[flowVars.encoding]">
+                    <email:content>#[payload]</email:content>
+                </email:body>
+            </email:email-builder>
         </email:send>
     </flow>
-
-    <email:email-content name="emailContent" contentType="text/plain">
-        <email:body>Email Content</email:body>
-    </email:email-content>
 
 </mule>

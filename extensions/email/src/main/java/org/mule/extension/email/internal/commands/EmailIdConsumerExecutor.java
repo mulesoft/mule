@@ -7,8 +7,7 @@
 package org.mule.extension.email.internal.commands;
 
 import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-
-import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.ReceivedEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.Message;
 
@@ -40,7 +39,7 @@ public class EmailIdConsumerExecutor {
    * @param emailId the id of the email that is wanted to perform the operation, can be {@code null}
    * @param consumer a {@link Consumer} to be applied to an email.
    */
-  public void execute(Message muleMessage, Integer emailId, Consumer<Integer> consumer) {
+  void execute(Message muleMessage, Integer emailId, Consumer<Integer> consumer) {
     if (emailId == null) {
       Object payload = muleMessage.getPayload().getValue();
       if (payload instanceof List) {
@@ -60,7 +59,7 @@ public class EmailIdConsumerExecutor {
   }
 
   /**
-   * Gets an emailId from a MuleMessage of fails if the MuleMessage does not contains attributes of {@link EmailAttributes} type.
+   * Gets an emailId from a MuleMessage of fails if the MuleMessage does not contains attributes of {@link ReceivedEmailAttributes} type.
    */
   private int getIdOrFail(Message muleMessage) {
     return getAttributesFromMessage(muleMessage).orElseThrow(() -> new EmailException(NO_ID_ERROR)).getId();

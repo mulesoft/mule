@@ -6,16 +6,19 @@
  */
 package org.mule.extension.email.internal.commands;
 
-import org.mule.extension.email.api.EmailAttachment;
-import org.mule.extension.email.api.EmailContent;
-import org.mule.extension.email.api.MessageBuilder;
-import org.mule.extension.email.api.exception.EmailSenderException;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import org.mule.extension.email.api.EmailBody;
+import org.mule.extension.email.api.EmailBuilder;
+import org.mule.extension.email.internal.MessageBuilder;
+import org.mule.extension.email.api.exception.EmailSendException;
+import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.extension.email.internal.sender.SenderConnection;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
+import java.util.Calendar;
+
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Transport;
 
@@ -28,45 +31,37 @@ public final class SendCommand {
 
   /**
    * Send an email message. The message will be sent to all recipient {@code toAddresses}, {@code ccAddresses},
-   * {@code bccAddresses} specified in the message.
+   * {@code bccAddresses} specified in the {@code emailBuilder}.
    *
-   * @param connection the connection associated to the operation.
-   * @param content the text content of the email.
-   * @param subject the subject of the email.
-   * @param toAddresses the "to" (primary) addresses to deliver the email.
-   * @param fromAddress the person(s) that are sending the email.
-   * @param defaultCharset the default charset of the email message to be used if the {@param content} don't specify it.
-   * @param ccAddresses the carbon copy addresses to deliver the email.
-   * @param bccAddresses the blind carbon copy addresses to deliver the email.
-   * @param headers a map of custom headers that are bounded with the email.
-   * @param attachments the attachments that are bounded in the content of the email.
+   * @param connection    the connection associated to the operation.
+   * @param configuration the specified configuration to send the email.
+   * @param emailBuilder       the email emailBuilder used to create the email that is going to be sent.
    */
-  public void send(SenderConnection connection,
-                   EmailContent content,
-                   String subject,
-                   List<String> toAddresses,
-                   String fromAddress,
-                   String defaultCharset,
-                   List<String> ccAddresses,
-                   List<String> bccAddresses,
-                   Map<String, String> headers,
-                   List<EmailAttachment> attachments) {
+  public void send(SenderConnection connection, SMTPConfiguration configuration, EmailBuilder emailBuilder) {
     try {
-      javax.mail.Message message = MessageBuilder.newMessage(connection.getSession())
+
+      ImmutableMap.Builder<String, String> headers = ImmutableMap.builder();
+      headers.putAll(configuration.getHeaders());
+      headers.putAll(emailBuilder.getHeaders());
+
+      EmailBody body = emailBuilder.getBody();
+
+      Message message = MessageBuilder.newMessage(connection.getSession())
           .withSentDate(Calendar.getInstance().getTime())
-          .fromAddresses(fromAddress)
-          .to(toAddresses)
-          .cc(ccAddresses)
-          .bcc(bccAddresses)
-          .withSubject(subject)
-          .withAttachments(attachments)
-          .withContent(content.getBody(), content.getContentType(),
-                       content.getCharset() == null ? defaultCharset : content.getCharset())
-          .withHeaders(headers).build();
+          .fromAddresses(isNotBlank(emailBuilder.getFromAddress()) ? emailBuilder.getFromAddress() : configuration.getFrom())
+          .to(emailBuilder.getToAddresses())
+          .cc(emailBuilder.getCcAddresses())
+          .bcc(emailBuilder.getBccAddresses())
+          .withSubject(emailBuilder.getSubject())
+          .withAttachments(emailBuilder.getAttachments())
+          .withBody(body.getContent(), body.getContentType(),
+                    body.getCharset() == null ? configuration.getDefaultCharset() : body.getCharset())
+          .withHeaders(headers.build())
+          .build();
 
       Transport.send(message);
     } catch (MessagingException e) {
-      throw new EmailSenderException(e);
+      throw new EmailSendException(e);
     }
   }
 }

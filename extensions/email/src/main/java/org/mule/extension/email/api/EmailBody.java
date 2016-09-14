@@ -20,13 +20,13 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 
 /**
- * Represents and enables the construction of the content of an email with a body of type "text/*" and a specific character
+ * Represents and enables the construction of the body of an email with a body of type "text/*" and a specific character
  * encoding.
  *
  * @since 4.0
  */
 @XmlHints(allowTopLevelDefinition = true)
-public class EmailContent {
+public class EmailBody {
 
   /**
    * Text body of the message content
@@ -35,7 +35,8 @@ public class EmailContent {
   @Optional(defaultValue = PAYLOAD)
   @Placement(order = 1)
   @Text
-  private String body;
+  private String content;
+
   /**
    * ContentType of the body text. Example: "text/html" or "text/plain".
    */
@@ -44,6 +45,7 @@ public class EmailContent {
   @DisplayName("ContentType")
   @Placement(order = 2)
   private String contentType;
+
   /**
    * The character encoding of the body. If not specified, it defaults to the default charset in the mule configuration
    */
@@ -52,16 +54,10 @@ public class EmailContent {
   @Placement(order = 3)
   private String charset;
 
-  public EmailContent() {}
+  public EmailBody() {}
 
-  public EmailContent(String body, String charset) {
-    this.body = body;
-    this.contentType = TEXT_PLAIN;
-    this.charset = charset;
-  }
-
-  public EmailContent(String body, MediaType contentType, String charset) {
-    this.body = body;
+  public EmailBody(String content, MediaType contentType, String charset) {
+    this.content = content;
     this.contentType = contentType.toString();
     this.charset = charset;
   }
@@ -69,8 +65,8 @@ public class EmailContent {
   /**
    * @return the body of the message content. The body aims to be text.
    */
-  public String getBody() {
-    return body;
+  public String getContent() {
+    return content;
   }
 
   /**

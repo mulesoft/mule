@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api;
+package org.mule.extension.email.internal;
 
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
@@ -16,6 +16,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddre
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 
+import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.util.EmailConnectorUtils;
 import org.mule.runtime.api.metadata.DataType;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.activation.DataHandler;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
@@ -220,7 +222,7 @@ public final class MessageBuilder {
    * @return this {@link MessageBuilder}
    * @throws MessagingException
    */
-  public MessageBuilder withContent(String content, MediaType contentType, String charset) throws MessagingException {
+  public MessageBuilder withBody(String content, MediaType contentType, String charset) throws MessagingException {
     this.content = content;
     this.contentType = contentType;
     this.charset = charset;
@@ -234,7 +236,7 @@ public final class MessageBuilder {
    * @return this {@link MessageBuilder}
    * @throws MessagingException
    */
-  public MessageBuilder withContent(String content) throws MessagingException {
+  public MessageBuilder withBody(String content) throws MessagingException {
     this.content = content;
     this.contentType = TEXT;
     return this;

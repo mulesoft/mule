@@ -8,7 +8,8 @@
 package org.mule.extension.email.retriever;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
+import static javax.mail.Message.RecipientType.CC;
+import static javax.mail.Message.RecipientType.TO;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -20,7 +21,6 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.extension.email.api.MessageBuilder.newMessage;
 import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
@@ -33,7 +33,6 @@ import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.assertAttachmentContent;
 import static org.mule.extension.email.util.EmailTestUtils.getMultipartTestMessage;
 import static org.mule.extension.email.util.EmailTestUtils.testSession;
-
 import org.mule.extension.email.EmailConnectorTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -47,6 +46,7 @@ import java.util.List;
 
 import javax.mail.Flags.Flag;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Before;
@@ -79,8 +79,7 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   @Before
   public void sendInitialEmailBatch() throws MessagingException {
     for (int i = 0; i < 10; i++) {
-      user.deliver(newMessage(testSession).to(singletonList(JUANI_EMAIL)).fromAddresses(ESTEBAN_EMAIL)
-          .cc(singletonList(ALE_EMAIL)).withContent(EMAIL_CONTENT).withSubject(EMAIL_SUBJECT).build());
+      user.deliver(getMimeMessage(JUANI_EMAIL, ALE_EMAIL, EMAIL_CONTENT, EMAIL_SUBJECT, ESTEBAN_EMAIL));
     }
   }
 
@@ -95,14 +94,24 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
   @Test
   public void retrieveMatchingSubjectAndFromAddress() throws Exception {
     for (int i = 0; i < 5; i++) {
-      String fromEmail = format("address.%s@enterprise.com", i);
-      user.deliver(newMessage(testSession).to(singletonList(ESTEBAN_EMAIL)).cc(singletonList(ALE_EMAIL))
-          .withContent(EMAIL_CONTENT).withSubject("Non Matching Subject").fromAddresses(fromEmail).build());
+      String fromAddress = format("address.%s@enterprise.com", i);
+      MimeMessage mimeMessage = getMimeMessage(ESTEBAN_EMAIL, ALE_EMAIL, EMAIL_CONTENT, "Non Matching Subject", fromAddress);
+      user.deliver(mimeMessage);
     }
 
     List<Message> messages = runFlowAndGetMessages(RETRIEVE_MATCH_SUBJECT_AND_FROM);
     assertThat(server.getReceivedMessages(), arrayWithSize(15));
     assertThat(messages, hasSize(10));
+  }
+
+  private MimeMessage getMimeMessage(String to, String cc, String body, String subject, String from) throws MessagingException {
+    MimeMessage mimeMessage = new MimeMessage(testSession);
+    mimeMessage.setRecipient(TO, new InternetAddress(to));
+    mimeMessage.setRecipient(CC, new InternetAddress(cc));
+    mimeMessage.setContent(body, "text/plain");
+    mimeMessage.setSubject(subject);
+    mimeMessage.setFrom(new InternetAddress(from));
+    return mimeMessage;
   }
 
   @Test

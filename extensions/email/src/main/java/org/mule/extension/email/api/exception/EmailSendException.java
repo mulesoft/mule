@@ -7,12 +7,12 @@
 package org.mule.extension.email.api.exception;
 
 /**
- * This {@link EmailSenderException} is the base {@link RuntimeException} type for operations that sends emails any other
+ * This {@link EmailSendException} is the base {@link RuntimeException} type for operations that sends emails any other
  * exceptions thrown by operations that sends emails will be wrapped into one of this.
  *
  * @since 4.0
  */
-public class EmailSenderException extends EmailException {
+public class EmailSendException extends EmailException {
 
   private static final String ERROR = "Error while sending email: ";
 
@@ -21,7 +21,7 @@ public class EmailSenderException extends EmailException {
    *
    * @param message the detail message
    */
-  public EmailSenderException(String message) {
+  public EmailSendException(String message) {
     super(ERROR + message);
   }
 
@@ -30,7 +30,7 @@ public class EmailSenderException extends EmailException {
    *
    * @param cause the exception's cause
    */
-  public EmailSenderException(Throwable cause) {
+  public EmailSendException(Throwable cause) {
     super(ERROR + cause.getMessage(), cause);
   }
 }
