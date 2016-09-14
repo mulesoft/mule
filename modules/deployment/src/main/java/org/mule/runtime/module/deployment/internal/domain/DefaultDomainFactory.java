@@ -12,6 +12,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -50,15 +51,16 @@ public class DefaultDomainFactory implements DomainFactory {
   }
 
   @Override
-  public Domain createArtifact(String artifactName) throws IOException {
-    Domain domain = domainManager.getDomain(artifactName);
+  public Domain createArtifact(File domainLocation) throws IOException {
+    String domainName = domainLocation.getName();
+    Domain domain = domainManager.getDomain(domainName);
     if (domain != null) {
-      throw new IllegalArgumentException(format("Domain '%s'  already exists", artifactName));
+      throw new IllegalArgumentException(format("Domain '%s'  already exists", domainName));
     }
-    if (artifactName.contains(" ")) {
-      throw new IllegalArgumentException("Mule domain name may not contain spaces: " + artifactName);
+    if (domainName.contains(" ")) {
+      throw new IllegalArgumentException("Mule domain name may not contain spaces: " + domainName);
     }
-    DomainDescriptor descriptor = findDomain(artifactName);
+    DomainDescriptor descriptor = findDomain(domainName);
     // TODO MULE-9653 - use the plugins class loader maps when plugins are allowed in domains
     DefaultMuleDomain defaultMuleDomain =
         new DefaultMuleDomain(descriptor, domainClassLoaderFactory.create(containerClassLoader, descriptor, emptyList()));
@@ -70,17 +72,18 @@ public class DefaultDomainFactory implements DomainFactory {
 
   private DomainDescriptor findDomain(String domainName) throws IOException {
     if (DEFAULT_DOMAIN_NAME.equals(domainName)) {
-      return new EmptyDomainDescriptor(DEFAULT_DOMAIN_NAME);
+      return new EmptyDomainDescriptor(new File(getMuleDomainsDir(), DEFAULT_DOMAIN_NAME));
     }
 
-    final File deploymentFile = getDeploymentFile(getDomainFolder(domainName));
+    File domainFolder = getDomainFolder(domainName);
+    final File deploymentFile = getDeploymentFile(domainFolder);
 
     DomainDescriptor descriptor;
 
     if (deploymentFile != null) {
-      descriptor = domainDescriptorParser.parse(deploymentFile, domainName);
+      descriptor = domainDescriptorParser.parse(domainFolder, deploymentFile, domainName);
     } else {
-      descriptor = new EmptyDomainDescriptor(domainName);
+      descriptor = new EmptyDomainDescriptor(new File(getMuleDomainsDir(), domainName));
     }
 
     return descriptor;
@@ -88,7 +91,7 @@ public class DefaultDomainFactory implements DomainFactory {
 
   @Override
   public File getArtifactDir() {
-    return MuleContainerBootstrapUtils.getMuleDomainsDir();
+    return getMuleDomainsDir();
   }
 
   public void dispose(DomainWrapper domain) {

@@ -167,7 +167,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase {
   @Test
   public void testAppContextTogetherWithMuleConfig() throws Exception {
     context = new DefaultMuleContextFactory()
-        .createMuleContext(new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}));
+        .createMuleContext(new SpringXmlConfigurationBuilder(new String[] {"application-context.xml", "mule-config.xml"}, false));
 
     context.start();
 

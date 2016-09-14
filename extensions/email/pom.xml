@@ -16,7 +16,6 @@
 
     <properties>
         <javaMailVersion>1.5.6</javaMailVersion>
-        <icegreenVersion>1.5.0</icegreenVersion>
         <javaxActivationVersion>1.1</javaxActivationVersion>
         <guavaVersion>18.0</guavaVersion>
         <powermockVersion>1.6.5</powermockVersion>
@@ -50,7 +49,7 @@
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail</artifactId>
-            <version>${icegreenVersion}</version>
+            <version>${greenmailVersion}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>

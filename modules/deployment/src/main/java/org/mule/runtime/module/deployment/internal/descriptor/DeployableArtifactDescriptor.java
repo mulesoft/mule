@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.internal.descriptor;
 
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
+import java.io.File;
 import java.net.URL;
 
 /**
@@ -20,6 +21,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private boolean redeploymentEnabled = true;
   private URL[] runtimeLibs = new URL[0];
   private URL[] sharedRuntimeLibs = new URL[0];
+  private File location;
 
   /**
    * Creates a new deployable artifact descriptor
@@ -52,5 +54,19 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public void setSharedRuntimeLibs(URL[] sharedRuntimeLibs) {
     this.sharedRuntimeLibs = sharedRuntimeLibs;
+  }
+
+  /**
+   * @param location the directory where the artifact content is stored.
+   */
+  public void setArtifactLocation(File location) {
+    this.location = location;
+  }
+
+  /**
+   * @return the directory where the artifact content is stored.
+     */
+  public File getArtifactLocation() {
+    return this.location;
   }
 }

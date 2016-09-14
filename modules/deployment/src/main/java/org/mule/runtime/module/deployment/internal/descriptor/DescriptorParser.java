@@ -14,5 +14,15 @@ import java.io.IOException;
  */
 public interface DescriptorParser<D extends DeployableArtifactDescriptor> {
 
-  D parse(File descriptor, String artifactName) throws IOException;
+  /**
+   * Parses an artifact descriptor and creates a {@link DeployableArtifactDescriptor} with
+   * the information from the descriptor.
+   *
+   * @param artifactLocation the location of the artifact. This is the folder where the artifact content is stored.
+   * @param descriptor file that contains the descriptor content
+   * @param artifactName name of the artifact
+   * @return a descriptor with all the information of the descriptor file.
+   * @throws IOException
+     */
+  D parse(File artifactLocation, File descriptor, String artifactName) throws IOException;
 }

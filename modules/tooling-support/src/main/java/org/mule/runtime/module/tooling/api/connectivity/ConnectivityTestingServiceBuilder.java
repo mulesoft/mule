@@ -7,6 +7,7 @@
 package org.mule.runtime.module.tooling.api.connectivity;
 
 import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 
 /**
  * Builder for creating a {@code ConnectivityTestingService} from a set of extensions and an {@code ArtifactConfiguration} that

@@ -7,11 +7,12 @@
 package org.mule.runtime.module.deployment.internal.domain;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentStartException;
 import org.mule.runtime.module.deployment.api.InstallException;
 import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;
 
@@ -36,6 +37,16 @@ public class TestDomainWrapper implements Domain {
   }
 
   @Override
+  public File getLocation() {
+    return delegate.getLocation();
+  }
+
+  @Override
+  public ConnectivityTestingService getConnectivityTestingService() {
+    return delegate.getConnectivityTestingService();
+  }
+
+  @Override
   public void install() throws InstallException {
     delegate.install();
   }
@@ -43,6 +54,11 @@ public class TestDomainWrapper implements Domain {
   @Override
   public void init() {
     delegate.init();
+  }
+
+  @Override
+  public void lazyInit() {
+    delegate.lazyInit();
   }
 
   @Override

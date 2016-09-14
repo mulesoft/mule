@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.ClassUtils;
@@ -24,7 +25,8 @@ import org.mule.runtime.module.deployment.api.DeploymentStopException;
 import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.deployment.internal.application.NullDeploymentListener;
-import org.mule.runtime.module.deployment.internal.artifact.ArtifactMuleContextBuilder;
+import org.mule.runtime.module.deployment.internal.artifact.ArtifactContext;
+import org.mule.runtime.module.deployment.internal.artifact.ArtifactContextBuilder;
 import org.mule.runtime.module.deployment.internal.artifact.MuleContextDeploymentListener;
 import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
@@ -46,11 +48,11 @@ public class DefaultMuleDomain implements Domain {
   protected transient final Logger deployLogger = LoggerFactory.getLogger(MuleDeploymentService.class);
 
   private final DomainDescriptor descriptor;
-  private MuleContext muleContext;
   private DeploymentListener deploymentListener;
   private ArtifactClassLoader deploymentClassLoader;
 
   private File configResourceFile;
+  private ArtifactContext artifactContext;
 
   public DefaultMuleDomain(DomainDescriptor descriptor, ArtifactClassLoader deploymentClassLoader) {
     this.deploymentClassLoader = deploymentClassLoader;
@@ -80,7 +82,17 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public MuleContext getMuleContext() {
-    return muleContext;
+    return artifactContext != null ? artifactContext.getMuleContext() : null;
+  }
+
+  @Override
+  public File getLocation() {
+    return descriptor.getArtifactLocation();
+  }
+
+  @Override
+  public ConnectivityTestingService getConnectivityTestingService() {
+    return artifactContext.getConnectivityTestingService();
   }
 
   @Override
@@ -94,6 +106,15 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public void init() {
+    doInit(false);
+  }
+
+  @Override
+  public void lazyInit() {
+    doInit(true);
+  }
+
+  public void doInit(boolean lazy) {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(String.format("Initializing domain '%s'", getArtifactName())));
     }
@@ -102,15 +123,16 @@ public class DefaultMuleDomain implements Domain {
       if (this.configResourceFile != null) {
         validateConfigurationFileDoNotUsesCoreNamespace();
 
-        ArtifactMuleContextBuilder artifactBuilder = new ArtifactMuleContextBuilder().setArtifactName(getArtifactName())
+        ArtifactContextBuilder artifactBuilder = new ArtifactContextBuilder().setArtifactName(getArtifactName())
             .setExecutionClassloader(deploymentClassLoader.getClassLoader())
             .setArtifactInstallationDirectory(new File(MuleContainerBootstrapUtils.getMuleDomainsDir(), getArtifactName()))
-            .setConfigurationFiles(new String[] {this.configResourceFile.getAbsolutePath()}).setArtifactType(DOMAIN);
+            .setConfigurationFiles(new String[] {this.configResourceFile.getAbsolutePath()}).setArtifactType(DOMAIN)
+            .setEnableLazyInit(lazy);
 
         if (deploymentListener != null) {
           artifactBuilder.setMuleContextListener(new MuleContextDeploymentListener(getArtifactName(), deploymentListener));
         }
-        muleContext = artifactBuilder.build();
+        artifactContext = artifactBuilder.build();
       }
     } catch (Exception e) {
       // log it here so it ends up in app log, sys log will only log a message without stacktrace
@@ -150,9 +172,9 @@ public class DefaultMuleDomain implements Domain {
   @Override
   public void start() {
     try {
-      if (this.muleContext != null) {
+      if (this.artifactContext != null) {
         try {
-          this.muleContext.start();
+          this.artifactContext.getMuleContext().start();
         } catch (MuleException e) {
           logger.error(null, ExceptionUtils.getRootCause(e));
           throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
@@ -177,8 +199,8 @@ public class DefaultMuleDomain implements Domain {
       if (logger.isInfoEnabled()) {
         logger.info(miniSplash(String.format("Stopping domain '%s'", getArtifactName())));
       }
-      if (this.muleContext != null) {
-        this.muleContext.stop();
+      if (this.artifactContext != null) {
+        this.artifactContext.getMuleContext().stop();
       }
     } catch (Exception e) {
       throw new DeploymentStopException(CoreMessages.createStaticMessage("Failure trying to stop domain " + getArtifactName()),
@@ -191,8 +213,8 @@ public class DefaultMuleDomain implements Domain {
     if (logger.isInfoEnabled()) {
       logger.info(miniSplash(String.format("Disposing domain '%s'", getArtifactName())));
     }
-    if (this.muleContext != null) {
-      this.muleContext.dispose();
+    if (this.artifactContext != null) {
+      this.artifactContext.getMuleContext().dispose();
     }
     this.deploymentClassLoader.dispose();
   }
@@ -219,8 +241,8 @@ public class DefaultMuleDomain implements Domain {
 
   public void initialise() {
     try {
-      if (this.muleContext != null) {
-        this.muleContext.initialise();
+      if (this.artifactContext != null) {
+        this.artifactContext.getMuleContext().initialise();
       }
     } catch (InitialisationException e) {
       throw new DeploymentInitException(CoreMessages
@@ -229,6 +251,6 @@ public class DefaultMuleDomain implements Domain {
   }
 
   public boolean containsSharedResources() {
-    return this.muleContext != null;
+    return this.artifactContext != null;
   }
 }

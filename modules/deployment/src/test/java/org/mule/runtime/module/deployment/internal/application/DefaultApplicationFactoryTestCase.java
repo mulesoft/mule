@@ -116,7 +116,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     pluginClassLoaders.add(artifactClassLoader);
     when(applicationArtifactClassLoader.getArtifactPluginClassLoaders()).thenReturn(pluginClassLoaders);
 
-    final Application application = applicationFactory.createArtifact(APP_NAME);
+    final Application application = applicationFactory.createArtifact(new File(APP_NAME));
 
     assertThat(application.getDomain(), is(domain));
     assertThat(application.getArtifactClassLoader(), is(applicationArtifactClassLoader));
@@ -152,6 +152,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     when(applicationDescriptorFactory.create(any())).thenReturn(descriptor);
 
     expectedException.expect(DeploymentException.class);
-    applicationFactory.createArtifact(APP_NAME);
+    applicationFactory.createArtifact(new File(APP_NAME));
   }
 }

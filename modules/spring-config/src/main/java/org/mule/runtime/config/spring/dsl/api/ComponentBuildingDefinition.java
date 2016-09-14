@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Stream.concat;
 import static org.mule.runtime.config.spring.dsl.spring.DslSimpleType.isSimpleType;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.core.config.ComponentIdentifier;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * Defines the mapping between a component configuration and how the object that represents that model in runtime is created.
@@ -130,6 +132,14 @@ public class ComponentBuildingDefinition {
    */
   public boolean isNamed() {
     return named;
+  }
+
+  /**
+   * @return the complete list of {@link AttributeDefinition}s
+   */
+  public List<AttributeDefinition> getAttributesDefinitions() {
+    return concat(setterParameterDefinitions.stream().map(SetterAttributeDefinition::getAttributeDefinition),
+                  constructorAttributeDefinition.stream()).collect(Collectors.toList());
   }
 
   /**

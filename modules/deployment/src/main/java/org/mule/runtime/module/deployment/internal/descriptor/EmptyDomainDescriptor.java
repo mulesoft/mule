@@ -6,12 +6,15 @@
  */
 package org.mule.runtime.module.deployment.internal.descriptor;
 
+import java.io.File;
+
 /**
  * Represents the description of a domain when none is given
  */
 public class EmptyDomainDescriptor extends DomainDescriptor {
 
-  public EmptyDomainDescriptor(String name) {
-    super(name);
+  public EmptyDomainDescriptor(File domainLocation) {
+    super(domainLocation.getName());
+    this.setArtifactLocation(domainLocation);
   }
 }

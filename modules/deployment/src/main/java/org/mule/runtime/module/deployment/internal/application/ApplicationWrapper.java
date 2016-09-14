@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
-import org.mule.runtime.module.deployment.api.application.ApplicationStatus;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.module.deployment.api.application.ApplicationStatus;
+import org.mule.runtime.module.deployment.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.artifact.DeployableArtifactWrapper;
 import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.deployment.api.domain.Domain;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -47,4 +49,15 @@ public class ApplicationWrapper extends DeployableArtifactWrapper<Application, A
   public Application getDelegate() {
     return super.getDelegate();
   }
+
+  @Override
+  public File getLocation() {
+    return getDelegate().getLocation();
+  }
+
+  @Override
+  public ConnectivityTestingService getConnectivityTestingService() {
+    return getDelegate().getConnectivityTestingService();
+  }
+
 }

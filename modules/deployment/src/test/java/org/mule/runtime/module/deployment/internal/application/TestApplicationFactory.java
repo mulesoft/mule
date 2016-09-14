@@ -18,6 +18,7 @@ import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescript
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -60,8 +61,8 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
   }
 
   @Override
-  public Application createArtifact(String appName) throws IOException {
-    Application app = super.createArtifact(appName);
+  public Application createArtifact(File appLocation) throws IOException {
+    Application app = super.createArtifact(appLocation);
 
     TestApplicationWrapper testApplicationWrapper = new TestApplicationWrapper(app);
     testApplicationWrapper.setFailOnDisposeApplication(failOnDisposeApplication);

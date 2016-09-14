@@ -24,11 +24,16 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.module.deployment.internal.DefaultTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
+import org.mule.runtime.module.repository.api.RepositoryService;
+import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.ServiceManager;
+import org.mule.runtime.module.tooling.api.ToolingService;
+import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -43,6 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class FakeMuleServer {
 
   protected static final int DEPLOYMENT_TIMEOUT = 20000;
+  private final RepositoryService repositoryService;
 
   private File muleHome;
   private File appsDir;
@@ -51,7 +57,9 @@ public class FakeMuleServer {
   private File serverPluginsDir;
 
   private final DeploymentService deploymentService;
+  private final DeploymentListener domainDeploymentListener;
   private final DeploymentListener deploymentListener;
+  private final ToolingService toolingService;
 
   private final List<MuleCoreExtension> coreExtensions;
 
@@ -96,14 +104,21 @@ public class FakeMuleServer {
       throw new RuntimeException(e);
     }
 
+    repositoryService = new RepositoryServiceFactory().createRepositoryService();
+
+    toolingService = new DefaultToolingService(muleArtifactResourcesRegistry.getApplicationFactory(), repositoryService,
+                                               new DefaultTemporaryArtifactBuilderFactory(muleArtifactResourcesRegistry));
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                   muleArtifactResourcesRegistry.getApplicationFactory());
     deploymentListener = mock(DeploymentListener.class);
     deploymentService.addDeploymentListener(deploymentListener);
+    domainDeploymentListener = mock(DeploymentListener.class);
+    deploymentService.addDomainDeploymentListener(domainDeploymentListener);
 
     coreExtensionManager =
         new DefaultMuleCoreExtensionManagerServer(() -> coreExtensions, new ReflectionMuleCoreExtensionDependencyResolver());
     coreExtensionManager.setDeploymentService(deploymentService);
+    coreExtensionManager.setToolingService(toolingService);
   }
 
   public void stop() throws MuleException {
@@ -345,6 +360,16 @@ public class FakeMuleServer {
   }
 
   /**
+   * Deploys a Domain from a folder
+   *
+   * @param domainFolder folder in which the domain is defined
+   * @param domainName name of the domain to use as domain artifact name
+   */
+  public void deployDomainFromFolder(File domainFolder, String domainName) {
+    copyExplodedArtifactFromFolderToDeployFolder(domainFolder, getDomainsDir(), domainName);
+  }
+
+  /**
    * Deploys an Application from a classpath folder
    *
    * @param appFolder folder in which the app is defined
@@ -354,17 +379,36 @@ public class FakeMuleServer {
     copyExplodedArtifactFromClasspathFolderToDeployFolder(appFolder, getAppsDir(), appName);
   }
 
-  private void copyExplodedArtifactFromClasspathFolderToDeployFolder(String artifactFolder, File artifactDirectory,
+  private void copyExplodedArtifactFromClasspathFolderToDeployFolder(String artifactFolderPath, File artifactDirectory,
                                                                      String artifactName) {
     ReentrantLock lock = this.deploymentService.getLock();
     lock.lock();
     try {
-      URL resource = getClass().getClassLoader().getResource(artifactFolder);
-      FileUtils.copyDirectory(new File(resource.getFile()), new File(artifactDirectory, artifactName));
+      URL resource = getClass().getClassLoader().getResource(artifactFolderPath);
+      File artifactFolder = new File(resource.getFile());
+      copyExplodedArtifactFromFolderToDeployFolder(artifactFolder, artifactDirectory, artifactName);
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  private void copyExplodedArtifactFromFolderToDeployFolder(File artifactFolder, File artifactDirectory,
+                                                            String artifactName) {
+    ReentrantLock lock = this.deploymentService.getLock();
+    lock.lock();
+    try {
+      FileUtils.copyDirectory(artifactFolder, new File(artifactDirectory, artifactName));
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * @return repository server to download artifacts. To configure it use system properties from {@link RepositoryServiceFactory}.
+   */
+  public RepositoryService getRepositoryService() {
+    return repositoryService;
   }
 }

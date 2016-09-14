@@ -6,14 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.tooling;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingStrategy;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 
 import javax.inject.Inject;
 
@@ -23,7 +29,7 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ExtensionConnectivityTestingStrategy implements ConnectivityTestingStrategy {
+public class ExtensionConnectivityTestingStrategy implements ConnectivityTestingStrategy, MuleContextAware {
 
   @Inject
   private MuleContext muleContext;
@@ -42,7 +48,8 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
    */
   public ExtensionConnectivityTestingStrategy() {}
 
-  void setMuleContext(MuleContext muleContext) {
+  @Override
+  public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 
@@ -52,13 +59,33 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
   @Override
   public ConnectionValidationResult testConnectivity(Object connectivityTestingObject) {
     try {
-      ConnectionProvider connectionProvider =
-          ((ConnectionProviderResolver) connectivityTestingObject).resolve(getInitialiserEvent(muleContext));
-      Object connection = connectionProvider.connect();
-      return connectionProvider.validate(connection);
+      if (connectivityTestingObject instanceof ConnectionProviderResolver) {
+        ConnectionProvider connectionProvider =
+            ((ConnectionProviderResolver) connectivityTestingObject).resolve(getInitialiserEvent(muleContext));
+        return validateConnectionOverConnectionProvider(connectionProvider);
+      } else if (connectivityTestingObject instanceof ConfigurationProvider) {
+        ConfigurationProvider configurationProvider = (ConfigurationProvider) connectivityTestingObject;
+        ConfigurationInstance configurationInstance = configurationProvider.get(getInitialiserEvent(muleContext));
+        configurationInstance.getConnectionProvider();
+        if (configurationInstance.getConnectionProvider().isPresent()) {
+          return validateConnectionOverConnectionProvider(configurationInstance.getConnectionProvider().get());
+        } else {
+          throw new MuleRuntimeException(createStaticMessage("The component does not support connectivity testing"));
+        }
+      } else {
+        throw new MuleRuntimeException(createStaticMessage(
+                                                           format("testConnectivity was invoked with an object type %s not supported.",
+                                                                  connectivityTestingObject.getClass().getName())));
+      }
     } catch (Exception e) {
       return failure(e.getMessage(), ConnectionExceptionCode.UNKNOWN, e);
     }
+  }
+
+  private ConnectionValidationResult validateConnectionOverConnectionProvider(ConnectionProvider connectionProvider)
+      throws org.mule.runtime.api.connection.ConnectionException {
+    Object connection = connectionProvider.connect();
+    return connectionProvider.validate(connection);
   }
 
   /**
@@ -66,7 +93,8 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
    */
   @Override
   public boolean accepts(Object connectivityTestingObject) {
-    return connectivityTestingObject instanceof ConnectionProviderResolver;
+    return connectivityTestingObject instanceof ConnectionProviderResolver
+        || connectivityTestingObject instanceof ConfigurationProvider;
   }
 
 }

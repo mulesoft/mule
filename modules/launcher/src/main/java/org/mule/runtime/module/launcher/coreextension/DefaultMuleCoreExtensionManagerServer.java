@@ -15,7 +15,7 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.launcher.RepositoryServiceAware;
-import org.mule.runtime.module.launcher.ToolingServiceAware;
+import org.mule.runtime.module.tooling.api.ToolingServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.tooling.api.ToolingService;
 

@@ -163,6 +163,7 @@ public class MuleProperties {
   public static final String OBJECT_METADATA_MANAGER = "_muleMetadataManager";
   public static final String OBJECT_EXCEPTION_LOCATION_PROVIDER = "_muleExceptionLocationProvider";
   public static final String OBJECT_MESSAGE_PROCESSING_FLOW_TRACE_MANAGER = "_muleMessageProcessingFlowTraceManager";
+  public static final String OBJECT_CONNECTIVITY_TESTING_SERVICE = "_muleConnectivityTestingService";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_REGISTRY_KEY = "_muleDefaultTlsContextFactory";
   public static final String DEFAULT_TLS_CONTEXT_FACTORY_BUILDER_REGISTRY_KEY = "_muleDefaultTlsContextFactoryBuilder";
 

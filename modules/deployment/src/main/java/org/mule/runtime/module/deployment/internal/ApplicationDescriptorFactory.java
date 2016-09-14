@@ -82,9 +82,9 @@ public class ApplicationDescriptorFactory implements ArtifactDescriptorFactory<A
       if (deployPropertiesFile != null) {
         // lookup the implementation by extension
         final PropertiesDescriptorParser descriptorParser = new PropertiesDescriptorParser();
-        desc = descriptorParser.parse(deployPropertiesFile, appName);
+        desc = descriptorParser.parse(artifactFolder, deployPropertiesFile, appName);
       } else {
-        desc = new EmptyApplicationDescriptor(appName);
+        desc = new EmptyApplicationDescriptor(artifactFolder);
       }
 
       // get a ref to an optional app props file (right next to the descriptor)

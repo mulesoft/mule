@@ -48,7 +48,7 @@ public class SpringConfigurationBuilder extends AbstractConfigurationBuilder {
       registry = new SpringRegistry(appContext, muleContext);
     }
 
-    // Note: The SpringRegistry must be created before applicationContext.refresh() gets called because
+    // Note: The SpringRegistry must be created before muleArtifactContext.refresh() gets called because
     // some beans may try to look up other beans via the Registry during preInstantiateSingletons().
     muleContext.addRegistry(registry);
     if (muleContext.getLifecycleManager().isPhaseComplete(Initialisable.PHASE_NAME)) {
