@@ -14,8 +14,10 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-10531")
 public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 
   @Override
