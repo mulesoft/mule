@@ -229,7 +229,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     if (isMulePlugin(rootArtifact)) {
       logger.debug("rootArtifact '{}' identified as Mule plugin", rootArtifact);
-      buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, directDependencies,
+      buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, rootArtifact, directDependencies,
                                    pluginsClassified);
 
       pluginsArtifacts = pluginsArtifacts.stream()
@@ -240,7 +240,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     pluginsArtifacts.stream()
         .forEach(pluginArtifact -> buildPluginUrlClassification(pluginArtifact, context, extensionPluginMetadataGenerator,
-                                                                directDependencies, pluginsClassified));
+                                                                rootArtifact, directDependencies, pluginsClassified));
 
     extensionPluginMetadataGenerator.generateDslResources();
 
@@ -301,18 +301,18 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private void buildPluginUrlClassification(Artifact pluginArtifact, ClassPathClassifierContext context,
                                             ExtensionPluginMetadataGenerator extensionPluginGenerator,
-                                            List<Dependency> rootArtifactDirectDependencies,
+                                            Artifact rootArtifact, List<Dependency> rootArtifactDirectDependencies,
                                             Map<String, PluginClassificationNode> pluginsClassified) {
+    if (!rootArtifact.equals(pluginArtifact)) {
+      if (!findDirectDependency(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), rootArtifactDirectDependencies)
+          .isPresent()) {
+        throw new IllegalStateException("Plugin '" + pluginArtifact + "' has to be defined as direct dependency");
+      }
+    }
+
     List<URL> urls;
     try {
-      List<Dependency> managedDependencies = dependencyResolver.readArtifactDescriptor(
-                                                                                       getPluginDependencyDeclared(pluginArtifact
-                                                                                           .getGroupId(),
-                                                                                                                   pluginArtifact
-                                                                                                                       .getArtifactId(),
-                                                                                                                   rootArtifactDirectDependencies)
-                                                                                                                       .getArtifact())
-          .getManagedDependencies();
+      List<Dependency> managedDependencies = dependencyResolver.readArtifactDescriptor(pluginArtifact).getManagedDependencies();
 
       final DependencyFilter dependencyFilter = orFilter(classpathFilter(COMPILE),
                                                          new PatternExclusionsDependencyFilter(context.getExcludedArtifacts()));
@@ -340,8 +340,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         .map(artifact -> {
           String artifactClassifierLessId = toClassifierLessId(artifact);
           if (!pluginsClassified.containsKey(artifactClassifierLessId)) {
-            buildPluginUrlClassification(artifact, context, extensionPluginGenerator, rootArtifactDirectDependencies,
-                                         pluginsClassified);
+            buildPluginUrlClassification(artifact, context, extensionPluginGenerator, rootArtifact,
+                                         rootArtifactDirectDependencies, pluginsClassified);
           }
           return pluginsClassified.get(artifactClassifierLessId);
         })
@@ -373,26 +373,18 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
-   * Gets the plugin {@link Dependency} defined in rootArtifact dependencies. If it is not declared throws an
-   * q{@link IllegalStateException}.
+   * Finds the direct {@link Dependency} from rootArtifact for the given groupId and artifactId.
    *
-   * @param pluginGroupId groupId of the plugin artifact
-   * @param pluginArtifactId artifactId of the plugin artifact
-   * @param directDependencies direct dependencies of the rootArtifact being classified
-   * @return {@link Dependency} declared at the rootArtifact for the plugin coordinates
-   * @throws {@link IllegalStateException} if plugin is not defined in rootArtifact as dependency
+   * @param groupId of the artifact to be found
+   * @param artifactId of the artifact to be found
+   * @param directDependencies the rootArtifact direct {@link Dependency}s
+   * @return {@link Optional} {@link Dependency} to the dependency. Could be empty it if not present in the list of direct
+   * dependencies
    */
-  private Dependency getPluginDependencyDeclared(String pluginGroupId, String pluginArtifactId,
-                                                 List<Dependency> directDependencies) {
-    Optional<Dependency> pluginDependencyOp = directDependencies.isEmpty() ? Optional.<Dependency>empty()
-        : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(pluginGroupId)
-            && dependency.getArtifact().getArtifactId().equals(pluginArtifactId)).findFirst();
-
-    if (!pluginDependencyOp.isPresent() || !pluginDependencyOp.get().getScope().equals(PROVIDED)) {
-      throw new IllegalStateException("Plugin '" + pluginGroupId + ":" + pluginArtifactId
-          + " in order to be resolved has to be declared as " + PROVIDED + " dependency of your Maven project");
-    }
-    return pluginDependencyOp.get();
+  private Optional<Dependency> findDirectDependency(String groupId, String artifactId, List<Dependency> directDependencies) {
+    return directDependencies.isEmpty() ? Optional.<Dependency>empty()
+        : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(groupId)
+            && dependency.getArtifact().getArtifactId().equals(artifactId)).findFirst();
   }
 
   private String toClassifierLessId(Artifact pluginArtifact) {
@@ -421,7 +413,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       pluginVersion = rootArtifact.getVersion();
     } else {
       logger.debug("Resolving version for '{}' from direct dependencies", pluginCoords);
-      Dependency pluginDependency = getPluginDependencyDeclared(pluginGroupId, pluginArtifactId, directDependencies);
+      Optional<Dependency> pluginDependencyOp = findDirectDependency(pluginGroupId, pluginArtifactId, directDependencies);
+
+      if (!pluginDependencyOp.isPresent() || !pluginDependencyOp.get().getScope().equals(PROVIDED)) {
+        throw new IllegalStateException("Plugin '" + pluginGroupId + ":" + pluginArtifactId
+            + "' in order to be resolved has to be declared as " + PROVIDED + " dependency of your Maven project");
+      }
+
+      Dependency pluginDependency = pluginDependencyOp.get();
       pluginVersion = pluginDependency.getArtifact().getVersion();
     }
 
