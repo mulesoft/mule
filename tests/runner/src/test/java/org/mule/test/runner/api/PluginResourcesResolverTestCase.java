@@ -90,7 +90,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
     final URL manifestUrl =
         new File(urls.get(0).getFile(), "META-INF/" + ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME).toURI().toURL();
     when(extensionManager.parseExtensionManifestXml(manifestUrl)).thenReturn(extensionManifest);
-    
+
     PluginUrlClassification result = resolver.resolvePluginResourcesFor(extensionPluginClassification);
     verify(extensionManager).parseExtensionManifestXml(manifestUrl);
     verify(extensionManifest).getExportedResources();
@@ -100,7 +100,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
   }
 
   private PluginUrlClassification newPluginUrlClassification(List<URL> urls) {
-    return new PluginUrlClassification(MULE_PLUGIN, urls, Collections.<Class>emptyList(),Collections.<String>emptyList());
+    return new PluginUrlClassification(MULE_PLUGIN, urls, Collections.<Class>emptyList(), Collections.<String>emptyList());
   }
 
   private List<URL> buildUrl(String resourceBaseFolder) throws Exception {
