@@ -12,6 +12,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -71,7 +72,7 @@ public class DefaultDomainFactory implements DomainFactory {
 
   private DomainDescriptor findDomain(String domainName) throws IOException {
     if (DEFAULT_DOMAIN_NAME.equals(domainName)) {
-      return new EmptyDomainDescriptor(DEFAULT_DOMAIN_NAME);
+      return new EmptyDomainDescriptor(new File(getMuleDomainsDir(), DEFAULT_DOMAIN_NAME));
     }
 
     File domainFolder = getDomainFolder(domainName);
@@ -82,7 +83,7 @@ public class DefaultDomainFactory implements DomainFactory {
     if (deploymentFile != null) {
       descriptor = domainDescriptorParser.parse(domainFolder, deploymentFile, domainName);
     } else {
-      descriptor = new EmptyDomainDescriptor(domainName);
+      descriptor = new EmptyDomainDescriptor(new File(getMuleDomainsDir(), domainName));
     }
 
     return descriptor;
@@ -90,7 +91,7 @@ public class DefaultDomainFactory implements DomainFactory {
 
   @Override
   public File getArtifactDir() {
-    return MuleContainerBootstrapUtils.getMuleDomainsDir();
+    return getMuleDomainsDir();
   }
 
   public void dispose(DomainWrapper domain) {
