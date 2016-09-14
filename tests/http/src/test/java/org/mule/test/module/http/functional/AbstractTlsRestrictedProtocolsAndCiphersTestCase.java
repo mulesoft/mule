@@ -15,7 +15,7 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
  * {@link org.mule.functional.junit4.MuleArtifactFunctionalTestCase}. Therefore this one has to be a
  * {@link ExtensionFunctionalTestCase}.
  * <p/>
- * Mostly the scenarios are about changing the {@code tls.properties} so it is modified by tests and that cannot be done with an
+ * Mostly these scenarios are about changing the {@code tls.properties} so it is modified by tests and that cannot be done with an
  * isolated class loader.
  */
 public abstract class AbstractTlsRestrictedProtocolsAndCiphersTestCase extends ExtensionFunctionalTestCase {

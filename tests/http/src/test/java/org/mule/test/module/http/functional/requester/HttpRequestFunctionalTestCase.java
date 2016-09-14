@@ -13,12 +13,11 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
 import static org.mule.test.module.http.functional.matcher.HttpMessageAttributesMatchers.hasStatusCode;
-
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
 import org.mule.runtime.core.api.Event;
@@ -33,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Request;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -48,6 +48,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
     return "http-request-functional-config.xml";
   }
 
+  @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultPortHttp() throws Exception {
     Event testEvent = getTestEvent(TEST_PAYLOAD);
@@ -58,6 +59,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
     assertThat(provider.getPort().apply(testEvent), is(HTTP.getDefaultPort()));
   }
 
+  @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultPortHttps() throws Exception {
     Event testEvent = getTestEvent(TEST_PAYLOAD);
@@ -68,6 +70,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
     assertThat(provider.getPort().apply(testEvent), is(HTTPS.getDefaultPort()));
   }
 
+  @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultTlsContextHttps() throws Exception {
     Event testEvent = getTestEvent(TEST_PAYLOAD);

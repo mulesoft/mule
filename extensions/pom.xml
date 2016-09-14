@@ -111,6 +111,21 @@
                 </dependencies>
             </plugin>
             <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>mule-plugin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>mule-plugin</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.mule.extensions</groupId>
                 <artifactId>mule-extensions-maven-plugin</artifactId>
                 <version>${mule.extensions.maven.plugin.version}</version>

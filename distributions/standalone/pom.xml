@@ -163,6 +163,14 @@
             </exclusions>
         </dependency>
 
+        <!-- Include all Mule Plugins -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-file-extension-common</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
+
         <!-- Include all Mule Extensions -->
         <dependency>
             <groupId>org.mule.extensions</groupId>
