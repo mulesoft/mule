@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
+import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.api.metadata.ComponentId;
@@ -19,11 +21,23 @@ import org.mule.runtime.core.config.i18n.I18nMessage;
  */
 public class InvalidComponentIdException extends MuleException {
 
+  private final FailureCode failureCode;
+
   /**
    * @param message the exception message
    */
   InvalidComponentIdException(I18nMessage message) {
     super(message);
+    failureCode = UNKNOWN;
+  }
+
+  /**
+   * @param message the exception message
+   * @param code {@link FailureCode} associated to the exception
+   */
+  InvalidComponentIdException(I18nMessage message, FailureCode code) {
+    super(message);
+    failureCode = code;
   }
 
   /**
@@ -32,5 +46,20 @@ public class InvalidComponentIdException extends MuleException {
    */
   InvalidComponentIdException(I18nMessage message, Throwable cause) {
     super(message, cause);
+    failureCode = UNKNOWN;
+  }
+
+  /**
+   * @param message the exception message
+   * @param cause the exception that cause this exception to be thrown
+   * @param code {@link FailureCode} associated to the exception
+   */
+  InvalidComponentIdException(I18nMessage message, Throwable cause, FailureCode code) {
+    super(message, cause);
+    failureCode = code;
+  }
+
+  public FailureCode getFailureCode() {
+    return failureCode;
   }
 }

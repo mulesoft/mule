@@ -12,6 +12,7 @@ import static org.apache.commons.lang.StringUtils.join;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.core.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getComponentModelTypeName;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -60,7 +61,7 @@ public class MetadataComponentModelValidator implements ModelValidator {
   private void validateMetadataReturnType(ExtensionModel extensionModel, ComponentModel componentModel) {
     RuntimeComponentModel component = (RuntimeComponentModel) componentModel;
     MetadataType returnMetadataType = component.getOutput().getType();
-    validateCategories(component.getMetadataResolverFactory());
+    validateCategories(componentModel, component.getMetadataResolverFactory());
 
     if (returnMetadataType instanceof ObjectType) {
       validateReturnType(extensionModel, component, getType(returnMetadataType));
@@ -72,21 +73,22 @@ public class MetadataComponentModelValidator implements ModelValidator {
   private void validateReturnType(ExtensionModel extensionModel, RuntimeComponentModel component, Class<?> returnType) {
     if (Object.class.equals(returnType)
         && component.getMetadataResolverFactory().getOutputResolver() instanceof NullMetadataResolver) {
-      throw new IllegalModelDefinitionException(format("Component '%s' in Extension '%s' specifies '%s' as a return type. Operations and Sources with "
+      throw new IllegalModelDefinitionException(format("%s '%s' specifies '%s' as a return type. Operations and Sources with "
           + "return type such as Object or Map must have defined a not null MetadataOutputResolver", component.getName(),
                                                        extensionModel.getName(), returnType.getName()));
     }
   }
 
-  private void validateCategories(MetadataResolverFactory metadataResolverFactory) {
-    validateCategoryNames(metadataResolverFactory.getKeyResolver(), metadataResolverFactory.getContentResolver(),
+  private void validateCategories(ComponentModel componentModel, MetadataResolverFactory metadataResolverFactory) {
+    validateCategoryNames(componentModel, metadataResolverFactory.getKeyResolver(), metadataResolverFactory.getContentResolver(),
                           metadataResolverFactory.getOutputAttributesResolver(), metadataResolverFactory.getOutputResolver());
   }
 
-  private void validateCategoryNames(MetadataResolver... resolvers) {
+  private void validateCategoryNames(ComponentModel componentModel, MetadataResolver... resolvers) {
     stream(resolvers).filter(r -> isBlank(r.getCategoryName()))
         .findFirst().ifPresent(r -> {
-          throw new IllegalModelDefinitionException(format("Metadata resolver '%s' should have a  non empty category name",
+          throw new IllegalModelDefinitionException(format("%s '%s' specifies a metadata resolver [%s] which has an empty category name",
+                                                           getComponentModelTypeName(componentModel), componentModel.getName(),
                                                            r.getClass().getSimpleName()));
         });
 
@@ -96,7 +98,8 @@ public class MetadataComponentModelValidator implements ModelValidator {
         .collect(Collectors.toSet());
 
     if (names.size() > 1) {
-      throw new IllegalModelDefinitionException(format("Metadata resolvers should belong to the same category but resolvers from [%s] categories were found",
+      throw new IllegalModelDefinitionException(format("%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found [%s]",
+                                                       getComponentModelTypeName(componentModel), componentModel.getName(),
                                                        join(names, ",")));
     }
   }
