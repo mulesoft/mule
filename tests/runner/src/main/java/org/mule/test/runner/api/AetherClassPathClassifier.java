@@ -228,7 +228,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     if (isMulePlugin(rootArtifact)) {
       logger.debug("rootArtifact '{}' identified as Mule plugin", rootArtifact);
-      buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, rootArtifact, directDependencies,
+      buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, directDependencies,
                                    pluginsClassified);
 
       pluginsArtifacts = pluginsArtifacts.stream()
@@ -239,7 +239,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     pluginsArtifacts.stream()
         .forEach(pluginArtifact -> buildPluginUrlClassification(pluginArtifact, context, extensionPluginMetadataGenerator,
-                                                                rootArtifact, directDependencies, pluginsClassified));
+                                                                directDependencies, pluginsClassified));
 
     extensionPluginMetadataGenerator.generateDslResources();
 
@@ -300,14 +300,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private void buildPluginUrlClassification(Artifact pluginArtifact, ClassPathClassifierContext context,
                                             ExtensionPluginMetadataGenerator extensionPluginGenerator,
-                                            Artifact rootArtifact, List<Dependency> rootArtifactDirectDependencies,
+                                            List<Dependency> rootArtifactDirectDependencies,
                                             Map<String, PluginClassificationNode> pluginsClassified) {
-    if (!rootArtifact.equals(pluginArtifact)) {
-      if (!findDirectDependency(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), rootArtifactDirectDependencies)
-          .isPresent()) {
-        throw new IllegalStateException("Plugin '" + pluginArtifact + "' has to be defined as direct dependency");
-      }
-    }
+    checkPluginDeclaredAsDirectDependency(pluginArtifact, context, rootArtifactDirectDependencies);
 
     List<URL> urls;
     try {
@@ -330,37 +325,21 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       throw new IllegalStateException("Couldn't get direct dependencies for plugin: '" + pluginArtifact + "'", e);
     }
     logger.debug("Searching for plugin dependencies on direct dependencies of plugin {}", pluginArtifact);
-    List<Artifact> pluginArtifactDependencies = directDependencies.stream()
-        .filter(dependency -> dependency.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER))
-        .map(dependency -> dependency.getArtifact())
-        .collect(toList());
+    List<Artifact> pluginArtifactDependencies = collectMulePluginArtifacts(directDependencies);
     logger.debug("Artifacts {} identified a plugin dependencies for plugin {}", pluginArtifactDependencies, pluginArtifact);
     pluginArtifactDependencies.stream()
         .map(artifact -> {
           String artifactClassifierLessId = toClassifierLessId(artifact);
           if (!pluginsClassified.containsKey(artifactClassifierLessId)) {
-            buildPluginUrlClassification(artifact, context, extensionPluginGenerator, rootArtifact,
-                                         rootArtifactDirectDependencies, pluginsClassified);
+            buildPluginUrlClassification(artifact, context, extensionPluginGenerator, rootArtifactDirectDependencies,
+                                         pluginsClassified);
           }
           return pluginsClassified.get(artifactClassifierLessId);
         })
         .forEach(pluginDependencies::add);
 
     // Generate Metadata
-    Class extensionClass = extensionPluginGenerator.scanForExtensionAnnotatedClasses(pluginArtifact, urls);
-    if (extensionClass != null) {
-      logger.debug("Plugin '{}' has been discovered as Extension", pluginArtifact);
-      if (context.isExtensionMetadataGenerationEnabled()) {
-        File generatedMetadataFolder = extensionPluginGenerator.generateExtensionManifest(pluginArtifact, extensionClass);
-        if (generatedMetadataFolder != null) {
-          URL generatedTestResources = toUrl(generatedMetadataFolder);
-
-          List<URL> appendedTestResources = newArrayList(generatedTestResources);
-          appendedTestResources.addAll(urls);
-          urls = appendedTestResources;
-        }
-      }
-    }
+    urls = generateExtensionMetadata(pluginArtifact, context, extensionPluginGenerator, urls);
 
     final ArrayList<Class> exportClasses = newArrayList(context.getExportPluginClasses(pluginArtifact));
     PluginClassificationNode pluginUrlClassification = new PluginClassificationNode(toClassifierLessId(pluginArtifact),
@@ -372,13 +351,74 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
+   * Collects from the list of directDependencies {@link Dependency} those that are classified with classifier
+   * {@value #MULE_PLUGIN_CLASSIFIER}.
+   *
+   * @param directDependencies {@link List} of direct {@link Dependency}
+   * @return {@link List} of {@link Artifact}s for those dependencies classified as {@value #MULE_PLUGIN_CLASSIFIER}, can be
+   *         empty.
+   */
+  private List<Artifact> collectMulePluginArtifacts(List<Dependency> directDependencies) {
+    return directDependencies.stream()
+        .filter(dependency -> dependency.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER))
+        .map(dependency -> dependency.getArtifact())
+        .collect(toList());
+  }
+
+  /**
+   * Checks if the pluginArtifact {@link Artifact} is declared as direct dependency of the rootArtifact or if the pluginArtifact
+   * is the same rootArtifact. In case if it is a dependency and is not declared it throws an {@link IllegalStateException}.
+   *
+   * @param pluginArtifact plugin {@link Artifact} to be checked
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @param rootArtifactDirectDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @throws {@link IllegalStateException} if the plugin is a dependency not declared in rootArtifact directDependencies
+   */
+  private void checkPluginDeclaredAsDirectDependency(Artifact pluginArtifact, ClassPathClassifierContext context,
+                                                     List<Dependency> rootArtifactDirectDependencies) {
+    if (!context.getRootArtifact().equals(pluginArtifact)) {
+      if (!findDirectDependency(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), rootArtifactDirectDependencies)
+          .isPresent()) {
+        throw new IllegalStateException("Plugin '" + pluginArtifact + "' has to be defined as direct dependency");
+      }
+    }
+  }
+
+  /**
+   * If enabled generates the Extension metadata and returns the {@link List} of {@link URL}s with the folder were metadata is
+   * generated as first entry in the list.
+   *
+   * @param pluginArtifact plugin {@link Artifact} to generate its Extension metadata
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @param extensionPluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
+   * @param urls current {@link List} of {@link URL}s classified for the plugin
+   * @return {@link List} of {@link URL}s classified for the plugin
+   */
+  private List<URL> generateExtensionMetadata(Artifact pluginArtifact, ClassPathClassifierContext context,
+                                              ExtensionPluginMetadataGenerator extensionPluginGenerator, List<URL> urls) {
+    Class extensionClass = extensionPluginGenerator.scanForExtensionAnnotatedClasses(pluginArtifact, urls);
+    if (extensionClass != null) {
+      logger.debug("Plugin '{}' has been discovered as Extension", pluginArtifact);
+      if (context.isExtensionMetadataGenerationEnabled()) {
+        File generatedMetadataFolder = extensionPluginGenerator.generateExtensionManifest(pluginArtifact, extensionClass);
+        URL generatedTestResources = toUrl(generatedMetadataFolder);
+
+        List<URL> appendedTestResources = newArrayList(generatedTestResources);
+        appendedTestResources.addAll(urls);
+        urls = appendedTestResources;
+      }
+    }
+    return urls;
+  }
+
+  /**
    * Finds the direct {@link Dependency} from rootArtifact for the given groupId and artifactId.
    *
    * @param groupId of the artifact to be found
    * @param artifactId of the artifact to be found
    * @param directDependencies the rootArtifact direct {@link Dependency}s
    * @return {@link Optional} {@link Dependency} to the dependency. Could be empty it if not present in the list of direct
-   * dependencies
+   *         dependencies
    */
   private Optional<Dependency> findDirectDependency(String groupId, String artifactId, List<Dependency> directDependencies) {
     return directDependencies.isEmpty() ? Optional.<Dependency>empty()

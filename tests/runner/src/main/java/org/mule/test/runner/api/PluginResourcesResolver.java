@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Resolves the {@link PluginUrlClassification} resources, exported pacakges and resources.
+ * Resolves the {@link PluginUrlClassification} resources, exported packages and resources.
  *
  * @since 4.0
  */

@@ -36,7 +36,6 @@
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-            <exclusions><exclusion><groupId>org.zaraza</groupId><artifactId>zaraza</artifactId></exclusion></exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
