@@ -8,28 +8,33 @@ package org.mule.runtime.config.spring;
 
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTING_SERVICE;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.config.spring.dsl.model.NoSuchComponentModelException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingObjectNotFoundException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
+import org.mule.runtime.core.api.lifecycle.Initialisable;
+import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 /**
- * {@link ConnectivityTestingService} implementation that creates the required
+ * {@link ConnectivityTestingService} implementation that initialises the required
  * components before doing test connectivity.
  *
  * This guarantees that if the application has been created lazily, the requested
  * components exists before the execution of the actual {@link ConnectivityTestingService}.
  */
-public class LazyConnectivityTestingService implements ConnectivityTestingService {
+public class LazyConnectivityTestingService implements ConnectivityTestingService, Initialisable {
 
   private final LazyComponentInitializer lazyComponentInitializer;
-  private final ConnectivityTestingService connectivityTestingService;
+  private final MuleContext muleContext;
+  private ConnectivityTestingService connectivityTestingService;
 
-  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer,
-                                        ConnectivityTestingService connectivityTestingService) {
+  public LazyConnectivityTestingService(LazyComponentInitializer lazyComponentInitializer, MuleContext muleContext) {
     this.lazyComponentInitializer = lazyComponentInitializer;
-    this.connectivityTestingService = connectivityTestingService;
+    this.muleContext = muleContext;
   }
 
   @Override
@@ -42,5 +47,10 @@ public class LazyConnectivityTestingService implements ConnectivityTestingServic
       return failure(e.getMessage(), UNKNOWN, e);
     }
     return connectivityTestingService.testConnection(identifier);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    this.connectivityTestingService = muleContext.getRegistry().get(OBJECT_CONNECTIVITY_TESTING_SERVICE);
   }
 }

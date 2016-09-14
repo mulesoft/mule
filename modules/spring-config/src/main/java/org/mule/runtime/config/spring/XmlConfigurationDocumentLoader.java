@@ -31,7 +31,7 @@ public class XmlConfigurationDocumentLoader {
    * Creates a {@link Document} from an {@link InputStream} with the required configuration
    * of a mule configuration file parsing.
    *
-   * @param inputStream the input stream with the xml configuration content.
+   * @param inputStream the input stream with the XML configuration content.
    * @return a new {@link Document} object with the provided content.
    */
   public Document loadDocument(InputStream inputStream) {

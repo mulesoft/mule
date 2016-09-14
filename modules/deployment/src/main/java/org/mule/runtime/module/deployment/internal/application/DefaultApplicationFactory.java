@@ -63,13 +63,13 @@ public class DefaultApplicationFactory implements ArtifactFactory<Application> {
     this.deploymentListener = deploymentListener;
   }
 
-  public Application createArtifact(File appsDir) throws IOException {
-    String appName = appsDir.getName();
+  public Application createArtifact(File appDir) throws IOException {
+    String appName = appDir.getName();
     if (appName.contains(" ")) {
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(appsDir);
+    final ApplicationDescriptor descriptor = applicationDescriptorFactory.create(appDir);
 
     return createAppFrom(descriptor);
   }

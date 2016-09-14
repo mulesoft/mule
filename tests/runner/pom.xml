@@ -47,11 +47,6 @@
             <artifactId>aether-transport-file</artifactId>
             <version>${aetherVersion}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-transport-http</artifactId>
-            <version>${aetherVersion}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.mule</groupId>

@@ -141,8 +141,12 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   protected MuleArtifactContext doCreateApplicationContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                                                            ArtifactConfiguration artifactConfiguration,
                                                            OptionalObjectsController optionalObjectsController) {
+    if (enableLazyInit) {
+      return new LazyMuleArtifactContext(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController,
+                                         getArtifactProperties(), artifactType);
+    }
     return new MuleArtifactContext(muleContext, artifactConfigResources, artifactConfiguration, optionalObjectsController,
-                                   getArtifactProperties(), artifactType, enableLazyInit);
+                                   getArtifactProperties(), artifactType);
   }
 
 

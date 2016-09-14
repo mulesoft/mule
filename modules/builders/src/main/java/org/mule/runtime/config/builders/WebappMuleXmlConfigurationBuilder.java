@@ -93,7 +93,7 @@ public class WebappMuleXmlConfigurationBuilder extends SpringXmlConfigurationBui
                                                            OptionalObjectsController optionalObjectsController) {
     Resource[] artifactConfigServletContextResources = preProcessResources(artifactConfigResources);
     return new MuleArtifactContext(muleContext, artifactConfigServletContextResources, artifactConfiguration,
-                                   optionalObjectsController, emptyMap(), APP, false);
+                                   optionalObjectsController, emptyMap(), APP);
   }
 
   private Resource[] preProcessResources(ConfigResource[] configResources) {

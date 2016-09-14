@@ -16,8 +16,11 @@ public interface LazyComponentInitializer {
   /**
    * Calling this method guarantees that the requested component from the configuration
    * will be created.
+   * <p/>
+   * The requested component must exists in the configuration.
    *
-   * @param componentIdentifier the identier of the configuration component.
+   * @param componentIdentifier the identifier of the configuration component.
+   * @throws org.mule.runtime.core.api.MuleRuntimeException if there's a problem creating the component or the component does not exists.
    */
   void initializeComponent(String componentIdentifier);
 

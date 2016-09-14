@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.tooling;
 
+import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
@@ -47,6 +48,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
    */
   public ExtensionConnectivityTestingStrategy() {}
 
+  @Override
   public void setMuleContext(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
@@ -61,7 +63,7 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
         ConnectionProvider connectionProvider =
             ((ConnectionProviderResolver) connectivityTestingObject).resolve(getInitialiserEvent(muleContext));
         return validateConnectionOverConnectionProvider(connectionProvider);
-      } else {
+      } else if (connectivityTestingObject instanceof ConfigurationProvider) {
         ConfigurationProvider configurationProvider = (ConfigurationProvider) connectivityTestingObject;
         ConfigurationInstance configurationInstance = configurationProvider.get(getInitialiserEvent(muleContext));
         configurationInstance.getConnectionProvider();
@@ -70,6 +72,10 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
         } else {
           throw new MuleRuntimeException(createStaticMessage("The component does not support connectivity testing"));
         }
+      } else {
+        throw new MuleRuntimeException(createStaticMessage(
+                                                           format("testConnectivity was invoked with an object type %s not supported.",
+                                                                  connectivityTestingObject.getClass().getName())));
       }
     } catch (Exception e) {
       return failure(e.getMessage(), ConnectionExceptionCode.UNKNOWN, e);

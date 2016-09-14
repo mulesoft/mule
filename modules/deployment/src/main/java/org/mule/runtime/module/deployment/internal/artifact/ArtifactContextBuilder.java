@@ -257,8 +257,8 @@ public class ArtifactContextBuilder {
         }
         muleContextBuilder.setExecutionClassLoader(this.executionClassLoader);
         try {
-          MuleContext muleContext = muleContextFactory.createMuleContext(builders, muleContextBuilder);
-          return new ArtifactContext(muleContext, mainBuilder.getMuleArtifactContext());
+          muleContextFactory.createMuleContext(builders, muleContextBuilder);
+          return new ArtifactContext(mainBuilder.getMuleArtifactContext());
         } catch (InitialisationException e) {
           throw new ConfigurationException(e);
         }

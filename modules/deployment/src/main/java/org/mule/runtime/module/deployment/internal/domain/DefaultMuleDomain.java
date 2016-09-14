@@ -87,7 +87,7 @@ public class DefaultMuleDomain implements Domain {
 
   @Override
   public File getLocation() {
-    return null;
+    return descriptor.getArtifactLocation();
   }
 
   @Override

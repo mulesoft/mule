@@ -71,7 +71,7 @@ class DefaultConnectivityTestingServiceBuilder implements ConnectivityTestingSer
     checkState(artifactConfiguration != null, "artifact configuration cannot be null");
     checkState(!bundleDescriptors.isEmpty(), "no extensions were configured");
     TemporaryArtifact temporaryArtifact = buildArtifact();
-    return new DefaultConnectivityTestingService(temporaryArtifact);
+    return new TemporaryArtifactConnectivityTestingService(temporaryArtifact);
   }
 
   private TemporaryArtifact buildArtifact() {

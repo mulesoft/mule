@@ -19,7 +19,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.exception.ErrorTypeRepositoryFactory.createDefaultErrorTypeRepository;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
@@ -55,7 +54,6 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.TransformerResolver;
 import org.mule.runtime.core.api.transformer.Converter;
@@ -104,25 +102,24 @@ import org.w3c.dom.Document;
  * <code>MuleArtifactContext</code> is a simple extension application context that allows resources to be loaded from the
  * Classpath of file system using the MuleBeanDefinitionReader.
  */
-public class MuleArtifactContext extends AbstractXmlApplicationContext implements LazyComponentInitializer {
+public class MuleArtifactContext extends AbstractXmlApplicationContext {
 
   private static final ThreadLocal<MuleContext> currentMuleContext = new ThreadLocal<>();
   public static final String INNER_BEAN_PREFIX = "(inner bean)";
 
-  private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
+  protected final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry =
       new ComponentBuildingDefinitionRegistry();
   private final OptionalObjectsController optionalObjectsController;
   private final Map<String, String> artifactProperties;
   private final ArtifactConfiguration artifactConfiguration;
   private final XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader = new XmlConfigurationDocumentLoader();
-  private final boolean enableLazyInit;
-  private ApplicationModel applicationModel;
-  private MuleContext muleContext;
+  protected ApplicationModel applicationModel;
+  protected MuleContext muleContext;
   private Resource[] artifactConfigResources;
-  private BeanDefinitionFactory beanDefinitionFactory;
+  protected BeanDefinitionFactory beanDefinitionFactory;
   private MuleXmlBeanDefinitionReader beanDefinitionReader;
   private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
-  private boolean useNewParsingMechanism = true;
+  protected boolean useNewParsingMechanism = true;
   protected final XmlApplicationParser xmlApplicationParser;
   private ArtifactType artifactType;
   private List<ComponentIdentifier> componentNotSupportedByNewParsers = new ArrayList<>();
@@ -135,20 +132,19 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext implement
    * @param artifactConfiguration the mule configuration defined programmatically
    * @param optionalObjectsController the {@link OptionalObjectsController} to use. Cannot be {@code null} @see
    *        org.mule.runtime.config.spring.SpringRegistry
-   * @param enableLazyInit
    * @since 3.7.0
    */
   public MuleArtifactContext(MuleContext muleContext, ConfigResource[] artifactConfigResources,
                              ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
-                             Map<String, String> artifactProperties, ArtifactType artifactType, boolean enableLazyInit)
+                             Map<String, String> artifactProperties, ArtifactType artifactType)
       throws BeansException {
     this(muleContext, convert(artifactConfigResources), artifactConfiguration, optionalObjectsController, artifactProperties,
-         artifactType, enableLazyInit);
+         artifactType);
   }
 
   public MuleArtifactContext(MuleContext muleContext, Resource[] artifactConfigResources,
                              ArtifactConfiguration artifactConfiguration, OptionalObjectsController optionalObjectsController,
-                             Map<String, String> artifactProperties, ArtifactType artifactType, boolean enableLazyInit) {
+                             Map<String, String> artifactProperties, ArtifactType artifactType) {
     checkArgument(optionalObjectsController != null, "optionalObjectsController cannot be null");
     this.muleContext = muleContext;
     this.artifactConfigResources = artifactConfigResources;
@@ -156,7 +152,6 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext implement
     this.artifactProperties = artifactProperties;
     this.artifactType = artifactType;
     this.artifactConfiguration = artifactConfiguration;
-    this.enableLazyInit = enableLazyInit;
 
     serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class).forEach(componentBuildingDefinitionProvider -> {
       componentBuildingDefinitionProvider.init(muleContext);
@@ -283,24 +278,27 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext implement
     // Communicate mule context to parsers
     try {
       currentMuleContext.set(muleContext);
-      if (useNewParsingMechanism) {
-        if (enableLazyInit) {
-          return;
-        }
-        createComponents(beanFactory, applicationModel, true);
-      } else {
-        if (enableLazyInit) {
-          throw new MuleRuntimeException(createStaticMessage("Could not create mule application since lazy init is enabled but there are component in the configuration that are not parsed with the new mechanism "
-              + join(componentNotSupportedByNewParsers.toArray(), ",")));
-        }
-        beanDefinitionReader.loadBeanDefinitions(getConfigResources());
-      }
+      createInitialApplicationComponents(beanFactory, beanDefinitionReader);
     } finally {
       currentMuleContext.remove();
     }
   }
 
-  private void createComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel, boolean mustBeRoot) {
+  protected void createInitialApplicationComponents(DefaultListableBeanFactory beanFactory,
+                                                    BeanDefinitionReader beanDefinitionReader) {
+    if (useNewParsingMechanism) {
+      createApplicationComponents(beanFactory, applicationModel, true);
+    } else {
+      //TODO MULE-9638 - Remove log line
+      logger
+          .info("Using mixed mechanism to load configuration since there are some components that were not yet migrated to the new mechanism: "
+              + getOldParsingMechanismComponentIdentifiers());
+      beanDefinitionReader.loadBeanDefinitions(getConfigResources());
+    }
+  }
+
+  protected List<String> createApplicationComponents(DefaultListableBeanFactory beanFactory, ApplicationModel applicationModel,
+                                                     boolean mustBeRoot) {
     List<String> createdComponentModels = new ArrayList<>();
     applicationModel.executeOnEveryMuleComponentTree(componentModel -> {
       if (!mustBeRoot || componentModel.isRoot()) {
@@ -333,30 +331,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext implement
                                                           }, null);
       }
     });
-    applyLifecycle(createdComponentModels);
+    return createdComponentModels;
   }
 
-  private void applyLifecycle(List<String> createdComponentModels) {
-    if (muleContext.isInitialised()) {
-      for (String createdComponentModelName : createdComponentModels) {
-        Object object = muleContext.getRegistry().get(createdComponentModelName);
-        try {
-          initialiseIfNeeded(object, true, muleContext);
-        } catch (InitialisationException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    if (muleContext.isStarted()) {
-      for (String createdComponentModelName : createdComponentModels) {
-        Object object = muleContext.getRegistry().get(createdComponentModelName);
-        try {
-          startIfNeeded(object);
-        } catch (MuleException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
+  protected String getOldParsingMechanismComponentIdentifiers() {
+    return join(componentNotSupportedByNewParsers.toArray(), ",");
   }
 
   @Override
@@ -500,16 +479,11 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext implement
     } else {
       minimalApplicationModel = minimalApplicationModelGenerator.getMinimalModelByPath(componentName);
     }
-    createComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
+    createApplicationComponents((DefaultListableBeanFactory) this.getBeanFactory(), minimalApplicationModel, false);
   }
 
   public ConnectivityTestingService getConnectivityTestingService() {
-    ConnectivityTestingService connectivityTestingService =
-        muleContext.getRegistry().lookupObject(OBJECT_CONNECTIVITY_TESTING_SERVICE);
-    if (enableLazyInit) {
-      return new LazyConnectivityTestingService(this, connectivityTestingService);
-    }
-    return connectivityTestingService;
+    return muleContext.getRegistry().lookupObject(OBJECT_CONNECTIVITY_TESTING_SERVICE);
   }
 
   private class XmlServiceRegistry implements ServiceRegistry {

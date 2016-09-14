@@ -6,14 +6,11 @@
  */
 package org.mule.runtime.core.connectivity;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingObjectNotFoundException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
@@ -25,23 +22,32 @@ import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.registry.SpiServiceRegistry;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import javax.inject.Inject;
 
 /**
- * {@inheritDoc}
+ * Default implementation of {@link ConnectivityTestingService}.
+ *
+ * It searchs for the {@link ConnectivityTestingStrategy} instances registered in
+ * mule to find the possible strategies to do connection testing over mule component instances
+ *
+ * @since 4.0
  */
 public class DefaultConnectivityTestingService implements ConnectivityTestingService, Initialisable {
-
-  protected static final String NO_CONNECTIVITY_TESTING_STRATEGY_FOUND =
-      format("No %s instances where found", ConnectivityTestingStrategy.class);
 
   private ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private Collection<ConnectivityTestingStrategy> connectivityTestingStrategies;
 
   @Inject
   private MuleContext muleContext;
+
+  protected void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
 
   @Override
   public void initialise() throws InitialisationException {

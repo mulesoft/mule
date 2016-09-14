@@ -17,9 +17,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Generates the minimal required component set to create an isolated configuration
- * component (i.e.: file:config, ftp:connection, a flow MP).
- *
+ * Generates the minimal required component set to create a configuration
+ * component (i.e.: file:config, ftp:connection, a flow MP). This set is defined by the component
+ * dependencies.
+ * <p/>
  * Based on the requested component, the {@link ComponentModel} configuration associated is
  * introspected to find it dependencies based on it's {@link ComponentBuildingDefinition}.
  * This process is recursively done for each of the dependencies in order to find all the required
@@ -28,10 +29,11 @@ import java.util.Set;
  *
  * @since 4.0
  */
+//TODO MULE-9688 - refactor this class when the ComponentModel becomes immutable
 public class MinimalApplicationModelGenerator {
 
   private final ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry;
-  private ApplicationModel applicationModel;
+  private final ApplicationModel applicationModel;
 
   /**
    * Creates a new instance associated to a complete {@link ApplicationModel}.
@@ -107,8 +109,8 @@ public class MinimalApplicationModelGenerator {
         .orElseThrow(() -> new NoSuchComponentModelException(createStaticMessage("No named component with name " + name)));
   }
 
-  private Set<String> findComponentModelsDependencies(Set<String> componentModelsNames) {
-    Set<String> componentsToSearchDependencies = componentModelsNames;
+  private Set<String> findComponentModelsDependencies(Set<String> componentModelNames) {
+    Set<String> componentsToSearchDependencies = componentModelNames;
     Set<String> foundDependencies = new HashSet<>();
     Set<String> alreadySearchedDependencies = new HashSet<>();
     do {
@@ -119,7 +121,7 @@ public class MinimalApplicationModelGenerator {
           foundDependencies.addAll(resolveComponentDependencies(findRequiredComponentModel(componentModelName)));
         }
       }
-      foundDependencies.addAll(componentModelsNames);
+      foundDependencies.addAll(componentModelNames);
 
     } while (!foundDependencies.containsAll(componentsToSearchDependencies));
     return foundDependencies;
