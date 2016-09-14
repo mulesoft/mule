@@ -22,7 +22,6 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
-import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 
 import java.io.File;
@@ -591,7 +590,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           logger.debug("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
           listIterator.set(urlFromClassPath);
         } else {
-          throw new IllegalSourceException(artifactResolvedFile
+          logger.error("'{}' resolved SNAPSHOT version couldn't be matched to a class path URL: '{}'", artifactResolvedFile,
+                       classpathURLs);
+          throw new IllegalStateException(artifactResolvedFile
               + " resolved SNAPSHOT version couldn't be matched to a class path URL");
         }
       }
