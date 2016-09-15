@@ -24,6 +24,7 @@ import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.net.URL;
@@ -36,6 +37,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Matchers;
 
+@SmallTest
 public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
 
   private static final String MULE_PLUGIN = "mule-plugin";
