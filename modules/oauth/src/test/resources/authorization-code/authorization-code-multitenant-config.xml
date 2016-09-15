@@ -14,7 +14,8 @@
         <oauth2:authorization-code-grant-type
                 clientId="${client.id}"
                 clientSecret="${client.secret}"
-                redirectionUrl="${redirect.url}"
+                localCallbackUrl="${local.callback.url}"
+                externalCallbackUrl="${local.callback.url}"
                 localAuthorizationUrlResourceOwnerId="#[message.inboundProperties['http.query.params']['userId']]"
                 tokenManager-ref="multitenantConfig">
             <oauth2:authorization-request

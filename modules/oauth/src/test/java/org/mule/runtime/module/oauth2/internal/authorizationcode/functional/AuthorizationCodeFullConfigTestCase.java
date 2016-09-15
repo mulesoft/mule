@@ -103,7 +103,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
     assertThat(requests.size(), is(1));
 
     AuthorizationRequestAsserter.create((requests.get(0))).assertMethodIsGet().assertClientIdIs(clientId.getValue())
-        .assertRedirectUriIs(redirectUrl.getValue()).assertScopeIs(scopes.getValue()).assertStateIs(state.getValue())
+        .assertRedirectUriIs(localCallbackUrl.getValue()).assertScopeIs(scopes.getValue()).assertStateIs(state.getValue())
         .assertContainsCustomParameter(authenticationRequestParam1.getValue(), authenticationRequestValue1.getValue())
         .assertContainsCustomParameter(authenticationRequestParam2.getValue(), authenticationRequestValue2.getValue())
         .assertResponseTypeIsCode();
@@ -126,7 +126,7 @@ public class AuthorizationCodeFullConfigTestCase extends AbstractOAuthAuthorizat
     final ImmutableMap<Object, Object> redirectUrlQueryParams = ImmutableMap.builder()
         .put(OAuthConstants.CODE_PARAMETER, AUTHENTICATION_CODE).put(OAuthConstants.STATE_PARAMETER, state.getValue()).build();
 
-    muleContext.getClient().send(redirectUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams),
+    muleContext.getClient().send(localCallbackUrl.getValue() + "?" + HttpParser.encodeQueryString(redirectUrlQueryParams),
                                  InternalMessage.builder().nullPayload().build(),
                                  newOptions().tlsContextFactory(createClientTlsContextFactory()).build());
 

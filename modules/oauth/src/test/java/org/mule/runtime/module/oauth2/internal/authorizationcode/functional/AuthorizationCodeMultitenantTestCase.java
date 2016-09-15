@@ -49,8 +49,8 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
   public SystemProperty authorizationUrl =
       new SystemProperty("authorization.url", String.format("http://localhost:%d" + AUTHORIZE_PATH, oauthServerPort.getNumber()));
   @Rule
-  public SystemProperty redirectUrl =
-      new SystemProperty("redirect.url", String.format("http://localhost:%d/redirect", localHostPort.getNumber()));
+  public SystemProperty localCallbackUrl =
+      new SystemProperty("local.callback.url", String.format("http://localhost:%d/callback", localHostPort.getNumber()));
   @Rule
   public SystemProperty tokenUrl =
       new SystemProperty("token.url", String.format("http://localhost:%d" + TOKEN_PATH, oauthServerPort.getNumber()));
@@ -121,7 +121,7 @@ public class AuthorizationCodeMultitenantTestCase extends AbstractOAuthAuthoriza
 
     final String redirectUrlQueryParams = HttpParser.encodeQueryString(new ImmutableMap.Builder()
         .put(OAuthConstants.CODE_PARAMETER, AUTHENTICATION_CODE).put(OAuthConstants.STATE_PARAMETER, expectedState).build());
-    Request.Get(redirectUrl.getValue() + "?" + redirectUrlQueryParams).connectTimeout(REQUEST_TIMEOUT)
+    Request.Get(localCallbackUrl.getValue() + "?" + redirectUrlQueryParams).connectTimeout(REQUEST_TIMEOUT)
         .socketTimeout(REQUEST_TIMEOUT).execute();
   }
 

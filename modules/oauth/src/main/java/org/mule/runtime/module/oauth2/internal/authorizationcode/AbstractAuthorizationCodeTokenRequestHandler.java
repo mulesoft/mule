@@ -94,23 +94,37 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
    */
   public void init() throws MuleException {}
 
-  protected void createListenerForRedirectUrl() throws MuleException {
-    try {
-      final String flowName = "OAuthRedirectUrlFlow" + getOauthConfig().getRedirectionUrl();
-      final Flow redirectUrlFlow =
-          DynamicFlowFactory.createDynamicFlow(getMuleContext(), flowName, Arrays.asList(createRedirectUrlProcessor()));
-      final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext())
-          .setUrl(new URL(getOauthConfig().getRedirectionUrl())).setFlow(redirectUrlFlow);
-      if (getOauthConfig().getTlsContext() != null) {
-        httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
+  protected void createListenerForCallbackUrl() throws MuleException {
+    String flowName = "OAuthCallbackUrlFlow";
+    final HttpListenerBuilder httpListenerBuilder = new HttpListenerBuilder(getMuleContext());
+
+    if (getOauthConfig().getLocalCallbackUrl() != null) {
+      flowName = flowName + getOauthConfig().getLocalCallbackUrl();
+      try {
+        httpListenerBuilder.setUrl(new URL(getOauthConfig().getLocalCallbackUrl()));
+      } catch (MalformedURLException e) {
+        logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getLocalCallbackUrl());
+        throw new DefaultMuleException(e);
       }
-      this.redirectUrlListener = httpListenerBuilder.build();
-      this.redirectUrlListener.initialise();
-      this.redirectUrlListener.start();
-    } catch (MalformedURLException e) {
-      logger.warn("Could not parse provided url %s. Validate that the url is correct", getOauthConfig().getRedirectionUrl());
-      throw new DefaultMuleException(e);
+    } else if (getOauthConfig().getLocalCallbackConfig() != null) {
+      flowName =
+          flowName + getOauthConfig().getLocalCallbackConfig().getName() + " " + getOauthConfig().getLocalCallbackConfigPath();
+      httpListenerBuilder
+          .setListenerConfig(getOauthConfig().getLocalCallbackConfig())
+          .setPath(getOauthConfig().getLocalCallbackConfigPath());
     }
+
+    final Flow redirectUrlFlow =
+        DynamicFlowFactory.createDynamicFlow(getMuleContext(), flowName, Arrays.asList(createRedirectUrlProcessor()));
+    httpListenerBuilder.setFlow(redirectUrlFlow);
+
+    if (getOauthConfig().getTlsContext() != null) {
+      httpListenerBuilder.setTlsContextFactory(getOauthConfig().getTlsContext());
+    }
+
+    this.redirectUrlListener = httpListenerBuilder.build();
+    this.redirectUrlListener.initialise();
+    this.redirectUrlListener.start();
   }
 
   protected abstract Processor createRedirectUrlProcessor();

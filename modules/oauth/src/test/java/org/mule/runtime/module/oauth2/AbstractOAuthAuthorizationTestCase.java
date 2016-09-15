@@ -15,7 +15,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
-
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.module.http.api.HttpHeaders;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -23,6 +22,8 @@ import org.mule.runtime.module.oauth2.internal.OAuthConstants;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.UnsupportedEncodingException;
@@ -30,9 +31,6 @@ import java.net.URLEncoder;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Rule;
-
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestCase {
 
@@ -44,11 +42,13 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
   public static final String REFRESH_TOKEN = "cry825cyCs2O0j7tRXXVS4AXNu7hsO5wbWjcBoFFcJePy5zZwuQEevIp6hsUaywp";
   public static final String EXPIRES_IN = "3897";
   public static final String AUTHORIZE_PATH = "/authorize";
-  protected final DynamicPort localHostPort = new DynamicPort("port1");
   protected final DynamicPort oauthServerPort = new DynamicPort("port2");
   protected final DynamicPort oauthHttpsServerPort = new DynamicPort("port3");
   private String keyStorePath = Thread.currentThread().getContextClassLoader().getResource("ssltest-keystore.jks").getPath();
   private String keyStorePassword = "changeit";
+
+  @Rule
+  public final DynamicPort localHostPort = new DynamicPort("localHostPort");
 
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(oauthServerPort.getNumber())
@@ -66,8 +66,12 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
   public SystemProperty oauthServerPortNumber =
       new SystemProperty("oauth.server.port", String.valueOf(oauthServerPort.getNumber()));
   @Rule
-  public SystemProperty redirectUrl =
-      new SystemProperty("redirect.url", format("%s://localhost:%d/redirect", getProtocol(), localHostPort.getNumber()));
+  public SystemProperty localCallbackPath =
+      new SystemProperty("local.callback.path", "/callback");
+  @Rule
+  public SystemProperty localCallbackUrl =
+      new SystemProperty("local.callback.url",
+                         format("%s://localhost:%d%s", getProtocol(), localHostPort.getNumber(), localCallbackPath.getValue()));
   @Rule
   public SystemProperty wireMockHttpPort = new SystemProperty("oauthServerHttpPort", String.valueOf(oauthServerPort.getNumber()));
 
@@ -146,7 +150,7 @@ public abstract class AbstractOAuthAuthorizationTestCase extends FunctionalTestC
         .withRequestBody(containing(OAuthConstants.GRANT_TYPE_PARAMETER + "="
             + URLEncoder.encode(OAuthConstants.GRANT_TYPE_AUTHENTICATION_CODE, UTF_8.name())))
         .withRequestBody(containing(OAuthConstants.REDIRECT_URI_PARAMETER + "="
-            + URLEncoder.encode(redirectUrl.getValue(), UTF_8.name()))));
+            + URLEncoder.encode(localCallbackUrl.getValue(), UTF_8.name()))));
   }
 
   protected void verifyRequestDoneToTokenUrlForClientCredentials() throws UnsupportedEncodingException {

@@ -8,6 +8,7 @@ package org.mule.runtime.module.oauth2.internal.authorizationcode;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.oauth2.internal.ApplicationCredentials;
 import org.mule.runtime.module.oauth2.internal.authorizationcode.state.ConfigOAuthContext;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -19,9 +20,24 @@ import org.mule.runtime.core.util.AttributeEvaluator;
 public interface AuthorizationCodeGrantType extends ApplicationCredentials {
 
   /**
-   * @return redirect url as defined in the oauth authentication server.
+   * @return callback listener configuration to start the server and define corresponding flow.
    */
-  String getRedirectionUrl();
+  HttpListenerConfig getLocalCallbackConfig();
+
+  /**
+   * @return callback listener path for the flow to be created according to localCallbackConfig.
+   */
+  String getLocalCallbackConfigPath();
+
+  /**
+   * @return local callback URL for the flow to be created.
+   */
+  String getLocalCallbackUrl();
+
+  /**
+   * @return the external address of the callback, sent to the client.
+   */
+  String getExternalCallbackUrl();
 
   /**
    * @return expression to determine if a call to the resource secured with oauth failed because the access token has expired or
