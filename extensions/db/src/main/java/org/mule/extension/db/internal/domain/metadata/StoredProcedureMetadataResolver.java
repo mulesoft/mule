@@ -23,6 +23,7 @@ public class StoredProcedureMetadataResolver extends BaseDbMetadataResolver impl
   public MetadataType getOutputMetadata(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
 
+    typeBuilder = context.getTypeBuilder();
     return typeBuilder.dictionaryType()
         .ofKey(typeBuilder.stringType())
         .ofValue(typeBuilder.anyType())
