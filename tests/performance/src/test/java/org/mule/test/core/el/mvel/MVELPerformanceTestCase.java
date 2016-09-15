@@ -30,11 +30,6 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ContiPerfRule rule = new ContiPerfRule();
 
-  @Override
-  public int getTestTimeoutSecs() {
-    return 180;
-  }
-
   final protected String mel = "StringBuilder sb = new StringBuilder(); fields = payload.split(',\');"
       + "if (fields.length > 4) {"
       + "    sb.append('  <Contact>\n');"

@@ -8,8 +8,9 @@
 package org.mule.test.module.extension.file;
 
 import static org.junit.rules.ExpectedException.none;
+
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.test.module.extension.AbstractIsolatedPerformanceTestCase;
+import org.mule.test.performance.util.AbstractIsolatedFunctionalPerformanceTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +19,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
-import org.databene.contiperf.junit.ContiPerfRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -26,12 +26,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-public class FilePerformanceTestCase extends AbstractIsolatedPerformanceTestCase {
+public class FilePerformanceTestCase extends AbstractIsolatedFunctionalPerformanceTestCase {
 
   private static final String HELLO_WORLD = "Hello World!";
   private static final String HELLO_FILE_NAME = "hello.json";
   private static final int REPETITIONS = 10;
-
 
   @ClassRule
   public static TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -52,14 +51,6 @@ public class FilePerformanceTestCase extends AbstractIsolatedPerformanceTestCase
   @Override
   protected void doTearDownAfterMuleContextDispose() throws Exception {
     temporaryFolder.delete();
-  }
-
-  @Rule
-  public ContiPerfRule rule = new ContiPerfRule();
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 120;
   }
 
   @Override
