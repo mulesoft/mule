@@ -34,15 +34,15 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
   enum ProcessingType {
 
     /**
-     * CPU intensive processing such as calculation of transformation.
+     * CPU intensive processing such as calculation or transformation.
      */
     CPU,
     /**
-     * Processing which neither blocks or is CPU instensive such as message passing, filtering and routing etc.
+     * Processing which neither blocks nor is CPU intensive such as message passing, filtering and routing etc.
      */
     CPU_LITE,
     /**
-     * Blocking processing such as blocking IO or anything that performs Thread.sleep()
+     * Blocking processing such as blocking IO or anything that may block the current thread.
      */
     BLOCKING
   }
