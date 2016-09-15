@@ -10,13 +10,14 @@
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-file-extension-common</artifactId>
     <name>Mule File Extension Common</name>
-    <packaging>jar</packaging>
+    <packaging>mule-plugin</packaging>
     <description>
         Reusable components for extensions built using Mule's SDK which operate over file systems (e.g: file, ftp, sftp, etc)
     </description>
 
     <properties>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <mule.plugins.maven.app.plugins.version>1.0.0-SNAPSHOT</mule.plugins.maven.app.plugins.version>
     </properties>
 
     <dependencies>
@@ -25,10 +26,12 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!--Test Dependencies-->
         <dependency>
@@ -63,8 +66,8 @@
 
     <build>
         <plugins>
+            <!--TODO (MULE-10540) parent pom for mule plugins -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
@@ -72,7 +75,24 @@
                             <goal>test-jar</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>mule-plugin</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>mule-plugin</classifier>
+                        </configuration>
+                    </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.mule.plugins</groupId>
+                <artifactId>mule-app-plugins-maven-plugin</artifactId>
+                <version>${mule.plugins.maven.app.plugins.version}</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>

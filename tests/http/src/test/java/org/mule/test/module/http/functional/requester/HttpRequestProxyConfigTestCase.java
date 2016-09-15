@@ -32,6 +32,7 @@ import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -39,6 +40,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
+@Ignore("MULE-10531")
 public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
 
   private static final String PROXY_HOST = "localhost";

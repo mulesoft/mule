@@ -8,6 +8,8 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
@@ -19,15 +21,14 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilt
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
+import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
-
-import com.google.common.collect.Maps;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -73,13 +74,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String MAVEN_COORDINATES_SEPARATOR = ":";
   private static final String JAR_EXTENSION = "jar";
   private static final String SNAPSHOT_WILCARD_FILE_FILTER = "*-SNAPSHOT*.*";
-  private static final String MULE_EXTENSION = "mule-extension";
+  private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
+  private static final String MULE_EXTESION_CLASSIFIER = "mule-extension";
   private static final String TESTS_CLASSIFIER = "tests";
   private static final String TESTS_JAR = "-tests.jar";
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private DependencyResolver dependencyResolver;
+  private DefaultExtensionManager extensionManager = new DefaultExtensionManager();
+  private PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver(extensionManager);
 
   /**
    * Creates an instance of the classifier.
@@ -209,7 +213,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   private List<PluginUrlClassification> buildPluginUrlClassifications(ClassPathClassifierContext context,
                                                                       List<Dependency> directDependencies) {
-    List<PluginUrlClassification> pluginUrlClassifications = newArrayList();
+    Map<String, PluginClassificationNode> pluginsClassified = newLinkedHashMap();
 
     ExtensionPluginMetadataGenerator extensionPluginMetadataGenerator =
         new ExtensionPluginMetadataGenerator(context.getPluginResourcesFolder());
@@ -222,9 +226,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     logger.debug("{} plugins defined to be classified", pluginsArtifacts.size());
 
-    if (isExtensionPlugin(rootArtifact)) {
-      logger.debug("rootArtifact '{}' identified as Extension plugin", rootArtifact);
-      pluginUrlClassifications.add(buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator));
+    if (isMulePlugin(rootArtifact)) {
+      logger.debug("rootArtifact '{}' identified as Mule plugin", rootArtifact);
+      buildPluginUrlClassification(rootArtifact, context, extensionPluginMetadataGenerator, directDependencies,
+                                   pluginsClassified);
 
       pluginsArtifacts = pluginsArtifacts.stream()
           .filter(pluginArtifact -> !(rootArtifact.getGroupId().equals(pluginArtifact.getGroupId())
@@ -232,29 +237,73 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .collect(toList());
     }
 
-    pluginsArtifacts.stream().forEach(pluginArtifact -> pluginUrlClassifications
-        .add(buildPluginUrlClassification(pluginArtifact, context, extensionPluginMetadataGenerator)));
+    pluginsArtifacts.stream()
+        .forEach(pluginArtifact -> buildPluginUrlClassification(pluginArtifact, context, extensionPluginMetadataGenerator,
+                                                                directDependencies, pluginsClassified));
 
     extensionPluginMetadataGenerator.generateDslResources();
-    return pluginUrlClassifications;
+
+    return toPluginUrlClassification(pluginsClassified.values());
   }
 
-  private boolean isExtensionPlugin(Artifact artifact) {
-    return artifact.getExtension().equals(MULE_EXTENSION);
+  /**
+   * Transforms the {@link PluginClassificationNode} to {@link PluginUrlClassification}.
+   *
+   * @param classificationNodes the fat object classified that needs to be transformed
+   * @return {@link PluginUrlClassification}
+   */
+  private List<PluginUrlClassification> toPluginUrlClassification(Collection<PluginClassificationNode> classificationNodes) {
+
+    Map<String, PluginUrlClassification> classifiedPluginUrls = newLinkedHashMap();
+
+    for (PluginClassificationNode node : classificationNodes) {
+      final List<String> pluginDependencies = node.getPluginDependencies().stream()
+          .map(dependency -> dependency.getName())
+          .collect(toList());
+      final PluginUrlClassification pluginUrlClassification =
+          pluginResourcesResolver.resolvePluginResourcesFor(
+                                                            new PluginUrlClassification(node.getName(), node.getUrls(),
+                                                                                        node.getExportClasses(),
+                                                                                        pluginDependencies));
+
+      classifiedPluginUrls.put(node.getName(), pluginUrlClassification);
+    }
+
+    for (PluginUrlClassification pluginUrlClassification : classifiedPluginUrls.values()) {
+      for (String dependency : pluginUrlClassification.getPluginDependencies()) {
+        final PluginUrlClassification dependencyPlugin = classifiedPluginUrls.get(dependency);
+        if (dependencyPlugin == null) {
+          throw new IllegalStateException("Unable to find a plugin dependency: " + dependency);
+        }
+
+        pluginUrlClassification.getExportedPackages().removeAll(dependencyPlugin.getExportedPackages());
+      }
+    }
+
+    return newArrayList(classifiedPluginUrls.values());
+  }
+
+  private boolean isMulePlugin(Artifact artifact) {
+    return artifact.getExtension().equals(MULE_PLUGIN_CLASSIFIER) || artifact.getExtension().equals(MULE_EXTESION_CLASSIFIER);
   }
 
   /**
    * Classifies a plugin {@link Artifact}. {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE} dependencies will be
    * resolved for building the {@link URL}'s for the class loader. For {@link Extension} annotated classes it will also generate
-   * its metadata.
+   * its metadata. Once classified the node is added to {@link Map} of pluginsClassified.
    *
    * @param pluginArtifact {@link Artifact} that represents the plugin to be classified
    * @param context {@link ClassPathClassifierContext} with settings for the classification process
    * @param extensionPluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
-   * @return {@link PluginUrlClassification} for the plugin
+   * @param rootArtifactDirectDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param pluginsClassified {@link Map} that contains already classified plugins
    */
-  private PluginUrlClassification buildPluginUrlClassification(Artifact pluginArtifact, ClassPathClassifierContext context,
-                                                               ExtensionPluginMetadataGenerator extensionPluginGenerator) {
+  private void buildPluginUrlClassification(Artifact pluginArtifact, ClassPathClassifierContext context,
+                                            ExtensionPluginMetadataGenerator extensionPluginGenerator,
+                                            List<Dependency> rootArtifactDirectDependencies,
+                                            Map<String, PluginClassificationNode> pluginsClassified) {
+    checkPluginDeclaredAsDirectDependency(pluginArtifact, context, rootArtifactDirectDependencies);
+
     List<URL> urls;
     try {
       List<Dependency> managedDependencies = dependencyResolver.readArtifactDescriptor(pluginArtifact).getManagedDependencies();
@@ -268,20 +317,118 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       throw new IllegalStateException("Couldn't resolve dependencies for plugin: '" + pluginArtifact + "' classification", e);
     }
 
-    if (context.isExtensionMetadataGenerationEnabled()) {
-      File generatedMetadataFolder = extensionPluginGenerator.generateExtensionManifest(pluginArtifact, urls);
-      if (generatedMetadataFolder != null) {
-        URL generatedTestResources = toUrl(generatedMetadataFolder);
+    List<Dependency> directDependencies;
+    List<PluginClassificationNode> pluginDependencies = newArrayList();
+    try {
+      directDependencies = dependencyResolver.getDirectDependencies(pluginArtifact);
+    } catch (ArtifactDescriptorException e) {
+      throw new IllegalStateException("Couldn't get direct dependencies for plugin: '" + pluginArtifact + "'", e);
+    }
+    logger.debug("Searching for plugin dependencies on direct dependencies of plugin {}", pluginArtifact);
+    List<Artifact> pluginArtifactDependencies = collectMulePluginArtifacts(directDependencies);
+    logger.debug("Artifacts {} identified a plugin dependencies for plugin {}", pluginArtifactDependencies, pluginArtifact);
+    pluginArtifactDependencies.stream()
+        .map(artifact -> {
+          String artifactClassifierLessId = toClassifierLessId(artifact);
+          if (!pluginsClassified.containsKey(artifactClassifierLessId)) {
+            buildPluginUrlClassification(artifact, context, extensionPluginGenerator, rootArtifactDirectDependencies,
+                                         pluginsClassified);
+          }
+          return pluginsClassified.get(artifactClassifierLessId);
+        })
+        .forEach(pluginDependencies::add);
 
-        if (generatedTestResources != null) {
-          List<URL> appendedTestResources = newArrayList(generatedTestResources);
-          appendedTestResources.addAll(urls);
-          urls = appendedTestResources;
-        }
+    // Generate Metadata
+    urls = generateExtensionMetadata(pluginArtifact, context, extensionPluginGenerator, urls);
+
+    final ArrayList<Class> exportClasses = newArrayList(context.getExportPluginClasses(pluginArtifact));
+    PluginClassificationNode pluginUrlClassification = new PluginClassificationNode(toClassifierLessId(pluginArtifact),
+                                                                                    urls,
+                                                                                    exportClasses,
+                                                                                    pluginDependencies);
+
+    pluginsClassified.put(toClassifierLessId(pluginArtifact), pluginUrlClassification);
+  }
+
+  /**
+   * Collects from the list of directDependencies {@link Dependency} those that are classified with classifier
+   * {@value #MULE_PLUGIN_CLASSIFIER}.
+   *
+   * @param directDependencies {@link List} of direct {@link Dependency}
+   * @return {@link List} of {@link Artifact}s for those dependencies classified as {@value #MULE_PLUGIN_CLASSIFIER}, can be
+   *         empty.
+   */
+  private List<Artifact> collectMulePluginArtifacts(List<Dependency> directDependencies) {
+    return directDependencies.stream()
+        .filter(dependency -> dependency.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER))
+        .map(dependency -> dependency.getArtifact())
+        .collect(toList());
+  }
+
+  /**
+   * Checks if the pluginArtifact {@link Artifact} is declared as direct dependency of the rootArtifact or if the pluginArtifact
+   * is the same rootArtifact. In case if it is a dependency and is not declared it throws an {@link IllegalStateException}.
+   *
+   * @param pluginArtifact plugin {@link Artifact} to be checked
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @param rootArtifactDirectDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @throws {@link IllegalStateException} if the plugin is a dependency not declared in rootArtifact directDependencies
+   */
+  private void checkPluginDeclaredAsDirectDependency(Artifact pluginArtifact, ClassPathClassifierContext context,
+                                                     List<Dependency> rootArtifactDirectDependencies) {
+    if (!context.getRootArtifact().equals(pluginArtifact)) {
+      if (!findDirectDependency(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), rootArtifactDirectDependencies)
+          .isPresent()) {
+        throw new IllegalStateException("Plugin '" + pluginArtifact + "' has to be defined as direct dependency");
       }
     }
-    // TODO(gfernandes): MULE-10484 How could I check if exported classes belong to this plugin?
-    return new PluginUrlClassification(toId(pluginArtifact), urls, newArrayList(context.getExportPluginClasses()));
+  }
+
+  /**
+   * If enabled generates the Extension metadata and returns the {@link List} of {@link URL}s with the folder were metadata is
+   * generated as first entry in the list.
+   *
+   * @param pluginArtifact plugin {@link Artifact} to generate its Extension metadata
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @param extensionPluginGenerator {@link ExtensionPluginMetadataGenerator} extensions metadata generator
+   * @param urls current {@link List} of {@link URL}s classified for the plugin
+   * @return {@link List} of {@link URL}s classified for the plugin
+   */
+  private List<URL> generateExtensionMetadata(Artifact pluginArtifact, ClassPathClassifierContext context,
+                                              ExtensionPluginMetadataGenerator extensionPluginGenerator, List<URL> urls) {
+    Class extensionClass = extensionPluginGenerator.scanForExtensionAnnotatedClasses(pluginArtifact, urls);
+    if (extensionClass != null) {
+      logger.debug("Plugin '{}' has been discovered as Extension", pluginArtifact);
+      if (context.isExtensionMetadataGenerationEnabled()) {
+        File generatedMetadataFolder = extensionPluginGenerator.generateExtensionManifest(pluginArtifact, extensionClass);
+        URL generatedTestResources = toUrl(generatedMetadataFolder);
+
+        List<URL> appendedTestResources = newArrayList(generatedTestResources);
+        appendedTestResources.addAll(urls);
+        urls = appendedTestResources;
+      }
+    }
+    return urls;
+  }
+
+  /**
+   * Finds the direct {@link Dependency} from rootArtifact for the given groupId and artifactId.
+   *
+   * @param groupId of the artifact to be found
+   * @param artifactId of the artifact to be found
+   * @param directDependencies the rootArtifact direct {@link Dependency}s
+   * @return {@link Optional} {@link Dependency} to the dependency. Could be empty it if not present in the list of direct
+   *         dependencies
+   */
+  private Optional<Dependency> findDirectDependency(String groupId, String artifactId, List<Dependency> directDependencies) {
+    return directDependencies.isEmpty() ? Optional.<Dependency>empty()
+        : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(groupId)
+            && dependency.getArtifact().getArtifactId().equals(artifactId)).findFirst();
+  }
+
+  private String toClassifierLessId(Artifact pluginArtifact) {
+    return toId(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getExtension(), null,
+                pluginArtifact.getVersion());
   }
 
   /**
@@ -305,14 +452,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       pluginVersion = rootArtifact.getVersion();
     } else {
       logger.debug("Resolving version for '{}' from direct dependencies", pluginCoords);
-      Optional<Dependency> pluginDependencyOp = directDependencies.isEmpty() ? Optional.<Dependency>empty()
-          : directDependencies.stream().filter(dependency -> dependency.getArtifact().getGroupId().equals(pluginGroupId)
-              && dependency.getArtifact().getArtifactId().equals(pluginArtifactId)).findFirst();
+      Optional<Dependency> pluginDependencyOp = findDirectDependency(pluginGroupId, pluginArtifactId, directDependencies);
 
       if (!pluginDependencyOp.isPresent() || !pluginDependencyOp.get().getScope().equals(PROVIDED)) {
-        throw new IllegalStateException("Plugin '" + pluginCoords
-            + " in order to be resolved has to be declared as " + PROVIDED + " dependency of your Maven project");
+        throw new IllegalStateException("Plugin '" + pluginGroupId + ":" + pluginArtifactId
+            + "' in order to be resolved has to be declared as " + PROVIDED + " dependency of your Maven project");
       }
+
       Dependency pluginDependency = pluginDependencyOp.get();
       pluginVersion = pluginDependency.getArtifact().getVersion();
     }
@@ -484,7 +630,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           logger.debug("Replacing resolved URL '{}' from class path URL '{}'", urlResolved, urlFromClassPath);
           listIterator.set(urlFromClassPath);
         } else {
-          throw new IllegalSourceException(artifactResolvedFile
+          logger.error("'{}' resolved SNAPSHOT version couldn't be matched to a class path URL: '{}'", artifactResolvedFile,
+                       classpathURLs);
+          throw new IllegalStateException(artifactResolvedFile
               + " resolved SNAPSHOT version couldn't be matched to a class path URL");
         }
       }
@@ -512,7 +660,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @return {@link Map} that has as key the folder that holds the artifact and value a {@link List} of {@link URL}s.
    */
   private Map<File, List<URL>> groupArtifactUrlsByFolder(List<URL> classpathURLs) {
-    Map<File, List<URL>> classpathFolders = Maps.newHashMap();
+    Map<File, List<URL>> classpathFolders = newHashMap();
     classpathURLs.forEach(url -> {
       File folder = new File(url.getFile()).getParentFile();
       if (classpathFolders.containsKey(folder)) {

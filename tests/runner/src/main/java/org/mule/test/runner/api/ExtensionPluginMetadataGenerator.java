@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.registry.DefaultRegistryBroker;
 import org.mule.runtime.core.registry.MuleRegistryHelper;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -98,51 +99,65 @@ public class ExtensionPluginMetadataGenerator {
   }
 
   /**
-   * Generates the extension manifest for the {@link Artifact} plugin if it has a {@link Class} annotated with {@link Extension}.
+   * Scans for a {@link Class} annotated with {@link Extension} annotation and return the {@link Class} or {@code null} if there
+   * is no annotated {@link Class}.
    *
    * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
    * @param urls {@link URL}s to use for discovering {@link Class}es annotated with {@link Extension}
-   * @return {@link File} folder where extension manifest resources were generated or {@code null} if the plugins has no
-   *         {@link Class} annotated as {@link Extension}
+   * @return {@link Class} annotated with {@link Extension} or {@code null}
    */
-  public File generateExtensionManifest(Artifact plugin, List<URL> urls) {
+  public Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
     logger.debug("Scanning plugin '{}' for annotated Extension class", plugin);
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     scanner.setResourceLoader(new PathMatchingResourcePatternResolver(new URLClassLoader(urls.toArray(new URL[0]), null)));
     Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
-    if (extensionsAnnotatedClasses.size() > 1) {
-      throw new IllegalStateException("While scanning class loader on plugin '" + plugin
-          + "' for discovering @Extension classes annotated, more than one found. Only one should be discovered, found: "
-          + extensionsAnnotatedClasses);
-    } else if (extensionsAnnotatedClasses.size() == 1) {
+    if (!extensionsAnnotatedClasses.isEmpty()) {
+      if (extensionsAnnotatedClasses.size() > 1) {
+        logger.warn("While scanning class loader on plugin '{}' for discovering @Extension classes annotated, more than one " +
+            "found. It will pick up the first one, found: {}", plugin, extensionsAnnotatedClasses);
+      }
       String extensionClassName = extensionsAnnotatedClasses.iterator().next().getBeanClassName();
-      logger.debug("Generating Extension metadata for extension class: '{}'", extensionClassName);
-
-      File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
-      generatedResourcesDirectory.mkdirs();
-
-      Class extensionClass;
       try {
-        extensionClass = Class.forName(extensionClassName);
+        return Class.forName(extensionClassName);
       } catch (ClassNotFoundException e) {
         throw new IllegalArgumentException("Cannot load Extension class '" + extensionClassName + "'", e);
       }
-
-      final StaticVersionResolver versionResolver = new StaticVersionResolver(plugin.getVersion());
-      extensionsInfrastructure
-          .generateLoaderResources(extensionsInfrastructure
-              .discoverExtension(extensionClass, versionResolver), generatedResourcesDirectory);
-
-      extensionsResourcesFolders.add(generatedResourcesDirectory);
-
-      return generatedResourcesDirectory.getParentFile();
-    } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Plugin '{}' not an Extension", plugin);
-      }
     }
+    logger.debug("No class found annotated with {}", Extension.class.getName());
     return null;
+  }
+
+  /**
+   * Discovers the extension and builds the {@link RuntimeExtensionModel}.
+   *
+   * @param plugin the extension {@link Artifact} plugin
+   * @param extensionClass the {@link Class} annotated with {@link Extension}
+   * @return {@link RuntimeExtensionModel} for the extensionClass
+   */
+  public RuntimeExtensionModel getExtensionModel(Artifact plugin, Class extensionClass) {
+    final StaticVersionResolver versionResolver = new StaticVersionResolver(plugin.getVersion());
+    return extensionsInfrastructure.discoverExtension(extensionClass, versionResolver);
+  }
+
+  /**
+   * Generates the extension manifest for the {@link Artifact} plugin with the {@link Extension}.
+   *
+   * @param plugin the {@link Artifact} to generate its extension manifest if it is an extension.
+   * @param extensionClass {@link Class} annotated with {@link Extension}
+   * @return {@link File} folder where extension manifest resources were generated
+   */
+  public File generateExtensionManifest(Artifact plugin, Class extensionClass) {
+    logger.debug("Generating Extension metadata for extension class: '{}'", extensionClass);
+
+    File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
+    generatedResourcesDirectory.mkdirs();
+    extensionsInfrastructure
+        .generateLoaderResources(getExtensionModel(plugin, extensionClass), generatedResourcesDirectory);
+
+    extensionsResourcesFolders.add(generatedResourcesDirectory);
+
+    return generatedResourcesDirectory.getParentFile();
   }
 
   /**

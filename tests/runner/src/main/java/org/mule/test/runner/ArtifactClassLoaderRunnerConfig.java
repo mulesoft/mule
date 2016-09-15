@@ -61,16 +61,16 @@ public @interface ArtifactClassLoaderRunnerConfig {
   String[] providedInclusions() default {};
 
   /**
-   * Plugins in the format of {@code <groupId>:<artifactId>} to be loaded and registered to Mule Container during the execution of
-   * the test. {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} will be created for each plugin.
+   * Plugins in the format of {@code <groupId>:<artifactId>} to be loaded and registered to Mule Container during the
+   * execution of the test. {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} will be created for each
+   * plugin.
    * <p/>
-   * If the current artifact being tested is a plugin it would need to be declared here the groupId and artifactId, its
+   * If the current artifact being tested is a plugin it would not need to be declared here the groupId and artifactId, its
    * {@code /target/classes/} folder and Maven {@code compile} dependencies will be used to build the
    * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}.
    * <p/>
    * Otherwise any plugin artifact declared on this list should be declared as Maven dependency with scope {@code provided}, the
    * version of the plugin to be resolved will be the one defined in the Maven dependency.
-   * <p/>
    *
    * @return array of {@link String} to define plugins in order to create for each a plugin {@link ClassLoader}
    */
@@ -83,14 +83,11 @@ public @interface ArtifactClassLoaderRunnerConfig {
    * they are not exposed by the plugin. Meaning that the isolation of plugins would be broken due to these {@link Class}es would
    * be exposed no matter if the plugin doesn't expose them.
    * <p/>
-   * For each class defined here it will look the source code location of that file in order to get which plugin or extension has
-   * to be appended to export the {@link Class} defined.
-   * <p/>
    * {@link Class}es defined here will be also visible for all the tests in the module due to the {@link ClassLoader} is created
    * one per module when running tests.
    * <p/>
-   * Only {@link Class}es from the plugin code would be exposed, it is not possible to export a {@link Class} that belongs to a
-   * third-party library.
+   * Only {@link Class}es from the rootArtifact when it is a plugin would be exposed, it is not possible to export a {@link Class}
+   * that belongs to other plugins rather than rootArtifact.
    *
    * @return array of {@link Class} for those classes that has to be exposed for the test. By default is empty.
    */
