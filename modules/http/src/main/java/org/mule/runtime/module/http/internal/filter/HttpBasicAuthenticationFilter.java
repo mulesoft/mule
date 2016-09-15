@@ -135,7 +135,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
         event = setUnauthenticated(event);
-        throw new UnauthorisedException(authFailedForUser(username), e, event.getMessage());
+        throw new BasicUnauthorisedException(authFailedForUser(username), e, event.getMessage());
       }
 
       // Authentication success
@@ -149,7 +149,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       return event;
     } else if (header == null) {
       event = setUnauthenticated(event);
-      throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);
+      throw new BasicUnauthorisedException(event, event.getSession().getSecurityContext(), this);
     } else {
       event = setUnauthenticated(event);
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "

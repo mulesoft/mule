@@ -15,7 +15,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.ComponentIdentifier;
-import org.mule.runtime.core.exception.ErrorMessageAwareException;
+import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
@@ -47,7 +47,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
         // messagingException.causedExactlyBy(..) condition.
         if (!error.isPresent() || !error.get().getException().equals(causeException)
-            || messagingException.causedExactlyBy(error.get().getException().getClass())) {
+            || !messagingException.causedExactlyBy(error.get().getException().getClass())) {
           ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, causeException);
           event = Event.builder(messagingException.getEvent())
               .error(ErrorBuilder.builder(causeException).errorType(errorType).build()).build();
@@ -61,7 +61,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         messagingException = new MessagingException(event, causeException, messageProcessor);
         ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, causeException);
         Event exceptionEvent = messagingException.getEvent();
-        event = Event.builder(exceptionEvent).error(ErrorBuilder.builder(causeException).errorType(errorType).build()).build();
+        event = Event.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
         messagingException.setProcessedEvent(event);
       }
 

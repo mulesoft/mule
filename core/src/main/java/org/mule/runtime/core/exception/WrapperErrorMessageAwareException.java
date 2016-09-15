@@ -8,7 +8,13 @@ package org.mule.runtime.core.exception;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 
+/**
+ * {@link ErrorMessageAwareException} implementation that wraps an actual exception and can be treated as a {@link MuleException}.
+ *
+ * @since 4.0
+ */
 public class WrapperErrorMessageAwareException extends MuleException implements ErrorMessageAwareException {
 
   private Message errorMessage;

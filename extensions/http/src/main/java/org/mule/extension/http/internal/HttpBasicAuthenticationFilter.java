@@ -32,6 +32,7 @@ import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -144,7 +145,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
         if (logger.isDebugEnabled()) {
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
-        throw new UnauthorisedException(authFailedForUser(username), e, createUnauthenticatedMessage(event.getMessage()));
+        throw new BasicUnauthorisedException(authFailedForUser(username), e, createUnauthenticatedMessage(event.getMessage()));
       }
 
       if (logger.isDebugEnabled()) {
@@ -157,7 +158,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       return event;
     } else if (header == null) {
       event = setUnauthenticated(event, (InternalMessage) createUnauthenticatedMessage(event.getMessage()));
-      throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);
+      throw new BasicUnauthorisedException(event, event.getSession().getSecurityContext(), this);
     } else {
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
           + header), createUnauthenticatedMessage(event.getMessage()));

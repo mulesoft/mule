@@ -6,6 +6,7 @@
  */
 package org.mule.tck.security;
 
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.security.CryptoFailureException;
@@ -48,7 +49,7 @@ public class TestSecurityFilter extends AbstractAuthenticationFilter {
   public static class StaticMessageUnauthorisedException extends UnauthorisedException {
 
     public StaticMessageUnauthorisedException() {
-      super(null);
+      super(createStaticMessage(""));
     }
 
     @Override

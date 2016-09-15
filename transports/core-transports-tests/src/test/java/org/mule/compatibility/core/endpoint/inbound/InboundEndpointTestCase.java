@@ -193,7 +193,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
       result = mpChain.process(requestEvent);
       fail("Exception expected");
     } catch (MessagingException e) {
-      assertThat(e, is(instanceOf(TestSecurityFilter.StaticMessageUnauthorisedException.class)));
+      assertThat(e.getCause(), is(instanceOf(TestSecurityFilter.StaticMessageUnauthorisedException.class)));
       endpoint.getFlowConstruct().getExceptionListener().handleException(e, requestEvent);
     }
 
@@ -272,7 +272,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
       result = mpChain.process(requestEvent);
       fail("Exception expected");
     } catch (MessagingException e) {
-      assertThat(e, is(instanceOf(TestSecurityFilter.StaticMessageUnauthorisedException.class)));
+      assertThat(e.getCause(), is(instanceOf(TestSecurityFilter.StaticMessageUnauthorisedException.class)));
     }
 
     assertMessageNotSent();

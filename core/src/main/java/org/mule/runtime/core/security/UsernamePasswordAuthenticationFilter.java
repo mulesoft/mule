@@ -49,7 +49,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
       if (logger.isDebugEnabled()) {
         logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
       }
-      throw new UnauthorisedException(CoreMessages.authFailedForUser(authentication.getPrincipal().toString()), e, null);
+      throw new UnauthorisedException(CoreMessages.authFailedForUser(authentication.getPrincipal().toString()), e);
     }
 
     // Authentication success

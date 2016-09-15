@@ -47,7 +47,7 @@ public class WsSecurityConfigMelExpressionTestCase extends FunctionalTestCase {
     Exception e = flowRunner("cxfClient").withPayload("UnknownPasswordEncoding").runExpectingException();
 
     assertThat(e, is(instanceOf(MessagingException.class)));
-    assertThat(e.getCause(), is(instanceOf(SOAPFaultException.class)));
-    assertThat(e.getMessage(), containsString("Security exception occurred invoking web service"));
+    assertThat(e.getCause().getCause().getCause(), is(instanceOf(SOAPFaultException.class)));
+    assertThat(e.getCause().getCause().getMessage(), containsString("Security exception occurred invoking web service"));
   }
 }
