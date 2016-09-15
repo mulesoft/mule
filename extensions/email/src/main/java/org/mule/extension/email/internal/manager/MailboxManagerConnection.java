@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A connection with a mail server for retrieving emails from an specific folder.
+ * A connection with a mail server for retrieving and managing emails from an specific folder in a mailbox.
  *
  * @since 4.0
  */

@@ -7,6 +7,7 @@
 package org.mule.extension.email.api.predicate;
 
 import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.EmailFlags;
 import org.mule.extension.email.api.ImapEmailAttributes;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -15,6 +16,13 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import java.util.function.Predicate;
 
 /**
+ * Builds a {@link Predicate} which verifies that a {@link ImapEmailAttributes} instance is compliant with a number of criteria.
+ * This builder is stateful and not thread-safe. A new instance should be use per each desired {@link Predicate}.
+ * <p>
+ * This builder is an more specific implementation of a {@link DefaultEmailPredicateBuilder} with the capability to
+ * build a predicate that filter by the {@link EmailFlags} contained in an email returned from an IMAP mailbox
+ * <p>
+ * The class is also given the &quot;imap-matcher&quot; alias to make it DSL/XML friendly.
  *
  * @since 4.0
  */

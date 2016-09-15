@@ -31,7 +31,7 @@ import java.util.function.Predicate;
  * None of the criteria fields are mandatory. If a particular criteria is not specified, then it's simply not applied on the
  * evaluation.
  * <p>
- * The class is also given the &quot;matcher&quot; alias to make it DSL/XML friendly.
+ * The class is also given the &quot;default-matcher&quot; alias to make it DSL/XML friendly.
  *
  * @since 4.0
  */

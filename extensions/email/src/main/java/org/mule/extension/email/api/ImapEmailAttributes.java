@@ -16,7 +16,9 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
- *
+ * Contains all the basic metadata of a received email from an IMAP mailbox, it carries information such as the subject of the email,
+ * the id in the mailbox and the recipients between others but also this attributes carry flags that mark different states of
+ * the email such as SEEN, ANSWERED, DELETED, etc. This flags are represented by an {@link EmailFlags} object.
  *
  * @since 4.0
  */

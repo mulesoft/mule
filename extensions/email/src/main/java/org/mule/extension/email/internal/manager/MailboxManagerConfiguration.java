@@ -11,7 +11,7 @@ import org.mule.extension.email.api.EmailAttributes;
 import javax.mail.Message;
 
 /**
- * Generic contract for configurations that contains operations for retrieving emails.
+ * Generic contract for configurations that contains operations for retrieving and managing emails in a mailbox.
  *
  * @since 4.0
  */
