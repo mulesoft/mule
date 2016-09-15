@@ -76,7 +76,7 @@ public class MuleSecurityManager implements SecurityManager {
           result = provider.authenticate(authentication);
         } catch (Exception e) {
           if (!iter.hasNext()) {
-            throw new UnauthorisedException(CoreMessages.authorizationAttemptFailed(), e);
+            throw new UnauthorisedException(CoreMessages.authorizationAttemptFailed(), e, null);
           }
         }
 

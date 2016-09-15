@@ -25,6 +25,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
 
   private static final String MESSAGE = "message";
   private static final String EXCEPTION = "exception";
+  private static final String ERROR = "error";
   public static final String PAYLOAD = "payload";
   public static final String MESSAGE_PAYLOAD = MESSAGE + "." + PAYLOAD;
   public static final String FLOW_VARS = "flowVars";
@@ -57,7 +58,7 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
 
   @Override
   public boolean isTarget(String name) {
-    return MESSAGE.equals(name) || PAYLOAD.equals(name) || FLOW_VARS.equals(name) || EXCEPTION.equals(name)
+    return MESSAGE.equals(name) || PAYLOAD.equals(name) || FLOW_VARS.equals(name) || EXCEPTION.equals(name) || ERROR.equals(name)
         || SESSION_VARS.equals(name) || MVELExpressionLanguageContext.MULE_MESSAGE_INTERNAL_VARIABLE.equals(name);
   }
 
@@ -82,6 +83,12 @@ public class MessageVariableResolverFactory extends MuleBaseVariableResolverFact
           return new MuleImmutableVariableResolver<>(EXCEPTION, wrapIfNecessary(event, exception), null);
         } else {
           return new MuleImmutableVariableResolver<InternalMessage>(EXCEPTION, null, null);
+        }
+      } else if (ERROR.equals(name)) {
+        if (event.getError().isPresent()) {
+          return new MuleImmutableVariableResolver<>(ERROR, event.getError().get(), null);
+        } else {
+          return new MuleImmutableVariableResolver<>(ERROR, null, null);
         }
       } else if (SESSION_VARS.equals(name)) {
         return new MuleImmutableVariableResolver<Map<String, Object>>(SESSION_VARS,

@@ -6,13 +6,12 @@
  */
 package org.mule.extension.http.internal;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.http.internal.component.ResourceNotFoundException;
 
@@ -35,17 +34,11 @@ public class HttpOperations {
    * @param realm Authentication realm.
    * @param securityProviders The delegate-security-provider to use for authenticating. Use this in case you have multiple
    *        security managers defined in your configuration.
-   * @param statusCodeFlowVar Reference to the flow variable name used for the statusCode attribute of the error-response-builder.
-   * @param headersFlowVar Reference to the flow variable name used for the headersRef attribute of the error-response-builder.
    * @throws MuleException if unauthenticated.
    */
-  public void basicSecurityFilter(String realm, @Optional String securityProviders, Event event,
-                                  @Optional(
-                                      defaultValue = "statusCode") @DisplayName("Status Code - Flow Var Ref") String statusCodeFlowVar,
-                                  @Optional(
-                                      defaultValue = "headers") @DisplayName("Headers - Flow Var Ref") String headersFlowVar)
+  public void basicSecurityFilter(String realm, @Optional String securityProviders, Event event)
       throws MuleException {
-    HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders, statusCodeFlowVar, headersFlowVar);
+    HttpBasicAuthenticationFilter filter = createFilter(realm, securityProviders);
 
     filter.doFilter(event);
   }
@@ -60,10 +53,9 @@ public class HttpOperations {
     return OperationResult.builder(resourceLoader.load(event)).build();
   }
 
-  private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders, String statusCodeFlowVar,
-                                                     String headersFlowVar)
+  private HttpBasicAuthenticationFilter createFilter(String realm, String securityProviders)
       throws InitialisationException {
-    HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter(statusCodeFlowVar, headersFlowVar);
+    HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();
     filter.setRealm(realm);
     filter.setSecurityProviders(securityProviders);
     filter.setMuleContext(muleContext);

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
@@ -22,12 +20,11 @@ public class EncryptionNotSupportedException extends SecurityException {
    */
   private static final long serialVersionUID = -1661059380853528624L;
 
-  public EncryptionNotSupportedException(I18nMessage message, Event event) {
-    super(message, event);
+  public EncryptionNotSupportedException(I18nMessage message) {
+    super(message);
   }
 
-  public EncryptionNotSupportedException(I18nMessage message, Event event, Throwable cause,
-                                         Processor failingMessageProcessor) {
-    super(message, event, cause, failingMessageProcessor);
+  public EncryptionNotSupportedException(I18nMessage message, Throwable cause) {
+    super(message, cause);
   }
 }

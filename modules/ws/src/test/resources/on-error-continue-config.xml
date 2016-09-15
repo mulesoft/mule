@@ -35,8 +35,9 @@
 
         <error-handler>
             <on-error-continue>
-                <set-property propertyName="soapFaultException" value="#[exception]" />
-                <test:assert expression="#[exception.getCause() instanceof org.apache.cxf.binding.soap.SoapFault]" />
+                <set-property propertyName="soapFaultException" value="#[exception.getCause()]" />
+                <test:assert expression="#[exception.getCause().getCause() instanceof org.apache.cxf.binding.soap.SoapFault]" />
+                <set-payload value="#[error.getErrorMessage().getPayload().getValue()]"/>
             </on-error-continue>
         </error-handler>
     </flow>

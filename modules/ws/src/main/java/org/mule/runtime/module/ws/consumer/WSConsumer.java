@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
@@ -192,10 +193,14 @@ public class WSConsumer
 
           if (e.getCause() instanceof DispatchException && e.getCause().getCause() instanceof SoapFault) {
             SoapFault soapFault = (SoapFault) e.getCause().getCause();
-            event = Event.builder(e.getEvent()).message(InternalMessage.builder(e.getEvent().getMessage())
-                .payload(soapFault.getDetail() != null ? soapFault.getDetail() : null).build()).build();
+            org.mule.runtime.api.message.Message errorMessage = e.getEvent().getMessage();
+            if (e.getEvent().getError().isPresent() && e.getEvent().getError().get().getErrorMessage() != null) {
+              errorMessage = e.getEvent().getError().get().getErrorMessage();
+            }
 
-            throw new SoapFaultException(event, soapFault, this);
+            SoapFaultException soapFaultException = new SoapFaultException(soapFault);
+            throw new WrapperErrorMessageAwareException(InternalMessage.builder(errorMessage)
+                .payload(soapFault.getDetail() != null ? soapFault.getDetail() : null).build(), soapFaultException);
           } else {
             throw e;
           }
@@ -426,7 +431,7 @@ public class WSConsumer
   /**
    * Takes the set of CXF attachments from the CxfConstants.ATTACHMENTS invocation properties and sets them as inbound attachments
    * in the Mule Message.
-   * 
+   *
    * @return
    */
   private Event copyAttachmentsResponse(Event event) throws MessagingException {

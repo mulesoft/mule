@@ -9,16 +9,15 @@ package org.mule.runtime.module.cxf.security;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityManager;
 
 public class WebServiceSecurityException extends org.mule.runtime.core.api.security.SecurityException {
 
-  public WebServiceSecurityException(Event event, Throwable cause, Processor failingMessageProcessor,
+  public WebServiceSecurityException(Event event, Throwable cause,
                                      SecurityManager securityManager) {
     super(createStaticMessage("Security exception occurred invoking web service\nEndpoint = "
         + event.getContext().getOriginatingConnectorName() + "\nSecurity provider(s) = " + securityManager.getProviders()
-        + "\nEvent = " + event), event, cause, failingMessageProcessor);
+        + "\nEvent = " + event), cause);
   }
 }
 

@@ -13,10 +13,9 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
@@ -136,7 +135,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
         event = setUnauthenticated(event);
-        throw new UnauthorisedException(authFailedForUser(username), event, e);
+        throw new UnauthorisedException(authFailedForUser(username), e, event.getMessage());
       }
 
       // Authentication success
@@ -154,7 +153,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     } else {
       event = setUnauthenticated(event);
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
-          + header), event);
+          + header), event.getMessage());
     }
   }
 }

@@ -8,11 +8,11 @@ package org.mule.runtime.core.message;
 
 import static org.mule.runtime.core.config.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.core.util.Preconditions.checkState;
-
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.exception.ErrorMessageAwareException;
 
 /**
  * Builder for {@link Error} instances.
@@ -47,11 +47,16 @@ public final class ErrorBuilder {
    * @param e the exception to use from which the error will be created.
    */
   private ErrorBuilder(Throwable e) {
-    this.exception = e;
-    String exceptionDescription = e.getMessage() != null ? e.getMessage() : "unknown description";
+    Throwable exception = e;
+    if (e instanceof ErrorMessageAwareException) {
+      exception = ((ErrorMessageAwareException) e).getException();
+      this.errorMessage = ((ErrorMessageAwareException) e).getErrorMessage();
+    }
+    this.exception = exception;
+    String exceptionDescription = exception.getMessage() != null ? exception.getMessage() : "unknown description";
     this.description = exceptionDescription;
     this.detailedDescription = exceptionDescription;
-    MuleException muleRoot = getRootMuleException(exception);
+    MuleException muleRoot = getRootMuleException(this.exception);
     if (muleRoot != null && muleRoot.getMessage() != null) {
       this.description = muleRoot.getMessage();
     }

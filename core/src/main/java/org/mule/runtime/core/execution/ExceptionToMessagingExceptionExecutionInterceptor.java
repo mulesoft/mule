@@ -6,19 +6,23 @@
  */
 package org.mule.runtime.core.execution;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.AnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.ComponentIdentifier;
+import org.mule.runtime.core.exception.ErrorMessageAwareException;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.ErrorBuilder;
 
 import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * Replace any exception thrown with a MessagingException
@@ -35,28 +39,29 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
       return messageProcessor.process(event);
     } catch (Exception exception) {
       MessagingException messagingException;
-      if (!(exception instanceof MessagingException) || !((MessagingException) exception).getEvent().getError().isPresent()) {
-        ErrorType errorType;
-        errorType = getErrorTypeFromFailingProcessor(messageProcessor, exception);
-        if (exception instanceof MessagingException) {
-          messagingException = (MessagingException) exception;
-        } else {
-          messagingException = new MessagingException(event, exception, messageProcessor);
-        }
-        Event exceptionEvent = messagingException.getEvent();
-        event = Event.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
-        messagingException.setProcessedEvent(event);
-      } else {
+      if (exception instanceof MessagingException) {
+        //Use same exception, but make sure whether a new error is needed
         messagingException = (MessagingException) exception;
-        Event exceptionEvent = messagingException.getEvent();
+        Exception causeException = exception.getCause() != null ? (Exception) exception.getCause() : exception;
+        Optional<Error> error = messagingException.getEvent().getError();
         // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
         // messagingException.causedExactlyBy(..) condition.
-        if (!exceptionEvent.getError().isPresent() || !(exceptionEvent.getError().get().equals(exception)
-            || messagingException.causedExactlyBy(exceptionEvent.getError().get().getException().getClass()))) {
-          ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, exception);
-          event = Event.builder(exceptionEvent).error(ErrorBuilder.builder(exception).errorType(errorType).build()).build();
+        if (!error.isPresent() || !error.get().getException().equals(causeException)
+          || messagingException.causedExactlyBy(error.get().getException().getClass())) {
+          ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, causeException);
+          event = Event.builder(messagingException.getEvent()).error(ErrorBuilder.builder(causeException).errorType(errorType).build()).build();
           messagingException.setProcessedEvent(event);
         }
+      } else {
+        //Create a ME and an error, both using the exception
+        Exception causeException = exception instanceof ErrorMessageAwareException
+          ? ((ErrorMessageAwareException) exception).getException()
+          : exception;
+        messagingException = new MessagingException(event, causeException, messageProcessor);
+        ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, causeException);
+        Event exceptionEvent = messagingException.getEvent();
+        event = Event.builder(exceptionEvent).error(ErrorBuilder.builder(causeException).errorType(errorType).build()).build();
+        messagingException.setProcessedEvent(event);
       }
 
       if (messagingException.getFailingMessageProcessor() == null) {
@@ -71,12 +76,15 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
 
   private ErrorType getErrorTypeFromFailingProcessor(Processor messageProcessor, Exception exception) {
     ErrorType errorType;
+    Exception causeException =
+        exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getException()
+            : exception;
     if (AnnotatedObject.class.isAssignableFrom(messageProcessor.getClass())) {
       ComponentIdentifier componentIdentifier =
           (ComponentIdentifier) ((AnnotatedObject) messageProcessor).getAnnotation(ComponentIdentifier.ANNOTATION_NAME);
-      errorType = errorTypeLocator.lookupComponentErrorType(componentIdentifier, exception);
+      errorType = errorTypeLocator.lookupComponentErrorType(componentIdentifier, causeException);
     } else {
-      errorType = errorTypeLocator.lookupErrorType(exception);
+      errorType = errorTypeLocator.lookupErrorType(causeException);
     }
     return errorType;
   }

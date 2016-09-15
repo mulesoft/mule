@@ -9,6 +9,7 @@ package org.mule.runtime.module.ws.functional;
 
 import static java.util.Collections.emptyMap;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.mule.runtime.module.ws.functional.SoapFaultCodeMatcher.hasFaultCode;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -53,8 +54,8 @@ public abstract class AbstractWSConsumerFunctionalTestCase extends FunctionalTes
 
   protected void assertSoapFault(String flowName, String message, Map<String, Serializable> properties, String expectedFaultCode)
       throws Exception {
-    expectedException.expect(SoapFaultException.class);
-    expectedException.expect(hasFaultCode(expectedFaultCode));
+    expectedException.expectCause(instanceOf(SoapFaultException.class));
+    expectedException.expectCause(hasFaultCode(expectedFaultCode));
     flowRunner(flowName).withPayload(message).withInboundProperties(properties).run().getMessage();
   }
 

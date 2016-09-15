@@ -10,11 +10,12 @@ import static org.mule.runtime.core.config.ExceptionHelper.getTransportErrorMapp
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.AsyncResponseFlowProcessingPhaseTemplate;
 import org.mule.runtime.core.execution.ResponseCompletionCallback;
@@ -26,6 +27,7 @@ import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallba
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -144,7 +146,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
                                           ResponseCompletionCallback responseCompletationCallback)
       throws MuleException {
     // For now let's use the HTTP transport exception mapping since makes sense and the gateway depends on it.
-    Throwable cause = messagingException instanceof SecurityException ? messagingException : messagingException.getCause();
+    Throwable cause = messagingException.getCause();
     String exceptionStatusCode =
         getTransportErrorMapping(HTTP.getScheme(), cause.getClass(), responseBuilder.getMuleContext());
     Integer statusCodeFromException =
@@ -155,10 +157,21 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
             .setReasonPhrase(messagingException.getMessage());
     addThrottlingHeaders(failureResponseBuilder);
     Event event = messagingException.getEvent();
+    Message errorMessage = resolveErrorMessage(event);
     event = Event.builder(event)
-        .message(InternalMessage.builder(event.getMessage()).payload(messagingException.getMessage()).build()).build();
+        .message(InternalMessage.builder(errorMessage).payload(messagingException.getMessage()).build()).build();
     final HttpResponse response = errorResponseBuilder.build(failureResponseBuilder, event);
     responseReadyCallback.responseReady(response, getResponseFailureCallback(responseCompletationCallback, event));
+  }
+
+  private Message resolveErrorMessage(Event event) {
+    Optional<Error> error = event.getError();
+    if (error.isPresent() && error.get().getErrorMessage() != null
+      && "SECURITY".equals(error.get().getErrorType().getIdentifier())) {
+      return error.get().getErrorMessage();
+    } else {
+      return event.getMessage();
+    }
   }
 
   @Override
