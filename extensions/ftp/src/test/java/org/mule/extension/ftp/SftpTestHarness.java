@@ -6,22 +6,16 @@
  */
 package org.mule.extension.ftp;
 
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.functional.util.sftp.SftpServer.PASSWORD;
-import static org.mule.functional.util.sftp.SftpServer.USERNAME;
-import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
-import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.mule.extension.AbstractFtpTestHarness;
 import org.mule.extension.FtpTestHarness;
+import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClientFactory;
 import org.mule.functional.util.sftp.SftpServer;
-import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayInputStream;
@@ -30,8 +24,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.junit.rules.TemporaryFolder;
-import org.junit.rules.TestRule;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mule.extension.file.common.api.FileWriteMode.APPEND;
+import static org.mule.extension.file.common.api.FileWriteMode.OVERWRITE;
+import static org.mule.functional.util.sftp.SftpServer.PASSWORD;
+import static org.mule.functional.util.sftp.SftpServer.USERNAME;
 
 /**
  * Implementation of {@link FtpTestHarness} for classic SFTP connections
@@ -182,8 +182,16 @@ public class SftpTestHarness extends AbstractFtpTestHarness {
    */
   @Override
   public String[] getFileList(String path) throws Exception {
-    List<String> files = sftpClient.list(path).stream().map(FileAttributes::getPath).collect(toList());
+    List<String> files = sftpClient.list(path).stream().map(FileAttributes::getName).collect(toList());
     return files.toArray(new String[files.size()]);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int getServerPort() throws Exception {
+    return sftpPort.getNumber();
   }
 
   /**
