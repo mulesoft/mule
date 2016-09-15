@@ -243,7 +243,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                     failureResponseBuilder = new HttpResponseBuilder()
                         .setStatusCode(attributes.getStatusCode())
                         .setReasonPhrase(attributes.getReasonPhrase());
-                    attributes.getHeaders().forEach((name, value) -> failureResponseBuilder.addHeader(name, value));
+                    attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
                     exceptionEvent = Event.builder(event).message((InternalMessage) errorMessage).build();
                   } else {
                     failureResponseBuilder = createDefaultFailureResponseBuilder(messagingException);

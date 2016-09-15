@@ -167,7 +167,7 @@ public class HttpMessageProcessorTemplate implements AsyncResponseFlowProcessing
   private Message resolveErrorMessage(Event event) {
     Optional<Error> error = event.getError();
     if (error.isPresent() && error.get().getErrorMessage() != null
-      && "SECURITY".equals(error.get().getErrorType().getIdentifier())) {
+        && "SECURITY".equals(error.get().getErrorType().getIdentifier())) {
       return error.get().getErrorMessage();
     } else {
       return event.getMessage();
