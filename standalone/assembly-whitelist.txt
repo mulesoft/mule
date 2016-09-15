@@ -133,7 +133,6 @@
 /mule-standalone-${productVersion}/lib/mule/mule-module-cxf-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-spring-support-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-extensions-support-${productVersion}.jar
-/mule-standalone-${productVersion}/lib/mule/mule-module-file-extension-common-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-http-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jaas-${productVersion}.jar
 /mule-standalone-${productVersion}/lib/mule/mule-module-jbossts-${productVersion}.jar
@@ -167,6 +166,7 @@
 /mule-standalone-${productVersion}/plugins
 /mule-standalone-${productVersion}/plugins/mule-module-db-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-email-${productVersion}.zip
+/mule-standalone-${productVersion}/plugins/mule-module-file-extension-common-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-file-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-ftp-${productVersion}.zip
 /mule-standalone-${productVersion}/plugins/mule-module-sockets-${productVersion}.zip
