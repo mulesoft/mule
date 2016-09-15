@@ -47,6 +47,11 @@ public class TestMultiLevelKeyResolver implements MetadataKeysResolver, Metadata
 
 
   @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
+
+  @Override
   public MetadataType getContentMetadata(MetadataContext context, LocationKey key)
       throws MetadataResolvingException, ConnectionException {
     checkLocationKey(key);

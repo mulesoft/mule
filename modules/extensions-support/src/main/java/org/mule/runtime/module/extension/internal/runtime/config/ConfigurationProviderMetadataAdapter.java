@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.config;
 import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
+import static org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver.NULL_CATEGORY_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -29,7 +29,6 @@ import org.mule.runtime.extension.api.introspection.ComponentModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataEnrichableModel;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.List;
@@ -79,9 +78,9 @@ public final class ConfigurationProviderMetadataAdapter extends StaticConfigurat
       MetadataKeysResolver keysResolver =
           ((MetadataEnrichableModel) component).getMetadataResolverFactory().getKeyResolver();
 
-      String resolverName = getAliasName(keysResolver.getClass());
-      if (!(keysResolver instanceof NullMetadataResolver) && !keysBuilder.containsResolver(resolverName)) {
-        keysBuilder.add(resolverName, keysResolver.getMetadataKeys(metadataContext));
+      String categoryName = keysResolver.getCategoryName();
+      if (!NULL_CATEGORY_NAME.equals(categoryName) && !keysBuilder.containsCategory(categoryName)) {
+        keysBuilder.add(categoryName, keysResolver.getMetadataKeys(metadataContext));
       }
     }
   }

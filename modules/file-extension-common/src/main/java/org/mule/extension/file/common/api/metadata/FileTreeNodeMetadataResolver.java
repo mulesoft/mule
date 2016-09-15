@@ -36,4 +36,9 @@ public class FileTreeNodeMetadataResolver implements MetadataOutputResolver {
 
     return treeNode.build();
   }
+
+  @Override
+  public String getCategoryName() {
+    return "TreeNodeCategory";
+  }
 }

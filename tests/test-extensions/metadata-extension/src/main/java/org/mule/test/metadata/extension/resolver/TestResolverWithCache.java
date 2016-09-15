@@ -38,6 +38,11 @@ public class TestResolverWithCache
   public static final String BRAND_VALUE = "Nikdidas";
 
   @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
+
+  @Override
   public MetadataType getContentMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
     MetadataCache cache = context.getCache();

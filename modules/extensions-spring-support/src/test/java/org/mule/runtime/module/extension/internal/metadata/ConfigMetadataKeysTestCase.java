@@ -8,15 +8,12 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.metadata.ConfigurationId;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
-import org.mule.test.vegan.extension.AppleKeyResolver;
-import org.mule.test.vegan.extension.HarvestAppleKeyResolver;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Map;
@@ -52,13 +49,22 @@ public class ConfigMetadataKeysTestCase extends ExtensionFunctionalTestCase {
     assertThat(metadataKeysResult.isSuccess(), is(true));
     final Map<String, Set<MetadataKey>> metadataKeys = getKeyMapFromContainer(metadataKeysResult);
     assertThat(metadataKeys.size(), is(2));
-    assertThat(metadataKeys.get(getAliasName(AppleKeyResolver.class)).size(), is(1));
-    assertThat(metadataKeys.get(getAliasName(HarvestAppleKeyResolver.class)).size(), is(1));
+    assertThat(metadataKeys.get("AppleKeys").size(), is(1));
+    assertThat(metadataKeys.get("HarvestedKeys").size(), is(1));
+  }
+
+  @Test
+  public void getMetadataKeysForConfigWithoutResolvers() throws Exception {
+    final MetadataResult<MetadataKeysContainer> metadataKeysResult =
+        metadataManager.getMetadataKeys(new ConfigurationId("banana"));
+    assertThat(metadataKeysResult.isSuccess(), is(true));
+    final Map<String, Set<MetadataKey>> metadataKeys = getKeyMapFromContainer(metadataKeysResult);
+    assertThat(metadataKeys.isEmpty(), is(true));
   }
 
   private Map<String, Set<MetadataKey>> getKeyMapFromContainer(MetadataResult<MetadataKeysContainer> metadataKeysResult) {
     return metadataKeysResult.get()
-        .getResolvers()
+        .getCategories()
         .stream()
         .collect(Collectors.toMap(resolver -> resolver, resolver -> metadataKeysResult.get().getKeys(resolver).get()));
   }

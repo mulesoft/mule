@@ -15,8 +15,10 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataAttributesResolver;
+import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataResolverFactory;
 import org.mule.runtime.core.internal.metadata.NullMetadataResolverFactory;
@@ -29,6 +31,8 @@ import org.mule.runtime.extension.api.introspection.source.RuntimeSourceModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -65,6 +69,37 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     @Override
     public MetadataType getAttributesMetadata(MetadataContext context, String key)
         throws MetadataResolvingException, ConnectionException {
+      return null;
+    }
+
+    @Override
+    public String getCategoryName() {
+      return "SimpleOutputResolver";
+    }
+  }
+
+  public static class DifferentCategoryResolver implements MetadataKeysResolver {
+
+    @Override
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+      return emptySet();
+    }
+
+    @Override
+    public String getCategoryName() {
+      return "NotSimpleOutputResolver";
+    }
+  }
+
+  public static class EmptyCategoryName implements MetadataKeysResolver {
+
+    @Override
+    public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+      return emptySet();
+    }
+
+    @Override
+    public String getCategoryName() {
       return null;
     }
   }
@@ -142,6 +177,22 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
     when(sourceModel.getOutput()).thenReturn(new ImmutableOutputModel("", dictionaryType, false, emptySet()));
     when(sourceModel.getMetadataResolverFactory())
         .thenReturn(new DefaultMetadataResolverFactory(NullMetadataResolver.class, NullMetadataResolver.class,
+                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    validator.validate(extensionModel);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void metadataResolverWithDifferentCategories() {
+    when(sourceModel.getMetadataResolverFactory())
+        .thenReturn(new DefaultMetadataResolverFactory(DifferentCategoryResolver.class, NullMetadataResolver.class,
+                                                       SimpleOutputResolver.class, SimpleOutputResolver.class));
+    validator.validate(extensionModel);
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void metadataResolverWithEmptyCategoryName() {
+    when(sourceModel.getMetadataResolverFactory())
+        .thenReturn(new DefaultMetadataResolverFactory(EmptyCategoryName.class, NullMetadataResolver.class,
                                                        SimpleOutputResolver.class, SimpleOutputResolver.class));
     validator.validate(extensionModel);
   }

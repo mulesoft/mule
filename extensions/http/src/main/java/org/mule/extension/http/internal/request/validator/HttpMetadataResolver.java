@@ -43,6 +43,11 @@ public class HttpMetadataResolver implements Initialisable, MetadataKeysResolver
   private Set<MetadataKey> keys;
 
   @Override
+  public String getCategoryName() {
+    return "HttpCategory";
+  }
+
+  @Override
   public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     return keys;
   }
@@ -66,5 +71,4 @@ public class HttpMetadataResolver implements Initialisable, MetadataKeysResolver
     // Create MetadataKeys
     types.keySet().stream().forEach(aKey -> keys.add(newKey(aKey).build()));
   }
-
 }

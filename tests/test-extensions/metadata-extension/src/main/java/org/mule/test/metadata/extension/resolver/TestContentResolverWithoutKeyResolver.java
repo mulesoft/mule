@@ -19,4 +19,9 @@ public class TestContentResolverWithoutKeyResolver implements MetadataContentRes
       throws MetadataResolvingException, ConnectionException {
     return TestMetadataResolverUtils.getMetadata(key);
   }
+
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
 }

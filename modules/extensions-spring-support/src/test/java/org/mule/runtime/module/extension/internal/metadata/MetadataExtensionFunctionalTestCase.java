@@ -196,6 +196,6 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   }
 
   protected Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
-    return metadataKeysContainer.getKeys(metadataKeysContainer.getResolvers().iterator().next()).get();
+    return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();
   }
 }

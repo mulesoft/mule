@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.metadata;
 
 import static com.google.common.collect.ImmutableMap.copyOf;
 import static java.lang.String.format;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_METADATA_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.metadata.ComponentId;
@@ -51,6 +53,7 @@ import javax.inject.Inject;
 public class MuleMetadataManager implements MetadataManager, Initialisable {
 
   private static final String PROCESSOR_NOT_FOUND = "Processor doesn't exist in the given index [%s]";
+  private static final String FLOW_NOT_FOUND = "Flow [%s] doesn't exist";
   private static final String SOURCE_NOT_FOUND = "Flow doesn't contain a message source";
   private static final String COMPONENT_NOT_METADATA_PROVIDER =
       "Component [%s] is not a MetadataProvider or MetadataEntityProvider, no information available";
@@ -104,8 +107,6 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
    */
   @Override
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(ComponentId componentId) {
-
-
     return exceptionHandledMetadataFetch(() -> findMetadataKeyProvider(componentId).getMetadataKeys(),
                                          EXCEPTION_RESOLVING_METADATA_KEYS);
   }
@@ -170,7 +171,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     try {
       return producer.get();
     } catch (InvalidComponentIdException e) {
-      return failure(e);
+      return failure(e, e.getFailureCode());
     } catch (Exception e) {
       return failure(null, format("%s: %s", failureMessage, e.getMessage()), e);
     }
@@ -181,7 +182,8 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
       return componentId.getFlowName().isPresent() ? (MetadataKeyProvider) lookupComponent(componentId)
           : lookupConfig(componentId.getComponentPath());
     } catch (ClassCastException e) {
-      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_KEY_PROVIDER, componentId)));
+      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_KEY_PROVIDER, componentId)),
+                                            NO_DYNAMIC_METADATA_AVAILABLE);
     }
   }
 
@@ -189,7 +191,8 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     try {
       return (MetadataProvider) lookupComponent(componentId);
     } catch (ClassCastException e) {
-      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_PROVIDER, componentId)));
+      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_PROVIDER, componentId)),
+                                            NO_DYNAMIC_METADATA_AVAILABLE);
     }
   }
 
@@ -197,7 +200,8 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     try {
       return (EntityMetadataProvider) lookupComponent(componentId);
     } catch (ClassCastException e) {
-      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_PROVIDER, componentId)));
+      throw new InvalidComponentIdException(createStaticMessage(format(COMPONENT_NOT_METADATA_PROVIDER, componentId)),
+                                            NO_DYNAMIC_METADATA_AVAILABLE);
     }
   }
 
@@ -205,19 +209,20 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     // FIXME MULE-9496 : Use flow paths to obtain Processors
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct(componentId.getFlowName().get());
     if (flow == null) {
-      throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())));
+      throw new InvalidComponentIdException(createStaticMessage(format(FLOW_NOT_FOUND, componentId.getFlowName().get())),
+                                            COMPONENT_NOT_FOUND);
     }
     if (!componentId.getComponentPath().equals("-1")) {
       try {
         return flow.getMessageProcessors().get(Integer.parseInt(componentId.getComponentPath()));
       } catch (IndexOutOfBoundsException | NumberFormatException e) {
         throw new InvalidComponentIdException(createStaticMessage(format(PROCESSOR_NOT_FOUND, componentId.getComponentPath())),
-                                              e);
+                                              e, COMPONENT_NOT_FOUND);
       }
     } else {
       final MessageSource messageSource = flow.getMessageSource();
       if (messageSource == null) {
-        throw new InvalidComponentIdException(createStaticMessage(SOURCE_NOT_FOUND));
+        throw new InvalidComponentIdException(createStaticMessage(SOURCE_NOT_FOUND), COMPONENT_NOT_FOUND);
       }
       return messageSource;
     }
@@ -228,7 +233,7 @@ public class MuleMetadataManager implements MetadataManager, Initialisable {
     if (configurationProvider != null) {
       return configurationProvider;
     } else {
-      throw new InvalidComponentIdException(createStaticMessage(format(CONFIG_NOT_FOUND, configName)));
+      throw new InvalidComponentIdException(createStaticMessage(format(CONFIG_NOT_FOUND, configName)), COMPONENT_NOT_FOUND);
     }
   }
 

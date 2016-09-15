@@ -45,6 +45,11 @@ public class SocketMetadataResolver
       ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(getClass().getClassLoader());
 
   @Override
+  public String getCategoryName() {
+    return "SocketCategory";
+  }
+
+  @Override
   public MetadataType getOutputMetadata(MetadataContext metadataContext, String key)
       throws MetadataResolvingException, ConnectionException {
     return valueOf(key) ? BaseTypeBuilder.create(MetadataFormat.JAVA).binaryType().build()

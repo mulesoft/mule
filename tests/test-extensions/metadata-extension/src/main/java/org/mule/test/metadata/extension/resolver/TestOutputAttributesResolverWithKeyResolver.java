@@ -35,4 +35,9 @@ public class TestOutputAttributesResolverWithKeyResolver
       throws MetadataResolvingException, ConnectionException {
     return TestMetadataResolverUtils.getMetadata(key);
   }
+
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
+  }
 }

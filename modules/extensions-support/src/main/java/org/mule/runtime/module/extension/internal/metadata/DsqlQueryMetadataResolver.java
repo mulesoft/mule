@@ -44,6 +44,14 @@ final class DsqlQueryMetadataResolver implements MetadataOutputResolver {
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getCategoryName() {
+    return "DsqlQueryCategory";
+  }
+
+  /**
    * Automatically resolves the output metadata for the {@link DsqlQuery}.
    * <p>
    * The base entity is resolved using the component {@link QueryEntityResolver} and assuming the key of the entity is the DSQL

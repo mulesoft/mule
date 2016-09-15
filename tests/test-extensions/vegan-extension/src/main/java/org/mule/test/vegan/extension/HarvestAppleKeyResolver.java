@@ -23,4 +23,9 @@ public class HarvestAppleKeyResolver implements MetadataKeysResolver {
   public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     return ImmutableSet.of(MetadataKeyBuilder.newKey("HARVESTED").build());
   }
+
+  @Override
+  public String getCategoryName() {
+    return "HarvestedKeys";
+  }
 }
