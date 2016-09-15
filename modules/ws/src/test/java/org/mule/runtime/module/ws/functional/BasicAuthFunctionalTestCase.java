@@ -9,12 +9,15 @@ package org.mule.runtime.module.ws.functional;
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.module.ws.consumer.SoapFaultException;
 
 import java.util.Arrays;
@@ -47,10 +50,10 @@ public class BasicAuthFunctionalTestCase extends AbstractWSConsumerFunctionalTes
   public void requestWithInvalidCredentialsThrowsException() throws Exception {
     // The unauthorized response contains an error message in the payload (which is not a SOAP Fault), then WSConsumer
     // should fail to parse the response and throw a SoapFaultException because of this.
-    SoapFaultException e =
-        (SoapFaultException) flowRunner("clientInvalidCredentials").withPayload(ECHO_REQUEST).runExpectingException();
-    Event event = e.getEvent();
-    assertThat(event.getMessage().<String>getInboundProperty(HTTP_STATUS_PROPERTY),
+    MessagingException e = flowRunner("clientInvalidCredentials").withPayload(ECHO_REQUEST).runExpectingException();
+    assertThat(e, hasCause(instanceOf(SoapFaultException.class)));
+    InternalMessage errorMessage = (InternalMessage) e.getEvent().getError().get().getErrorMessage();
+    assertThat(errorMessage.<String>getInboundProperty(HTTP_STATUS_PROPERTY),
                equalTo(String.valueOf(UNAUTHORIZED.getStatusCode())));
   }
 

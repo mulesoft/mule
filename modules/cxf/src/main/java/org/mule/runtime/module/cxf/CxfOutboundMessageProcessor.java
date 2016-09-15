@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
+import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
@@ -137,7 +138,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     }
   }
 
-  private MuleException wrapException(Event event, Throwable ex, boolean alwaysReturnMessagingException) {
+  private MuleException wrapException(Event event, Throwable ex) {
     if (ex instanceof MessagingException) {
       return (MessagingException) ex;
     }
@@ -146,7 +147,26 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       Fault fault = (Fault) ex;
       if (fault.getCause() instanceof MuleException) {
         MuleException muleException = (MuleException) fault.getCause();
-        return alwaysReturnMessagingException ? new MessagingException(event, muleException, this) : muleException;
+        return muleException;
+      }
+      DispatchException dispatchException = new DispatchException(createStaticMessage(fault.getMessage()), this, fault);
+      return new WrapperErrorMessageAwareException(event.getMessage(), dispatchException);
+    }
+    DispatchException dispatchException =
+        new DispatchException(createStaticMessage(ExceptionHelper.getRootException(ex).getMessage()), this, ex);
+    return new WrapperErrorMessageAwareException(event.getMessage(), dispatchException);
+  }
+
+  private MessagingException wrapToMessagingException(Event event, Throwable ex) {
+    if (ex instanceof MessagingException) {
+      return (MessagingException) ex;
+    }
+    if (ex instanceof Fault) {
+      // Because of CXF API, MuleExceptions can be wrapped in a Fault, in that case we should return the mule exception
+      Fault fault = (Fault) ex;
+      if (fault.getCause() instanceof MuleException) {
+        MuleException muleException = (MuleException) fault.getCause();
+        return new MessagingException(event, muleException, this);
       }
       DispatchException dispatchException = new DispatchException(createStaticMessage(fault.getMessage()), this, fault);
       return new MessagingException(event, dispatchException);
@@ -154,10 +174,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     DispatchException dispatchException =
         new DispatchException(createStaticMessage(ExceptionHelper.getRootException(ex).getMessage()), this, ex);
     return new MessagingException(event, dispatchException);
-  }
-
-  private MessagingException wrapException(Event event, Throwable ex) {
-    return (MessagingException) wrapException(event, ex, true);
   }
 
   /**
@@ -193,7 +209,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         Throwable ex = e.getTargetException();
 
         if (ex != null && ex.getMessage().contains("Security")) {
-          throw new WebServiceSecurityException(event, e, this, muleContext.getSecurityManager());
+          throw new WebServiceSecurityException(event, e, muleContext.getSecurityManager());
         } else {
           throw e;
         }
@@ -204,7 +220,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
       return buildResponseMessage(event, muleRes, objResponse);
     } catch (Exception e) {
-      throw wrapException(event, e, false);
+      throw wrapException(event, e);
     }
   }
 
@@ -213,7 +229,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     try {
       bop = getOperation(event);
     } catch (Exception e) {
-      throw wrapException(event, e, false);
+      throw wrapException(event, e);
     }
 
     Map<String, Object> props = getInovcationProperties(event);
@@ -256,7 +272,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
           @Override
           public void handleException(Map<String, Object> ctx, Throwable ex) {
-            event.getReplyToHandler().processExceptionReplyTo(wrapException(responseHolder.value, ex), null);
+            event.getReplyToHandler().processExceptionReplyTo(wrapToMessagingException(responseHolder.value, ex), null);
           }
         }, bop, getArgs(event), ctx, exchange);
         return NonBlockingVoidMuleEvent.getInstance();
@@ -265,7 +281,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return buildResponseMessage(event, (Event) exchange.get(CxfConstants.MULE_EVENT), response);
       }
     } catch (Exception e) {
-      throw wrapException((Event) exchange.get(CxfConstants.MULE_EVENT), e, false);
+      throw wrapException((Event) exchange.get(CxfConstants.MULE_EVENT), e);
     }
   }
 

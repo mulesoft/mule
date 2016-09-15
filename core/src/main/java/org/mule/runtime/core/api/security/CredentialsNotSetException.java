@@ -19,12 +19,12 @@ public class CredentialsNotSetException extends UnauthorisedException {
    */
   private static final long serialVersionUID = -6271648179641734580L;
 
-  public CredentialsNotSetException(I18nMessage message, Event event) {
-    super(message, event);
+  public CredentialsNotSetException(I18nMessage message) {
+    super(message);
   }
 
-  public CredentialsNotSetException(I18nMessage message, Event event, Throwable cause) {
-    super(message, event, cause);
+  public CredentialsNotSetException(I18nMessage message, Throwable cause) {
+    super(message, cause);
   }
 
   public CredentialsNotSetException(Event event, SecurityContext context, SecurityFilter filter) {

@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.core.api.security;
 
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authDeniedOnEndpoint;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authSetButNoContext;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 
@@ -26,28 +24,15 @@ public class UnauthorisedException extends SecurityException {
   private static final long serialVersionUID = -6664384216189042673L;
 
   public UnauthorisedException(I18nMessage message) {
-    super(message, getCurrentEvent());
+    super(message);
   }
 
   public UnauthorisedException(I18nMessage message, Throwable cause) {
-    super(message, getCurrentEvent(), cause);
-  }
-
-  public UnauthorisedException(I18nMessage message, Event event) {
-    super(message, event);
-  }
-
-  public UnauthorisedException(I18nMessage message, Event event, Throwable cause) {
-    super(message, event, cause);
+    super(message, cause);
   }
 
   public UnauthorisedException(Event event, SecurityContext context, SecurityFilter filter) {
-    super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter), event);
-  }
-
-  @Deprecated
-  public UnauthorisedException(Event event, SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
-    super(constructMessage(context, originatingConnectorName, filter), event);
+    super(constructMessage(context, event.getContext().getOriginatingConnectorName(), filter));
   }
 
   private static I18nMessage constructMessage(SecurityContext context, String originatingConnectorName, SecurityFilter filter) {
@@ -60,4 +45,5 @@ public class UnauthorisedException extends SecurityException {
     m.setNextMessage(authDeniedOnEndpoint(originatingConnectorName));
     return m;
   }
+
 }

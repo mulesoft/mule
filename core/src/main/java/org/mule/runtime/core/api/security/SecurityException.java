@@ -6,25 +6,20 @@
  */
 package org.mule.runtime.core.api.security;
 
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 
 /**
  * <code>SecurityException</code> is a generic security exception
  */
-public abstract class SecurityException extends MessagingException {
+public abstract class SecurityException extends MuleException {
 
-  protected SecurityException(I18nMessage message, Event event) {
-    super(message, event);
+  protected SecurityException(I18nMessage message) {
+    super(message);
   }
 
-  protected SecurityException(I18nMessage message, Event event, Throwable cause) {
-    super(message, event, cause);
+  protected SecurityException(I18nMessage message, Throwable cause) {
+    super(message, cause);
   }
 
-  protected SecurityException(I18nMessage message, Event event, Throwable cause, Processor failingMessageProcessor) {
-    super(message, event, cause, failingMessageProcessor);
-  }
 }

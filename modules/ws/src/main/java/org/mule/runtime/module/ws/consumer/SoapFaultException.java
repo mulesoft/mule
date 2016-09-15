@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.module.ws.consumer;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.exception.MessagingException;
 
 import javax.xml.namespace.QName;
 
@@ -19,14 +17,14 @@ import org.w3c.dom.Element;
 /**
  * Exception thrown by the Web Services Consumer when processing a SOAP fault. The exception contains the details about the fault.
  */
-public class SoapFaultException extends MessagingException {
+public class SoapFaultException extends MuleException {
 
   private final QName faultCode;
   private final QName subCode;
   private final Element detail;
 
-  public SoapFaultException(Event event, SoapFault soapFault, Processor failingMessageProcessor) {
-    super(CoreMessages.createStaticMessage(soapFault.getMessage()), event, soapFault, failingMessageProcessor);
+  public SoapFaultException(SoapFault soapFault) {
+    super(CoreMessages.createStaticMessage(soapFault.getMessage()), soapFault);
     this.faultCode = soapFault.getFaultCode();
     this.subCode = soapFault.getSubCode();
     this.detail = soapFault.getDetail();

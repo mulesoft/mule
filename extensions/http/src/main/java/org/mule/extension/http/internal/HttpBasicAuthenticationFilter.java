@@ -9,15 +9,16 @@ package org.mule.extension.http.internal;
 import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.WWW_AUTHENTICATE;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpResponseAttributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.security.Authentication;
 import org.mule.runtime.core.api.security.CryptoFailureException;
 import org.mule.runtime.core.api.security.EncryptionStrategyNotFoundException;
@@ -30,9 +31,8 @@ import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeExcepti
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,19 +47,12 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
   private String realm;
 
   private boolean realmRequired = true;
-  private final String headersFlowVar;
-  private final String statusCodeFlowVar;
 
   /**
    * Creates a filter based on the HTTP listener error response builder status code and headers configuration.
-   *
-   * @param statusCodeFlowVar The flow variable name used to set the HTTP response status code.
-   * @param headersFlowVar The flow variable name used to set the HTTP response headers.
    */
-  public HttpBasicAuthenticationFilter(String statusCodeFlowVar, String headersFlowVar) {
+  public HttpBasicAuthenticationFilter() {
     super();
-    this.statusCodeFlowVar = statusCodeFlowVar;
-    this.headersFlowVar = headersFlowVar;
   }
 
   @Override
@@ -94,20 +87,21 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
   }
 
-  protected Event setUnauthenticated(Event event) {
+  protected Event setUnauthenticated(Event event, InternalMessage message) {
+    return Event.builder(event).message(message).build();
+  }
+
+  private Message createUnauthenticatedMessage(Message message) {
     String realmHeader = "Basic realm=";
     if (realm != null) {
       realmHeader += "\"" + realm + "\"";
     }
-    Map<String, String> headers = getVariableValueOrNull(headersFlowVar, event);
-    Builder builder = Event.builder(event);
-    if (headers == null) {
-      headers = new HashMap<>();
-      builder.addVariable(headersFlowVar, headers);
-    }
+    ParameterMap headers = new ParameterMap();
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    builder.addVariable(statusCodeFlowVar, UNAUTHORIZED.getStatusCode());
-    return builder.build();
+    return Message.builder(message).attributes(new HttpResponseAttributes(UNAUTHORIZED.getStatusCode(),
+                                                                          UNAUTHORIZED.getReasonPhrase(),
+                                                                          headers))
+        .build();
   }
 
   /**
@@ -151,8 +145,7 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
         if (logger.isDebugEnabled()) {
           logger.debug("Authentication request for user: " + username + " failed: " + e.toString());
         }
-        event = setUnauthenticated(event);
-        throw new UnauthorisedException(authFailedForUser(username), event, e);
+        throw new BasicUnauthorisedException(authFailedForUser(username), e, createUnauthenticatedMessage(event.getMessage()));
       }
 
       if (logger.isDebugEnabled()) {
@@ -164,12 +157,11 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
       event.getSession().setSecurityContext(context);
       return event;
     } else if (header == null) {
-      event = setUnauthenticated(event);
-      throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);
+      event = setUnauthenticated(event, (InternalMessage) createUnauthenticatedMessage(event.getMessage()));
+      throw new BasicUnauthorisedException(event, event.getSession().getSecurityContext(), this);
     } else {
-      event = setUnauthenticated(event);
       throw new UnsupportedAuthenticationSchemeException(createStaticMessage("Http Basic filter doesn't know how to handle header "
-          + header), event);
+          + header), createUnauthenticatedMessage(event.getMessage()));
     }
   }
 }

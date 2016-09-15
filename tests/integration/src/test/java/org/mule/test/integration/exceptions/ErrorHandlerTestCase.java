@@ -141,7 +141,7 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void security() throws Exception {
-    callTypeAndThrowException(new UnauthorisedException(mockMessage, getTestEvent("0")), "0 security");
+    callTypeAndThrowException(new UnauthorisedException(mockMessage), "0 security");
   }
 
   @Test
