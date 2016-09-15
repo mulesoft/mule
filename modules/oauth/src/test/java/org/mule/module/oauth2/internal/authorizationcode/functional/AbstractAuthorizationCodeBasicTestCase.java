@@ -20,6 +20,7 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.http.client.fluent.Request;
@@ -51,14 +52,9 @@ public abstract class AbstractAuthorizationCodeBasicTestCase extends AbstractOAu
     @Test
     public void localAuthorizationUrlRedirectsToOAuthAuthorizationUrl() throws Exception
     {
-        wireMockRule.stubFor(get(urlMatching(AUTHORIZE_PATH + ".*")).willReturn(aResponse().withStatus(200)));
+        LoggedRequest request = getLoggedRequest();
 
-        Request.Get(localAuthorizationUrl.getValue()).connectTimeout(RECEIVE_TIMEOUT).socketTimeout(RECEIVE_TIMEOUT).execute();
-
-        final List<LoggedRequest> requests = findAll(getRequestedFor(urlMatching(AUTHORIZE_PATH + ".*")));
-        assertThat(requests.size(), is(1));
-
-        AuthorizationRequestAsserter.create((requests.get(0)))
+        AuthorizationRequestAsserter.create(request)
                 .assertMethodIsGet()
                 .assertClientIdIs(clientId.getValue())
                 .assertRedirectUriIs(redirectUrl.getValue())
@@ -66,4 +62,15 @@ public abstract class AbstractAuthorizationCodeBasicTestCase extends AbstractOAu
     }
 
 
+    protected LoggedRequest getLoggedRequest() throws IOException
+    {
+        wireMockRule.stubFor(get(urlMatching(AUTHORIZE_PATH + ".*")).willReturn(aResponse().withStatus(200)));
+
+        Request.Get(localAuthorizationUrl.getValue()).connectTimeout(RECEIVE_TIMEOUT).socketTimeout(RECEIVE_TIMEOUT).execute();
+
+        final List<LoggedRequest> requests = findAll(getRequestedFor(urlMatching(AUTHORIZE_PATH + ".*")));
+        assertThat(requests.size(), is(1));
+
+        return requests.get(0);
+    }
 }
