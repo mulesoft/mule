@@ -6,7 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -14,12 +19,14 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.extension.internal.config.AbstractConfigParserTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.subtypes.extension.CarDoor;
+import org.mule.test.subtypes.extension.Door;
 import org.mule.test.subtypes.extension.FinalPojo;
 import org.mule.test.subtypes.extension.HouseDoor;
 import org.mule.test.subtypes.extension.NoGlobalPojo;
@@ -35,6 +42,7 @@ import org.mule.test.vegan.extension.VeganCookBook;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -202,10 +210,10 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
 
   @Test
   public void duplicatedOperationParameterAndTypeNames() throws Exception {
-    MuleEvent responseEvent = flowRunner("duplicatedOperationParameterAndTypeNames").run();
+    final Object payload = flowRunner("duplicatedOperationParameterAndTypeNames").run().getMessage().getPayload().getValue();
 
-    assertThat(responseEvent.getMessage().getPayload().getValue(), notNullValue());
-    assertThat(responseEvent.getMessage().getPayload().getValue(), instanceOf(NoGlobalPojo.class));
+    assertThat(payload, notNullValue());
+    assertThat(payload, instanceOf(NoGlobalPojo.class));
   }
 
   @Test
@@ -213,6 +221,15 @@ public class SubTypesMappingParserTestCase extends AbstractConfigParserTestCase 
     Revolver revolver = muleContext.getRegistry().get("sledgeHammer's");
     assertThat(revolver, is(notNullValue()));
     assertThat(revolver.getBullets(), is(1));
+  }
+
+  @Test
+  public void doorIsUsedInMapAndAlone() throws Exception {
+    final Map<Door, Map<String, Door>> payload =
+        (Map<Door, Map<String, Door>>) flowRunner("pojoIsUsedInMapAndAlone").run().getMessage().getPayload().getValue();
+    assertThat(payload, hasKey(instanceOf(HouseDoor.class)));
+    assertThat(payload, hasValue(allOf(hasKey(is("leftDoor")), hasValue(instanceOf(CarDoor.class)))));
+    assertThat(payload, hasValue(allOf(hasKey(is("rightDoor")), hasValue(instanceOf(CarDoor.class)))));
   }
 
   private void assertRicin(Object payload, Long micrograms, String victim) {

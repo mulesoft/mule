@@ -151,6 +151,21 @@
         <subtypes:no-global-pojo noGlobalPojo="#[new org.mule.test.subtypes.extension.NoGlobalPojo()]"/>
     </flow>
 
+    <flow name="pojoIsUsedInMapAndAlone">
+        <subtypes:process-door>
+            <subtypes:door>
+                <subtypes:house-door isLocked="false"/>
+            </subtypes:door>
+            <subtypes:door-registries>
+                <subtypes:door-registry key="leftDoor">
+                    <subtypes:car-door handle="left"/>
+                </subtypes:door-registry>
+                <subtypes:door-registry key="rightDoor">
+                    <subtypes:car-door handle="right"/>
+                </subtypes:door-registry>
+            </subtypes:door-registries>
+        </subtypes:process-door>
+    </flow>
 
     <subtypes:revolver name="sledgeHammer's" bullets="1" />
 </mule>
