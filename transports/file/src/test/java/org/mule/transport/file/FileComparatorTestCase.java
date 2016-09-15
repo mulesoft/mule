@@ -28,6 +28,7 @@ public class FileComparatorTestCase extends FunctionalTestCase
     public static final String FILE_NAMES[] = {"first", "second"};
     public static final String COMPONENT_NAME = "FolderTO";
     public static final String INPUT_FOLDER = "in";
+    public static final String ENCODING = null;
 
     @Override
     protected String getConfigFile()
@@ -55,9 +56,11 @@ public class FileComparatorTestCase extends FunctionalTestCase
         muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).stop();
         File f1 = FileUtils.newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator +  FILE_NAMES[0]).getAbsolutePath());
         assertTrue(f1.createNewFile());
+        FileUtils.writeStringToFile(f1, FILE_NAMES[0], ENCODING);
         Thread.sleep(1000);
         File f2 = FileUtils.newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator + FILE_NAMES[1]).getAbsolutePath());
         assertTrue(f2.createNewFile());
+        FileUtils.writeStringToFile(f2, FILE_NAMES[0], ENCODING);
         Thread.sleep(1000);
         muleContext.getRegistry().lookupConnector(FILE_CONNECTOR_NAME).start();
         assertTrue(countDown.await(TIMEOUT, TimeUnit.MILLISECONDS));

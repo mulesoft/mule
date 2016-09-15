@@ -214,6 +214,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         try
                         {
+                            //Skipping empty files
+                            if (file.length() == 0)
+                            {
+                                continue;
+                            }
                             String fileAbsolutePath = file.getAbsolutePath();
                             try
                             {

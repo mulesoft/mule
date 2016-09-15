@@ -14,6 +14,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.tck.probe.file.FileExists;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     public void testDoesNotAutoDeleteFileOnException() throws Exception
     {
         File target = createTestFile(testFolder1);
+        FileUtils.writeStringToFile(target, "test", (String) null);
         // Starts file endpoint polling
         muleContext.start();
 
@@ -78,6 +80,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase
     public void testAutoDeletesFileOnExceptionIfFileWasTransformed() throws Exception
     {
         File target = createTestFile(testFolder2);
+        FileUtils.writeStringToFile(target, "test", (String) null);
 
         // Starts file endpoint polling
         muleContext.start();

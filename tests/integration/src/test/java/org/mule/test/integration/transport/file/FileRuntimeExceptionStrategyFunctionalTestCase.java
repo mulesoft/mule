@@ -40,6 +40,8 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServ
     {
         File f = FileUtils.newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
         f.createNewFile();
+        // If file is empty it won't be processed
+        FileUtils.writeStringToFile(f, "test", (String) null);
 
         // try a couple of times with backoff strategy, then fail
         File errorFile = FileUtils.newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());
