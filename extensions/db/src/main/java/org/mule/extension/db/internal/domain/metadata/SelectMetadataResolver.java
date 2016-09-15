@@ -37,6 +37,7 @@ public class SelectMetadataResolver extends BaseDbMetadataResolver implements Me
       throws MetadataResolvingException, ConnectionException {
 
     typeLoader = context.getTypeLoader();
+    typeBuilder = context.getTypeBuilder();
 
     if (isEmpty(query)) {
       throw new MetadataResolvingException("No Metadata available for an empty query", FailureCode.INVALID_METADATA_KEY);
