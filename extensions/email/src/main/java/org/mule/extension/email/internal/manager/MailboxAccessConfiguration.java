@@ -15,7 +15,7 @@ import javax.mail.Message;
  *
  * @since 4.0
  */
-public interface MailboxManagerConfiguration {
+public interface MailboxAccessConfiguration {
 
   /**
    * @return a boolean value that indicates whether the retrieved emails should be opened and read or not.

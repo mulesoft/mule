@@ -15,7 +15,7 @@ import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.EmailFlags;
 import org.mule.extension.email.api.attributes.ImapEmailAttributes;
-import org.mule.extension.email.api.predicate.DefaultEmailPredicateBuilder;
+import org.mule.extension.email.api.predicate.BaseEmailPredicateBuilder;
 import org.mule.extension.email.api.predicate.ImapEmailPredicateBuilder;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ public class EmailPredicateTestCase {
   private static final LocalDateTime SENT_DATE = LocalDateTime.of(2014, 4, 10, 00, 00);
 
   private ImapEmailAttributes attributes;
-  private DefaultEmailPredicateBuilder builder;
+  private BaseEmailPredicateBuilder builder;
 
   @Before
   public void before() {

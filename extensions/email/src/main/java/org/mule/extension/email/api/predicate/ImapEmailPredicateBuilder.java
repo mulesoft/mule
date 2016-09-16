@@ -19,15 +19,15 @@ import java.util.function.Predicate;
  * Builds a {@link Predicate} which verifies that a {@link ImapEmailAttributes} instance is compliant with a number of criteria.
  * This builder is stateful and not thread-safe. A new instance should be use per each desired {@link Predicate}.
  * <p>
- * This builder is an more specific implementation of a {@link DefaultEmailPredicateBuilder} with the capability to
- * build a predicate that filter by the {@link EmailFlags} contained in an email returned from an IMAP mailbox
+ * This builder adds the capability to build a predicate that filters by the {@link EmailFlags} contained in
+ * an email returned from an IMAP mailbox
  * <p>
  * The class is also given the &quot;imap-matcher&quot; alias to make it DSL/XML friendly.
  *
  * @since 4.0
  */
 @Alias("imap-matcher")
-public class ImapEmailPredicateBuilder extends DefaultEmailPredicateBuilder {
+public class ImapEmailPredicateBuilder extends BaseEmailPredicateBuilder {
 
   /**
    * Indicates if should retrieve 'seen' or 'not seen' emails

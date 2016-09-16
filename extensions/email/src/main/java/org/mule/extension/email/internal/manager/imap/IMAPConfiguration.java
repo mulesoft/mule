@@ -9,7 +9,7 @@ package org.mule.extension.email.internal.manager.imap;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.attributes.ImapEmailAttributes;
 import org.mule.extension.email.internal.manager.CommonEmailOperations;
-import org.mule.extension.email.internal.manager.MailboxManagerConfiguration;
+import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -28,7 +28,7 @@ import javax.mail.Message;
 @ConnectionProviders({IMAPProvider.class, IMAPSProvider.class})
 @Configuration(name = "imap")
 @DisplayName("IMAP")
-public class IMAPConfiguration implements MailboxManagerConfiguration {
+public class IMAPConfiguration implements MailboxAccessConfiguration {
 
   /**
    * Indicates whether the retrieved emails should be opened and read. The default value is "true".

@@ -12,17 +12,19 @@ import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 /**
- * Builds a {@link Predicate} which verifies that a {@link BaseEmailAttributes} instance is compliant with a number of criteria. This
- * builder is stateful and not thread-safe. A new instance should be use per each desired {@link Predicate}.
+ * Base builder class for {@link Predicate}s that verify that a {@link BaseEmailAttributes} instance is compliant with a
+ * number of criteria. Builder implementation of this class are stateful and not thread-safe. A new instance should be
+ * use per each desired {@link Predicate}.
  * <p>
- * This builder can either be used programmatically or through Mule's SDK since its internal state is annotated with the
- * {@link Parameter} annotation.
+ * Builder implementations can either be used programmatically or through Mule's SDK since its internal state is
+ * annotated with the {@link Parameter} annotation.
  * <p>
  * Criterias are evaluated using an {@code AND} operator, meaning that for the predicate to accept a file, ALL the criterias must
  * be complied with.
@@ -30,18 +32,19 @@ import java.util.function.Predicate;
  * None of the criteria fields are mandatory. If a particular criteria is not specified, then it's simply not applied on the
  * evaluation.
  * <p>
- * The class is also given the &quot;default-matcher&quot; alias to make it DSL/XML friendly.
  *
  * @since 4.0
  */
-@Alias("default-matcher")
-public class DefaultEmailPredicateBuilder {
+@XmlHints(allowTopLevelDefinition = true)
+@Alias("matcher")
+public abstract class BaseEmailPredicateBuilder {
 
   private static final TimeUntilFunction TIME_UNTIL = new TimeUntilFunction();
   private static final TimeSinceFunction TIME_SINCE = new TimeSinceFunction();
 
   /**
    * Indicates since which date the received emails must be retrieved
+   *
    */
   @Parameter
   @Optional
@@ -123,32 +126,32 @@ public class DefaultEmailPredicateBuilder {
     return (Predicate<BaseEmailAttributes>) predicate;
   }
 
-  public DefaultEmailPredicateBuilder setFromRegex(String fromRegex) {
+  public BaseEmailPredicateBuilder setFromRegex(String fromRegex) {
     this.fromRegex = fromRegex;
     return this;
   }
 
-  public DefaultEmailPredicateBuilder setReceivedSince(LocalDateTime receivedSince) {
+  public BaseEmailPredicateBuilder setReceivedSince(LocalDateTime receivedSince) {
     this.receivedSince = receivedSince;
     return this;
   }
 
-  public DefaultEmailPredicateBuilder setReceivedUntil(LocalDateTime receivedUntil) {
+  public BaseEmailPredicateBuilder setReceivedUntil(LocalDateTime receivedUntil) {
     this.receivedUntil = receivedUntil;
     return this;
   }
 
-  public DefaultEmailPredicateBuilder setSubjectRegex(String subjectRegex) {
+  public BaseEmailPredicateBuilder setSubjectRegex(String subjectRegex) {
     this.subjectRegex = subjectRegex;
     return this;
   }
 
-  public DefaultEmailPredicateBuilder setSentSince(LocalDateTime sentSince) {
+  public BaseEmailPredicateBuilder setSentSince(LocalDateTime sentSince) {
     this.sentSince = sentSince;
     return this;
   }
 
-  public DefaultEmailPredicateBuilder setSentUntil(LocalDateTime sentUntil) {
+  public BaseEmailPredicateBuilder setSentUntil(LocalDateTime sentUntil) {
     this.sentUntil = sentUntil;
     return this;
   }

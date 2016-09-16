@@ -10,8 +10,8 @@ import static javax.mail.Folder.READ_ONLY;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.exception.EmailRetrieveException;
-import org.mule.extension.email.api.predicate.DefaultEmailPredicateBuilder;
-import org.mule.extension.email.internal.manager.MailboxManagerConfiguration;
+import org.mule.extension.email.api.predicate.BaseEmailPredicateBuilder;
+import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.runtime.api.message.Message;
@@ -43,16 +43,16 @@ public final class ListCommand {
    * For folder implementations (like IMAP) that support fetching without reading the content, if the content should NOT be read
    * ({@code shouldReadContent} = false) the SEEN flag is not going to be set.
    *
-   * @param configuration  The {@link MailboxManagerConfiguration} associated to this operation.
+   * @param configuration  The {@link MailboxAccessConfiguration} associated to this operation.
    * @param connection     the associated {@link MailboxConnection}.
    * @param folderName     the name of the folder where the emails are stored.
    * @param matcherBuilder a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
    *                       {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
    */
-  public <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(MailboxManagerConfiguration configuration,
+  public <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(MailboxAccessConfiguration configuration,
                                                                                MailboxConnection connection,
                                                                                String folderName,
-                                                                               DefaultEmailPredicateBuilder matcherBuilder) {
+                                                                               BaseEmailPredicateBuilder matcherBuilder) {
     Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);

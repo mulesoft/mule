@@ -15,10 +15,9 @@ import org.mule.extension.email.internal.commands.ExpungeCommand;
 import org.mule.extension.email.internal.commands.ListCommand;
 import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.manager.CommonEmailOperations;
-import org.mule.extension.email.internal.manager.MailboxManagerConfiguration;
+import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -27,8 +26,6 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 /**
  * Basic set of operations which perform on top the IMAP email protocol.
@@ -41,16 +38,13 @@ public class IMAPOperations {
   private final ExpungeCommand expungeCommand = new ExpungeCommand();
   private final ListCommand listCommand = new ListCommand();
 
-  @Inject
-  private MuleContext context;
-
   /**
    * List all the emails in the configured imap mailBoxFolder that match with the specified {@code imapMatcher} criteria.
    *
-   * @param config        The {@link MailboxManagerConfiguration} associated to this operation.
+   * @param config        The {@link MailboxAccessConfiguration} associated to this operation.
    * @param connection    The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be fetched
-   * @param imapMatcher       Email Matcher which gives the capability of filter the retrieved emails
+   * @param imapMatcher   Email Matcher which gives the capability of filter the retrieved emails
    * @return an {@link OperationResult} {@link List} carrying all the emails content
    * and it's corresponding {@link ImapEmailAttributes}.
    */
@@ -58,7 +52,7 @@ public class IMAPOperations {
   public List<OperationResult<Object, ImapEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
                                                                      @Connection MailboxConnection connection,
                                                                      @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                     @Optional ImapEmailPredicateBuilder imapMatcher) {
+                                                                     @DisplayName("Matcher") @Optional ImapEmailPredicateBuilder imapMatcher) {
     return listCommand.list(config, connection, mailboxFolder, imapMatcher);
   }
 
