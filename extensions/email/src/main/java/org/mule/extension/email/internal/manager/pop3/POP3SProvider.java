@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 import org.mule.extension.email.internal.manager.AbstractMailboxManagerProvider;
-import org.mule.extension.email.internal.manager.MailboxManagerConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
- * A {@link ConnectionProvider} that returns instances of pop3s (secured) based {@link MailboxManagerConnection}s.
+ * A {@link ConnectionProvider} that returns instances of pop3s (secured) based {@link MailboxConnection}s.
  * <p>
  * The returned connection is secured by TLS.
  *
@@ -35,7 +35,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  */
 @Alias("pop3s")
 @DisplayName("POP3S Connection")
-public class POP3SProvider extends AbstractMailboxManagerProvider<MailboxManagerConnection> implements Initialisable {
+public class POP3SProvider extends AbstractMailboxManagerProvider<MailboxConnection> implements Initialisable {
 
   /**
    * The port number of the mail server. '995' by default.
@@ -67,9 +67,9 @@ public class POP3SProvider extends AbstractMailboxManagerProvider<MailboxManager
    * {@inheritDoc}
    */
   @Override
-  public MailboxManagerConnection connect() throws ConnectionException {
-    return new MailboxManagerConnection(POP3S, settings.getUser(), settings.getPassword(), settings.getHost(), port,
-                                        getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties(),
-                                        tlsContextFactory);
+  public MailboxConnection connect() throws ConnectionException {
+    return new MailboxConnection(POP3S, settings.getUser(), settings.getPassword(), settings.getHost(), port,
+                                 getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties(),
+                                 tlsContextFactory);
   }
 }

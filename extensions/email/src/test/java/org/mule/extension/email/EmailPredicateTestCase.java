@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.EmailFlags;
-import org.mule.extension.email.api.ImapEmailAttributes;
+import org.mule.extension.email.api.attributes.ImapEmailAttributes;
 import org.mule.extension.email.api.predicate.DefaultEmailPredicateBuilder;
 import org.mule.extension.email.api.predicate.ImapEmailPredicateBuilder;
 

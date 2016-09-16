@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api;
+package org.mule.extension.email.api.attributes;
 
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
@@ -13,6 +13,7 @@ import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.internal.commands.ListCommand;
 import org.mule.runtime.core.message.BaseAttributes;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 
@@ -32,14 +33,14 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
- * Contains all the metadata of a received email, it carries information such as the subject of the email,
+ * Contains all the basic metadata of a received email, it carries information such as the subject of the email,
  * the id in the mailbox and the recipients between others.
  * <p>
- * This class aims to be returned as attributes in a {@link org.mule.runtime.api.message.Message} for every retriever operation.
+ * This class aims to be returned as attributes for every email message in a {@link ListCommand} operation.
  *
  * @since 4.0
  */
-public class BasicEmailAttributes extends BaseAttributes implements EmailAttributes {
+public abstract class BaseEmailAttributes extends BaseAttributes {
 
   /**
    * The id is the relative position of the email in its Folder. Note that the id for a particular email can change during a
@@ -103,7 +104,7 @@ public class BasicEmailAttributes extends BaseAttributes implements EmailAttribu
    */
   private final LocalDateTime sentDate;
 
-  public BasicEmailAttributes(Message msg) {
+  public BaseEmailAttributes(Message msg) {
     try {
       Map<String, String> headers = new HashMap<>();
       list(msg.getAllHeaders()).forEach(h -> headers.put(((Header) h).getName(), ((Header) h).getValue()));
@@ -118,88 +119,86 @@ public class BasicEmailAttributes extends BaseAttributes implements EmailAttribu
       this.sentDate = asDateTime(msg.getSentDate());
       this.receivedDate = asDateTime(msg.getReceivedDate());
       this.fromAddresses = addressesAsList(msg.getFrom());
-
     } catch (MessagingException mse) {
       throw new EmailException(mse.getMessage(), mse);
     }
   }
 
   /**
-   * {@inheritDoc}
+   * @return the unique identifier of the email
    */
-  @Override
   public int getId() {
     return id;
   }
 
   /**
-   * {@inheritDoc}
+   * @return the subject of the email.
    */
-  @Override
-  public List<String> getReplyToAddresses() {
-    return replyToAddresses;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public String getSubject() {
     return subject;
   }
 
   /**
-   * {@inheritDoc}
+   * @return all the recipient addresses of "To" (primary) type.
    */
-  @Override
   public List<String> getToAddresses() {
     return toAddresses;
   }
 
   /**
-   * {@inheritDoc}
+   * @return all the recipient addresses of "Bcc" (blind carbon copy) type.
    */
-  @Override
   public List<String> getBccAddresses() {
     return bccAddresses;
   }
 
   /**
-   * {@inheritDoc}
+   * @return all the recipient addresses of "Cc" (carbon copy) type.
    */
-  @Override
   public List<String> getCcAddresses() {
     return ccAddresses;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the identity of the person(s) who wished this message to be sent.
+   *
+   * @return all the from addresses.
    */
-  @Override
   public List<String> getFromAddresses() {
     return fromAddresses;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the addresses to which replies should be directed. This will usually be the sender of the email, but some emails may
+   * direct replies to a different address
+   *
+   * @return all the recipient addresses of replyTo type.
    */
-  @Override
+  public List<String> getReplyToAddresses() {
+    return replyToAddresses;
+  }
+
+  /**
+   * Get the date this message was received.
+   *
+   * @return the date this message was received.
+   */
   public LocalDateTime getReceivedDate() {
     return receivedDate;
   }
 
   /**
-   * {@inheritDoc}
+   * Get the date this message was sent.
+   *
+   * @return the date this message was sent.
    */
-  @Override
   public LocalDateTime getSentDate() {
     return sentDate;
   }
 
   /**
-   * {@inheritDoc}
+   * @return all the headers of this email message.
    */
-  @Override
   public Map<String, String> getHeaders() {
     return headers != null ? ImmutableMap.copyOf(headers) : ImmutableMap.of();
   }

@@ -8,12 +8,11 @@ package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-import org.mule.extension.email.api.BasicEmailAttributes;
-import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.exception.EmailRetrieveException;
 import org.mule.extension.email.api.predicate.DefaultEmailPredicateBuilder;
 import org.mule.extension.email.internal.manager.MailboxManagerConfiguration;
-import org.mule.extension.email.internal.manager.MailboxManagerConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
@@ -39,22 +38,22 @@ public final class ListCommand {
    * Retrieves all the emails in the specified {@code folderName}.
    * <p>
    * A new {@link Message} is created for each fetched email from the folder, where the payload is the text body of the email
-   * and the other metadata is carried by an {@link BasicEmailAttributes} instance.
+   * and the other metadata is carried by an {@link BaseEmailAttributes} instance.
    * <p>
    * For folder implementations (like IMAP) that support fetching without reading the content, if the content should NOT be read
    * ({@code shouldReadContent} = false) the SEEN flag is not going to be set.
    *
    * @param configuration  The {@link MailboxManagerConfiguration} associated to this operation.
-   * @param connection     the associated {@link MailboxManagerConnection}.
+   * @param connection     the associated {@link MailboxConnection}.
    * @param folderName     the name of the folder where the emails are stored.
-   * @param matcherBuilder a {@link Predicate} of {@link BasicEmailAttributes} used to filter the output list @return a
+   * @param matcherBuilder a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
    *                       {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
    */
-  public <T extends EmailAttributes> List<OperationResult<Object, T>> list(MailboxManagerConfiguration configuration,
-                                                                           MailboxManagerConnection connection,
-                                                                           String folderName,
-                                                                           DefaultEmailPredicateBuilder matcherBuilder) {
-    Predicate<EmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
+  public <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(MailboxManagerConfiguration configuration,
+                                                                               MailboxConnection connection,
+                                                                               String folderName,
+                                                                               DefaultEmailPredicateBuilder matcherBuilder) {
+    Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);
       List<OperationResult<Object, T>> list = new LinkedList<>();

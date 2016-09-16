@@ -6,9 +6,9 @@
  */
 package org.mule.extension.email.api.predicate;
 
-import org.mule.extension.email.api.EmailAttributes;
 import org.mule.extension.email.api.EmailFlags;
-import org.mule.extension.email.api.ImapEmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
+import org.mule.extension.email.api.attributes.ImapEmailAttributes;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -59,7 +59,7 @@ public class ImapEmailPredicateBuilder extends DefaultEmailPredicateBuilder {
 
 
   @Override
-  protected Predicate<? extends EmailAttributes> getBasePredicate() {
+  protected Predicate<? extends BaseEmailAttributes> getBasePredicate() {
 
     Predicate<ImapEmailAttributes> predicate = imapEmailAttributes -> true;
 

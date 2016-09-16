@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.email.internal.commands.EmailIdConsumerExecutor.NO_ID_ERROR;
-import org.mule.extension.email.api.ImapEmailAttributes;
+import org.mule.extension.email.api.attributes.ImapEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.test.runner.RunnerDelegateTo;

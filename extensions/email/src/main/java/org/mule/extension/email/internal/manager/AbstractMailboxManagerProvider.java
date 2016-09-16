@@ -47,8 +47,8 @@ public abstract class AbstractMailboxManagerProvider<Connection extends Abstract
 
   @Override
   public void onBorrow(Connection connection) {
-    if (connection instanceof MailboxManagerConnection) {
-      ((MailboxManagerConnection) connection).closeFolder(false);
+    if (connection instanceof MailboxConnection) {
+      ((MailboxConnection) connection).closeFolder(false);
     }
   }
 }

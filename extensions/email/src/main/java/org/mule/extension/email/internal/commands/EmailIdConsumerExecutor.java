@@ -6,8 +6,7 @@
  */
 package org.mule.extension.email.internal.commands;
 
-import org.mule.extension.email.api.BasicEmailAttributes;
-import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
@@ -66,12 +65,12 @@ public class EmailIdConsumerExecutor {
   }
 
   /**
-   * Gets an emailId from a MuleMessage of fails if the MuleMessage does not contains attributes of {@link BasicEmailAttributes} type.
+   * Gets an emailId from a MuleMessage of fails if the MuleMessage does not contains attributes of {@link BaseEmailAttributes} type.
    */
   private int getIdOrFail(OperationResult result) {
     Optional attributes = result.getAttributes();
     if (attributes.isPresent()) {
-      return ((EmailAttributes) attributes.get()).getId();
+      return ((BaseEmailAttributes) attributes.get()).getId();
     }
     throw new EmailException(NO_ID_ERROR);
   }

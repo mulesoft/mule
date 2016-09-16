@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class CommonManagerOperations {
+public class CommonEmailOperations {
 
   private final StoreCommand storeCommand = new StoreCommand();
   private final DeleteCommand deleteCommand = new DeleteCommand();
@@ -39,7 +39,7 @@ public class CommonManagerOperations {
    * <p>
    * The name of the email file is composed by the subject and the received date of the email.
    *
-   * @param connection     The associated {@link MailboxManagerConnection}.
+   * @param connection     The associated {@link MailboxConnection}.
    * @param muleMessage    The incoming {@link Message}.
    * @param mailboxFolder  Name of the folder where the email(s) is going to be stored.
    * @param localDirectory Local directory where the emails are going to be stored.
@@ -50,9 +50,9 @@ public class CommonManagerOperations {
    */
   // TODO: annotated the parameter localDirectory with @Path when available
   @Summary("Stores an specified email into a local directory")
-  public void store(@Connection MailboxManagerConnection connection, Message muleMessage, String localDirectory,
+  public void store(@Connection MailboxConnection connection, Message muleMessage, String localDirectory,
                     @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder, @Optional String fileName,
-                    @Optional @Summary("Email ID Number of the email to delete") @DisplayName("Email ID") Integer emailId,
+                    @Optional @Summary("Email ID of the email to delete") @DisplayName("Email ID") Integer emailId,
                     @Optional(defaultValue = "false") @DisplayName("Should Overwrite") boolean overwrite) {
     storeCommand.store(connection, muleMessage, mailboxFolder, localDirectory, fileName, emailId, overwrite);
   }
@@ -68,15 +68,15 @@ public class CommonManagerOperations {
    * email is going to be erased from the folder, not even the ones marked as DELETED previously.
    *
    * @param message       The incoming {@link Message}.
-   * @param connection    The corresponding {@link MailboxManagerConnection} instance.
+   * @param connection    The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be deleted
    * @param emailId       Email ID Number of the email to delete, if there is no email in the incoming {@link Message}.
    */
   @Summary("Deletes an email from the given Mailbox Folder")
   public void delete(Message message,
-                     @Connection MailboxManagerConnection connection,
+                     @Connection MailboxConnection connection,
                      @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                     @Optional @Summary("Email ID Number of the email to delete") @DisplayName("Email ID") Integer emailId) {
+                     @Optional @Summary("Email ID of the email to delete") @DisplayName("Email ID") Integer emailId) {
     deleteCommand.delete(message, connection, mailboxFolder, emailId);
   }
 }

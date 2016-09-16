@@ -11,7 +11,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAP_PO
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 import org.mule.extension.email.internal.manager.AbstractMailboxManagerProvider;
-import org.mule.extension.email.internal.manager.MailboxManagerConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -21,13 +21,13 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
 /**
- * A {@link ConnectionProvider} that returns instances of imap based {@link MailboxManagerConnection}s.
+ * A {@link ConnectionProvider} that returns instances of imap based {@link MailboxConnection}s.
  *
  * @since 4.0
  */
 @Alias("imap")
 @DisplayName("IMAP Connection")
-public class IMAPProvider extends AbstractMailboxManagerProvider<MailboxManagerConnection> {
+public class IMAPProvider extends AbstractMailboxManagerProvider<MailboxConnection> {
 
   /**
    * The port number of the mail server. '143' by default
@@ -41,8 +41,8 @@ public class IMAPProvider extends AbstractMailboxManagerProvider<MailboxManagerC
    * {@inheritDoc}
    */
   @Override
-  public MailboxManagerConnection connect() throws ConnectionException {
-    return new MailboxManagerConnection(IMAP, settings.getUser(), settings.getPassword(), settings.getHost(), port,
-                                        getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties());
+  public MailboxConnection connect() throws ConnectionException {
+    return new MailboxConnection(IMAP, settings.getUser(), settings.getPassword(), settings.getHost(), port,
+                                 getConnectionTimeout(), getReadTimeout(), getWriteTimeout(), getProperties());
   }
 }

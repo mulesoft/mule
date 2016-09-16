@@ -6,7 +6,7 @@
  */
 package org.mule.extension.email.internal.manager;
 
-import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 
 import javax.mail.Message;
 
@@ -23,10 +23,10 @@ public interface MailboxManagerConfiguration {
   boolean isEagerlyFetchContent();
 
   /**
-   * Resolves the {@link EmailAttributes} from a given message for this configuration.
+   * Resolves the {@link BaseEmailAttributes} from a given message for this configuration.
    *
    * @param message the {@link Message} that we want to parse.
-   * @return an {@link EmailAttributes} instance from the parsed {@code message}.
+   * @return an {@link BaseEmailAttributes} instance from the parsed {@code message}.
    */
-  <T extends EmailAttributes> T parseAttributesFromMessage(Message message);
+  <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message);
 }

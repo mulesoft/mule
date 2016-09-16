@@ -26,7 +26,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.internal.manager.MailboxManagerConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -57,7 +57,7 @@ public class MailboxManagerConnectionTestCase {
   private static final String RECENT_FOLDER = "Recent";
 
   private Store store;
-  private MailboxManagerConnection connection;
+  private MailboxConnection connection;
 
   @Before
   public void setUpTestConnection() throws Exception {
@@ -81,7 +81,7 @@ public class MailboxManagerConnectionTestCase {
     TestFolder recent = new TestFolder(store, RECENT_FOLDER);
     doReturn(recent).when(store).getFolder(RECENT_FOLDER);
 
-    connection = new MailboxManagerConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+    connection = new MailboxConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
 
   @Test
@@ -115,14 +115,14 @@ public class MailboxManagerConnectionTestCase {
   public void usernameMissingPassword() throws MessagingException, EmailConnectionException {
     expectedException.expect(EmailException.class);
     expectedException.expectMessage(is(PASSWORD_NO_USERNAME_ERROR));
-    new MailboxManagerConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+    new MailboxConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
 
   @Test
   public void passwordMissingUsername() throws MessagingException, EmailConnectionException {
     expectedException.expect(EmailException.class);
     expectedException.expectMessage(is(USERNAME_NO_PASSWORD_ERROR));
-    new MailboxManagerConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
+    new MailboxConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
 
   private void assertFolder(Folder folder, String name, int mode) {

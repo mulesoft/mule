@@ -7,8 +7,7 @@
 package org.mule.extension.email.api.predicate;
 
 import static java.util.regex.Pattern.compile;
-import org.mule.extension.email.api.BasicEmailAttributes;
-import org.mule.extension.email.api.EmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 /**
- * Builds a {@link Predicate} which verifies that a {@link BasicEmailAttributes} instance is compliant with a number of criteria. This
+ * Builds a {@link Predicate} which verifies that a {@link BaseEmailAttributes} instance is compliant with a number of criteria. This
  * builder is stateful and not thread-safe. A new instance should be use per each desired {@link Predicate}.
  * <p>
  * This builder can either be used programmatically or through Mule's SDK since its internal state is annotated with the
@@ -88,8 +87,8 @@ public class DefaultEmailPredicateBuilder {
    *
    * @return a {@link Predicate}
    */
-  public Predicate<EmailAttributes> build() {
-    Predicate<? extends EmailAttributes> predicate = getBasePredicate();
+  public Predicate<BaseEmailAttributes> build() {
+    Predicate<? extends BaseEmailAttributes> predicate = getBasePredicate();
 
     if (subjectRegex != null) {
       Predicate<String> subjectPredicate = compile(subjectRegex).asPredicate();
@@ -121,7 +120,7 @@ public class DefaultEmailPredicateBuilder {
           predicate.and(attributes -> attributes.getSentDate() != null && TIME_UNTIL.apply(sentUntil, attributes.getSentDate()));
     }
 
-    return (Predicate<EmailAttributes>) predicate;
+    return (Predicate<BaseEmailAttributes>) predicate;
   }
 
   public DefaultEmailPredicateBuilder setFromRegex(String fromRegex) {
@@ -154,7 +153,7 @@ public class DefaultEmailPredicateBuilder {
     return this;
   }
 
-  protected Predicate<? extends EmailAttributes> getBasePredicate() {
+  protected Predicate<? extends BaseEmailAttributes> getBasePredicate() {
     return emailAttributes -> true;
   }
 }

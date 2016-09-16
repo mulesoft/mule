@@ -6,9 +6,9 @@
  */
 package org.mule.extension.email.internal.manager.imap;
 
-import org.mule.extension.email.api.EmailAttributes;
-import org.mule.extension.email.api.ImapEmailAttributes;
-import org.mule.extension.email.internal.manager.CommonManagerOperations;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
+import org.mule.extension.email.api.attributes.ImapEmailAttributes;
+import org.mule.extension.email.internal.manager.CommonEmailOperations;
 import org.mule.extension.email.internal.manager.MailboxManagerConfiguration;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -24,7 +24,7 @@ import javax.mail.Message;
  *
  * @since 4.0
  */
-@Operations({IMAPOperations.class, CommonManagerOperations.class})
+@Operations({IMAPOperations.class, CommonEmailOperations.class})
 @ConnectionProviders({IMAPProvider.class, IMAPSProvider.class})
 @Configuration(name = "imap")
 @DisplayName("IMAP")
@@ -49,7 +49,7 @@ public class IMAPConfiguration implements MailboxManagerConfiguration {
    * {@inheritDoc}
    */
   @Override
-  public <T extends EmailAttributes> T parseAttributesFromMessage(Message message) {
+  public <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message) {
     return (T) new ImapEmailAttributes(message);
   }
 }
