@@ -20,6 +20,7 @@ import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.Category.COMMUNITY;
 import static org.mule.runtime.extension.api.Category.SELECT;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
@@ -36,6 +37,12 @@ import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_D
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
+
+import com.google.common.reflect.TypeToken;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -67,12 +74,12 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOpera
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
+import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
-import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -88,6 +95,7 @@ import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
 import org.mule.test.heisenberg.extension.model.Ricin;
+import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -106,9 +114,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -151,6 +156,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   private static final String IGNORED_OPERATION = "ignoredOperation";
   private static final String EXTENSION_VERSION = MuleManifest.getProductVersion();
   private static final String OTHER_HEISENBERG = "OtherHeisenberg";
+  private static final String PROCESS_WEAPON = "processWeapon";
+  private static final String PROCESS_WEAPON_WITH_DEFAULT_VALUE = "processWeaponWithDefaultValue";
+  private static final String PROCESS_INFO = "processSale";
 
   @Before
   public void setUp() {
@@ -413,7 +421,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(23));
+    assertThat(extensionDeclaration.getOperations(), hasSize(25));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(8));
@@ -443,6 +451,9 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertOperation(extensionDeclaration, EMPTY_PAGED_OPERATION, "");
     assertOperation(extensionDeclaration, FAILING_PAGED_OPERATION, "");
     assertOperation(extensionDeclaration, CONNECTION_PAGED_OPERATION, "");
+    assertOperation(extensionDeclaration, PROCESS_INFO, "");
+    assertOperation(extensionDeclaration, PROCESS_WEAPON, "");
+    assertOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE, "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -556,6 +567,21 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     operation = getOperation(extensionDeclaration, GET_PAGED_PERSONAL_INFO_OPERATION);
     assertThat(operation.getModelProperty(PagedOperationModelProperty.class).isPresent(), is(true));
     assertThat(operation.getOutput().getType(), is(TYPE_LOADER.load(PersonalInfo.class)));
+
+    operation = getOperation(extensionDeclaration, PROCESS_INFO);
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getParameters(), "sales", "", TYPE_LOADER.load(new TypeToken<Map<String, SaleInfo>>() {}.getType()),
+                    true, SUPPORTED, null);
+
+    operation = getOperation(extensionDeclaration, PROCESS_WEAPON);
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getParameters(), "weapon", "",
+                    TYPE_LOADER.load(Weapon.class), false, SUPPORTED, null);
+
+    operation = getOperation(extensionDeclaration, PROCESS_WEAPON_WITH_DEFAULT_VALUE);
+    assertThat(operation, is(notNullValue()));
+    assertParameter(operation.getParameters(), "weapon", "",
+                    TYPE_LOADER.load(Weapon.class), false, SUPPORTED, PAYLOAD);
   }
 
   private void assertTestModuleConnectionProviders(ExtensionDeclaration extensionDeclaration) throws Exception {

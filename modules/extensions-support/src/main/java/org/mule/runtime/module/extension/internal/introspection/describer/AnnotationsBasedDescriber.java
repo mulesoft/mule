@@ -6,24 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.describer;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
-import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
-import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetterAndSetters;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
+import com.google.common.collect.ImmutableList;
+
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.MuleVersion;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -59,10 +45,11 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Parameter
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
+import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.manifest.DescriberManifest;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalConfigurationModelDefinitionException;
@@ -97,12 +84,9 @@ import org.mule.runtime.module.extension.internal.model.property.ImplementingPar
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.InterceptingModelProperty;
-import org.mule.runtime.extension.api.introspection.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.executor.ReflectiveOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.runtime.source.DefaultSourceFactory;
-
-import com.google.common.collect.ImmutableList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -112,6 +96,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
+import static org.mule.runtime.core.util.Preconditions.checkArgument;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
+import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_NAME;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExceptionEnricherFactory;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.getExtension;
+import static org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser.parseLayoutAnnotations;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getExpressionSupport;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetterAndSetters;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnAttributesType;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMethodReturnType;
 
 /**
  * Implementation of {@link Describer} which generates a {@link ExtensionDeclarer} by scanning annotations on a type provided in
@@ -143,6 +146,8 @@ public final class AnnotationsBasedDescriber implements Describer {
   private final Map<Class<?>, ConnectionProviderDeclarer> connectionProviderDeclarers = new HashMap<>();
 
   private List<ParameterDeclarerContributor> fieldParameterContributor = ImmutableList.of(new InfrastructureFieldContributor());
+  private List<ParameterDeclarerContributor> methodParameterContributor =
+      ImmutableList.of(new ParameterResolverParameterTypeContributor());
 
   public AnnotationsBasedDescriber(Class<?> extensionType, VersionResolver versionResolver) {
     checkArgument(extensionType != null, format("describer %s does not specify an extension type", getClass().getName()));
@@ -411,7 +416,7 @@ public final class AnnotationsBasedDescriber implements Describer {
 
   private List<ParameterDeclarer> declareMethodBasedParameters(ParameterizedDeclarer component,
                                                                List<ExtensionParameter> parameters) {
-    return declareParameters(component, parameters, emptyList(), null);
+    return declareParameters(component, parameters, this.methodParameterContributor, null);
   }
 
   private List<ParameterDeclarer> declareParameters(ParameterizedDeclarer component, List<ExtensionParameter> parameters,
@@ -584,14 +589,27 @@ public final class AnnotationsBasedDescriber implements Describer {
     void contribute(ExtensionParameter parameter, ParameterDeclarer declarer);
   }
 
-
   private static class InfrastructureFieldContributor implements ParameterDeclarerContributor {
 
     @Override
     public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer) {
       if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaringClass())) {
         declarer.withModelProperty(new InfrastructureParameterModelProperty());
-        declarer.withExpressionSupport(ExpressionSupport.NOT_SUPPORTED);
+        declarer.withExpressionSupport(NOT_SUPPORTED);
+      }
+    }
+  }
+
+  private class ParameterResolverParameterTypeContributor implements ParameterDeclarerContributor {
+
+    @Override
+    public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer) {
+      MetadataType metadataType = parameter.getMetadataType(typeLoader);
+      if (ParameterResolver.class.isAssignableFrom(parameter.getType().getDeclaringClass())) {
+        final Optional<MetadataType> expressionResolverType = getGenericTypeAt(metadataType, 0, typeLoader);
+        metadataType = expressionResolverType.isPresent() ? expressionResolverType.get() : typeLoader.load(Object.class);
+        declarer.ofType(metadataType);
+        declarer.withModelProperty(new ParameterResolverTypeModelProperty());
       }
     }
   }

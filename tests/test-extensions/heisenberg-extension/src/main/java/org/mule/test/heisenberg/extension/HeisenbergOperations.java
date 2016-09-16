@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
@@ -23,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 
 public class HeisenbergOperations {
 
@@ -179,8 +179,8 @@ public class HeisenbergOperations {
     return connection.getSaulPhoneNumber();
   }
 
-  public String literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) @Expression(LITERAL) String literalExpression) {
-    return literalExpression;
+  public String literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
+    return literalExpression.getExpression();
   }
 
   public int[][] getGramsInStorage(@Optional(defaultValue = PAYLOAD) int[][] grams) {
@@ -189,6 +189,15 @@ public class HeisenbergOperations {
 
   public Map<String, SaleInfo> processSale(Map<String, SaleInfo> sales) {
     return sales;
+  }
+
+  public Map<String, Weapon> processWeapon(@Optional ParameterResolver<Weapon> weapon) {
+    return singletonMap(weapon.getExpression(), weapon.resolve());
+  }
+
+  public Map<String, Weapon> processWeaponWithDefaultValue(@Optional(
+      defaultValue = "#[payload]") ParameterResolver<Weapon> weapon) {
+    return singletonMap(weapon.getExpression(), weapon.resolve());
   }
 
   @Ignore
