@@ -35,8 +35,6 @@ import java.util.function.Predicate;
  *
  * @since 4.0
  */
-@XmlHints(allowTopLevelDefinition = true)
-@Alias("matcher")
 public abstract class BaseEmailPredicateBuilder {
 
   private static final TimeUntilFunction TIME_UNTIL = new TimeUntilFunction();
