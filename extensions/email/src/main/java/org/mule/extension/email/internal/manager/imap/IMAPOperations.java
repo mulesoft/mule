@@ -6,18 +6,19 @@
  */
 package org.mule.extension.email.internal.manager.imap;
 
+import static java.lang.String.format;
 import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Flags.Flag.SEEN;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
-import org.mule.extension.email.api.attributes.ImapEmailAttributes;
-import org.mule.extension.email.api.predicate.ImapEmailPredicateBuilder;
+import static javax.mail.Folder.READ_WRITE;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
+import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
+import org.mule.extension.email.api.exception.EmailException;
+import org.mule.extension.email.api.predicate.IMAPEmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.ExpungeCommand;
 import org.mule.extension.email.internal.commands.ListCommand;
-import org.mule.extension.email.internal.commands.SetFlagCommand;
-import org.mule.extension.email.internal.manager.CommonEmailOperations;
+import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.manager.MailboxConnection;
-import org.mule.runtime.api.message.Message;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -25,7 +26,13 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
+import com.sun.mail.imap.IMAPFolder;
+
 import java.util.List;
+
+import javax.mail.Flags.Flag;
+import javax.mail.MessagingException;
+import javax.mail.UIDFolder;
 
 /**
  * Basic set of operations which perform on top the IMAP email protocol.
@@ -34,9 +41,9 @@ import java.util.List;
  */
 public class IMAPOperations {
 
-  private final SetFlagCommand setFlagCommand = new SetFlagCommand();
   private final ExpungeCommand expungeCommand = new ExpungeCommand();
   private final ListCommand listCommand = new ListCommand();
+  private final StoreCommand storeCommand = new StoreCommand();
 
   /**
    * List all the emails in the configured imap mailBoxFolder that match with the specified {@code imapMatcher} criteria.
@@ -46,53 +53,49 @@ public class IMAPOperations {
    * @param mailboxFolder Mailbox folder where the emails are going to be fetched
    * @param imapMatcher   Email Matcher which gives the capability of filter the retrieved emails
    * @return an {@link OperationResult} {@link List} carrying all the emails content
-   * and it's corresponding {@link ImapEmailAttributes}.
+   * and it's corresponding {@link IMAPEmailAttributes}.
    */
   @Summary("List all the emails in the given POP3 Mailbox Folder")
-  public List<OperationResult<Object, ImapEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
+  public List<OperationResult<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
                                                                      @Connection MailboxConnection connection,
                                                                      @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                     @DisplayName("Matcher") @Optional ImapEmailPredicateBuilder imapMatcher) {
+                                                                     @DisplayName("Matcher") @Optional IMAPEmailPredicateBuilder imapMatcher) {
     return listCommand.list(config, connection, mailboxFolder, imapMatcher);
   }
 
   /**
-   * Marks an incoming email as READ.
+   * Marks a single email as READ changing it's state in the specified mailbox folder.
    * <p>
-   * This operation can target a single email, but if no emailID is specified and the incoming {@link Message} is carrying a list
-   * of emails this operation will mark all the emails that the {@link Message} is carrying if they belong to the specified
-   * folder.
+   * This operation can targets a single email.
    *
-   * @param message       The incoming {@link Message}.
    * @param connection    The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Folder where the emails are going to be marked as read
-   * @param emailId       Email ID Number of the email to mark as read, if there is no email in the incoming {@link Message}.
+   * @param emailId       Email ID Number of the email to mark as read.
    */
-  public void markAsRead(Message message, @Connection MailboxConnection connection,
+  public void markAsRead(@Connection MailboxConnection connection,
                          @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                         @Optional @Summary("Email ID of the email to mark as read") @DisplayName("Email ID") Integer emailId) {
-    setFlagCommand.set(message, connection, mailboxFolder, emailId, SEEN);
+                         @Summary("Email ID Number of the email to mark as read") @DisplayName("Email ID") long emailId) {
+    setFlagByUID(connection, mailboxFolder, SEEN, emailId);
   }
 
   /**
-   * Marks an incoming email as DELETED, this way the marked email(s) are scheduled for deletion when the folder closes.
+   * Marks an incoming email as DELETED, this way the marked email(s) are scheduled for deletion when the folder closes, this
+   * means that the email is not physically eliminated from the mailbox folder, but it's state changes.
    * <p>
    * All DELETED marked emails are going to be eliminated from the mailbox when one of
    * {@link IMAPOperations#expungeFolder(MailboxConnection, String)} or
-   * {@link CommonEmailOperations#delete(Message, MailboxConnection, String, Integer)} is executed.
+   * {@link IMAPOperations#delete(MailboxConnection, String, long)} is executed.
    * <p>
-   * This operation can target a single email, but also if the incoming {@link Message} is carrying a list of emails this
-   * operation will mark all the emails that the {@link Message} is carrying.
+   * This operation targets a single email.
    *
-   * @param message       The incoming {@link Message}.
    * @param connection    The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be marked as deleted
-   * @param emailId       Email ID Number of the email to mark as deleted, if there is no email in the incoming {@link Message}.
+   * @param emailId       Email ID Number of the email to mark as deleted.
    */
-  public void markAsDeleted(Message message, @Connection MailboxConnection connection,
+  public void markAsDeleted(@Connection MailboxConnection connection,
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                            @Optional @Summary("Email ID of the email to mark as deleted") @DisplayName("Email ID") Integer emailId) {
-    setFlagCommand.set(message, connection, mailboxFolder, emailId, DELETED);
+                            @Summary("Email ID Number of the email to mark as deleted") @DisplayName("Email ID") long emailId) {
+    setFlagByUID(connection, mailboxFolder, DELETED, emailId);
   }
 
   /**
@@ -102,8 +105,72 @@ public class IMAPOperations {
    * @param mailboxFolder Mailbox folder where the emails with the 'DELETED' flag are going to be scheduled to be definitely
    *                      deleted
    */
+
   public void expungeFolder(@Connection MailboxConnection connection,
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder) {
     expungeCommand.expunge(connection, mailboxFolder);
+  }
+
+  /**
+   * Stores the specified email of id {@code emailId} into the configured {@code localDirectory}.
+   * <p>
+   * The emails are stored as mime message in a ".txt" format.
+   * <p>
+   * The name of the email file is composed by the subject and the received date of the email.
+   *
+   * @param connection     The associated {@link MailboxConnection}.
+   * @param mailboxFolder  Name of the folder where the email(s) is going to be stored.
+   * @param localDirectory Local directory where the emails are going to be stored.
+   * @param fileName       Name of the file that is going to be stored. The operation will append the email number and received
+   *                       date in the end.
+   * @param emailId        Email ID Number of the email to store.
+   * @param overwrite      Whether to overwrite a file that already exist
+   */
+  // TODO: annotated the parameter localDirectory with @Path when available
+  @Summary("Stores an specified email into a local directory")
+  public void store(@Connection MailboxConnection connection, String localDirectory,
+                    @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder, @Optional String fileName,
+                    @Summary("Email ID Number of the email to delete") @DisplayName("Email ID") long emailId,
+                    @Optional(defaultValue = "false") @DisplayName("Should Overwrite") boolean overwrite) {
+    storeCommand.store(connection, mailboxFolder, localDirectory, fileName, emailId, overwrite);
+  }
+
+  /**
+   * Eliminates from the mailbox the email with id {@code emailId}.
+   * <p>
+   * For IMAP mailboxes all the messages scheduled for deletion (marked as DELETED) will also be erased from the folder.
+   *
+   * @param connection    The corresponding {@link MailboxConnection} instance.
+   * @param mailboxFolder Mailbox folder where the emails are going to be deleted
+   * @param emailId       Email ID Number of the email to delete.
+   */
+  @Summary("Deletes an email from the given Mailbox Folder")
+  public void delete(@Connection MailboxConnection connection,
+                     @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
+                     @Summary("Email ID Number of the email to delete") @DisplayName("Email ID") long emailId) {
+    markAsDeleted(connection, mailboxFolder, emailId);
+    try {
+      connection.getFolder(mailboxFolder, READ_WRITE).close(true);
+    } catch (MessagingException e) {
+      throw new EmailException(format("Error while eliminating email uid:[%s] from the [%s] folder", emailId, mailboxFolder), e);
+    }
+  }
+
+  /**
+   * Sets the specified {@code flag} into the email of UID (unique identifier) {@code emailId}.
+   * <p>
+   * This method only works for {@link UIDFolder}s, that are handled by the IMAP protocol
+   */
+  private void setFlagByUID(MailboxConnection connection, String mailboxFolder, Flag flag, long emailId) {
+    try {
+      IMAPFolder folder = (IMAPFolder) connection.getFolder(mailboxFolder, READ_WRITE);
+      javax.mail.Message message = folder.getMessageByUID(emailId);
+      if (message == null) {
+        throw new EmailException(format("No email was found with id:[%s]", emailId));
+      }
+      message.setFlag(flag, true);
+    } catch (MessagingException e) {
+      throw new EmailException(format("Error while setting [%s] flag in email of id [%s]", flag.toString(), emailId), e);
+    }
   }
 }

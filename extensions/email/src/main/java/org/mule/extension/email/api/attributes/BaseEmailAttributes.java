@@ -34,7 +34,7 @@ import javax.mail.MessagingException;
 
 /**
  * Contains all the basic metadata of a received email, it carries information such as the subject of the email,
- * the id in the mailbox and the recipients between others.
+ * the number in the mailbox and the recipients between others.
  * <p>
  * This class aims to be returned as attributes for every email message in a {@link ListCommand} operation.
  *
@@ -43,13 +43,13 @@ import javax.mail.MessagingException;
 public abstract class BaseEmailAttributes extends BaseAttributes {
 
   /**
-   * The id is the relative position of the email in its Folder. Note that the id for a particular email can change during a
+   * The number is the relative position of the email in its Folder. Note that the number for a particular email can change during a
    * session if other emails in the Folder are isDeleted and expunged.
    * <p>
    * Valid message ids start at 1. Emails that do not belong to any folder (like newly composed or derived messages) have 0 as
-   * their message id.
+   * their message number.
    */
-  private final int id;
+  private final int number;
 
   /**
    * The address(es) of the person(s) which sent the email.
@@ -109,7 +109,7 @@ public abstract class BaseEmailAttributes extends BaseAttributes {
       Map<String, String> headers = new HashMap<>();
       list(msg.getAllHeaders()).forEach(h -> headers.put(((Header) h).getName(), ((Header) h).getValue()));
 
-      this.id = msg.getMessageNumber();
+      this.number = msg.getMessageNumber();
       this.subject = msg.getSubject();
       this.headers = ImmutableMap.copyOf(headers);
       this.toAddresses = addressesAsList(msg.getRecipients(TO));
@@ -125,10 +125,20 @@ public abstract class BaseEmailAttributes extends BaseAttributes {
   }
 
   /**
-   * @return the unique identifier of the email
+   * @return the unique id of the email in a folder.
    */
-  public int getId() {
-    return id;
+  public abstract long getId();
+
+  /**
+   * Returns the number of the email in the mailbox folder in a moment.
+   * <p>
+   * Take in mind that this number change with the different operations that can occur in a folder
+   * i.e. moving mails, deleting emails, etc.
+   *
+   * @return the number of the email in the mailbox.
+   */
+  public int getNumber() {
+    return number;
   }
 
   /**

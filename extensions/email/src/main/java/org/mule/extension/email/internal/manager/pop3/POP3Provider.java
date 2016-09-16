@@ -7,7 +7,7 @@
 package org.mule.extension.email.internal.manager.pop3;
 
 import static org.mule.extension.email.internal.EmailProtocol.POP3;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.POP3_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.POP3_PORT;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 import org.mule.extension.email.internal.manager.AbstractMailboxManagerProvider;

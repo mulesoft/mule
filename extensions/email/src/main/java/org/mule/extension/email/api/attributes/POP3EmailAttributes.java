@@ -6,7 +6,13 @@
  */
 package org.mule.extension.email.api.attributes;
 
+import static java.lang.Long.parseLong;
+import org.mule.extension.email.api.exception.EmailException;
+
+import com.sun.mail.pop3.POP3Folder;
+
 import javax.mail.Message;
+import javax.mail.MessagingException;
 
 /**
  * Contains all the metadata of a received email from a POP3 mailbox, it carries information such as the subject of the email,
@@ -17,11 +23,29 @@ import javax.mail.Message;
 public class POP3EmailAttributes extends BaseEmailAttributes {
 
   /**
+   * The unique identifier of the email in an IMAP mailbox folder.
+   */
+  private final long id;
+
+  /**
    * Creates a new instance from a {@link Message}
    *
    * @param msg an email message to take the attributes from.
    */
-  public POP3EmailAttributes(Message msg) {
+  public POP3EmailAttributes(Message msg, POP3Folder folder) {
     super(msg);
+    try {
+      this.id = parseLong(folder.getUID(msg));
+    } catch (MessagingException e) {
+      throw new EmailException("Could not initialize POP3 attributes", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long getId() {
+    return id;
   }
 }

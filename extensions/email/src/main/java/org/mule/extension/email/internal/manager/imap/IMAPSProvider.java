@@ -8,7 +8,7 @@ package org.mule.extension.email.internal.manager.imap;
 
 import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.IMAPS;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAPS_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.IMAPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 

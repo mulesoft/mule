@@ -7,7 +7,7 @@
 package org.mule.extension.email.internal.manager.imap;
 
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAP_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.IMAP_PORT;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 import org.mule.extension.email.internal.manager.AbstractMailboxManagerProvider;

@@ -7,7 +7,7 @@
 package org.mule.extension.email.internal.util;
 
 import static javax.mail.Part.ATTACHMENT;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.TEXT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.TEXT;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;

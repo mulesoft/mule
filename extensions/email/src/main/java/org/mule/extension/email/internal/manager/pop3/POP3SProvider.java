@@ -8,7 +8,7 @@ package org.mule.extension.email.internal.manager.pop3;
 
 import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.POP3S;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.POP3S_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.POP3S_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
