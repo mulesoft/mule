@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -45,7 +46,7 @@ public class ZipUtils {
    * @param resources resources to compress
    * @throws IOException in case of any error processing the files
    */
-  public static void compress(File targetFile, ZipResource[] resources) throws IOException {
+  public static void compress(File targetFile, ZipResource[] resources) {
     try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(targetFile))) {
       for (ZipResource zipResource : resources) {
         URL resourceUrl = ClassUtils.getResource(zipResource.file, ZipUtils.class);
@@ -65,9 +66,7 @@ public class ZipUtils {
         }
       }
     } catch (IOException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new IOException("Error compressing file " + targetFile.getName(), e);
+      throw new UncheckedIOException(e);
     }
   }
 }
