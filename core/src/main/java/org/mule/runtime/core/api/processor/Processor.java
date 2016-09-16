@@ -40,8 +40,10 @@ public interface Processor extends ReactiveProcessor {
    * Applies a {@link Publisher<Event>} function transforming a stream of {@link Event}'s.
    * <p>
    * The default implementation delegates to {@link #process(Event)} and will:
-   * <li>propagte any exception thrown
-   * <li>drop events if invocation of {@link #process(Event)} returns null.
+   * <ol>
+   * <li>propagte any exception thrown</li>
+   * <li>drop events if invocation of {@link #process(Event)} returns null.</li>
+   * </ol>
    *
    * @param publisher the event stream to transform
    * @return the transformed event stream
@@ -53,7 +55,7 @@ public interface Processor extends ReactiveProcessor {
 
   /**
    * Given existing processor may be doing anything we need to be conservative and use the {@link ProcessingType#BLOCKING} type.
-   * Implementations can of course easily override this and should so.
+   * Implementations can of course easily override this and should do so.
    * 
    * @return default {@link ProcessingType#BLOCKING} processing type.
    */
