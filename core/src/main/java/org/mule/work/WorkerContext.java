@@ -41,28 +41,30 @@ public class WorkerContext implements Work
         @Override
         public void workRejected(WorkEvent event)
         {
-            logEventException(event);
+            if (event.getException() != null)
+            {
+                logEventException(event.getWork().toString() + " Rejected", event.getException());
+            }
         }
 
         @Override
         public void workCompleted(WorkEvent event)
         {
-            logEventException(event);
-        }
-
-        private void logEventException(WorkEvent event)
-        {
             if (event.getException() != null)
             {
-                if (event.getException() instanceof WorkCompletedException
-                    && event.getException().getCause() != null)
-                {
-                    logger.error(event.getWork().toString(), event.getException().getCause());
-                }
-                else
-                {
-                    logger.error(event.getWork().toString(), event.getException());
-                }
+                logEventException(event.getWork().toString() + " Completed with exception", event.getException());
+            }
+        }
+
+        private void logEventException(String message, WorkException exception)
+        {
+            if (exception instanceof WorkCompletedException && exception.getCause() != null)
+            {
+                logger.error(message, exception.getCause());
+            }
+            else
+            {
+                logger.error(message, exception);
             }
         }
     };
