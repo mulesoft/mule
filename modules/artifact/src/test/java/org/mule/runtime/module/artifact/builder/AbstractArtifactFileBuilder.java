@@ -179,7 +179,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
 
   private void buildBrokenZipFile(File tempFile) throws UncheckedIOException {
     try {
-      FileUtils.write(tempFile, "This is content represents invalid compressed data");
+      FileUtils.write(tempFile, "This content represents invalid compressed data");
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }

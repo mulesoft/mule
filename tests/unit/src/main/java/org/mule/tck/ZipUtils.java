@@ -44,7 +44,7 @@ public class ZipUtils {
    *
    * @param targetFile file that will contain the zipped files
    * @param resources resources to compress
-   * @throws IOException in case of any error processing the files
+   * @throws UncheckedIOException in case of any error processing the files
    */
   public static void compress(File targetFile, ZipResource[] resources) {
     try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(targetFile))) {
