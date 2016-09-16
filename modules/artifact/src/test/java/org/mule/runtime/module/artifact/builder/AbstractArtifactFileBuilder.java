@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -124,7 +125,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
   }
 
   @Override
-  public File getArtifactFile() throws Exception {
+  public File getArtifactFile() {
     if (artifactFile == null) {
       checkArgument(!isEmpty(fileName), "Filename cannot be empty");
 
@@ -149,7 +150,7 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     assertThat("Cannot change attributes once the artifact file was built", artifactFile, is(nullValue()));
   }
 
-  protected ZipResource createPropertiesFile(Properties props, String propertiesFileName) throws IOException {
+  protected ZipResource createPropertiesFile(Properties props, String propertiesFileName) {
     ZipResource result = null;
 
     if (!props.isEmpty()) {
@@ -176,9 +177,13 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     return System.getProperty("java.io.tmpdir");
   }
 
-  private void buildBrokenZipFile(File tempFile) throws IOException {
-    FileUtils.write(tempFile, "This is content represents invalid compressed data");
+  private void buildBrokenZipFile(File tempFile) throws UncheckedIOException {
+    try {
+      FileUtils.write(tempFile, "This content represents invalid compressed data");
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
-  protected abstract List<ZipResource> getCustomResources() throws Exception;
+  protected abstract List<ZipResource> getCustomResources();
 }

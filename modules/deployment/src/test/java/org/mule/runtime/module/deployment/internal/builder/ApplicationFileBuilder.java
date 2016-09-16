@@ -174,7 +174,7 @@ public class ApplicationFileBuilder extends AbstractArtifactFileBuilder<Applicat
   }
 
   @Override
-  protected List<ZipResource> getCustomResources() throws Exception {
+  protected List<ZipResource> getCustomResources() {
     final List<ZipResource> customResources = new LinkedList<>();
 
     for (ArtifactPluginFileBuilder plugin : plugins) {

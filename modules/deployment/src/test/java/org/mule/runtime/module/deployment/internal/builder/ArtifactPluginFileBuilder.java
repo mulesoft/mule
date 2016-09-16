@@ -126,7 +126,7 @@ public class ArtifactPluginFileBuilder extends AbstractArtifactFileBuilder<Artif
   }
 
   @Override
-  protected List<ZipResource> getCustomResources() throws Exception {
+  protected List<ZipResource> getCustomResources() {
     final List<ZipResource> customResources = new LinkedList<>();
 
     if (!properties.isEmpty()) {

@@ -75,7 +75,7 @@ public class ServiceFileBuilder extends AbstractArtifactFileBuilder<ServiceFileB
   }
 
   @Override
-  protected List<ZipUtils.ZipResource> getCustomResources() throws Exception {
+  protected List<ZipUtils.ZipResource> getCustomResources() {
     final List<ZipUtils.ZipResource> customResources = new LinkedList<>();
 
     if (!properties.isEmpty()) {
