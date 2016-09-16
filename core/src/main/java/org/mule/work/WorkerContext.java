@@ -41,6 +41,17 @@ public class WorkerContext implements Work
         @Override
         public void workRejected(WorkEvent event)
         {
+            logEventException(event);
+        }
+
+        @Override
+        public void workCompleted(WorkEvent event)
+        {
+            logEventException(event);
+        }
+
+        private void logEventException(WorkEvent event)
+        {
             if (event.getException() != null)
             {
                 if (event.getException() instanceof WorkCompletedException
@@ -149,6 +160,7 @@ public class WorkerContext implements Work
         }
     }
 
+    @Override
     public void release()
     {
         worker.release();
@@ -258,6 +270,7 @@ public class WorkerContext implements Work
         return workException;
     }
 
+    @Override
     public void run()
     {
         if (isTimedOut())
