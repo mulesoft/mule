@@ -6,11 +6,11 @@
  */
 package org.mule.runtime.core.processor;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.message.InternalMessage.of;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import static reactor.core.publisher.Mono.just;
@@ -21,9 +21,9 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.concurrent.TimeUnit;
-
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -38,101 +38,78 @@ public class MapProcessorTestCase extends AbstractMuleTestCase {
   @Mock
   private Event event;
 
+  private RuntimeException exception = new RuntimeException() {};
+
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
+
+  private Processor testProcessor = event -> Event.builder(eventContext).message(of(TEST_PAYLOAD)).build();
+  private Processor testProcessorReturnsNull = event -> Event.builder(eventContext).message(of(null)).build();
+  private Processor testProcessorThrowsException = event -> {
+    throw exception;
+  };
+
   @Test
   public void mapBlocking() throws Exception {
-    Processor mapProcessor = event -> Event.builder(eventContext).message(of(TEST_PAYLOAD)).build();
-    assertThat(mapProcessor.process(event).getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
+    assertThat(testProcessor.process(event).getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamBlockingGet() {
-
-    Processor mapProcessor = event -> Event.builder(eventContext).message(of(TEST_PAYLOAD)).build();
-
-    assertThat(just(event).transform(mapProcessor).block().getMessage().getPayload().getValue(),
+    assertThat(just(event).transform(testProcessor).block().getMessage().getPayload().getValue(),
                equalTo(TEST_PAYLOAD));
   }
 
   @Test
   public void mapStreamSubscribe() throws Exception {
-    Processor mapProcessor = event -> Event.builder(eventContext).message(of(TEST_PAYLOAD)).build();
     Latch latch = new Latch();
-    just(event).transform(mapProcessor).subscribe(event -> {
-      latch.countDown();
+    just(event).transform(testProcessor).subscribe(event -> {
       assertThat(event.getMessage().getPayload().getValue(), equalTo(TEST_PAYLOAD));
+      latch.countDown();
     });
-    latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
   }
 
   @Test
   public void mapBlockingNullResult() throws Exception {
-    Processor mapProcessor = event -> Event.builder(eventContext).message(of(null)).build();
-    assertThat(mapProcessor.process(event).getMessage().getPayload().getValue(), equalTo(null));
+    assertThat(testProcessorReturnsNull.process(event).getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamBlockingGetNullResult() {
-
-    Processor mapProcessor = event -> Event.builder(eventContext).message(of(null)).build();
-
-    assertThat(just(event).transform(mapProcessor).block().getMessage().getPayload().getValue(),
-               equalTo(null));
+    assertThat(just(event).transform(testProcessorReturnsNull).block().getMessage().getPayload().getValue(), is(nullValue()));
   }
 
   @Test
   public void mapStreamSubscribeNullResult() throws Exception {
-    Processor mapProcessor = event -> Event.builder(eventContext).message(of(null)).build();
     Latch latch = new Latch();
-    just(event).transform(mapProcessor).subscribe(event -> {
+    just(event).transform(testProcessorReturnsNull).subscribe(event -> {
+      assertThat(event.getMessage().getPayload().getValue(), is(nullValue()));
       latch.countDown();
-      assertThat(event.getMessage().getPayload().getValue(), equalTo(null));
     });
-    latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
   }
 
   @Test
   public void mapBlockingExceptionThrown() throws Exception {
-    Processor mapProcessor = event1 -> {
-      throw new IllegalArgumentException();
-    };
-
-    Event result = null;
-    try {
-      result = mapProcessor.process(event);
-      fail("Exception expected");
-    } catch (Exception e) {
-      assertThat(e, instanceOf(IllegalArgumentException.class));
-      assertThat(result, nullValue());
-    }
+    thrown.expect(is(exception));
+    assertThat(testProcessorThrowsException.process(event), is(nullValue()));
   }
 
   @Test
   public void mapStreamBlockingGetExceptionThrown() {
-    Processor mapProcessor = event1 -> {
-      throw new IllegalArgumentException();
-    };
-
-    Event result = null;
-    try {
-      result = just(event).transform(mapProcessor).block();
-      fail("Exception expected");
-    } catch (Exception e) {
-      assertThat(e, instanceOf(IllegalArgumentException.class));
-      assertThat(result, nullValue());
-    }
+    thrown.expect(is(exception));
+    assertThat(just(event).transform(testProcessorThrowsException).block(), is(nullValue()));
   }
 
   @Test
   public void mapStreamSubscribeExceptionThrown() throws Exception {
-    Processor mapProcessor = event1 -> {
-      throw new IllegalArgumentException();
-    };
     Latch latch = new Latch();
-    just(event).transform(mapProcessor).doOnError(throwable -> {
+    just(event).transform(testProcessorThrowsException).doOnError(throwable -> {
+      assertThat(throwable, is(exception));
       latch.countDown();
-      assertThat(throwable, instanceOf(IllegalArgumentException.class));
     }).subscribe();
-    latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+    latch.await(RECEIVE_TIMEOUT, MILLISECONDS);
   }
 
 }

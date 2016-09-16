@@ -18,9 +18,9 @@ import org.reactivestreams.Publisher;
  * Processes {@link Event}'s. Implementations that do not mutate the {@link Event} or pass it on to another MessageProcessor
  * should return the MuleEvent they receive.
  *
- * This interface now also extends {@link ReactiveProcessor} and implementations of this interface can be used in {@link Event}
- * stream processing via the default implementation of {@link #apply(Publisher)} that performs a map function on the stream using
- * the result of the invocation of the blocking {@link #process(Event)} method. Using this approach simple processor
+ * From 4.0 this interface also extends {@link ReactiveProcessor} and implementations of this interface can be used in
+ * {@link Event} stream processing via the default implementation of {@link #apply(Publisher)} that performs a map function on the
+ * stream using the result of the invocation of the blocking {@link #process(Event)} method. Using this approach simple processor
  * implementations that don't block or perform blocking IO can continue to implement {@link Processor} and require no changes.
  * 
  * @since 3.0
@@ -36,12 +36,12 @@ public interface Processor extends ReactiveProcessor {
    */
   Event process(Event event) throws MuleException;
 
-
   /**
    * Applies a {@link Publisher<Event>} function transforming a stream of {@link Event}'s.
    * <p>
-   * The default implementation delegates to {@link #process(Event)} and will i) propagte any exception thrown ii) drop events if
-   * invocation of {@link #process(Event)} returns null.
+   * The default implementation delegates to {@link #process(Event)} and will:
+   * <li>propagte any exception thrown
+   * <li>drop events if invocation of {@link #process(Event)} returns null.
    *
    * @param publisher the event stream to transform
    * @return the transformed event stream
@@ -52,10 +52,10 @@ public interface Processor extends ReactiveProcessor {
   }
 
   /**
-   * Given existing processor may be doing anything we need to be conservative and use the
-   * {@link ProcessingType#BLOCKING} type.  Implementations can of course easily override this and should.
+   * Given existing processor may be doing anything we need to be conservative and use the {@link ProcessingType#BLOCKING} type.
+   * Implementations can of course easily override this and should so.
    * 
-   * @return
+   * @return default {@link ProcessingType#BLOCKING} processing type.
    */
   @Override
   default ReactiveProcessor.ProcessingType getProccesingType() {

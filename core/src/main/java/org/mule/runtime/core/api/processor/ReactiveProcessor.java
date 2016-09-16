@@ -22,7 +22,8 @@ public interface ReactiveProcessor extends Function<Publisher<Event>, Publisher<
 
   /**
    * In order for Mule to determine the best way to execute different processors based on the chosen {@link ProcessingStrategy} it
-   * need to know the type of work the message processor will be performing and if it is blocking, cpu instensive or neither.
+   * needs to know the type of work the message processor will be performing and if it is {@link ProcessingType#BLOCKING},
+   * {@link ProcessingType#CPU} intensive or neither ({@link ProcessingType#CPU_LITE}).
    *
    * @return the processing type for this processor.
    */
