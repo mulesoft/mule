@@ -13,13 +13,12 @@ package org.mule.runtime.core.api.retry;
  */
 public interface RetryCallback {
 
-  public void doWork(RetryContext context) throws Exception;
+  void doWork(RetryContext context) throws Exception;
 
-  public String getWorkDescription();
+  String getWorkDescription();
 
   /**
-   * @return the object for which the retry of the work is being done. Ideally, it should return a
-   *         {@link org.mule.runtime.core.api.transport.Connector}.
+   * @return the object for which the retry of the work is being done.
    */
-  public Object getWorkOwner();
+  Object getWorkOwner();
 }

@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.connector;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -21,7 +22,7 @@ public class PetStoreConnectionValidationTestCase extends PetStoreConnectionTest
 
 
   @Rule
-  public ExpectedException expectedEx = ExpectedException.none();
+  public ExpectedException expectedEx = none();
 
   @Override
   protected String getConfigFile() {

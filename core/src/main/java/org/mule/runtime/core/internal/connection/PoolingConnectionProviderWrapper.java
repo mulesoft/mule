@@ -20,7 +20,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class PoolingConnectionProviderWrapper<Connection> extends ConnectionProviderWrapper<Connection> {
+public final class PoolingConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
   private final PoolingProfile poolingProfile;
   private final boolean disableValidation;
@@ -34,7 +34,7 @@ public final class PoolingConnectionProviderWrapper<Connection> extends Connecti
    * @param retryPolicyTemplate a {@link AbstractPolicyTemplate} which will hold the retry policy configured in the Mule
    *        Application
    */
-  public PoolingConnectionProviderWrapper(ConnectionProvider<Connection> delegate, PoolingProfile poolingProfile,
+  public PoolingConnectionProviderWrapper(ConnectionProvider<C> delegate, PoolingProfile poolingProfile,
                                           boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate) {
     super(delegate);
     this.poolingProfile = poolingProfile;
@@ -51,7 +51,7 @@ public final class PoolingConnectionProviderWrapper<Connection> extends Connecti
    * @return A {@link ConnectionValidationResult} returned by the delegated {@link ConnectionProvider}
    */
   @Override
-  public ConnectionValidationResult validate(Connection connection) {
+  public ConnectionValidationResult validate(C connection) {
     if (disableValidation) {
       return ConnectionValidationResult.success();
     }

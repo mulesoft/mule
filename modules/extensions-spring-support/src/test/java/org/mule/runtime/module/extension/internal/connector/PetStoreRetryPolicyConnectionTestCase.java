@@ -60,7 +60,7 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
   @Test
   public void retryPolicyExhaustedDueToInvalidConnectionAtValidateTime() throws Exception {
     exception.expect(MessagingException.class);
-    exception.expectCause(is(instanceOf(RetryPolicyExhaustedException.class)));
+    exception.expectCause(is(instanceOf(ConnectionException.class)));
     exception.expectMessage(is(CONNECTION_FAIL_DOT));
     runFlow("fail-connection-validation");
   }

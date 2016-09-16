@@ -11,11 +11,11 @@ import static org.mule.runtime.api.connection.ConnectionValidationResult.failure
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingObjectNotFoundException;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -27,7 +27,7 @@ import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ConnectivityTestingService}.
- *
+ * <p>
  * It searchs for the {@link ConnectivityTestingStrategy} instances registered in
  * mule to find the possible strategies to do connection testing over mule component instances
  *
@@ -55,8 +55,14 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
         serviceRegistry.lookupProviders(ConnectivityTestingStrategy.class);
 
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
-      if (connectivityTestingStrategy instanceof MuleContextAware) {
-        ((MuleContextAware) connectivityTestingStrategy).setMuleContext(muleContext);
+      try {
+        muleContext.getInjector().inject(connectivityTestingStrategy);
+      } catch (MuleException e) {
+        throw new InitialisationException(createStaticMessage(
+                                                              "Could not initialise connectivity testing strategy of type "
+                                                                  + connectivityTestingStrategy.getClass().getName()),
+                                          e,
+                                          this);
       }
     }
   }
@@ -79,7 +85,8 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
         }
       }
     }
-    throw new UnsupportedConnectivityTestingObjectException(createStaticMessage("Could not do connectivity testing over object of type "
-        + connectivityTestingObject.getClass().getName()));
+    throw new UnsupportedConnectivityTestingObjectException(
+                                                            createStaticMessage("Could not do connectivity testing over object of type "
+                                                                + connectivityTestingObject.getClass().getName()));
   }
 }

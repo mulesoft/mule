@@ -18,12 +18,12 @@ import org.mule.runtime.core.api.MuleException;
  * <p>
  * For example, whether connections should be pooled, tied to an OAuth token, cached, etc.
  *
- * @param <Connection> the generic type of the connection being managed by {@code this} instance
+ * @param <C> the generic type of the connection being managed by {@code this} instance
  * @since 1.0
  */
-abstract class ConnectionManagementStrategy<Connection> implements Closeable {
+abstract class ConnectionManagementStrategy<C> implements Closeable {
 
-  protected final ConnectionProvider<Connection> connectionProvider;
+  protected final ConnectionProvider<C> connectionProvider;
   protected final MuleContext muleContext;
 
   /**
@@ -32,7 +32,7 @@ abstract class ConnectionManagementStrategy<Connection> implements Closeable {
    * @param connectionProvider the {@link ConnectionProvider} which will be used to manage the connections
    * @param muleContext the application's {@link MuleContext}
    */
-  ConnectionManagementStrategy(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext) {
+  ConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
     this.connectionProvider = connectionProvider;
     this.muleContext = muleContext;
   }
@@ -45,7 +45,7 @@ abstract class ConnectionManagementStrategy<Connection> implements Closeable {
    * @return a {@link ConnectionHandler}
    * @throws ConnectionException if an exception was found trying to obtain the connection
    */
-  abstract ConnectionHandler<Connection> getConnectionHandler() throws ConnectionException;
+  abstract ConnectionHandler<C> getConnectionHandler() throws ConnectionException;
 
   /**
    * Closes all connections and resources allocated through {@code this} instance.

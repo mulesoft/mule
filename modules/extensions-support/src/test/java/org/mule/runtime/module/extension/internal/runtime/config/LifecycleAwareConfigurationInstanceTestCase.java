@@ -7,29 +7,41 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static org.hamcrest.CoreMatchers.any;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.retry.RetryNotifier;
+import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -42,12 +54,14 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
 
 @SmallTest
@@ -55,6 +69,8 @@ import org.mockito.verification.VerificationMode;
 public class LifecycleAwareConfigurationInstanceTestCase
     extends AbstractInterceptableContractTestCase<LifecycleAwareConfigurationInstance> {
 
+  private static final int RECONNECTION_MAX_ATTEMPTS = 5;
+  private static final int RECONNECTION_FREQ = 100;
   private static final String NAME = "name";
 
   @Parameters(name = "{0}")
@@ -67,6 +83,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
                              {"Without provider", null}});
   }
 
+  @Rule
+  public ExpectedException expectedException = none();
+
   @Mock
   private RuntimeConfigurationModel configurationModel;
 
@@ -74,7 +93,9 @@ public class LifecycleAwareConfigurationInstanceTestCase
   private Lifecycle value;
 
   @Mock
-  private ConnectionManager connectionManager;
+  private ConnectionManagerAdapter connectionManager;
+
+  private RetryPolicyTemplate retryPolicyTemplate;
 
   private String name;
   private Optional<ConnectionProvider> connectionProvider;
@@ -89,9 +110,13 @@ public class LifecycleAwareConfigurationInstanceTestCase
   @Before
   @Override
   public void before() throws Exception {
-    MockitoAnnotations.initMocks(this);
+    initMocks(this);
     muleContext.getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManager);
     muleContext.getRegistry().registerObject(OBJECT_TIME_SUPPLIER, timeSupplier);
+
+    retryPolicyTemplate = new SimpleRetryPolicyTemplate(RECONNECTION_FREQ, RECONNECTION_MAX_ATTEMPTS);
+    retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
+
     super.before();
   }
 
@@ -100,7 +125,22 @@ public class LifecycleAwareConfigurationInstanceTestCase
     if (connectionProvider.isPresent()) {
       reset(connectionProvider.get());
     }
+    setup(connectionManager);
     return new LifecycleAwareConfigurationInstance(NAME, configurationModel, value, getInterceptors(), connectionProvider);
+  }
+
+  private void setup(ConnectionManagerAdapter connectionManager) {
+    if (connectionProvider.isPresent()) {
+      when(connectionManager.getRetryTemplateFor(connectionProvider.get())).thenReturn(retryPolicyTemplate);
+      when(connectionManager.testConnectivity(connectionProvider.get())).thenReturn(success());
+    }
+  }
+
+  private void reset(Object object) {
+    Mockito.reset(object);
+    if (object instanceof ConnectionManagerAdapter) {
+      setup((ConnectionManagerAdapter) object);
+    }
   }
 
   @Test
@@ -115,12 +155,12 @@ public class LifecycleAwareConfigurationInstanceTestCase
   }
 
   @Test
-  public void connectionBinded() throws Exception {
+  public void connectionBound() throws Exception {
     interceptable.initialise();
-    assertBinded();
+    asseretBound();
   }
 
-  private void assertBinded() throws Exception {
+  private void asseretBound() throws Exception {
     if (connectionProvider.isPresent()) {
       verify(connectionManager, times(1)).bind(value, connectionProvider.get());
     } else {
@@ -134,13 +174,13 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
   @Test
   public void connectionReBindedAfterStopStart() throws Exception {
-    connectionBinded();
+    connectionBound();
     interceptable.stop();
     verify(connectionManager, getBindingVerificationMode()).unbind(value);
 
     reset(connectionManager);
     interceptable.start();
-    assertBinded();
+    asseretBound();
   }
 
   @Test
@@ -158,6 +198,31 @@ public class LifecycleAwareConfigurationInstanceTestCase
     verify((Startable) value).start();
     if (connectionProvider.isPresent()) {
       verify((Startable) connectionProvider.get()).start();
+    }
+  }
+
+  @Test
+  public void testConnectivityUponStart() throws Exception {
+    if (connectionProvider.isPresent()) {
+      valueStarted();
+      verify(connectionManager).testConnectivity(connectionProvider.get());
+    }
+  }
+
+  @Test
+  public void testConnectivityFailsUponStart() throws Exception {
+    if (connectionProvider.isPresent()) {
+      Exception connectionException = new ConnectionException("Oops!");
+      when(connectionManager.testConnectivity(connectionProvider.get()))
+          .thenReturn(failure(connectionException.getMessage(), UNKNOWN, connectionException));
+
+      try {
+        interceptable.start();
+        fail("Was expecting connectivity testing to fail");
+      } catch (Exception e) {
+        verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(connectionProvider.get());
+        assertThat(e.getCause(), is(instanceOf(RetryPolicyExhaustedException.class)));
+      }
     }
   }
 

@@ -107,15 +107,14 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
     ExecutionTemplate<RetryContext> executionTemplate = getExecutionTemplate(context);
 
     final OperationRetryCallBack connectionRetry = new OperationRetryCallBack(executor, context, interceptors);
-
     // TODO - MULE-9336 - Add support for non blocking retry policies
-    RetryContext execute = executionTemplate.execute(() -> retryPolicyTemplate.execute(connectionRetry, WORK_MANAGER));
-
-    if (execute.isOk()) {
-      return connectionRetry.getOperationExecutionResult().getOutput();
-    } else {
-      throw execute.getLastFailure();
+    // TODO - MULE-10579 - Reconnection should be centralized
+    executionTemplate.execute(() -> retryPolicyTemplate.execute(connectionRetry, WORK_MANAGER));
+    Throwable exception = connectionRetry.getOperationExecutionResult().getException();
+    if (exception != null) {
+      throw exception;
     }
+    return connectionRetry.getOperationExecutionResult().getOutput();
   }
 
   private OperationExecutionResult executeWithInterceptors(OperationExecutor executor, OperationContextAdapter context,
@@ -216,6 +215,7 @@ public final class DefaultExecutionMediator implements ExecutionMediator {
         .orElse((ExecutionTemplate<T>) defaultExecutionTemplate);
   }
 
+  //TODO: MULE-10580 - Operation reconnection should be decoupled from config reconnection
   private RetryPolicyTemplate getRetryPolicyTemplate(Optional<ConfigurationInstance> configurationInstance) {
     Optional<ConnectionProvider> connectionProviderOptional = configurationInstance.map(
                                                                                         ConfigurationInstance::getConnectionProvider)

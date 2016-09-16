@@ -27,20 +27,20 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * This implementation is thread-safe.
  *
- * @param <Connection> the generic type of the connection being wrapped
+ * @param <C> the generic type of the connection being wrapped
  * @since 4.0
  */
-final class CachedConnectionHandler<Connection> implements ConnectionHandlerAdapter<Connection> {
+final class CachedConnectionHandler<C> implements ConnectionHandlerAdapter<C> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CachedConnectionHandler.class);
 
-  private final ConnectionProvider<Connection> connectionProvider;
+  private final ConnectionProvider<C> connectionProvider;
   private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
   private final Lock readLock = readWriteLock.readLock();
   private final Lock writeLock = readWriteLock.writeLock();
   private final MuleContext muleContext;
 
-  private Connection connection;
+  private C connection;
 
   /**
    * Creates a new instance
@@ -48,7 +48,7 @@ final class CachedConnectionHandler<Connection> implements ConnectionHandlerAdap
    * @param connectionProvider the {@link ConnectionProvider} to be used to managed the connection
    * @param muleContext the owning {@link MuleContext}
    */
-  public CachedConnectionHandler(ConnectionProvider<Connection> connectionProvider, MuleContext muleContext) {
+  public CachedConnectionHandler(ConnectionProvider<C> connectionProvider, MuleContext muleContext) {
     this.connectionProvider = connectionProvider;
     this.muleContext = muleContext;
   }
@@ -64,8 +64,8 @@ final class CachedConnectionHandler<Connection> implements ConnectionHandlerAdap
    * @throws IllegalStateException if the first invocation is executed while the {@link #muleContext} is stopping or stopped
    */
   @Override
-  public Connection getConnection() throws ConnectionException {
-    Connection oldConnection;
+  public C getConnection() throws ConnectionException {
+    C oldConnection;
     readLock.lock();
     try {
       if (connection != null && validateConnection(connection).isValid()) {
@@ -91,7 +91,7 @@ final class CachedConnectionHandler<Connection> implements ConnectionHandlerAdap
     }
   }
 
-  private Connection createConnection() throws ConnectionException {
+  private C createConnection() throws ConnectionException {
     assertNotStopping(muleContext, "Mule is shutting down... Cannot establish new connections");
     connection = connectionProvider.connect();
     return connection;
@@ -123,7 +123,7 @@ final class CachedConnectionHandler<Connection> implements ConnectionHandlerAdap
     }
   }
 
-  protected ConnectionValidationResult validateConnection(Connection connection) {
+  protected ConnectionValidationResult validateConnection(C connection) {
     ConnectionValidationResult validationResult = null;
     try {
       validationResult = connectionProvider.validate(connection);
@@ -143,7 +143,7 @@ final class CachedConnectionHandler<Connection> implements ConnectionHandlerAdap
     return validationResult;
   }
 
-  private void disconnectAndCleanConnection(Connection connection) {
+  private void disconnectAndCleanConnection(C connection) {
     try {
       connectionProvider.disconnect(connection);
     } catch (Exception e) {

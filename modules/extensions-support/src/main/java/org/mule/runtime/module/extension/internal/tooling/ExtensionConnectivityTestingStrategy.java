@@ -7,19 +7,19 @@
 package org.mule.runtime.module.extension.internal.tooling;
 
 import static java.lang.String.format;
+import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getInitialiserEvent;
-import org.mule.runtime.api.connection.ConnectionExceptionCode;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
 
 import javax.inject.Inject;
 
@@ -29,29 +29,27 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-public class ExtensionConnectivityTestingStrategy implements ConnectivityTestingStrategy, MuleContextAware {
+public class ExtensionConnectivityTestingStrategy implements ConnectivityTestingStrategy {
 
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private ConnectionManager connectionManager;
+
+  public ExtensionConnectivityTestingStrategy() {}
+
   /**
    * Used for testing purposes
    *
-   * @param muleContext the {@code MuleContext}.
+   * @param muleContext       a {@link MuleContext}
+   * @param connectionManager the {@link ConnectionManager} to use for validating the connection.
    */
-  ExtensionConnectivityTestingStrategy(MuleContext muleContext) {
+  ExtensionConnectivityTestingStrategy(ConnectionManager connectionManager, MuleContext muleContext) {
     this.muleContext = muleContext;
+    this.connectionManager = connectionManager;
   }
 
-  /**
-   * Constructor used for creation using SPI.
-   */
-  public ExtensionConnectivityTestingStrategy() {}
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
 
   /**
    * {@inheritDoc}
@@ -62,30 +60,19 @@ public class ExtensionConnectivityTestingStrategy implements ConnectivityTesting
       if (connectivityTestingObject instanceof ConnectionProviderResolver) {
         ConnectionProvider connectionProvider =
             ((ConnectionProviderResolver) connectivityTestingObject).resolve(getInitialiserEvent(muleContext));
-        return validateConnectionOverConnectionProvider(connectionProvider);
+        return connectionManager.testConnectivity(connectionProvider);
       } else if (connectivityTestingObject instanceof ConfigurationProvider) {
         ConfigurationProvider configurationProvider = (ConfigurationProvider) connectivityTestingObject;
         ConfigurationInstance configurationInstance = configurationProvider.get(getInitialiserEvent(muleContext));
-        configurationInstance.getConnectionProvider();
-        if (configurationInstance.getConnectionProvider().isPresent()) {
-          return validateConnectionOverConnectionProvider(configurationInstance.getConnectionProvider().get());
-        } else {
-          throw new MuleRuntimeException(createStaticMessage("The component does not support connectivity testing"));
-        }
+        return connectionManager.testConnectivity(configurationInstance);
       } else {
         throw new MuleRuntimeException(createStaticMessage(
                                                            format("testConnectivity was invoked with an object type %s not supported.",
                                                                   connectivityTestingObject.getClass().getName())));
       }
     } catch (Exception e) {
-      return failure(e.getMessage(), ConnectionExceptionCode.UNKNOWN, e);
+      return failure("Failed to obtain connectivity testing object", UNKNOWN, e);
     }
-  }
-
-  private ConnectionValidationResult validateConnectionOverConnectionProvider(ConnectionProvider connectionProvider)
-      throws org.mule.runtime.api.connection.ConnectionException {
-    Object connection = connectionProvider.connect();
-    return connectionProvider.validate(connection);
   }
 
   /**
