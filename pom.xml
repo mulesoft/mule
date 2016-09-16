@@ -209,6 +209,7 @@
         <mysqlDriverVersion>5.1.33</mysqlDriverVersion>
         <ognlVersion>2.7.3</ognlVersion>
         <oroVersion>2.0.8</oroVersion>
+        <projectreactorVersion>3.0.2.RELEASE</projectreactorVersion>
         <reflectionsVersion>0.9.10</reflectionsVersion>
         <quartzVersion>2.2.1</quartzVersion>
         <rhinoVersion>1.7R4</rhinoVersion>
@@ -1401,6 +1402,11 @@
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-aether-provider</artifactId>
                 <version>${aetherProviderVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-core</artifactId>
+                <version>${projectreactorVersion}</version>
             </dependency>
         </dependencies>
 
