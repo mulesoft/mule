@@ -7,7 +7,7 @@
 package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_WRITE;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 
 /**
  * Represents the expungeFolder (eliminate completely) emails from folder operation.
@@ -21,10 +21,10 @@ public final class ExpungeCommand {
   /**
    * Removes from the mailbox all deleted messages if the flag is set true.
    *
-   * @param connection the associated {@link RetrieverConnection}.
+   * @param connection the associated {@link MailboxConnection}.
    * @param folderName the name of the folder that is going to erase the deleted emails.
    */
-  public void expunge(RetrieverConnection connection, String folderName) {
+  public void expunge(MailboxConnection connection, String folderName) {
     connection.getFolder(folderName, READ_WRITE);
     connection.closeFolder(true);
   }

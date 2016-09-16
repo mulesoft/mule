@@ -7,14 +7,16 @@
 package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Folder.READ_ONLY;
-import static org.mule.extension.email.api.EmailAttributesBuilder.fromMessage;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
-import org.mule.extension.email.internal.util.EmailContentProcessor;
-import org.mule.extension.email.api.ReceivedEmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.exception.EmailRetrieveException;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.api.predicate.BaseEmailPredicateBuilder;
+import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
+import org.mule.extension.email.internal.manager.MailboxConnection;
+import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -23,6 +25,7 @@ import java.util.function.Predicate;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
+
 
 /**
  * Represents the list emails operation.
@@ -35,33 +38,39 @@ public final class ListCommand {
    * Retrieves all the emails in the specified {@code folderName}.
    * <p>
    * A new {@link Message} is created for each fetched email from the folder, where the payload is the text body of the email
-   * and the other metadata is carried by an {@link ReceivedEmailAttributes} instance.
+   * and the other metadata is carried by an {@link BaseEmailAttributes} instance.
    * <p>
    * For folder implementations (like IMAP) that support fetching without reading the content, if the content should NOT be read
    * ({@code shouldReadContent} = false) the SEEN flag is not going to be set.
    *
-   * @param connection        the associated {@link RetrieverConnection}.
-   * @param folderName        the name of the folder where the emails are stored.
-   * @param shouldReadContent if should read the email content or not.
-   * @param matcher           a {@link Predicate} of {@link ReceivedEmailAttributes} used to filter the output list @return a {@link List} of
-   *                          {@link Message} carrying all the emails and it's corresponding attributes.
+   * @param configuration  The {@link MailboxAccessConfiguration} associated to this operation.
+   * @param connection     the associated {@link MailboxConnection}.
+   * @param folderName     the name of the folder where the emails are stored.
+   * @param matcherBuilder a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
+   *                       {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
    */
-  public List<Message> list(RetrieverConnection connection,
-                            String folderName,
-                            boolean shouldReadContent,
-                            Predicate<ReceivedEmailAttributes> matcher) {
+  public <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(MailboxAccessConfiguration configuration,
+                                                                               MailboxConnection connection,
+                                                                               String folderName,
+                                                                               BaseEmailPredicateBuilder matcherBuilder) {
+    Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);
-      List<Message> list = new LinkedList<>();
+      List<OperationResult<Object, T>> list = new LinkedList<>();
       for (javax.mail.Message m : folder.getMessages()) {
         Object emailContent = "";
-        ReceivedEmailAttributes attributes = fromMessage(m);
+        T attributes = configuration.parseAttributesFromMessage(m);
         if (matcher.test(attributes)) {
-          if (shouldReadContent) {
+          if (configuration.isEagerlyFetchContent()) {
             emailContent = readContent(m);
+            // Attributes are parsed again since they may change after the email has been read.
+            attributes = configuration.parseAttributesFromMessage(m);
           }
-          attributes = fromMessage(m);
-          list.add(Message.builder().payload(emailContent).attributes(attributes).build());
+          OperationResult<Object, T> operationResult = OperationResult.<Object, T>builder()
+              .output(emailContent)
+              .attributes(attributes)
+              .build();
+          list.add(operationResult);
         }
       }
       return list;

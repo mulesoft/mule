@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.retriever;
+package org.mule.extension.email.internal.manager;
 
 import org.mule.extension.email.api.EmailConnectionSettings;
 import org.mule.extension.email.internal.AbstractEmailConnection;
@@ -20,7 +20,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
  * @since 4.0
  */
 // TODO: Change generic signature for a more specific one. MULE-9874
-public abstract class AbstractRetrieverProvider<Connection extends AbstractEmailConnection>
+public abstract class AbstractMailboxManagerProvider<Connection extends AbstractEmailConnection>
     extends AbstractEmailConnectionProvider<Connection> implements PoolingConnectionProvider<Connection> {
 
   /**
@@ -47,8 +47,8 @@ public abstract class AbstractRetrieverProvider<Connection extends AbstractEmail
 
   @Override
   public void onBorrow(Connection connection) {
-    if (connection instanceof RetrieverConnection) {
-      ((RetrieverConnection) connection).closeFolder(false);
+    if (connection instanceof MailboxConnection) {
+      ((MailboxConnection) connection).closeFolder(false);
     }
   }
 }

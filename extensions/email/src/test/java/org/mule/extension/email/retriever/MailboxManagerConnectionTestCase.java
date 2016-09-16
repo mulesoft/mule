@@ -26,7 +26,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -49,7 +49,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Session.class, Store.class})
 @PowerMockIgnore("javax.management.*")
-public class RetrieverConnectionTestCase {
+public class MailboxManagerConnectionTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -57,7 +57,7 @@ public class RetrieverConnectionTestCase {
   private static final String RECENT_FOLDER = "Recent";
 
   private Store store;
-  private RetrieverConnection connection;
+  private MailboxConnection connection;
 
   @Before
   public void setUpTestConnection() throws Exception {
@@ -81,7 +81,7 @@ public class RetrieverConnectionTestCase {
     TestFolder recent = new TestFolder(store, RECENT_FOLDER);
     doReturn(recent).when(store).getFolder(RECENT_FOLDER);
 
-    connection = new RetrieverConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+    connection = new MailboxConnection(IMAP, JUANI_EMAIL, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
 
   @Test
@@ -115,14 +115,14 @@ public class RetrieverConnectionTestCase {
   public void usernameMissingPassword() throws MessagingException, EmailConnectionException {
     expectedException.expect(EmailException.class);
     expectedException.expectMessage(is(PASSWORD_NO_USERNAME_ERROR));
-    new RetrieverConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
+    new MailboxConnection(IMAP, null, "password", "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
 
   @Test
   public void passwordMissingUsername() throws MessagingException, EmailConnectionException {
     expectedException.expect(EmailException.class);
     expectedException.expectMessage(is(USERNAME_NO_PASSWORD_ERROR));
-    new RetrieverConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
+    new MailboxConnection(IMAP, JUANI_EMAIL, null, "127.0.0.1", "123", 1000, 1000, 1000, null);
   }
 
   private void assertFolder(Folder folder, String name, int mode) {

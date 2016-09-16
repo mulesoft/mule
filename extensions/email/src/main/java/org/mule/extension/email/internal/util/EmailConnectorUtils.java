@@ -7,7 +7,7 @@
 package org.mule.extension.email.internal.util;
 
 import static java.lang.String.format;
-import org.mule.extension.email.api.ReceivedEmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.Message;
 
@@ -105,14 +105,14 @@ public final class EmailConnectorUtils {
   }
 
   /**
-   * Extracts the incoming {@link Message} attributes of {@link ReceivedEmailAttributes} type.
+   * Extracts the incoming {@link Message} attributes of {@link BaseEmailAttributes} type.
    *
    * @param muleMessage the incoming {@link Message}.
-   * @return an {@link Optional} value with the {@link ReceivedEmailAttributes}.
+   * @return an {@link Optional} value with the {@link BaseEmailAttributes}.
    */
-  public static Optional<ReceivedEmailAttributes> getAttributesFromMessage(Message muleMessage) {
-    if (muleMessage.getAttributes() instanceof ReceivedEmailAttributes) {
-      return Optional.ofNullable((ReceivedEmailAttributes) muleMessage.getAttributes());
+  public static Optional<BaseEmailAttributes> getAttributesFromMessage(Message muleMessage) {
+    if (muleMessage.getAttributes() instanceof BaseEmailAttributes) {
+      return Optional.ofNullable((BaseEmailAttributes) muleMessage.getAttributes());
     }
     return Optional.empty();
   }

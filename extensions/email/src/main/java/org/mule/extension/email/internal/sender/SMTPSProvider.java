@@ -12,7 +12,7 @@ import static org.mule.extension.email.internal.util.EmailConnectorUtils.SMTPS_P
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -26,7 +26,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
 
 /**
- * A {@link ConnectionProvider} that returns instances of smtps based {@link RetrieverConnection}s.
+ * A {@link ConnectionProvider} that returns instances of smtps based {@link MailboxConnection}s.
  * <p>
  * The returned connection is secured by TLS.
  *

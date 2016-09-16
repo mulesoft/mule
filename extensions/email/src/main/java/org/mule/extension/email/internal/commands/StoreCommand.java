@@ -12,7 +12,7 @@ import static javax.mail.Folder.READ_ONLY;
 import static org.apache.commons.io.FileUtils.write;
 
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.runtime.api.message.Message;
 import org.mule.extension.email.api.exception.EmailRetrieveException;
 
@@ -48,7 +48,7 @@ public final class StoreCommand {
    * <p>
    * The name of the email file is composed by the subject and the received date of the email.
    *
-   * @param connection the associated {@link RetrieverConnection}.
+   * @param connection the associated {@link MailboxConnection}.
    * @param muleMessage the incoming {@link Message}.
    * @param folderName the name of the folder where the email(s) is going to be fetched.
    * @param localDirectory the localDirectory where the emails are going to be stored.
@@ -58,7 +58,7 @@ public final class StoreCommand {
    *        {@link Message}.
    * @param overwrite if should overwrite a file that already exist or not.
    */
-  public void store(RetrieverConnection connection, Message muleMessage, String folderName, String localDirectory,
+  public void store(MailboxConnection connection, Message muleMessage, String folderName, String localDirectory,
                     final String fileName, Integer emailId, boolean overwrite) {
     Folder folder = connection.getFolder(folderName, READ_ONLY);
     executor.execute(muleMessage, emailId, id -> {

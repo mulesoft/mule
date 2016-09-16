@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.retriever;
+package org.mule.extension.email.internal.manager;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.DISCONNECTED;
@@ -28,34 +28,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A connection with a mail server for retrieving emails from an specific folder.
+ * A connection with a mail server for retrieving and managing emails from an specific folder in a mailbox.
  *
  * @since 4.0
  */
-public class RetrieverConnection extends AbstractEmailConnection {
+public class MailboxConnection extends AbstractEmailConnection {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RetrieverConnection.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MailboxConnection.class);
 
   private final Store store;
   private Folder folder;
 
   /**
-   * Creates a new instance of the of the {@link RetrieverConnection} secured by TLS.
+   * Creates a new instance of the of the {@link MailboxConnection} secured by TLS.
    *
-   * @param protocol the desired protocol to use. One of imap or pop3 (and its secure versions)
-   * @param username the username to establish the connection.
-   * @param password the password corresponding to the {@code username}.
-   * @param host the host name of the mail server
-   * @param port the port number of the mail server.
+   * @param protocol          the desired protocol to use. One of imap or pop3 (and its secure versions)
+   * @param username          the username to establish the connection.
+   * @param password          the password corresponding to the {@code username}.
+   * @param host              the host name of the mail server
+   * @param port              the port number of the mail server.
    * @param connectionTimeout the socket connection timeout
-   * @param readTimeout the socket read timeout
-   * @param writeTimeout the socket write timeout
-   * @param properties additional custom properties.
+   * @param readTimeout       the socket read timeout
+   * @param writeTimeout      the socket write timeout
+   * @param properties        additional custom properties.
    * @param tlsContextFactory the tls context factory for creating the context to secure the connection
    */
-  public RetrieverConnection(EmailProtocol protocol, String username, String password, String host, String port,
-                             long connectionTimeout, long readTimeout, long writeTimeout, Map<String, String> properties,
-                             TlsContextFactory tlsContextFactory)
+  public MailboxConnection(EmailProtocol protocol, String username, String password, String host, String port,
+                           long connectionTimeout, long readTimeout, long writeTimeout, Map<String, String> properties,
+                           TlsContextFactory tlsContextFactory)
       throws EmailConnectionException {
     super(protocol, username, password, host, port, connectionTimeout, readTimeout, writeTimeout, properties, tlsContextFactory);
     try {
@@ -72,20 +72,20 @@ public class RetrieverConnection extends AbstractEmailConnection {
   }
 
   /**
-   * Creates a new instance of the of the {@link RetrieverConnection}.
+   * Creates a new instance of the of the {@link MailboxConnection}.
    *
-   * @param protocol the desired protocol to use. One of imap or pop3 (and its secure versions)
-   * @param username the username to establish the connection.
-   * @param password the password corresponding to the {@code username}.
-   * @param host the host name of the mail server
-   * @param port the port number of the mail server.
+   * @param protocol          the desired protocol to use. One of imap or pop3 (and its secure versions)
+   * @param username          the username to establish the connection.
+   * @param password          the password corresponding to the {@code username}.
+   * @param host              the host name of the mail server
+   * @param port              the port number of the mail server.
    * @param connectionTimeout the socket connection timeout
-   * @param readTimeout the socket read timeout
-   * @param writeTimeout the socket write timeout
-   * @param properties additional custom properties.
+   * @param readTimeout       the socket read timeout
+   * @param writeTimeout      the socket write timeout
+   * @param properties        additional custom properties.
    */
-  public RetrieverConnection(EmailProtocol protocol, String username, String password, String host, String port,
-                             long connectionTimeout, long readTimeout, long writeTimeout, Map<String, String> properties)
+  public MailboxConnection(EmailProtocol protocol, String username, String password, String host, String port,
+                           long connectionTimeout, long readTimeout, long writeTimeout, Map<String, String> properties)
       throws EmailConnectionException {
     this(protocol, username, password, host, port, connectionTimeout, readTimeout, writeTimeout, properties, null);
   }
@@ -99,7 +99,7 @@ public class RetrieverConnection extends AbstractEmailConnection {
    * be opened.
    *
    * @param mailBoxFolder the name of the folder to be opened.
-   * @param openMode open the folder in READ_ONLY or READ_WRITE mode
+   * @param openMode      open the folder in READ_ONLY or READ_WRITE mode
    * @return the opened {@link Folder}
    */
   public synchronized Folder getFolder(String mailBoxFolder, int openMode) {

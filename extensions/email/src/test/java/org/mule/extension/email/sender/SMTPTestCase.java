@@ -17,9 +17,8 @@ import static org.mule.extension.email.util.EmailTestUtils.ALE_EMAIL;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_JSON_ATTACHMENT_CONTENT;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
-
 import org.mule.extension.email.EmailConnectorTestCase;
-import org.mule.extension.email.api.ReceivedEmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -65,8 +64,8 @@ public abstract class SMTPTestCase extends EmailConnectorTestCase {
     return messages;
   }
 
-  ReceivedEmailAttributes getTestAttributes() throws MessagingException {
-    ReceivedEmailAttributes attributes = mock(ReceivedEmailAttributes.class);
+  BaseEmailAttributes getTestAttributes() throws MessagingException {
+    BaseEmailAttributes attributes = mock(BaseEmailAttributes.class);
     when(attributes.getCcAddresses()).thenReturn(singletonList(ALE_EMAIL));
     when(attributes.getToAddresses()).thenReturn(singletonList(JUANI_EMAIL));
     when(attributes.getSubject()).thenReturn(EMAIL_SUBJECT);

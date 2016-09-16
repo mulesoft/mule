@@ -12,6 +12,11 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 
+/**
+ * Abstract implementation of a {@link PoolingConnectionProvider} for email sender connection providers.
+ *
+ * @since 4.0
+ */
 public abstract class AbstractSenderProvider extends AbstractEmailConnectionProvider<SenderConnection>
     implements PoolingConnectionProvider<SenderConnection> {
 

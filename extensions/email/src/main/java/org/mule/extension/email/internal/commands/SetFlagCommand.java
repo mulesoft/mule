@@ -10,7 +10,7 @@ import static java.lang.String.format;
 import static javax.mail.Folder.READ_WRITE;
 
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.runtime.api.message.Message;
 
 import java.util.List;
@@ -39,13 +39,13 @@ public class SetFlagCommand {
    * If no email(s) are found in the {@link Message} and no {@code emailId} is specified. the operation will fail.
    *
    * @param muleMessage the incoming {@link Message}.
-   * @param connection the associated {@link RetrieverConnection}.
+   * @param connection the associated {@link MailboxConnection}.
    * @param folderName the name of the folder where the email(s) is going to be fetched.
    * @param emailId the optional number of the email to be marked. for default the email is taken from the incoming
    *        {@link Message}.
    * @param flag the flag to be set.
    */
-  public void set(Message muleMessage, RetrieverConnection connection, String folderName, Integer emailId, Flag flag) {
+  public void set(Message muleMessage, MailboxConnection connection, String folderName, Integer emailId, Flag flag) {
     Folder folder = connection.getFolder(folderName, READ_WRITE);
     executor.execute(muleMessage, emailId, id -> {
       try {

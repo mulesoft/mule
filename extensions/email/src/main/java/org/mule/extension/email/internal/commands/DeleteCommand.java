@@ -8,7 +8,7 @@ package org.mule.extension.email.internal.commands;
 
 import static javax.mail.Flags.Flag.DELETED;
 
-import org.mule.extension.email.internal.retriever.RetrieverConnection;
+import org.mule.extension.email.internal.manager.MailboxConnection;
 import org.mule.runtime.api.message.Message;
 
 import java.util.List;
@@ -34,11 +34,11 @@ public final class DeleteCommand {
    * email is going to be erased from the folder, not even the ones marked as DELETED previously.
    *
    * @param message the incoming {@link Message}.
-   * @param connection the corresponding {@link RetrieverConnection} instance.
+   * @param connection the corresponding {@link MailboxConnection} instance.
    * @param folderName the folder where the emails are going to be fetched
    * @param emailId an optional email number to look up in the folder.
    */
-  public void delete(Message message, RetrieverConnection connection, String folderName, Integer emailId) {
+  public void delete(Message message, MailboxConnection connection, String folderName, Integer emailId) {
     setFlagCommand.set(message, connection, folderName, emailId, DELETED);
     connection.closeFolder(true);
   }

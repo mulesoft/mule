@@ -4,25 +4,27 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.api;
+package org.mule.extension.email.api.predicate;
 
 import static java.util.regex.Pattern.compile;
-
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.runtime.core.api.util.TimeSinceFunction;
 import org.mule.runtime.core.api.util.TimeUntilFunction;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 /**
- * Builds a {@link Predicate} which verifies that a {@link ReceivedEmailAttributes} instance is compliant with a number of criteria. This
- * builder is stateful and not thread-safe. A new instance should be use per each desired {@link Predicate}.
+ * Base builder class for {@link Predicate}s that verify that a {@link BaseEmailAttributes} instance is compliant with a
+ * number of criteria. Builder implementation of this class are stateful and not thread-safe. A new instance should be
+ * use per each desired {@link Predicate}.
  * <p>
- * This builder can either be used programmatically or through Mule's SDK since its internal state is annotated with the
- * {@link Parameter} annotation.
+ * Builder implementations can either be used programmatically or through Mule's SDK since its internal state is
+ * annotated with the {@link Parameter} annotation.
  * <p>
  * Criterias are evaluated using an {@code AND} operator, meaning that for the predicate to accept a file, ALL the criterias must
  * be complied with.
@@ -30,18 +32,17 @@ import java.util.function.Predicate;
  * None of the criteria fields are mandatory. If a particular criteria is not specified, then it's simply not applied on the
  * evaluation.
  * <p>
- * The class is also given the &quot;matcher&quot; alias to make it DSL/XML friendly.
  *
  * @since 4.0
  */
-@Alias("matcher")
-public class EmailPredicateBuilder {
+public abstract class BaseEmailPredicateBuilder {
 
   private static final TimeUntilFunction TIME_UNTIL = new TimeUntilFunction();
   private static final TimeSinceFunction TIME_SINCE = new TimeSinceFunction();
 
   /**
    * Indicates since which date the received emails must be retrieved
+   *
    */
   @Parameter
   @Optional
@@ -69,34 +70,6 @@ public class EmailPredicateBuilder {
   private LocalDateTime sentUntil;
 
   /**
-   * Indicates if should retrieve 'seen' or 'not seen' emails
-   */
-  @Parameter
-  @Optional
-  private Boolean seen;
-
-  /**
-   * Indicates if should retrieve 'answered' or 'not answered' emails
-   */
-  @Parameter
-  @Optional
-  private Boolean answered;
-
-  /**
-   * Indicates if should retrieve 'marked as deleted' or 'not marked as deleted' emails
-   */
-  @Parameter
-  @Optional
-  private Boolean deleted;
-
-  /**
-   * "Indicates if should retrieve 'recent' or 'not recent' emails
-   */
-  @Parameter
-  @Optional
-  private Boolean recent;
-
-  /**
    * Subject Regex to match with the wanted emails
    */
   @Parameter
@@ -115,8 +88,8 @@ public class EmailPredicateBuilder {
    *
    * @return a {@link Predicate}
    */
-  public Predicate<ReceivedEmailAttributes> build() {
-    Predicate<ReceivedEmailAttributes> predicate = emailAttributes -> true;
+  public Predicate<BaseEmailAttributes> build() {
+    Predicate<? extends BaseEmailAttributes> predicate = getBasePredicate();
 
     if (subjectRegex != null) {
       Predicate<String> subjectPredicate = compile(subjectRegex).asPredicate();
@@ -148,72 +121,40 @@ public class EmailPredicateBuilder {
           predicate.and(attributes -> attributes.getSentDate() != null && TIME_UNTIL.apply(sentUntil, attributes.getSentDate()));
     }
 
-    if (recent != null) {
-      predicate = predicate.and(attributes -> recent == attributes.getFlags().isRecent());
-    }
-
-    if (deleted != null) {
-      predicate = predicate.and(attributes -> deleted == attributes.getFlags().isDeleted());
-    }
-
-    if (answered != null) {
-      predicate = predicate.and(attributes -> answered == attributes.getFlags().isAnswered());
-    }
-
-    if (seen != null) {
-      predicate = predicate.and(attributes -> seen == attributes.getFlags().isSeen());
-    }
-
-    return predicate;
+    return (Predicate<BaseEmailAttributes>) predicate;
   }
 
-  public EmailPredicateBuilder setAnswered(Boolean answered) {
-    this.answered = answered;
-    return this;
-  }
-
-  public EmailPredicateBuilder setDeleted(Boolean deleted) {
-    this.deleted = deleted;
-    return this;
-  }
-
-  public EmailPredicateBuilder setFromRegex(String fromRegex) {
+  public BaseEmailPredicateBuilder setFromRegex(String fromRegex) {
     this.fromRegex = fromRegex;
     return this;
   }
 
-  public EmailPredicateBuilder setReceivedSince(LocalDateTime receivedSince) {
+  public BaseEmailPredicateBuilder setReceivedSince(LocalDateTime receivedSince) {
     this.receivedSince = receivedSince;
     return this;
   }
 
-  public EmailPredicateBuilder setReceivedUntil(LocalDateTime receivedUntil) {
+  public BaseEmailPredicateBuilder setReceivedUntil(LocalDateTime receivedUntil) {
     this.receivedUntil = receivedUntil;
     return this;
   }
 
-  public EmailPredicateBuilder setRecent(Boolean recent) {
-    this.recent = recent;
-    return this;
-  }
-
-  public EmailPredicateBuilder setSeen(Boolean seen) {
-    this.seen = seen;
-    return this;
-  }
-
-  public EmailPredicateBuilder setSubjectRegex(String subjectRegex) {
+  public BaseEmailPredicateBuilder setSubjectRegex(String subjectRegex) {
     this.subjectRegex = subjectRegex;
     return this;
   }
 
-  public EmailPredicateBuilder setSentSince(LocalDateTime sentSince) {
+  public BaseEmailPredicateBuilder setSentSince(LocalDateTime sentSince) {
     this.sentSince = sentSince;
     return this;
   }
 
-  public EmailPredicateBuilder setSentUntil(LocalDateTime sentUntil) {
+  public BaseEmailPredicateBuilder setSentUntil(LocalDateTime sentUntil) {
     this.sentUntil = sentUntil;
     return this;
+  }
+
+  protected Predicate<? extends BaseEmailAttributes> getBasePredicate() {
+    return emailAttributes -> true;
   }
 }

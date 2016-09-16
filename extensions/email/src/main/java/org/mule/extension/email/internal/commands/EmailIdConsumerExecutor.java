@@ -6,12 +6,13 @@
  */
 package org.mule.extension.email.internal.commands;
 
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.getAttributesFromMessage;
-import org.mule.extension.email.api.ReceivedEmailAttributes;
+import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -44,8 +45,8 @@ public class EmailIdConsumerExecutor {
       Object payload = muleMessage.getPayload().getValue();
       if (payload instanceof List) {
         for (Object o : (List) payload) {
-          if (o instanceof Message) {
-            emailId = getIdOrFail(((Message) o));
+          if (o instanceof OperationResult) {
+            emailId = getIdOrFail(((OperationResult) o));
             consumer.accept(emailId);
           } else {
             throw new EmailException(NO_ID_ERROR);
@@ -53,15 +54,24 @@ public class EmailIdConsumerExecutor {
         }
         return;
       }
-      emailId = getIdOrFail(muleMessage);
+      Object result = muleMessage.getPayload().getValue();
+      if (result instanceof OperationResult) {
+        emailId = getIdOrFail((OperationResult) result);
+      } else {
+        throw new EmailException(NO_ID_ERROR);
+      }
     }
     consumer.accept(emailId);
   }
 
   /**
-   * Gets an emailId from a MuleMessage of fails if the MuleMessage does not contains attributes of {@link ReceivedEmailAttributes} type.
+   * Gets an emailId from a MuleMessage of fails if the MuleMessage does not contains attributes of {@link BaseEmailAttributes} type.
    */
-  private int getIdOrFail(Message muleMessage) {
-    return getAttributesFromMessage(muleMessage).orElseThrow(() -> new EmailException(NO_ID_ERROR)).getId();
+  private int getIdOrFail(OperationResult result) {
+    Optional attributes = result.getAttributes();
+    if (attributes.isPresent()) {
+      return ((BaseEmailAttributes) attributes.get()).getId();
+    }
+    throw new EmailException(NO_ID_ERROR);
   }
 }

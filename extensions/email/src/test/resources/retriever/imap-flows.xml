@@ -5,27 +5,23 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
-    <spring:beans>
-        <spring:import resource="retriever-flows.xml"/>
-    </spring:beans>
-
     <flow name="retrieveAndDontRead">
-        <email:list config-ref="config-dont-read"/>
+        <email:list-imap config-ref="config-dont-read"/>
     </flow>
 
     <flow name="retrieveAndMarkRead">
-        <email:list config-ref="config"/>
+        <email:list-imap config-ref="config"/>
         <email:mark-as-read config-ref="config"/>
     </flow>
 
     <flow name="retrieveAndThenExpungeDelete">
-        <email:list config-ref="config"/>
+        <email:list-imap config-ref="config"/>
         <email:mark-as-deleted config-ref="config"/>
         <email:expunge-folder config-ref="config"/>
     </flow>
 
     <flow name="retrieveAndMarkDelete">
-        <email:list config-ref="config"/>
+        <email:list-imap config-ref="config"/>
         <email:mark-as-deleted config-ref="config"/>
     </flow>
 
@@ -34,15 +30,48 @@
     </flow>
 
     <flow name="retrieveOnlyNotReadEmails">
-        <email:list config-ref="config">
-            <email:matcher seen="false"/>
-        </email:list>
+        <email:list-imap config-ref="config">
+            <email:imap-matcher seen="false"/>
+        </email:list-imap>
     </flow>
 
     <flow name="retrieveOnlyRecentEmails">
-        <email:list config-ref="config">
-            <email:matcher recent="true"/>
-        </email:list>
+        <email:list-imap config-ref="config">
+            <email:imap-matcher recent="true"/>
+        </email:list-imap>
+    </flow>
+
+    <flow name="retrieveAndRead">
+        <email:list-imap config-ref="config"/>
+    </flow>
+
+    <flow name="retrieveMatchingSubjectAndFromAddress">
+        <email:list-imap config-ref="config">
+            <email:imap-matcher subjectRegex="Email Subject" fromRegex="@mulesoft"/>
+        </email:list-imap>
+    </flow>
+
+    <flow name="retrieveWithAttachments">
+        <email:list-imap config-ref="config"/>
+    </flow>
+
+    <flow name="storeMessages">
+        <email:list-imap config-ref="config"/>
+        <email:store config-ref="config" localDirectory="${storePath}"/>
+    </flow>
+
+    <flow name="storeSingleMessage">
+        <email:store config-ref="config" localDirectory="${storePath}" emailId="1"/>
+    </flow>
+
+    <flow name="retrieveAndDelete">
+        <email:list-imap config-ref="config"/>
+        <email:delete config-ref="config"/>
+    </flow>
+
+    <flow name="retrieveAndDeleteIncomingAndScheduled">
+        <email:list-imap config-ref="config"/>
+        <email:delete config-ref="config" emailId="6"/>
     </flow>
 
 </mule>
