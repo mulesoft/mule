@@ -434,6 +434,46 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ProcessDoorType" substitutionGroup="mule:abstract-message-processor" name="process-door"></xs:element>
+    <xs:complexType name="ProcessDoorType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="door">
+                        <xs:complexType>
+                            <xs:choice minOccurs="1" maxOccurs="1">
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
+                            </xs:choice>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="door-registries">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="door-registry">
+                                    <xs:complexType>
+                                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                            <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:abstract-door"></xs:element>
+                                            <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" minOccurs="0" maxOccurs="1" ref="subtypes:global-abstract-door"></xs:element>
+                                        </xs:choice>
+                                        <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                                        <xs:attribute type="xs:string" use="optional" name="value"></xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" use="optional" name="door"></xs:attribute>
+                <xs:attribute type="mule:expressionMap" use="optional" name="doorRegistry"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/subtypes" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ShapeRetrieverType" substitutionGroup="mule:abstract-message-processor" name="shape-retriever"></xs:element>
     <xs:complexType name="ShapeRetrieverType">
         <xs:complexContent>

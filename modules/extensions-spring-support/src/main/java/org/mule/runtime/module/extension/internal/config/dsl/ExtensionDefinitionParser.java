@@ -319,7 +319,8 @@ public abstract class ExtensionDefinitionParser {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        addDefinition(baseDefinitionBuilder.copy().withIdentifier(valueChildElementDsl.getElementName())
+        addDefinition(baseDefinitionBuilder.copy()
+            .withIdentifier(valueChildElementDsl.getElementName())
             .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
             .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true, false))
             .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true, false))
@@ -329,7 +330,8 @@ public abstract class ExtensionDefinitionParser {
       @Override
       public void visitObject(ObjectType objectType) {
         defaultVisit(objectType);
-        if (valueChildElementDsl.supportsTopLevelDeclaration() || valueChildElementDsl.supportsChildDeclaration()) {
+        if (valueChildElementDsl.supportsTopLevelDeclaration()
+            || (valueChildElementDsl.supportsChildDeclaration() && !valueChildElementDsl.isWrapped())) {
           try {
             new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslSyntaxResolver,
                                           parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
@@ -781,4 +783,3 @@ public abstract class ExtensionDefinitionParser {
     return getHintsModelProperty(parameterModel).map(XmlHintsModelProperty::allowsReferences).orElse(true);
   }
 }
-
