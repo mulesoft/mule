@@ -14,9 +14,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.extension.email.util.EmailTestUtils.EMAIL_SUBJECT;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import org.mule.extension.email.api.EmailFlags;
-import org.mule.extension.email.api.attributes.ImapEmailAttributes;
+import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.extension.email.api.predicate.BaseEmailPredicateBuilder;
-import org.mule.extension.email.api.predicate.ImapEmailPredicateBuilder;
+import org.mule.extension.email.api.predicate.IMAPEmailPredicateBuilder;
 
 import java.time.LocalDateTime;
 
@@ -28,19 +28,19 @@ public class EmailPredicateTestCase {
   private static final LocalDateTime RECEIVED_DATE = LocalDateTime.of(2015, 4, 20, 00, 00);
   private static final LocalDateTime SENT_DATE = LocalDateTime.of(2014, 4, 10, 00, 00);
 
-  private ImapEmailAttributes attributes;
+  private IMAPEmailAttributes attributes;
   private BaseEmailPredicateBuilder builder;
 
   @Before
   public void before() {
-    builder = new ImapEmailPredicateBuilder();
+    builder = new IMAPEmailPredicateBuilder();
 
     EmailFlags flags = mock(EmailFlags.class);
     when(flags.isSeen()).thenReturn(true);
     when(flags.isRecent()).thenReturn(true);
     when(flags.isDeleted()).thenReturn(false);
 
-    attributes = mock(ImapEmailAttributes.class);
+    attributes = mock(IMAPEmailAttributes.class);
     when(attributes.getSubject()).thenReturn(EMAIL_SUBJECT);
     when(attributes.getFromAddresses()).thenReturn(singletonList(JUANI_EMAIL));
     when(attributes.getFlags()).thenReturn(flags);

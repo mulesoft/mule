@@ -9,10 +9,10 @@ package org.mule.extension.email.internal.commands;
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
-import org.mule.extension.email.api.exception.EmailRetrieveException;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.predicate.BaseEmailPredicateBuilder;
-import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
-import org.mule.extension.email.internal.manager.MailboxConnection;
+import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
+import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.extension.email.internal.util.EmailContentProcessor;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
@@ -59,12 +59,12 @@ public final class ListCommand {
       List<OperationResult<Object, T>> list = new LinkedList<>();
       for (javax.mail.Message m : folder.getMessages()) {
         Object emailContent = "";
-        T attributes = configuration.parseAttributesFromMessage(m);
+        T attributes = configuration.parseAttributesFromMessage(m, folder);
         if (matcher.test(attributes)) {
           if (configuration.isEagerlyFetchContent()) {
             emailContent = readContent(m);
             // Attributes are parsed again since they may change after the email has been read.
-            attributes = configuration.parseAttributesFromMessage(m);
+            attributes = configuration.parseAttributesFromMessage(m, folder);
           }
           OperationResult<Object, T> operationResult = OperationResult.<Object, T>builder()
               .output(emailContent)
@@ -75,7 +75,7 @@ public final class ListCommand {
       }
       return list;
     } catch (MessagingException me) {
-      throw new EmailRetrieveException(me);
+      throw new EmailException("Error while retrieving emails: " + me.getMessage(), me);
     }
   }
 

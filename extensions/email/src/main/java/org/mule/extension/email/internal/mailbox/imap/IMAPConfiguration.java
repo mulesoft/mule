@@ -4,12 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.manager.imap;
+package org.mule.extension.email.internal.mailbox.imap;
 
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
-import org.mule.extension.email.api.attributes.ImapEmailAttributes;
-import org.mule.extension.email.internal.manager.CommonEmailOperations;
-import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
+import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
+import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -17,6 +16,9 @@ import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
+import com.sun.mail.imap.IMAPFolder;
+
+import javax.mail.Folder;
 import javax.mail.Message;
 
 /**
@@ -24,7 +26,7 @@ import javax.mail.Message;
  *
  * @since 4.0
  */
-@Operations({IMAPOperations.class, CommonEmailOperations.class})
+@Operations(IMAPOperations.class)
 @ConnectionProviders({IMAPProvider.class, IMAPSProvider.class})
 @Configuration(name = "imap")
 @DisplayName("IMAP")
@@ -45,11 +47,8 @@ public class IMAPConfiguration implements MailboxAccessConfiguration {
     return eagerlyFetchContent;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message) {
-    return (T) new ImapEmailAttributes(message);
+  public <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message, Folder folder) {
+    return (T) new IMAPEmailAttributes(message, (IMAPFolder) folder);
   }
 }

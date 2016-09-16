@@ -19,23 +19,8 @@
         <email:list-pop3 config-ref="config"/>
     </flow>
 
-    <flow name="storeMessages">
-        <email:list-pop3 config-ref="config"/>
-        <email:store config-ref="config" localDirectory="${storePath}"/>
-    </flow>
-
-    <flow name="storeSingleMessage">
-        <email:store config-ref="config" localDirectory="${storePath}" emailId="1"/>
-    </flow>
-
     <flow name="retrieveAndDelete">
-        <email:list-pop3 config-ref="config"/>
-        <email:delete config-ref="config"/>
-    </flow>
-
-    <flow name="retrieveAndDeleteIncomingAndScheduled">
-        <email:list-pop3 config-ref="config"/>
-        <email:delete config-ref="config" emailId="6"/>
+        <email:list-pop3 config-ref="config" deleteAfterRetrieve="true"/>
     </flow>
 
 </mule>

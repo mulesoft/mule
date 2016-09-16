@@ -13,11 +13,7 @@ import static javax.mail.Message.RecipientType.TO;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.Matchers.arrayWithSize;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -40,9 +36,6 @@ import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
 import javax.mail.Flags.Flag;
@@ -138,36 +131,6 @@ public abstract class AbstractEmailRetrieverTestCase extends EmailConnectorTestC
     assertThat(server.getReceivedMessages(), arrayWithSize(10));
     runFlow(RETRIEVE_AND_DELETE);
     assertThat(server.getReceivedMessages(), arrayWithSize(0));
-  }
-
-  @Test
-  public void storeEmailsInDirectory() throws Exception {
-    runFlow(STORE_MESSAGES);
-    File[] storedEmails = temporaryFolder.getRoot().listFiles();
-    assertThat(storedEmails, is(not(nullValue())));
-    assertThat(storedEmails, arrayWithSize(10));
-    for (File storedEmail : storedEmails) {
-      assertStoredEmail(storedEmail);
-    }
-  }
-
-  @Test
-  public void storeSingleEmailInDirectory() throws Exception {
-    runFlow(STORE_SINGLE_MESSAGE);
-    File[] storedEmails = temporaryFolder.getRoot().listFiles();
-    assertThat(storedEmails, is(not(nullValue())));
-    assertThat(storedEmails, arrayWithSize(1));
-    assertStoredEmail(storedEmails[0]);
-  }
-
-  private void assertStoredEmail(File storedEmail) throws IOException {
-    assertThat(storedEmail.getName(), startsWith(EMAIL_SUBJECT));
-    String fileContent = new String(Files.readAllBytes(storedEmail.toPath()));
-    assertThat(fileContent, containsString("To: " + JUANI_EMAIL));
-    assertThat(fileContent, containsString("From: " + ESTEBAN_EMAIL));
-    assertThat(fileContent, containsString("Cc: " + ALE_EMAIL));
-    assertThat(fileContent, containsString("Subject: " + EMAIL_SUBJECT));
-    assertThat(fileContent, containsString(EMAIL_CONTENT));
   }
 
   protected List<OperationResult> runFlowAndGetMessages(String flowName) throws Exception {

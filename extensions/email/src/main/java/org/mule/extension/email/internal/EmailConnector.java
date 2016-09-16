@@ -9,8 +9,8 @@ package org.mule.extension.email.internal;
 
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
-import org.mule.extension.email.internal.manager.imap.IMAPConfiguration;
-import org.mule.extension.email.internal.manager.pop3.POP3Configuration;
+import org.mule.extension.email.internal.mailbox.imap.IMAPConfiguration;
+import org.mule.extension.email.internal.mailbox.pop3.POP3Configuration;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;

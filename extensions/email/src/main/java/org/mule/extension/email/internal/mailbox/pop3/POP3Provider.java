@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.manager.pop3;
+package org.mule.extension.email.internal.mailbox.pop3;
 
 import static org.mule.extension.email.internal.EmailProtocol.POP3;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.POP3_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.POP3_PORT;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
-import org.mule.extension.email.internal.manager.AbstractMailboxManagerProvider;
-import org.mule.extension.email.internal.manager.MailboxConnection;
+import org.mule.extension.email.internal.mailbox.AbstractMailboxConnectionProvider;
+import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -27,7 +27,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Placement;
  */
 @Alias("pop3")
 @DisplayName("POP3 Connection")
-public class POP3Provider extends AbstractMailboxManagerProvider<MailboxConnection> {
+public class POP3Provider extends AbstractMailboxConnectionProvider<MailboxConnection> {
 
   /**
    * The port number of the mail server. '110' by default.

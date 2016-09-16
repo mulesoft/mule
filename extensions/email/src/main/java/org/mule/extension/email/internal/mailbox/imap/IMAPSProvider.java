@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.manager.imap;
+package org.mule.extension.email.internal.mailbox.imap;
 
 import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.IMAPS;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.IMAPS_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.IMAPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
-import org.mule.extension.email.internal.manager.AbstractMailboxManagerProvider;
-import org.mule.extension.email.internal.manager.MailboxConnection;
+import org.mule.extension.email.internal.mailbox.AbstractMailboxConnectionProvider;
+import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -35,7 +35,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  */
 @Alias("imaps")
 @DisplayName("IMAPS Connection")
-public class IMAPSProvider extends AbstractMailboxManagerProvider<MailboxConnection> implements Initialisable {
+public class IMAPSProvider extends AbstractMailboxConnectionProvider<MailboxConnection> implements Initialisable {
 
   /**
    * The port number of the mail server. '993' by default.
