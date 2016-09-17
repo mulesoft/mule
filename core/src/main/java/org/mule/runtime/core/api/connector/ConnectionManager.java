@@ -95,9 +95,10 @@ public interface ConnectionManager {
   /**
    * Tests connectivity for the given {@code configurationInstance}.
    * <p>
-   * The {@code connectionProvider} is expected to be fully initialised and functional. However,
-   * it is not required for it to have been registered through the {@link #bind(Object, ConnectionProvider)}
-   * method.
+   * The {@code connectionProvider} is expected to be fully initialised and functional. It is not
+   * required for the config wrapped by the {@code configurationInstance} to have been registered
+   * through the {@link #bind(Object, ConnectionProvider)} method. However, if it has been, then
+   * the test will be performed using the resources allocated by such registration.
    *
    * @param configurationInstance a {@link ConfigurationInstance}
    * @return a {@link ConnectionValidationResult}

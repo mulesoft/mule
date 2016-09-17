@@ -12,6 +12,7 @@ import org.mule.extension.socket.api.exceptions.UnresolvableHostException;
 import org.mule.extension.socket.api.socket.udp.UdpSocketProperties;
 import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.internal.SocketUtils;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -27,7 +28,7 @@ import java.net.DatagramSocket;
  * @since 4.0
  */
 @Alias("udp-listener")
-public class UdpListenerProvider implements ConnectionProvider<UdpListenerConnection> {
+public class UdpListenerProvider implements CachedConnectionProvider<UdpListenerConnection> {
 
   /**
    * This configuration parameter refers to the address where the UDP socket should listen for incoming packets.
