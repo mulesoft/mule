@@ -13,6 +13,7 @@ import org.mule.api.client.MuleClient;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class PipelineMessageNotificationTestCase extends AbstractNotificationTestCase
@@ -22,7 +23,7 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
         super(variant, configResources);
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -33,6 +34,8 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
         client.request("vm://ow-out", RECEIVE_TIMEOUT);
         client.dispatch("vm://owException", "goodbye cruel world", null);
         client.request("vm://owException-out", RECEIVE_TIMEOUT);
+
+        assertNotifications();
     }
 
     @Override

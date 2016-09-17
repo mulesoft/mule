@@ -7,14 +7,13 @@
 package org.mule.context.notification;
 
 import static org.junit.Assert.fail;
+
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
 import java.util.Iterator;
-
-import org.junit.Test;
 
 /**
  * Tests must define a "notificationLogger" listener
@@ -28,12 +27,10 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
         super(variant, configResources);
     }
 
-    @Test
-    public final void testNotifications() throws Exception
+    protected void assertNotifications()
     {
-        doTest();
         notificationLogger = (NotificationLogger) muleContext.getRegistry()
-            .lookupObject("notificationLogger");
+                                                             .lookupObject("notificationLogger");
 
         // Need to explicitly dispose manager here to get disposal notifications
         muleContext.dispose();
@@ -47,42 +44,38 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
             @Override
             protected boolean test() throws Exception
             {
-                logNotifications();
+                String notificationsLog = buildLogNotifications();
                 RestrictedNode spec = getSpecification();
                 validateSpecification(spec);
-                assertExpectedNotifications(spec);
+                assertExpectedNotifications(notificationsLog, spec);
 
                 return true;
             }
-
-            @Override
-            public String describeFailure()
-            {
-                return "expected notifications not matched";
-            }
         });
     }
-
-    public abstract void doTest() throws Exception;
 
     public abstract RestrictedNode getSpecification();
 
     public abstract void validateSpecification(RestrictedNode spec) throws Exception;
 
-    protected void logNotifications()
+    protected String buildLogNotifications()
     {
-        logger.info("Number of notifications: " + notificationLogger.getNotifications().size());
+        final StringBuilder logMessageBuilder = new StringBuilder();
+        logMessageBuilder.append("Number of notifications: " + notificationLogger.getNotifications().size() + System.lineSeparator());
         for (Iterator<?> iterator = notificationLogger.getNotifications().iterator(); iterator.hasNext();)
         {
             ServerNotification notification = (ServerNotification) iterator.next();
-            logger.info(notification);
+            logMessageBuilder.append("\t" + notification + System.lineSeparator());
         }
+        
+        return logMessageBuilder.toString();
     }
 
     /**
      * This is destructive - do not use spec after calling this routine
+     * @param notificationsLog 
      */
-    protected void assertExpectedNotifications(RestrictedNode spec)
+    protected void assertExpectedNotifications(String notificationsLog, RestrictedNode spec)
     {
         for (Iterator<?> iterator = notificationLogger.getNotifications().iterator(); iterator.hasNext();)
         {
@@ -92,15 +85,15 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
                 case Node.SUCCESS :
                     break;
                 case Node.FAILURE :
-                    fail("Could not match " + notification);
+                    fail("Could not match " + notification + System.lineSeparator() + notificationsLog);
                     break;
                 case Node.EMPTY :
-                    fail("Extra notification: " + notification);
+                    fail("Extra notification: " + notification + System.lineSeparator() + notificationsLog);
             }
         }
         if (!spec.isExhausted())
         {
-            fail("Specification not exhausted: " + spec.getAnyRemaining());
+            fail("Specification not exhausted: " + spec.getAnyRemaining() + System.lineSeparator() + notificationsLog);
         }
     }
 
