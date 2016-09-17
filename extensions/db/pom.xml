@@ -101,7 +101,7 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>${derbyVersion}</version>
-            <scope>test</scope>
+            <!--TODO MULE-10435 - <scope>test</scope>-->
         </dependency>
 
         <dependency>

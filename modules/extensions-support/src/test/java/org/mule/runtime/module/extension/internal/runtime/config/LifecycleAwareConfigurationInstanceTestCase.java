@@ -43,6 +43,7 @@ import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.AbstractInterceptableContractTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -132,7 +133,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
   private void setup(ConnectionManagerAdapter connectionManager) {
     if (connectionProvider.isPresent()) {
       when(connectionManager.getRetryTemplateFor(connectionProvider.get())).thenReturn(retryPolicyTemplate);
-      when(connectionManager.testConnectivity(connectionProvider.get())).thenReturn(success());
+      when(connectionManager.testConnectivity(Mockito.any(ConfigurationInstance.class))).thenReturn(success());
     }
   }
 
@@ -157,10 +158,10 @@ public class LifecycleAwareConfigurationInstanceTestCase
   @Test
   public void connectionBound() throws Exception {
     interceptable.initialise();
-    asseretBound();
+    assertBound();
   }
 
-  private void asseretBound() throws Exception {
+  private void assertBound() throws Exception {
     if (connectionProvider.isPresent()) {
       verify(connectionManager, times(1)).bind(value, connectionProvider.get());
     } else {
@@ -180,7 +181,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
 
     reset(connectionManager);
     interceptable.start();
-    asseretBound();
+    assertBound();
   }
 
   @Test
@@ -205,7 +206,7 @@ public class LifecycleAwareConfigurationInstanceTestCase
   public void testConnectivityUponStart() throws Exception {
     if (connectionProvider.isPresent()) {
       valueStarted();
-      verify(connectionManager).testConnectivity(connectionProvider.get());
+      verify(connectionManager).testConnectivity(interceptable);
     }
   }
 
@@ -213,14 +214,14 @@ public class LifecycleAwareConfigurationInstanceTestCase
   public void testConnectivityFailsUponStart() throws Exception {
     if (connectionProvider.isPresent()) {
       Exception connectionException = new ConnectionException("Oops!");
-      when(connectionManager.testConnectivity(connectionProvider.get()))
+      when(connectionManager.testConnectivity(interceptable))
           .thenReturn(failure(connectionException.getMessage(), UNKNOWN, connectionException));
 
       try {
         interceptable.start();
         fail("Was expecting connectivity testing to fail");
       } catch (Exception e) {
-        verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(connectionProvider.get());
+        verify(connectionManager, times(RECONNECTION_MAX_ATTEMPTS + 1)).testConnectivity(interceptable);
         assertThat(e.getCause(), is(instanceOf(RetryPolicyExhaustedException.class)));
       }
     }

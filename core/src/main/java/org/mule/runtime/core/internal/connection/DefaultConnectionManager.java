@@ -30,6 +30,7 @@ import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -110,17 +111,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
    */
   @Override
   public <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider) {
-    ConnectionHandler<C> connectionHandler = null;
-    try {
-      connectionHandler = managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
-      return connectionProvider.validate(connectionHandler.getConnection());
-    } catch (Exception e) {
-      return failure("Exception was found trying to test connectivity", UNKNOWN, e);
-    } finally {
-      if (connectionHandler != null) {
-        connectionHandler.release();
-      }
-    }
+    return doTestConnectivity(() -> testConnectivity(connectionProvider, managementStrategyFactory.getStrategy(connectionProvider)
+        .getConnectionHandler()));
   }
 
   /**
@@ -129,12 +121,43 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter,
   @Override
   public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
       throws IllegalArgumentException {
-    if (configurationInstance.getConnectionProvider().isPresent()) {
-      return testConnectivity(configurationInstance.getConnectionProvider().get());
+
+    if (!configurationInstance.getConnectionProvider().isPresent()) {
+      throw new IllegalArgumentException("The component does not support connectivity testing");
     }
 
-    throw new IllegalArgumentException("The component does not support connectivity testing");
+    return doTestConnectivity(() -> {
+      ConnectionProvider<Object> connectionProvider = configurationInstance.getConnectionProvider().get();
+      final Object config = configurationInstance.getValue();
+      ConnectionHandler<Object> connectionHandler = hasBinding(config)
+          ? getConnection(config)
+          : managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+
+      return testConnectivity(connectionProvider, connectionHandler);
+    });
+
   }
+
+  private ConnectionValidationResult doTestConnectivity(Callable<ConnectionValidationResult> callable) {
+    try {
+      return callable.call();
+    } catch (Exception e) {
+      return failure("Exception was found trying to test connectivity", UNKNOWN, e);
+    }
+  }
+
+  private <C> ConnectionValidationResult testConnectivity(ConnectionProvider<C> connectionProvider,
+                                                          ConnectionHandler<C> connectionHandler)
+      throws Exception {
+    try {
+      return connectionProvider.validate(connectionHandler.getConnection());
+    } finally {
+      if (connectionHandler != null) {
+        connectionHandler.release();
+      }
+    }
+  }
+
 
   /**
    * {@inheritDoc}

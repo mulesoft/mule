@@ -146,7 +146,7 @@ public final class LifecycleAwareConfigurationInstance extends AbstractIntercept
 
       @Override
       public void doWork(RetryContext context) throws Exception {
-        ConnectionValidationResult result = connectionManager.testConnectivity(provider);
+        ConnectionValidationResult result = connectionManager.testConnectivity(LifecycleAwareConfigurationInstance.this);
         if (result.isValid()) {
           context.setOk();
         } else {

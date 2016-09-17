@@ -19,6 +19,7 @@ import org.mule.extension.socket.api.socket.tcp.TcpProtocol;
 import org.mule.extension.socket.api.socket.tcp.TcpServerSocketProperties;
 import org.mule.extension.socket.api.source.SocketListener;
 import org.mule.extension.socket.internal.SocketUtils;
+import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -46,7 +47,7 @@ import javax.net.ssl.SSLServerSocket;
  * @since 4.0
  */
 @Alias("tcp-listener")
-public final class TcpListenerProvider implements ConnectionProvider<TcpListenerConnection>, Initialisable {
+public final class TcpListenerProvider implements CachedConnectionProvider<TcpListenerConnection>, Initialisable {
 
   /**
    * Its presence will imply the use of {@link SSLServerSocket} instead of plain TCP {@link ServerSocket} for accepting new SSL
