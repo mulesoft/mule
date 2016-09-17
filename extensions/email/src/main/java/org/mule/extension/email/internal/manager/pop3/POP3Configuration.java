@@ -8,13 +8,15 @@ package org.mule.extension.email.internal.manager.pop3;
 
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.attributes.POP3EmailAttributes;
-import org.mule.extension.email.internal.manager.CommonEmailOperations;
 import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
+import com.sun.mail.pop3.POP3Folder;
+
+import javax.mail.Folder;
 import javax.mail.Message;
 
 /**
@@ -22,7 +24,7 @@ import javax.mail.Message;
  *
  * @since 4.0
  */
-@Operations({CommonEmailOperations.class, POP3Operations.class})
+@Operations(POP3Operations.class)
 @ConnectionProviders({POP3Provider.class, POP3SProvider.class})
 @Configuration(name = "pop3")
 @DisplayName("POP3")
@@ -41,8 +43,7 @@ public class POP3Configuration implements MailboxAccessConfiguration {
   /**
    * {@inheritDoc}
    */
-  @Override
-  public <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message) {
-    return (T) new POP3EmailAttributes(message);
+  public <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message, Folder folder) {
+    return (T) new POP3EmailAttributes(message, (POP3Folder) folder);
   }
 }

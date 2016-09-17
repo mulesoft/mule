@@ -6,9 +6,13 @@
  */
 package org.mule.extension.email.internal.manager.pop3;
 
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
+import static java.lang.String.format;
+import static javax.mail.Flags.Flag.DELETED;
+import static javax.mail.Folder.READ_WRITE;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.attributes.POP3EmailAttributes;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.predicate.POP3EmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.ListCommand;
 import org.mule.extension.email.internal.manager.MailboxAccessConfiguration;
@@ -22,8 +26,12 @@ import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 
 import java.util.List;
 
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+
 /**
- * Basic set of operations which perform on top the POP3 email protocol.
+ * A set of operations which perform on top the POP3 email protocol.
  *
  * @since 4.0
  */
@@ -45,7 +53,25 @@ public class POP3Operations {
   public List<OperationResult<Object, POP3EmailAttributes>> listPop3(@UseConfig POP3Configuration config,
                                                                      @Connection MailboxConnection connection,
                                                                      @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                     @DisplayName("Matcher") @Optional POP3EmailPredicateBuilder pop3Matcher) {
-    return listCommand.list(config, connection, mailboxFolder, pop3Matcher);
+                                                                     @DisplayName("Matcher") @Optional POP3EmailPredicateBuilder pop3Matcher,
+                                                                     @Optional(
+                                                                         defaultValue = "false") boolean deleteAfterRetrieve) {
+    List<OperationResult<Object, POP3EmailAttributes>> result = listCommand.list(config, connection, mailboxFolder, pop3Matcher);
+    if (deleteAfterRetrieve) {
+      Folder f = connection.getFolder(mailboxFolder, READ_WRITE);
+      result.forEach(r -> {
+        int id = r.getAttributes()
+            .orElseThrow(() -> new EmailException("Could not find attributes in retrieved email"))
+            .getNumber();
+        try {
+          Message m = f.getMessage(id);
+          m.setFlag(DELETED, true);
+        } catch (MessagingException e) {
+          throw new EmailException(format("Could not delete email number:[%s] from the [%s] POP3 folder", id, mailboxFolder), e);
+        }
+      });
+      connection.closeFolder(true);
+    }
+    return result;
   }
 }
