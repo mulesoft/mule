@@ -9,20 +9,23 @@ package org.mule.extension.http.internal.listener;
 
 import static org.mule.extension.http.api.HttpStreamingType.ALWAYS;
 import static org.mule.extension.http.api.HttpStreamingType.AUTO;
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
-
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -43,8 +46,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
-
-import javax.activation.DataHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,60 +110,56 @@ public class MuleEventToHttpResponse {
     final String existingContentLength = httpResponseHeaderBuilder.getContentLength();
 
     HttpEntity httpEntity;
+    final Object payload = event.getMessage().getPayload().getValue();
 
-    Map<String, DataHandler> parts = listenerResponseBuilder.getParts(event);
-
-    if (!parts.isEmpty()) {
+    if (payload == null) {
+      setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
+      httpEntity = new EmptyHttpEntity();
+    } else if (payload instanceof Map) {
+      if (configuredContentType == null) {
+        httpResponseHeaderBuilder.addContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
+      } else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
+        warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
+      }
+      httpEntity = createUrlEncodedEntity(event, (Map) payload);
+      if (responseStreaming == ALWAYS && supportsTransferEncoding) {
+        setupChunkedEncoding(httpResponseHeaderBuilder);
+      } else {
+        if (httpEntity instanceof EmptyHttpEntity) {
+          setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
+        } else {
+          ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) httpEntity;
+          setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+        }
+      }
+    } else if (payload instanceof MultiPartPayload) {
       if (configuredContentType == null) {
         httpResponseHeaderBuilder.addContentType(createMultipartFormDataContentType());
       } else if (!configuredContentType.startsWith(MULTIPART)) {
         warnNoMultipartContentTypeButMultipartEntity(httpResponseHeaderBuilder.getContentType());
       }
-      httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType(), parts);
+      httpEntity = createMultipartEntity(event, httpResponseHeaderBuilder.getContentType(), (MultiPartPayload) payload);
       resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
                       (ByteArrayHttpEntity) httpEntity);
-    } else {
-      final Object payload = event.getMessage().getPayload().getValue();
-      if (payload == null) {
-        setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
-        httpEntity = new EmptyHttpEntity();
-      } else if (payload instanceof Map) {
-        if (configuredContentType == null) {
-          httpResponseHeaderBuilder.addContentType(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString());
-        } else if (!configuredContentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED.toRfcString())) {
-          warnMapPayloadButNoUrlEncodedContentType(httpResponseHeaderBuilder.getContentType());
-        }
-        httpEntity = createUrlEncodedEntity(event, (Map) payload);
-        if (responseStreaming == ALWAYS && supportsTransferEncoding) {
+    } else if (payload instanceof InputStream) {
+      if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null)) {
+        if (supportsTransferEncoding) {
           setupChunkedEncoding(httpResponseHeaderBuilder);
-        } else {
-          if (httpEntity instanceof EmptyHttpEntity) {
-            setupContentLengthEncoding(httpResponseHeaderBuilder, 0);
-          } else {
-            ByteArrayHttpEntity byteArrayHttpEntity = (ByteArrayHttpEntity) httpEntity;
-            setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
-          }
         }
-      } else if (payload instanceof InputStream) {
-        if (responseStreaming == ALWAYS || (responseStreaming == AUTO && existingContentLength == null)) {
-          if (supportsTransferEncoding) {
-            setupChunkedEncoding(httpResponseHeaderBuilder);
-          }
-          httpEntity = new InputStreamHttpEntity((InputStream) payload);
-        } else {
-          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
-          setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
-          httpEntity = byteArrayHttpEntity;
-        }
+        httpEntity = new InputStreamHttpEntity((InputStream) payload);
       } else {
-        try {
-          ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes(muleContext));
-          resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
-                          byteArrayHttpEntity);
-          httpEntity = byteArrayHttpEntity;
-        } catch (Exception e) {
-          throw new RuntimeException(e);
-        }
+        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(IOUtils.toByteArray(((InputStream) payload)));
+        setupContentLengthEncoding(httpResponseHeaderBuilder, byteArrayHttpEntity.getContent().length);
+        httpEntity = byteArrayHttpEntity;
+      }
+    } else {
+      try {
+        ByteArrayHttpEntity byteArrayHttpEntity = new ByteArrayHttpEntity(event.getMessageAsBytes(muleContext));
+        resolveEncoding(httpResponseHeaderBuilder, existingTransferEncoding, existingContentLength, supportsTransferEncoding,
+                        byteArrayHttpEntity);
+        httpEntity = byteArrayHttpEntity;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
       }
     }
 
@@ -261,7 +258,7 @@ public class MuleEventToHttpResponse {
     }
   }
 
-  private HttpEntity createMultipartEntity(Event event, String contentType, Map<String, DataHandler> parts)
+  private HttpEntity createMultipartEntity(Event event, String contentType, MultiPartPayload partPayload)
       throws MessagingException {
     if (logger.isDebugEnabled()) {
       logger.debug("Message contains attachments. Ignoring payload and trying to generate multipart response.");
@@ -269,7 +266,8 @@ public class MuleEventToHttpResponse {
 
     final MultipartHttpEntity multipartEntity;
     try {
-      multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(parts));
+      Transformer objectToByteArray = muleContext.getRegistry().lookupTransformer(OBJECT, BYTE_ARRAY);
+      multipartEntity = new MultipartHttpEntity(HttpPartDataSource.createFrom(partPayload, objectToByteArray));
       return new ByteArrayHttpEntity(HttpMultipartEncoder.createMultipartContent(multipartEntity, contentType));
     } catch (Exception e) {
       throw new MessagingException(I18nMessageFactory.createStaticMessage("Error creating multipart HTTP entity."),

@@ -13,11 +13,8 @@ import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import javax.activation.DataHandler;
 
 /**
  * Component that specifies how to create a proper HTTP response.
@@ -49,13 +46,6 @@ public class HttpListenerResponseBuilder extends HttpMessageBuilder {
   @Optional
   private Function<Event, Map> headersRef;
 
-  /**
-   * HTTP parts the message should include, as an expression. Will override the parts attribute.
-   */
-  @Parameter
-  @Optional
-  private Function<Event, List> partsRef;
-
   public Integer getStatusCode(Event event) {
     return statusCode != null ? statusCode.apply(event) : null;
   }
@@ -68,7 +58,4 @@ public class HttpListenerResponseBuilder extends HttpMessageBuilder {
     return headersRef != null ? headersRef.apply(event) : headers;
   }
 
-  public Map<String, DataHandler> getParts(Event event) {
-    return partsRef != null ? getResolvedParts(partsRef.apply(event)) : getParts();
-  }
 }
