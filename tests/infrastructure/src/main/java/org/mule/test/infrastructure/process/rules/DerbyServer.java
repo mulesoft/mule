@@ -6,6 +6,8 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
+import static com.jayway.awaitility.Awaitility.await;
+import static com.jayway.awaitility.Awaitility.matches;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 
@@ -88,6 +90,7 @@ public class DerbyServer extends ExternalResource implements Closeable {
     try {
       server = new NetworkServerControl(InetAddress.getByName(HOST), port);
       server.start(new PrintWriter(new LogWriter()));
+      await().until(matches(() -> server.ping()));
     } catch (Exception e) {
       throw new RuntimeException("Couldn't start Derby server", e);
     }
