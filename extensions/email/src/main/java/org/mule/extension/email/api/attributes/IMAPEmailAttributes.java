@@ -9,6 +9,8 @@ package org.mule.extension.email.api.attributes;
 import org.mule.extension.email.api.EmailFlags;
 import org.mule.extension.email.api.exception.EmailException;
 
+import com.sun.mail.imap.IMAPFolder;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
@@ -19,16 +21,22 @@ import javax.mail.MessagingException;
  *
  * @since 4.0
  */
-public class ImapEmailAttributes extends BaseEmailAttributes {
+public class IMAPEmailAttributes extends BaseEmailAttributes {
 
   /**
    * The flags set in the email.
    */
   private final EmailFlags flags;
 
-  public ImapEmailAttributes(Message msg) {
+  /**
+   * The unique identifier of the email in an IMAP mailbox folder.
+   */
+  private final long id;
+
+  public IMAPEmailAttributes(Message msg, IMAPFolder folder) {
     super(msg);
     try {
+      this.id = folder.getUID(msg);
       this.flags = new EmailFlags(msg.getFlags());
     } catch (MessagingException mse) {
       throw new EmailException(mse.getMessage(), mse);
@@ -41,4 +49,13 @@ public class ImapEmailAttributes extends BaseEmailAttributes {
   public EmailFlags getFlags() {
     return flags;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public long getId() {
+    return id;
+  }
+
 }

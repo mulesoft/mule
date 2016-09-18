@@ -8,11 +8,11 @@ package org.mule.extension.email.internal.sender;
 
 import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.SMTPS;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.SMTPS_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.SMTPS_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
-import org.mule.extension.email.internal.manager.MailboxConnection;
+import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;

@@ -8,7 +8,7 @@ package org.mule.extension.email.api.predicate;
 
 import org.mule.extension.email.api.EmailFlags;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
-import org.mule.extension.email.api.attributes.ImapEmailAttributes;
+import org.mule.extension.email.api.attributes.IMAPEmailAttributes;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
@@ -17,7 +17,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import java.util.function.Predicate;
 
 /**
- * Builds a {@link Predicate} which verifies that a {@link ImapEmailAttributes} instance is compliant with a number of criteria.
+ * Builds a {@link Predicate} which verifies that a {@link IMAPEmailAttributes} instance is compliant with a number of criteria.
  * This builder is stateful and not thread-safe. A new instance should be use per each desired {@link Predicate}.
  * <p>
  * This builder adds the capability to build a predicate that filters by the {@link EmailFlags} contained in
@@ -29,7 +29,7 @@ import java.util.function.Predicate;
  */
 @XmlHints(allowTopLevelDefinition = true)
 @Alias("imap-matcher")
-public class ImapEmailPredicateBuilder extends BaseEmailPredicateBuilder {
+public class IMAPEmailPredicateBuilder extends BaseEmailPredicateBuilder {
 
   /**
    * Indicates if should retrieve 'seen' or 'not seen' emails
@@ -63,7 +63,7 @@ public class ImapEmailPredicateBuilder extends BaseEmailPredicateBuilder {
   @Override
   protected Predicate<? extends BaseEmailAttributes> getBasePredicate() {
 
-    Predicate<ImapEmailAttributes> predicate = imapEmailAttributes -> true;
+    Predicate<IMAPEmailAttributes> predicate = imapEmailAttributes -> true;
 
     if (recent != null) {
       predicate = predicate.and(attributes -> recent == attributes.getFlags().isRecent());
@@ -84,22 +84,22 @@ public class ImapEmailPredicateBuilder extends BaseEmailPredicateBuilder {
     return predicate;
   }
 
-  public ImapEmailPredicateBuilder setAnswered(Boolean answered) {
+  public IMAPEmailPredicateBuilder setAnswered(Boolean answered) {
     this.answered = answered;
     return this;
   }
 
-  public ImapEmailPredicateBuilder setDeleted(Boolean deleted) {
+  public IMAPEmailPredicateBuilder setDeleted(Boolean deleted) {
     this.deleted = deleted;
     return this;
   }
 
-  public ImapEmailPredicateBuilder setRecent(Boolean recent) {
+  public IMAPEmailPredicateBuilder setRecent(Boolean recent) {
     this.recent = recent;
     return this;
   }
 
-  public ImapEmailPredicateBuilder setSeen(Boolean seen) {
+  public IMAPEmailPredicateBuilder setSeen(Boolean seen) {
     this.seen = seen;
     return this;
   }

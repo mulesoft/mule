@@ -9,8 +9,8 @@ package org.mule.extension.email.internal.commands;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import org.mule.extension.email.api.EmailBody;
 import org.mule.extension.email.api.EmailBuilder;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.MessageBuilder;
-import org.mule.extension.email.api.exception.EmailSendException;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
 import org.mule.extension.email.internal.sender.SenderConnection;
 
@@ -39,7 +39,6 @@ public final class SendCommand {
    */
   public void send(SenderConnection connection, SMTPConfiguration configuration, EmailBuilder emailBuilder) {
     try {
-
       ImmutableMap.Builder<String, String> headers = ImmutableMap.builder();
       headers.putAll(configuration.getHeaders());
       headers.putAll(emailBuilder.getHeaders());
@@ -61,7 +60,7 @@ public final class SendCommand {
 
       Transport.send(message);
     } catch (MessagingException e) {
-      throw new EmailSendException(e);
+      throw new EmailException("Error while sending email: " + e.getMessage(), e);
     }
   }
 }

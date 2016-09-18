@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.manager.pop3;
+package org.mule.extension.email.internal.mailbox.pop3;
 
 import static org.mule.extension.email.internal.EmailConnector.TLS_CONFIGURATION;
 import static org.mule.extension.email.internal.EmailProtocol.POP3S;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.POP3S_PORT;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.POP3S_PORT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
-import org.mule.extension.email.internal.manager.AbstractMailboxManagerProvider;
-import org.mule.extension.email.internal.manager.MailboxConnection;
+import org.mule.extension.email.internal.mailbox.AbstractMailboxConnectionProvider;
+import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.tls.TlsContextFactory;
@@ -35,7 +35,7 @@ import org.mule.runtime.extension.api.annotation.param.display.Summary;
  */
 @Alias("pop3s")
 @DisplayName("POP3S Connection")
-public class POP3SProvider extends AbstractMailboxManagerProvider<MailboxConnection> implements Initialisable {
+public class POP3SProvider extends AbstractMailboxConnectionProvider<MailboxConnection> implements Initialisable {
 
   /**
    * The port number of the mail server. '995' by default.

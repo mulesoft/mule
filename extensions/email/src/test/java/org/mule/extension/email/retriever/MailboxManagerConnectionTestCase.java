@@ -17,7 +17,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mule.extension.email.internal.AbstractEmailConnection.PASSWORD_NO_USERNAME_ERROR;
 import static org.mule.extension.email.internal.AbstractEmailConnection.USERNAME_NO_PASSWORD_ERROR;
 import static org.mule.extension.email.internal.EmailProtocol.IMAP;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.INBOX_FOLDER;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
 import static org.mule.extension.email.util.EmailTestUtils.JUANI_EMAIL;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.mock;
@@ -26,7 +26,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 import org.mule.extension.email.api.exception.EmailConnectionException;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.internal.manager.MailboxConnection;
+import org.mule.extension.email.internal.mailbox.MailboxConnection;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;

@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.email.internal.manager;
+package org.mule.extension.email.internal.mailbox;
 
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 
+import javax.mail.Folder;
 import javax.mail.Message;
 
 /**
@@ -26,7 +27,9 @@ public interface MailboxAccessConfiguration {
    * Resolves the {@link BaseEmailAttributes} from a given message for this configuration.
    *
    * @param message the {@link Message} that we want to parse.
+   * @param folder  the folder used to find the id of the message in it.
    * @return an {@link BaseEmailAttributes} instance from the parsed {@code message}.
    */
-  <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message);
+  <T extends BaseEmailAttributes> T parseAttributesFromMessage(Message message, Folder folder);
+
 }

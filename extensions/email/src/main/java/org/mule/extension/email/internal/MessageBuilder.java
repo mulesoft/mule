@@ -6,19 +6,18 @@
  */
 package org.mule.extension.email.internal;
 
+import static java.lang.String.format;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Part.ATTACHMENT;
 import static javax.mail.Part.INLINE;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.MULTIPART;
-import static org.mule.extension.email.internal.util.EmailConnectorUtils.toAddressArray;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.CONTENT_TYPE_HEADER;
+import static org.mule.extension.email.internal.util.EmailConnectorConstants.MULTIPART;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
-
 import org.mule.extension.email.api.EmailAttachment;
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.internal.util.EmailConnectorUtils;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
@@ -30,9 +29,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.activation.DataHandler;
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
@@ -104,7 +106,7 @@ public final class MessageBuilder {
    */
   public MessageBuilder fromAddresses(String from) throws MessagingException {
     if (from != null) {
-      this.message.setFrom(EmailConnectorUtils.toAddress(from));
+      this.message.setFrom(toAddress(from));
     } else {
       this.message.setFrom();
     }
@@ -265,7 +267,9 @@ public final class MessageBuilder {
       MimeMultipart multipart = new MimeMultipart();
       MimeBodyPart bodyPart = new MimeBodyPart();
       bodyPart.setDisposition(INLINE);
+      String contentType = getBodyType().toRfcString();
       bodyPart.setContent(content, getBodyType().toRfcString());
+      bodyPart.setHeader(CONTENT_TYPE_HEADER, contentType);
       multipart.addBodyPart(bodyPart);
 
       MimeBodyPart attachmentPart;
@@ -276,6 +280,7 @@ public final class MessageBuilder {
           attachmentPart.setFileName(attachment);
           DataHandler attachmentDataHandler = attachments.get(attachment);
           attachmentPart.setDataHandler(attachmentDataHandler);
+          attachmentPart.setHeader(CONTENT_TYPE_HEADER, attachmentDataHandler.getContentType());
           multipart.addBodyPart(attachmentPart);
         } catch (Exception e) {
           throw new EmailException("Error while adding attachment: " + attachment, e);
@@ -296,5 +301,29 @@ public final class MessageBuilder {
       return DataType.builder().mediaType(contentType).charset(Charset.forName(charset)).build().getMediaType();
     }
     return contentType;
+  }
+
+  /**
+   * Converts a simple {@link String} representing an address into an {@link InternetAddress} instance
+   *
+   * @param address the string to be converted.
+   * @return a new {@link InternetAddress} instance.
+   */
+  private Address toAddress(String address) {
+    try {
+      return new InternetAddress(address);
+    } catch (AddressException e) {
+      throw new EmailException(format("Error while creating %s InternetAddress", address));
+    }
+  }
+
+  /**
+   * Converts a {@link List} of {@link String}s representing email addresses into an {@link InternetAddress} array.
+   *
+   * @param addresses the list to be converted.
+   * @return a new {@link Address}[] instance.
+   */
+  private Address[] toAddressArray(List<String> addresses) {
+    return addresses.stream().map(this::toAddress).toArray(Address[]::new);
   }
 }
