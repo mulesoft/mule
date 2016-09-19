@@ -13,9 +13,15 @@ import org.mule.runtime.api.metadata.MediaType;
 import java.nio.charset.Charset;
 
 import org.hamcrest.Description;
+import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Verifies a given {@link DataType}'s type, mime type and encoding.
+ *
+ * @since 4.0
+ */
 public class DataTypeMatcher extends TypeSafeMatcher<DataType> {
 
   private final Class type;
@@ -40,13 +46,26 @@ public class DataTypeMatcher extends TypeSafeMatcher<DataType> {
 
   @Override
   public void describeTo(Description description) {
-    description.appendText("a dataType with type = " + type.getName() + ", mimeType= " + mimeType + ", encoding=" + encoding);
+    description
+        .appendText("a dataType with type = ").appendValue(type.getName())
+        .appendText(", mimeType = ").appendValue(mimeType)
+        .appendText(", encoding = ").appendValue(encoding);
   }
 
+  @Override
+  protected void describeMismatchSafely(DataType dataType, Description mismatchDescription) {
+    mismatchDescription
+        .appendText("got a dataType with type = ").appendValue(dataType.getType().getName())
+        .appendText(", mimeType = ").appendValue(dataType.getMediaType())
+        .appendText(", encoding = ").appendValue(dataType.getMediaType().getCharset());
+  }
+
+  @Factory
   public static Matcher<DataType> like(Class type, MediaType mimeType, Charset encoding) {
     return new DataTypeMatcher(type, mimeType, encoding);
   }
 
+  @Factory
   public static Matcher<DataType> like(DataType dataType) {
     return new DataTypeMatcher(dataType.getType(), dataType.getMediaType(), dataType.getMediaType().getCharset().orElse(null));
   }

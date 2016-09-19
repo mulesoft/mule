@@ -11,6 +11,11 @@ import org.mule.runtime.api.message.MultiPartPayload;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Verifies a {@link MultiPartPayload}'s amount of parts.
+ *
+ * @since 4.0
+ */
 public class IsMultiPartPayloadWithSize extends TypeSafeMatcher<MultiPartPayload> {
 
   private final int expectedSize;

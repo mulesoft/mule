@@ -16,6 +16,11 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Verifies a {@link Message}'s payload, using a {@link String} matcher. Works with String and InputStream payloads.
+ *
+ * @since 4.0
+ */
 public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
 
   private final Matcher<String> matcher;
@@ -34,13 +39,13 @@ public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
 
   @Override
   public void describeTo(Description description) {
-    description.appendText(" message with payload ");
+    description.appendText("message with payload ");
     description.appendDescriptionOf(matcher);
   }
 
   @Override
   protected void describeMismatchSafely(Message message, Description mismatchDescription) {
-    mismatchDescription.appendText(" got a message with a payload that ");
+    mismatchDescription.appendText("got a message with a payload that ");
     matcher.describeMismatch(incomingValue, mismatchDescription);
   }
 
@@ -50,7 +55,7 @@ public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
     } else if (payload instanceof InputStream) {
       return IOUtils.toString((InputStream) payload);
     } else {
-      fail(String.format("Expected String or InputStream payload but got %s", payload.getClass().getSimpleName()));
+      fail(String.format("Expected String or InputStream payload but got %s", payload.getClass().getName()));
       return null;
     }
   }

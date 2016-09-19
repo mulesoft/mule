@@ -13,6 +13,11 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Verifies a {@link Message}'s attributes, using a specific {@link Attributes} matcher.
+ *
+ * @since 4.0
+ */
 public class IsMessageWithAttributes<T extends Attributes> extends TypeSafeMatcher<Message> {
 
   private final Matcher<T> attributesMatcher;

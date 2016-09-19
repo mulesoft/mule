@@ -13,6 +13,11 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Verifies whether a {@link MultiPartPayload} contains a part matching a given {@link Message} matcher.
+ *
+ * @since 4.0
+ */
 public class IsMultiPartPayloadContainingPart extends TypeSafeMatcher<MultiPartPayload> {
 
   private final Matcher<Message> matcher;
@@ -34,6 +39,6 @@ public class IsMultiPartPayloadContainingPart extends TypeSafeMatcher<MultiPartP
 
   @Override
   protected void describeMismatchSafely(MultiPartPayload multiPartPayload, Description mismatchDescription) {
-    mismatchDescription.appendText(" got a multipart payload containing ").appendValue(multiPartPayload.getParts());
+    mismatchDescription.appendText("got a multipart payload containing ").appendValue(multiPartPayload.getParts());
   }
 }

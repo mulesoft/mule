@@ -6,11 +6,17 @@
  */
 package org.mule.functional.junit4.matchers;
 
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * Verifies whether a {@link MultiPartPayload}'s part has a given size.
+ *
+ * @since 4.0
+ */
 public class IsPartWithSize extends TypeSafeMatcher<PartAttributes> {
 
   private long expectedSize;
@@ -26,11 +32,11 @@ public class IsPartWithSize extends TypeSafeMatcher<PartAttributes> {
 
   @Override
   public void describeTo(Description description) {
-    description.appendText(" part attributes with size ").appendValue(expectedSize);
+    description.appendText("part attributes with size ").appendValue(expectedSize);
   }
 
   @Override
   protected void describeMismatchSafely(PartAttributes partAttributes, Description mismatchDescription) {
-    mismatchDescription.appendText(" got part attributes with size ").appendValue(partAttributes.getSize());
+    mismatchDescription.appendText("got part attributes with size ").appendValue(partAttributes.getSize());
   }
 }
