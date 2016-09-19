@@ -137,7 +137,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     List<Dependency> pluginSharedLibDependencies = context.getSharedPluginLibCoordinates().stream()
         .map(sharedPluginLibCoords -> findPluginSharedLibArtifact(sharedPluginLibCoords, context.getRootArtifact(),
-                                                                    directDependencies))
+                                                                  directDependencies))
         .collect(toList());
 
     logger.debug("Plugin sharedLib artifacts matched with versions from direct dependencies declared: {}",
@@ -476,11 +476,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @return {@link Artifact} representing the plugin shared lib artifact
    */
-  private Dependency findPluginSharedLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact, List<Dependency> directDependencies) {
+  private Dependency findPluginSharedLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact,
+                                                 List<Dependency> directDependencies) {
     Optional<Dependency> pluginSharedLibDependency = discoverDependency(pluginSharedLibCoords, rootArtifact, directDependencies);
     if (!pluginSharedLibDependency.isPresent() || !pluginSharedLibDependency.get().getScope().equals(TEST)) {
       throw new IllegalStateException("Plugin shared lib artifact '" + pluginSharedLibCoords +
-                                          "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project");
+          "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project");
     }
 
     return pluginSharedLibDependency.get();
@@ -501,7 +502,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     Optional<Dependency> pluginDependency = discoverDependency(pluginCoords, rootArtifact, directDependencies);
     if (!pluginDependency.isPresent() || !pluginDependency.get().getScope().equals(PROVIDED)) {
       throw new IllegalStateException("Plugin '" + pluginCoords + "' in order to be resolved has to be declared as " + PROVIDED +
-                                          " dependency of your Maven project");
+          " dependency of your Maven project");
     }
 
     return pluginDependency.get().getArtifact();
