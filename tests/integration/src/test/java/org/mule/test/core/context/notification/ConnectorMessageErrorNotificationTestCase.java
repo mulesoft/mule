@@ -10,6 +10,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RECEIVED;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_BEGIN;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
+
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -17,6 +18,7 @@ import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
+import org.junit.Test;
 
 public class ConnectorMessageErrorNotificationTestCase extends AbstractNotificationTestCase {
 
@@ -35,10 +37,12 @@ public class ConnectorMessageErrorNotificationTestCase extends AbstractNotificat
     return "org/mule/test/integration/notifications/connector-message-error-notification-test-flow.xml";
   }
 
-  @Override
+  @Test
   public void doTest() throws Exception {
     final String url = String.format("http://localhost:%s/path", port.getNumber());
     muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS);
+
+    assertNotifications();
   }
 
   @Override

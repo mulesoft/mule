@@ -7,6 +7,7 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -20,8 +21,10 @@ import org.mule.test.core.context.notification.RestrictedNode;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections.Factory;
 import org.junit.Ignore;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 @Ignore("MULE-10185 - ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
@@ -35,127 +38,258 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
   }
 
-  @Override
-  public void doTest() throws Exception {
-    List<String> testList = Arrays.asList("test", "with", "collection");
-    assertNotNull(flowRunner("singleMP").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("processorChain").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("customProcessor").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("choice").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("scatterGather").withPayload(TEST_PAYLOAD).run());
+  private Factory specificationFactory;
 
-    assertNotNull(flowRunner("foreach").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("enricher").withPayload(TEST_PAYLOAD).run());
-    // assertNotNull(runFlow("in-async", TEST_PAYLOAD));
-    assertNotNull(flowRunner("filters").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("idempotent-msg-filter").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("idempotent-secure-hash-msg-filter").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("subflow").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
-    expectedException.expect(ComponentException.class);
-    flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run();
-    assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
-    CompositeMessageSource composite =
-        (CompositeMessageSource) ((Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source")).getMessageSource();
-    assertNotNull(((TestMessageSource) composite.getSources().get(0)).fireEvent(getTestEvent(TEST_PAYLOAD)));
-    assertNotNull(((TestMessageSource) composite.getSources().get(1)).fireEvent(getTestEvent(TEST_PAYLOAD)));
-    assertNotNull(flowRunner("first-successful").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("round-robin").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("collectionAggregator").withPayload(testList).run());
-    assertNotNull(flowRunner("customAggregator").withPayload(testList).run());
-    assertNotNull(flowRunner("chunkAggregator").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("wire-tap").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("until-successful").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("until-successful-with-processor-chain").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("until-successful-with-enricher").withPayload(TEST_PAYLOAD).run());
+  @Test
+  public void single() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(prePost());
+
+    assertNotNull(flowRunner("singleMP").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
   }
 
-  @Override
-  public RestrictedNode getSpecification() {
-    return new Node()
-        // singleMP
-        .serial(prePost())
-
-        // processorChain
+  @Test
+  public void chain() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // Message Processor Chain
         .serial(prePost()) // logger-1
         .serial(prePost()) // logger-2
         .serial(post()) // Message Processor Chain
+    ;
 
-        // custom-processor
-        .serial(prePost()).serial(prePost())
+    assertNotNull(flowRunner("processorChain").withPayload(TEST_PAYLOAD).run());
 
+    assertNotifications();
+  }
+
+  @Test
+  public void customProcessor() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(prePost())
+        .serial(prePost());
+
+    assertNotNull(flowRunner("customProcessor").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void choice() throws Exception {
+    specificationFactory = () -> new Node()
         // choice
         .serial(pre()) // choice
         .serial(prePost()) // otherwise-logger
-        .serial(post())
+        .serial(post());
 
-        // scatter-gather
+    assertNotNull(flowRunner("choice").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void scatterGather() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // scatter-gather
         .serial(new Node()
-            .parallel(pre() // route 1 chain
+            .parallelSynch(pre() // route 1 chain
                 .serial(prePost()) // route 1 first logger
                 .serial(prePost()) // route 1 second logger
                 .serial(post())) // route 1 chain
-            .parallel(prePost())) // route 0 logger
+            .parallelSynch(prePost())) // route 0 logger
         .serial(post()) // scatter-gather
+    ;
 
-        // foreach
+    assertNotNull(flowRunner("scatterGather").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void foreach() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // foreach
         .serial(prePost()) // logger-loop-1
         .serial(prePost()) // logger-loop-2
-        .serial(post()).serial(prePost()) // MP after the Scope
+        .serial(post())
+        .serial(prePost()) // MP after the Scope
+    ;
 
-        // enricher
+    assertNotNull(flowRunner("foreach").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void enricher() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // append-string
-        .serial(prePost()).serial(post()).serial(pre()) // chain
-        .serial(prePost()).serial(prePost()).serial(post())
+        .serial(prePost())
+        .serial(post())
+        .serial(pre()) // chain
+        .serial(prePost())
+        .serial(prePost())
+        .serial(post());
 
-        //// async //This is unstable
-        // .serial(prePost())
-        // .serial(prePost())
-        // .serial(prePost())
+    assertNotNull(flowRunner("enricher").withPayload(TEST_PAYLOAD).run());
 
-        // filter
-        .serial(pre()).serial(prePost()).serial(post())
+    assertNotifications();
+  }
 
-        // idempotent-message-filter
+  @Test
+  @Ignore("This is unstable")
+  public void async() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(prePost())
+        .serial(prePost())
+        .serial(prePost());
+
+    // assertNotNull(runFlow("in-async", TEST_PAYLOAD));
+
+    assertNotifications();
+  }
+
+  @Test
+  public void filter() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(pre())
+        .serial(prePost())
+        .serial(post());
+
+    assertNotNull(flowRunner("filters").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void idempotentMessageFilter() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // open message filter
         .serial(prePost()) // message processor
         .serial(post()) // close mf
+    ;
 
-        // idempotent-secure-hash-message-filter
+    assertNotNull(flowRunner("idempotent-msg-filter").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void idempotentSecureHashMessageFilter() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // open message filter
         .serial(prePost()) // message processor
         .serial(post()) // close mf
+    ;
 
-        // subflow
-        .serial(prePost()).serial(pre()).serial(pre()).serial(prePost()).serial(post()).serial(post())
+    assertNotNull(flowRunner("idempotent-secure-hash-msg-filter").withPayload(TEST_PAYLOAD).run());
 
+    assertNotifications();
+  }
+
+  @Test
+  public void subFlow() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(prePost())
+        .serial(pre())
+        .serial(pre())
+        .serial(prePost())
+        .serial(post())
+        .serial(post());
+
+    assertNotNull(flowRunner("subflow").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void catchExceptionStrategy() throws Exception {
+    specificationFactory = () -> new Node()
         // catch-es
-        .serial(prePost()).serial(prePost())
+        .serial(prePost())
+        .serial(prePost());
 
+    assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void rollbackExceptionStrategy() throws Exception {
+    specificationFactory = () -> new Node()
         // rollback-es
-        .serial(prePost()).serial(prePost())
+        .serial(prePost())
+        .serial(prePost());
 
-        // choice-es
-        .serial(prePost()).serial(prePost())
+    expectedException.expect(ComponentException.class);
+    flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run();
 
-        // composite-source
-        .serial(prePost()).serial(prePost())
+    assertNotifications();
+  }
 
-        // first-successful
+  @Test
+  public void choiceExceptionStrategy() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(prePost())
+        .serial(prePost());
+
+    assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void compositeSource() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(prePost()) // call throw cs1
+        .serial(prePost())
+        .serial(prePost())
+        .serial(prePost()) // call throw cs4
+    ;
+
+    CompositeMessageSource composite =
+        (CompositeMessageSource) ((Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source")).getMessageSource();
+    assertNotNull(((TestMessageSource) composite.getSources().get(0)).fireEvent(getTestEvent(TEST_PAYLOAD)));
+    assertNotNull(((TestMessageSource) composite.getSources().get(1)).fireEvent(getTestEvent(TEST_PAYLOAD)));
+
+
+    assertNotifications();
+  }
+
+  @Test
+  public void firstSuccessful() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(prePost()) // logger
         .serial(pre()) // first-successful
-        .serial(prePost()).serial(prePost()).serial(prePost()).serial(prePost()) // dlq
-        .serial(post())
+        .serial(prePost())
+        .serial(prePost())
+        .serial(prePost())
+        .serial(prePost()) // dlq
+        .serial(post());
 
-        // round-robin
+    assertNotNull(flowRunner("first-successful").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void roundRobin() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // round-robin
         .serial(prePost()) // inner logger
-        .serial(post()).serial(prePost()) // logger
+        .serial(post())
+        .serial(prePost()) // logger
+    ;
 
-        // collection-aggregator
+    assertNotNull(flowRunner("round-robin").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void collectionAggregator() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // open Splitter, unpacks three messages
         .serial(prePost()) // 1st message on Logger
         .serial(prePost()) // gets to Aggregator
@@ -164,8 +298,17 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         .serial(prePost()) // 3rd message on Logger
         .serial(prePost()) // gets to Aggregator and packs the three messages, then close
         .serial(post()) // close Splitter
+    ;
 
-        // custom-aggregator
+    List<String> testList = Arrays.asList("test", "with", "collection");
+    assertNotNull(flowRunner("collectionAggregator").withPayload(testList).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void customAggregator() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // open Splitter, unpacks three messages
         .serial(prePost()) // 1st message, open Aggregator
         .serial(prePost()) // 2nd message
@@ -173,8 +316,17 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         .serial(prePost()) // Logger process packed message
         .serial(post()) // close Aggregator
         .serial(post()) // close Splitter
+    ;
 
-        // chunk-aggregator
+    List<String> testList = Arrays.asList("test", "with", "collection");
+    assertNotNull(flowRunner("customAggregator").withPayload(testList).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void chunkAggregator() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre()) // start Splitter
         .serial(prePost()) // 1st message on Logger
         .serial(prePost()) // gets to Aggregator
@@ -187,19 +339,66 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         .serial(prePost()) // packed message get to the second Logger
         .serial(post()) // close Aggregator
         .serial(post()) // close Splitter
+    ;
 
-        // wire-tap
-        .serial(prePost()).serial(prePost())
+    assertNotNull(flowRunner("chunkAggregator").withPayload(TEST_PAYLOAD).run());
 
-        // until successful
-        .serial(pre()).serial(new Node().parallel(prePost()).parallel(post().serial(prePost())))
+    assertNotifications();
+  }
 
-        // until successful with processor chain
+  @Test
+  public void wireTap() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(prePost())
+        .serial(prePost());
+
+    assertNotNull(flowRunner("wire-tap").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void untilSuccesful() throws Exception {
+    specificationFactory = () -> new Node()
         .serial(pre())
-        .serial(new Node().parallel(pre().serial(prePost()).serial(prePost()).serial(post())).parallel(post().serial(prePost())))
+        .serial(new Node()
+            .parallelSynch(prePost())
+            .parallelSynch(post().serial(prePost())));
 
-        // until successful with enricher
-        .serial(pre()).serial(new Node().parallel(pre().serial(prePost()).serial(post())).parallel(post().serial(prePost())));
+    assertNotNull(flowRunner("until-successful").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void untilSuccesfulWithProcessorChain() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(pre())
+        .serial(new Node()
+            .parallelSynch(pre().serial(prePost()).serial(prePost()).serial(post()))
+            .parallelSynch(post().serial(prePost())));
+
+    assertNotNull(flowRunner("until-successful-with-processor-chain").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void untilSuccesfulWithEnricher() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(pre())
+        .serial(new Node()
+            .parallelSynch(pre().serial(prePost()).serial(post()))
+            .parallelSynch(post().serial(prePost())));
+
+    assertNotNull(flowRunner("until-successful-with-enricher").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Override
+  public RestrictedNode getSpecification() {
+    return (RestrictedNode) specificationFactory.create();
   }
 
   @Override

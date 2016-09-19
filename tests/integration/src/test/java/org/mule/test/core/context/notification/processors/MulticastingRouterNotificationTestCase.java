@@ -7,13 +7,18 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+
+import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.test.core.context.notification.Node;
 import org.mule.test.core.context.notification.RestrictedNode;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections.Factory;
+import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
 
 @Ignore("MULE-10185 - ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
 public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase {
@@ -23,28 +28,78 @@ public class MulticastingRouterNotificationTestCase extends AbstractMessageProce
     return "org/mule/test/integration/notifications/message-processor-notification-test-flow.xml";
   }
 
-  @Override
-  public void doTest() throws Exception {
-    List<String> testList = Arrays.asList(TEST_PAYLOAD);
-    assertNotNull(flowRunner("all").withPayload(TEST_PAYLOAD).run());
-    assertNotNull(flowRunner("all2").withPayload(testList).run());
-    assertNotNull(flowRunner("all3").withPayload(TEST_PAYLOAD).run());
+  private MuleClient client;
+
+  @Before
+  public void before() {
+    client = muleContext.getClient();
   }
 
+  private Factory specificationFactory;
+
+  @Test
+  public void all() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(pre()) // Two routes with chain with one element
+        .serial(prePost())
+        .serial(prePost())
+        .serial(post())
+        .serial(prePost()) // MP after the Scope;
+    ;
+
+    assertNotNull(flowRunner("all").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void all2() throws Exception {
+    specificationFactory = () -> new Node()
+        // All
+        // Two routes with chain with two first one is interceptiong elements
+        .serial(pre())
+        // CollectionSplitter
+        .serial(pre())
+        // Logger
+        .serial(prePost())
+        // CollectionSplitter
+        .serial(post())
+        // CollectionSplitter
+        .serial(pre())
+        // Logger
+        .serial(prePost())
+        // CollectionSplitter
+        .serial(post())
+        // All
+        .serial(post())
+        // Logger
+        .serial(prePost()) // MP after the Scope;
+    ;
+
+    List<String> testList = Arrays.asList("test");
+    assertNotNull(flowRunner("all2").withPayload(testList).run());
+
+    assertNotifications();
+  }
+
+  @Test
+  public void all3() throws Exception {
+    specificationFactory = () -> new Node()
+        .serial(pre()) // Two routes with no chain with one element
+        .serial(prePost())
+        .serial(prePost())
+        .serial(post())
+        .serial(prePost()) // MP after the Scope;
+    ;
+
+    assertNotNull(flowRunner("all3").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
+  }
 
   @Override
   public RestrictedNode getSpecification() {
-    return new Node().serial(pre()) // Two routes with chain with one element
-        .serial(prePost()).serial(prePost()).serial(post()).serial(prePost()) // MP after the Scope;
-
-        /* All */.serial(pre()) // Two routes with chain with two first one is interceptiong elements
-        /* CollectionSplitter */.serial(pre())/* Logger */.serial(prePost())/* CollectionSplitter */.serial(post())
-        /* CollectionSplitter */.serial(pre())/* Logger */.serial(prePost())/* CollectionSplitter */.serial(post())
-        /* All */.serial(post())/* Logger */.serial(prePost()) // MP after the Scope;
-
-        .serial(pre()) // Two routes with no chain with one element
-        .serial(prePost()).serial(prePost()).serial(post()).serial(prePost()) // MP after the Scope;
-    ;
+    return (RestrictedNode) specificationFactory.create();
   }
 
   @Override

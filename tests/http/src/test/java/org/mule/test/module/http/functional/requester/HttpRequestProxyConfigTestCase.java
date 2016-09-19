@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
+
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
@@ -151,12 +152,16 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
 
         latch.release();
       } catch (IOException e) {
-        /* Ignore */ } finally {
+        /* Ignore */
+        logger.error("Exception while configuring MockProxy", e);
+      } finally {
         if (serverSocket != null) {
           try {
             serverSocket.close();
           } catch (IOException e) {
-            /* Ignore */ }
+            /* Ignore */
+            logger.error("Exception while closing MockProxy", e);
+          }
         }
       }
     }

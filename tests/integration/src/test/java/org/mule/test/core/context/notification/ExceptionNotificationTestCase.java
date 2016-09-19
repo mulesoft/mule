@@ -8,12 +8,14 @@ package org.mule.test.core.context.notification;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNull;
+
+import org.mule.functional.listener.ExceptionListener;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
-import org.mule.functional.listener.ExceptionListener;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase {
@@ -26,7 +28,7 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase 
     return "org/mule/test/integration/notifications/exception-notification-test-flow.xml";
   }
 
-  @Override
+  @Test
   public void doTest() throws Exception {
     ExceptionListener exceptionListener = new ExceptionListener(muleContext);
     expectedException.expectCause(instanceOf(ComponentException.class));
@@ -35,6 +37,8 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase 
     exceptionListener.waitUntilAllNotificationsAreReceived();
 
     assertNull(result);
+
+    assertNotifications();
   }
 
   @Override

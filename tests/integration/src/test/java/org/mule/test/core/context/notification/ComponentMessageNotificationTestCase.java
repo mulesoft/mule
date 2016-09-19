@@ -7,8 +7,11 @@
 package org.mule.test.core.context.notification;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.context.notification.ComponentMessageNotification;
+
+import org.junit.Test;
 
 /**
  * Test ComponentNotifications/Listeners by sending events to a component. A pre and post notification should be received by
@@ -21,12 +24,14 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
     return "org/mule/test/integration/notifications/component-message-notification-test-flow.xml";
   }
 
-  @Override
+  @Test
   public void doTest() throws Exception {
     MuleClient client = muleContext.getClient();
     assertNotNull(flowRunner("service-1").withPayload("hello sweet world").run());
     flowRunner("service-2").withPayload("goodbye cruel world").run();
     assertNotNull(client.request("test://out-2", RECEIVE_TIMEOUT));
+
+    assertNotifications();
   }
 
   @Override

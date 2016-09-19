@@ -8,12 +8,13 @@ package org.mule.test.core.context.notification;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.context.notification.PipelineMessageNotification;
+import org.mule.runtime.core.exception.MessagingException;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class PipelineMessageNotificationTestCase extends AbstractNotificationTestCase {
@@ -26,7 +27,7 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
     return "org/mule/test/integration/notifications/pipeline-message-notification-test-flow.xml";
   }
 
-  @Override
+  @Test
   public void doTest() throws Exception {
     MuleClient client = muleContext.getClient();
     assertNotNull(flowRunner("service-1").withPayload("hello sweet world").run());
@@ -37,6 +38,8 @@ public class PipelineMessageNotificationTestCase extends AbstractNotificationTes
     client.request("test://ow-out", RECEIVE_TIMEOUT);
     flowRunner("service-5").withPayload("goodbye cruel world").withInboundProperty("fail", "true").asynchronously().run();
     client.request("test://owException-out", RECEIVE_TIMEOUT);
+
+    assertNotifications();
   }
 
   @Override

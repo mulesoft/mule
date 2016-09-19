@@ -7,6 +7,7 @@
 package org.mule.test.core.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.runtime.config.spring.util.ProcessingStrategyUtils;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -18,9 +19,9 @@ import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 @RunnerDelegateTo(Parameterized.class)
@@ -50,12 +51,12 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
     return "org/mule/test/integration/notifications/nonblocking-message-processor-notification-test-flow.xml";
   }
 
-  @Override
+  @Test
   public void doTest() throws Exception {
-    List<String> testList = Arrays.asList("test", "with", "collection");
-
     MuleClient client = muleContext.getClient();
     assertNotNull(client.send("http://localhost:" + proxyPort.getValue() + "/in", "test", null));
+
+    assertNotifications();
   }
 
   @Override

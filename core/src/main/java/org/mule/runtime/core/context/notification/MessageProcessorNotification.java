@@ -11,14 +11,14 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.meta.NameableObject;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.MessageProcessorPathResolver;
 import org.mule.runtime.core.api.context.notification.BlockingServerEvent;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.ObjectUtils;
 
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent {
@@ -68,16 +68,16 @@ public class MessageProcessorNotification extends ServerNotification implements 
     return processor;
   }
 
-  protected String toString(Object obj) {
-    if (obj == null) {
+  protected String processorToString() {
+    if (processor == null) {
       return "";
     }
 
     String name;
-    if (obj instanceof NameableObject) {
-      name = String.format("%s '%s'", obj.getClass().getName(), ((NameableObject) obj).getName());
+    if (processor instanceof NameableObject) {
+      name = String.format("%s '%s'", processor.getClass().getName(), ((NameableObject) processor).getName());
     } else {
-      name = ObjectUtils.identityToString(obj);
+      name = ObjectUtils.identityToString(processor);
     }
     return name;
   }

@@ -15,6 +15,7 @@ import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class ExceptionStrategyNotificationTestCase extends AbstractNotificationTestCase {
@@ -28,13 +29,15 @@ public class ExceptionStrategyNotificationTestCase extends AbstractNotificationT
     return "org/mule/test/integration/notifications/exception-strategy-notification-test-flow.xml";
   }
 
-  @Override
+  @Test
   public void doTest() throws Exception {
     assertNotNull(flowRunner("catch-es").withPayload(TEST_PAYLOAD).run());
     assertNotNull(flowRunner("choice-es").withPayload(TEST_PAYLOAD).run());
     expectedException.expectCause(instanceOf(ComponentException.class));
     assertNotNull(flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run());
     assertNotNull(flowRunner("default-es").withPayload(TEST_PAYLOAD).run());
+
+    assertNotifications();
   }
 
   @Override
