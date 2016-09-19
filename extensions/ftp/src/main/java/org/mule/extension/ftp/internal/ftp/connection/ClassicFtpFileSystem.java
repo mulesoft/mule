@@ -44,6 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.slf4j.Logger;
@@ -68,6 +69,17 @@ public final class ClassicFtpFileSystem extends FtpFileSystem {
   private final RenameCommand renameCommand;
   private final WriteCommand writeCommand;
 
+  private static String resolveBasePath(String basePath, FTPClient client) {
+    if (StringUtils.isBlank(basePath)) {
+      try {
+        return client.printWorkingDirectory();
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("FTP working dir was not specified and failed to resolve a default one"),
+                                       e);
+      }
+    }
+    return basePath;
+  }
 
   /**
    * Creates a new instance
@@ -75,7 +87,7 @@ public final class ClassicFtpFileSystem extends FtpFileSystem {
    * @param client a ready to use {@link FTPClient}
    */
   ClassicFtpFileSystem(FTPClient client, String basePath, MuleContext muleContext) {
-    super(basePath);
+    super(resolveBasePath(basePath, client));
     this.client = client;
     this.muleContext = muleContext;
 

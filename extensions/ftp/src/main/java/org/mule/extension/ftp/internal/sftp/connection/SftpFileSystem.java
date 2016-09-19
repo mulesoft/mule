@@ -38,6 +38,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
@@ -59,13 +60,25 @@ public class SftpFileSystem extends FtpFileSystem {
   protected final WriteCommand writeCommand;
 
 
+  private static String resolveBasePath(String basePath, SftpClient client) {
+    if (StringUtils.isBlank(basePath)) {
+      try {
+        return client.getWorkingDirectory();
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("SFTP working dir was not specified and failed to resolve a default one"),
+                                       e);
+      }
+    }
+    return basePath;
+  }
+
   /**
    * Creates a new instance
    *
    * @param client a ready to use {@link FTPClient}
    */
   public SftpFileSystem(SftpClient client, String basePath, MuleContext muleContext) {
-    super(basePath);
+    super(resolveBasePath(basePath, client));
     this.client = client;
     this.muleContext = muleContext;
 
