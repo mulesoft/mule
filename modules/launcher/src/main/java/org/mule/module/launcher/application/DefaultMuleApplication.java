@@ -6,6 +6,7 @@
  */
 package org.mule.module.launcher.application;
 
+import static org.mule.config.i18n.MessageFactory.createStaticMessage;
 import static org.mule.util.SplashScreen.miniSplash;
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
@@ -16,8 +17,6 @@ import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
@@ -91,16 +90,22 @@ public class DefaultMuleApplication implements Application
         // set even though it might be redundant, just in case the app is been redeployed
         updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
 
-        for (String configResourceAbsolutePatch : this.descriptor.getAbsoluteResourcePaths())
+        try
         {
-            File configResource = new File(configResourceAbsolutePatch);
-            if (!configResource.exists())
+            for (String configResourceAbsolutePatch : this.descriptor.getAbsoluteResourcePaths())
             {
-                String message = String.format("Config for app '%s' not found: %s", getArtifactName(), configResource);
-                throw new InstallException(MessageFactory.createStaticMessage(message));
+                File configResource = new File(configResourceAbsolutePatch);
+                if (!configResource.exists())
+                {
+                    String message = String.format("Config for app '%s' not found: %s", getArtifactName(), configResource);
+                    throw new InstallException(createStaticMessage(message));
+                }
             }
+            deploymentClassLoader = applicationClassLoaderFactory.create(descriptor);
+        } catch (Exception e) {
+            setStatusToFailed();
+            throw new DeploymentStartException(createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
-        deploymentClassLoader = applicationClassLoaderFactory.create(descriptor);
     }
 
     @Override
@@ -152,7 +157,7 @@ public class DefaultMuleApplication implements Application
             // log it here so it ends up in app log, sys log will only log a message without stacktrace
             logger.error(null, ExceptionUtils.getRootCause(e));
             // TODO add app name to the exception field
-            throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
+            throw new DeploymentStartException(createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
     }
 
@@ -193,7 +198,7 @@ public class DefaultMuleApplication implements Application
 
             // log it here so it ends up in app log, sys log will only log a message without stacktrace
             logger.error(null, ExceptionUtils.getRootCause(e));
-            throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
+            throw new DeploymentInitException(createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
     }
 
@@ -355,7 +360,7 @@ public class DefaultMuleApplication implements Application
         catch (MuleException e)
         {
             // TODO add app name to the exception field
-            throw new DeploymentStopException(MessageFactory.createStaticMessage(descriptor.getAppName()), e);
+            throw new DeploymentStopException(createStaticMessage(descriptor.getAppName()), e);
         }
     }
 

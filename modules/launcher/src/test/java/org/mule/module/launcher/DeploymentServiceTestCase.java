@@ -2091,6 +2091,23 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertEquals("Failed domain still appears as zombie after a successful redeploy", 0, deploymentService.getZombieDomains().size());
     }
 
+
+    @Test
+    public void deployFailsWhenMissingFile() throws Exception
+    {
+        addExplodedAppFromResource(dummyAppDescriptor.zipPath);
+        deploymentService.start();
+
+        assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptor.id);
+        reset(applicationDeploymentListener);
+
+        File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptor.path, MULE_CONFIG_XML_FILE);
+        FileUtils.forceDelete(originalConfigFile);
+
+        assertDeploymentFailure(applicationDeploymentListener, dummyAppDescriptor.id);
+        assertStatus(dummyAppDescriptor.id, ApplicationStatus.DEPLOYMENT_FAILED);
+    }
+
     private Action createUndeployDummyDomainAction()
     {
         return new Action()
