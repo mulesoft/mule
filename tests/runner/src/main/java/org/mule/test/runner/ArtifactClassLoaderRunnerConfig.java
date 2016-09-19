@@ -77,6 +77,17 @@ public @interface ArtifactClassLoaderRunnerConfig {
   String[] plugins() default {};
 
   /**
+   * Runtime libraries in the format of {@code <groupId>:<artifactId>} to be added as shared libraries to
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}. These artifacts have to be declared as {@code test}
+   * scope dependencies for the rootArtifact.
+   * <p/>
+   * Be aware that only the artifact would be added as shared libraries, it will not include its dependencies.
+   *
+   * @return array of {@link String} to define runtime libraries in order to be added as shared libraries.
+   */
+  String[] sharedRuntimeLibs() default {};
+
+  /**
    * <b>WARNING: do not use this if you want to have a pure isolated test case.</b>
    * <p/>
    * Allows to declare an array of {@link String} fully qualified {@link Class}es that the test would need to get access to and

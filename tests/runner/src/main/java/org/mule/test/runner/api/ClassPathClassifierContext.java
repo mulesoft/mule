@@ -43,6 +43,7 @@ public class ClassPathClassifierContext {
   private final List<String> extraBootPackages = newArrayList();
 
   private final List<String> pluginCoordinates = newArrayList();
+  private final List<String> sharedPluginLibCoordinates = newArrayList();
   private final List<Class> exportPluginClasses = newArrayList();
   private final List<String> excludedArtifacts = newArrayList();
   private boolean extensionMetadataGenerationEnabled = false;
@@ -66,13 +67,14 @@ public class ClassPathClassifierContext {
    * @param testInclusions {@link List} of Maven coordinates to be included in application class loader.
    * @param pluginCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to create plugin
    *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s
+   * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
+   *        added to the sharedLib {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
    * @param exportPluginClasses {@link List} of {@link Class} to be exported in addition to the ones already exported by the
    *        plugin, for testing purposes only.
    * @param extensionMetadataGenerationEnabled if while building the a plugin
    *        {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader} for an
    *        {@link org.mule.runtime.extension.api.annotation.Extension} the metadata should be generated.
-   * @throws IOException if an error happened while reading
-   *         {@link RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
+   * @throws IOException if an error happened while reading {@link RunnerModuleUtils#EXCLUDED_PROPERTIES_FILE} file
    */
   public ClassPathClassifierContext(final Artifact rootArtifact,
                                     final File pluginResourcesFolder,
@@ -84,6 +86,7 @@ public class ClassPathClassifierContext {
                                     final List<String> testExclusions,
                                     final List<String> testInclusions,
                                     final List<String> pluginCoordinates,
+                                    final List<String> sharedPluginLibCoordinates,
                                     final List<Class> exportPluginClasses,
                                     final boolean extensionMetadataGenerationEnabled)
       throws IOException {
@@ -104,6 +107,7 @@ public class ClassPathClassifierContext {
     this.testInclusions.addAll(testInclusions);
 
     this.pluginCoordinates.addAll(pluginCoordinates);
+    this.sharedPluginLibCoordinates.addAll(sharedPluginLibCoordinates);
     this.exportPluginClasses.addAll(exportPluginClasses);
     this.extensionMetadataGenerationEnabled = extensionMetadataGenerationEnabled;
   }
@@ -208,6 +212,14 @@ public class ClassPathClassifierContext {
    */
   public List<String> getPluginCoordinates() {
     return this.pluginCoordinates;
+  }
+
+  /**
+   * @return {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be added to the sharedLib
+   *         {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   */
+  public List<String> getSharedPluginLibCoordinates() {
+    return this.sharedPluginLibCoordinates;
   }
 
   /**

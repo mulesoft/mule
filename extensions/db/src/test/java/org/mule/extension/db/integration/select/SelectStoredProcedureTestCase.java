@@ -18,7 +18,6 @@ import org.mule.runtime.api.message.Message;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -45,7 +44,6 @@ public class SelectStoredProcedureTestCase extends AbstractDbIntegrationTestCase
   }
 
   @Test
-  @Ignore("MULE-10435")
   public void selectsFromStoredProcedure() throws Exception {
     Message response = flowRunner("selectStoredProcedure").run().getMessage();
     assertMessageContains(response, getAllPlanetRecords());

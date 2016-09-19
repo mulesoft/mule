@@ -102,6 +102,7 @@
             <artifactId>derby</artifactId>
             <version>${derbyVersion}</version>
             <!--TODO MULE-10435 - <scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
 
         <dependency>

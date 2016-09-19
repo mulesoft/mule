@@ -14,10 +14,8 @@ import org.mule.extension.db.integration.model.AbstractTestDatabase;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10435")
 public class StoredProcedureReturningResultsetTestCase extends AbstractStoredProcedureReturningResultsetTestCase {
 
   public StoredProcedureReturningResultsetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
