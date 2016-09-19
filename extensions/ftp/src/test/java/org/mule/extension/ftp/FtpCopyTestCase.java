@@ -62,6 +62,16 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
   }
 
   @Test
+  public void absoluteSourcePath() throws Exception {
+    final String absoluteSourcePath = String.format("%s/%s", testHarness.getWorkingDirectory(), SOURCE_FILE_NAME);
+    testHarness.makeDir(TARGET_DIRECTORY);
+    final String path = getPath(TARGET_DIRECTORY);
+    doExecute(getFlowName(), absoluteSourcePath, path, false, false);
+
+    assertCopy(format("%s/%s", path, SOURCE_FILE_NAME));
+  }
+
+  @Test
   public void nullTarget() throws Exception {
     expectedException.expect(MessagingException.class);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));

@@ -178,15 +178,15 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
    * copying logic
    *
    * @param config the config that is parameterizing this operation
-   * @param sourcePath the path to be copied
+   * @param source the path to be copied
    * @param target the path to the target destination
    * @param overwrite whether to overwrite existing target paths
    * @param createParentDirectory whether to create the target's parent directory if it doesn't exists
    * @param event the {@link MuleEvent} which triggered this operation
    */
-  protected final void copy(FileConnectorConfig config, String sourcePath, String target, boolean overwrite,
+  protected final void copy(FileConnectorConfig config, String source, String target, boolean overwrite,
                             boolean createParentDirectory, MuleEvent event, FtpCopyDelegate delegate) {
-    FileAttributes sourceFile = getExistingFile(sourcePath);
+    FileAttributes sourceFile = getExistingFile(source);
     Path targetPath = resolvePath(target);
     FileAttributes targetFile = getFile(targetPath.toString());
 
@@ -195,7 +195,12 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
         if (sourceFile.isDirectory() && sourceFile.getName().equals(targetFile.getName()) && !overwrite) {
           throw alreadyExistsException(targetPath);
         } else {
-          targetPath = targetPath.resolve(sourceFile.getName());
+          Path sourcePath = resolvePath(sourceFile.getName());
+          if (sourcePath.isAbsolute()) {
+            targetPath = targetPath.resolve(sourcePath.getName(sourcePath.getNameCount() - 1));
+          } else {
+            targetPath = targetPath.resolve(sourceFile.getName());
+          }
         }
       } else if (!overwrite) {
         throw alreadyExistsException(targetPath);
