@@ -8,30 +8,40 @@ package org.mule.test.module.http.functional.listener;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasAttributes;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasMediaType;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
+import static org.mule.functional.junit4.matchers.MultiPartPayloadMatchers.hasSize;
+import static org.mule.functional.junit4.matchers.PartAttributesMatchers.hasFilename;
+import static org.mule.functional.junit4.matchers.PartAttributesMatchers.hasName;
+import static org.mule.functional.junit4.matchers.ThatMatcher.that;
+import static org.mule.runtime.api.message.Message.builder;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
-
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpHeaders;
@@ -43,11 +53,8 @@ import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -64,9 +71,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-
-public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
+public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 
   private static final String TEXT_BODY_FIELD_NAME = "field1";
   private static final String TEXT_BODY_FIELD_VALUE = "yes";
@@ -122,12 +127,6 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
   }
 
   @Test
-  public void fixedPartContent() throws Exception {
-    String contentLengthValue = getResponseWithExpectedAttachmentFrom("fixedPart", CONTENT_LENGTH);
-    assertThat(contentLengthValue, is(notNullValue()));
-  }
-
-  @Test
   public void respondWithAttachmentsChunked() throws Exception {
     String transferEncodingValue = getResponseWithExpectedAttachmentFrom(chunked.getValue(), TRANSFER_ENCODING);
     assertThat(transferEncodingValue, is(CHUNKED));
@@ -137,20 +136,17 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
   public void respondWithSeveralAttachments() throws Exception {
     InternalMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage()).getRight();
     assertThat(response.getPayload().getValue(), instanceOf(MultiPartPayload.class));
-    assertThat(((MultiPartPayload) response.getPayload().getValue()).getParts(), hasSize(2));
+    assertThat((MultiPartPayload) response.getPayload().getValue(), hasSize(2));
 
-    org.mule.runtime.api.message.Message attachment1 =
-        ((MultiPartPayload) response.getPayload().getValue()).getPart(FILE_BODY_FIELD_NAME);
-    assertThat(attachment1.getAttributes(), instanceOf(PartAttributes.class));
-    assertThat(((PartAttributes) attachment1.getAttributes()).getName(), is(FILE_BODY_FIELD_NAME));
-    assertThat(((PartAttributes) attachment1.getAttributes()).getFileName(), is(FILE_BODY_FIELD_FILENAME));
-    assertThat(attachment1.getPayload().getDataType().getMediaType(), is(MediaType.BINARY));
-    assertThat(IOUtils.toString((InputStream) attachment1.getPayload().getValue()), is(FILE_BODY_FIELD_VALUE));
+    Message attachment1 = ((MultiPartPayload) response.getPayload().getValue()).getPart(FILE_BODY_FIELD_NAME);
+    assertThat(attachment1, hasAttributes(that(hasName(FILE_BODY_FIELD_NAME))));
+    assertThat(attachment1, hasAttributes(that(hasFilename(FILE_BODY_FIELD_FILENAME))));
+    assertThat(attachment1, hasMediaType(BINARY));
+    assertThat(attachment1, hasPayload(equalTo(FILE_BODY_FIELD_VALUE)));
 
-    org.mule.runtime.api.message.Message attachment2 =
-        ((MultiPartPayload) response.getPayload().getValue()).getPart(TEXT_BODY_FIELD_NAME);
-    assertThat(IOUtils.toString((InputStream) attachment2.getPayload().getValue()), is(TEXT_BODY_FIELD_VALUE));
-    assertThat(attachment2.getPayload().getDataType().getMediaType().toRfcString(), is(TEXT_PLAIN.toString()));
+    Message attachment2 = ((MultiPartPayload) response.getPayload().getValue()).getPart(TEXT_BODY_FIELD_NAME);
+    assertThat(attachment2, hasPayload(equalTo(TEXT_BODY_FIELD_VALUE)));
+    assertThat(attachment2, hasMediaType(TEXT_PLAIN_LATIN));
   }
 
   @Test
@@ -260,9 +256,9 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      org.mule.extension.http.api.HttpPart part =
-          new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, TEXT_PLAIN_LATIN, null);
-      return Event.builder(event).addVariable("parts", asList(part)).build();
+      PartAttributes partAttributes = new PartAttributes(TEXT_BODY_FIELD_NAME);
+      Message part = builder().payload(TEXT_BODY_FIELD_VALUE).attributes(partAttributes).mediaType(TEXT_PLAIN_LATIN).build();
+      return Event.builder(event).message(InternalMessage.of(new DefaultMultiPartPayload(part))).build();
     }
   }
 
@@ -270,31 +266,15 @@ public class HttpListenerAttachmentsTestCase extends AbstractHttpTestCase {
 
     @Override
     public Event process(Event event) throws MuleException {
-      org.mule.extension.http.api.HttpPart part1 =
-          new org.mule.extension.http.api.HttpPart(TEXT_BODY_FIELD_NAME, TEXT_BODY_FIELD_VALUE, TEXT_PLAIN_LATIN, null);
-      org.mule.extension.http.api.HttpPart part2 =
-          new org.mule.extension.http.api.HttpPart(FILE_BODY_FIELD_NAME, FILE_BODY_FIELD_VALUE.getBytes(), BINARY,
-                                                   FILE_BODY_FIELD_FILENAME);
-      return Event.builder(event).addVariable("parts", asList(part1, part2)).build();
+      PartAttributes part1Attributes = new PartAttributes(TEXT_BODY_FIELD_NAME);
+      Message part1 = builder().payload(TEXT_BODY_FIELD_VALUE).attributes(part1Attributes).mediaType(TEXT_PLAIN_LATIN).build();
+      PartAttributes part2Attributes = new PartAttributes(FILE_BODY_FIELD_NAME,
+                                                          FILE_BODY_FIELD_FILENAME,
+                                                          FILE_BODY_FIELD_VALUE.length(),
+                                                          emptyMap());
+      Message part2 = builder().payload(FILE_BODY_FIELD_VALUE).attributes(part2Attributes).mediaType(BINARY).build();
+      return Event.builder(event).message(InternalMessage.of(new DefaultMultiPartPayload(part1, part2))).build();
     }
   }
 
-  public static class ConvertPartsMessageProcessor implements Processor {
-
-    @Override
-    public Event process(Event event) throws MuleException {
-      List<org.mule.extension.http.api.HttpPart> parts = new LinkedList<>();
-      ((MultiPartPayload) event.getMessage().getPayload().getValue()).getParts().forEach(m -> {
-        String filename = null;
-        final PartAttributes attributes = (PartAttributes) m.getAttributes();
-        if (!attributes.getName().equals(attributes.getFileName())) {
-          filename = ((PartAttributes) m.getAttributes()).getFileName();
-        }
-        parts.add(new org.mule.extension.http.api.HttpPart(attributes.getName(), m.getPayload().getValue(),
-                                                           m.getPayload().getDataType().getMediaType(),
-                                                           filename));
-      });
-      return Event.builder(event).addVariable("parts", parts).build();
-    }
-  }
 }

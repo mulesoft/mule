@@ -6,14 +6,19 @@
  */
 package org.mule.runtime.module.http.internal.multipart;
 
+import static java.lang.Math.toIntExact;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.internal.HttpParser.parseMultipartContent;
-
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleRuntimeException;
-import org.mule.runtime.core.message.PartAttributes;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
+import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
@@ -93,6 +98,28 @@ public class HttpPartDataSource implements DataSource {
       }
     }
     return httpParts;
+  }
+
+  public static Collection<HttpPart> createFrom(MultiPartPayload multiPartPayload, Transformer objectToByteArray) {
+    return multiPartPayload.getParts().stream().map(message -> {
+      PartAttributes partAttributes = (PartAttributes) message.getAttributes();
+      TypedValue<Object> payload = message.getPayload();
+      String name = partAttributes.getName();
+      byte[] data;
+      try {
+        data = (byte[]) objectToByteArray.transform(payload.getValue());
+        String fileName = partAttributes.getFileName();
+        String contentType = payload.getDataType().getMediaType().toRfcString();
+        int size = toIntExact(partAttributes.getSize());
+        if (fileName != null) {
+          return new HttpPart(name, fileName, data, contentType, size);
+        } else {
+          return new HttpPart(name, data, contentType, size);
+        }
+      } catch (TransformerException e) {
+        throw new MuleRuntimeException(createStaticMessage(String.format("Could not create HTTP part %s", name), e));
+      }
+    }).collect(toList());
   }
 
   public static MultiPartPayload multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException {

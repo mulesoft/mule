@@ -17,23 +17,11 @@
     </httpn:request-config>
 
     <flow name="attachmentFromBytes">
-        <httpn:request config-ref="requesterConfig" path="reqWithAttachment" method="POST" key="ANY">
-            <httpn:request-builder>
-                <httpn:parts>
-                    <httpn:part id="someJson" data="#['{ \'I am a JSON attachment!\' }'.getBytes('UTF-8')]" contentType="#['text/json']"/>
-                </httpn:parts>
-            </httpn:request-builder>
-        </httpn:request>
+        <httpn:request config-ref="requesterConfig" path="reqWithAttachment" method="POST" key="ANY"/>
     </flow>
 
     <flow name="attachmentFromStream">
-        <httpn:request config-ref="requesterConfig" path="reqWithAttachment" method="POST" key="ANY">
-            <httpn:request-builder>
-                <httpn:parts>
-                    <httpn:part id="someJson" data="#[new java.io.ByteArrayInputStream('{ \'I am a JSON attachment!\' }'.getBytes('UTF-8'))]" contentType="#['text/json']"/>
-                </httpn:parts>
-            </httpn:request-builder>
-        </httpn:request>
+        <httpn:request config-ref="requesterConfig" path="reqWithAttachment" method="POST" key="ANY"/>
     </flow>
 
     <flow name="reqWithAttachment">

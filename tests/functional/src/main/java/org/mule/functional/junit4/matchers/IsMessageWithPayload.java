@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.functional.junit4.matchers;
+
+import static org.junit.Assert.fail;
+import org.mule.runtime.api.message.Message;
+import org.mule.runtime.core.util.IOUtils;
+
+import java.io.InputStream;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+
+/**
+ * Verifies a {@link Message}'s payload, using a {@link String} matcher.
+ * Works with {@link String} and {@link InputStream} payloads.
+ *
+ * @since 4.0
+ */
+public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
+
+  private final Matcher<String> matcher;
+  private String incomingValue;
+
+  public IsMessageWithPayload(Matcher<String> matcher) {
+    this.matcher = matcher;
+  }
+
+  @Override
+  protected boolean matchesSafely(Message message) {
+    //Save the String since we may consume the payload here
+    incomingValue = getString(message.getPayload().getValue());
+    return matcher.matches(incomingValue);
+  }
+
+  @Override
+  public void describeTo(Description description) {
+    description.appendText("message with payload ");
+    description.appendDescriptionOf(matcher);
+  }
+
+  @Override
+  protected void describeMismatchSafely(Message message, Description mismatchDescription) {
+    mismatchDescription.appendText("got a message with a payload that ");
+    matcher.describeMismatch(incomingValue, mismatchDescription);
+  }
+
+  private String getString(Object payload) {
+    if (payload instanceof String) {
+      return (String) payload;
+    } else if (payload instanceof InputStream) {
+      return IOUtils.toString((InputStream) payload);
+    } else {
+      fail(String.format("Expected String or InputStream payload but got %s", payload.getClass().getName()));
+      return null;
+    }
+  }
+}

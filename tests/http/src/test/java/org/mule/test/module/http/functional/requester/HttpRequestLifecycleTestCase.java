@@ -6,16 +6,14 @@
  */
 package org.mule.test.module.http.functional.requester;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.construct.AbstractFlowConstruct;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
-import org.mule.runtime.core.util.IOUtils;
-
-import java.io.InputStream;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,6 +74,6 @@ public class HttpRequestLifecycleTestCase extends AbstractHttpRequestTestCase {
   }
 
   private void verifyRequest(String flowName) throws Exception {
-    assertThat(IOUtils.toString((InputStream) runFlow(flowName).getMessage().getPayload().getValue()), is(DEFAULT_RESPONSE));
+    assertThat(runFlow(flowName).getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 }

@@ -6,6 +6,8 @@
  */
 package org.mule.extension.http.internal.request;
 
+import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
+import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_LENGTH;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
@@ -14,18 +16,19 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODI
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.DEFAULT_PAYLOAD_EXPRESSION;
-
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.builder.HttpRequesterRequestBuilder;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
+import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.http.internal.HttpParser;
@@ -38,6 +41,8 @@ import org.mule.runtime.module.http.internal.domain.MultipartHttpEntity;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
 import org.mule.runtime.module.http.internal.multipart.HttpPartDataSource;
 
+import com.google.common.collect.Lists;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,12 +51,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 /**
  * Component that transforms a {@link Event} to a {@link HttpRequest}.
@@ -126,7 +127,7 @@ public class MuleEventToHttpRequest {
 
     }
 
-    builder.setEntity(createRequestEntity(builder, event, this.method, requestBuilder.getParts(), muleContext));
+    builder.setEntity(createRequestEntity(builder, event, this.method, muleContext));
 
     if (authentication != null) {
       authentication.authenticate(event, builder);
@@ -142,7 +143,7 @@ public class MuleEventToHttpRequest {
   }
 
   private HttpEntity createRequestEntity(HttpRequestBuilder requestBuilder, Event muleEvent, String resolvedMethod,
-                                         Map<String, DataHandler> parts, MuleContext muleContext)
+                                         MuleContext muleContext)
       throws MessagingException {
     HttpEntity entity;
 
@@ -152,20 +153,20 @@ public class MuleEventToHttpRequest {
           Event.builder(muleEvent).message(InternalMessage.builder(muleEvent.getMessage()).payload(newPayload).build()).build();
     }
 
-    if (isEmptyBody(muleEvent, resolvedMethod, parts)) {
+    if (isEmptyBody(muleEvent, resolvedMethod)) {
       entity = new EmptyHttpEntity();
     } else {
-      entity = createRequestEntityFromPayload(requestBuilder, muleEvent, parts, muleContext);
+      entity = createRequestEntityFromPayload(requestBuilder, muleEvent, muleContext);
     }
 
     return entity;
   }
 
-  private boolean isEmptyBody(Event event, String method, Map<String, DataHandler> parts) {
+  private boolean isEmptyBody(Event event, String method) {
     boolean emptyBody;
 
     // TODO MULE-9986 Use multi-part payload
-    if (event.getMessage().getPayload().getValue() == null && parts.isEmpty()) {
+    if (event.getMessage().getPayload().getValue() == null) {
       emptyBody = true;
     } else {
       emptyBody = DEFAULT_EMPTY_BODY_METHODS.contains(method);
@@ -179,14 +180,15 @@ public class MuleEventToHttpRequest {
   }
 
   private HttpEntity createRequestEntityFromPayload(HttpRequestBuilder requestBuilder, Event muleEvent,
-                                                    Map<String, DataHandler> parts, MuleContext muleContext)
+                                                    MuleContext muleContext)
       throws MessagingException {
     Object payload = muleEvent.getMessage().getPayload().getValue();
 
-    if (!parts.isEmpty()) {
+    if (payload instanceof MultiPartPayload) {
       try {
-        return new MultipartHttpEntity(HttpPartDataSource.createFrom(parts));
-      } catch (IOException e) {
+        Transformer objectToByteArray = muleContext.getRegistry().lookupTransformer(OBJECT, BYTE_ARRAY);
+        return new MultipartHttpEntity(HttpPartDataSource.createFrom((MultiPartPayload) payload, objectToByteArray));
+      } catch (Exception e) {
         throw new MessagingException(muleEvent, e);
       }
     }

@@ -15,20 +15,11 @@
     </httpn:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY">
-            <httpn:request-builder parts="#[parts]"/>
-        </httpn:request>
+        <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY"/>
     </flow>
 
     <flow name="requestPartFlow">
-        <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY">
-            <httpn:request-builder>
-                <httpn:parts>
-                    <httpn:part id="part1" data="#['content 1']" contentType="text/plain"/>
-                    <httpn:part id="part2" data="#['content 2'.getBytes()]" contentType="text/plain" filename="myPart.txt"/>
-                </httpn:parts>
-            </httpn:request-builder>
-        </httpn:request>
+        <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY"/>
     </flow>
 
     <!-- Requester with TLS and a small send buffer size to test that big attachments work over HTTPS -->
@@ -46,9 +37,7 @@
     </httpn:request-config>
 
     <flow name="requestFlowTls">
-        <httpn:request config-ref="requestConfigTls" path="path" method="POST" responseTimeout="5000"  key="ANY">
-            <httpn:request-builder parts="#[parts]"/>
-        </httpn:request>
+        <httpn:request config-ref="requestConfigTls" path="path" method="POST" responseTimeout="5000"  key="ANY"/>
     </flow>
 
 </mule>

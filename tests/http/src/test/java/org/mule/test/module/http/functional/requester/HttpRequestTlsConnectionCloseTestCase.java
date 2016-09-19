@@ -7,15 +7,14 @@
 
 package org.mule.test.module.http.functional.requester;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.util.IOUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,6 +41,6 @@ public class HttpRequestTlsConnectionCloseTestCase extends AbstractHttpRequestTe
   @Test
   public void handlesRequest() throws Exception {
     Event response = flowRunner("testFlowHttps").withPayload(TEST_PAYLOAD).run();
-    assertThat(IOUtils.toString((InputStream) response.getMessage().getPayload().getValue()), is(DEFAULT_RESPONSE));
+    assertThat(response.getMessage(), hasPayload(equalTo((DEFAULT_RESPONSE))));
   }
 }

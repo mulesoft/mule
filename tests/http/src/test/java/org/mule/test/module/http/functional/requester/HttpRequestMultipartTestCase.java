@@ -7,9 +7,9 @@
 package org.mule.test.module.http.functional.requester;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mule.functional.junit4.matchers.MultiPartPayloadMatchers.hasSize;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
@@ -67,6 +67,6 @@ public class HttpRequestMultipartTestCase extends AbstractHttpRequestTestCase {
     Event response = flowRunner("requestFlow").withFlowVariable("requestPath", path).run();
     Serializable attributes = response.getMessage().getAttributes();
     assertThat(attributes, instanceOf(HttpResponseAttributes.class));
-    assertThat(((MultiPartPayload) response.getMessage().getPayload().getValue()).getParts(), hasSize(1));
+    assertThat(((MultiPartPayload) response.getMessage().getPayload().getValue()), hasSize(1));
   }
 }
