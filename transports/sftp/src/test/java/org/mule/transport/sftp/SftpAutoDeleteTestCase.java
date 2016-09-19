@@ -12,23 +12,21 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.springframework.core.env.AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.util.FileUtils;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.concurrent.Latch;
 
-import com.jcraft.jsch.SftpException;
-
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -46,8 +44,8 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
     private static Latch latch;
     private static MuleMessage  message;
 
-    @Parameterized.Parameter(0)
-    public String profile;
+    @Rule
+    public SystemProperty profile;
 
     @Parameterized.Parameters(name= "{0}")
     public static Collection<Object[]> parameters()
@@ -57,24 +55,15 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
                 {"implicit-connector"}});
     }
 
+    public SftpAutoDeleteTestCase(String profile)
+    {
+        this.profile = new SystemProperty(ACTIVE_PROFILES_PROPERTY_NAME, profile);
+    }
+
     @Override
     protected String getConfigFile()
     {
         return "mule-sftp-auto-delete-config.xml";
-    }
-
-    @Override
-    protected void doSetUpBeforeMuleContextCreation() throws Exception
-    {
-        super.doSetUpBeforeMuleContextCreation();
-        System.setProperty(ACTIVE_PROFILES_PROPERTY_NAME, profile);
-    }
-
-    @Override
-    protected void doTearDownAfterMuleContextDispose() throws Exception
-    {
-        System.clearProperty(ACTIVE_PROFILES_PROPERTY_NAME);
-        super.doTearDownAfterMuleContextDispose();
     }
 
     @Override
@@ -88,7 +77,9 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
     @Override
     public void doTearDown() throws Exception
     {
-        FileUtils.deleteQuietly(new File(getTestDirPath()));
+        sftpClient.changeWorkingDirectory("..");
+        sftpClient.recursivelyDeleteDirectory(AUTO_DELETE_OFF);
+        sftpClient.recursivelyDeleteDirectory(AUTO_DELETE_ON);
         super.doTearDown();
     }
 
@@ -110,21 +101,9 @@ public class SftpAutoDeleteTestCase extends AbstractSftpFunctionalTestCase
     {
         sftpClient.changeWorkingDirectory(directory);
         sftpClient.storeFile(FILENAME, new ByteArrayInputStream(FILE_CONTENT.getBytes()));
-        MuleClient muleClient = muleContext.getClient();
-        muleClient.dispatch(getUrl(directory), getTestMuleMessage(TEST_MESSAGE));
         latch.await(TIMEOUT, TimeUnit.MILLISECONDS);
         assertThat(message, notNullValue());
         assertThat(message.getPayloadAsString(), is(FILE_CONTENT));
-    }
-
-    private String getUrl(String directory)
-    {
-        return String.format("sftp://localhost:%s/%s/%s", sftpPort.getNumber(), TESTDIR, directory);
-    }
-
-    private String getTestDirPath() throws SftpException
-    {
-        return String.format("%s/%s", sftpClient.getChannelSftp().getHome(), TESTDIR);
     }
 
     public static class LatchMessageProcessor implements MessageProcessor

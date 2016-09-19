@@ -15,6 +15,7 @@ import org.mule.api.client.MuleClient;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 public class ExceptionStrategyNotificationTestCase extends AbstractNotificationTestCase
@@ -31,7 +32,7 @@ public class ExceptionStrategyNotificationTestCase extends AbstractNotificationT
                 "org/mule/test/integration/notifications/exception-strategy-notification-test-flow.xml"}});
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -39,6 +40,8 @@ public class ExceptionStrategyNotificationTestCase extends AbstractNotificationT
         assertNotNull(client.send("vm://in-rollback", "test", null));
         assertNotNull(client.send("vm://in-choice-es", "test", null));
         assertNotNull(client.send("vm://in-default-es", "test", null));
+
+        assertNotifications();
     }
 
     @Override

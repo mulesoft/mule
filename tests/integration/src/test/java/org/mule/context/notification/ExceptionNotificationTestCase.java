@@ -14,6 +14,7 @@ import org.mule.api.client.MuleClient;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
@@ -32,12 +33,14 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
         super(variant, configResources);
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("vm://in-1", "hello world", null);
         assertNull(result);
+
+        assertNotifications();
     }
 
     @Override
