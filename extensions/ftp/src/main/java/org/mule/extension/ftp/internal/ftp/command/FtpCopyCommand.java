@@ -82,11 +82,8 @@ public final class FtpCopyCommand extends ClassicFtpCommand implements CopyComma
     @Override
     protected void copyFile(FileConnectorConfig config, FileAttributes source, Path target, boolean overwrite,
                             FtpFileSystem writerConnection, MuleEvent event) {
-      try {
-        super.copyFile(config, source, target, overwrite, writerConnection, event);
-      } finally {
-        fileSystem.awaitCommandCompletion();
-      }
+      super.copyFile(config, source, target, overwrite, writerConnection, event);
+      fileSystem.awaitCommandCompletion();
     }
   }
 }
