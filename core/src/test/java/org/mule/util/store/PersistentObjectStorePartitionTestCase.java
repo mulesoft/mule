@@ -19,6 +19,8 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,6 +64,23 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
         catch (ObjectDoesNotExistException e)
         {
             assertTrue(e.getMessage().contains(nonExistentKey));
+        }
+    }
+
+    @Test
+    public void skipCorruptedOrUnreadableFiles()
+    {
+        final String KEY = "key";
+        final String VALUE = "value";
+        try
+        {
+            File.createTempFile("temp", ".obj", objectStoreFolder.getRoot());
+            partition.store(KEY, VALUE);
+            assertEquals(objectStoreFolder.getRoot().listFiles().length, 2);
+        }
+        catch (Exception e)
+        {
+            fail("Supposed to have skipped corrupted or unreadable files");
         }
     }
 

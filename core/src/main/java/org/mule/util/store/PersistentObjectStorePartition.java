@@ -265,9 +265,20 @@ public class PersistentObjectStorePartition<T extends Serializable>
             File[] files = listValuesFiles();
             for (int i = 0; i < files.length; i++)
             {
-                File file = files[i];
-                StoreValue<T> storeValue = deserialize(file);
-                realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+                try
+                {
+                    File file = files[i];
+                    StoreValue<T> storeValue = deserialize(file);
+                    realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+                }
+                catch (ObjectStoreException e)
+                {
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn("Could not deserialize an ObjectStore file");
+                    }
+                    files[i].delete();
+                }
             }
 
             loaded = true;
