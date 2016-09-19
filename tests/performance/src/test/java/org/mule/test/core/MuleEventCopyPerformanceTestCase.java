@@ -31,6 +31,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCase {
 
+  @Rule
+  public ContiPerfRule rule = new ContiPerfRule();
 
   private String payload;
   private Event events[];
@@ -39,14 +41,6 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   private Event muleEventWith50Properties;
   private Event muleEventWith100Properties;
   private static final int repetitions = 1000;
-
-  @Rule
-  public ContiPerfRule rule = new ContiPerfRule();
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 120;
-  }
 
   @Before
   public void before() throws IOException {

@@ -30,11 +30,6 @@ public class MVELDeepAssignPerformanceTestCase extends AbstractMuleContextTestCa
   @Rule
   public ContiPerfRule rule = new ContiPerfRule();
 
-  @Override
-  public int getTestTimeoutSecs() {
-    return 180;
-  }
-
   final protected String mel = "payload.firstName = 'Tom';"
       + "payload.lastName = 'Fennelly';"
       + "payload.contact.address = 'Male';"

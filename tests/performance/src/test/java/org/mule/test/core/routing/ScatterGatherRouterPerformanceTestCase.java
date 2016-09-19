@@ -7,23 +7,13 @@
 
 package org.mule.test.core.routing;
 
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
+import org.mule.test.performance.util.AbstractIsolatedFunctionalPerformanceTestCase;
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
-import org.databene.contiperf.junit.ContiPerfRule;
-import org.junit.Rule;
 import org.junit.Test;
 
-public class ScatterGatherRouterTestCase extends MuleArtifactFunctionalTestCase {
-
-  @Rule
-  public ContiPerfRule rule = new ContiPerfRule();
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 120;
-  }
+public class ScatterGatherRouterPerformanceTestCase extends AbstractIsolatedFunctionalPerformanceTestCase {
 
   @Override
   protected String getConfigFile() {
@@ -31,43 +21,43 @@ public class ScatterGatherRouterTestCase extends MuleArtifactFunctionalTestCase 
   }
 
   @Test
-  @Required(throughput = 180, average = 6, percentile90 = 7)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
+  @Required(throughput = 180, average = 6, percentile90 = 7)
   public void parallelProcessing() throws Exception {
     this.runFlow("parallelProcessing");
   }
 
   @Test
-  @Required(throughput = 50, average = 18, percentile90 = 20)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
+  @Required(throughput = 50, average = 18, percentile90 = 20)
   public void sequentialProcessing() throws Exception {
     this.runFlow("sequentialProcessing");
   }
 
   @Test
-  @Required(throughput = 220, average = 5, percentile90 = 6)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
+  @Required(throughput = 220, average = 5, percentile90 = 6)
   public void parallelHttpProcessing() throws Exception {
     this.runFlow("parallelHttpProcessing");
   }
 
   @Test
-  @Required(throughput = 200, average = 5, percentile90 = 6)
   @PerfTest(duration = 15000, threads = 1, warmUp = 5000)
+  @Required(throughput = 200, average = 5, percentile90 = 6)
   public void sequentialHttpProcessing() throws Exception {
     this.runFlow("sequentialHttpProcessing");
   }
 
   @Test
-  @Required(throughput = 1600, average = 6, percentile90 = 13)
   @PerfTest(duration = 15000, threads = 10, warmUp = 5000)
+  @Required(throughput = 1600, average = 6, percentile90 = 13)
   public void parallelHttMultiThreadedProcessing() throws Exception {
     this.runFlow("parallelHttpProcessing");
   }
 
   @Test
-  @Required(throughput = 2000, average = 5, percentile90 = 6)
   @PerfTest(duration = 15000, threads = 10, warmUp = 5000)
+  @Required(throughput = 2000, average = 5, percentile90 = 6)
   public void sequentialHttpMultiThreadedProcessing() throws Exception {
     this.runFlow("sequentialHttpProcessing");
   }

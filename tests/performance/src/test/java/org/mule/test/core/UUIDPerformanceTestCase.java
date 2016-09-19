@@ -6,8 +6,8 @@
  */
 package org.mule.test.core;
 
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.UUID;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.databene.contiperf.PerfTest;
 import org.databene.contiperf.Required;
@@ -20,10 +20,6 @@ public class UUIDPerformanceTestCase extends AbstractMuleContextTestCase {
   @Rule
   public ContiPerfRule rule = new ContiPerfRule();
 
-  @Override
-  public int getTestTimeoutSecs() {
-    return 360;
-  }
 
   @Test
   @Required(throughput = 3500, average = 1, percentile90 = 2)

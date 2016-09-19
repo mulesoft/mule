@@ -6,11 +6,10 @@
  */
 package org.mule.test.core;
 
-
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 
@@ -26,7 +25,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase {
+public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public ContiPerfRule rule = new ContiPerfRule();
 
   private static final int repetitions = 1000;
   private InternalMessage[] messages;
@@ -34,20 +36,10 @@ public class MuleMessgeCopyPerformanceTestCase extends AbstractMuleTestCase {
   private InternalMessage muleMessageWith20Properties;
   private InternalMessage muleMessageWith100Properties;
 
-
-
-  @Rule
-  public ContiPerfRule rule = new ContiPerfRule();
-
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private MuleContext muleContext;
 
   private String payload;
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 120;
-  }
 
   @Before
   public void before() throws IOException {

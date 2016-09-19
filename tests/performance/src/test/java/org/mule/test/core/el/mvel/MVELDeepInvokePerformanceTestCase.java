@@ -6,6 +6,7 @@
  */
 package org.mule.test.core.el.mvel;
 
+
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
 import org.mule.runtime.core.DefaultEventContext;
@@ -25,15 +26,12 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+
+
 public class MVELDeepInvokePerformanceTestCase extends AbstractMuleContextTestCase {
 
   @Rule
   public ContiPerfRule rule = new ContiPerfRule();
-
-  @Override
-  public int getTestTimeoutSecs() {
-    return 180;
-  }
 
   final protected String mel = "payload.setFirstName('Tom');"
       + "payload.setLastName('Fennelly');"

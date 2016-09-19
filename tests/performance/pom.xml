@@ -21,7 +21,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <skip>${skipPerformanceTests}</skip>
+                    <systemPropertyVariables>
+                        <contiperf.active>false</contiperf.active>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
@@ -55,12 +57,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-artifact</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -75,6 +71,24 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-ftp</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http-ext</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-http</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-sockets</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -115,4 +129,23 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>performance</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <contiperf.active>true</contiperf.active>
+                                <mule.test.timeoutSecs>300</mule.test.timeoutSecs>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+            </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
