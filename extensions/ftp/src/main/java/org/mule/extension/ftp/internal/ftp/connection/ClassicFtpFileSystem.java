@@ -8,6 +8,7 @@ package org.mule.extension.ftp.internal.ftp.connection;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -68,6 +69,17 @@ public final class ClassicFtpFileSystem extends FtpFileSystem {
   private final RenameCommand renameCommand;
   private final WriteCommand writeCommand;
 
+  private static String resolveBasePath(String basePath, FTPClient client) {
+    if (isBlank(basePath)) {
+      try {
+        return client.printWorkingDirectory();
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("FTP working dir was not specified and failed to resolve a default one"),
+                                       e);
+      }
+    }
+    return basePath;
+  }
 
   /**
    * Creates a new instance
@@ -75,7 +87,7 @@ public final class ClassicFtpFileSystem extends FtpFileSystem {
    * @param client a ready to use {@link FTPClient}
    */
   ClassicFtpFileSystem(FTPClient client, String basePath, MuleContext muleContext) {
-    super(basePath);
+    super(resolveBasePath(basePath, client));
     this.client = client;
     this.muleContext = muleContext;
 

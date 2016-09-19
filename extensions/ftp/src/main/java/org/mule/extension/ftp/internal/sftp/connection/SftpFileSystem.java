@@ -7,6 +7,7 @@
 package org.mule.extension.ftp.internal.sftp.connection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -59,13 +60,25 @@ public class SftpFileSystem extends FtpFileSystem {
   protected final WriteCommand writeCommand;
 
 
+  private static String resolveBasePath(String basePath, SftpClient client) {
+    if (isBlank(basePath)) {
+      try {
+        return client.getWorkingDirectory();
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("SFTP working dir was not specified and failed to resolve a default one"),
+                                       e);
+      }
+    }
+    return basePath;
+  }
+
   /**
    * Creates a new instance
    *
    * @param client a ready to use {@link FTPClient}
    */
   public SftpFileSystem(SftpClient client, String basePath, MuleContext muleContext) {
-    super(basePath);
+    super(resolveBasePath(basePath, client));
     this.client = client;
     this.muleContext = muleContext;
 
