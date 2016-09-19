@@ -8,6 +8,7 @@ package org.mule.extension.ftp.internal.ftp.connection;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -44,7 +45,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.slf4j.Logger;
@@ -70,7 +70,7 @@ public final class ClassicFtpFileSystem extends FtpFileSystem {
   private final WriteCommand writeCommand;
 
   private static String resolveBasePath(String basePath, FTPClient client) {
-    if (StringUtils.isBlank(basePath)) {
+    if (isBlank(basePath)) {
       try {
         return client.printWorkingDirectory();
       } catch (Exception e) {

@@ -7,6 +7,7 @@
 package org.mule.extension.ftp.internal.sftp.connection;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.mule.extension.ftp.internal.FtpConnector.FTP_PROTOCOL;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import org.mule.extension.file.common.api.FileAttributes;
@@ -38,7 +39,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
@@ -61,7 +61,7 @@ public class SftpFileSystem extends FtpFileSystem {
 
 
   private static String resolveBasePath(String basePath, SftpClient client) {
-    if (StringUtils.isBlank(basePath)) {
+    if (isBlank(basePath)) {
       try {
         return client.getWorkingDirectory();
       } catch (Exception e) {
