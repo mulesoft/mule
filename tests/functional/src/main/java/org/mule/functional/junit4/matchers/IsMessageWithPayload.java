@@ -47,7 +47,7 @@ public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
   private String getString(Object payload) {
     if (payload instanceof String) {
       return (String) payload;
-    } else if (payload instanceof InputStream){
+    } else if (payload instanceof InputStream) {
       return IOUtils.toString((InputStream) payload);
     } else {
       fail(String.format("Expected String or InputStream payload but got %s", payload.getClass().getSimpleName()));
