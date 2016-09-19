@@ -55,6 +55,21 @@ public class TestContainerClassLoaderFactory extends ContainerClassLoaderFactory
   }
 
   /**
+   * Overrides method due to it has to use the {@link ClassLoader} set to this factory in order to discover modules.
+   *
+   * @param parentClassLoader parent classLoader. Can be null.
+   * @return a non null {@link ArtifactClassLoader} containing container code that can be used as parent classloader for other
+   *         mule artifacts.
+   */
+  @Override
+  public ArtifactClassLoader createContainerClassLoader(final ClassLoader parentClassLoader) {
+    final List<MuleModule> muleModules = withContextClassLoader(classLoader, () -> discoverModules());
+    final ClassLoaderLookupPolicy containerLookupPolicy = getContainerClassLoaderLookupPolicy(muleModules);
+
+    return createArtifactClassLoader(parentClassLoader, muleModules, containerLookupPolicy, new ArtifactDescriptor("mule"));
+  }
+
+  /**
    * Overrides the method in order to create a {@link ArtifactClassLoader} that will have a CHILD_FIRST
    * {@link ClassLoaderLookupPolicy}, it is needed due to as difference from a mule standalone container where the parent
    * {@link ClassLoader} for the container only has bootstrap jars plugins mule modules and third-party libraries when the runner
