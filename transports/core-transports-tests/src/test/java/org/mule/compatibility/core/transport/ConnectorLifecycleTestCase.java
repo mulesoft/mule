@@ -23,12 +23,12 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequester;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -321,7 +321,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
   @Test
   public void testReceiversServiceLifecycle() throws Exception {
-    Flow flow = MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_SERVICE, muleContext, false);
+    final Flow flow = new Flow(MuleTestUtils.APPLE_SERVICE, muleContext);
     InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
     flow.setMessageSource(endpoint);
     connector = (TestConnector) endpoint.getConnector();

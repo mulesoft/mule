@@ -13,9 +13,9 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.compatibility.transport.jms.transformers.ObjectToJMSMessage;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.jms.Message;
@@ -54,7 +54,9 @@ public class JmsTransformerTestCase extends AbstractMuleContextTestCase {
     // underlying message when a "current event" is available, so we need to set
     // one.
     assertNotNull("The test hasn't been configured properly, no muleContext available", muleContext);
-    setCurrentEvent(Event.builder(MuleTestUtils.getTestEvent("previous", muleContext)).message(msg).build());
+    setCurrentEvent(Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR))
+        .message(msg)
+        .build());
 
     // The transformer we are going to use is ObjectToJMSMessage, which will
     // return the same (but mockingly modified!) JMS message that is used as

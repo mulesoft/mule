@@ -15,11 +15,14 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.MuleTestUtils.getTestEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -69,7 +72,11 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testAcceptMessage() throws Exception {
     final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    Event event = getTestEvent(null, muleContext);
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
+
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.builder().nullPayload().build())
+        .build();
     XPathFilter filter = new XPathFilter() {
 
       @Override
@@ -86,7 +93,9 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
     Builder builder = Event.builder(event);
     assertFalse("shouldn't accept a message if no payload is set.", filter.accept(event, builder));
 
-    event = getTestEvent(new Object(), muleContext);
+    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(new Object()))
+        .build();
     filter.setPattern("/some/pattern = null");
     builder = Event.builder(event);
     assertTrue(filter.accept(event, builder));
@@ -94,7 +103,9 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
     assertEquals("/some/pattern", filter.getPattern().trim());
     assertSame(document, builder.build().getMessage().getPayload().getValue());
 
-    event = getTestEvent(new Object(), muleContext);
+    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(new Object()))
+        .build();
     builder = Event.builder(event);
     filter.setExpectedValue(null);
     assertTrue(filter.accept(event, builder));
@@ -136,7 +147,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
 
     filter.setPattern("/soap:Envelope/soap:Body/mule:echo/mule:echo");
     filter.setExpectedValue("Hello!");
-    HashMap<String, String> prefix2Namespace = new HashMap<String, String>();
+    HashMap<String, String> prefix2Namespace = new HashMap<>();
     prefix2Namespace.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
     prefix2Namespace.put("mule", "http://simple.component.mule.org/");
     filter.setNamespaces(prefix2Namespace);

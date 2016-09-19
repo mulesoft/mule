@@ -9,13 +9,15 @@ package org.mule.runtime.core.mule.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.tck.MuleTestUtils.getTestEventContext;
 
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.ExplicitMethodEntryPointResolver;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -28,7 +30,12 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodSetPass() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
-    MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("blah"))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
         resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
@@ -39,7 +46,12 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
     resolver.addMethod("someSetter");
-    MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("blah"))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
         resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
@@ -50,7 +62,12 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("noMethod");
     resolver.addMethod("noMethod2");
-    MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+      .message(InternalMessage.of("blah"))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
         resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.FAILED);
@@ -60,7 +77,12 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testNoMethodSet() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     try {
-      MuleEventContext eventContext = getTestEventContext("blah", REQUEST_RESPONSE, muleContext);
+      FlowConstruct flowConstruct = getTestFlow();
+      final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("blah"))
+          .exchangePattern(REQUEST_RESPONSE)
+          .build();
+      MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
       InvocationResult result =
           resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(eventContext.getEvent()));
       fail("method property is not set, this should cause an error");
@@ -79,7 +101,12 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterAssignableFromPayload() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("wash");
-    MuleEventContext ctx = getTestEventContext(new Apple(), REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(new Apple()))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext ctx = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result = resolver.invoke(new TestFruitCleaner(), ctx, Event.builder(ctx.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
   }
@@ -94,7 +121,12 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterNull() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someOtherBusinessMethod");
-    MuleEventContext eventContext = getTestEventContext(new Object[] {null, "blah"}, REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(new Object[] {null, "blah"}))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult result =
         resolver.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);

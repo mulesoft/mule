@@ -12,10 +12,13 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
-import static org.mule.tck.MuleTestUtils.getTestEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -44,11 +47,16 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase {
     SchemaValidationFilter filter = new SchemaValidationFilter();
     filter.setSchemaLocations(SIMPLE_SCHEMA);
     filter.initialise();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
 
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext),
+    assertThat(filter.accept(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(getClass().getResourceAsStream(VALID_XML_FILE)))
+        .build(),
                              mock(Event.Builder.class)),
                is(true));
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext),
+    assertThat(filter.accept(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(getClass().getResourceAsStream(INVALID_XML_FILE)))
+        .build(),
                              mock(Event.Builder.class)),
                is(false));
   }
@@ -67,11 +75,16 @@ public class SchemaValidationTestCase extends AbstractMuleTestCase {
     SchemaValidationFilter filter = new SchemaValidationFilter();
     filter.setSchemaLocations(INCLUDE_SCHEMA);
     filter.initialise();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
 
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(VALID_XML_FILE), muleContext),
+    assertThat(filter.accept(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(getClass().getResourceAsStream(VALID_XML_FILE)))
+        .build(),
                              mock(Event.Builder.class)),
                is(true));
-    assertThat(filter.accept(getTestEvent(getClass().getResourceAsStream(INVALID_XML_FILE), muleContext),
+    assertThat(filter.accept(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(getClass().getResourceAsStream(INVALID_XML_FILE)))
+        .build(),
                              mock(Event.Builder.class)),
                is(false));
   }

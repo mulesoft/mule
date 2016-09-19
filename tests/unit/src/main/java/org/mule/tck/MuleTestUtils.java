@@ -6,36 +6,15 @@
  */
 package org.mule.tck;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleContext;
-import org.mule.runtime.core.DefaultMuleEventContext;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.component.JavaComponent;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.session.DefaultMuleSession;
-
-import java.util.ArrayList;
-import java.util.Map;
-
-import org.mockito.Mockito;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -52,7 +31,7 @@ public final class MuleTestUtils {
    * @return a mocked {@link Error}
    */
   public static Error createErrorMock(Exception exception) {
-    Error errorMock = Mockito.mock(Error.class);
+    Error errorMock = mock(Error.class);
     when(errorMock.getException()).thenReturn(exception);
     return errorMock;
   }
@@ -64,105 +43,10 @@ public final class MuleTestUtils {
     return spy;
   }
 
-  /**
-   * Supply no service, no endpoint
-   */
-  public static Event getTestEvent(Object data, MuleContext context) throws Exception {
-    return getTestEvent(data, getTestFlow(context), MessageExchangePattern.REQUEST_RESPONSE, context);
-  }
-
-  public static Event getTestEvent(Object data, MessageExchangePattern mep, MuleContext context)
-      throws Exception {
-    return getTestEvent(data, getTestFlow(context), mep, context);
-  }
-
-  public static Event getTestEvent(Object data,
-                                   FlowConstruct flowConstruct,
-                                   MessageExchangePattern mep,
-                                   MuleContext context)
-      throws Exception {
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(data).build()).exchangePattern(mep).flow(flowConstruct)
-        .session(getTestSession(flowConstruct, context)).build();
-  }
-
-
-  public static MuleEventContext getTestEventContext(Object data,
-                                                     MessageExchangePattern mep,
-                                                     MuleContext context)
-      throws Exception {
-    try {
-      final Event event = getTestEvent(data, mep, context);
-      setCurrentEvent(event);
-      return new DefaultMuleEventContext(getTestFlow(context), event);
-    } finally {
-      setCurrentEvent(null);
-    }
-  }
-
-  public static MuleSession getTestSession(FlowConstruct flowConstruct, MuleContext context) {
-    return new DefaultMuleSession();
-  }
-
-  public static MuleSession getTestSession(MuleContext context) {
-    return getTestSession(null, context);
-  }
-
   public static Flow getTestFlow(MuleContext context) throws Exception {
-    return getTestFlow(APPLE_FLOW, context);
-  }
-
-  public static Flow getTestFlow(String name, Class<?> clazz, MuleContext context) throws Exception {
-    return getTestFlow(name, clazz, null, context);
-  }
-
-  @Deprecated
-  public static Flow getTestFlow(String name, Class<?> clazz, Map props, MuleContext context)
-      throws Exception {
-    return getTestFlow(name, clazz, props, context, true);
-  }
-
-  public static Flow getTestFlow(String name, MuleContext context) throws Exception {
-    return getTestFlow(name, context, true);
-  }
-
-  public static Flow getTestFlow(String name,
-                                 Class<?> clazz,
-                                 Map props,
-                                 MuleContext context,
-                                 boolean initialize)
-      throws Exception {
-    final SingletonObjectFactory of = new SingletonObjectFactory(clazz, props);
-    of.initialise();
-    final JavaComponent component = new DefaultJavaComponent(of);
-    ((MuleContextAware) component).setMuleContext(context);
-
-    return getTestFlow(name, component, initialize, context);
-  }
-
-  public static Flow getTestFlow(String name, MuleContext context, boolean initialize)
-      throws Exception {
-    final Flow flow = new Flow(name, context);
-    if (initialize) {
-      context.getRegistry().registerFlowConstruct(flow);
-    }
-
-    return flow;
-  }
-
-  public static Flow getTestFlow(String name, Object component, boolean initialize, MuleContext context)
-      throws Exception {
-    final Flow flow = new Flow(name, context);
-    flow.setMessageProcessors(new ArrayList<Processor>());
-    if (component instanceof Component) {
-      flow.getMessageProcessors().add((Processor) component);
-    } else {
-      flow.getMessageProcessors().add(new DefaultJavaComponent(new SingletonObjectFactory(component)));
-
-    }
-    if (initialize) {
-      context.getRegistry().registerFlowConstruct(flow);
-    }
+    final Flow flow = new Flow(APPLE_FLOW, context);
+    context.getRegistry().registerFlowConstruct(flow);
+    
     return flow;
   }
 

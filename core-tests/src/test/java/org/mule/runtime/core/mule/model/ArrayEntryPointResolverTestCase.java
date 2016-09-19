@@ -8,14 +8,16 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.tck.MuleTestUtils.getTestEventContext;
 
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.AbstractArgumentEntryPointResolver;
 import org.mule.runtime.core.model.resolvers.ArrayEntryPointResolver;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -29,7 +31,12 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    MuleEventContext eventContext = getTestEventContext(new Fruit[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(new Fruit[] {new Apple(), new Orange()}))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult ctx = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(ctx.getState(), InvocationResult.State.SUCCESSFUL);
   }
@@ -37,7 +44,12 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchGenericFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    MuleEventContext eventContext = getTestEventContext(new Object[] {new Apple(), new Orange()}, REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(new Object[] {new Apple(), new Orange()}))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult ctx = resolver.invoke(new FruitBowl(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(ctx.getState(), InvocationResult.State.FAILED);
   }
@@ -45,7 +57,12 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    MuleEventContext eventContext = getTestEventContext(new Object[] {"blah"}, REQUEST_RESPONSE, muleContext);
+    FlowConstruct flowConstruct = getTestFlow();
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(new Object[] {"blah"}))
+        .exchangePattern(REQUEST_RESPONSE)
+        .build();
+    MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
     InvocationResult ctx = resolver.invoke(new Apple(), eventContext, Event.builder(eventContext.getEvent()));
     assertEquals(ctx.getState(), InvocationResult.State.FAILED);
   }

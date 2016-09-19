@@ -13,6 +13,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transformer.AbstractTransformerTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -41,7 +42,7 @@ public class SerializedMuleMessageTransformersTestCase extends AbstractTransform
 
     Flow flow = getTestFlow();
     setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(testObject).flow(flow)
-        .session(MuleTestUtils.getTestSession(muleContext)).build());
+        .session(new DefaultMuleSession()).build());
   }
 
   @Override

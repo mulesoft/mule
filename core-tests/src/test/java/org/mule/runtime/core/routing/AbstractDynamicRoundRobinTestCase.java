@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing;
 
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -70,12 +71,12 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
     return event -> getMessageProcessorsList();
   }
 
-  protected Event getEvent() throws Exception {
-    return MuleTestUtils.getTestEvent(TEST_MESSAGE, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-  }
-
   protected Event getEventWithId(String id) throws Exception {
-    return Event.builder(getEvent()).addVariable(ID_PROPERTY_NAME, id).build();
+    return Event.builder(DefaultEventContext.create(MuleTestUtils.getTestFlow(muleContext), TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload(TEST_MESSAGE).build())
+        .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
+        .addVariable(ID_PROPERTY_NAME, id)
+        .build();
   }
 
   public static class LetterMessageProcessor implements Processor {

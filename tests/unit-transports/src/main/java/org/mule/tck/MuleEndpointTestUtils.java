@@ -35,6 +35,7 @@ import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.routing.MessageFilter;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -227,7 +228,7 @@ public final class MuleEndpointTestUtils {
 
   public static Event getTestEvent(Object data, FlowConstruct flowConstruct, InboundEndpoint endpoint, MuleContext context)
       throws Exception {
-    final MuleSession session = getTestSession(flowConstruct, context);
+    final MuleSession session = new DefaultMuleSession();
 
     final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
     final InternalMessage message = factory.create(data, endpoint.getEncoding());
