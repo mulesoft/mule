@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class ConnectorMessageErrorNotificationTestCase extends AbstractNotificationTestCase
@@ -46,11 +47,13 @@ public class ConnectorMessageErrorNotificationTestCase extends AbstractNotificat
         super(variant, configResources);
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
         final String url = String.format("http://localhost:%s/path", port.getNumber());
         muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS);
+
+        assertNotifications();
     }
 
     @Override

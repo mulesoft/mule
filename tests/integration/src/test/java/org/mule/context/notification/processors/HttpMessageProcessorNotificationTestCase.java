@@ -18,9 +18,9 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 public class HttpMessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase
@@ -54,13 +54,13 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
         });
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
-        List<String> testList = Arrays.asList("test", "with", "collection");
-
         MuleClient client = muleContext.getClient();
         assertNotNull(client.send("http://localhost:" + proxyPort.getValue() + "/in", "test", null));
+
+        assertNotifications();
     }
 
     @Override

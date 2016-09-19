@@ -16,6 +16,7 @@ import org.mule.tck.listener.ExceptionListener;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
@@ -34,7 +35,7 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
         super(variant, configResources);
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
         ExceptionListener exceptionListener = new ExceptionListener(muleContext);
@@ -44,6 +45,8 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
         exceptionListener.waitUntilAllNotificationsAreReceived();
 
         assertNull(result);
+
+        assertNotifications();
     }
 
     @Override
