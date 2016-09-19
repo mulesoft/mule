@@ -86,7 +86,7 @@ public class DerbyServer extends ExternalResource implements Closeable {
     stop();
   }
 
-  public void start() {
+  public DerbyServer start() {
     try {
       server = new NetworkServerControl(InetAddress.getByName(HOST), port);
       server.start(new PrintWriter(new LogWriter()));
@@ -95,6 +95,7 @@ public class DerbyServer extends ExternalResource implements Closeable {
       throw new RuntimeException("Couldn't start Derby server", e);
     }
     logger.info("Started Derby Database server.");
+    return this;
   }
 
   public void stop() {
