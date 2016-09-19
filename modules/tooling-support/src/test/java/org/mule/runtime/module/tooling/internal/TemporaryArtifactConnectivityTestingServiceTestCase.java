@@ -17,7 +17,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.module.deployment.internal.connectivity.artifact.TemporaryArtifact;
+import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

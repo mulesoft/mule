@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.domain;
 
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactFactory;
 
 /**

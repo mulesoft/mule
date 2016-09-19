@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.module.deployment.internal.application.ArtifactPluginFactory;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.AbstractArtifactClassLoaderBuilder;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginRepository;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 
 import java.io.IOException;
 
@@ -28,13 +29,13 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
 
   /**
    * Creates an {@link TemporaryArtifactClassLoaderBuilder}.
-   *
-   * @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
-   * @param artifactPluginFactory factory for creating artifact plugins. Must be not null.
+   *  @param artifactPluginRepository repository of plugins contained by the runtime. Must be not null.
+   * @param artifactPluginClassLoaderFactory factory for creating class loaders for artifact plugins. Must be not null.
    */
   public TemporaryArtifactClassLoaderBuilder(ArtifactPluginRepository artifactPluginRepository,
-                                             ArtifactPluginFactory artifactPluginFactory) {
-    super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository, artifactPluginFactory);
+                                             ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory) {
+    super(new TemporaryArtifactClassLoaderFactory(), artifactPluginRepository,
+          artifactPluginClassLoaderFactory);
   }
 
   /**
@@ -59,7 +60,7 @@ public class TemporaryArtifactClassLoaderBuilder extends AbstractArtifactClassLo
    * {@inheritDoc}
    */
   @Override
-  ArtifactClassLoader getParentClassLoader() {
+  protected ArtifactClassLoader getParentClassLoader() {
     return parentClassLoader;
   }
 }

@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+
 /**
  * Keeps track of the deployment status of all artifact in the Mule instance.
  */
-public class DeploymentStatusTracker extends AbstractDeploymentListener {
+public class DeploymentStatusTracker implements DeploymentListener {
 
   private ArtifactDeploymentStatusTracker applicationDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();
   private ArtifactDeploymentStatusTracker domainDeploymentStatusTracker = new ArtifactDeploymentStatusTracker();

@@ -8,9 +8,9 @@ package org.mule.runtime.module.deployment.internal.domain;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainLibFolder;
 
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactStartedSplashScreen;
-import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 
 
 /**

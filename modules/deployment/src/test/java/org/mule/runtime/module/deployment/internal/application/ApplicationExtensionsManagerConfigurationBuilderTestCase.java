@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapterFactory;

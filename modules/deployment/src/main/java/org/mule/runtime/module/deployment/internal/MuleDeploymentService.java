@@ -13,12 +13,12 @@ import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemp
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.util.Preconditions;
-import org.mule.runtime.module.deployment.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
-import org.mule.runtime.module.deployment.api.application.Application;
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.internal.domain.DefaultDomainFactory;

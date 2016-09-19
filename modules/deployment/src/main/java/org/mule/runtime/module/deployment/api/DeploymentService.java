@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.api;
 
-import org.mule.runtime.module.deployment.api.application.Application;
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 
 import java.io.IOException;
 import java.net.URL;

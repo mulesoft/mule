@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 import org.mule.runtime.core.util.SimpleLoggingTable;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
-import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.Application;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;

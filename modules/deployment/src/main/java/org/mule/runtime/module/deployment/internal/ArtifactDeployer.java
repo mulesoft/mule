@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.module.deployment.internal.artifact.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
 
 /**
  * Deployes and Undeploys artifacts in the container.

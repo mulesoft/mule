@@ -9,11 +9,10 @@ package org.mule.runtime.module.deployment.internal.builder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
+import static org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor.PLUGIN_PROPERTIES;
 import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_DEPENDENCIES;
 
 import org.mule.runtime.module.artifact.builder.AbstractArtifactFileBuilder;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.tck.ZipUtils.ZipResource;
 
 import java.io.File;

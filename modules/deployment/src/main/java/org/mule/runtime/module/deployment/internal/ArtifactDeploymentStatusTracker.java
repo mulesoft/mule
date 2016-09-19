@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import org.mule.runtime.module.deployment.api.DeploymentListener;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Keeps track of the deployment status of the artifact listening to the deployment notifications
  */
-public class ArtifactDeploymentStatusTracker extends AbstractDeploymentListener {
+public class ArtifactDeploymentStatusTracker implements DeploymentListener {
 
   public static enum DeploymentState {
     // The deployment is in progress

@@ -7,9 +7,9 @@
 package org.mule.runtime.module.deployment.internal.domain;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.artifact.DeployableArtifactWrapper;
-import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 
 import java.io.IOException;
 

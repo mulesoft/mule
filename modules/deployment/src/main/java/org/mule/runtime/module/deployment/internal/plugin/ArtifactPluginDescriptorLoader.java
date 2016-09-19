@@ -10,6 +10,8 @@ import static org.apache.commons.lang.StringUtils.removeEnd;
 import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+
 import java.io.File;
 import java.io.IOException;
 

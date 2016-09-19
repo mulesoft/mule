@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 
 import org.mule.runtime.module.deployment.internal.AbstractSplashScreenTestCase;
-import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 
 import java.io.File;
 import java.io.IOException;

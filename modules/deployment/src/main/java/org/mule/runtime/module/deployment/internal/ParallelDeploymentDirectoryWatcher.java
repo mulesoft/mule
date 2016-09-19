@@ -7,8 +7,8 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.module.deployment.api.application.Application;
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.ArrayList;

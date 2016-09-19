@@ -30,6 +30,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-deployment-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <!--for the extensions configuration builder-->
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-extensions-support</artifactId>
@@ -87,6 +92,13 @@
             <artifactId>mule-module-test-services</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-deployment-model</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 
