@@ -13,6 +13,7 @@ import org.mule.api.client.MuleClient;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -36,13 +37,15 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
         super(variant, configResources);
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
         assertNotNull(client.send("vm://in-1", "hello sweet world", null));
         client.dispatch("vm://in-2", "goodbye cruel world", null);
         assertNotNull(client.request("vm://out-2", 5000));
+
+        assertNotifications();
     }
 
     @Override
