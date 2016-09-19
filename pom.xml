@@ -1674,6 +1674,7 @@
                             <exclude>**/*.css</exclude>
                             <exclude>**/build-number.txt</exclude>
 
+                            <exclude>**/org/apache/**</exclude>
                             <exclude>**/org/springframework/**</exclude>
                             <exclude>**/HttpTransactionContext.java</exclude>
                             <exclude>**/HttpConnection.java</exclude>
