@@ -719,9 +719,7 @@ public abstract class ExtensionDefinitionParser {
   private boolean isExpressionResolver(Set<ModelProperty> modelProperties) {
     return modelProperties
         .stream()
-        .filter(property -> property instanceof ParameterResolverTypeModelProperty)
-        .findAny()
-        .isPresent();
+        .anyMatch(property -> property instanceof ParameterResolverTypeModelProperty);
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {

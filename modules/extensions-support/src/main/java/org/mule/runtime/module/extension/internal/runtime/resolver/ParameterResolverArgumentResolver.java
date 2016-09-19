@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
 /**
  * {@link ArgumentResolver} for the parameters that are of {@link ParameterResolver} type.
@@ -28,7 +28,8 @@ public final class ParameterResolverArgumentResolver<T> implements ArgumentResol
   @Override
   public ParameterResolver<T> resolve(OperationContext operationContext) {
     Object value = argumentResolver.resolve(operationContext);
-    return value != null && ParameterResolver.class.isAssignableFrom(value.getClass()) ? (ParameterResolver<T>) value
+    return ParameterResolver.class.isInstance(value)
+        ? (ParameterResolver<T>) value
         : new StaticParameterResolver<>((T) value);
   }
 }

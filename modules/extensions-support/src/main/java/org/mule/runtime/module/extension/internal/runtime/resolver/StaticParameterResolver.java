@@ -8,6 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
+import java.util.Optional;
+
+import static java.util.Optional.empty;
+
 /**
  * {@link ParameterResolver} implementation for the parameter values that are resolved statically
  *
@@ -34,7 +38,7 @@ final class StaticParameterResolver<T> implements ParameterResolver<T> {
    * {@inheritDoc}
    */
   @Override
-  public String getExpression() {
-    return "";
+  public Optional<String> getExpression() {
+    return empty();
   }
 }

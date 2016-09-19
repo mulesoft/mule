@@ -13,6 +13,8 @@ import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 
+import java.util.Optional;
+
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 
 /**
@@ -49,7 +51,7 @@ class ExpressionBasedParameterResolver<T> implements ParameterResolver<T> {
    * {@inheritDoc}
    */
   @Override
-  public String getExpression() {
-    return expression;
+  public Optional<String> getExpression() {
+    return Optional.ofNullable(expression);
   }
 }

@@ -39,6 +39,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasConnectionProviderDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.HasSourceDeclarer;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.NamedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterizedDeclarer;
@@ -76,6 +77,7 @@ import org.mule.runtime.module.extension.internal.introspection.describer.model.
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithOperationContainers;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithParameters;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.runtime.FieldWrapper;
+import org.mule.runtime.module.extension.internal.introspection.utils.ParameterDeclarationContext;
 import org.mule.runtime.module.extension.internal.introspection.version.VersionResolver;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ExtendingOperationModelProperty;
@@ -136,6 +138,10 @@ public final class AnnotationsBasedDescriber implements Describer {
 
   public static final String DEFAULT_CONNECTION_PROVIDER_NAME = "connection";
   private static final String CUSTOM_CONNECTION_PROVIDER_SUFFIX = "-" + DEFAULT_CONNECTION_PROVIDER_NAME;
+  private static final String CONNECTION_PROVIDER = "Connection Provider";
+  private static final String CONFIGURATION = "Configuration";
+  private static final String SOURCE = "Source";
+  private static final String OPERATION = "Operation";
 
   private final Class<?> extensionType;
   private final VersionResolver versionResolver;
@@ -219,7 +225,8 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                        extensionType.getDeclaringClass().getClassLoader()))
         .withModelProperty(new ImplementingTypeModelProperty(configurationType.getDeclaringClass()));
 
-    declareFieldBasedParameters(configurationDeclarer, configurationType.getParameters());
+    declareFieldBasedParameters(configurationDeclarer, configurationType.getParameters(),
+                                new ParameterDeclarationContext(CONFIGURATION, configurationDeclarer.getDeclaration()));
 
     declareOperations(declarer, configurationDeclarer, configurationType);
     declareMessageSources(declarer, configurationDeclarer, configurationType);
@@ -273,7 +280,8 @@ public final class AnnotationsBasedDescriber implements Describer {
 
     source.withOutput().ofType(typeLoader.load(sourceGenerics.get(0)));
     source.withOutputAttributes().ofType(typeLoader.load(sourceGenerics.get(1)));
-    declareFieldBasedParameters(source, sourceType.getParameters());
+    declareFieldBasedParameters(source, sourceType.getParameters(),
+                                new ParameterDeclarationContext(SOURCE, source.getDeclaration()));
 
     sourceDeclarers.put(sourceType.getDeclaringClass(), source);
   }
@@ -331,7 +339,8 @@ public final class AnnotationsBasedDescriber implements Describer {
       operation.withOutputAttributes().ofType(getMethodReturnAttributesType(method, typeLoader));
       addInterceptingCallbackModelProperty(operationMethod, operation);
       addPagedOperationModelProperty(operationMethod, operation, supportsConfig);
-      declareMethodBasedParameters(operation, operationMethod.getParameters());
+      declareMethodBasedParameters(operation, operationMethod.getParameters(),
+                                   new ParameterDeclarationContext(OPERATION, operation.getDeclaration()));
       calculateExtendedTypes(declaringClass, method, operation);
       operationDeclarers.put(operationMethod, operation);
     }
@@ -406,21 +415,25 @@ public final class AnnotationsBasedDescriber implements Describer {
     providerDeclarer.withConnectionManagementType(managementType);
 
     connectionProviderDeclarers.put(providerClass, providerDeclarer);
-    declareFieldBasedParameters(providerDeclarer, providerType.getParameters());
+    declareFieldBasedParameters(providerDeclarer, providerType.getParameters(),
+                                new ParameterDeclarationContext(CONNECTION_PROVIDER, providerDeclarer.getDeclaration()));
   }
 
   private List<ParameterDeclarer> declareFieldBasedParameters(ParameterizedDeclarer component,
-                                                              List<ExtensionParameter> parameters) {
-    return declareParameters(component, parameters, this.fieldParameterContributor, null);
+                                                              List<ExtensionParameter> parameters,
+                                                              ParameterDeclarationContext componentName) {
+    return declareParameters(component, parameters, this.fieldParameterContributor, componentName, null);
   }
 
   private List<ParameterDeclarer> declareMethodBasedParameters(ParameterizedDeclarer component,
-                                                               List<ExtensionParameter> parameters) {
-    return declareParameters(component, parameters, this.methodParameterContributor, null);
+                                                               List<ExtensionParameter> parameters,
+                                                               ParameterDeclarationContext componentName) {
+    return declareParameters(component, parameters, this.methodParameterContributor, componentName, null);
   }
 
   private List<ParameterDeclarer> declareParameters(ParameterizedDeclarer component, List<ExtensionParameter> parameters,
                                                     List<ParameterDeclarerContributor> contributors,
+                                                    ParameterDeclarationContext declarationContext,
                                                     ExtensionParameter parameterGroupOwner) {
     List<ParameterDeclarer> declarerList = new ArrayList<>();
     checkAnnotationsNotUsedMoreThanOnce(parameters, Connection.class, UseConfig.class, MetadataKeyId.class);
@@ -438,7 +451,7 @@ public final class AnnotationsBasedDescriber implements Describer {
         addLayoutModelProperty(extensionParameter, parameter);
         addImplementingTypeModelProperty(extensionParameter, parameter);
         addXmlHintsModelProperty(extensionParameter, parameter);
-        contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter));
+        contributors.forEach(contributor -> contributor.contribute(extensionParameter, parameter, declarationContext));
         declarerList.add(parameter);
       }
 
@@ -468,12 +481,12 @@ public final class AnnotationsBasedDescriber implements Describer {
                                                                       parameterGroupOwner.getName(),
                                                                       parameterGroupOwner.getType().getName()));
           } else {
-            declareParameters(component, annotatedParameters, contributors, extensionParameter);
+            declareParameters(component, annotatedParameters, contributors, declarationContext, extensionParameter);
           }
 
         } else {
           declareParameters(component, getFieldsWithGetterAndSetters(type.getDeclaringClass()).stream().map(FieldWrapper::new)
-              .collect(toList()), contributors, extensionParameter);
+              .collect(toList()), contributors, declarationContext, extensionParameter);
         }
       }
     }
@@ -586,13 +599,14 @@ public final class AnnotationsBasedDescriber implements Describer {
 
   private interface ParameterDeclarerContributor {
 
-    void contribute(ExtensionParameter parameter, ParameterDeclarer declarer);
+    void contribute(ExtensionParameter parameter, ParameterDeclarer declarer, ParameterDeclarationContext declarationContext);
   }
 
   private static class InfrastructureFieldContributor implements ParameterDeclarerContributor {
 
     @Override
-    public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer) {
+    public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
+                           ParameterDeclarationContext declarationContext) {
       if (InfrastructureTypeMapping.getMap().containsKey(parameter.getType().getDeclaringClass())) {
         declarer.withModelProperty(new InfrastructureParameterModelProperty());
         declarer.withExpressionSupport(NOT_SUPPORTED);
@@ -603,11 +617,18 @@ public final class AnnotationsBasedDescriber implements Describer {
   private class ParameterResolverParameterTypeContributor implements ParameterDeclarerContributor {
 
     @Override
-    public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer) {
+    public void contribute(ExtensionParameter parameter, ParameterDeclarer declarer,
+                           ParameterDeclarationContext declarationContext) {
       MetadataType metadataType = parameter.getMetadataType(typeLoader);
       if (ParameterResolver.class.isAssignableFrom(parameter.getType().getDeclaringClass())) {
         final Optional<MetadataType> expressionResolverType = getGenericTypeAt(metadataType, 0, typeLoader);
-        metadataType = expressionResolverType.isPresent() ? expressionResolverType.get() : typeLoader.load(Object.class);
+        if (expressionResolverType.isPresent()) {
+          metadataType = expressionResolverType.get();
+        } else {
+          throw new IllegalParameterModelDefinitionException(String
+              .format("The parameter [%s] from the Operation [%s] doesn't specify the %s parameterized type", parameter.getName(),
+                      declarationContext.getName(), ParameterResolver.class.getSimpleName()));
+        }
         declarer.ofType(metadataType);
         declarer.withModelProperty(new ParameterResolverTypeModelProperty());
       }

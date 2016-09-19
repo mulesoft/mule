@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
@@ -179,8 +178,8 @@ public class HeisenbergOperations {
     return connection.getSaulPhoneNumber();
   }
 
-  public String literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
-    return literalExpression.getExpression();
+  public ParameterResolver<String> literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
+    return literalExpression;
   }
 
   public int[][] getGramsInStorage(@Optional(defaultValue = PAYLOAD) int[][] grams) {
@@ -191,13 +190,13 @@ public class HeisenbergOperations {
     return sales;
   }
 
-  public Map<String, Weapon> processWeapon(@Optional ParameterResolver<Weapon> weapon) {
-    return singletonMap(weapon.getExpression(), weapon.resolve());
+  public ParameterResolver<Weapon> processWeapon(@Optional ParameterResolver<Weapon> weapon) {
+    return weapon;
   }
 
-  public Map<String, Weapon> processWeaponWithDefaultValue(@Optional(
+  public ParameterResolver<Weapon> processWeaponWithDefaultValue(@Optional(
       defaultValue = "#[payload]") ParameterResolver<Weapon> weapon) {
-    return singletonMap(weapon.getExpression(), weapon.resolve());
+    return weapon;
   }
 
   @Ignore
