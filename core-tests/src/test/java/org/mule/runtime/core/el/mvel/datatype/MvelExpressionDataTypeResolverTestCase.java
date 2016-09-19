@@ -15,8 +15,12 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -31,8 +35,11 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
   @Test
   public void returnsDefaultDataTypeForNonNullValue() throws Exception {
     CompiledExpression compiledExpression = compileMelExpression();
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event testEvent = getTestEvent(TEST_MESSAGE);
+    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     dataTypeResolver = new MvelDataTypeResolver(EMPTY_LIST);
 
@@ -42,8 +49,11 @@ public class MvelExpressionDataTypeResolverTestCase extends AbstractMuleContextT
   @Test
   public void returnsDefaultDataTypeForNullValue() throws Exception {
     CompiledExpression compiledExpression = compileMelExpression();
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event testEvent = getTestEvent(TEST_MESSAGE);
+    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     dataTypeResolver = new MvelDataTypeResolver();
 

@@ -43,7 +43,10 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() throws Exception {
-    event = getTestEvent("");
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build();
   }
 
   @Test

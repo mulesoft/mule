@@ -23,12 +23,15 @@ import static org.mule.runtime.core.message.NullAttributes.NULL_ATTRIBUTES;
 
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
+import org.mule.tck.MuleTestUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,14 +57,20 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void message() throws Exception {
-    Event event = getTestEvent("foo");
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("foo"))
+        .build();
     assertTrue(evaluate("message", event) instanceof MessageContext);
     assertEquals("foo", evaluate("message.payload", event));
   }
 
   @Test
   public void assignToMessage() throws Exception {
-    Event event = getTestEvent("");
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build();
     assertImmutableVariable("message='foo'", event);
   }
 

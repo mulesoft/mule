@@ -297,7 +297,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     TestSerializableMessageProcessor processor = new TestSerializableMessageProcessor();
     processor.setValue(value);
 
-    MessagingException e = new MessagingException(I18nMessageFactory.createStaticMessage(message), getTestEvent(""), processor);
+    MessagingException e = new MessagingException(I18nMessageFactory.createStaticMessage(message), mockEvent, processor);
 
     e = SerializationTestUtils.testException(e, muleContext);
 
@@ -311,7 +311,7 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   public void nonSerializableMessagingException() throws Exception {
     TestNotSerializableMessageProcessor processor = new TestNotSerializableMessageProcessor();
 
-    MessagingException e = new MessagingException(I18nMessageFactory.createStaticMessage(message), getTestEvent(""), processor);
+    MessagingException e = new MessagingException(I18nMessageFactory.createStaticMessage(message), mockEvent, processor);
 
     e = SerializationTestUtils.testException(e, muleContext);
 

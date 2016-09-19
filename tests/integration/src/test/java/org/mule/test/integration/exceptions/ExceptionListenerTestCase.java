@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
@@ -46,13 +47,14 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
 
     exceptionStrategyStartNotification = null;
     exceptionStrategyEndNotification = null;
-    muleContext.getNotificationManager().addListener(notification -> {
+    final ExceptionStrategyNotificationListener listener = notification -> {
       if (notification.getAction() == ExceptionStrategyNotification.PROCESS_START) {
         exceptionStrategyStartNotification = notification;
       } else if (notification.getAction() == ExceptionStrategyNotification.PROCESS_END) {
         exceptionStrategyEndNotification = notification;
       }
-    });
+    };
+    muleContext.getNotificationManager().addListener(listener);
   }
 
   @Test

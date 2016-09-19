@@ -15,7 +15,6 @@ import org.mule.runtime.core.TransformationService;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -36,7 +35,6 @@ import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.object.SingletonObjectFactory;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -300,16 +298,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(data))
         .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
-        // .flow(flowConstruct)
-        // .session(getTestSession(flowConstruct, context))
-        .build();
-  }
-
-  public static Event getTestEvent(Object data, MessageExchangePattern mep) throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(data).build())
-        .exchangePattern(mep)
         // .flow(flowConstruct)
         // .session(getTestSession(flowConstruct, context))
         .build();

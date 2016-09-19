@@ -6,10 +6,6 @@
  */
 package org.mule.tck;
 
-import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
-import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
-
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
@@ -17,28 +13,20 @@ import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.MuleEndpointURI;
 import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.routing.MessageFilter;
-import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import java.io.Serializable;
@@ -216,32 +204,6 @@ public final class MuleEndpointTestUtils {
     endpointBuilder.setConnector(connector);
     endpointBuilder.setName(name);
     return source.getEndpoint(endpointBuilder);
-  }
-
-  /**
-   * Supply endpoint but no service
-   */
-  public static Event getTestEvent(Object data, InboundEndpoint endpoint, MuleContext context) throws Exception {
-    return getTestEvent(data, getTestFlow(context), endpoint, context);
-  }
-
-  public static Event getTestEvent(Object data, FlowConstruct flowConstruct, InboundEndpoint endpoint, MuleContext context)
-      throws Exception {
-    final MuleSession session = new DefaultMuleSession();
-
-    final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
-    final InternalMessage message = factory.create(data, endpoint.getEncoding());
-
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(message)
-        .flow(flowConstruct).session(session).build();
-    return populateFieldsFromInboundEndpoint(event, endpoint);
-  }
-
-  public static TestConnector getTestConnector(MuleContext context) throws Exception {
-    final TestConnector testConnector = new TestConnector(context);
-    testConnector.setName("testConnector");
-    context.getRegistry().applyLifecycle(testConnector);
-    return testConnector;
   }
 
   public static EndpointFactory getEndpointFactory(MuleRegistry registry) {

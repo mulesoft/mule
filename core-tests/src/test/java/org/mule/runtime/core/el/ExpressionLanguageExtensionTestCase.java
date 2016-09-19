@@ -15,15 +15,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.mvel2.compiler.AbstractParser;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
@@ -109,14 +110,18 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testVariableAlias() throws Exception {
-    Event event = getTestEvent("foo");
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("foo"))
+        .build();
 
     assertThat(expressionLanguage.evaluate("p", event, flowConstruct), is("foo"));
   }
 
   @Test
   public void testAssignValueToVariableAlias() throws Exception {
-    Event event = getTestEvent("");
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build();
 
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.evaluate("p='bar'", event, eventBuilder, flowConstruct);
@@ -125,7 +130,9 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testMuleMessageAvailableAsVariable() throws Exception {
-    Event event = getTestEvent("");
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build();
     InternalMessage message = event.getMessage();
     expressionLanguage.evaluate("p=m.uniqueId", event, flowConstruct);
   }

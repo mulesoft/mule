@@ -10,8 +10,12 @@ import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
@@ -50,8 +54,11 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   public void keyWithNullableValue() throws Exception {
     Map<String, String> payload = new HashMap<>();
     payload.put(KEY, VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent(payload);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(payload))
+        .build();
 
     assertMapKey(event, KEY, VALUE);
     payload.remove(KEY);
@@ -61,8 +68,11 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   @Test
   public void nullKeyWhichGetsValueLater() throws Exception {
     Map<String, String> payload = new HashMap<>();
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent(payload);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(payload))
+        .build();
 
     assertMapKey(event, KEY, null);
 
@@ -71,7 +81,10 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   }
 
   private void assertMapKey(Object payload, String key, Object expectedValue) throws Exception {
-    assertMapKey(getTestEvent(payload), key, expectedValue);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    assertMapKey(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(payload))
+        .build(), key, expectedValue);
   }
 
   private void assertMapKey(Event event, String key, Object expectedValue) throws Exception {
