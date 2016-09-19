@@ -44,7 +44,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     FlowConstruct flowConstruct = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-      .message(InternalMessage.of("blah"))
+        .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -99,7 +99,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
     FlowConstruct flowConstruct = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-      .message(InternalMessage.of(new Fruit[] {new Apple(), new Orange()}))
+        .message(InternalMessage.of(new Fruit[] {new Apple(), new Orange()}))
         .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -165,7 +165,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTes
     Object proxy = e.create();
     FlowConstruct flowConstruct = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-      .message(InternalMessage.of("Blah"))
+        .message(InternalMessage.of("Blah"))
         .exchangePattern(REQUEST_RESPONSE)
         .build();
 

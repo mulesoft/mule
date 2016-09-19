@@ -33,7 +33,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     resolver.addMethod("bite");
     FlowConstruct flowConstruct = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-      .message(InternalMessage.of("blah"))
+        .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);
@@ -47,7 +47,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
     resolver.addMethod("wash");
     FlowConstruct flowConstruct = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-      .message(InternalMessage.of("blah"))
+        .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
         .build();
     MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);

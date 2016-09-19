@@ -54,7 +54,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
       FlowConstruct flowConstruct = getTestFlow();
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
+          .message(InternalMessage.of("blah"))
           .exchangePattern(REQUEST_RESPONSE)
           .build();
       MuleEventContext eventContext = new DefaultMuleEventContext(flowConstruct, event);

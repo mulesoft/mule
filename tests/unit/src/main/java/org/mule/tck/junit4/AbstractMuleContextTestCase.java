@@ -315,8 +315,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   public static Event getTestEvent(Object data, FlowConstruct service) throws Exception {
     return Event.builder(DefaultEventContext.create(service, TEST_CONNECTOR))
-    .message(InternalMessage.builder().payload(data).build()).exchangePattern(MessageExchangePattern.REQUEST_RESPONSE).flow(service)
-    .session(new DefaultMuleSession()).build();
+        .message(InternalMessage.builder().payload(data).build()).exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
+        .flow(service)
+        .session(new DefaultMuleSession()).build();
   }
 
   public static Event getTestEvent(Object data, MuleContext muleContext) throws Exception {
@@ -369,7 +370,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     of.initialise();
     final JavaComponent component = new DefaultJavaComponent(of);
     ((MuleContextAware) component).setMuleContext(muleContext);
-    
+
     final Flow flow = new Flow(name, muleContext);
     flow.setMessageProcessors(Collections.singletonList((Processor) component));
     muleContext.getRegistry().registerFlowConstruct(flow);
