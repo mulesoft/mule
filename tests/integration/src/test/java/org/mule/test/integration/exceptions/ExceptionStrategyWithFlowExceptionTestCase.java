@@ -8,14 +8,15 @@ package org.mule.test.integration.exceptions;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.exception.MessagingException;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.ExceptionMessage;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ public class ExceptionStrategyWithFlowExceptionTestCase extends AbstractIntegrat
 
   @Test
   public void testFlowExceptionExceptionStrategy() throws Exception {
-    flowRunner("customException").withPayload(getTestMuleMessage(TEST_MESSAGE)).asynchronously().run();
+    flowRunner("customException").withPayload(TEST_MESSAGE).asynchronously().run();
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
 

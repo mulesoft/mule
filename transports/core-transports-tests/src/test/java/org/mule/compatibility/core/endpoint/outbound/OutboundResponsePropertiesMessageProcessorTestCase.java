@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.session.DefaultMuleSession;
 
 import org.junit.Test;
 
@@ -39,7 +40,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
         return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
             .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue()).build())
             .exchangePattern(REQUEST_RESPONSE)
-            .flow(flow).session(getTestSession(null, muleContext)).build();
+            .flow(flow).session(new DefaultMuleSession()).build();
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -40,6 +41,7 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
     return "cxf-proxy-service-without-mustunderstand-flow-httpn.xml";
   }
 
+  @Override
   @Before
   public void doSetUp() throws Exception {
     request = IOUtils.getResourceAsString("in-message-with-mustunderstand.xml", getClass());
@@ -59,6 +61,6 @@ public class UsernameTokenProxyWithoutMustUnderstandTestCase extends FunctionalT
   }
 
   protected InternalMessage sendRequest(String url, String payload) throws MuleException {
-    return muleContext.getClient().send(url, getTestMuleMessage(payload), HTTP_REQUEST_OPTIONS).getRight();
+    return muleContext.getClient().send(url, InternalMessage.of(payload), HTTP_REQUEST_OPTIONS).getRight();
   }
 }

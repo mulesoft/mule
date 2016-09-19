@@ -44,6 +44,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -128,7 +129,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     Flow flow = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build()).flow(flow)
-        .session(getTestSession(null, muleContext)).build();
+        .session(new DefaultMuleSession()).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
   }
 
@@ -204,7 +205,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     }
     final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build()).flow(flow)
-        .session(getTestSession(null, muleContext)).build();
+        .session(new DefaultMuleSession()).build();
     return populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(REQUEST_RESPONSE));
   }
 

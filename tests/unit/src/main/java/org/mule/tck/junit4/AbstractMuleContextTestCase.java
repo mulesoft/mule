@@ -6,7 +6,6 @@
  */
 package org.mule.tck.junit4;
 
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -296,51 +295,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     // template method
   }
 
-  /**
-   * @return creates a new {@link InternalMessage} with a test payload
-   */
-  @Deprecated
-  protected InternalMessage getTestMuleMessage() {
-    return getTestMuleMessage(TEST_PAYLOAD);
-  }
-
-  /**
-   * @param message
-   * @return creates a new {@link InternalMessage} with message as payload
-   */
-  @Deprecated
-  protected InternalMessage getTestMuleMessage(Object message) {
-    return InternalMessage.builder().payload(message).build();
-  }
-
-  public static Event getTestEvent(Object data, FlowConstruct service) throws Exception {
-    return Event.builder(DefaultEventContext.create(service, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(data).build()).exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
-        .flow(service)
-        .session(new DefaultMuleSession()).build();
-  }
-
-  public static Event getTestEvent(Object data, MuleContext muleContext) throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(data).build())
-        .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
-        // .flow(flowConstruct)
-        // .session(getTestSession(flowConstruct, context))
-        .build();
-  }
-
-  public static Event getTestEvent(InternalMessage data) throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(data)
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(new DefaultMuleSession())
-        .build();
-  }
-
   public static Event getTestEvent(Object data) throws Exception {
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(data).build())
+        .message(InternalMessage.of(data))
         .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
         // .flow(flowConstruct)
         // .session(getTestSession(flowConstruct, context))
@@ -355,10 +313,6 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
         // .flow(flowConstruct)
         // .session(getTestSession(flowConstruct, context))
         .build();
-  }
-
-  public static MuleSession getTestSession(Flow flow, MuleContext context) {
-    return new DefaultMuleSession();
   }
 
   public static Flow getTestFlow() throws Exception {

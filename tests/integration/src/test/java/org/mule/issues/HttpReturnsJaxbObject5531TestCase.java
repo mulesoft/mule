@@ -16,6 +16,7 @@ import org.mule.test.AbstractIntegrationTestCase;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.simple.ObjectToString;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -48,7 +49,7 @@ public class HttpReturnsJaxbObject5531TestCase extends AbstractIntegrationTestCa
   public void testGetWeather() throws Exception {
     String testUrl = "http://localhost:" + port1.getNumber() + "/test";
     MuleClient client = muleContext.getClient();
-    Object response = client.send(testUrl, getTestMuleMessage("hello"), newOptions().method(POST.name()).build());
+    Object response = client.send(testUrl, InternalMessage.of("hello"), newOptions().method(POST.name()).build());
     assertNotNull(response);
     String stringResponse = (String) new ObjectToString().transform(response, UTF_8);
     assertTrue(stringResponse.contains("<Success>true</Success>"));

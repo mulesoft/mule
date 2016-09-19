@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -43,7 +44,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFirstSuccessful() throws Exception {
-    MuleSession session = getTestSession(null, muleContext);
+    MuleSession session = new DefaultMuleSession();
 
     FirstSuccessful fs =
         createFirstSuccessfulRouter(new TestProcessor("abc"), new TestProcessor("def"), new TestProcessor("ghi"));

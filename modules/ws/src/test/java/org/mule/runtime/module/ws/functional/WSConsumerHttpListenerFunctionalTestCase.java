@@ -35,7 +35,7 @@ public class WSConsumerHttpListenerFunctionalTestCase extends AbstractWSConsumer
   @Test
   public void listenerReturnsSoapEnvelopeXMLCorrectly() throws Exception {
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.send("http://localhost:" + clientPort.getValue(), getTestMuleMessage(ECHO_REQUEST),
+    InternalMessage response = client.send("http://localhost:" + clientPort.getValue(), InternalMessage.of(ECHO_REQUEST),
                                            newOptions().method(POST.name()).build())
         .getRight();
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(response));

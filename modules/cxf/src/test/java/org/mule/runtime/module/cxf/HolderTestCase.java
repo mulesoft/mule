@@ -34,7 +34,7 @@ public class HolderTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEchoHolder() throws Exception {
-    InternalMessage received = flowRunner("echoServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received = flowRunner("echoServiceClient").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(received);
     Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
@@ -46,7 +46,7 @@ public class HolderTestCase extends FunctionalTestCase {
   @Test
   public void testClientProxyEchoHolder() throws Exception {
     InternalMessage received =
-        flowRunner("echoServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+        flowRunner("echoServiceClientProxy").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(received);
     Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
@@ -56,7 +56,7 @@ public class HolderTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEcho2Holder() throws Exception {
-    InternalMessage received = flowRunner("echo2ServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received = flowRunner("echo2ServiceClient").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(received);
     Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
@@ -67,7 +67,7 @@ public class HolderTestCase extends FunctionalTestCase {
   @Test
   public void testClientProxyEcho2Holder() throws Exception {
     InternalMessage received =
-        flowRunner("echo2ServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+        flowRunner("echo2ServiceClientProxy").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(received);
     Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals("one-response", payload[0]);
@@ -76,7 +76,7 @@ public class HolderTestCase extends FunctionalTestCase {
 
   @Test
   public void testClientEcho3Holder() throws Exception {
-    InternalMessage received = flowRunner("echo3ServiceClient").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+    InternalMessage received = flowRunner("echo3ServiceClient").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(received);
     Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals(null, payload[0]);
@@ -86,7 +86,7 @@ public class HolderTestCase extends FunctionalTestCase {
   @Test
   public void testClientProxyEcho3Holder() throws Exception {
     InternalMessage received =
-        flowRunner("echo3ServiceClientProxy").withPayload(getTestMuleMessage(TEST_PAYLOAD)).run().getMessage();
+        flowRunner("echo3ServiceClientProxy").withPayload(TEST_PAYLOAD).run().getMessage();
     assertNotNull(received);
     Object[] payload = (Object[]) received.getPayload().getValue();
     assertEquals(null, payload[0]);

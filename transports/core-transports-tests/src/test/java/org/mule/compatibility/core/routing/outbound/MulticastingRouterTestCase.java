@@ -20,10 +20,10 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.filters.RegExFilter;
@@ -93,10 +93,11 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
 
-    assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
-
     Flow flow = getTestFlow();
     final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    assertTrue(router.isMatch(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).build(),
+                              mock(Event.Builder.class)));
+
     Event event = Event.builder(context).message(message).flow(flow).build();
 
     when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));
@@ -131,9 +132,9 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
 
     InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
 
-    assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
     Flow flow = getTestFlow();
     final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
+    assertTrue(router.isMatch(Event.builder(context).message(message).build(), mock(Event.Builder.class)));
     Event event = Event.builder(context).message(message).flow(flow).build();
 
     when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));

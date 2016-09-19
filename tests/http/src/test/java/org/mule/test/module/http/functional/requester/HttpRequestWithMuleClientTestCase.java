@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.runtime.module.http.api.requester.HttpStreamingType.NEVER;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -61,7 +62,7 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase {
 
   @Test
   public void dispatchRequestUseNewConnectorByDefault() throws MuleException {
-    muleContext.getClient().dispatch(getUrl(), getTestMuleMessage());
+    muleContext.getClient().dispatch(getUrl(), InternalMessage.of(TEST_PAYLOAD));
     final InternalMessage receivedMessage = getMessageReceivedByFlow();
     assertThat(receivedMessage.getPayload().getValue(), is(Objects.toString(null)));
   }
@@ -69,7 +70,7 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase {
   @Ignore("See MULE-8049")
   @Test
   public void dispatchHttpPostRequestWithStreamingEnabled() throws Exception {
-    muleContext.getClient().dispatch(getUrl(), getTestMuleMessage(new ByteArrayInputStream(TEST_MESSAGE.getBytes())),
+    muleContext.getClient().dispatch(getUrl(), InternalMessage.of(new ByteArrayInputStream(TEST_MESSAGE.getBytes())),
                                      newOptions().method("POST").build());
     final InternalMessage receivedMessage = getMessageReceivedByFlow();
     assertThat(receivedMessage, notNullValue());
@@ -81,7 +82,7 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase {
   @Test
   public void dispatchWithStreamingDisabled() throws Exception {
     final HttpRequestOptions options = newOptions().method(PUT_HTTP_METHOD).requestStreamingMode(NEVER).build();
-    muleContext.getClient().dispatch(getUrl(), getTestMuleMessage(TEST_MESSAGE), options);
+    muleContext.getClient().dispatch(getUrl(), InternalMessage.of(TEST_MESSAGE), options);
     final InternalMessage receivedMessage = getMessageReceivedByFlow();
     assertThat(receivedMessage.getInboundProperty(HttpHeaders.Names.TRANSFER_ENCODING), nullValue());
     assertThat(receivedMessage.getInboundProperty(HttpHeaders.Names.CONTENT_LENGTH), is("12"));
@@ -91,7 +92,7 @@ public class HttpRequestWithMuleClientTestCase extends AbstractHttpTestCase {
   @Test
   public void sendHttpPutMethod() throws Exception {
     final InternalMessage response =
-        muleContext.getClient().send(getUrl(), getTestMuleMessage(TEST_MESSAGE), newOptions().method(PUT_HTTP_METHOD).build())
+        muleContext.getClient().send(getUrl(), InternalMessage.of(TEST_MESSAGE), newOptions().method(PUT_HTTP_METHOD).build())
             .getRight();
     assertThat(getPayloadAsString(response), is(TEST_MESSAGE));
     final InternalMessage receivedMessage = getMessageReceivedByFlow();

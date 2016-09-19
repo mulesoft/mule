@@ -14,14 +14,17 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -57,9 +60,10 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
     RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();
 
     try {
-      Event event = getTestEvent("message1");
-      final InternalMessage message = InternalMessage.builder(event.getMessage()).build();
-      event = Event.builder(event).message(message).correlationId(event.getCorrelationId())
+      FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+      Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+          .message(InternalMessage.of("message1"))
+          .flow(flowConstruct)
           .groupCorrelation(new GroupCorrelation(1, null)).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();

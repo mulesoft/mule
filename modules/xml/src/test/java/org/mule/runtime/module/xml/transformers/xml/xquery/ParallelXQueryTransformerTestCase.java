@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.object.SingletonObjectFactory;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.XQueryTransformer;
 import org.mule.tck.MuleTestUtils;
@@ -77,7 +78,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
         try {
           setCurrentEvent(Event.builder(DefaultEventContext.create(testFlow, TEST_CONNECTOR))
               .message(InternalMessage.builder().payload("test").build()).exchangePattern(REQUEST_RESPONSE).flow(testFlow)
-              .session(getTestSession(testFlow, muleContext)).build());
+              .session(new DefaultMuleSession()).build());
         } catch (Exception e1) {
           e1.printStackTrace();
           return;

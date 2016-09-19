@@ -22,6 +22,7 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.CorrelationSequenceComparator;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
 import org.mule.runtime.core.routing.correlation.ResequenceMessagesCorrelatorCallback;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -38,7 +39,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testMessageResequencer() throws Exception {
-    MuleSession session = getTestSession(null, muleContext);
+    MuleSession session = new DefaultMuleSession();
     Flow flow = getTestFlow("test", Apple.class);
     assertNotNull(flow);
 
@@ -72,7 +73,7 @@ public class ResequencerTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testMessageResequencerWithComparator() throws Exception {
-    MuleSession session = getTestSession(null, muleContext);
+    MuleSession session = new DefaultMuleSession();
     Flow flow = getTestFlow("test", Apple.class);
     assertNotNull(flow);
 

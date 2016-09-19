@@ -17,6 +17,7 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -30,7 +31,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testMessageProcessor() throws Exception {
-    MuleSession session = getTestSession(null, muleContext);
+    MuleSession session = new DefaultMuleSession();
     Flow flow = getTestFlow("test", Apple.class);
     assertNotNull(flow);
 

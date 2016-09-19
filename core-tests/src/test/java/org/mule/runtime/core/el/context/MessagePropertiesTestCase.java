@@ -16,8 +16,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.tck.MuleTestUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -45,7 +48,10 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void inboundPropertyMap() throws Exception {
-    event = getTestEvent(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build());
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build())
+        .build();
     assertTrue(evaluate("message.inboundProperties", event) instanceof Map);
   }
 
@@ -56,13 +62,19 @@ public class MessagePropertiesTestCase extends AbstractELTestCase {
 
   @Test
   public void inboundProperty() throws Exception {
-    event = getTestEvent(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build());
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build())
+        .build();
     assertEquals("bar", evaluate("message.inboundProperties['foo']", event));
   }
 
   @Test
   public void assignValueToInboundProperty() throws Exception {
-    event = getTestEvent(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build());
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload("").inboundProperties(singletonMap("foo", "bar")).build())
+        .build();
     assertUnsupportedOperation("message.inboundProperties['foo']='bar'", event);
   }
 

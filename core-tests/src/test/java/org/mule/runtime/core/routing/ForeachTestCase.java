@@ -13,11 +13,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -102,7 +105,9 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     list.add(InternalMessage.builder().payload("bar").build());
     list.add(InternalMessage.builder().payload("zip").build());
     InternalMessage msgCollection = InternalMessage.builder().payload(list).build();
-    simpleForeach.process(getTestEvent(msgCollection));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    simpleForeach
+        .process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(msgCollection).build());
 
     assertSimpleProcessedMessages();
   }
@@ -176,7 +181,9 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     parentList.add(InternalMessage.builder().payload(list2).build());
     InternalMessage parentCollection = InternalMessage.builder().payload(parentList).build();
 
-    nestedForeach.process(getTestEvent(parentCollection));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    nestedForeach
+        .process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(parentCollection).build());
     assertNestedProcessedMessages();
   }
 

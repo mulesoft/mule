@@ -15,15 +15,16 @@ import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.METHOD_N
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.NOT_FOUND;
 import static org.mule.test.module.http.functional.matcher.HttpResponseReasonPhraseMatcher.hasReasonPhrase;
 import static org.mule.test.module.http.functional.matcher.HttpResponseStatusCodeMatcher.hasStatusCode;
+
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.HttpConstants.HttpStatus;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
+import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -120,7 +121,7 @@ public class HttpListenerConfigFunctionalTestCase extends AbstractHttpTestCase {
   }
 
   private String callAndAssertStatusWithMuleClient(String url, int expectedStatus) throws Exception {
-    InternalMessage response = muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS).getRight();
+    InternalMessage response = muleContext.getClient().send(url, InternalMessage.of(TEST_PAYLOAD), GET_OPTIONS).getRight();
     assertThat((Integer) response.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY), is(expectedStatus));
     return IOUtils.toString((InputStream) response.getPayload().getValue());
   }

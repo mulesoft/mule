@@ -57,9 +57,8 @@ public class HttpResponseTestCase extends FunctionalTestCase {
   @Test
   public void testHttpResponseMove() throws Exception {
     MuleClient client = muleContext.getClient();
-    InternalMessage muleMessage = getTestMuleMessage(HTTP_BODY);
     InternalMessage response =
-        client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/move", muleMessage).getRight();
+        client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/move", InternalMessage.of(HTTP_BODY)).getRight();
     assertEquals(HTTP_BODY, getPayloadAsString(response));
     assertEquals("" + HttpConstants.SC_MOVED_PERMANENTLY, response.getInboundProperty("http.status"));
     assertEquals("http://localhost:9090/resources/moved", response.getInboundProperty("Location"));
@@ -68,9 +67,8 @@ public class HttpResponseTestCase extends FunctionalTestCase {
   @Test
   public void testHttpResponseAll() throws Exception {
     MuleClient client = muleContext.getClient();
-    InternalMessage muleMessage = getTestMuleMessage(HTTP_BODY);
     InternalMessage response =
-        client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/all", muleMessage).getRight();
+        client.send("http://localhost:" + dynamicPort1.getNumber() + "/resources/all", InternalMessage.of(HTTP_BODY)).getRight();
     assertEquals("Custom body", getPayloadAsString(response));
     assertEquals("" + HttpConstants.SC_NOT_FOUND, response.getInboundProperty("http.status"));
     assertEquals("public,no-cache,must-revalidate,max-age=3600,no-transform", response.getInboundProperty("Cache-Control"));

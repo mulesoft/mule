@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   public void testRoundRobin() throws Exception {
     RoundRobin rr = new RoundRobin();
     rr.setMuleContext(muleContext);
-    MuleSession session = getTestSession(null, muleContext);
+    MuleSession session = new DefaultMuleSession();
     List<TestProcessor> routes = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       routes.add(new TestProcessor());

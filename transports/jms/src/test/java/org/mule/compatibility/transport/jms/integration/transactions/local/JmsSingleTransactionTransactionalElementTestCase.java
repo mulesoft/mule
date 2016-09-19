@@ -12,10 +12,13 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.compatibility.transport.jms.integration.AbstractJmsFunctionalTestCase;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -41,7 +44,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactional() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactional");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     InternalMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
@@ -52,7 +57,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalFailInTheMiddle() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailInTheMiddle");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -64,7 +71,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalFailAtEnd() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailAtEnd");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -76,7 +85,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalFailAfterEnd() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailAfterEnd");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -90,7 +101,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalFailInTheMiddleWithCatchExceptionStrategy() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailInTheMiddleWithCatchExceptionStrategy");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));
@@ -100,7 +113,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalFailAtEndWithCatchExceptionStrategy() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailAtEndWithCatchExceptionStrategy");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     InternalMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
@@ -111,7 +126,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalFailsWithAnotherResourceType() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalFailsWithAnotherResourceType");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     try {
       flow.process(event);
       fail("DispatchException should be thrown");
@@ -125,7 +142,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalDoesntFailWithAnotherResourceType() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalDoesntFailWithAnotherResourceType");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     InternalMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
@@ -138,7 +157,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testTransactionalWithAnotherResourceTypeAndExceptionAtEnd() throws Exception {
     Flow flow = (Flow) getFlowConstruct("transactionalWithAnotherResourceTypeAndExceptionAtEnd");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -152,7 +173,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testNestedTransactional() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactional");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message")).exchangePattern(REQUEST_RESPONSE)
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     InternalMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
@@ -163,7 +186,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testNestedTransactionalFail() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalFail");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -176,7 +201,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testNestedTransactionalFailWithCatch() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalFailWithCatch");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     InternalMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
@@ -189,7 +216,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testNestedTransactionalWithBeginOrJoin() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoin");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     InternalMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
@@ -200,7 +229,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testNestedTransactionalWithBeginOrJoinFail() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFail");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     try {
       flow.process(event);
     } catch (Exception e) {
@@ -212,7 +243,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testNestedTransactionalWithBeginOrJoinFailWithCatch() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFailWithCatch");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     InternalMessage message1 = muleContext.getClient().request("out1", 1000).getRight().get();
     InternalMessage message2 = muleContext.getClient().request("out2", 1000).getRight().get();
@@ -223,7 +256,9 @@ public class JmsSingleTransactionTransactionalElementTestCase extends AbstractJm
   @Test
   public void testNestedTransactionalWithBeginOrJoinFailWithCatchAndRollback() throws Exception {
     Flow flow = (Flow) getFlowConstruct("nestedTransactionalWithBeginOrJoinFailWithCatchAndRollback");
-    Event event = getTestEvent("message", flow);
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("message"))
+        .build();
     flow.process(event);
     assertThat(muleContext.getClient().request("out1", 1000).getRight().isPresent(), is(false));
     assertThat(muleContext.getClient().request("out2", 1000).getRight().isPresent(), is(false));

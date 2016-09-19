@@ -10,11 +10,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.MessageExchangePattern;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -73,8 +77,12 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, unaccepted);
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setListener(out);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event inEvent = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
+    Event inEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .exchangePattern(ONE_WAY)
+        .build();
 
     Event resultEvent = mp.process(inEvent);
 

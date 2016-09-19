@@ -11,7 +11,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -26,8 +29,11 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
   @Test
   public void testEncrypt() throws Exception {
     String msg = "Test Message";
+    FlowConstruct service = getTestFlow("orange", Orange.class);
 
-    Event event = getTestEvent(msg, getTestFlow("orange", Orange.class));
+    Event event = Event.builder(DefaultEventContext.create(service, TEST_CONNECTOR))
+        .message(InternalMessage.of(msg))
+        .build();
     setCurrentEvent(event);
 
     EncryptionTransformer etrans = new EncryptionTransformer();

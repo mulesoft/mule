@@ -91,7 +91,7 @@ public class MuleClientDispatchExceptionHandlingTestCase extends AbstractIntegra
     isSameMessage = true;
 
     MuleClient client = muleContext.getClient();
-    InternalMessage result = client.send(getUrl(endpoint), getTestMuleMessage("Original Message")).getRight();
+    InternalMessage result = client.send(getUrl(endpoint), InternalMessage.of("Original Message")).getRight();
 
     boolean innerFlowCalled = innerFlowLatch.await(3, TimeUnit.SECONDS);
     assertThat(innerFlowCalled, is(true));

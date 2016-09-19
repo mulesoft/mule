@@ -16,9 +16,10 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
@@ -112,20 +113,20 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase {
   @Test
   public void testClientWithSOAPFault() throws Exception {
     expectedException.expectCause(hasCause(instanceOf(Fault.class)));
-    flowRunner("FlowWithClientAndSOAPFault").withPayload(getTestMuleMessage("hello")).run().getMessage();
+    flowRunner("FlowWithClientAndSOAPFault").withPayload("hello").run().getMessage();
   }
 
   @Test
   public void testClientWithTransformerException() throws Exception {
     expectedException.expect(MessagingException.class);
-    flowRunner("FlowWithClientAndTransformerException").withPayload(getTestMuleMessage("hello")).run();
+    flowRunner("FlowWithClientAndTransformerException").withPayload("hello").run();
   }
 
   @Test
   public void testServerClientProxyWithFault() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithFault",
-                                         getTestMuleMessage(requestFaultPayload), HTTP_REQUEST_OPTIONS)
+                                         InternalMessage.of(requestFaultPayload), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertThat(resString, containsString("<faultstring>Cxf Exception Message</faultstring>"));
@@ -137,7 +138,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase {
   public void testServerClientProxyWithTransformerException() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerException",
-                                         getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
+                                         InternalMessage.of(requestPayload), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertTrue(resString.contains("TransformerException"));
@@ -149,7 +150,7 @@ public class CxfErrorBehaviorTestCase extends FunctionalTestCase {
   public void testServerClientJaxwsWithUnwrapFault() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/testUnwrapProxyFault",
-                                         getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
+                                         InternalMessage.of(requestPayload), HTTP_REQUEST_OPTIONS)
         .getRight();
     String resString = getPayloadAsString(result);
     assertThat(resString, containsString("Illegal argument!!"));

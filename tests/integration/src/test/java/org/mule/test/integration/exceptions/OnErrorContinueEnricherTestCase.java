@@ -10,11 +10,12 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -38,7 +39,7 @@ public class OnErrorContinueEnricherTestCase extends AbstractIntegrationTestCase
 
   @Test
   public void testFlowRefHandlingException() throws Exception {
-    Event event = flowRunner("enricherExceptionFlow").withPayload(getTestMuleMessage()).run();
+    Event event = flowRunner("enricherExceptionFlow").withPayload(TEST_PAYLOAD).run();
     InternalMessage response = event.getMessage();
     assertThat(ErrorProcessor.handled, not(nullValue()));
     assertThat(event.getError().isPresent(), is(false));

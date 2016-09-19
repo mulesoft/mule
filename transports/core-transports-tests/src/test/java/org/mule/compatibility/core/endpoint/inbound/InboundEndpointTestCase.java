@@ -50,6 +50,7 @@ import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.NullMessageProcessor;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.security.TestSecurityFilter;
 
 import java.util.concurrent.TimeUnit;
@@ -346,7 +347,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
   protected Event createTestRequestEvent(InboundEndpoint ep) throws Exception {
     Flow flow = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
-        .session(getTestSession(null, muleContext)).build();
+        .session(new DefaultMuleSession()).build();
     return populateFieldsFromInboundEndpoint(event, ep);
   }
 
@@ -354,7 +355,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     Flow flow = getTestFlow();
     final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(RESPONSE_MESSAGE).build()).flow(flow)
-        .session(getTestSession(null, muleContext))
+        .session(new DefaultMuleSession())
         .build();
     return populateFieldsFromInboundEndpoint(event, ep);
   }

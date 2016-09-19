@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
@@ -119,7 +120,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
   public void testEmptySequence() throws Exception {
     Object payload = Collections.emptySet();
     Flow fc = getTestFlow();
-    MuleSession session = getTestSession(fc, muleContext);
+    MuleSession session = new DefaultMuleSession();
     InternalMessage toSplit = InternalMessage.builder().payload(payload).build();
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
@@ -135,7 +136,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
 
   private void assertRouted(Object payload, int count, boolean counted) throws Exception, MuleException {
     Flow fc = getTestFlow();
-    MuleSession session = getTestSession(fc, muleContext);
+    MuleSession session = new DefaultMuleSession();
 
     Map<String, Serializable> inboundProps = new HashMap<>();
     inboundProps.put("inbound1", "1");

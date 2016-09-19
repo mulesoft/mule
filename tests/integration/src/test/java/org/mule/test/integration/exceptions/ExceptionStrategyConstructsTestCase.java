@@ -15,9 +15,9 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.ExceptionMessage;
@@ -36,13 +36,13 @@ public class ExceptionStrategyConstructsTestCase extends AbstractIntegrationTest
   public void testDefaultExceptionStrategySingleEndpoint() throws Exception {
     MuleClient client = muleContext.getClient();
 
-    flowRunner("testService").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
+    flowRunner("testService").withPayload(TEST_PAYLOAD).asynchronously().run();
     assertExceptionMessage(client.request("test://modelout", RECEIVE_TIMEOUT).getRight().get());
 
-    flowRunner("testService1").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
+    flowRunner("testService1").withPayload(TEST_PAYLOAD).asynchronously().run();
     assertExceptionMessage(client.request("test://service1out", RECEIVE_TIMEOUT).getRight().get());
 
-    flowRunner("testflow1").withPayload(getTestMuleMessage(TEST_PAYLOAD)).asynchronously().run();
+    flowRunner("testflow1").withPayload(TEST_PAYLOAD).asynchronously().run();
     assertExceptionMessage(client.request("test://flow1out", RECEIVE_TIMEOUT).getRight().get());
   }
 

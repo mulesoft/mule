@@ -11,6 +11,7 @@ import static org.mule.runtime.core.context.notification.ConnectorMessageNotific
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_REQUEST_END;
 import static org.mule.runtime.core.context.notification.ConnectorMessageNotification.MESSAGE_RESPONSE;
 
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -40,7 +41,7 @@ public class ConnectorMessageNotificationTestCase extends AbstractNotificationTe
   @Test
   public void doTest() throws Exception {
     final String url = String.format("http://localhost:%s/path", port.getNumber());
-    muleContext.getClient().send(url, getTestMuleMessage(), GET_OPTIONS);
+    muleContext.getClient().send(url, InternalMessage.of(TEST_PAYLOAD), GET_OPTIONS);
 
     assertNotifications();
   }

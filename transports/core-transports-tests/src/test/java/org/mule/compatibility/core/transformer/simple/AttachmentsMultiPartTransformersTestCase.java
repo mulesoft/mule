@@ -10,17 +10,17 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.construct.Flow;
@@ -35,6 +35,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContextTestCase {
 
@@ -67,7 +69,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
   @Test
   public void nonMultiPartToAttachment() throws Exception {
     expected.expect(MessageTransformerException.class);
-    mp2a.transform("", Event.builder(context).message(getTestMuleMessage()).flow(flow).build());
+    mp2a.transform("", Event.builder(context).message(InternalMessage.of(TEST_PAYLOAD)).build());
   }
 
   @Test

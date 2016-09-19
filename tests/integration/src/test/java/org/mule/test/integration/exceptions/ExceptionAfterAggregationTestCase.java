@@ -44,6 +44,6 @@ public class ExceptionAfterAggregationTestCase extends AbstractIntegrationTestCa
   @Test
   public void testReceiveCorrectExceptionAfterAggregation() throws Exception {
     expectedException.expectMessage("Ad hoc message exception");
-    flowRunner("main").withPayload(getTestMuleMessage("some data")).run();
+    flowRunner("main").withPayload("some data").run();
   }
 }
