@@ -6,6 +6,7 @@
  */
 package org.mule.module.cxf;
 
+import static org.apache.commons.lang.StringUtils.countMatches;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -373,7 +374,7 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
     private MuleMessage executeSoapCall(String msg, String soapAction, String path) throws MuleException
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         if (soapAction != null)
         {
             props.put("SOAPAction", soapAction);
@@ -549,7 +550,41 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
         assertNotNull(result);
-        assertTrue(result.getPayloadAsString().contains("![CDATA["));
+        assertThat(countMatches(result.getPayloadAsString(), "![CDATA["), is(1));
+    }
+
+    @Test
+    public void testProxyLongCDATA() throws Exception
+    {
+        String SRC_TEXT =
+                "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678\r\n"
+                          + "<embededElement>Woodstox 4.0.5 does not like this embedded element.  However, if you take\r\n"
+                          + "out one or more characters from the really long line (so that less than 500 characters come between\r\n"
+                          + "'CDATA[' and the opening of the embeddedElement tag (including LF), then Woodstox will instead\r\n"
+                          + "complain that the CDATA section wasn't ended.";
+
+        String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sup=\"http://support.cxf.module.mule.org/\">\n" +
+                     "<soapenv:Header/>\n" +
+                     "<soapenv:Body>\n" +
+                     "<sup:invoke>\n" +
+                     "<soapenv:Envelope>\n" +
+                     "<soapenv:Header/>\n" +
+                     "<soapenv:Body>\n" +
+                     "<sup:invoke>\n" +
+                     "<Request>\n" +
+                     "<servicePayload><![CDATA[" + SRC_TEXT + "]]></servicePayload>\n" +
+                     "</Request>\n" +
+                     "</sup:invoke>\n" +
+                     "</soapenv:Body>\n" +
+                     "</soapenv:Envelope>\n" +
+                     "</sup:invoke>\n" +
+                     "</soapenv:Body>\n" +
+                     "</soapenv:Envelope>";
+
+        MuleClient client = muleContext.getClient();
+        MuleMessage result = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/CDATAService", getTestMuleMessage(msg), HTTP_REQUEST_OPTIONS);
+        assertNotNull(result);
+        assertThat(countMatches(result.getPayloadAsString(), "![CDATA["), is(1));
     }
 
     /** MULE-6159: Proxy service fails when WSDL has faults **/
@@ -642,21 +677,21 @@ public class ProxyTestCase extends AbstractServiceAndFlowTestCase
 
     protected Map<String, Object> prepareOneWayTestProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("SOAPAction", "");
         return props;
     }
 
     protected Map<String, Object> prepareOneWayWithSoapActionTestProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("SOAPAction", "send");
         return props;
     }
 
     protected Map<String, Object> prepareOneWaySpoofingTestProperties()
     {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("SOAPAction", "hiddenAction");
         return props;
     }
