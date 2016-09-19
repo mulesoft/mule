@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 @Ignore
@@ -37,7 +38,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
         super(variant, configResources);
     }
 
-    @Override
+    @Test
     public void doTest() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -45,6 +46,8 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
         Service service = muleContext.getRegistry().lookupService(SERVICE);
         service.pause();
         service.resume();
+
+        assertNotifications();
     }
 
     @Override

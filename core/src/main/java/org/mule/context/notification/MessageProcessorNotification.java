@@ -65,21 +65,28 @@ public class MessageProcessorNotification extends ServerNotification implements 
         return processor;
     }
 
-    protected String toString(Object obj)
+    @Override
+    public String toString()
     {
-        if (obj == null)
+        return EVENT_NAME + "{" + "action=" + getActionName(action) + ", processor=" + processorToString() + ", resourceId=" + resourceIdentifier
+               + ", serverId=" + serverId + ", timestamp=" + timestamp + "}";
+    }
+
+    protected String processorToString()
+    {
+        if (processor == null)
         {
             return "";
         }
 
         String name;
-        if (obj instanceof NameableObject)
+        if (processor instanceof NameableObject)
         {
-            name = String.format("%s '%s'", obj.getClass().getName(), ((NameableObject) obj).getName());
+            name = String.format("%s '%s'", processor.getClass().getName(), ((NameableObject) processor).getName());
         }
         else
         {
-            name = ObjectUtils.identityToString(obj);
+            name = ObjectUtils.identityToString(processor);
         }
         return name;
     }

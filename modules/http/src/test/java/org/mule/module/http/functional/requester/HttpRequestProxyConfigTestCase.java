@@ -37,10 +37,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
 public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
 {
+    private static Logger logger = LoggerFactory.getLogger(HttpRequestProxyConfigTestCase.class);
 
     private static final String PROXY_HOST = "localhost";
     private static final String PROXY_USERNAME = "theUsername";
@@ -177,7 +180,10 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
                 latch.release();
             }
             catch (IOException e)
-            { /* Ignore */ }
+            {
+                /* Ignore */
+                logger.error("Exception while configuring MockProxy", e);
+            }
             finally
             {
                 if (serverSocket != null)
@@ -187,7 +193,10 @@ public class HttpRequestProxyConfigTestCase extends FunctionalTestCase
                         serverSocket.close();
                     }
                     catch (IOException e)
-                    { /* Ignore */ }
+                    {
+                        /* Ignore */
+                        logger.error("Exception while closing MockProxy", e);
+                    }
                 }
             }
         }
