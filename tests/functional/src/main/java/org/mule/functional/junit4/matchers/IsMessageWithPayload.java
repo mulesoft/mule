@@ -6,6 +6,7 @@
  */
 package org.mule.functional.junit4.matchers;
 
+import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -44,12 +45,13 @@ public class IsMessageWithPayload extends TypeSafeMatcher<Message> {
   }
 
   private String getString(Object payload) {
-    String value;
     if (payload instanceof String) {
-      value = (String) payload;
+      return (String) payload;
+    } else if (payload instanceof InputStream){
+      return IOUtils.toString((InputStream) payload);
     } else {
-      value = IOUtils.toString((InputStream) payload);
+      fail(String.format("Expected String or InputStream payload but got %s", payload.getClass().getSimpleName()));
+      return null;
     }
-    return value;
   }
 }

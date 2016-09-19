@@ -7,6 +7,7 @@
 package org.mule.runtime.module.http.internal.multipart;
 
 import static java.lang.Math.toIntExact;
+import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.internal.HttpParser.parseMultipartContent;
 import org.mule.runtime.api.message.MultiPartPayload;
@@ -32,7 +33,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -119,7 +119,7 @@ public class HttpPartDataSource implements DataSource {
       } catch (TransformerException e) {
         throw new MuleRuntimeException(createStaticMessage(String.format("Could not create HTTP part %s", name), e));
       }
-    }).collect(Collectors.toList());
+    }).collect(toList());
   }
 
   public static MultiPartPayload multiPartPayloadForAttachments(MultipartHttpEntity entity) throws IOException {
