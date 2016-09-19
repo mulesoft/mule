@@ -17,7 +17,8 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * Verifies a {@link Message}'s payload, using a {@link String} matcher. Works with String and InputStream payloads.
+ * Verifies a {@link Message}'s payload, using a {@link String} matcher.
+ * Works with {@link String} and {@link InputStream} payloads.
  *
  * @since 4.0
  */

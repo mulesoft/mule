@@ -12,7 +12,7 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
- * Verifies a {@link MultiPartPayload}'s amount of parts.
+ * Verifies a {@link MultiPartPayload}'s part count.
  *
  * @since 4.0
  */
