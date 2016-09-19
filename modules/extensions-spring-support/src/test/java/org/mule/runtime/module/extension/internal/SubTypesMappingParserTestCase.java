@@ -7,9 +7,7 @@
 package org.mule.runtime.module.extension.internal;
 
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.instanceOf;
@@ -19,7 +17,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.extension.internal.config.AbstractConfigParserTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;

@@ -12,7 +12,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.annotation.DataTypeParameters;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.OnException;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.RestrictedTo;
@@ -23,6 +22,7 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
@@ -47,7 +47,6 @@ import javax.inject.Inject;
 
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 
 public class HeisenbergOperations {
 
@@ -179,7 +178,7 @@ public class HeisenbergOperations {
     return connection.getSaulPhoneNumber();
   }
 
-  public String literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) @Expression(LITERAL) String literalExpression) {
+  public ParameterResolver<String> literalEcho(@DisplayName(OPERATION_PARAMETER_OVERRIDED_DISPLAY_NAME) ParameterResolver<String> literalExpression) {
     return literalExpression;
   }
 
@@ -189,6 +188,15 @@ public class HeisenbergOperations {
 
   public Map<String, SaleInfo> processSale(Map<String, SaleInfo> sales) {
     return sales;
+  }
+
+  public ParameterResolver<Weapon> processWeapon(@Optional ParameterResolver<Weapon> weapon) {
+    return weapon;
+  }
+
+  public ParameterResolver<Weapon> processWeaponWithDefaultValue(@Optional(
+      defaultValue = "#[payload]") ParameterResolver<Weapon> weapon) {
+    return weapon;
   }
 
   @Ignore

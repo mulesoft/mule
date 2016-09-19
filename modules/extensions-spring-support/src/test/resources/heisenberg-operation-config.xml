@@ -13,6 +13,10 @@
 
     <heisenberg:door victim="#[victim]" address="308 Negra Arroyo Lane" name="dynamicDoor"/>
 
+    <heisenberg:ricin microgramsPerKilo="22" name="ricin-weapon">
+        <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+    </heisenberg:ricin>
+
     <heisenberg:config name="heisenberg"
                        myName="heisenberg"
                        age="50"
@@ -31,7 +35,7 @@
             </heisenberg:ricin>
         </heisenberg:ricin-packs>
         <heisenberg:next-door address="pollos hermanos" victim="Gustavo Fring">
-                <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
+            <heisenberg:previous victim="Krazy-8" address="Jesse's"/>
         </heisenberg:next-door>
         <heisenberg:monthly-incomes>
             <heisenberg:monthly-income value="12000"/>
@@ -87,7 +91,8 @@
     <flow name="killMany">
         <heisenberg:kill-many reason="I'm the one who knocks">
             <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring"
+                                                     goodbyeMessage="bye bye"/>
                 <heisenberg:kill-with-custom-message victim="Frank" goodbyeMessage="bye bye"/>
                 <heisenberg:kill-with-custom-message victim="Nazi dudes" goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
@@ -97,7 +102,8 @@
     <flow name="killManyButOnlyOneProvided">
         <heisenberg:kill-many reason="I'm the one who knocks">
             <heisenberg:kill-operations>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring"
+                                                     goodbyeMessage="bye bye"/>
             </heisenberg:kill-operations>
         </heisenberg:kill-many>
     </flow>
@@ -105,7 +111,8 @@
     <flow name="killOne">
         <heisenberg:kill-one reason="I'm the one who knocks">
             <heisenberg:kill-operation>
-                <heisenberg:kill-with-custom-message victim="Gustavo Fring" goodbyeMessage="bye bye"/>
+                <heisenberg:kill-with-custom-message victim="Gustavo Fring"
+                                                     goodbyeMessage="bye bye"/>
             </heisenberg:kill-operation>
         </heisenberg:kill-one>
     </flow>
@@ -219,18 +226,61 @@
     <flow name="investment">
         <heisenberg:approve>
             <heisenberg:investment>
-                <heisenberg:car-wash commercialName="A1" valuation="100" carsPerMinute="5" />
+                <heisenberg:car-wash commercialName="A1" valuation="100" carsPerMinute="5"/>
             </heisenberg:investment>
         </heisenberg:approve>
     </flow>
-    
+
     <flow name="processSale">
-        <heisenberg:process-sale >
+        <heisenberg:process-sale>
             <heisenberg:sales>
-                <heisenberg:sale key="Dean" >
-                    <heisenberg:sale-info details="Some detail" amount="500" />
+                <heisenberg:sale key="Dean">
+                    <heisenberg:sale-info details="Some detail" amount="500"/>
                 </heisenberg:sale>
             </heisenberg:sales>
         </heisenberg:process-sale>
+    </flow>
+
+
+    <flow name="processWeaponAsStaticChildElement">
+        <heisenberg:process-weapon>
+            <heisenberg:weapon>
+                <heisenberg:ricin microgramsPerKilo="100">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:weapon>
+        </heisenberg:process-weapon>
+    </flow>
+
+    <flow name="processWeaponAsDynamicChildElement">
+        <set-payload value="#[100L]"/>
+        <heisenberg:process-weapon>
+            <heisenberg:weapon>
+                <heisenberg:ricin microgramsPerKilo="#[payload]">
+                    <heisenberg:destination victim="Lidia" address="Stevia coffe shop"/>
+                </heisenberg:ricin>
+            </heisenberg:weapon>
+        </heisenberg:process-weapon>
+    </flow>
+
+    <flow name="processWeapon">
+        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
+        <heisenberg:process-weapon weapon="#[payload]"/>
+    </flow>
+
+    <flow name="processNullWeapon">
+        <heisenberg:process-weapon/>
+    </flow>
+
+    <flow name="processWeaponWithDefaultValue">
+        <set-payload value="#[new org.mule.test.heisenberg.extension.model.Ricin()]"/>
+        <expression-component><![CDATA[payload.microgramsPerKilo = 100L]]></expression-component>
+        <heisenberg:process-weapon-with-default-value/>
+    </flow>
+
+    <flow name="processWrongWeapon">
+        <set-payload value="#[app.registry['door']]"/>
+        <heisenberg:process-weapon weapon="#[payload]"/>
     </flow>
 </mule>

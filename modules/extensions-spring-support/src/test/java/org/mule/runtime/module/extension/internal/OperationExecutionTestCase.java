@@ -6,17 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal;
 
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatcher;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.CarWash;
@@ -33,17 +39,22 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
 import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
@@ -64,6 +75,10 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   private static final BigDecimal MONEY = BigDecimal.valueOf(1000000);
   private static final String GOODBYE_MESSAGE = "Say hello to my little friend";
   private static final String VICTIM = "Skyler";
+  private static final String EMPTY_STRING = "";
+  private static final Matcher<? super Weapon> WEAPON_MATCHER =
+      allOf(notNullValue(), instanceOf(Ricin.class), hasProperty("microgramsPerKilo", is(100L)));
+
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
 
@@ -84,12 +99,12 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithReturnValueOnTarget() throws Exception {
-    FlowRunner runner = flowRunner("sayMyNameOnTarget").withPayload("");
+    FlowRunner runner = flowRunner("sayMyNameOnTarget").withPayload(EMPTY_STRING);
     runner.spyObjects();
 
     Event responseEvent = runner.run();
 
-    assertThat(responseEvent.getMessage().getPayload().getValue(), is(""));
+    assertThat(responseEvent.getMessage().getPayload().getValue(), is(EMPTY_STRING));
 
     InternalMessage responseMessage = (InternalMessage) responseEvent.getVariable("myFace").getValue();
     assertThat(responseMessage.getPayload().getValue(), is(HEISENBERG));
@@ -147,7 +162,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void optionalParameterWithDefaultOverride() throws Exception {
-    Event event = flowRunner("customKillWithoutDefault").withPayload("").withFlowVariable("goodbye", GOODBYE_MESSAGE)
+    Event event = flowRunner("customKillWithoutDefault").withPayload(EMPTY_STRING).withFlowVariable("goodbye", GOODBYE_MESSAGE)
         .withFlowVariable("victim", VICTIM).run();
 
     assertKillPayload(event);
@@ -215,7 +230,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void operationWithInlineListParameter() throws Exception {
-    List<String> response = (List<String>) flowRunner("knockManyWithInlineList").withPayload("")
+    List<String> response = (List<String>) flowRunner("knockManyWithInlineList").withPayload(EMPTY_STRING)
         .withFlowVariable("victim", "Saul").run().getMessage().getPayload().getValue();
     assertThat(response, Matchers.contains(knock("Inline Skyler"), knock("Saul")));
   }
@@ -224,8 +239,9 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   public void operationWithExpressionListParameter() throws Exception {
     List<KnockeableDoor> doors = Arrays.asList(new KnockeableDoor("Skyler"), new KnockeableDoor("Saul"));
 
-    List<String> response = (List<String>) flowRunner("knockManyByExpression").withPayload("").withFlowVariable("doors", doors)
-        .run().getMessage().getPayload().getValue();
+    List<String> response =
+        (List<String>) flowRunner("knockManyByExpression").withPayload(EMPTY_STRING).withFlowVariable("doors", doors)
+            .run().getMessage().getPayload().getValue();
     assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
   }
 
@@ -326,7 +342,8 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void operationWithLiteralArgument() throws Exception {
     Event event = flowRunner("literalEcho").withPayload(EMPTY).run();
-    assertThat(event.getMessage().getPayload().getValue(), is("#[money]"));
+    assertThat(((ParameterResolver<String>) event.getMessage().getPayload().getValue()).getExpression(),
+               is(Optional.of("#[money]")));
   }
 
   @Test
@@ -377,13 +394,62 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     assertThat(saleInfo.getDetails(), is("Some detail"));
   }
 
+  @Test
+  public void operationWithExpressionResolver() throws Exception {
+    assertExpressionResolverWeapon("processWeapon", PAYLOAD, WEAPON_MATCHER);
+  }
+
+  @Test
+  public void operationWithExpressionResolverAsStaticChildElement() throws Exception {
+    assertExpressionResolverWeapon("processWeaponAsStaticChildElement", null, WEAPON_MATCHER);
+  }
+
+  @Test
+  public void operationWithExpressionResolverAsDynamicChildElement() throws Exception {
+    assertExpressionResolverWeapon("processWeaponAsDynamicChildElement", null, WEAPON_MATCHER);
+  }
+
+  @Test
+  public void parameterResolverWithDefaultValue() throws Exception {
+    assertExpressionResolverWeapon("processWeaponWithDefaultValue", PAYLOAD, WEAPON_MATCHER);
+  }
+
+  @Test
+  public void operationWithExpressionResolverAndNullWeapon() throws Exception {
+    assertExpressionResolverWeapon("processNullWeapon", null, is(nullValue()));
+  }
+
+  @Test
+  public void operationWithExpressionResolverNegative() throws Exception {
+    expectedException.expect(new ArgumentMatcher<MessagingException>() {
+
+      @Override
+      public boolean matches(Object o) {
+        return o instanceof MuleRuntimeException &&
+            ((MuleRuntimeException) o).getCause().getCause() instanceof TransformerException;
+      }
+    });
+
+    final ParameterResolver<Weapon> weapon =
+        (ParameterResolver<Weapon>) flowRunner("processWrongWeapon").run().getMessage().getPayload().getValue();
+    weapon.resolve();
+  }
+
+  private void assertExpressionResolverWeapon(String flowName, String expression, Matcher<? super Weapon> weaponMatcher)
+      throws Exception {
+    ParameterResolver<Weapon> weaponInfo =
+        (ParameterResolver<Weapon>) flowRunner(flowName).run().getMessage().getPayload().getValue();
+    assertThat(weaponInfo.getExpression(), is(Optional.ofNullable(expression)));
+    assertThat(weaponInfo.resolve(), weaponMatcher);
+  }
+
   private void assertDynamicDoor(String flowName) throws Exception {
     assertDynamicVictim(flowName, "Skyler");
     assertDynamicVictim(flowName, "Saul");
   }
 
   private void assertDynamicVictim(String flowName, String victim) throws Exception {
-    assertKnockedDoor(getPayloadAsString(flowRunner(flowName).withPayload("").withFlowVariable("victim", victim).run()
+    assertKnockedDoor(getPayloadAsString(flowRunner(flowName).withPayload(EMPTY_STRING).withFlowVariable("victim", victim).run()
         .getMessage()), victim);
   }
 
@@ -406,6 +472,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private HeisenbergExtension getConfig(String name) throws Exception {
-    return ExtensionsTestUtils.getConfigurationFromRegistry(name, getTestEvent(""), muleContext);
+    return ExtensionsTestUtils.getConfigurationFromRegistry(name, getTestEvent(EMPTY_STRING), muleContext);
   }
 }

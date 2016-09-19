@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
+import static java.util.Collections.emptySet;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
@@ -92,7 +93,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
-        parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false);
+        parseAttributeParameter(fieldName, fieldName, metadataType, defaultValue, expressionSupport, false, emptySet());
       }
 
       @Override
@@ -104,7 +105,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
               .withTypeDefinition(fromType(String.class))
               .withTypeConverter(value -> resolverOf(fieldName, stringType, value, defaultValue,
                                                      expressionSupport, false,
-                                                     acceptsReferences))
+                                                     emptySet(), acceptsReferences))
               .build());
         } else {
           defaultVisit(stringType);
@@ -121,20 +122,21 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         if (!parsingContext.isRegistered(name, namespace)) {
           parsingContext.registerObjectType(name, namespace, type);
           parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
-                               childDsl);
+                               childDsl, emptySet());
         } else {
-          parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences, childDsl);
+          parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences, childDsl,
+                      emptySet());
         }
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, childDsl);
+        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, childDsl, emptySet());
       }
 
       @Override
       public void visitDictionary(DictionaryType dictionaryType) {
-        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, childDsl);
+        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, childDsl, emptySet());
       }
     });
   }

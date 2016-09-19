@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.OperationContext;
 import org.mule.runtime.module.extension.internal.introspection.ParameterGroup;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
@@ -25,6 +26,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ByParameterNa
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.EventArgumentResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterResolverArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MessageArgumentResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
 
@@ -96,6 +98,8 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
         argumentResolver = MESSAGE_ARGUMENT_RESOLVER;
       } else if (isParameterContainer(annotations.keySet(), typeLoader.load(parameterType))) {
         argumentResolver = parameterGroupResolvers.get(parameters[i]);
+      } else if (ParameterResolver.class.isAssignableFrom(parameterType)) {
+        argumentResolver = new ParameterResolverArgumentResolver<>(paramNames.get(i));
       } else {
         argumentResolver = new ByParameterNameArgumentResolver<>(paramNames.get(i));
       }

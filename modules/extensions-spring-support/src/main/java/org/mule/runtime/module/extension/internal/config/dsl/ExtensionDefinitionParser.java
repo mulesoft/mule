@@ -39,6 +39,7 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.TemplateParser;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.ModelProperty;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -56,8 +57,10 @@ import org.mule.runtime.module.extension.internal.config.dsl.object.ValueResolve
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.ObjectTypeParameterParser;
 import org.mule.runtime.module.extension.internal.config.dsl.parameter.TopLevelParameterObjectFactory;
 import org.mule.runtime.module.extension.internal.introspection.BasicTypeMetadataVisitor;
+import org.mule.runtime.module.extension.internal.introspection.describer.ParameterResolverTypeModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionFunctionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionBasedParameterResolverValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NativeQueryParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorListValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcessorValueResolver;
@@ -219,7 +222,7 @@ public abstract class ExtensionDefinitionParser {
             } else {
               converter = value -> resolverOf(parameter.getName(), stringType, value, parameter.getDefaultValue(),
                                               parameter.getExpressionSupport(), parameter.isRequired(),
-                                              acceptsReferences(parameter));
+                                              parameter.getModelProperties(), acceptsReferences(parameter));
             }
 
             addDefinition(baseDefinitionBuilder.copy()
@@ -272,7 +275,7 @@ public abstract class ExtensionDefinitionParser {
    */
   protected void parseMapParameters(ParameterModel parameter, DictionaryType dictionaryType, DslElementSyntax paramDsl) {
     parseMapParameters(getKey(parameter), parameter.getName(), dictionaryType, parameter.getDefaultValue(),
-                       parameter.getExpressionSupport(), parameter.isRequired(), paramDsl);
+                       parameter.getExpressionSupport(), parameter.isRequired(), paramDsl, parameter.getModelProperties());
   }
 
   /**
@@ -286,8 +289,9 @@ public abstract class ExtensionDefinitionParser {
    * @param required whether the parameter is required
    */
   protected void parseMapParameters(String key, String name, DictionaryType dictionaryType, Object defaultValue,
-                                    ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl) {
-    parseAttributeParameter(key, name, dictionaryType, defaultValue, expressionSupport, required);
+                                    ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl,
+                                    Set<ModelProperty> modelProperties) {
+    parseAttributeParameter(key, name, dictionaryType, defaultValue, expressionSupport, required, modelProperties);
 
     Class<? extends Map> mapType = getType(dictionaryType);
     if (ConcurrentMap.class.equals(mapType)) {
@@ -322,8 +326,10 @@ public abstract class ExtensionDefinitionParser {
         addDefinition(baseDefinitionBuilder.copy()
             .withIdentifier(valueChildElementDsl.getElementName())
             .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
-            .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true, false))
-            .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true, false))
+            .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true,
+                                                      modelProperties, false))
+            .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true,
+                                                   modelProperties, false))
             .build());
       }
 
@@ -355,7 +361,7 @@ public abstract class ExtensionDefinitionParser {
                   .withTypeDefinition(fromType(getType(metadataType)))
                   .withTypeConverter(
                                      value -> resolverOf(parameterName, metadataType, value, getDefaultValue(metadataType),
-                                                         getExpressionSupport(metadataType), false))
+                                                         getExpressionSupport(metadataType), false, modelProperties))
                   .build());
             }
 
@@ -381,7 +387,8 @@ public abstract class ExtensionDefinitionParser {
    */
   protected void parseCollectionParameter(ParameterModel parameter, ArrayType arrayType, DslElementSyntax parameterDsl) {
     parseCollectionParameter(getKey(parameter), parameter.getName(), arrayType, parameter.getDefaultValue(),
-                             parameter.getExpressionSupport(), parameter.isRequired(), parameterDsl);
+                             parameter.getExpressionSupport(), parameter.isRequired(), parameterDsl,
+                             parameter.getModelProperties());
   }
 
   /**
@@ -395,8 +402,9 @@ public abstract class ExtensionDefinitionParser {
    * @param required whether the parameter is required
    */
   protected void parseCollectionParameter(String key, String name, ArrayType arrayType, Object defaultValue,
-                                          ExpressionSupport expressionSupport, boolean required, DslElementSyntax parameterDsl) {
-    parseAttributeParameter(key, name, arrayType, defaultValue, expressionSupport, required);
+                                          ExpressionSupport expressionSupport, boolean required, DslElementSyntax parameterDsl,
+                                          Set<ModelProperty> modelProperties) {
+    parseAttributeParameter(key, name, arrayType, defaultValue, expressionSupport, required, modelProperties);
 
     Class<? extends Iterable> collectionType = getType(arrayType);
 
@@ -424,7 +432,7 @@ public abstract class ExtensionDefinitionParser {
           Builder itemDefinitionBuilder = baseDefinitionBuilder.copy().withIdentifier(itemIdentifier).withNamespace(itemNamespace)
               .withTypeDefinition(fromType(getType(metadataType)))
               .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),
-                                                     getExpressionSupport(metadataType), false));
+                                                     getExpressionSupport(metadataType), false, modelProperties));
 
           addDefinition(itemDefinitionBuilder.build());
         }
@@ -452,12 +460,13 @@ public abstract class ExtensionDefinitionParser {
   }
 
   private ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
-                                      ExpressionSupport expressionSupport, boolean required) {
-    return resolverOf(parameterName, expectedType, value, defaultValue, expressionSupport, required, true);
+                                      ExpressionSupport expressionSupport, boolean required, Set<ModelProperty> modelProperties) {
+    return resolverOf(parameterName, expectedType, value, defaultValue, expressionSupport, required, modelProperties, true);
   }
 
   protected ValueResolver<?> resolverOf(String parameterName, MetadataType expectedType, Object value, Object defaultValue,
-                                        ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences) {
+                                        ExpressionSupport expressionSupport, boolean required, Set<ModelProperty> modelProperties,
+                                        boolean acceptsReferences) {
     if (value instanceof ValueResolver) {
       return (ValueResolver<?>) value;
     }
@@ -469,8 +478,12 @@ public abstract class ExtensionDefinitionParser {
 
     if (isExpressionFunction(expectedType) && value != null) {
       resolver =
-          new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt((ObjectType) expectedType, 1, typeLoader).get(),
+          new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt(expectedType, 1, typeLoader).get(),
                                                 muleContext);
+    }
+    if (isExpressionResolver(modelProperties) && value != null) {
+      resolver =
+          new ExpressionBasedParameterResolverValueResolver<>((String) value, expectedType, muleContext);
     }
 
     final Class<Object> expectedClass = getType(expectedType);
@@ -550,7 +563,7 @@ public abstract class ExtensionDefinitionParser {
   protected AttributeDefinition.Builder parseAttributeParameter(ParameterModel parameterModel) {
     return parseAttributeParameter(getKey(parameterModel), parameterModel.getName(), parameterModel.getType(),
                                    parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(),
-                                   parameterModel.isRequired());
+                                   parameterModel.isRequired(), parameterModel.getModelProperties());
   }
 
   /**
@@ -565,17 +578,19 @@ public abstract class ExtensionDefinitionParser {
    * @return an {@link AttributeDefinition.Builder}
    */
   protected AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
-                                                                ExpressionSupport expressionSupport, boolean required) {
-    return parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, true);
+                                                                ExpressionSupport expressionSupport, boolean required,
+                                                                Set<ModelProperty> modelProperties) {
+    return parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, true, modelProperties);
   }
 
   private AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
                                                               ExpressionSupport expressionSupport, boolean required,
-                                                              boolean acceptsReferences) {
+                                                              boolean acceptsReferences, Set<ModelProperty> modelProperties) {
     AttributeDefinition.Builder definitionBuilder =
         fromSimpleParameter(name,
-                            value -> resolverOf(name, type, value, defaultValue, expressionSupport, required, acceptsReferences))
-                                .withDefaultValue(defaultValue);
+                            value -> resolverOf(name, type, value, defaultValue, expressionSupport, required, modelProperties,
+                                                acceptsReferences))
+                                                    .withDefaultValue(defaultValue);
     addParameter(key, definitionBuilder);
 
     return definitionBuilder;
@@ -589,7 +604,7 @@ public abstract class ExtensionDefinitionParser {
   protected void parseObjectParameter(ParameterModel parameterModel, DslElementSyntax paramDsl) {
     parseObjectParameter(getKey(parameterModel), parameterModel.getName(), (ObjectType) parameterModel.getType(),
                          parameterModel.getDefaultValue(), parameterModel.getExpressionSupport(), parameterModel.isRequired(),
-                         acceptsReferences(parameterModel), paramDsl);
+                         acceptsReferences(parameterModel), paramDsl, parameterModel.getModelProperties());
   }
 
   /**
@@ -601,11 +616,12 @@ public abstract class ExtensionDefinitionParser {
    * @param defaultValue the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
    * @param required whether the parameter is required or not
+   * @param modelProperties
    */
   protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue,
                                       ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences,
-                                      DslElementSyntax elementDsl) {
-    parseObject(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, elementDsl);
+                                      DslElementSyntax elementDsl, Set<ModelProperty> modelProperties) {
+    parseObject(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, elementDsl, modelProperties);
 
     final String elementNamespace = elementDsl.getNamespace();
     final String elementName = elementDsl.getElementName();
@@ -623,8 +639,9 @@ public abstract class ExtensionDefinitionParser {
   }
 
   protected void parseObject(String key, String name, ObjectType type, Object defaultValue, ExpressionSupport expressionSupport,
-                             boolean required, boolean acceptsReferences, DslElementSyntax elementDsl) {
-    parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, acceptsReferences);
+                             boolean required, boolean acceptsReferences, DslElementSyntax elementDsl,
+                             Set<ModelProperty> modelProperties) {
+    parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, modelProperties);
 
     ObjectParsingDelegate delegate = (ObjectParsingDelegate) locateParsingDelegate(objectParsingDelegates, type)
         .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type "
@@ -699,6 +716,11 @@ public abstract class ExtensionDefinitionParser {
     }
   }
 
+  private boolean isExpressionResolver(Set<ModelProperty> modelProperties) {
+    return modelProperties
+        .stream()
+        .anyMatch(property -> property instanceof ParameterResolverTypeModelProperty);
+  }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {
 
