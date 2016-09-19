@@ -8,7 +8,6 @@ package org.mule.extension.email.internal;
 
 
 import org.mule.extension.email.api.exception.EmailException;
-import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.internal.mailbox.imap.IMAPConfiguration;
 import org.mule.extension.email.internal.mailbox.pop3.POP3Configuration;
 import org.mule.extension.email.internal.sender.SMTPConfiguration;
@@ -25,7 +24,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
  */
 @Configurations({SMTPConfiguration.class, POP3Configuration.class, IMAPConfiguration.class})
 @Extension(name = "Email", description = "Connector to send and list email messages to and from mailboxes")
-@Export(classes = {EmailException.class, BaseEmailAttributes.class})
+@Export(classes = EmailException.class)
 public class EmailConnector {
 
   public static final String TLS_CONFIGURATION = "TLS Configuration";
