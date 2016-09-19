@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
-import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;

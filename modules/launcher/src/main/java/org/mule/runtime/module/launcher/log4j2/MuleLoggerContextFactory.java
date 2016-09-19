@@ -12,7 +12,7 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.DirectoryResourceLocator;
 import org.mule.runtime.module.artifact.classloader.LocalResourceLocator;
 import org.mule.runtime.module.artifact.classloader.ShutdownListener;
-import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;

@@ -7,15 +7,12 @@
 package org.mule.runtime.module.deployment.internal.artifact;
 
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.module.deployment.api.DeploymentStartException;
-import org.mule.runtime.module.deployment.api.InstallException;
-import org.mule.runtime.module.deployment.internal.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.InstallException;
+import org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;

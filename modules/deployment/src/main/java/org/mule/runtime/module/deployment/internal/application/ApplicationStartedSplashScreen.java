@@ -8,10 +8,10 @@ package org.mule.runtime.module.deployment.internal.application;
 
 import static java.lang.String.format;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppLibFolder;
-import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.internal.artifact.ArtifactStartedSplashScreen;
-import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
 import java.util.Set;
 

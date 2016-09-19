@@ -18,8 +18,9 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPlug
 import static org.mule.runtime.core.util.FileUtils.unzip;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 
-import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -27,7 +28,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 /**

@@ -14,13 +14,8 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.module.deployment.internal.connectivity.artifact.TemporaryArtifact;
+import org.mule.runtime.module.deployment.internal.artifact.TemporaryArtifact;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingStrategy;
-import org.mule.runtime.core.api.connectivity.ConnectivityTestingObjectNotFoundException;
-import org.mule.runtime.core.api.connectivity.UnsupportedConnectivityTestingObjectException;
-
-import java.util.Collection;
 
 /**
  * {@link ConnectivityTestingService} for a temporary artifact.

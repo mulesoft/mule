@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.deployment.internal.application;
 
-import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
 import org.mule.runtime.module.deployment.internal.domain.DomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilterFactory;
-import org.mule.runtime.module.deployment.internal.ApplicationClassLoaderBuilderFactory;
-import org.mule.runtime.module.deployment.internal.ApplicationDescriptorFactory;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory;
 import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorLoader;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;
@@ -51,11 +51,9 @@ public class TestApplicationFactory extends DefaultApplicationFactory {
     TestEmptyApplicationPluginRepository applicationPluginRepository = new TestEmptyApplicationPluginRepository();
     ApplicationDescriptorFactory applicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, applicationPluginRepository);
-    ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory = new ArtifactPluginClassLoaderFactory();
-    DefaultArtifactPluginFactory applicationPluginFactory = new DefaultArtifactPluginFactory(artifactPluginClassLoaderFactory);
     ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory =
         new ApplicationClassLoaderBuilderFactory(applicationClassLoaderFactory, applicationPluginRepository,
-                                                 applicationPluginFactory);
+                                                 new ArtifactPluginClassLoaderFactory());
     return new TestApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
                                       applicationPluginRepository, domainManager, serviceRepository);
   }

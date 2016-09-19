@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.module.deployment.internal.domain;
 
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
+import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
-import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
-import static org.mule.runtime.module.deployment.internal.descriptor.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
-import static org.mule.runtime.module.deployment.internal.descriptor.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
+import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import static org.mule.runtime.module.deployment.internal.application.PropertiesDescriptorParser.PROPERTY_REDEPLOYMENT_ENABLED;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.MULE_DOMAIN_FOLDER;
 
 import java.io.File;

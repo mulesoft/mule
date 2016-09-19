@@ -10,19 +10,15 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
-import static org.mule.runtime.module.deployment.api.domain.Domain.DEFAULT_DOMAIN_NAME;
+import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.internal.artifact.ArtifactFactoryUtils.getDeploymentFile;
 import static org.mule.runtime.module.reboot.MuleContainerBootstrapUtils.getMuleDomainsDir;
 
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
-import org.mule.runtime.module.deployment.api.domain.Domain;
-import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
-import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptorParser;
-import org.mule.runtime.module.deployment.internal.descriptor.EmptyDomainDescriptor;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.classloader.DeployableArtifactClassLoaderFactory;
-import org.mule.runtime.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;

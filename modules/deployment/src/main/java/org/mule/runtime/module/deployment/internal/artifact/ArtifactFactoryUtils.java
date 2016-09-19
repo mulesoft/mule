@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal.artifact;
 
-import static org.mule.runtime.module.deployment.internal.descriptor.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
+import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.DEFAULT_DEPLOY_PROPERTIES_RESOURCE;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.module.artifact.Artifact;

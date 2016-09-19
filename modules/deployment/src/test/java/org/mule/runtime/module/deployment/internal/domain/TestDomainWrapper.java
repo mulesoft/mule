@@ -9,10 +9,10 @@ package org.mule.runtime.module.deployment.internal.domain;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.deployment.api.DeploymentStartException;
-import org.mule.runtime.module.deployment.api.InstallException;
-import org.mule.runtime.module.deployment.api.domain.Domain;
-import org.mule.runtime.module.deployment.internal.descriptor.DomainDescriptor;
+import org.mule.runtime.deployment.model.api.DeploymentStartException;
+import org.mule.runtime.deployment.model.api.InstallException;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 
 import java.io.File;
 

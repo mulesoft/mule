@@ -11,27 +11,25 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.module.deployment.api.application.Application;
-import org.mule.runtime.module.deployment.api.domain.Domain;
-import org.mule.runtime.module.deployment.internal.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
+import org.mule.runtime.deployment.model.internal.application.ApplicationClassLoaderBuilder;
+import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.deployment.internal.ApplicationClassLoaderBuilder;
-import org.mule.runtime.module.deployment.internal.ApplicationClassLoaderBuilderFactory;
-import org.mule.runtime.module.deployment.internal.ApplicationDescriptorFactory;
-import org.mule.runtime.module.deployment.api.DeploymentException;
-import org.mule.runtime.module.deployment.internal.MuleApplicationClassLoader;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptor;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginRepository;
+import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
+import org.mule.runtime.module.deployment.internal.domain.DomainRepository;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
@@ -57,7 +55,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
   private final DomainRepository domainRepository = mock(DomainRepository.class);
   private final ArtifactPluginRepository applicationPluginRepository = mock(ArtifactPluginRepository.class);
   private final ApplicationDescriptorFactory applicationDescriptorFactory = mock(ApplicationDescriptorFactory.class);
-  private final ArtifactPluginFactory artifactPluginFactory = mock(ArtifactPluginFactory.class);
   private final ServiceRepository serviceRepository = mock(ServiceRepository.class);
   private final DefaultApplicationFactory applicationFactory =
       new DefaultApplicationFactory(applicationClassLoaderBuilderFactory, applicationDescriptorFactory,
@@ -90,7 +87,6 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
     when(coreArtifactPluginDescriptor.getClassLoaderFilter()).thenReturn(classLoaderFilter);
     when(coreArtifactPluginDescriptor.getName()).thenReturn(FAKE_ARTIFACT_PLUGIN);
     when(appPlugin.getDescriptor()).thenReturn(coreArtifactPluginDescriptor);
-    when(artifactPluginFactory.create(same(coreArtifactPluginDescriptor), any())).thenReturn(appPlugin);
 
     final Domain domain = createDomain(DOMAIN_NAME);
 

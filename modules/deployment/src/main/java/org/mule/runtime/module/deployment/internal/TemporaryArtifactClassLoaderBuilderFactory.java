@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import org.mule.runtime.module.deployment.internal.application.ArtifactPluginFactory;
-import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginRepository;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginClassLoaderFactory;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginRepository;
 
 /**
  * Factory for {@code ArtifactClassLoaderBuilder} instances.
@@ -17,18 +17,17 @@ import org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginReposito
 public class TemporaryArtifactClassLoaderBuilderFactory {
 
   private ArtifactPluginRepository applicationPluginRepository;
-  private ArtifactPluginFactory artifactPluginFactory;
+  private final ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory;
 
   /**
    * Creates an {@code ArtifactClassLoaderBuilderFactory} to create instances of {@code ArtifactClassLoaderBuilder}.
-   *
-   * @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
-   * @param artifactPluginFactory factory for creating an artifact plugin from it's descriptor
+   *  @param applicationPluginRepository repository for artifacts plugins that are provided by default by the runtime
+   * @param artifactPluginClassLoaderFactory creates artifact class loaders from descriptors
    */
   public TemporaryArtifactClassLoaderBuilderFactory(ArtifactPluginRepository applicationPluginRepository,
-                                                    ArtifactPluginFactory artifactPluginFactory) {
+                                                    ArtifactPluginClassLoaderFactory artifactPluginClassLoaderFactory) {
     this.applicationPluginRepository = applicationPluginRepository;
-    this.artifactPluginFactory = artifactPluginFactory;
+    this.artifactPluginClassLoaderFactory = artifactPluginClassLoaderFactory;
   }
 
   /**
@@ -37,7 +36,7 @@ public class TemporaryArtifactClassLoaderBuilderFactory {
    * @return a new instance of {@code ArtifactClassLoaderBuilder}
    */
   public TemporaryArtifactClassLoaderBuilder createArtifactClassLoaderBuilder() {
-    return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginFactory);
+    return new TemporaryArtifactClassLoaderBuilder(applicationPluginRepository, artifactPluginClassLoaderFactory);
   }
 
 }

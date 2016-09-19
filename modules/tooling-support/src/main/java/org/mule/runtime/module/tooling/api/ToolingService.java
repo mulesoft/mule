@@ -7,7 +7,7 @@
 package org.mule.runtime.module.tooling.api;
 
 import org.mule.runtime.core.api.connectivity.ConnectivityTestingService;
-import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.tooling.api.connectivity.ConnectivityTestingServiceBuilder;
 
 import java.io.File;

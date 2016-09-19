@@ -27,9 +27,9 @@ import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.module.deployment.internal.application.ApplicationExtensionsManagerConfigurationBuilder;
 import org.mule.runtime.module.deployment.internal.application.ApplicationMuleContextBuilder;
-import org.mule.runtime.module.deployment.internal.application.ArtifactPlugin;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.deployment.internal.domain.DomainMuleContextBuilder;
-import org.mule.runtime.module.deployment.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.service.ServiceRepository;
 
 import java.io.File;

@@ -7,9 +7,9 @@
 package org.mule.runtime.module.deployment.internal.application;
 
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
-import org.mule.runtime.module.deployment.api.DeploymentException;
-import org.mule.runtime.module.deployment.api.DeploymentStopException;
-import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.deployment.model.api.DeploymentException;
+import org.mule.runtime.deployment.model.api.DeploymentStopException;
+import org.mule.runtime.deployment.model.api.application.Application;
 
 import java.io.IOException;
 

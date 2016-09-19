@@ -23,7 +23,7 @@ import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.runtime.module.deployment.api.application.Application;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.internal.DefaultTemporaryArtifactBuilderFactory;
 import org.mule.runtime.module.deployment.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
