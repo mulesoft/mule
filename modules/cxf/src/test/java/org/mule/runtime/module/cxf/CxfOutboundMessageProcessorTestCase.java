@@ -10,11 +10,14 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.component.simple.EchoService;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.cxf.builder.SimpleClientMessageProcessorBuilder;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -54,9 +57,11 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(msg).build()).build();
     };
     processor.setListener(messageProcessor);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent("hello");
-    Event response = processor.process(event);
+    Event response = processor.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("hello"))
+        .build());
     assertThat(processor.getClient().getRequestContext().isEmpty(), is(true));
     assertThat(processor.getClient().getResponseContext().isEmpty(), is(true));
     Object payload = response.getMessage().getPayload().getValue();

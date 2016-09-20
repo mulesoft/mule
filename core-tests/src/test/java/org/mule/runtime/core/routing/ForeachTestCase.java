@@ -81,31 +81,37 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void arrayListPayload() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     List<String> arrayList = new ArrayList<>();
     arrayList.add("bar");
     arrayList.add("zip");
-    simpleForeach.process(getTestEvent(arrayList));
+    simpleForeach.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(arrayList))
+        .build());
 
     assertSimpleProcessedMessages();
   }
 
   @Test
   public void arrayPayload() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     String[] array = new String[2];
     array[0] = "bar";
     array[1] = "zip";
-    simpleForeach.process(getTestEvent(array));
+    simpleForeach.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(array))
+        .build());
 
     assertSimpleProcessedMessages();
   }
 
   @Test
   public void muleMessageCollectionPayload() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     List<InternalMessage> list = new ArrayList<>();
     list.add(InternalMessage.builder().payload("bar").build());
     list.add(InternalMessage.builder().payload("zip").build());
     InternalMessage msgCollection = InternalMessage.builder().payload(list).build();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     simpleForeach
         .process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(msgCollection).build());
 
@@ -115,7 +121,11 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   @Test
   public void iterablePayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    simpleForeach.process(getTestEvent(iterable));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(iterable))
+        .build();
+    simpleForeach.process(testEvent);
 
     assertSimpleProcessedMessages();
   }
@@ -123,13 +133,17 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   @Test
   public void iteratorPayload() throws Exception {
     Iterable<String> iterable = new DummySimpleIterableClass();
-    simpleForeach.process(getTestEvent(iterable.iterator()));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    simpleForeach.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(iterable.iterator()))
+        .build());
 
     assertSimpleProcessedMessages();
   }
 
   @Test
   public void nestedArrayListPayload() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     List<List<String>> payload = new ArrayList<>();
     List<String> elem1 = new ArrayList<>();
     List<String> elem2 = new ArrayList<>();
@@ -144,12 +158,15 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     payload.add(elem2);
     payload.add(elem3);
 
-    nestedForeach.process(getTestEvent(payload));
+    nestedForeach.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(payload))
+        .build());
     assertNestedProcessedMessages();
   }
 
   @Test
   public void nestedArrayPayload() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     String[][] payload = new String[3][2];
     payload[0][0] = "a1";
     payload[0][1] = "a2";
@@ -158,7 +175,9 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
     payload[2][0] = "b2";
     payload[2][1] = "c1";
 
-    nestedForeach.process(getTestEvent(payload));
+    nestedForeach.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(payload))
+        .build());
     assertNestedProcessedMessages();
   }
 
@@ -189,17 +208,23 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void nestedIterablePayload() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     Iterable iterable = new DummyNestedIterableClass();
 
-    nestedForeach.process(getTestEvent(iterable));
+    nestedForeach.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(iterable))
+        .build());
     assertNestedProcessedMessages();
   }
 
   @Test
   public void nestedIteratorPayload() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     Iterable iterable = new DummyNestedIterableClass();
 
-    nestedForeach.process(getTestEvent(iterable.iterator()));
+    nestedForeach.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(iterable.iterator()))
+        .build());
     assertNestedProcessedMessages();
   }
 

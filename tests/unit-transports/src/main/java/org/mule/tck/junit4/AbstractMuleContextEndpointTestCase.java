@@ -20,6 +20,7 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -80,6 +81,12 @@ public abstract class AbstractMuleContextEndpointTestCase extends AbstractMuleCo
                                                          Map<String, Serializable> properties, Connector connector)
       throws Exception {
     return MuleEndpointTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
+  }
+
+  public static Event getTestEvent(Object data) throws Exception {
+    return Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR))
+        .message(InternalMessage.of(data))
+        .build();
   }
 
   public static Event getTestEvent(Object data, InboundEndpoint endpoint) throws Exception {

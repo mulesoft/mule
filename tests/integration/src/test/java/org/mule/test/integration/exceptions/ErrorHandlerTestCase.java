@@ -13,9 +13,11 @@ import static org.mockito.Mockito.mock;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 
 import org.mule.functional.functional.FunctionalTestComponent;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
@@ -31,6 +33,7 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
+import org.mule.tck.MuleTestUtils;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.sql.SQLDataException;
@@ -153,7 +156,11 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void redelivery() throws Exception {
-    MessageRedeliveredException exception = new MessageRedeliveredException("3", 1, 1, getTestEvent("0"), mockMP);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MessageRedeliveredException exception =
+        new MessageRedeliveredException("3", 1, 1, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+            .message(InternalMessage.of("0"))
+            .build(), mockMP);
     callTypeAndThrowException(exception, "0 redelivery");
   }
 

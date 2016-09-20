@@ -8,11 +8,15 @@ package org.mule.runtime.core.processor;
 
 import static org.junit.Assert.assertEquals;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -26,7 +30,10 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
         new ResponseMessageProcessorAdapter(createStringAppendTransformer("3"));
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("0123", builder.build().process(getTestEvent("0")).getMessageAsString(muleContext));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    assertEquals("0123", builder.build().process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("0"))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -36,7 +43,10 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
         new ResponseMessageProcessorAdapter(new ReturnNullMP());
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("012", builder.build().process(getTestEvent("0")).getMessageAsString(muleContext));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    assertEquals("012", builder.build().process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("0"))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -47,7 +57,10 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
             .chain(createStringAppendTransformer("a"), createStringAppendTransformer("b")).build());
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("012ab", builder.build().process(getTestEvent("0")).getMessageAsString(muleContext));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    assertEquals("012ab", builder.build().process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("0"))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -58,7 +71,10 @@ public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContext
             .chain(createStringAppendTransformer("a"), createStringAppendTransformer("b"), new ReturnNullMP()).build());
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(createStringAppendTransformer("1"), responseMessageProcessorAdapter, createStringAppendTransformer("2"));
-    assertEquals("012", builder.build().process(getTestEvent("0")).getMessageAsString(muleContext));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    assertEquals("012", builder.build().process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("0"))
+        .build()).getMessageAsString(muleContext));
   }
 
   private StringAppendTransformer createStringAppendTransformer(String append) {

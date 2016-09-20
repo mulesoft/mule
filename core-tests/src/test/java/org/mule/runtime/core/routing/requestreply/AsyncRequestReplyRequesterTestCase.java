@@ -68,8 +68,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     asyncReplyMP.setListener(target);
     asyncReplyMP.setReplySource(target.getMessageSource());
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent(TEST_MESSAGE);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     Event resultEvent = asyncReplyMP.process(event);
 
@@ -86,8 +89,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncMP.setListener(target);
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent(TEST_MESSAGE);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     Event resultEvent = asyncReplyMP.process(event);
 
@@ -139,8 +145,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         return fakeLatch;
       }
     };
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    final Event event = getTestEvent(TEST_MESSAGE);
+    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     final CountDownLatch processingLatch = new CountDownLatch(1);
 
@@ -189,7 +198,10 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
         public void run() {
           Event event;
           try {
-            event = getTestEvent(TEST_MESSAGE);
+            FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+            event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+                .message(InternalMessage.of(TEST_MESSAGE))
+                .build();
             Event resultEvent = asyncReplyMP.process(event);
 
             // Can't assert same because we copy event for async currently

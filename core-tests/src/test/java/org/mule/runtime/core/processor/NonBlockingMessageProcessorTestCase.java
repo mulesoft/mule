@@ -11,15 +11,16 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -35,7 +36,10 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
 
   @Test
   public void blockingProcess() throws MuleException, Exception {
-    Event request = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event request = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
     Event response = nonBlockingMessageProcessor.process(request);
 
     // Test processor echos request so we can assert request equals response.

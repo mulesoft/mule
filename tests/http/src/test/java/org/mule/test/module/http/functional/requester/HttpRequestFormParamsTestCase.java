@@ -40,8 +40,6 @@ public class HttpRequestFormParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendsMapAsUrlEncodedBody() throws Exception {
-    Event event = getTestEvent(getTestMap());
-
     runAndAssert(ANY);
   }
 

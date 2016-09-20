@@ -6,21 +6,25 @@
  */
 package org.mule.runtime.core.source;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.util.ObjectUtils;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
+
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.util.ObjectUtils;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 public class StartableCompositeMessageSourceTestCase extends AbstractMuleContextTestCase {
 
@@ -36,7 +40,10 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     listener = getSensingNullMessageProcessor();
     listener2 = getSensingNullMessageProcessor();
     compositeSource = getCompositeSource();
-    testEvent = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
     source = new NullMessageSource(testEvent);
   }
 
@@ -153,6 +160,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
       this.event = event;
     }
 
+    @Override
     public void setListener(Processor listener) {
       this.listener = listener;
     }
@@ -163,10 +171,12 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
       }
     }
 
+    @Override
     public void start() throws MuleException {
       started = true;
     }
 
+    @Override
     public void stop() throws MuleException {
       started = false;
     }

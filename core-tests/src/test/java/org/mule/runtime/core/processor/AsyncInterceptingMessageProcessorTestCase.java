@@ -18,6 +18,7 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
 
 import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
@@ -76,7 +77,11 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
+        .build();
 
     try {
       messageProcessor.process(event);
@@ -106,7 +111,11 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
 
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
+        .build();
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 

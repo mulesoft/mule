@@ -39,10 +39,15 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
+import org.mule.tck.MuleTestUtils;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import org.mule.test.runner.RunnerDelegateTo;
 
@@ -83,8 +88,13 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
   protected DataSource getDefaultDataSource(String configName) {
     try {
       ConfigurationProvider configurationProvider = muleContext.getRegistry().get(configName);
+      FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
       DbConnectionProvider connectionProvider =
-          (DbConnectionProvider) configurationProvider.get(getTestEvent("")).getConnectionProvider().get();
+          (DbConnectionProvider) configurationProvider
+              .get(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+                  .message(InternalMessage.of(""))
+                  .build())
+              .getConnectionProvider().get();
       return connectionProvider.getDataSource();
     } catch (Exception e) {
       throw new RuntimeException(e);

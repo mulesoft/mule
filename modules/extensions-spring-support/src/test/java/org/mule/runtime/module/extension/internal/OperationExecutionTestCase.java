@@ -6,23 +6,42 @@
  */
 package org.mule.runtime.module.extension.internal;
 
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatcher;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
+import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
+import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
+import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.tck.MuleTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.CarWash;
@@ -42,28 +61,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatcher;
+
 import static org.hamcrest.collection.IsMapContaining.hasKey;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
-import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
-import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
-import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -472,6 +477,10 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private HeisenbergExtension getConfig(String name) throws Exception {
-    return ExtensionsTestUtils.getConfigurationFromRegistry(name, getTestEvent(EMPTY_STRING), muleContext);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    return ExtensionsTestUtils
+        .getConfigurationFromRegistry(name, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+            .message(InternalMessage.of(EMPTY_STRING))
+            .build(), muleContext);
   }
 }

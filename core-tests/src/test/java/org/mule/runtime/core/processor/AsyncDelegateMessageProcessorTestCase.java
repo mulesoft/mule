@@ -17,18 +17,22 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
@@ -58,7 +62,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessOneWay() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     Event result = messageProcessor.process(event);
 
@@ -79,7 +86,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     Event result = messageProcessor.process(event);
 
@@ -100,7 +110,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -117,7 +130,10 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 

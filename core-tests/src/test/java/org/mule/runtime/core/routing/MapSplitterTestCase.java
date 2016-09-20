@@ -9,6 +9,11 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -22,7 +27,6 @@ public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
   private MapSplitter mapSplitter;
   private List<String> splitPayloads = new ArrayList<>();
-  private List<String> splitKeyProperties = new ArrayList<>();
 
   @Override
   protected void doSetUp() throws Exception {
@@ -37,12 +41,15 @@ public class MapSplitterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testSplit() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     Map<String, Object> testMap = new HashMap<>();
     testMap.put("1", "one");
     testMap.put("2", "two");
     testMap.put("3", "three");
 
-    mapSplitter.process(getTestEvent(testMap));
+    mapSplitter.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(testMap))
+        .build());
 
     assertEquals(3, splitPayloads.size());
     assertTrue(splitPayloads.contains("one"));

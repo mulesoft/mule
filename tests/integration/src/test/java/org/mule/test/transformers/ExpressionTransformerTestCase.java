@@ -11,17 +11,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
+
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.expression.ExpressionConfig;
 import org.mule.runtime.core.expression.transformers.ExpressionArgument;
 import org.mule.runtime.core.expression.transformers.ExpressionTransformer;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
 
 import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
-import org.junit.Test;
 
 public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
 
@@ -53,9 +58,11 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
     ExpressionArgument argument = new ExpressionArgument("test", config, true);
     argument.setMuleContext(muleContext);
     transformer.addArgument(argument);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent("Test");
-    Object result = transformer.transformMessage(event, null);
+    Object result = transformer.transformMessage(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("Test"))
+        .build(), null);
     assertTrue(result instanceof InternalMessage);
     InternalMessage transformedMessage = (InternalMessage) result;
 

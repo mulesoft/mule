@@ -11,10 +11,14 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.tck.MuleTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,8 +52,13 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
   @Test
   public void staticHeisenbergWasInjected() throws Exception {
     assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     HeisenbergExtension heisenberg =
-        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, getTestEvent(""), muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG,
+                                                         Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+                                                             .message(InternalMessage.of(""))
+                                                             .build(),
+                                                         muleContext);
     assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
   }
 
@@ -58,7 +67,10 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
     assertCorrectProviderInjected(DYNAMIC_AGE_HEISENBERG, dependent.getDynamicAgeHeisenberg());
 
     final int age = 52;
-    Event event = Event.builder(getTestEvent("")).addVariable("age", age).build();
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .addVariable("age", age).build();
 
     HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(DYNAMIC_AGE_HEISENBERG, event, muleContext);
     assertThat(heisenberg.getPersonalInfo().getAge(), is(age));

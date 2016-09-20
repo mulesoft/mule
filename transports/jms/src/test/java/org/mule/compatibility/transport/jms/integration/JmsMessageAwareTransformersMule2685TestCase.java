@@ -14,9 +14,12 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import org.mule.compatibility.core.routing.outbound.ExpressionRecipientList;
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
+import org.mule.tck.MuleTestUtils;
 
 import java.nio.charset.Charset;
 
@@ -58,7 +61,10 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
   @Test
   public void testMessageAwareTransformerChainedWithObjectToJMSMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     InternalMessage message = InternalMessage.of("This is a test TextMessage");
 

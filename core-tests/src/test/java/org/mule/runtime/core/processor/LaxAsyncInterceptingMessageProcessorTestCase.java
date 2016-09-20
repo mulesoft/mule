@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.processor;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import org.junit.Test;
@@ -19,7 +23,10 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
 
     assertSync(messageProcessor, event);
   }
@@ -27,7 +34,10 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
@@ -41,7 +51,10 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(TEST_MESSAGE))
+        .build();
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 

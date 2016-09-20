@@ -10,12 +10,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.runtime.module.cxf.testmodels.Echo;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.apache.commons.io.output.NullOutputStream;
@@ -41,10 +44,11 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("echo").build()).build();
     };
     processor.setListener(messageProcessor);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent(msg);
-
-    Event response = processor.process(event);
+    Event response = processor.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(msg))
+        .build());
 
     Object payload = response.getMessage().getPayload().getValue();
     assertTrue(payload instanceof OutputHandler);
@@ -64,10 +68,11 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
       return null;
     };
     processor.setListener(messageProcessor);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = getTestEvent(msg);
-
-    Event response = processor.process(event);
+    Event response = processor.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(msg))
+        .build());
 
     assertTrue(gotEvent);
     assertNull(response);

@@ -11,9 +11,14 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.queue.DefaultQueueStore;
 import org.mule.runtime.core.util.xa.MuleXid;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.Multimap;
@@ -49,7 +54,10 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logAddAndRetrieve() throws Exception {
-    Event muleEvent = getTestEvent(SOME_VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MuleEvent muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(SOME_VALUE))
+        .build();
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);
@@ -66,7 +74,10 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logAddFirstAndRetrieve() throws Exception {
-    Event muleEvent = getTestEvent(SOME_VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MuleEvent muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(SOME_VALUE))
+        .build();
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logAddFirst(TX_ID, mockQueueInfo, muleEvent);
@@ -83,7 +94,10 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logRemoveAndRetrieve() throws Exception {
-    Event muleEvent = getTestEvent(SOME_VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MuleEvent muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(SOME_VALUE))
+        .build();
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logRemove(TX_ID, mockQueueInfo, muleEvent);
@@ -122,7 +136,10 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logSeveralAddsThenCommitAndRetrieve() throws Exception {
-    Event muleEvent = getTestEvent(SOME_VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MuleEvent muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(SOME_VALUE))
+        .build();
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
@@ -138,7 +155,10 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logSeveralAddsThenRetrieveAndCommit() throws Exception {
-    Event muleEvent = getTestEvent(SOME_VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MuleEvent muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(SOME_VALUE))
+        .build();
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
@@ -154,7 +174,10 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logSeveralAddsAndRetrieve() throws Exception {
-    Event muleEvent = getTestEvent(SOME_VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MuleEvent muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(SOME_VALUE))
+        .build();
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
@@ -174,7 +197,10 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
 
   @Test
   public void logAddAndPrepare() throws Exception {
-    Event muleEvent = getTestEvent(SOME_VALUE);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    MuleEvent muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(SOME_VALUE))
+        .build();
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     transactionJournal.logAdd(TX_ID, mockQueueInfo, muleEvent);

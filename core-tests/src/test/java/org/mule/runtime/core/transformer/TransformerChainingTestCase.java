@@ -13,12 +13,16 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -42,7 +46,11 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(new Integer(0)).build();
     Transformer messageTransformer = new TransformerChain(validTransformer);
-    message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    message =
+        transformationService.applyTransformers(message, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+            .message(InternalMessage.of(0))
+            .build(), messageTransformer);
 
     Object transformedMessage = message.getPayload().getValue();
     assertNotNull(transformedMessage);
@@ -56,7 +64,11 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(new Integer(0)).build();
     Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer);
-    message = transformationService.applyTransformers(message, getTestEvent(0), singletonList(messageTransformer));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    message =
+        transformationService.applyTransformers(message, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+            .message(InternalMessage.of(0))
+            .build(), singletonList(messageTransformer));
 
     Object transformedMessage = message.getPayload().getValue();
     assertNotNull(transformedMessage);
@@ -70,7 +82,11 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(new Integer(0)).build();
     Transformer messageTransformer = new TransformerChain(validTransformer, validTransformer, validTransformer);
-    message = transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    message =
+        transformationService.applyTransformers(message, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+            .message(InternalMessage.of(0))
+            .build(), messageTransformer);
 
     Object transformedMessage = message.getPayload().getValue();
     assertNotNull(transformedMessage);
@@ -88,7 +104,10 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(new Integer(0)).build();
     Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
-    transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    transformationService.applyTransformers(message, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(0))
+        .build(), messageTransformer);
   }
 
   @Test
@@ -104,7 +123,10 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
     Transformer messageTransformer = new TransformerChain(invalidTransformer, validTransformer);
 
     try {
-      transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+      FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+      transformationService.applyTransformers(message, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+          .message(InternalMessage.of(0))
+          .build(), messageTransformer);
       fail("Transformer chain is expected to fail because of invalid transformer within chain.");
     } catch (MuleException tfe) {
       // ignore
@@ -124,7 +146,10 @@ public class TransformerChainingTestCase extends AbstractMuleContextTestCase {
     Transformer messageTransformer = new TransformerChain(validTransformer, invalidTransformer);
 
     try {
-      transformationService.applyTransformers(message, getTestEvent(0), messageTransformer);
+      FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+      transformationService.applyTransformers(message, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+          .message(InternalMessage.of(0))
+          .build(), messageTransformer);
       fail("Transformer chain is expected to fail because of invalid transformer within chain.");
     } catch (MuleException tfe) {
       assertNotNull(tfe);

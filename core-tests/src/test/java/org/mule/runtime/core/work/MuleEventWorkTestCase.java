@@ -13,9 +13,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.TimeUnit;
@@ -33,12 +36,12 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     // Create a dummy event and give it some properties
-    originalEvent = getTestEvent("test");
-    originalEvent = Event.builder(originalEvent).message(InternalMessage.builder(originalEvent.getMessage())
-        .addOutboundProperty("test", "val")
-        .addOutboundProperty("test2", "val2")
-        .build()).build();
+    originalEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.builder().payload("test").addOutboundProperty("test", "val")
+            .addOutboundProperty("test2", "val2").build())
+        .build();
     setCurrentEvent(originalEvent);
   }
 

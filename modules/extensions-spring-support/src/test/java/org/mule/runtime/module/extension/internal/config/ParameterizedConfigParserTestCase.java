@@ -22,7 +22,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
+
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.tck.MuleTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
@@ -105,7 +110,10 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
     Event event = getHeisenbergEvent();
-    Event anotherEvent = getTestEvent("");
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event anotherEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
     assertThat(config, is(sameInstance(anotherConfig)));

@@ -13,9 +13,14 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.compatibility.transport.jms.transformers.JMSMessageToObject;
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.compression.CompressionStrategy;
 import org.mule.runtime.core.util.compression.GZipCompression;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.io.File;
@@ -66,7 +71,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformObjectMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     ObjectMessage oMsg = session.createObjectMessage();
     File f = FileUtils.newFile("/some/random/path");
@@ -84,7 +92,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformTextMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     String text = "This is a test TextMessage";
     TextMessage tMsg = session.createTextMessage();
@@ -103,7 +114,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformMapMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     Map p = new HashMap();
     p.put("Key1", "Value1");
@@ -130,7 +144,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformMapToObjectMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     Map p = new HashMap();
     p.put("Key1", "Value1");
@@ -159,7 +176,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformByteMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
     trans.setReturnDataType(DataType.fromType(BytesMessage.class));
@@ -179,7 +199,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformStreamMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     String text = "Test Text";
     int i = 97823;
@@ -218,7 +241,10 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
   // http://en.wikipedia.org/wiki/Zip_of_death
   @Test
   public void testCompressedBytesMessage() throws Exception {
-    setCurrentEvent(getTestEvent("test"));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("test"))
+        .build());
 
     // use GZIP
     CompressionStrategy compressor = new GZipCompression();

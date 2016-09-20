@@ -14,9 +14,13 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.NestedProcessor;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -36,12 +40,19 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Before
   public void before() throws Exception {
-    when(messageProcessor.process(any(Event.class))).thenReturn(getTestEvent(RESPONSE));
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    when(messageProcessor.process(any(Event.class)))
+        .thenReturn(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+            .message(InternalMessage.of(RESPONSE))
+            .build());
   }
 
   @Test
   public void yieldsNestedProcessor() throws Exception {
-    Event muleEvent = getTestEvent("");
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build();
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
     NestedProcessor nestedProcessor = resolver.resolve(muleEvent);
@@ -57,7 +68,10 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
-    Event muleEvent = getTestEvent("");
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
+    Event muleEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build();
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
     NestedProcessor resolved1 = resolver.resolve(muleEvent);

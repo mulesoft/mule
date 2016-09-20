@@ -13,8 +13,12 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
+import org.mule.tck.MuleTestUtils;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
@@ -33,8 +37,12 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
 
   @Test
   public void getPets() throws Exception {
+    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     ConfigurationInstance config =
-        muleContext.getExtensionManager().getConfiguration("petstore", getTestEvent(""));
+        muleContext.getExtensionManager()
+            .getConfiguration("petstore", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+                .message(InternalMessage.of(""))
+                .build());
     assertThat(config, is(notNullValue()));
 
     Event response = runFlow("getPets");

@@ -11,11 +11,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.exception.MessagingException;
+import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -27,11 +31,14 @@ import org.junit.Test;
 
 public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
+  private FlowConstruct flowConstruct;
+
   private InvokerMessageProcessor invoker;
 
   @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
+    flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     invoker = new InvokerMessageProcessor();
     invoker.setObject(new TestInvokeObject());
     invoker.setMuleContext(muleContext);
@@ -41,7 +48,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
   public void testMethodWithNoArgs() throws MuleException, Exception {
     invoker.setMethodName("testNoArgs");
     invoker.initialise();
-    invoker.process(getTestEvent(""));
+    invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build());
   }
 
   @Test
@@ -49,7 +58,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod");
     invoker.setArgumentExpressionsString("#['1'],#['2'],#['3'],#['4'],#['5'],#['6'],#['7'],#['8'],#['true'],#['true'],#['1']");
     invoker.initialise();
-    invoker.process(getTestEvent(""));
+    invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build());
   }
 
   @Test
@@ -57,7 +68,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#[#['1']]");
     invoker.initialise();
-    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
+    assertEquals("1 echo", invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -65,7 +78,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("1-#[#['2']]-3");
     invoker.initialise();
-    assertEquals("1-2-3 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
+    assertEquals("1-2-3 echo", invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -73,7 +88,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("1");
     invoker.initialise();
-    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
+    assertEquals("1 echo", invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -81,7 +98,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArguments(Collections.singletonList(null));
     invoker.initialise();
-    assertEquals("null echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
+    assertEquals("null echo", invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -114,7 +133,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setArgumentExpressionsString("#['1'], #['2']");
     invoker.setArgumentTypes(new Class[] {String.class, Integer.TYPE});
     invoker.initialise();
-    assertEquals("12(string and int)", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
+    assertEquals("12(string and int)", invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build()).getMessageAsString(muleContext));
 
   }
 
@@ -124,7 +145,10 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setArgumentTypes(new Class<?>[] {String.class, Integer.class});
     invoker.setArguments(asList("some String", 42));
     invoker.initialise();
-    assertEquals("some String42(string and int)", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
+    assertEquals("some String42(string and int)",
+                 invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+                     .message(InternalMessage.of(""))
+                     .build()).getMessageAsString(muleContext));
 
   }
 
@@ -134,7 +158,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setArgumentExpressionsString("#['1']");
     invoker.initialise();
     try {
-      invoker.process(getTestEvent(""));
+      invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+          .message(InternalMessage.of(""))
+          .build());
       fail("Exception expected");
     } catch (Exception e) {
       assertEquals(MessagingException.class, e.getClass());
@@ -147,7 +173,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#[payload:]");
     invoker.initialise();
-    assertEquals("hello echo", invoker.process(getTestEvent("hello")).getMessageAsString(muleContext));
+    assertEquals("hello echo", invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of("hello"))
+        .build()).getMessageAsString(muleContext));
   }
 
   @Test
@@ -155,7 +183,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testArrayArg");
     invoker.setArguments(Collections.singletonList(new String[] {"#['1']", "#['2']"}));
     invoker.initialise();
-    Event result = invoker.process(getTestEvent(""));
+    Event result = invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build());
     assertEquals(String[].class, result.getMessage().getPayload().getDataType().getType());
     assertEquals("1", ((String[]) result.getMessage().getPayload().getValue())[0]);
     assertEquals("2", ((String[]) result.getMessage().getPayload().getValue())[1]);
@@ -166,7 +196,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testListArg");
     invoker.setArguments(Collections.singletonList(Collections.singletonList("#['1']")));
     invoker.initialise();
-    Event result = invoker.process(getTestEvent(""));
+    Event result = invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build());
     assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getDataType().getType()));
     assertEquals("1", ((List) result.getMessage().getPayload().getValue()).get(0));
   }
@@ -176,7 +208,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testListArg");
     invoker.setArguments(Collections.singletonList(Collections.singletonList(Collections.singletonMap("#['key']", "#['val']"))));
     invoker.initialise();
-    Event result = invoker.process(getTestEvent(""));
+    Event result = invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build());
     assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getDataType().getType()));
     assertEquals("val", ((Map) ((List) result.getMessage().getPayload().getValue()).get(0)).get("key"));
   }
@@ -186,7 +220,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMapArg");
     invoker.setArguments(Collections.singletonList(Collections.singletonMap("#['key']", "#['val']")));
     invoker.initialise();
-    Event result = invoker.process(getTestEvent(""));
+    Event result = invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build());
     assertTrue(Map.class.isAssignableFrom(result.getMessage().getPayload().getDataType().getType()));
     assertEquals("val", ((Map) result.getMessage().getPayload().getValue()).get("key"));
   }
@@ -201,7 +237,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#['1']");
     invoker.initialise();
-    assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString(muleContext));
+    assertEquals("1 echo", invoker.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+        .message(InternalMessage.of(""))
+        .build()).getMessageAsString(muleContext));
   }
 
   private class TestInvokeObject {
