@@ -14,10 +14,12 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.util.FileUtils;
 
 import java.io.File;
 
@@ -40,12 +42,20 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
     @Mock
     private MuleContext muleContext;
 
+    @Mock
+    private MuleConfiguration muleConfiguration;
+
+    private File workingDirectory;
+
     private PersistentObjectStorePartition partition;
 
     @Before
     public void setUp() throws Exception
     {
         when(muleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+        workingDirectory = objectStoreFolder.getRoot().getParentFile();
+        when(muleConfiguration.getWorkingDirectory()).thenReturn(workingDirectory.getPath());
         addJavaSerializerToMockMuleContext(muleContext);
         partition = new PersistentObjectStorePartition(muleContext, "test", objectStoreFolder.getRoot());
         partition.open();
@@ -68,15 +78,23 @@ public class PersistentObjectStorePartitionTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void skipCorruptedOrUnreadableFiles()
+    public void skipAndMoveCorruptedOrUnreadableFiles()
     {
         final String KEY = "key";
         final String VALUE = "value";
         try
         {
             File.createTempFile("temp", ".obj", objectStoreFolder.getRoot());
+            File corruptedFolder = FileUtils.openDirectory(workingDirectory.getAbsolutePath()
+                                    + File.separator + PersistentObjectStorePartition.CORRUPTED_FOLDER);
+            int corruptedBefore = corruptedFolder.list().length;
+
             partition.store(KEY, VALUE);
-            assertEquals(objectStoreFolder.getRoot().listFiles().length, 2);
+            // Expect the new stored object, and the partition-descriptor file
+            assertEquals(2, objectStoreFolder.getRoot().listFiles().length);
+
+            // Expect to have one more corrupted file in the corrupted folder
+            assertEquals(corruptedBefore + 1, corruptedFolder.list().length);
         }
         catch (Exception e)
         {
