@@ -180,11 +180,11 @@ final class ExportedArtifactsCollector {
         }
       }
 
-      private Class loadClass(String name){
+      private Class loadClass(String name) {
         try {
           return ClassUtils.loadClass(name, extensionClassloader);
         } catch (ClassNotFoundException e) {
-          throw new IllegalStateException(e);
+          throw new IllegalArgumentException(e);
         }
       }
     });
