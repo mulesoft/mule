@@ -87,7 +87,7 @@ public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
     Optional<ObjectFieldType> name = type.getFieldByName("name");
     assertThat(name.isPresent(), is(true));
-    assertThat(name.get().getValue(), equalTo(testDatabase.getNameFielMetaDataType()));
+    assertThat(name.get().getValue(), equalTo(testDatabase.getNameFieldMetaDataType()));
   }
 
 }

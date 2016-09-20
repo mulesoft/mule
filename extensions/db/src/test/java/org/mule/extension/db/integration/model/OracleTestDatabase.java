@@ -22,7 +22,8 @@ public class OracleTestDatabase extends AbstractTestDatabase {
 
   @Override
   public void createPlanetTable(Connection connection) throws SQLException {
-    executeDdl(connection, "CREATE TABLE PLANET(ID INTEGER NOT NULL PRIMARY KEY,POSITION SMALLINT, NAME VARCHAR(255))");
+    executeDdl(connection,
+               "CREATE TABLE PLANET(ID INTEGER NOT NULL PRIMARY KEY,POSITION SMALLINT, NAME VARCHAR(255), PICTURE BLOB)");
 
     executeDdl(connection, "CREATE SEQUENCE PLANET_SEQ INCREMENT BY 1 START WITH 1");
 

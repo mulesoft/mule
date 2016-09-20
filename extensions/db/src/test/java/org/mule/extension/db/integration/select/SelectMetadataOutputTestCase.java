@@ -14,6 +14,7 @@ import static org.mule.extension.db.internal.domain.metadata.SelectMetadataResol
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -21,7 +22,9 @@ import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 
+import java.sql.Blob;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +32,8 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase {
+
+  private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
   public SelectMetadataOutputTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
     super(dataSourceConfigResource, testDatabase);
@@ -48,10 +53,11 @@ public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase 
   public void selectAll() throws Exception {
     ObjectType record = getSelectOutputMetadata("select * from PLANET");
 
-    assertThat(record.getFields().size(), equalTo(3));
+    assertThat(record.getFields().size(), equalTo(4));
     assertFieldOfType(record, "ID", testDatabase.getIdFieldMetaDataType());
-    assertFieldOfType(record, "POSITION", testDatabase.getPositionFielMetaDataType());
+    assertFieldOfType(record, "POSITION", testDatabase.getPositionFieldMetaDataType());
     assertFieldOfType(record, "NAME", typeBuilder.stringType().build());
+    assertFieldOfType(record, "PICTURE", typeLoader.load(Blob.class));
   }
 
   @Test
@@ -60,7 +66,7 @@ public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase 
 
     assertThat(record.getFields().size(), equalTo(2));
     assertFieldOfType(record, "ID", testDatabase.getIdFieldMetaDataType());
-    assertFieldOfType(record, "POSITION", testDatabase.getPositionFielMetaDataType());
+    assertFieldOfType(record, "POSITION", testDatabase.getPositionFieldMetaDataType());
   }
 
   @Test

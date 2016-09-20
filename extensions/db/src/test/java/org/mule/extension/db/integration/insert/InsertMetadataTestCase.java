@@ -72,7 +72,7 @@ public class InsertMetadataTestCase extends AbstractDbIntegrationTestCase {
 
     assertThat(parameters.getType(), is(instanceOf(ObjectType.class)));
     assertThat(((ObjectType) parameters.getType()).getFields().size(), equalTo(1));
-    assertFieldOfType(((ObjectType) parameters.getType()), "name", testDatabase.getNameFielMetaDataType());
+    assertFieldOfType(((ObjectType) parameters.getType()), "name", testDatabase.getNameFieldMetaDataType());
   }
 
   @Test

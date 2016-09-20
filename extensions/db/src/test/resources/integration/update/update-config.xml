@@ -29,6 +29,15 @@
         </db:update>
     </flow>
 
+    <flow name="updateBlob">
+        <db:update>
+            <db:sql>update PLANET set PICTURE = :pic where NAME='Mars'</db:sql>
+            <db:input-parameters>
+                <db:input-parameter key="pic" value="#[payload]"/>
+            </db:input-parameters>
+        </db:update>
+    </flow>
+
     <flow name="merge">
         <db:update>
             <db:sql>
