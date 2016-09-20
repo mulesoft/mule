@@ -2642,6 +2642,22 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp2FileBuilder.getId());
   }
 
+  @Test
+  public void deployFailsWhenMissingFile() throws Exception {
+    startDeployment();
+
+    addExplodedAppFromBuilder(emptyAppFileBuilder);
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    reset(applicationDeploymentListener);
+
+    File originalConfigFile = new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), MULE_CONFIG_XML_FILE);
+    FileUtils.forceDelete(originalConfigFile);
+
+    assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
+    assertStatus(emptyAppFileBuilder.getId(), ApplicationStatus.DEPLOYMENT_FAILED);
+  }
+
   private void doRedeployAppByChangingConfigFileWithGoodOne(String applicationPath) throws Exception {
     changeConfigFile(applicationPath, EMPTY_APP_CONFIG_XML);
   }

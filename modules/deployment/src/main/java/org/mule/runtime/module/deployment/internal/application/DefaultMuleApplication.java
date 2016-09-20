@@ -102,12 +102,17 @@ public class DefaultMuleApplication implements Application {
     // set even though it might be redundant, just in case the app is been redeployed
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
 
-    for (String configResourceAbsolutePatch : this.descriptor.getAbsoluteResourcePaths()) {
-      File configResource = new File(configResourceAbsolutePatch);
-      if (!configResource.exists()) {
-        String message = format("Config for app '%s' not found: %s", getArtifactName(), configResource);
-        throw new InstallException(createStaticMessage(message));
+    try {
+      for (String configResourceAbsolutePatch : this.descriptor.getAbsoluteResourcePaths()) {
+        File configResource = new File(configResourceAbsolutePatch);
+        if (!configResource.exists()) {
+          String message = format("Config for app '%s' not found: %s", getArtifactName(), configResource);
+          throw new InstallException(createStaticMessage(message));
+        }
       }
+    } catch (Exception e) {
+      setStatusToFailed();
+      throw e;
     }
   }
 
