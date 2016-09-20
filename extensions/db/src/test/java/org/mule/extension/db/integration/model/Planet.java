@@ -15,10 +15,16 @@ public class Planet {
 
   private String name;
   private int position;
+  private byte[] picture;
 
   public Planet(String name, int position) {
+    this(name, position, null);
+  }
+
+  public Planet(String name, int position, byte[] picture) {
     this.name = name;
     this.position = position;
+    this.picture = picture;
   }
 
   public String getName() {
@@ -27,5 +33,9 @@ public class Planet {
 
   public int getPosition() {
     return position;
+  }
+
+  public byte[] getPicture() {
+    return picture;
   }
 }

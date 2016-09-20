@@ -22,6 +22,7 @@ import org.mule.runtime.api.message.Message;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -73,6 +74,16 @@ public class UpdateTestCase extends AbstractDbIntegrationTestCase {
     Message response = flowRunner("updateParameterized").withPayload(PLUTO).run().getMessage();
     assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     assertPlanetRecordsFromQuery(PLUTO);
+  }
+
+  @Test
+  public void updateBlob() throws Exception {
+    byte[] picture = new byte[100];
+    new Random().nextBytes(picture);
+
+    Message response = flowRunner("updateBlob").withPayload(picture).run().getMessage();
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
+    assertPlanetRecordsFromQuery("Mars");
   }
 
   private void assertMergeResult(Message response) throws SQLException {

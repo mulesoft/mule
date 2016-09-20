@@ -350,11 +350,11 @@ public abstract class AbstractTestDatabase {
     return typeBuilder.numberType().build();
   }
 
-  public MetadataType getPositionFielMetaDataType() {
+  public MetadataType getPositionFieldMetaDataType() {
     return typeBuilder.numberType().build();
   }
 
-  public MetadataType getNameFielMetaDataType() {
+  public MetadataType getNameFieldMetaDataType() {
     return typeBuilder.stringType().build();
   }
 
