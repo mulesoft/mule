@@ -23,6 +23,7 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -81,7 +82,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
@@ -1300,7 +1300,7 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         final boolean[] lockedFromClient = new boolean[1];
 
-        Mockito.doAnswer(new Answer()
+        doAnswer(new Answer()
         {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
@@ -1346,6 +1346,84 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
         assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppDescriptor.id);
 
         assertFalse("Able to lock deployment service during start", lockedFromClient[0]);
+    }
+
+    @Test
+    public void synchronizesAppDeployFromClient() throws Exception
+    {
+        final Action action = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                deploymentService.deploy(getClass().getResource(dummyAppDescriptor.zipPath));
+            }
+        };
+
+        final Action assertAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptor.id);
+            }
+        };
+        doSynchronizedAppDeploymentActionTest(action, assertAction);
+    }
+
+    @Test
+    public void synchronizesAppUndeployFromClient() throws Exception
+    {
+        final Action action = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                deploymentService.undeploy(emptyAppDescriptor.id);
+            }
+        };
+
+        final Action assertAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppDescriptor.id);
+            }
+        };
+        doSynchronizedAppDeploymentActionTest(action, assertAction);
+    }
+
+    @Test
+    public void synchronizesAppRedeployFromClient() throws Exception
+    {
+        final Action action = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                // Clears notification from first deployment
+                reset(applicationDeploymentListener);
+                deploymentService.redeploy(emptyAppDescriptor.id);
+            }
+        };
+
+        final Action assertAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                verify(applicationDeploymentListener, never()).onDeploymentStart(emptyAppDescriptor.id);
+            }
+        };
+        doSynchronizedAppDeploymentActionTest(action, assertAction);
+    }
+
+    private void doSynchronizedAppDeploymentActionTest(final Action deploymentAction, final Action assertAction) throws Exception
+    {
+        addPackedAppFromResource(emptyAppDescriptor.zipPath);
+
+        doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, applicationDeploymentListener, emptyAppDescriptor.id);
     }
 
     @Test
@@ -2403,6 +2481,143 @@ public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 
         assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1Descriptor.id);
         assertDeploymentFailure(applicationDeploymentListener, dummyDomainApp2Descriptor.id);
+    }
+
+    @Test
+    public void synchronizesDomainDeployFromClient() throws Exception
+    {
+        final Action action = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                deploymentService.deployDomain(getClass().getResource(dummyDomainDescriptor.zipPath));
+            }
+        };
+
+        final Action assertAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                verify(domainDeploymentListener, never()).onDeploymentStart(dummyDomainDescriptor.id);
+            }
+        };
+        doSynchronizedDomainDeploymentActionTest(action, assertAction);
+    }
+
+    @Test
+    public void synchronizesDomainUndeployFromClient() throws Exception
+    {
+        final Action action = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                deploymentService.undeployDomain(emptyDomainDescriptor.id);
+            }
+        };
+
+        final Action assertAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                verify(domainDeploymentListener, never()).onUndeploymentStart(emptyDomainDescriptor.id);
+            }
+        };
+        doSynchronizedDomainDeploymentActionTest(action, assertAction);
+    }
+
+    @Test
+    public void synchronizesDomainRedeployFromClient() throws Exception
+    {
+        final Action action = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                // Clears notification from first deployment
+                reset(domainDeploymentListener);
+                deploymentService.redeployDomain(emptyDomainDescriptor.id);
+            }
+        };
+
+        final Action assertAction = new Action()
+        {
+            @Override
+            public void perform() throws Exception
+            {
+                verify(domainDeploymentListener, never()).onDeploymentStart(emptyDomainDescriptor.id);
+            }
+        };
+        doSynchronizedDomainDeploymentActionTest(action, assertAction);
+    }
+
+    private void doSynchronizedDomainDeploymentActionTest(final Action deploymentAction, final Action assertAction) throws Exception
+    {
+        addPackedDomainFromResource(emptyDomainDescriptor.zipPath);
+        final DeploymentListener domainDeploymentListener = this.domainDeploymentListener;
+        final String artifactId = emptyDomainDescriptor.id;
+
+        doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, domainDeploymentListener, artifactId);
+    }
+
+    private void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction, DeploymentListener domainDeploymentListener, String artifactId)
+    {
+        Thread deploymentServiceThread = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                deploymentService.start();
+            }
+        });
+
+        final boolean[] deployedFromClient = new boolean[1];
+
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+
+                Thread deploymentClientThread = new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            deploymentAction.perform();
+                        }
+                        catch (Exception e)
+                        {
+                            // Ignore
+                        }
+                    }
+                });
+
+                deploymentClientThread.start();
+                deploymentClientThread.join();
+                try
+                {
+                    assertAction.perform();
+                }
+                catch (AssertionError e)
+                {
+                    deployedFromClient[0] = true;
+                }
+
+                return null;
+            }
+        }).when(domainDeploymentListener).onDeploymentStart(artifactId);
+
+        deploymentServiceThread.start();
+
+        assertDeploymentSuccess(domainDeploymentListener, artifactId);
+
+        assertFalse("Able to perform a deployment action while another deployment operation was in progress", deployedFromClient[0]);
     }
 
     private void doRedeployAppByChangingConfigFileWithGoodOne(String applicationPath) throws Exception

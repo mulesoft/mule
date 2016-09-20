@@ -7,6 +7,7 @@
 package org.mule.module.launcher;
 
 import static java.lang.System.getProperties;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.module.launcher.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
@@ -215,49 +216,91 @@ public class MuleDeploymentService implements DeploymentService
     }
 
     @Override
-    public void undeploy(String appName)
+    public void undeploy(final String appName)
     {
-        applicationDeployer.undeployArtifact(appName);
-    }
-
-    @Override
-    public void deploy(URL appArchiveUrl) throws IOException
-    {
-        applicationDeployer.deployPackagedArtifact(appArchiveUrl);
-    }
-
-    @Override
-    public void redeploy(String artifactName)
-    {
-        try
+        executeSynchronized(new SynchronizedDeploymentAction()
         {
-            applicationDeployer.redeploy(findApplication(artifactName));
-        }
-        catch (DeploymentException e)
-        {
-            if (logger.isDebugEnabled())
+            @Override
+            public void execute()
             {
-                logger.debug("Failure while redeploying application: " + artifactName, e);
+                applicationDeployer.undeployArtifact(appName);
             }
-        }
+        });
     }
 
     @Override
-    public void undeployDomain(String domainName)
+    public void deploy(final URL appArchiveUrl) throws IOException
     {
-        domainDeployer.undeployArtifact(domainName);
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                applicationDeployer.deployPackagedArtifact(appArchiveUrl);
+            }
+        });
     }
 
     @Override
-    public void deployDomain(URL domainArchiveUrl) throws IOException
+    public void redeploy(final String artifactName)
     {
-        domainDeployer.deployPackagedArtifact(domainArchiveUrl);
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                try
+                {
+                    applicationDeployer.redeploy(findApplication(artifactName));
+                }
+                catch (DeploymentException e)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Failure while redeploying application: " + artifactName, e);
+                    }
+                }
+            }
+        });
     }
 
     @Override
-    public void redeployDomain(String domainName)
+    public void undeployDomain(final String domainName)
     {
-        domainDeployer.redeploy(findDomain(domainName));
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                domainDeployer.undeployArtifact(domainName);
+            }
+        });
+    }
+
+    @Override
+    public void deployDomain(final URL domainArchiveUrl) throws IOException
+    {
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                domainDeployer.deployPackagedArtifact(domainArchiveUrl);
+            }
+        });
+    }
+
+    @Override
+    public void redeployDomain(final String domainName)
+    {
+        executeSynchronized(new SynchronizedDeploymentAction()
+        {
+            @Override
+            public void execute()
+            {
+                domainDeployer.redeploy(findDomain(domainName));
+            }
+        });
     }
 
     @Override
@@ -309,5 +352,38 @@ public class MuleDeploymentService implements DeploymentService
     void undeploy(Domain domain)
     {
         domainDeployer.undeployArtifact(domain.getArtifactName());
+    }
+
+    private interface SynchronizedDeploymentAction
+    {
+        void execute();
+    }
+
+    private void executeSynchronized(SynchronizedDeploymentAction deploymentAction)
+    {
+        try
+        {
+            if (!deploymentLock.tryLock(0, SECONDS))
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Another deployment operation in progress, will skip this cycle. Owner thread: " +
+                                 (deploymentLock instanceof DebuggableReentrantLock ? ((DebuggableReentrantLock) deploymentLock).getOwner() : "Unknown"));
+                }
+                return;
+            }
+            deploymentAction.execute();
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (deploymentLock.isHeldByCurrentThread())
+            {
+                deploymentLock.unlock();
+            }
+        }
     }
 }
