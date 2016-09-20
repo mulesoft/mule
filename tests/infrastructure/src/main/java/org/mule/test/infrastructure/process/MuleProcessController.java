@@ -98,4 +98,7 @@ public class MuleProcessController {
     return controller.getLog(appName);
   }
 
+  public void addConfProperty(String value) {
+    controller.addConfProperty(value);
+  }
 }

@@ -7,6 +7,10 @@
 
 package org.mule.test.infrastructure.process;
 
+import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
 import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.forceDelete;
@@ -15,9 +19,14 @@ import static org.mule.runtime.core.util.FileUtils.newFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
@@ -41,11 +50,13 @@ public abstract class Controller {
   private static final String ANCHOR_DELETE_ERROR = "Could not delete anchor file [%s] when stopping Mule Runtime.";
   private static final String ADD_LIBRARY_ERROR = "Error copying jar file [%s] to lib directory [%s].";
   private static final int IS_RUNNING_STATUS_CODE = 0;
+  private static final Pattern pattern = Pattern.compile("wrapper\\.java\\.additional\\.(\\d*)=");
   protected String muleHome;
   protected String muleBin;
   protected File domainsDir;
   protected File appsDir;
   protected File libsDir;
+  protected Path wrapperConf;
   protected int timeout;
 
   public Controller(String muleHome, int timeout) {
@@ -54,6 +65,7 @@ public abstract class Controller {
     this.domainsDir = new File(muleHome + "/domains");
     this.appsDir = new File(muleHome + "/apps/");
     this.libsDir = new File(muleHome + "/lib/user");
+    this.wrapperConf = Paths.get(muleHome + "/conf/wrapper.conf");
     this.timeout = timeout != 0 ? timeout : DEFAULT_TIMEOUT;
   }
 
@@ -250,4 +262,28 @@ public abstract class Controller {
     }
     throw new MuleControllerException(String.format("There is no mule log available at %s/logs/", muleHome));
   }
+
+  public void addConfProperty(String value) {
+    try {
+      int maxOrder = getMaxPropertyOrder(wrapperConf);
+      String line = format("wrapper.java.additional.%d=%s\n", maxOrder + 1, value);
+      Files.write(wrapperConf, line.getBytes(UTF_8), APPEND);
+    } catch (IOException e) {
+      throw new UncheckedIOException("Couldn't add wrapper.conf property", e);
+    }
+  }
+
+  private int getOrderNumber(String line) {
+    Matcher matcher = pattern.matcher(line);
+    matcher.find();
+    return parseInt(matcher.group(1));
+  }
+
+  private Integer getMaxPropertyOrder(Path path) throws IOException {
+    return Files.lines(path)
+        .filter(line -> pattern.matcher(line).find())
+        .map(line -> getOrderNumber(line))
+        .max(Integer::compare).get();
+  }
+
 }
