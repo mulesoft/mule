@@ -40,7 +40,7 @@ public class HttpRequestSourceTargetTestCase extends AbstractHttpRequestTestCase
   }
 
   private void sendRequestFromCustomSourceAndAssertResponse(Object payload) throws Exception {
-    flowRunner("customSourceFlow").withPayload(payload).withFlowVariable("customSource", "customValue").run();
+    flowRunner("customSourceFlow").withPayload(payload).withVariable("customSource", "customValue").run();
     assertThat(body, equalTo("customValue"));
   }
 

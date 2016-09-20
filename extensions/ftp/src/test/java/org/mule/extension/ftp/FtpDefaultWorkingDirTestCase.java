@@ -33,8 +33,8 @@ public class FtpDefaultWorkingDirTestCase extends FtpConnectorTestCase {
   @Test
   public void list() throws Exception {
     TreeNode node = (TreeNode) flowRunner("list")
-        .withFlowVariable("path", "../")
-        .withFlowVariable("recursive", false)
+        .withVariable("path", "../")
+        .withVariable("recursive", false)
         .run()
         .getMessage().getPayload().getValue();
 

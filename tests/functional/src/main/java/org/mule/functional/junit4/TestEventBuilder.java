@@ -23,6 +23,7 @@ import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.message.InternalMessage.Builder;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -53,7 +54,7 @@ public class TestEventBuilder {
   private String sourceCorrelationId = null;
   private GroupCorrelation correlation = null;
 
-  private Map<String, Object> flowVariables = new HashMap<>();
+  private Map<String, Object> variables = new HashMap<>();
 
   private MessageExchangePattern exchangePattern = REQUEST_RESPONSE;
 
@@ -105,7 +106,9 @@ public class TestEventBuilder {
    * @param key the key of the inbound property to add
    * @param value the value of the inbound property to add
    * @return this {@link TestEventBuilder}
+   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
    */
+  @Deprecated
   public TestEventBuilder withInboundProperty(String key, Serializable value) {
     inboundProperties.put(key, value);
 
@@ -117,7 +120,9 @@ public class TestEventBuilder {
    *
    * @param properties the inbound properties to add
    * @return this {@link TestEventBuilder}
+   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
    */
+  @Deprecated
   public TestEventBuilder withInboundProperties(Map<String, Serializable> properties) {
     inboundProperties.putAll(properties);
 
@@ -130,7 +135,9 @@ public class TestEventBuilder {
    * @param key the key of the outbound property to add
    * @param value the value of the outbound property to add
    * @return this {@link TestEventBuilder}
+   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
    */
+  @Deprecated
   public TestEventBuilder withOutboundProperty(String key, Serializable value) {
     outboundProperties.put(key, value);
 
@@ -143,7 +150,9 @@ public class TestEventBuilder {
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link TestEventBuilder}
+   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
+  @Deprecated
   public TestEventBuilder withOutboundAttachment(String key, DataHandler value) {
     outboundAttachments.put(key, new DataHandlerAttachment(value));
 
@@ -158,7 +167,9 @@ public class TestEventBuilder {
    * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too i.e.
    *        text/plain;charset=UTF-8
    * @return this {@link TestEventBuilder}
+   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
+  @Deprecated
   public TestEventBuilder withOutboundAttachment(String key, Object object, MediaType contentType) {
     outboundAttachments.put(key, new ObjectAttachment(object, contentType));
 
@@ -171,7 +182,9 @@ public class TestEventBuilder {
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link TestEventBuilder}
+   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
+  @Deprecated
   public TestEventBuilder withInboundAttachment(String key, DataHandler value) {
     inboundAttachments.put(key, value);
 
@@ -184,7 +197,9 @@ public class TestEventBuilder {
    * @param key the key of the session property to add
    * @param value the value of the session property to add
    * @return this {@link TestEventBuilder}
+   * @deprecated Transport infrastructure is deprecated.
    */
+  @Deprecated
   public TestEventBuilder withSessionProperty(String key, Object value) {
     sessionProperties.put(key, value);
 
@@ -220,8 +235,8 @@ public class TestEventBuilder {
    * @param value the value of the flow variable to put
    * @return this {@link TestEventBuilder}
    */
-  public TestEventBuilder withFlowVariable(String key, Object value) {
-    flowVariables.put(key, value);
+  public TestEventBuilder withVariable(String key, Object value) {
+    variables.put(key, value);
 
     return this;
   }
@@ -247,7 +262,9 @@ public class TestEventBuilder {
    * Configures the product event to have the provided {@link ReplyToHandler}.
    *
    * @return this {@link TestEventBuilder}
+   * @deprecated TODO MULE-9731 Migrate 3.7 {@link ReplyToHandler}-centric non-blocking support to use new non-blocking API
    */
+  @Deprecated
   public TestEventBuilder withReplyToHandler(ReplyToHandler replyToHandler) {
     this.replyToHandler = replyToHandler;
 
@@ -258,7 +275,9 @@ public class TestEventBuilder {
    * Configures the product event to have the provided {@link MessageExchangePattern}.
    *
    * @return this {@link TestEventBuilder}
+   * @deprecated MULE-10445 Mule 4 - New Threading model
    */
+  @Deprecated
   public TestEventBuilder withExchangePattern(MessageExchangePattern exchangePattern) {
     this.exchangePattern = exchangePattern;
 
@@ -286,13 +305,8 @@ public class TestEventBuilder {
   public Event build(MuleContext muleContext, FlowConstruct flow) {
     final Builder messageBuilder;
 
-    if (payload instanceof Message) {
-      throw new IllegalStateException("This usage is no longer supported.");
-    } else {
-      messageBuilder = InternalMessage.builder().payload(payload);
-    }
-    messageBuilder.mediaType(mediaType).inboundProperties(inboundProperties).outboundProperties(outboundProperties)
-        .inboundAttachments(inboundAttachments);
+    messageBuilder = InternalMessage.builder().payload(payload).mediaType(mediaType).inboundProperties(inboundProperties)
+        .outboundProperties(outboundProperties).inboundAttachments(inboundAttachments);
 
     if (attributes != null) {
       messageBuilder.attributes(attributes);
@@ -300,7 +314,7 @@ public class TestEventBuilder {
     final InternalMessage muleMessage = messageBuilder.build();
 
     Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR, sourceCorrelationId))
-        .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(flowVariables)
+        .message((InternalMessage) spyTransformer.transform(muleMessage)).variables(variables).groupCorrelation(correlation)
         .exchangePattern(exchangePattern).flow(flow).replyToHandler(replyToHandler).transacted(transacted).build();
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {

@@ -174,7 +174,7 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
   private void callTypeAndThrowException(Exception exception, String expectedMessage) throws Exception {
     InternalMessage response = flowRunner("matchesHandlerUsingType")
         .withPayload("0")
-        .withFlowVariable("exception", exception)
+        .withVariable("exception", exception)
         .run()
         .getMessage();
     assertThat(getPayloadAsString(response), is(expectedMessage));

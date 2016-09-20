@@ -61,8 +61,8 @@ public class HttpRequestAuthTestCase extends AbstractHttpRequestTestCase {
   }
 
   private void assertValidRequest(String flowName, String user, String password, boolean preemptive) throws Exception {
-    Event event = flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("user", user)
-        .withFlowVariable("password", password).withFlowVariable("preemptive", preemptive).run();
+    Event event = flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("user", user)
+        .withVariable("password", password).withVariable("preemptive", preemptive).run();
 
     assertThat(getPayloadAsString(event.getMessage()), equalTo(DEFAULT_RESPONSE));
   }

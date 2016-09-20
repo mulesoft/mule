@@ -104,14 +104,14 @@ public class XPath3TestCase extends FunctionalTestCase {
   @Test
   public void foreach() throws Exception {
     List<Node> nodes = new ArrayList<>();
-    flowRunner("foreach").withPayload(getOthello()).withFlowVariable("nodes", nodes).run();
+    flowRunner("foreach").withPayload(getOthello()).withVariable("nodes", nodes).run();
 
     assertThat(nodes.size(), is(LINES_COUNT.intValue()));
   }
 
   private Object findLines(String word, XPathReturnType type) throws Exception {
-    return flowRunner("shakespeareLines").withPayload(getOthello()).withFlowVariable("word", word)
-        .withFlowVariable("returnType", type.name()).run().getMessage().getPayload().getValue();
+    return flowRunner("shakespeareLines").withPayload(getOthello()).withVariable("word", word)
+        .withVariable("returnType", type.name()).run().getMessage().getPayload().getValue();
   }
 
   private InputStream getOthello() throws IOException {

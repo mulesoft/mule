@@ -188,8 +188,8 @@ public class FileCopyTestCase extends FileConnectorTestCase {
 
   private void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder)
       throws Exception {
-    flowRunner(flowName).withFlowVariable(SOURCE_DIRECTORY_NAME, source).withFlowVariable("target", target)
-        .withFlowVariable("overwrite", overwrite).withFlowVariable("createParent", createParentFolder).run();
+    flowRunner(flowName).withVariable(SOURCE_DIRECTORY_NAME, source).withVariable("target", target)
+        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder).run();
 
   }
 

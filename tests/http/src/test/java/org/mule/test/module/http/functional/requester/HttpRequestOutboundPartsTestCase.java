@@ -149,7 +149,7 @@ public class HttpRequestOutboundPartsTestCase extends AbstractHttpRequestTestCas
     // Set a part bigger than the queue size.
     addPartToSend(new byte[maxAsyncWriteQueueSize * 2], TEXT, new PartAttributes(TEST_PART_NAME));
 
-    Event response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withFlowVariable(PARTS, partsToSend).run();
+    Event response = flowRunner("requestFlowTls").withPayload(TEST_MESSAGE).withVariable(PARTS, partsToSend).run();
 
     assertThat((HttpResponseAttributes) response.getMessage().getAttributes(), hasStatusCode(OK.getStatusCode()));
   }

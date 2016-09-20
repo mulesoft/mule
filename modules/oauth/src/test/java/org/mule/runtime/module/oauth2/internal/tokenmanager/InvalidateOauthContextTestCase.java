@@ -44,7 +44,7 @@ public class InvalidateOauthContextTestCase extends FunctionalTestCase {
     loadResourceOwnerWithAccessToken(configOAuthContext, RESOURCE_OWNER_TONY);
 
     flowRunner("invalidateOauthContextWithResourceOwnerId").withPayload(TEST_MESSAGE)
-        .withFlowVariable("resourceOwnerId", RESOURCE_OWNER_TONY).run();
+        .withVariable("resourceOwnerId", RESOURCE_OWNER_TONY).run();
     assertThatOAuthContextWasCleanForUser(configOAuthContext, RESOURCE_OWNER_TONY);
     assertThat(configOAuthContext.getContextForResourceOwner(RESOURCE_OWNER_JOHN).getAccessToken(), Is.is(ACCESS_TOKEN));
   }

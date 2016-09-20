@@ -439,7 +439,7 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     Iterable<String> iterable = mock(Iterable.class);
     when(iterable.iterator()).thenReturn(asList("foo", "bar").iterator());
     final String flowName = "expression-iterable";
-    flowRunner(flowName).withFlowVariable("iterable", iterable).run();
+    flowRunner(flowName).withVariable("iterable", iterable).run();
 
     assertIterable(flowName);
   }
@@ -460,7 +460,7 @@ public class ForeachTestCase extends AbstractIntegrationTestCase {
     }
 
     CountDownLatch latch = new CountDownLatch(size);
-    flowRunner("foreachWithAsync").withPayload(list).withFlowVariable("latch", latch).run();
+    flowRunner("foreachWithAsync").withPayload(list).withVariable("latch", latch).run();
 
     latch.await(10, TimeUnit.SECONDS);
   }

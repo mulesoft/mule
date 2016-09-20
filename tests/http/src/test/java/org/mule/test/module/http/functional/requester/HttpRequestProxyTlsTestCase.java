@@ -89,8 +89,8 @@ public class HttpRequestProxyTlsTestCase extends AbstractHttpTestCase {
 
     proxyServer.start();
 
-    Event event = flowRunner("clientFlow").withPayload(TEST_MESSAGE).withFlowVariable("host", requestHost)
-        .withFlowVariable("path", PATH).run();
+    Event event = flowRunner("clientFlow").withPayload(TEST_MESSAGE).withVariable("host", requestHost)
+        .withVariable("path", PATH).run();
 
     assertThat(requestPayload, equalTo(TEST_MESSAGE));
     assertThat(requestURI, equalTo(PATH));

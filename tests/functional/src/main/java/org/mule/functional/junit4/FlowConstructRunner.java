@@ -11,9 +11,10 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.message.Attributes;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.GroupCorrelation;
 
 import java.io.Serializable;
@@ -76,7 +77,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the inbound property to add
    * @param value the value of the inbound property to add
    * @return this {@link FlowRunner}
+   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
    */
+  @Deprecated
   public R withInboundProperty(String key, Serializable value) {
     eventBuilder.withInboundProperty(key, value);
 
@@ -88,7 +91,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    *
    * @param properties the inbound properties to add
    * @return this {@link FlowRunner}
+   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
    */
+  @Deprecated
   public R withInboundProperties(Map<String, Serializable> properties) {
     eventBuilder.withInboundProperties(properties);
 
@@ -102,7 +107,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the outbound property to add
    * @param value the value of the outbound property to add
    * @return this {@link FlowRunner}
+   * @deprecated Transport infrastructure is deprecated. Use {@link Attributes} instead.
    */
+  @Deprecated
   public R withOutboundProperty(String key, Serializable value) {
     eventBuilder.withOutboundProperty(key, value);
 
@@ -115,7 +122,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link FlowRunner}
+   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
+  @Deprecated
   public R withOutboundAttachment(String key, DataHandler value) {
     eventBuilder.withOutboundAttachment(key, value);
 
@@ -130,7 +139,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param contentType the content type of the attachment to add. Note that the charset attribute can be specifed too i.e.
    *        text/plain;charset=UTF-8
    * @return this {@link FlowRunner}
+   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
+  @Deprecated
   public R withOutboundAttachment(String key, Object object, MediaType contentType) {
     eventBuilder.withOutboundAttachment(key, object, contentType);
 
@@ -143,7 +154,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the attachment to add
    * @param value the {@link DataHandler} for the attachment to add
    * @return this {@link FlowRunner}
+   * @deprecated Transport infrastructure is deprecated. Use {@link DefaultMultiPartPayload} instead.
    */
+  @Deprecated
   public R withInboundAttachment(String key, DataHandler value) {
     eventBuilder.withInboundAttachment(key, value);
 
@@ -157,7 +170,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param key the key of the session property to add
    * @param value the value of the session property to add
    * @return this {@link FlowRunner}
+   * @deprecated Transport infrastructure is deprecated.
    */
+  @Deprecated
   public R withSessionProperty(String key, Object value) {
     eventBuilder.withSessionProperty(key, value);
 
@@ -193,8 +208,8 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * @param value the value of the flow variable to put
    * @return this {@link FlowRunner}
    */
-  public R withFlowVariable(String key, Object value) {
-    eventBuilder.withFlowVariable(key, value);
+  public R withVariable(String key, Object value) {
+    eventBuilder.withVariable(key, value);
 
     return (R) this;
   }
@@ -203,7 +218,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * Configures this runner to run this flow as one-way.
    *
    * @return this {@link FlowRunner}
+   * @deprecated MULE-10445 Mule 4 - New Threading model
    */
+  @Deprecated
   public R asynchronously() {
     eventBuilder.asynchronously();
 
@@ -215,7 +232,9 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> {
    * pattern needs to be paramatized, otherwise {@link #asynchronously()} can be used.
    *
    * @return this {@link FlowRunner}
+   * @deprecated MULE-10445 Mule 4 - New Threading model
    */
+  @Deprecated
   public R withExchangePattern(MessageExchangePattern exchangePattern) {
     eventBuilder.withExchangePattern(exchangePattern);
 

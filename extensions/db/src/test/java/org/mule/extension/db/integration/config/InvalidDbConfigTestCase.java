@@ -54,6 +54,6 @@ public class InvalidDbConfigTestCase extends AbstractDbIntegrationTestCase {
     dataSource.setDriverName("org.apache.derby.jdbc.EmbeddedDriver");
     dataSource.setUrl("jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true");
 
-    flowRunner("usesBeanDatasourceConfig").withFlowVariable("jdbcDataSource", dataSource);
+    flowRunner("usesBeanDatasourceConfig").withVariable("jdbcDataSource", dataSource);
   }
 }

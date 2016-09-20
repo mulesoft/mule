@@ -31,7 +31,7 @@ public class GreedyTestCase extends FunctionalTestCase {
   }
 
   private void runTest(double amount, String currency, String expectedResult) throws Exception {
-    Event response = flowRunner("greedy").withPayload(amount * 100).withFlowVariable("currency", currency).run();
+    Event response = flowRunner("greedy").withPayload(amount * 100).withVariable("currency", currency).run();
     assertThat(getPayloadAsString(response.getMessage()), equalTo(expectedResult));
   }
 }

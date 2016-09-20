@@ -80,7 +80,7 @@ public class ForEachSessionVarTestCase extends FunctionalTestCase {
     }
 
     CountDownLatch latch = new CountDownLatch(size);
-    flowRunner("foreachWithAsync").withPayload(list).withFlowVariable("latch", latch).run();
+    flowRunner("foreachWithAsync").withPayload(list).withVariable("latch", latch).run();
 
     latch.await(10, TimeUnit.SECONDS);
   }

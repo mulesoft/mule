@@ -36,7 +36,7 @@ public class OperationInvocationPropertyFunctionalTestCase extends AbstractWSCon
   @Test
   public void consumerWorksWithOperationInvocationPropertyDefined() throws Exception {
     Event event =
-        flowRunner("echo").withPayload(ECHO_REQUEST).withFlowVariable(CxfConstants.OPERATION, OPERATION_VALUE).run();
+        flowRunner("echo").withPayload(ECHO_REQUEST).withVariable(CxfConstants.OPERATION, OPERATION_VALUE).run();
 
     assertXMLEqual(EXPECTED_ECHO_RESPONSE, getPayloadAsString(event.getMessage()));
     assertThat(event.getVariable(CxfConstants.OPERATION).getValue(), is(OPERATION_VALUE));

@@ -27,7 +27,7 @@ public class FileDeleteTestCase extends FileConnectorTestCase {
     File file = temporaryFolder.newFile();
     assertExists(true, file);
 
-    flowRunner(DELETE).withFlowVariable(DELETE, file.getAbsolutePath()).run();
+    flowRunner(DELETE).withVariable(DELETE, file.getAbsolutePath()).run();
 
     assertExists(false, file);
   }
@@ -36,7 +36,7 @@ public class FileDeleteTestCase extends FileConnectorTestCase {
   public void deleteReadFile() throws Exception {
     File file = temporaryFolder.newFile();
 
-    flowRunner("readAndDelete").withFlowVariable(DELETE, file.getAbsolutePath()).run();
+    flowRunner("readAndDelete").withVariable(DELETE, file.getAbsolutePath()).run();
 
     assertExists(false, file);
   }
@@ -55,7 +55,7 @@ public class FileDeleteTestCase extends FileConnectorTestCase {
 
     assertExists(true, child, subFolder, grandChild);
 
-    flowRunner(DELETE).withFlowVariable(DELETE, directory.getAbsolutePath()).run();
+    flowRunner(DELETE).withVariable(DELETE, directory.getAbsolutePath()).run();
     assertExists(false, directory, child, subFolder, grandChild);
   }
 

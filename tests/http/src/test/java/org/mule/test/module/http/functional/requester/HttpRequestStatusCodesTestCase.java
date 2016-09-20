@@ -58,12 +58,12 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase 
   }
 
   private void assertSuccess(int statusCode, String flowName) throws Exception {
-    flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("code", statusCode).run();
+    flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("code", statusCode).run();
   }
 
   private void assertFailure(int statusCode, String flowName) throws Exception {
     MessagingException e =
-        flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("code", statusCode).runExpectingException();
+        flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("code", statusCode).runExpectingException();
 
     assertThat(e.getEvent().getError().get().getException(), instanceOf(ResponseValidatorException.class));
   }

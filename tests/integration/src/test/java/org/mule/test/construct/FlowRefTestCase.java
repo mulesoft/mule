@@ -69,9 +69,9 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
   @Test
   public void dynamicFlowRef() throws Exception {
     assertEquals("0A",
-                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "A").run().getMessageAsString(muleContext));
+                 flowRunner("flow2").withPayload("0").withVariable("letter", "A").run().getMessageAsString(muleContext));
     assertEquals("0B",
-                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "B").run().getMessageAsString(muleContext));
+                 flowRunner("flow2").withPayload("0").withVariable("letter", "B").run().getMessageAsString(muleContext));
   }
 
   public static class ProcessorPathAssertingProcessor implements Processor, FlowConstructAware {
@@ -94,7 +94,7 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void dynamicFlowRefProcessorPath() throws Exception {
-    flowRunner("flow2").withPayload("0").withFlowVariable("letter", "J").run();
+    flowRunner("flow2").withPayload("0").withVariable("letter", "J").run();
 
     assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(1));
     assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0),
@@ -103,7 +103,7 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void dynamicFlowRefProcessorPathSameSubflowFromSingleFlow() throws Exception {
-    flowRunner("flow3").withPayload("0").withFlowVariable("letter", "J").run();
+    flowRunner("flow3").withPayload("0").withVariable("letter", "J").run();
 
     assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(2));
     assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0),
@@ -114,9 +114,9 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void dynamicFlowRefProcessorPathSameSubflowFromDifferentFlow() throws Exception {
-    flowRunner("flow2").withPayload("0").withFlowVariable("letter", "J").run();
+    flowRunner("flow2").withPayload("0").withVariable("letter", "J").run();
 
-    flowRunner("flow3").withPayload("0").withFlowVariable("letter", "J").run();
+    flowRunner("flow3").withPayload("0").withVariable("letter", "J").run();
 
     assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.size(), is(3));
     assertThat(ProcessorPathAssertingProcessor.traversedProcessorPaths.get(0),
@@ -130,13 +130,13 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
   @Test
   public void dynamicFlowRefWithChoice() throws Exception {
     assertEquals("0A",
-                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "C").run().getMessageAsString(muleContext));
+                 flowRunner("flow2").withPayload("0").withVariable("letter", "C").run().getMessageAsString(muleContext));
   }
 
   @Test
   public void dynamicFlowRefWithScatterGather() throws Exception {
     List<InternalMessage> messageList =
-        (List<InternalMessage>) flowRunner("flow2").withPayload("0").withFlowVariable("letter", "SG").run().getMessage()
+        (List<InternalMessage>) flowRunner("flow2").withPayload("0").withVariable("letter", "SG").run().getMessage()
             .getPayload().getValue();
 
     List payloads = messageList.stream().map(msg -> msg.getPayload().getValue()).collect(toList());
@@ -147,7 +147,7 @@ public class FlowRefTestCase extends AbstractIntegrationTestCase {
   @Test(expected = MessagingException.class)
   public void flowRefNotFound() throws Exception {
     assertEquals("0C",
-                 flowRunner("flow2").withPayload("0").withFlowVariable("letter", "Z").run().getMessageAsString(muleContext));
+                 flowRunner("flow2").withPayload("0").withVariable("letter", "Z").run().getMessageAsString(muleContext));
   }
 
   @Test

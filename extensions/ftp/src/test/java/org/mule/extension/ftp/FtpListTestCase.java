@@ -137,7 +137,7 @@ public class FtpListTestCase extends FtpConnectorTestCase {
   }
 
   private TreeNode doList(String flowName, String path, boolean recursive) throws Exception {
-    TreeNode node = (TreeNode) flowRunner(flowName).withFlowVariable("path", path).withFlowVariable("recursive", recursive).run()
+    TreeNode node = (TreeNode) flowRunner(flowName).withVariable("path", path).withVariable("recursive", recursive).run()
         .getMessage().getPayload().getValue();
 
     assertThat(node, is(notNullValue()));

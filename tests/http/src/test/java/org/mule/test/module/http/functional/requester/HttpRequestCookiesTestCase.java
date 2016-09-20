@@ -40,19 +40,19 @@ public class HttpRequestCookiesTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void cookiesEnabledForSameDomainAndPath() throws Exception {
-    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/").run();
+    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withVariable("path", "/").run();
     assertNoCookiesSent();
 
-    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/").run();
+    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withVariable("path", "/").run();
     assertCookiesSent(COOKIE_ROOT_PATH_LOCAL_DOMAIN);
   }
 
   @Test
   public void cookiesEnabledForSpecificPath() throws Exception {
-    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/path").run();
+    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withVariable("path", "/path").run();
     assertNoCookiesSent();
 
-    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withFlowVariable("path", "/path").run();
+    flowRunner(CLIENT_COOKIES_ENABLED_FLOW).withPayload(TEST_MESSAGE).withVariable("path", "/path").run();
     assertCookiesSent(COOKIE_ROOT_PATH_LOCAL_DOMAIN, COOKIE_CUSTOM_PATH_LOCAL_DOMAIN);
   }
 

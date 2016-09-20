@@ -79,7 +79,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
 
   @Test
   public void readWithForcedMimeType() throws Exception {
-    Event event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
+    Event event = flowRunner("readWithForcedMimeType").withVariable("path", HELLO_PATH).run();
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getSubType(), equalTo("test"));
   }
@@ -144,7 +144,7 @@ public class FileReadTestCase extends FileConnectorTestCase {
   }
 
   private Message readWithLock(String path) throws Exception {
-    Message message = flowRunner("readWithLock").withFlowVariable("path", path).run().getMessage();
+    Message message = flowRunner("readWithLock").withVariable("path", path).run().getMessage();
     assertThat(((AbstractFileInputStream) message.getPayload().getValue()).isLocked(), is(true));
 
     return message;

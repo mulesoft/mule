@@ -37,7 +37,7 @@ public class SendEncodedStringTestCase extends SocketExtensionTestCase {
 
     assertThat(customEncoding, is(notNullValue()));
 
-    flowRunner("tcp-send").withFlowVariable("encoding", customEncoding).withPayload(WEIRD_CHAR_MESSAGE).run();
+    flowRunner("tcp-send").withVariable("encoding", customEncoding).withPayload(WEIRD_CHAR_MESSAGE).run();
 
     Message message = receiveConnection();
     byte[] byteArray = IOUtils.toByteArray((InputStream) message.getPayload().getValue());

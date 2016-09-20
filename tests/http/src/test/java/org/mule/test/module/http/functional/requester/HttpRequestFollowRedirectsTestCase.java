@@ -123,7 +123,7 @@ public class HttpRequestFollowRedirectsTestCase extends AbstractHttpRequestTestC
 
   private void testRedirectExpression(String flowName, String expectedPayload, String expectedPath, Object flowVar)
       throws Exception {
-    FlowRunner runner = flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable(FLOW_VAR_KEY, flowVar);
+    FlowRunner runner = flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable(FLOW_VAR_KEY, flowVar);
     doTest(expectedPayload, expectedPath, runner);
   }
 
