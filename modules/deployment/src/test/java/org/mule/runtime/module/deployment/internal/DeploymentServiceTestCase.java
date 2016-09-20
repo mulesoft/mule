@@ -45,26 +45,26 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
-import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.deployment.model.api.domain.Domain.DOMAIN_CONFIG_FILE_LOCATION;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
+import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.deployment.internal.application.PropertiesDescriptorParser.PROPERTY_DOMAIN;
+import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.config.StartupContext;
 import org.mule.runtime.core.construct.Flow;
@@ -73,23 +73,23 @@ import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
-import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.deployment.model.internal.application.MuleApplicationClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
+import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
+import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
+import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.internal.application.TestApplicationFactory;
 import org.mule.runtime.module.deployment.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.internal.builder.DomainFileBuilder;
-import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
 import org.mule.runtime.module.deployment.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.internal.domain.DefaultMuleDomain;
-import org.mule.runtime.deployment.model.internal.domain.DomainClassLoaderFactory;
 import org.mule.runtime.module.deployment.internal.domain.TestDomainFactory;
-import org.mule.runtime.deployment.model.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.service.ServiceManager;
 import org.mule.runtime.module.service.ServiceRepository;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -125,6 +125,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
@@ -1461,6 +1463,75 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void synchronizesAppDeployFromClient() throws Exception {
+    final Action action = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL());
+      }
+    };
+
+    final Action assertAction = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.getId());
+      }
+    };
+    doSynchronizedAppDeploymentActionTest(action, assertAction);
+  }
+
+  @Test
+  public void synchronizesAppUndeployFromClient() throws Exception {
+    final Action action = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        deploymentService.undeploy(emptyAppFileBuilder.getId());
+      }
+    };
+
+    final Action assertAction = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppFileBuilder.getId());
+      }
+    };
+    doSynchronizedAppDeploymentActionTest(action, assertAction);
+  }
+
+  @Test
+  public void synchronizesAppRedeployFromClient() throws Exception {
+    final Action action = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        // Clears notification from first deployment
+        reset(applicationDeploymentListener);
+        deploymentService.redeploy(emptyAppFileBuilder.getId());
+      }
+    };
+
+    final Action assertAction = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        verify(applicationDeploymentListener, never()).onDeploymentStart(emptyAppFileBuilder.getId());
+      }
+    };
+    doSynchronizedAppDeploymentActionTest(action, assertAction);
+  }
+
+  private void doSynchronizedAppDeploymentActionTest(final Action deploymentAction, final Action assertAction) throws Exception {
+    addPackedAppFromBuilder(emptyAppFileBuilder);
+
+    doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, applicationDeploymentListener,
+                                               emptyAppFileBuilder.getId());
+  }
+
+  @Test
   public void deploysDomainWithSharedLibPrecedenceOverApplicationSharedLib() throws Exception {
     final String domainId = "shared-lib";
     final ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("shared-lib-precedence-app")
@@ -2656,6 +2727,129 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
     assertStatus(emptyAppFileBuilder.getId(), ApplicationStatus.DEPLOYMENT_FAILED);
+  }
+
+  @Test
+  public void synchronizesDomainDeployFromClient() throws Exception {
+    final Action action = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        deploymentService.deployDomain(dummyDomainFileBuilder.getArtifactFile().toURI().toURL());
+      }
+    };
+
+    final Action assertAction = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        verify(domainDeploymentListener, never()).onDeploymentStart(dummyDomainFileBuilder.getId());
+      }
+    };
+    doSynchronizedDomainDeploymentActionTest(action, assertAction);
+  }
+
+  @Test
+  public void synchronizesDomainUndeployFromClient() throws Exception {
+    final Action action = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        deploymentService.undeployDomain(emptyDomainFileBuilder.getId());
+      }
+    };
+
+    final Action assertAction = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        verify(domainDeploymentListener, never()).onUndeploymentStart(emptyDomainFileBuilder.getId());
+      }
+    };
+    doSynchronizedDomainDeploymentActionTest(action, assertAction);
+  }
+
+  @Test
+  public void synchronizesDomainRedeployFromClient() throws Exception {
+    final Action action = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        // Clears notification from first deployment
+        reset(domainDeploymentListener);
+        deploymentService.redeployDomain(emptyDomainFileBuilder.getId());
+      }
+    };
+
+    final Action assertAction = new Action() {
+
+      @Override
+      public void perform() throws Exception {
+        verify(domainDeploymentListener, never()).onDeploymentStart(emptyDomainFileBuilder.getId());
+      }
+    };
+    doSynchronizedDomainDeploymentActionTest(action, assertAction);
+  }
+
+  private void doSynchronizedDomainDeploymentActionTest(final Action deploymentAction, final Action assertAction)
+      throws Exception {
+    addPackedDomainFromBuilder(emptyDomainFileBuilder);
+    final DeploymentListener domainDeploymentListener = this.domainDeploymentListener;
+    final String artifactId = emptyDomainFileBuilder.getId();
+
+    doSynchronizedArtifactDeploymentActionTest(deploymentAction, assertAction, domainDeploymentListener, artifactId);
+  }
+
+  private void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction,
+                                                          DeploymentListener domainDeploymentListener, String artifactId) {
+    Thread deploymentServiceThread = new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+        try {
+          startDeployment();
+        } catch (MuleException e) {
+          throw new RuntimeException("Unable to start deployment service");
+        }
+      }
+    });
+
+    final boolean[] deployedFromClient = new boolean[1];
+
+    doAnswer(new Answer() {
+
+      @Override
+      public Object answer(InvocationOnMock invocation) throws Throwable {
+
+        Thread deploymentClientThread = new Thread(new Runnable() {
+
+          @Override
+          public void run() {
+            try {
+              deploymentAction.perform();
+            } catch (Exception e) {
+              // Ignore
+            }
+          }
+        });
+
+        deploymentClientThread.start();
+        deploymentClientThread.join();
+        try {
+          assertAction.perform();
+        } catch (AssertionError e) {
+          deployedFromClient[0] = true;
+        }
+
+        return null;
+      }
+    }).when(domainDeploymentListener).onDeploymentStart(artifactId);
+
+    deploymentServiceThread.start();
+
+    assertDeploymentSuccess(domainDeploymentListener, artifactId);
+
+    assertFalse("Able to perform a deployment action while another deployment operation was in progress", deployedFromClient[0]);
   }
 
   private void doRedeployAppByChangingConfigFileWithGoodOne(String applicationPath) throws Exception {
