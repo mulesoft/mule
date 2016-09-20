@@ -7,6 +7,7 @@
 package org.mule.context.notification.processors;
 
 import static org.junit.Assert.assertNotNull;
+
 import org.mule.api.client.MuleClient;
 import org.mule.context.notification.Node;
 import org.mule.context.notification.RestrictedNode;
@@ -411,13 +412,8 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
             public Object create()
             {
                 return new Node()
-                                 .serial(prePost()) // logger
-                                 .serial(pre()) // first-successful
                                  .serial(prePost())
-                                 .serial(prePost())
-                                 .serial(prePost())
-                                 .serial(prePost()) // dlq
-                                 .serial(post());
+                                 .serial(prePost());
             }
         };
 
@@ -436,10 +432,8 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
             public Object create()
             {
                 return new Node()
-                                 .serial(pre()) // round-robin
-                                 .serial(prePost()) // inner logger
-                                 .serial(post())
-                                 .serial(prePost()) // logger
+                                 .serial(prePost())
+                                 .serial(prePost())
                 ;
             }
         };
@@ -468,11 +462,6 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         assertNotNull(client.send("vm://recipient-list", "recipient", null));
 
         assertNotifications();
-        assertNotNull(client.send("vm://until-successful", "test", null));
-        client.request("vm://out-us", RECEIVE_TIMEOUT);
-        assertNotNull(client.send("vm://until-successful-with-processor-chain", "test", null));
-        client.request("vm://out-us", RECEIVE_TIMEOUT);
-        assertNotNull(client.send("vm://until-successful-with-enricher", "test", null));
     }
 
     @Test
@@ -647,23 +636,6 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         assertNotifications();
     }
 
-                // until successful
-                .serial(pre())
-                .serial(new Node()
-                    .parallel(prePost())
-                    .parallel(post().serial(prePost())))
-
-                // until successful with processor chain
-                .serial(pre())
-                .serial(new Node()
-                    .parallel(pre().serial(prePost()).serial(prePost()).serial(post()))
-                    .parallel(post().serial(prePost())))
-
-                 // until successful with enricher
-                .serial(pre())
-                .serial(new Node()
-                    .parallel(pre().serial(prePost()).serial(post()))
-                    .parallel(post().serial(prePost())))
     @Override
     public RestrictedNode getSpecification()
     {
