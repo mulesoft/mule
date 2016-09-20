@@ -13,6 +13,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -32,7 +34,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
 
   @Override
   public void setupFlowConstruct() throws Exception {
-    flowConstruct = getTestFlow();
+    flowConstruct = getTestFlow(muleContext);
   }
 
   @Test

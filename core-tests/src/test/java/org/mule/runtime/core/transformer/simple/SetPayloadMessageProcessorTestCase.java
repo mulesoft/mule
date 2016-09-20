@@ -15,6 +15,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 
 import org.mule.runtime.api.metadata.DataType;
@@ -63,7 +64,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
         .thenAnswer(invocation -> (String) invocation.getArguments()[0]);
 
     muleMessage = InternalMessage.builder().payload("").build();
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     muleEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(muleMessage).flow(flow).build();
   }
 

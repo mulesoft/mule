@@ -7,6 +7,7 @@
 package org.mule.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -84,7 +85,7 @@ public class EndpointURITestCase extends AbstractMuleContextEndpointTestCase {
     public void checkResultUri(ImmutableEndpoint ep) throws Exception {
       String epUri;
       if (ep instanceof DynamicOutboundEndpoint) {
-        Flow flow = getTestFlow();
+        Flow flow = getTestFlow(muleContext);
         epUri = muleContext.getExpressionLanguage().parse(ep.getAddress(), Event
             .builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build(), flow);
       } else {

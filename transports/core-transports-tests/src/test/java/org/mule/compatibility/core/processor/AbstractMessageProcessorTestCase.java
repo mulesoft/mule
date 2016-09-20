@@ -9,6 +9,7 @@ package org.mule.compatibility.core.processor;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -126,7 +127,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
   }
 
   protected Event createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build()).flow(flow)
         .session(new DefaultMuleSession()).build();
@@ -199,7 +200,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     props.put("prop1", "value1");
     props.put("port", 12345);
 
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     if (exceptionListener != null) {
       flow.setExceptionListener(exceptionListener);
     }

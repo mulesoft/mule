@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -142,7 +143,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     transformers.add(trans2);
 
     Filter filter = new PayloadTypeFilter(Object.class);
-    getTestFlow();
+    getTestFlow(muleContext);
   }
 
 

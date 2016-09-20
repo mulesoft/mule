@@ -10,6 +10,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -79,7 +80,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     UntilSuccessful untilSuccessful = new UntilSuccessful();
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultErrorHandler());
-    untilSuccessful.setFlowConstruct(getTestFlow());
+    untilSuccessful.setFlowConstruct(getTestFlow(muleContext));
     untilSuccessful.setMaxRetries(2);
 
     if (millisBetweenRetries != null) {
@@ -198,7 +199,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("test_data"))
         .build();
-    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, getTestFlow(), muleContext),
+    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, getTestFlow(muleContext),
+                                                                                        muleContext),
                       testEvent);
     untilSuccessful.initialise();
     untilSuccessful.start();

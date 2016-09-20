@@ -11,6 +11,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -78,7 +79,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     EndpointDlqUntilSuccessful untilSuccessful = new EndpointDlqUntilSuccessful();
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultErrorHandler());
-    untilSuccessful.setFlowConstruct(getTestFlow());
+    untilSuccessful.setFlowConstruct(getTestFlow(muleContext));
     untilSuccessful.setMaxRetries(2);
 
     if (millisBetweenRetries != null) {

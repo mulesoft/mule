@@ -8,6 +8,7 @@ package org.mule.compatibility.core.endpoint.inbound;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
@@ -67,7 +68,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
   }
 
   protected Event createTestRequestEvent(InboundEndpoint endpoint) throws Exception {
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(inMessage).flow(flow)
         .session(new DefaultMuleSession()).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);

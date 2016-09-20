@@ -15,6 +15,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -147,7 +148,7 @@ public class NonBlockingProcessorExecutorTestCase extends BlockingProcessorExecu
   @Override
   protected ProcessorExecutor createProcessorExecutor(List<Processor> processors) {
     try {
-      return new NonBlockingProcessorExecutor(event, processors, executionTemplate, true, getTestFlow());
+      return new NonBlockingProcessorExecutor(event, processors, executionTemplate, true, getTestFlow(muleContext));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

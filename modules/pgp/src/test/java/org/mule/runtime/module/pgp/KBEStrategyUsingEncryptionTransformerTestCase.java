@@ -29,7 +29,7 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
   @Test
   public void testEncrypt() throws Exception {
     String msg = "Test Message";
-    FlowConstruct service = getTestFlow("orange", Orange.class);
+    FlowConstruct service = getTestFlowWithComponent("orange", Orange.class);
 
     Event event = Event.builder(DefaultEventContext.create(service, TEST_CONNECTOR))
         .message(InternalMessage.of(msg))

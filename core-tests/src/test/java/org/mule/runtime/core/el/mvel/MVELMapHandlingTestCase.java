@@ -9,6 +9,7 @@ package org.mule.runtime.core.el.mvel;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -94,7 +95,7 @@ public class MVELMapHandlingTestCase extends AbstractMuleContextTestCase {
   }
 
   private void runExpressionAndExpect(String expression, Object expectedValue, Event event) throws Exception {
-    Object result = el.evaluate(expression, event, getTestFlow());
+    Object result = el.evaluate(expression, event, getTestFlow(muleContext));
     assertThat(format("Expression %s returned unexpected value", expression), result, equalTo(expectedValue));
   }
 }

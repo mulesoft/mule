@@ -38,7 +38,7 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testMessageAggregator() throws Exception {
-    Flow flow = getTestFlow("test", Apple.class);
+    Flow flow = getTestFlowWithComponent("test", Apple.class);
     MuleSession session = new DefaultMuleSession();
 
     TestEventAggregator router = new TestEventAggregator(3);

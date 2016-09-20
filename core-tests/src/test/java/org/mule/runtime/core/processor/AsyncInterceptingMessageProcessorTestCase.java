@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.processor.AsyncInterceptingMessageProcessor.SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
@@ -207,7 +208,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
     AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
                                                                                  new TestWorkManagerSource());
     mp.setMuleContext(muleContext);
-    mp.setFlowConstruct(getTestFlow());
+    mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);
     return mp;
   }

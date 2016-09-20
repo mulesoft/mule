@@ -12,16 +12,17 @@ import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR;
 
 import org.mule.runtime.api.message.Attributes;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.util.IOUtils;
 
@@ -285,8 +286,8 @@ public class TestEventBuilder {
   public Event build(MuleContext muleContext, FlowConstruct flow) {
     final Builder messageBuilder;
 
-    if (payload instanceof InternalMessage) {
-      messageBuilder = InternalMessage.builder((InternalMessage) payload);
+    if (payload instanceof Message) {
+      throw new IllegalStateException("This usage is no longer supported.");
     } else {
       messageBuilder = InternalMessage.builder().payload(payload);
     }

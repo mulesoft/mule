@@ -7,6 +7,7 @@
 package org.mule.test.el;
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -75,7 +76,7 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
     assertEquals("123appended",
                  el.evaluate("appendPayload()", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
                      .message(InternalMessage.of("123"))
-                     .build(), getTestFlow()));
+                     .build(), getTestFlow(muleContext)));
   }
 
   @Test
@@ -83,7 +84,7 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     assertEquals("321", el.evaluate("reversePayload()", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("123"))
-        .build(), getTestFlow()));
+        .build(), getTestFlow(muleContext)));
   }
 
   @Test

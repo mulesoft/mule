@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
@@ -46,7 +47,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
   @Test
   public void testLifecycle() throws Exception {
     DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
-    component.setFlowConstruct(getTestFlow());
+    component.setFlowConstruct(getTestFlow(muleContext));
     component.setMuleContext(muleContext);
     component.initialise();
     component.start();
@@ -68,7 +69,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
   public void testComponentDisposal() throws Exception {
     DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
 
-    component.setFlowConstruct(getTestFlow());
+    component.setFlowConstruct(getTestFlow(muleContext));
     component.setMuleContext(muleContext);
     component.initialise();
     component.start();

@@ -39,7 +39,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
   @Test
   public void testAggregateMultipleEvents() throws Exception {
 
-    Flow flow = getTestFlow("test", Apple.class);
+    Flow flow = getTestFlowWithComponent("test", Apple.class);
     assertNotNull(flow);
 
     SimpleCollectionAggregator router = new SimpleCollectionAggregator();
@@ -84,7 +84,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
   @Test
   public void testAggregateSingleEvent() throws Exception {
-    Flow flow = getTestFlow("test", Apple.class);
+    Flow flow = getTestFlowWithComponent("test", Apple.class);
     assertNotNull(flow);
 
     SimpleCollectionAggregator router = new SimpleCollectionAggregator();
@@ -115,7 +115,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleContextTestC
 
   @Test
   public void testAggregateMessageCollections() throws Exception {
-    Flow flow = getTestFlow("test", Apple.class);
+    Flow flow = getTestFlowWithComponent("test", Apple.class);
     assertNotNull(flow);
 
     SimpleCollectionAggregator router = new SimpleCollectionAggregator();

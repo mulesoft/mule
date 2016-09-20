@@ -25,6 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
@@ -78,7 +79,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     when(resTransformer.process(any(Event.class))).then(echoEventAnswer);
 
     OutboundEndpoint endpoint = createOutboundEndpoint(null, null, reqTransformer, resTransformer, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(getTestFlow());
+    endpoint.setFlowConstruct(getTestFlow(muleContext));
 
     testOutboundEvent = createTestOutboundEvent();
     Event result = endpoint.process(testOutboundEvent);
@@ -192,7 +193,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase {
     muleContext.registerListener(securityNotificationListener);
 
     OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(false), null, null, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(getTestFlow());
+    endpoint.setFlowConstruct(getTestFlow(muleContext));
 
     testOutboundEvent = createTestOutboundEvent();
     setCurrentEvent(testOutboundEvent);

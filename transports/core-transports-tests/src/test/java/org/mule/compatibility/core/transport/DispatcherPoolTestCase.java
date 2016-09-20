@@ -9,6 +9,7 @@ package org.mule.compatibility.core.transport;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerConnector;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
@@ -152,7 +153,7 @@ public class DispatcherPoolTestCase extends AbstractMuleContextEndpointTestCase 
     TestConnector connector = new TestConnector(muleContext);
     ThreadingProfile threadingProfile = new ImmutableThreadingProfile(1, 1, 1, 1, 1, exhaustedAction, true, null, null);
     connector.setDispatcherThreadingProfile(threadingProfile);
-    connector.createReceiver(getTestFlow(), getTestInboundEndpoint("test", "test://test"));
+    connector.createReceiver(getTestFlow(muleContext), getTestInboundEndpoint("test", "test://test"));
     registerConnector(muleContext.getRegistry(), connector);
     return connector;
   }

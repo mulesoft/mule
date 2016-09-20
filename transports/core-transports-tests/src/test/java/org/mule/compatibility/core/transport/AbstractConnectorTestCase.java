@@ -129,7 +129,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleContextEndpo
   public void testConnectorListenerSupport() throws Exception {
     Connector connector = getConnectorAndAssert();
 
-    Flow flow = getTestFlow("anApple", Apple.class);
+    Flow flow = getTestFlowWithComponent("anApple", Apple.class);
 
     InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(getTestEndpointURI());
 

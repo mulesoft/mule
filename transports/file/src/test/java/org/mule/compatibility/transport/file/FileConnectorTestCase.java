@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -87,7 +88,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase {
     connector.setPollingFrequency(POLLING_FREQUENCY);
 
     InboundEndpoint endpoint = getTestInboundEndpoint("simple");
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     MessageReceiver receiver = connector.createReceiver(flow, endpoint);
     assertEquals("Connector's polling frequency must not be ignored.", POLLING_FREQUENCY,
                  ((FileMessageReceiver) receiver).getFrequency());
@@ -107,7 +108,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase {
     // Endpoint wants String-typed properties
     endpoint.getProperties().put(FileConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
 
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     MessageReceiver receiver = connector.createReceiver(flow, endpoint);
     assertEquals("Polling frequency endpoint override must not be ignored.", POLLING_FREQUENCY_OVERRIDE,
                  ((FileMessageReceiver) receiver).getFrequency());

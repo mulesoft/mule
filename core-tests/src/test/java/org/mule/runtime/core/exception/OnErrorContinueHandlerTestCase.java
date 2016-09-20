@@ -18,6 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -76,7 +77,7 @@ public class OnErrorContinueHandlerTestCase extends AbstractMuleContextTestCase 
     if (currentTransaction != null) {
       TransactionCoordination.getInstance().unbindTransaction(currentTransaction);
     }
-    flow = getTestFlow();
+    flow = getTestFlow(muleContext);
     onErrorContinueHandler = new OnErrorContinueHandler();
     onErrorContinueHandler.setMuleContext(mockMuleContext);
     onErrorContinueHandler.setFlowConstruct(flow);

@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
@@ -242,7 +243,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected Event configureEvent() throws Exception {
     when(message.getPayload().getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
     when(message.getPayload().getValue()).thenReturn(TEST_PAYLOAD);
-    Event event = Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
+    Event event = Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR)).message(message).build();
     return event;
   }
 

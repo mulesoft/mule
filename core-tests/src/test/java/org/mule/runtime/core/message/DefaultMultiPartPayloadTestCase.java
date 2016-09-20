@@ -18,6 +18,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import static org.mule.runtime.core.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.core.util.IOUtils.toMuleMessagePart;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -131,7 +132,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
     oos.writeObject(message);
     oos.flush();
@@ -158,7 +159,7 @@ public class DefaultMultiPartPayloadTestCase extends AbstractMuleContextTestCase
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(baos);
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
     oos.writeObject(message);
     oos.flush();

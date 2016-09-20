@@ -9,6 +9,7 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -88,7 +89,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     builder.setConfiguration(config);
     builder.setServiceClass(Echo.class);
     builder.setMuleContext(muleContext);
-    builder.setFlowConstruct(getTestFlow());
+    builder.setFlowConstruct(getTestFlow(muleContext));
 
     CxfInboundMessageProcessor processor = builder.build();
     processor.initialise();

@@ -8,6 +8,7 @@ package org.mule.compatibility.config.spring.parsers.specific;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -36,7 +37,7 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     assertEquals(2, endpoint.getMessageProcessors().size());
 
     Processor endpointProcessor =
-        endpoint.getMessageProcessorsFactory().createInboundMessageProcessorChain(endpoint, getTestFlow(),
+        endpoint.getMessageProcessorsFactory().createInboundMessageProcessorChain(endpoint, getTestFlow(muleContext),
                                                                                   new NullMessageProcessor());
     FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 

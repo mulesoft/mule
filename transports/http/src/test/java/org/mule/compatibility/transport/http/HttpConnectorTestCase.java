@@ -123,7 +123,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase {
     thrown.expect(ConnectorException.class);
     thrown.expectMessage(startsWith(LISTENER_ALREADY_REGISTERED));
 
-    Flow service = getTestFlow("orange", Orange.class);
+    Flow service = getTestFlowWithComponent("orange", Orange.class);
     InboundEndpoint allInterfacesEndpoint = getEndpointFactory().getInboundEndpoint(existingEndpointUri);
 
     getConnector().registerListener(allInterfacesEndpoint, getSensingNullMessageProcessor(), service);

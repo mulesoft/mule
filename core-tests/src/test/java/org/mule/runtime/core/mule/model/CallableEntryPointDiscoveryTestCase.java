@@ -8,6 +8,7 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -28,7 +29,7 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
   @Test
   public void testBadMatch() throws Exception {
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new StringBuilder("foo")))
         .exchangePattern(REQUEST_RESPONSE)
@@ -43,7 +44,7 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
     final Apple apple = new Apple();
     apple.setMuleContext(muleContext);
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new StringBuilder("blah")))
         .exchangePattern(REQUEST_RESPONSE)

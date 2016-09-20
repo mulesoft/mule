@@ -45,7 +45,9 @@ public final class MuleTestUtils {
 
   public static Flow getTestFlow(MuleContext context) throws Exception {
     final Flow flow = new Flow(APPLE_FLOW, context);
-    context.getRegistry().registerFlowConstruct(flow);
+    if (context.getRegistry() != null) {
+      context.getRegistry().registerFlowConstruct(flow);
+    }
 
     return flow;
   }

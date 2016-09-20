@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -52,7 +53,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatch() throws Exception {
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-      FlowConstruct flowConstruct = getTestFlow();
+      FlowConstruct flowConstruct = getTestFlow(muleContext);
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
           .message(InternalMessage.of("blah"))
           .build();
@@ -67,7 +68,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatchComplexObject() throws Exception {
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-      FlowConstruct flowConstruct = getTestFlow();
+      FlowConstruct flowConstruct = getTestFlow(muleContext);
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
           .message(InternalMessage.of(new FruitLover("Mmmm")))
           .build();
@@ -82,7 +83,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatchSetArrayFail() throws Exception {
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-      FlowConstruct flowConstruct = getTestFlow();
+      FlowConstruct flowConstruct = getTestFlow(muleContext);
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
           .message(InternalMessage.of(new Fruit[] {new Apple(), new Orange()}))
           .build();
@@ -98,7 +99,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatchSetArrayPass() throws Exception {
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
-      FlowConstruct flowConstruct = getTestFlow();
+      FlowConstruct flowConstruct = getTestFlow(muleContext);
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
           .message(InternalMessage.of(new Object[] {new Fruit[] {new Apple(), new Orange()}}))
           .build();
@@ -118,7 +119,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     try {
       LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
       resolver.addEntryPointResolver(new ArrayEntryPointResolver());
-      FlowConstruct flowConstruct = getTestFlow();
+      FlowConstruct flowConstruct = getTestFlow(muleContext);
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
           .message(InternalMessage.of(new Fruit[] {new Apple(), new Orange()}))
           .build();
@@ -141,7 +142,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
       setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
           .message(InternalMessage.of("Hello"))
           .build());
-      MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), getCurrentEvent());
+      MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), getCurrentEvent());
       resolverSet.invoke(new MultiplePayloadsTestObject(), eventContext, Event.builder(getCurrentEvent()));
       fail("Should have failed to find entrypoint.");
     } catch (EntryPointNotFoundException itex) {
@@ -169,7 +170,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     event = Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build()).build();
 
-    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), event);
+    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), event);
     resolverSet.invoke(new FruitBowl(), eventContext, Event.builder(event));
     // fail("Should have failed to find an entrypoint.");
   }
@@ -208,7 +209,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
       }
     });
     apple.setMuleContext(muleContext);
-    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), event);
+    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), event);
     resolver.invoke(apple, eventContext, Event.builder(event));
   }
 
@@ -233,7 +234,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
         .message(InternalMessage.builder(event.getMessage()).addOutboundProperty(propertyName, methodName).build()).build();
 
     try {
-      MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), event);
+      MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), event);
       resolverSet.invoke(new Kiwi(), eventContext, Event.builder(event));
       fail("no such method on service");
     } catch (EntryPointNotFoundException e) {
@@ -258,7 +259,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     assertFalse(bowl.hasApple());
     assertFalse(bowl.hasBanana());
 
-    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), event);
+    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), event);
     resolverSet.invoke(bowl, eventContext, Event.builder(event));
 
     assertTrue(bowl.hasApple());
@@ -280,7 +281,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     assertFalse(bowl.hasApple());
     assertFalse(bowl.hasBanana());
 
-    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), event);
+    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), event);
     resolverSet.invoke(bowl, eventContext, Event.builder(event));
 
     assertTrue(bowl.hasApple());
@@ -308,7 +309,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCas
     assertFalse(bowl.hasApple());
     assertFalse(bowl.hasBanana());
 
-    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(), event);
+    MuleEventContext eventContext = new DefaultMuleEventContext(getTestFlow(muleContext), event);
     resolverSet.invoke(bowl, eventContext, Event.builder(event));
 
     assertTrue(bowl.hasApple());

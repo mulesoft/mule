@@ -8,6 +8,7 @@ package org.mule.runtime.core.mule.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -31,7 +32,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new Fruit[] {new Apple(), new Orange()}))
         .exchangePattern(REQUEST_RESPONSE)
@@ -44,7 +45,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchGenericFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new Object[] {new Apple(), new Orange()}))
         .exchangePattern(REQUEST_RESPONSE)
@@ -57,7 +58,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
   @Test
   public void testArrayMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new Object[] {"blah"}))
         .exchangePattern(REQUEST_RESPONSE)

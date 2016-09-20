@@ -22,7 +22,7 @@ public class FlowTestCase extends AbstractELTestCase {
 
   @Override
   public void setupFlowConstruct() throws Exception {
-    flowConstruct = getTestFlow("flowName", Object.class);
+    flowConstruct = getTestFlowWithComponent("flowName", Object.class);
   }
 
   @Test

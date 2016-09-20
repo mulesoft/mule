@@ -11,6 +11,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.MuleContext;
@@ -69,7 +70,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     removeVariableProcessor.setMuleContext(mockMuleContext);
 
     message = InternalMessage.builder().payload("").build();
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).session(mockSession)
         .build();
   }

@@ -24,7 +24,7 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleContex
 
   @Override
   protected void doSetUp() throws Exception {
-    flow = getTestFlow("orange", Orange.class);
+    flow = getTestFlowWithComponent("orange", Orange.class);
     endpoint = getEndpoint();
   }
 

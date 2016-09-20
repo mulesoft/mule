@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
@@ -54,7 +55,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     rr.setRoutes(new ArrayList<Processor>(routes));
     List<Thread> threads = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
-      threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestFlow())));
+      threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestFlow(muleContext))));
     }
     for (Thread t : threads) {
       t.start();
@@ -80,7 +81,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(singletonList(TEST_MESSAGE)).build();
 
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     roundRobin.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
         .exchangePattern(REQUEST_RESPONSE).flow(flow).build());
 

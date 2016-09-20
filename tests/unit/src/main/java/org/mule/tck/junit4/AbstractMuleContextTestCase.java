@@ -6,18 +6,16 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -38,7 +36,6 @@ import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
@@ -292,18 +289,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     // template method
   }
 
-  public static Event getTestEvent(Object data) throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(data))
-        .build();
-  }
-
-  public static Flow getTestFlow() throws Exception {
-    return MuleTestUtils.getTestFlow(muleContext);
-  }
-
-  public static Flow getTestFlow(String name, Class<?> clazz) throws Exception {
+  public static Flow getTestFlowWithComponent(String name, Class<?> clazz) throws Exception {
     final SingletonObjectFactory of = new SingletonObjectFactory(clazz, null);
     of.initialise();
     final JavaComponent component = new DefaultJavaComponent(of);

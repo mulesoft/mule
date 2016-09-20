@@ -9,6 +9,7 @@ package org.mule.runtime.module.json.transformers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -63,7 +64,7 @@ public class JsonSchemaXsdValidationTestCase extends AbstractMuleContextTestCase
     filter.setResourceResolver(new Resolver());
     filter.setReturnResult(true);
     filter.setMuleContext(muleContext);
-    filter.setFlowConstruct(getTestFlow());
+    filter.setFlowConstruct(getTestFlow(muleContext));
     filter.initialise();
   }
 

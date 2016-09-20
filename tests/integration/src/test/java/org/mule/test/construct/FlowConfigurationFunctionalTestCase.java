@@ -111,10 +111,10 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     TestSimpleMessageSource source2 = (TestSimpleMessageSource) sources.get(1);
 
     assertEquals("01xyz", getPayloadAsString(source1.fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of("a"))
+        .message(InternalMessage.of("0"))
         .build()).getMessage()));
     assertEquals("01xyz", getPayloadAsString(source2.fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.of("a"))
+        .message(InternalMessage.of("0"))
         .build()).getMessage()));
   }
 

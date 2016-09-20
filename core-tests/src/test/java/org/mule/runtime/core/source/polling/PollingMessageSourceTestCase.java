@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -92,7 +93,7 @@ public class PollingMessageSourceTestCase extends AbstractMuleContextTestCase {
   private PollingMessageSource createMessageSource(Processor processor) throws Exception {
     PollingMessageSource pollingMessageSource =
         new PollingMessageSource(muleContext, processor, new NullOverride(), schedulerFactory());
-    pollingMessageSource.setFlowConstruct(getTestFlow());
+    pollingMessageSource.setFlowConstruct(getTestFlow(muleContext));
     pollingMessageSource.initialise();
     return pollingMessageSource;
   }

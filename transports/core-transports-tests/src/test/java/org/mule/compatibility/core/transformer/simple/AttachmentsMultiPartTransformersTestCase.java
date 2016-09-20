@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -56,7 +57,7 @@ public class AttachmentsMultiPartTransformersTestCase extends AbstractMuleContex
     a2mp.initialise();
     mp2a.initialise();
 
-    flow = getTestFlow();
+    flow = getTestFlow(muleContext);
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);
   }
 

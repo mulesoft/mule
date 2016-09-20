@@ -9,6 +9,7 @@ package org.mule.runtime.core.mule.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -30,7 +31,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodSetPass() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -46,7 +47,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someBusinessMethod");
     resolver.addMethod("someSetter");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -62,7 +63,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("noMethod");
     resolver.addMethod("noMethod2");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -77,7 +78,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testNoMethodSet() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     try {
-      FlowConstruct flowConstruct = getTestFlow();
+      FlowConstruct flowConstruct = getTestFlow(muleContext);
       final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
           .message(InternalMessage.of("blah"))
           .exchangePattern(REQUEST_RESPONSE)
@@ -101,7 +102,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterAssignableFromPayload() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("wash");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new Apple()))
         .exchangePattern(REQUEST_RESPONSE)
@@ -121,7 +122,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContex
   public void testMethodPropertyParameterNull() throws Exception {
     ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
     resolver.addMethod("someOtherBusinessMethod");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new Object[] {null, "blah"}))
         .exchangePattern(REQUEST_RESPONSE)

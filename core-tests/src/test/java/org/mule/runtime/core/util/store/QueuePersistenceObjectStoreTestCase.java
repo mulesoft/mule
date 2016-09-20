@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
 import org.mule.runtime.core.DefaultEventContext;
@@ -165,7 +166,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     String id = UUID.getUUID();
     QueueKey key = new QueueKey(QUEUE_NAME, id);
     InternalMessage msg = InternalMessage.builder().payload("Hello").build();
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(msg).exchangePattern(ONE_WAY)
         .flow(flow).build();
 

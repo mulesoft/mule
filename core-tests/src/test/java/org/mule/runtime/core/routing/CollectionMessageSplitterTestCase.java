@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
@@ -119,7 +120,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
   @Test
   public void testEmptySequence() throws Exception {
     Object payload = Collections.emptySet();
-    Flow fc = getTestFlow();
+    Flow fc = getTestFlow(muleContext);
     MuleSession session = new DefaultMuleSession();
     InternalMessage toSplit = InternalMessage.builder().payload(payload).build();
     CollectionSplitter splitter = new CollectionSplitter();
@@ -135,7 +136,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCa
   }
 
   private void assertRouted(Object payload, int count, boolean counted) throws Exception, MuleException {
-    Flow fc = getTestFlow();
+    Flow fc = getTestFlow(muleContext);
     MuleSession session = new DefaultMuleSession();
 
     Map<String, Serializable> inboundProps = new HashMap<>();

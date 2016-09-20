@@ -8,6 +8,7 @@ package org.mule.runtime.core.el.context;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.mvel2.ImmutableElementException;
 import org.mule.mvel2.PropertyAccessException;
@@ -44,7 +45,7 @@ public abstract class AbstractELTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void setupFlowConstruct() throws Exception {
-    flowConstruct = getTestFlow();
+    flowConstruct = getTestFlow(muleContext);
   }
 
   @Before

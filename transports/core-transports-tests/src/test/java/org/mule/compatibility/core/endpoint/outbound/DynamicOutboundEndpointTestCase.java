@@ -28,6 +28,7 @@ import static org.mule.compatibility.core.context.notification.EndpointMessageNo
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupServiceDescriptor;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
@@ -137,7 +138,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
     OutboundEndpoint endpoint =
         createOutboundEndpoint(null, new TestSecurityFilter(false), null, null, REQUEST_RESPONSE, null);
-    endpoint.setFlowConstruct(getTestFlow());
+    endpoint.setFlowConstruct(getTestFlow(muleContext));
     testOutboundEvent = createTestOutboundEvent();
 
     try {

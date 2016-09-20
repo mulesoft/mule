@@ -9,6 +9,7 @@ package org.mule.runtime.core.mule.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
@@ -31,7 +32,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("bite");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -45,7 +46,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatch2() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("wash");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -58,7 +59,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   @Test
   public void testDynamicMethodMatchFail() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -72,7 +73,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   @Test
   public void testDynamicMethodMatchPass() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -86,7 +87,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testDynamicMethodMatchFailOnWildcardMatch() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     assertTrue(resolver.removeIgnoredMethod("is*"));
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of("blah"))
         .exchangePattern(REQUEST_RESPONSE)
@@ -102,7 +103,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCas
   public void testExplicitMethodMatchAndNullPayload() throws Exception {
     AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
     resolver.addMethod("wash");
-    FlowConstruct flowConstruct = getTestFlow();
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(null))
         .exchangePattern(REQUEST_RESPONSE)

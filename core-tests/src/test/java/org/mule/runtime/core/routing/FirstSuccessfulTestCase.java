@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultEventContext;
@@ -137,7 +138,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     InternalMessage msg = InternalMessage.builder().payload(message).build();
     try {
-      Flow flow = getTestFlow();
+      Flow flow = getTestFlow(muleContext);
       Event event = mp.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(msg)
           .exchangePattern(REQUEST_RESPONSE).flow(flow).session(session).build());
       InternalMessage returnedMessage = event.getMessage();
@@ -174,8 +175,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = InternalMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        Event muleEvent = Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR))
-            .message(msg).exchangePattern(ONE_WAY).flow(getTestFlow()).error(error).build();
+        Event muleEvent = Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR))
+            .message(msg).exchangePattern(ONE_WAY).flow(getTestFlow(muleContext)).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

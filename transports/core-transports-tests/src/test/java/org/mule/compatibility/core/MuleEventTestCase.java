@@ -9,6 +9,7 @@ package org.mule.compatibility.core;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
@@ -151,7 +152,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     endpointBuilder.addMessageProcessor(new MessageFilter(filter));
     registerEndpointBuilder(muleContext.getRegistry(), "epBuilderTest", endpointBuilder);
 
-    getTestFlow();
+    getTestFlow(muleContext);
   }
 
   private static class TestEventTransformer extends AbstractTransformer {

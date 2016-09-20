@@ -8,6 +8,7 @@ package org.mule.test.spring;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
@@ -46,7 +47,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase {
     TransportServiceDescriptor serviceDescriptor = connector.getServiceDescriptor();
 
     // see if we get the overridden message receiver
-    MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector, getTestFlow(), endpoint);
+    MessageReceiver receiver = serviceDescriptor.createMessageReceiver(connector, getTestFlow(muleContext), endpoint);
     assertEquals(TestMessageReceiver.class, receiver.getClass());
   }
 
