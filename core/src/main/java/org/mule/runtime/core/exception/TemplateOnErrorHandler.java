@@ -13,7 +13,6 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
@@ -62,10 +61,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
 
     @Override
     protected Event processRequest(Event request) throws MuleException {
-      if (!handleException && request.getReplyToHandler() instanceof NonBlockingReplyToHandler) {
-        request = Event.builder(request).flow(flowConstruct).replyToHandler(null).replyToDestination(null).synchronous(true)
-            .build();
-      }
       muleContext.getNotificationManager()
           .fireNotification(new ExceptionStrategyNotification(request, flowConstruct, PROCESS_START));
       fireNotification(exception);
@@ -81,11 +76,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       processOutboundRouterStatistics();
       response = afterRouting(exception, response);
       if (response != null && !VoidMuleEvent.getInstance().equals(response)) {
-        // Only process reply-to if non-blocking is not enabled. Checking the exchange pattern is not sufficient
-        // because JMS inbound endpoints for example use a REQUEST_RESPONSE exchange pattern and async processing.
-        if (!(request.isAllowNonBlocking() && request.getReplyToHandler() instanceof NonBlockingReplyToHandler)) {
-          response = processReplyTo(response, exception);
-        }
+        response = processReplyTo(response, exception);
         closeStream(response.getMessage());
         return nullifyExceptionPayloadIfRequired(response);
       }

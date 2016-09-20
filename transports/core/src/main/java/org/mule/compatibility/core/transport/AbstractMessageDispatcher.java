@@ -14,7 +14,6 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -75,16 +74,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
       connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), event.getMessage(), endpoint.getMuleContext());
 
       if (hasResponse) {
-        if (isNonBlocking(event)) {
-          doSendNonBlocking(event,
-                            new NonBlockingSendCompletionHandler(event, ((Flow) endpoint.getFlowConstruct()).getWorkManager(),
-                                                                 connector));
-          // Update RequestContext ThreadLocal for backwards compatibility. Clear event as we are done with this thread.
-          setCurrentEvent(null);
-          return NonBlockingVoidMuleEvent.getInstance();
-        } else {
-          return createResponseEvent(doSend(event), event);
-        }
+        return createResponseEvent(doSend(event), event);
       } else {
         doDispatch(event);
         return VoidMuleEvent.getInstance();

@@ -8,12 +8,8 @@ package org.mule.runtime.core.processor;
 
 import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.NonBlockingSupported;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.exception.MessagingException;
 
@@ -30,16 +26,11 @@ import org.mule.runtime.core.exception.MessagingException;
  *
  * @since 3.7.0
  */
-public abstract class AbstractRequestResponseMessageProcessor extends AbstractInterceptingMessageProcessor implements
-    NonBlockingSupported {
+public abstract class AbstractRequestResponseMessageProcessor extends AbstractInterceptingMessageProcessor {
 
   @Override
   public final Event process(Event event) throws MuleException {
-    if (isNonBlocking(event)) {
-      return processNonBlocking(event);
-    } else {
-      return processBlocking(event);
-    }
+    return processBlocking(event);
   }
 
   protected Event processBlocking(Event event) throws MuleException {
@@ -58,61 +49,6 @@ public abstract class AbstractRequestResponseMessageProcessor extends AbstractIn
         processFinally(response, exception);
       }
     }
-  }
-
-  protected Event processNonBlocking(final Event request) throws MuleException {
-    MessagingException exception = null;
-    Event eventToProcess = Event.builder(request).replyToHandler(createReplyToHandler(request)).build();
-    // Update RequestContext ThreadLocal for backwards compatibility
-    setCurrentEvent(eventToProcess);
-
-    try {
-      Event result = processNext(processRequest(eventToProcess));
-      if (!(result instanceof NonBlockingVoidMuleEvent)) {
-        return processResponse(recreateEventWithOriginalReplyToHandler(result, request.getReplyToHandler()), eventToProcess);
-      } else {
-        return result;
-      }
-    } catch (MessagingException e) {
-      exception = e;
-      return processCatch(request, e);
-    } finally {
-      processFinally(request, exception);
-    }
-  }
-
-  protected ReplyToHandler createReplyToHandler(final Event request) {
-    final ReplyToHandler originalReplyToHandler = request.getReplyToHandler();
-    return new NonBlockingReplyToHandler() {
-
-      @Override
-      public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
-        try {
-          Event response = processResponse(recreateEventWithOriginalReplyToHandler(event, originalReplyToHandler), request);
-          if (!NonBlockingVoidMuleEvent.getInstance().equals(response)) {
-            response = originalReplyToHandler.processReplyTo(response, null, null);
-          }
-          return response;
-        } catch (Exception e) {
-          processExceptionReplyTo(new MessagingException(event, e), null);
-          return event;
-        } finally {
-          processFinally(event, null);
-        }
-      }
-
-      @Override
-      public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-        try {
-          Event handledEvent = processCatch(exception.getEvent(), exception);
-          originalReplyToHandler.processReplyTo(handledEvent, null, null);
-        } catch (Exception e) {
-          originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-        } finally {
-          processFinally(exception.getEvent(), exception);
-        }
-      }
-    };
   }
 
   private Event recreateEventWithOriginalReplyToHandler(Event event, ReplyToHandler originalReplyToHandler) {

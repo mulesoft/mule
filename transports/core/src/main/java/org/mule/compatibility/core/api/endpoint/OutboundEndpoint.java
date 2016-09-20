@@ -9,8 +9,8 @@ package org.mule.compatibility.core.api.endpoint;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transport.LegacyOutboundEndpoint;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 
 import java.util.List;
 
@@ -19,8 +19,8 @@ import java.util.List;
  */
 @Deprecated
 public interface OutboundEndpoint
-    extends ImmutableEndpoint, FlowConstructAware, NonBlockingMessageProcessor, MessagingExceptionHandlerAware,
-    LegacyOutboundEndpoint {
+    extends ImmutableEndpoint, FlowConstructAware, MessagingExceptionHandlerAware,
+    LegacyOutboundEndpoint, Processor {
 
   /**
    * @return a list of properties which should be carried over from the request message to the response message in the case of a

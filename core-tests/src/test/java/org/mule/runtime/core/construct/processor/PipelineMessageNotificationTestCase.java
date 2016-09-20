@@ -63,6 +63,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -118,6 +119,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void requestResponseNonBlocking() throws Exception {
     assertRequestResponseNonBlockingWithMessageProcessor(new SensingNullMessageProcessor(), 1);
   }
@@ -232,6 +234,7 @@ public class PipelineMessageNotificationTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void requestResponseNonBlockingResponseException() throws MuleException, InterruptedException {
     TriggerableMessageSource source = new TriggerableMessageSource();
     pipeline.setMessageSource(source);

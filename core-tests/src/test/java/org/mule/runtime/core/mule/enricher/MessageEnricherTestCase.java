@@ -8,36 +8,23 @@ package org.mule.runtime.core.mule.enricher;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.Event.getCurrentEvent;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
-import org.mule.tck.SensingNullMessageProcessor;
-import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.matcher.DataTypeMatcher;
 
@@ -255,50 +242,6 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
   @Test
   public void enrichesFlowVarWithDataTypeUsingExpressionEvaluator() throws Exception {
     doEnrichDataTypePropagationTest(new EnrichExpressionPair(FOO_FLOW_VAR_EXPRESSION));
-  }
-
-  @Test
-  public void testEnrichWithExceptionNonBlocking() throws Exception {
-    MessageEnricher enricher = new MessageEnricher();
-    enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[header:myHeader]"));
-    enricher.setEnrichmentMessageProcessor(event -> {
-      throw new MessagingException(CoreMessages.createStaticMessage("Expected"), event);
-    });
-
-    try {
-      SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-      enricher.process(createNonBlockingEvent(nullReplyToHandler));
-      fail("Expected a MessagingException");
-    } catch (MessagingException e) {
-      assertThat(e.getMessage(), is("Expected."));
-    }
-    assertThat(getCurrentEvent().getReplyToHandler(), instanceOf(ReplyToHandler.class));
-  }
-
-  private Event createNonBlockingEvent(SensingNullReplyToHandler nullReplyToHandler) {
-    Flow flow = mock(Flow.class);
-    when(flow.getProcessingStrategy()).thenReturn(new NonBlockingProcessingStrategy());
-    when(flow.getMuleContext()).thenReturn(muleContext);
-
-    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(TEST_MESSAGE).build())
-        .exchangePattern(REQUEST_RESPONSE).replyToHandler(nullReplyToHandler).flow(flow).build();
-  }
-
-  private MessageEnricher createNonBlockingEnricher(SensingNullMessageProcessor sensingNullMessageProcessor) {
-    MessageEnricher enricher = new MessageEnricher();
-    enricher.setMuleContext(muleContext);
-    enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[sessionVars['foo']]"));
-    enricher.setEnrichmentMessageProcessor(sensingNullMessageProcessor);
-    return enricher;
-  }
-
-  private Event processEnricherInChain(MessageEnricher enricher, final Event in) throws MuleException {
-    return newChain(enricher, event -> {
-      assertThat(event.getMessage(), is(sameInstance(in.getMessage())));
-      return event;
-    }).process(in);
   }
 
   private void doEnrichDataTypePropagationTest(EnrichExpressionPair pair) throws Exception {

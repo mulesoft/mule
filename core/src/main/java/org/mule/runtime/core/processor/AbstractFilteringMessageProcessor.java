@@ -9,7 +9,6 @@ package org.mule.runtime.core.processor;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
@@ -21,8 +20,7 @@ import org.mule.runtime.core.exception.MessagingException;
  * Abstract {@link InterceptingMessageProcessor} that can be easily be extended and used for filtering message flow through a
  * {@link Processor} chain. The default behaviour when the filter is not accepted is to return the request event.
  */
-public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements NonBlockingSupported {
+public abstract class AbstractFilteringMessageProcessor extends AbstractInterceptingMessageProcessor {
 
   /**
    * Throw a FilterUnacceptedException when a message is rejected by the filter?

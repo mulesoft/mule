@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.AbstractNonBlockingMessageProcessor;
 import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -25,7 +24,7 @@ import org.mule.runtime.core.util.concurrent.NamedThreadFactory;
 
 import java.util.concurrent.ExecutorService;
 
-public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProcessor implements Processor, Disposable {
+public class SensingNullMessageProcessor implements Processor, Disposable {
 
   public Event event;
   public Latch latch = new Latch();
@@ -45,23 +44,6 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
     this.appendString = appendString;
   }
 
-  @Override
-  protected void processNonBlocking(final Event event, CompletionHandler completionHandler) throws MuleException {
-    executor.execute(() -> {
-      try {
-        sense(event);
-        Event eventToProcess = event;
-        if (StringUtils.isNotEmpty(appendString)) {
-          eventToProcess = append(eventToProcess);
-        }
-        event.getReplyToHandler().processReplyTo(eventToProcess, null, null);
-        latch.countDown();
-      } catch (MuleException e) {
-        event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, e), null);
-      }
-    });
-  }
-
   private void sense(Event event) {
     sleepIfNeeded();
     this.event = event;
@@ -69,7 +51,7 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
   }
 
   @Override
-  protected Event processBlocking(Event event) throws MuleException {
+  public Event process(Event event) throws MuleException {
     sense(event);
     if (StringUtils.isNotEmpty(appendString)) {
       event = append(event);
@@ -84,11 +66,6 @@ public class SensingNullMessageProcessor extends AbstractNonBlockingMessageProce
         return VoidMuleEvent.getInstance();
       }
     }
-  }
-
-  @Override
-  public boolean isNonBlocking(Event event) {
-    return super.isNonBlocking(event) && enableNonBlocking;
   }
 
   private Event append(Event event) {

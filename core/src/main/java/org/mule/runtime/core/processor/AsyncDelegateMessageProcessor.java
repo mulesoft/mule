@@ -15,7 +15,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * exception is thrown.
  */
 public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
-    implements Processor, Initialisable, Startable, Stoppable, NonBlockingSupported {
+    implements Processor, Initialisable, Startable, Stoppable {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
   private AtomicBoolean consumablePayloadWarned = new AtomicBoolean(false);

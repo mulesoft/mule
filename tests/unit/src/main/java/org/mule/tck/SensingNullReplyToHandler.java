@@ -6,14 +6,14 @@
  */
 package org.mule.tck;
 
+import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.util.concurrent.Latch;
 
-public class SensingNullReplyToHandler implements NonBlockingReplyToHandler {
+public class SensingNullReplyToHandler implements ReplyToHandler {
 
   public Event event;
   public Exception exception;

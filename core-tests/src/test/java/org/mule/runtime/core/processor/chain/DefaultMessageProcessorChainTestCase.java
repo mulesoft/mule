@@ -29,7 +29,6 @@ import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -54,7 +53,6 @@ import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.runtime.core.routing.ChoiceRouter;
@@ -97,13 +95,14 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
     return Arrays.asList(new Object[][] {
+        // TODO MULE-9731
         {REQUEST_RESPONSE, false, true},
         {REQUEST_RESPONSE, false, false},
-        {REQUEST_RESPONSE, true, true},
-        {REQUEST_RESPONSE, true, false},
+        //{REQUEST_RESPONSE, true, true},
+        //{REQUEST_RESPONSE, true, false},
         {ONE_WAY, false, true},
-        {ONE_WAY, false, false},
-        {ONE_WAY, true, true}});
+        {ONE_WAY, false, false}});
+    //{ONE_WAY, true, true}});
   }
 
   private Pipeline mockFlow = mock(Flow.class);
@@ -820,28 +819,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     process(builder.build(), getTestEventUsingFlow("0"));
   }
 
-  private Event process(MessageProcessorChain messageProcessorChain, Event event) throws Exception {
-    messageProcessorChain.setFlowConstruct(mockFlow);
-    messageProcessorChain.setMuleContext(muleContext);
-    Event result;
-    if (nonBlocking && exchangePattern.hasResponse()) {
-      SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-      event = Event.builder(event).replyToHandler(nullReplyToHandler).build();
-      result = messageProcessorChain.process(event);
-      if (NonBlockingVoidMuleEvent.getInstance() == result) {
-        nullReplyToHandler.latch.await(1000, TimeUnit.MILLISECONDS);
-        if (nullReplyToHandler.exception != null) {
-          throw nullReplyToHandler.exception;
-        } else {
-          result = nullReplyToHandler.event;
-        }
-      }
-    } else {
-      result = messageProcessorChain.process(event);
-    }
-    return result;
-  }
-
   private AppendingMP getAppendingMP(String append) {
     if (nonBlocking) {
       return new NonBlockingAppendingMP(append);
@@ -893,7 +870,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     assertTrue(mp.disposed);
   }
 
-  class NonBlockingAppendingMP extends AppendingMP implements NonBlockingMessageProcessor {
+  class NonBlockingAppendingMP extends AppendingMP implements Processor {
 
     public NonBlockingAppendingMP(String append) {
       super(append);
@@ -918,22 +895,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
     @Override
     public Event process(final Event event) throws MuleException {
-      if (nonBlocking && event.isAllowNonBlocking() && event.getReplyToHandler() != null) {
-        executor.execute(() -> {
-          try {
-            threads++;
-            event.getReplyToHandler().processReplyTo(innerProcess(event), null, null);
-          } catch (MessagingException e1) {
-            event.getReplyToHandler().processExceptionReplyTo(e1, null);
-          } catch (MuleException e2) {
-            e2.printStackTrace();
-          }
-        });
-        return NonBlockingVoidMuleEvent.getInstance();
-
-      } else {
-        return innerProcess(event);
-      }
+      return innerProcess(event);
     }
 
     private Event innerProcess(Event event) {
@@ -1014,8 +976,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
               .build())
           .build();
       Event result = processNext(intermediateEvent);
-      if (result != null && !result.equals(VoidMuleEvent.getInstance())
-          && !result.equals(NonBlockingVoidMuleEvent.getInstance())) {
+      if (result != null && !result.equals(VoidMuleEvent.getInstance())) {
         return Event.builder(result)
             .message(InternalMessage.builder().payload(result.getMessage().getPayload().getValue() + "after" + appendString)
                 .build())

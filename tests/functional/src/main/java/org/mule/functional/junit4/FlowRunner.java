@@ -10,7 +10,6 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
 import org.mule.functional.functional.FlowAssert;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -21,7 +20,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
-import org.mule.tck.SensingNullReplyToHandler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -76,34 +74,7 @@ public class FlowRunner extends FlowConstructRunner<FlowRunner> {
    * @return this {@link FlowRunner}
    */
   public FlowRunner nonBlocking() {
-    replyToHandler = new SensingNullReplyToHandler();
-    eventBuilder.withReplyToHandler(replyToHandler);
-
-    responseEventTransformer = input -> {
-      Event responseEvent = (Event) input;
-      SensingNullReplyToHandler nullSensingReplyToHandler = (SensingNullReplyToHandler) replyToHandler;
-      try {
-        return getNonBlockingResponse(nullSensingReplyToHandler, responseEvent);
-      } catch (Exception e) {
-        throw new MuleRuntimeException(e);
-      }
-    };
-
     return this;
-  }
-
-  protected Event getNonBlockingResponse(SensingNullReplyToHandler replyToHandler, Event result) throws Exception {
-    if (NonBlockingVoidMuleEvent.getInstance() == result) {
-      if (!replyToHandler.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS)) {
-        throw new RuntimeException("No Non-Blocking Response");
-      }
-      if (replyToHandler.exception != null) {
-        throw replyToHandler.exception;
-      }
-      return replyToHandler.event;
-    } else {
-      return result;
-    }
   }
 
   /**

@@ -19,6 +19,7 @@ public class NonBlockingPartlySupportedFunctionalTestCase extends AbstractIntegr
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void wiretap() throws Exception {
     flowRunner("wiretap").withPayload(TEST_MESSAGE).nonBlocking().run();
   }

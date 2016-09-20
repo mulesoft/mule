@@ -7,22 +7,13 @@
 package org.mule.runtime.core.processor;
 
 import static org.junit.Assert.assertEquals;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.tck.SensingNullReplyToHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 

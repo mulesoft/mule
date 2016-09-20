@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.test.AbstractIntegrationTestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -28,6 +29,7 @@ public class SecurityFilterNonBlockingTestCase extends AbstractIntegrationTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void securityFilterShouldAllowNonBlocking() throws Exception {
     flowRunner("nonBlockingSecurity").withPayload(TEST_MESSAGE).nonBlocking().run();
   }

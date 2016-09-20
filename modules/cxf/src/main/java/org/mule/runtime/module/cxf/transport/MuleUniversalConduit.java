@@ -13,14 +13,12 @@ import static org.mule.runtime.core.api.Event.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -228,37 +226,9 @@ public class MuleUniversalConduit extends AbstractConduit {
 
   protected void dispatchMuleMessage(final Message m, Event reqEvent) throws MuleException {
     try {
-      if (reqEvent.isAllowNonBlocking()) {
-        final ReplyToHandler originalReplyToHandler = reqEvent.getReplyToHandler();
-
-        reqEvent = Event.builder(reqEvent).replyToHandler(new NonBlockingReplyToHandler() {
-
-          @Override
-          public Event processReplyTo(Event event, InternalMessage returnMessage, Object replyTo) throws MuleException {
-            try {
-              Holder<Event> holder = (Holder<Event>) m.getExchange().get("holder");
-              holder.value = event;
-              sendResultBackToCxf(m, event);
-            } catch (IOException e) {
-              processExceptionReplyTo(new MessagingException(event, e), replyTo);
-            }
-            return event;
-          }
-
-          @Override
-          public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-            originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-          }
-        }).build();
-      }
       // Update RequestContext ThreadLocal for backwards compatibility
       setCurrentEvent(reqEvent);
-
-      Event resEvent = processNext(reqEvent, m.getExchange());
-
-      if (!resEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
-        sendResultBackToCxf(m, resEvent);
-      }
+      sendResultBackToCxf(m, processNext(reqEvent, m.getExchange()));
     } catch (MuleException me) {
       throw me;
     } catch (Exception e) {

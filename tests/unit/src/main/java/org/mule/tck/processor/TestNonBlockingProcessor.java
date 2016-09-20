@@ -6,23 +6,23 @@
  */
 package org.mule.tck.processor;
 
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
-import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Test implementation of {@link org.mule.runtime.core.processor.NonBlockingMessageProcessor} that simply uses a @{link Executor}
- * to invoke the {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
+ * Test non-blocking {@link Processor} implementation that simply uses a @{link Executor} to invoke the
+ * {@link org.mule.runtime.core.api.connector.ReplyToHandler} in another thread.
  */
-public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, Initialisable, Disposable {
+public class TestNonBlockingProcessor implements Processor, Initialisable, Disposable {
 
   private ExecutorService executor;
 
@@ -38,7 +38,7 @@ public class TestNonBlockingProcessor implements NonBlockingMessageProcessor, In
           event.getReplyToHandler().processExceptionReplyTo(new MessagingException(event, e2), null);
         }
       });
-      return NonBlockingVoidMuleEvent.getInstance();
+      return VoidMuleEvent.getInstance();
     } else {
       return event;
     }

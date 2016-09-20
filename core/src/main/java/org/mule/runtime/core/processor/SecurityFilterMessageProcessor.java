@@ -8,7 +8,6 @@ package org.mule.runtime.core.processor;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
@@ -19,7 +18,7 @@ import org.mule.runtime.core.api.security.SecurityFilter;
  * not send or dispatched by the transport. When unauthorised the request message is returned as the response.
  */
 public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Initialisable, NonBlockingSupported {
+    implements Initialisable {
 
   private SecurityFilter filter;
 

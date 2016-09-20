@@ -7,11 +7,9 @@
 package org.mule.runtime.core.routing.requestreply;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.connector.DefaultReplyToHandler;
 
-public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier
-    implements NonBlockingSupported {
+public class AsyncReplyToPropertyRequestReplyReplier extends AbstractReplyToPropertyRequestReplyReplier {
 
   @Override
   protected boolean shouldProcessEvent(Event event) {

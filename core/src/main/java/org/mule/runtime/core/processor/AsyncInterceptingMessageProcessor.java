@@ -15,9 +15,7 @@ import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
@@ -40,7 +38,7 @@ import org.mule.runtime.core.work.MuleWorkManager;
  * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Startable, Stoppable, MessagingExceptionHandlerAware, NonBlockingSupported, InternalMessageProcessor {
+    implements Startable, Stoppable, MessagingExceptionHandlerAware, InternalMessageProcessor {
 
   public static final String SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE =
       "Unable to process a synchronous or non-blocking event asynchronously";
@@ -110,7 +108,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
   }
 
   protected boolean canProcessAsync(Event event) {
-    return !(event.isSynchronous() || event.isTransacted() || event.getReplyToHandler() instanceof NonBlockingReplyToHandler);
+    return !(event.isSynchronous() || event.isTransacted());
   }
 
   protected void processNextAsync(Event event) throws MuleException {

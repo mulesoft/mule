@@ -10,7 +10,6 @@ import static org.mule.runtime.core.api.Event.getVariableValueOrNull;
 import static org.mule.runtime.core.execution.ErrorHandlingExecutionTemplate.createErrorHandlingExecutionTemplate;
 import static org.mule.runtime.module.cxf.CxfConstants.UNWRAP_MULE_EXCEPTIONS;
 
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
@@ -125,13 +124,6 @@ public class MuleInvoker implements Invoker {
         // weird response from AbstractInterceptingMessageProcessor
         responseEvent = null;
       }
-
-      if (responseEvent instanceof NonBlockingVoidMuleEvent) {
-        exchange.put(Message.SUSPENDED_INVOCATION, true);
-        exchange.put(CxfConstants.MULE_EVENT, responseEvent);
-        return null;
-      }
-
     }
 
     if (responseEvent != null && !VoidMuleEvent.getInstance().equals(responseEvent)) {

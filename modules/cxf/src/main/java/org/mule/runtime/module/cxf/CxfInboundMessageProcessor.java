@@ -16,31 +16,23 @@ import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
-import static org.mule.runtime.core.api.Event.setCurrentEvent;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
-
 import org.mule.extension.http.api.HttpAttributes;
 import org.mule.extension.http.api.HttpConstants.HttpStatus;
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.NonBlockingSupported;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
-import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
 import org.mule.runtime.core.model.ParameterMap;
@@ -94,7 +86,7 @@ import org.w3c.dom.Node;
  * MessageProcessor. This processor gets built by a MessageProcessorBuilder which is responsible for configuring it and the
  * {@link Server} that it dispatches to.
  */
-public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle, NonBlockingSupported {
+public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProcessor implements Lifecycle {
 
   private static final String HTTP_REQUEST_PROPERTY_MANAGER_KEY = "_cxfHttpRequestPropertyManager";
 
@@ -236,55 +228,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
   protected Event sendToDestination(Event event) throws MuleException, IOException {
     try {
       final Exchange exchange = new ExchangeImpl();
-
-      final Event originalEvent = event;
-      if (event.isAllowNonBlocking()) {
-        final ReplyToHandler originalReplyToHandler = event.getReplyToHandler();
-
-        event = Event.builder(event).replyToHandler(new NonBlockingReplyToHandler() {
-
-          @Override
-          public Event processReplyTo(Event responseEvent, InternalMessage returnMessage, Object replyTo)
-              throws MuleException {
-            try {
-              // CXF execution chain was suspended, so we need to resume it.
-              // The MuleInvoker component will be recalled, by using the CxfConstants.NON_BLOCKING_RESPONSE flag we force using
-              // the received response event instead of re-invoke the flow
-              exchange.put(CxfConstants.MULE_EVENT, responseEvent);
-              exchange.put(CxfConstants.NON_BLOCKING_RESPONSE, true);
-              exchange.getInMessage().getInterceptorChain().resume();
-
-              // Process the response
-              responseEvent = (Event) exchange.get(CxfConstants.MULE_EVENT);
-              responseEvent = processResponse(originalEvent, exchange, responseEvent);
-
-              // Continue the non blocking execution
-              originalReplyToHandler.processReplyTo(responseEvent, responseEvent.getMessage(), replyTo);
-            } catch (Exception e) {
-              ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
-              responseEvent = Event.builder(responseEvent).message(InternalMessage.builder(responseEvent.getMessage())
-                  .exceptionPayload(exceptionPayload).addOutboundProperty(HTTP_STATUS_PROPERTY, 500).build()).build();
-              processExceptionReplyTo(new MessagingException(responseEvent, e, CxfInboundMessageProcessor.this), replyTo);
-            }
-            return responseEvent;
-          }
-
-          @Override
-          public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-            originalReplyToHandler.processExceptionReplyTo(exception, replyTo);
-          }
-        }).build();
-        // Update RequestContext ThreadLocal for backwards compatibility
-        setCurrentEvent(event);
-      }
-
-      Event responseEvent = sendThroughCxf(event, exchange);
-
-      if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
-        return processResponse(event, exchange, responseEvent);
-      }
-
-      return responseEvent;
+      return processResponse(event, exchange, sendThroughCxf(event, exchange));
     } catch (MuleException e) {
       logger.warn("Could not dispatch message to CXF!", e);
       throw e;
@@ -400,10 +344,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       d.getMessageObserver().onMessage(m);
     } catch (SuspendedInvocationException e) {
       Event responseEvent = (Event) exchange.get(CxfConstants.MULE_EVENT);
-
-      if (responseEvent == null || !responseEvent.equals(NonBlockingVoidMuleEvent.getInstance())) {
-        throw e;
-      }
+      throw e;
     }
 
     // get the response event

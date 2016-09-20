@@ -16,8 +16,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -34,7 +32,6 @@ import org.mule.runtime.core.api.processor.StageNameSourceProvider;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.runtime.core.execution.ExceptionHandlingReplyToHandlerDecorator;
 import org.mule.runtime.core.interceptor.ProcessingTimeInterceptor;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.processor.strategy.AsynchronousProcessingStrategy;
@@ -112,36 +109,15 @@ public class Flow extends AbstractPipeline implements Processor, StageNameSource
   }
 
   private Event createMuleEventForCurrentFlow(Event event, Object replyToDestination, ReplyToHandler replyToHandler) {
-    // Wrap and propagate reply to handler only if it's not a standard DefaultReplyToHandler.
-    if (replyToHandler != null && replyToHandler instanceof NonBlockingReplyToHandler) {
-      replyToHandler = createNonBlockingReplyToHandler(event, replyToHandler);
-    } else {
-      // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
-      // referenced flows. If it is passded on they two replyTo responses are sent.
-      replyToHandler = null;
-    }
+    // DefaultReplyToHandler is used differently and should only be invoked by the first flow and not any
+    // referenced flows. If it is passded on they two replyTo responses are sent.
+    replyToHandler = null;
 
     // Create new event for current flow with current flowConstruct, replyToHandler etc.
     event = Event.builder(event).flow(this).replyToHandler(replyToHandler).replyToDestination(replyToDestination)
         .synchronous(event.isSynchronous() || isSynchronous()).build();
     resetRequestContextEvent(event);
     return event;
-  }
-
-  private ReplyToHandler createNonBlockingReplyToHandler(final Event event, final ReplyToHandler replyToHandler) {
-    return new ExceptionHandlingReplyToHandlerDecorator(new NonBlockingReplyToHandler() {
-
-      @Override
-      public Event processReplyTo(Event result, InternalMessage returnMessage, Object replyTo) throws MuleException {
-        return replyToHandler.processReplyTo(createReturnEventForParentFlowConstruct(result, event), null, null);
-      }
-
-      @Override
-      public void processExceptionReplyTo(MessagingException exception, Object replyTo) {
-        exception.setProcessedEvent(createReturnEventForParentFlowConstruct(exception.getEvent(), event));
-        replyToHandler.processExceptionReplyTo(exception, null);
-      }
-    }, getExceptionListener(), this);
   }
 
   private Event createReturnEventForParentFlowConstruct(Event result, Event original) {

@@ -49,6 +49,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void testReplyEnabledNonBlocking() throws Exception {
     InternalMessage response =
         flowRunner("JMSService1NonBlockingFixed").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
@@ -56,6 +57,7 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void testReplyEnabledNonBlockingTimeout() throws Exception {
     InternalMessage response =
         flowRunner("JMSService1NonBlockingTimeoutFixed").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
@@ -75,12 +77,14 @@ public class JmsTemporaryReplyToTestCase extends AbstractJmsFunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void testTemporaryReplyEnabledNonBlocking() throws Exception {
     InternalMessage response = flowRunner("JMSService1NonBlocking").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();
     assertEchoResponse(response);
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void testTemporaryReplyEnabledNonBlockingTimeout() throws Exception {
     InternalMessage response =
         flowRunner("JMSService1NonBlockingTimeout").nonBlocking().withPayload(TEST_MESSAGE).run().getMessage();

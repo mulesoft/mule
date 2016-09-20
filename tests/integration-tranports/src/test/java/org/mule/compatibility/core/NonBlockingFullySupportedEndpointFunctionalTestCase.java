@@ -15,6 +15,7 @@ import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class NonBlockingFullySupportedEndpointFunctionalTestCase extends CompatibilityFunctionalTestCase {
@@ -25,6 +26,7 @@ public class NonBlockingFullySupportedEndpointFunctionalTestCase extends Compati
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void testTransportOutboundEndpoint() throws Exception {
     final Event result = flowRunner("testOutboundEndpoint").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();
@@ -33,6 +35,7 @@ public class NonBlockingFullySupportedEndpointFunctionalTestCase extends Compati
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void testTransportOutboundEndpointError() throws Exception {
     Event result = flowRunner("testOutboundEndpointError").withPayload(TEST_MESSAGE)
         .withExchangePattern(getMessageExchnagePattern()).nonBlocking().run();

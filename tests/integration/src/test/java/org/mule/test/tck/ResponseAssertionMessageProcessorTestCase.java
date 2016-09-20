@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageProcessorTestCase {
@@ -66,6 +67,7 @@ public class ResponseAssertionMessageProcessorTestCase extends AssertionMessageP
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void responseProcessNonBlocking() throws Exception {
     when(mockEvent.isAllowNonBlocking()).thenReturn(true);
     when(mockEvent.getExchangePattern()).thenReturn(MessageExchangePattern.REQUEST_RESPONSE);

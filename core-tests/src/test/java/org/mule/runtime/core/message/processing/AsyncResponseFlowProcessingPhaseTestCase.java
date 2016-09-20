@@ -46,6 +46,7 @@ import org.mule.tck.size.SmallTest;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
@@ -137,6 +138,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void runPhaseWithSuccessfulFlowProcessingNonBlocking() throws Exception {
     final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
     when(mockMuleEvent.isAllowNonBlocking()).thenReturn(true);
@@ -160,6 +162,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void sendResponseWhenFlowExecutionFailsAndExceptionIsHandledNonBlocking() throws Exception {
     when(mockTemplate.routeEvent(any(Event.class))).thenThrow(mockMessagingException);
     when(mockMessagingException.handled()).thenReturn(true);
@@ -183,6 +186,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void sendFailureResponseWhenFlowExecutionFailsAndExceptionIsNotHandledNonBlocking() throws Exception {
     when(mockTemplate.routeEvent(any(Event.class))).thenThrow(mockMessagingException);
     when(mockMessagingException.handled()).thenReturn(false);
@@ -208,6 +212,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void callExceptionHandlerWhenSuccessfulExecutionFailsWritingResponseNonBlocking() throws Exception {
     final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
     doAnswer(invocationOnMock -> {
@@ -242,6 +247,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void doNotCallExceptionHandlerWhenFailureExecutionFailsWritingResponseNonBlocking() throws Exception {
     doAnswer(invocationOnMock -> {
       ResponseCompletionCallback callback = (ResponseCompletionCallback) invocationOnMock.getArguments()[1];
@@ -285,6 +291,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void responseNotificationFiredNonBlocking() throws Exception {
     final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
     doAnswer(invocationOnMock -> {
@@ -321,6 +328,7 @@ public class AsyncResponseFlowProcessingPhaseTestCase extends AbstractMuleTestCa
   }
 
   @Test
+  @Ignore("MULE-9731")
   public void errorResponseNotificationFiredNonBlocking() throws Exception {
     final SensingNullMessageProcessor sensingMessageProcessor = new SensingNullMessageProcessor();
     doAnswer(invocationOnMock -> {

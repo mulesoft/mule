@@ -38,7 +38,6 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultMultiPartPayload;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.util.Base64;
 import org.mule.runtime.core.util.IOUtils;
@@ -85,7 +84,7 @@ import org.xml.sax.InputSource;
 
 
 public class WSConsumer
-    implements Processor, Initialisable, MuleContextAware, FlowConstructAware, Disposable, NonBlockingMessageProcessor {
+    implements Processor, Initialisable, MuleContextAware, FlowConstructAware, Disposable {
 
   public static final String SOAP_HEADERS_PROPERTY_PREFIX = "soap.";
 

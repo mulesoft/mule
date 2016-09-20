@@ -15,14 +15,11 @@ import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.cxf.CxfConstants.OPERATION;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
 import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
-
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
@@ -51,7 +48,6 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
@@ -65,7 +61,7 @@ import org.apache.cxf.ws.addressing.WSAContextUtils;
  * MessageProcessor.
  */
 public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements CloneableMessageProcessor, NonBlockingSupported {
+    implements CloneableMessageProcessor {
 
   private CxfPayloadToArguments payloadToArguments = CxfPayloadToArguments.NULL_PAYLOAD_AS_PARAMETER;
   private Client client;
@@ -261,28 +257,8 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     exchange.put(StaxInEndingInterceptor.STAX_IN_NOCLOSE, Boolean.TRUE);
 
     try {
-      if (event.isAllowNonBlocking() && event.getReplyToHandler() != null) {
-        client.invoke(new ClientCallback() {
-
-          @Override
-          public void handleResponse(Map<String, Object> ctx, Object[] res) {
-            try {
-              event.getReplyToHandler().processReplyTo(buildResponseMessage(event, responseHolder.value, res), null, null);
-            } catch (MuleException ex) {
-              handleException(ctx, ex);
-            }
-          }
-
-          @Override
-          public void handleException(Map<String, Object> ctx, Throwable ex) {
-            event.getReplyToHandler().processExceptionReplyTo(wrapToMessagingException(responseHolder.value, ex), null);
-          }
-        }, bop, getArgs(event), ctx, exchange);
-        return NonBlockingVoidMuleEvent.getInstance();
-      } else {
-        Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
-        return buildResponseMessage(event, (Event) exchange.get(CxfConstants.MULE_EVENT), response);
-      }
+      Object[] response = client.invoke(bop, getArgs(event), ctx, exchange);
+      return buildResponseMessage(event, (Event) exchange.get(CxfConstants.MULE_EVENT), response);
     } catch (Exception e) {
       throw wrapException((Event) exchange.get(CxfConstants.MULE_EVENT), e);
     }
@@ -290,7 +266,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
   public Method getMethod(Event event) throws Exception {
     Method method = null;
-    String opName = (String) event.getMessage().getOutboundProperty(OPERATION);
+    String opName = event.getMessage().getOutboundProperty(OPERATION);
     if (opName != null) {
       method = getMethodFromOperation(opName);
     }

@@ -12,9 +12,10 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstruc
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.core.AbstractAnnotatedObject;
+import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -22,13 +23,11 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
-import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
 
@@ -42,8 +41,7 @@ import org.slf4j.Logger;
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
  * nested in another chain the next MessageProcessor in the parent chain is not injected into the first in the nested chain.
  */
-public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject
-    implements NonBlockingMessageProcessor, MessageProcessorChain, MessagingExceptionHandlerAware {
+public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject implements MessageProcessorChain {
 
   private static final Logger log = getLogger(AbstractMessageProcessorChain.class);
 
@@ -75,9 +73,21 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   }
 
   protected Event doProcess(Event event) throws MuleException {
-    return new ProcessorExecutorFactory()
-        .createProcessorExecutor(event, getProcessorsToExecute(), messageProcessorExecutionTemplate, true, flowConstruct)
-        .execute();
+    Event copy;
+
+    for (Processor processor : getProcessorsToExecute()) {
+      copy = event;
+
+      event = messageProcessorExecutionTemplate.execute(processor, event);
+
+      if (VoidMuleEvent.getInstance().equals(event)) {
+        setCurrentEvent(copy);
+        event = copy;
+      } else if (event == null) {
+        return null;
+      }
+    }
+    return event;
   }
 
   protected List<Processor> getProcessorsToExecute() {
