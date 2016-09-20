@@ -13,6 +13,8 @@ import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 
+import org.mule.test.infrastructure.process.MuleProcessController;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,7 +30,6 @@ import org.junit.runners.model.Statement;
 
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.test.infrastructure.process.MuleProcessController;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,8 @@ public class MuleDeployment extends MuleInstallation {
   private static final long POLL_DELAY_MILLIS = 1000;
   private static final String DEFAULT_DEPLOYMENT_TIMEOUT = "60000";
   private static final boolean STOP_ON_EXIT = parseBoolean(getProperty("mule.test.stopOnExit", "true"));
-  private static final boolean DEBUG = parseBoolean(getProperty("mule.test.debug", "false"));
+  private static final boolean DEBUGGING_ENABLED = parseBoolean(getProperty("mule.test.debug", "false"));
+  public static final String DEBUG_PORT = "5005";
   private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
   private static PollingProber prober;
   private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
@@ -219,22 +221,22 @@ public class MuleDeployment extends MuleInstallation {
       domains.forEach((domain) -> mule.deployDomain(domain));
       applications.forEach((application) -> mule.deploy(application));
       logger.info("Starting Mule Server");
-      start();
+      if (DEBUGGING_ENABLED) {
+        setupDebugging();
+      }
+      mule.start(toArray(properties));
       domains.forEach((domain) -> checkDomainIsDeployed(getName(domain)));
       applications.forEach((application) -> checkAppIsDeployed(getName(application)));
       logger.info("Deployment successful");
     }
   }
 
-  private void start() {
-    if (DEBUG) {
-      mule.addConfProperty("-Xdebug");
-      mule.addConfProperty("-Xnoagent");
-      mule.addConfProperty("-Djava.compiler=NONE");
-      mule.addConfProperty("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005");
-      logger.info("Listening for remote debugger to attach at port: 5005");
-    }
-    mule.start(toArray(properties));
+  private void setupDebugging() {
+    mule.addConfProperty("-Xdebug");
+    mule.addConfProperty("-Xnoagent");
+    mule.addConfProperty("-Djava.compiler=NONE");
+    mule.addConfProperty("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=" + DEBUG_PORT);
+    logger.info("Listening for remote debugger to attach at port: " + DEBUG_PORT);
   }
 
   private void redeployDomain(String domain) {
