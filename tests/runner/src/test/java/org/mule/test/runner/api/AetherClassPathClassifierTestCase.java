@@ -8,10 +8,10 @@
 package org.mule.test.runner.api;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
 import static org.eclipse.aether.util.artifact.JavaScopes.PROVIDED;
 import static org.eclipse.aether.util.artifact.JavaScopes.TEST;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
@@ -45,6 +46,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
@@ -60,6 +62,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
+  @Rule
+  public ExpectedException expectedException = none();
 
   private DependencyResolver dependencyResolver;
   private ClassPathClassifierContext context;
@@ -136,8 +140,26 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void pluginSharedLibUrlsNotDeclaredLibraryAsDirectDependency() throws Exception {
+    when(context.getSharedPluginLibCoordinates()).thenReturn(newArrayList("org.mule.modules:mule-module-repository"));
+    expectedException.expect(IllegalStateException.class);
+    expectedException.expectMessage(containsString("has to be declared"));
+    expectedException.expectMessage(containsString(TEST));
+    classifier.classify(context);
+  }
+
+  @Test
+  public void pluginSharedLibUrlsInvalidCoordiantes() throws Exception {
+    when(context.getSharedPluginLibCoordinates()).thenReturn(newArrayList("mule-module-repository"));
+    expectedException.expect(IllegalArgumentException.class);
+    expectedException.expectMessage(containsString("not a valid format"));
+    classifier.classify(context);
+  }
+
+  @Test
   public void pluginSharedLibUrlsNoTransitiveNoManageDependenciesNoFilters() throws Exception {
-    when(context.getSharedPluginLibCoordinates()).thenReturn(newArrayList(toId(derbyDriverDep.getArtifact())));
+    when(context.getSharedPluginLibCoordinates())
+        .thenReturn(newArrayList(derbyDriverDep.getArtifact().getGroupId() + ":" + derbyDriverDep.getArtifact().getArtifactId()));
 
     File derbyDriverFile = temporaryFolder.newFile();
     ArtifactResult artifactResult = mock(ArtifactResult.class);
@@ -160,6 +182,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class));
     verify(dependencyResolver).resolveArtifact(argThat(equalTo(derbyDriverDep.getArtifact())));
   }
+
 
   private ArtifactDescriptorResult noManagedDependencies() throws ArtifactDescriptorException {
     ArtifactDescriptorResult artifactDescriptorResult = mock(ArtifactDescriptorResult.class);

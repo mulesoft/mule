@@ -510,7 +510,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   /**
    * Discovers the {@link Dependency} from the list of directDependencies using the artifact coordiantes in format of:
-   * <pre>groupId:artifactId</pre>
+   * 
+   * <pre>
+   * groupId:artifactId
+   * </pre>
    * <p/>
    * If the coordinates matches to the rootArtifact it will return a {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE}
    * {@link Dependency}.
@@ -519,13 +522,18 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param rootArtifact {@link Artifact} that defines the current artifact that requested to build this class loaders
    * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
    * @return {@link Dependency} representing the artifact if declared as direct dependency or rootArtifact if they match it or
-   * {@link Optional#EMPTY} if couldn't found the dependency.
+   *         {@link Optional#EMPTY} if couldn't found the dependency.
+   * @throws {@link IllegalArgumentException} if artifactCoords are not in the expected format
    */
   public Optional<Dependency> discoverDependency(String artifactCoords, Artifact rootArtifact,
                                                  List<Dependency> directDependencies) {
-    final String[] pluginSplitCoords = artifactCoords.split(MAVEN_COORDINATES_SEPARATOR);
-    String groupId = pluginSplitCoords[0];
-    String artifactId = pluginSplitCoords[1];
+    final String[] artifactCoordsSplit = artifactCoords.split(MAVEN_COORDINATES_SEPARATOR);
+    if (artifactCoordsSplit.length != 2) {
+      throw new IllegalArgumentException("Artifact coordinates should be in format of groupId:artifactId, '" + artifactCoords +
+          "' is not a valid format");
+    }
+    String groupId = artifactCoordsSplit[0];
+    String artifactId = artifactCoordsSplit[1];
 
     if (rootArtifact.getGroupId().equals(groupId) && rootArtifact.getArtifactId().equals(artifactId)) {
       logger.debug("'{}' artifact coordinates matched with rootArtifact '{}', resolving version from rootArtifact",
