@@ -6,20 +6,22 @@
  */
 package org.mule.test.core.context.notification.processors;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 /**
  *
@@ -63,7 +65,7 @@ public class MessageProcessorNotificationPathTestCase extends AbstractIntegratio
     testFlowPaths("enricher", "/0", "/0/0", "/1", "/1/0", "/1/0/0", "/1/0/1");
     testFlowPaths("until-successful", "/0", "/0/0", "/1");
     testFlowPaths("until-successful-with-processor-chain", "/0", "/0/0", "/0/0/0", "/0/0/1", "/1");
-    testFlowPaths("until-successful-with-enricher", "/0", "/0/0", "/0/0/0", "/1");
+    testFlowPaths("until-successful-with-enricher", "/0", "/0/0", "/0/0/0", "/0/0/0/0", "/0/0/1", "/1");
     testFlowPaths("async", "/0", "/0/0", "/0/1");
   }
 
@@ -122,7 +124,7 @@ public class MessageProcessorNotificationPathTestCase extends AbstractIntegratio
   }
 
   private String[] generatePaths(String flowName, String[] nodes) {
-    Set<String> pathSet = new LinkedHashSet<String>();
+    Set<String> pathSet = new LinkedHashSet<>();
     String base = "/" + flowName + "/processors";
     for (String node : nodes) {
       if (!node.startsWith("/")) {

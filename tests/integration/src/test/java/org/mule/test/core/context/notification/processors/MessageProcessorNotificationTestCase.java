@@ -245,8 +245,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
   public void compositeSource() throws Exception {
     specificationFactory = () -> new Node()
         .serial(prePost()) // call throw cs1
-        .serial(prePost())
-    ;
+        .serial(prePost());
 
     CompositeMessageSource composite =
         (CompositeMessageSource) ((Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source")).getMessageSource();
