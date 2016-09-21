@@ -7,6 +7,7 @@
 
 package org.mule.test.runner.classloader;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.joining;
@@ -29,6 +30,7 @@ import org.mule.runtime.module.artifact.classloader.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.util.FileJarExplorer;
+import org.mule.runtime.module.artifact.util.JarExplorer;
 import org.mule.runtime.module.artifact.util.JarInfo;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactUrlClassification;
@@ -40,8 +42,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +123,7 @@ public class IsolatedClassLoaderFactory {
     ArtifactClassLoader appClassLoader =
         createApplicationArtifactClassLoader(regionClassLoader, appLookupPolicy, artifactUrlClassification);
 
-
-    final URL url = artifactUrlClassification.getApplicationUrls().get(0);
-    final JarInfo testJarInfo = new FileJarExplorer().explore(url);
+    JarInfo testJarInfo = getJarInfo(artifactUrlClassification);
 
     regionClassLoader.addClassLoader(appClassLoader,
                                      new DefaultArtifactClassLoaderFilter(testJarInfo.getPackages(), testJarInfo.getResources()));
@@ -132,6 +134,30 @@ public class IsolatedClassLoaderFactory {
     }
 
     return new ArtifactClassLoaderHolder(containerClassLoader, pluginsArtifactClassLoaders, appClassLoader);
+  }
+
+  /**
+   * Creates the {@link JarInfo} for the {@link ArtifactUrlClassification}.
+   *
+   * @param artifactUrlClassification the {@link ArtifactUrlClassification} that defines the different {@link URL}s for each
+   *        {@link ClassLoader}
+   * @return {@link JarInfo} for the classification
+   */
+  private JarInfo getJarInfo(ArtifactUrlClassification artifactUrlClassification) {
+    Set<String> packages = new HashSet<>();
+    Set<String> resources = new HashSet<>();
+    final JarExplorer jarExplorer = new FileJarExplorer();
+
+    List<URL> libraries = newArrayList(artifactUrlClassification.getApplicationUrls().get(0));
+    libraries.addAll(artifactUrlClassification.getPluginSharedLibUrls());
+
+    for (URL library : libraries) {
+      final JarInfo jarInfo = jarExplorer.explore(library);
+      packages.addAll(jarInfo.getPackages());
+      resources.addAll(jarInfo.getResources());
+    }
+
+    return new JarInfo(packages, resources);
   }
 
   /**

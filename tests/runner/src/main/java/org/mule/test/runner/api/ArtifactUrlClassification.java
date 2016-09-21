@@ -7,6 +7,8 @@
 
 package org.mule.test.runner.api;
 
+import static org.mule.runtime.core.util.Preconditions.checkNotNull;
+
 import java.net.URL;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class ArtifactUrlClassification {
 
   private final List<URL> containerUrls;
+  private final List<URL> pluginSharedLibUrls;
   private final List<PluginUrlClassification> pluginClassificationsUrls;
   private final List<URL> applicationUrls;
 
@@ -27,21 +30,34 @@ public class ArtifactUrlClassification {
    *
    * @param containerUrls list of {@link URL} that define the artifacts that would be loaded with the container
    *        {@link ClassLoader}
+   * @param pluginSharedLibUrls of {@link URL} that define the artifacts that would be loaded with the shareLib
+   *        {@link ClassLoader}
    * @param pluginClassificationsUrls for each plugin discovered a list of {@link URL} that define the artifacts that would be
    *        loaded by the plugin {@link ClassLoader}
    * @param applicationUrls list of {@link URL} that define the artifacts that would be loaded with the application
    *        {@link ClassLoader}
    */
   public ArtifactUrlClassification(List<URL> containerUrls,
+                                   List<URL> pluginSharedLibUrls,
                                    List<PluginUrlClassification> pluginClassificationsUrls,
                                    List<URL> applicationUrls) {
+    checkNotNull(containerUrls, "containerUrls cannot be null");
+    checkNotNull(pluginSharedLibUrls, "pluginSharedLibUrls cannot be null");
+    checkNotNull(pluginClassificationsUrls, "pluginClassificationsUrls cannot be null");
+    checkNotNull(applicationUrls, "applicationUrls cannot be null");
+
     this.containerUrls = containerUrls;
+    this.pluginSharedLibUrls = pluginSharedLibUrls;
     this.pluginClassificationsUrls = pluginClassificationsUrls;
     this.applicationUrls = applicationUrls;
   }
 
   public List<URL> getContainerUrls() {
     return containerUrls;
+  }
+
+  public List<URL> getPluginSharedLibUrls() {
+    return pluginSharedLibUrls;
   }
 
   public List<PluginUrlClassification> getPluginClassificationUrls() {

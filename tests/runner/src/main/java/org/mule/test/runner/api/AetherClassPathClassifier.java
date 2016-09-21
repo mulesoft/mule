@@ -103,7 +103,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @return {@link ArtifactUrlClassification} as result with the classification
    */
   @Override
-  public ArtifactUrlClassification classify(ClassPathClassifierContext context) {
+  public ArtifactUrlClassification classify(final ClassPathClassifierContext context) {
     logger.debug("Building class loaders for rootArtifact: {}", context.getRootArtifact());
 
     List<Dependency> directDependencies;
@@ -114,12 +114,49 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                       e);
     }
 
+    List<URL> pluginSharedLibUrls = buildPluginSharedLibClassification(context, directDependencies);
     List<PluginUrlClassification> pluginUrlClassifications = buildPluginUrlClassifications(context, directDependencies);
 
     List<URL> containerUrls = buildContainerUrlClassification(context, directDependencies, pluginUrlClassifications);
     List<URL> applicationUrls = buildApplicationUrlClassification(context, directDependencies, pluginUrlClassifications);
 
-    return new ArtifactUrlClassification(containerUrls, pluginUrlClassifications, applicationUrls);
+    return new ArtifactUrlClassification(containerUrls, pluginSharedLibUrls, pluginUrlClassifications, applicationUrls);
+  }
+
+  /**
+   * Classifies the {@link List} of {@link URL}s from {@value org.eclipse.aether.util.artifact.JavaScopes#TEST} scope direct
+   * dependencies to be added as plugin runtime shared libraries.
+   *
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @return {@link List} of {@link URL}s to be added to runtime shared libraries.
+   */
+  private List<URL> buildPluginSharedLibClassification(final ClassPathClassifierContext context,
+                                                       final List<Dependency> directDependencies) {
+    List<URL> pluginSharedLibUrls = newArrayList();
+
+    List<Dependency> pluginSharedLibDependencies = context.getSharedPluginLibCoordinates().stream()
+        .map(sharedPluginLibCoords -> findPluginSharedLibArtifact(sharedPluginLibCoords, context.getRootArtifact(),
+                                                                  directDependencies))
+        .collect(toList());
+
+    logger.debug("Plugin sharedLib artifacts matched with versions from direct dependencies declared: {}",
+                 pluginSharedLibDependencies);
+
+    pluginSharedLibDependencies.stream()
+        .map(pluginSharedLibDependency -> {
+          try {
+            return dependencyResolver.resolveArtifact(pluginSharedLibDependency.getArtifact())
+                .getArtifact().getFile().toURI().toURL();
+          } catch (Exception e) {
+            throw new IllegalStateException("Error while resolving dependency '" + pluginSharedLibDependency
+                + "' as plugin sharedLibs");
+          }
+        })
+        .forEach(pluginSharedLibUrls::add);
+
+    logger.debug("Classified URLs as plugin runtime shared libraries: '{}", pluginSharedLibUrls);
+    return pluginSharedLibUrls;
   }
 
   /**
@@ -432,6 +469,26 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   }
 
   /**
+   * Finds the plugin shared lib {@link Dependency} from the direct dependencies of the  rootArtifact.
+   *
+   * @param pluginSharedLibCoords Maven coordinates that define the plugin shared lib artifact
+   * @param rootArtifact {@link Artifact} that defines the current artifact that requested to build this class loaders
+   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @return {@link Artifact} representing the plugin shared lib artifact
+   */
+  private Dependency findPluginSharedLibArtifact(String pluginSharedLibCoords, Artifact rootArtifact,
+                                                 List<Dependency> directDependencies) {
+    Optional<Dependency> pluginSharedLibDependency = discoverDependency(pluginSharedLibCoords, rootArtifact, directDependencies);
+    if (!pluginSharedLibDependency.isPresent() || !pluginSharedLibDependency.get().getScope().equals(TEST)) {
+      throw new IllegalStateException("Plugin shared lib artifact '" + pluginSharedLibCoords +
+          "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project");
+    }
+
+    return pluginSharedLibDependency.get();
+  }
+
+
+  /**
    * Creates the plugin {@link Artifact}, if no version is {@value org.eclipse.aether.util.artifact.JavaScopes#PROVIDED} it will
    * be obtained from the direct dependencies for the rootArtifact or if the same rootArtifact is the plugin declared it will take
    * its version.
@@ -442,30 +499,54 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @return {@link Artifact} representing the plugin
    */
   private Artifact createPluginArtifact(String pluginCoords, Artifact rootArtifact, List<Dependency> directDependencies) {
-    final String[] pluginSplitCoords = pluginCoords.split(MAVEN_COORDINATES_SEPARATOR);
-    String pluginGroupId = pluginSplitCoords[0];
-    String pluginArtifactId = pluginSplitCoords[1];
-    String pluginVersion;
-
-    if (rootArtifact.getGroupId().equals(pluginGroupId) && rootArtifact.getArtifactId().equals(pluginArtifactId)) {
-      logger.debug("'{}' declared as plugin, resolving version from pom file", rootArtifact);
-      pluginVersion = rootArtifact.getVersion();
-    } else {
-      logger.debug("Resolving version for '{}' from direct dependencies", pluginCoords);
-      Optional<Dependency> pluginDependencyOp = findDirectDependency(pluginGroupId, pluginArtifactId, directDependencies);
-
-      if (!pluginDependencyOp.isPresent() || !pluginDependencyOp.get().getScope().equals(PROVIDED)) {
-        throw new IllegalStateException("Plugin '" + pluginGroupId + ":" + pluginArtifactId
-            + "' in order to be resolved has to be declared as " + PROVIDED + " dependency of your Maven project");
-      }
-
-      Dependency pluginDependency = pluginDependencyOp.get();
-      pluginVersion = pluginDependency.getArtifact().getVersion();
+    Optional<Dependency> pluginDependency = discoverDependency(pluginCoords, rootArtifact, directDependencies);
+    if (!pluginDependency.isPresent() || !pluginDependency.get().getScope().equals(PROVIDED)) {
+      throw new IllegalStateException("Plugin '" + pluginCoords + "' in order to be resolved has to be declared as " + PROVIDED +
+          " dependency of your Maven project");
     }
 
-    final DefaultArtifact artifact = new DefaultArtifact(pluginGroupId, pluginArtifactId, JAR_EXTENSION, pluginVersion);
-    logger.debug("'{}' plugin coordinates resolved to: '{}'", pluginCoords, artifact);
-    return artifact;
+    return pluginDependency.get().getArtifact();
+  }
+
+  /**
+   * Discovers the {@link Dependency} from the list of directDependencies using the artifact coordiantes in format of:
+   * 
+   * <pre>
+   * groupId:artifactId
+   * </pre>
+   * <p/>
+   * If the coordinates matches to the rootArtifact it will return a {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE}
+   * {@link Dependency}.
+   *
+   * @param artifactCoords Maven coordinates that define the artifact dependency
+   * @param rootArtifact {@link Artifact} that defines the current artifact that requested to build this class loaders
+   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @return {@link Dependency} representing the artifact if declared as direct dependency or rootArtifact if they match it or
+   *         {@link Optional#EMPTY} if couldn't found the dependency.
+   * @throws {@link IllegalArgumentException} if artifactCoords are not in the expected format
+   */
+  public Optional<Dependency> discoverDependency(String artifactCoords, Artifact rootArtifact,
+                                                 List<Dependency> directDependencies) {
+    final String[] artifactCoordsSplit = artifactCoords.split(MAVEN_COORDINATES_SEPARATOR);
+    if (artifactCoordsSplit.length != 2) {
+      throw new IllegalArgumentException("Artifact coordinates should be in format of groupId:artifactId, '" + artifactCoords +
+          "' is not a valid format");
+    }
+    String groupId = artifactCoordsSplit[0];
+    String artifactId = artifactCoordsSplit[1];
+
+    if (rootArtifact.getGroupId().equals(groupId) && rootArtifact.getArtifactId().equals(artifactId)) {
+      logger.debug("'{}' artifact coordinates matched with rootArtifact '{}', resolving version from rootArtifact",
+                   artifactCoords, rootArtifact);
+      final DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, JAR_EXTENSION, rootArtifact.getVersion());
+      logger.debug("'{}' artifact coordinates resolved to: '{}'", artifactCoords, artifact);
+      return Optional.of(new Dependency(artifact, COMPILE));
+
+    } else {
+      logger.debug("Resolving version for '{}' from direct dependencies", artifactCoords);
+      return findDirectDependency(groupId, artifactId, directDependencies);
+    }
+
   }
 
   /**

@@ -55,13 +55,33 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private List<String> testExclusions = newArrayList();
   private List<String> testInclusions = newArrayList();
   private List<String> pluginCoordinates = newArrayList();
+  private List<String> sharedPluginLibCoordinates = newArrayList();
   private List<Class> exportPluginClasses = newArrayList();
   private boolean extensionMetadataGenerationEnabled = false;
   private List<String> providedInclusions = newArrayList();
   private List<String> extraBootPackages;
 
+  /**
+   * Sets the {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to create plugin
+   * {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}s
+   *
+   * @param pluginCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>}
+   * @return this
+   */
   public ArtifactIsolatedClassLoaderBuilder setPluginCoordinates(List<String> pluginCoordinates) {
     this.pluginCoordinates = pluginCoordinates;
+    return this;
+  }
+
+  /**
+   * Sets the {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>} in order to be
+   * added to the sharedLib {@link org.mule.runtime.module.artifact.classloader.ArtifactClassLoader}
+   *
+   * @param sharedPluginLibCoordinates {@link List} of Maven coordinates in format {@code <groupId>:<artifactId>}
+   * @return this
+   */
+  public ArtifactIsolatedClassLoaderBuilder setSharedPluginLibCoordinates(List<String> sharedPluginLibCoordinates) {
+    this.sharedPluginLibCoordinates = sharedPluginLibCoordinates;
     return this;
   }
 
@@ -243,7 +263,10 @@ public class ArtifactIsolatedClassLoaderBuilder {
                                          providedInclusions,
                                          testExclusions,
                                          testInclusions,
-                                         pluginCoordinates, exportPluginClasses, extensionMetadataGenerationEnabled);
+                                         pluginCoordinates,
+                                         sharedPluginLibCoordinates,
+                                         exportPluginClasses,
+                                         extensionMetadataGenerationEnabled);
     } catch (IOException e) {
       throw new RuntimeException("Error while creating the classification context", e);
     }
