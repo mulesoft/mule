@@ -46,8 +46,6 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
   private static final String CONFIGURATION_CANNOT_BE_DYNAMIC = "Configuration used for Metadata fetch cannot be dynamic";
   private static final String NO_DYNAMIC_KEY_AVAILABLE = "Component [%s] is not a MetadataKeyProvider";
 
-
-
   @Override
   protected String getConfigFile() {
     return METADATA_TEST;

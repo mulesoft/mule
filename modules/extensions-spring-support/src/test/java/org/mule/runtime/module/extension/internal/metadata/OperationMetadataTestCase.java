@@ -47,6 +47,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
+import org.mule.test.metadata.extension.model.animals.SwordFish;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Bear;
@@ -496,14 +497,26 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     assertThat(animalMetadata.get().getType(), is(toMetadataType(Bear.class)));
   }
 
+  @Test
+  public void booleanMetadataKey() {
+    componentId = new ProcessorId(BOOLEAN_METADATA_KEY, FIRST_PROCESSOR_INDEX);
+    MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, newKey("true").build());
+    assertThat(result.isSuccess(), is(true));
+    assertThat(result.get().getContentMetadata().get().get().getType(), is(toMetadataType(SwordFish.class)));
+  }
+
+  @Test
+  public void enumMetadataKey() {
+    componentId = new ProcessorId(ENUM_METADATA_KEY, FIRST_PROCESSOR_INDEX);
+    MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, newKey("MAMMAL").build());
+    assertThat(result.isSuccess(), is(true));
+    assertThat(result.get().getContentMetadata().get().get().getType(), is(toMetadataType(Bear.class)));
+  }
+
   /**
    * Test template that sets an "invalid" classloader in TCCL different from the one that was used to register the extension and
    * asserts that, it sets back the original classloader to TCCL. Done in this way due to it is not possible to change extension
    * model classloader property once it is registered.
-   *
-   * @param flowName
-   * @param doAction
-   * @throws Exception
    */
   private void doResolverTestWithContextClassLoader(String flowName, Callback<OperationMetadataTestCase> doAction)
       throws Exception {

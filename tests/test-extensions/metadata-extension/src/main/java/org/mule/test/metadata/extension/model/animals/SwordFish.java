@@ -6,7 +6,12 @@
  */
 package org.mule.test.metadata.extension.model.animals;
 
-public interface Animal {
+import static org.mule.test.metadata.extension.model.animals.AnimalClade.FISH;
 
-  AnimalClade getClade();
+public class SwordFish implements Animal {
+
+  @Override
+  public AnimalClade getClade() {
+    return FISH;
+  }
 }
