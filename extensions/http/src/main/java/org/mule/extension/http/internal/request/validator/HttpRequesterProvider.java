@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request.validator;
 
+import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnector.AUTHENTICATION;
 import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.TLS;
@@ -13,6 +14,7 @@ import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
 import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -33,7 +35,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -162,6 +163,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @DefaultTlsContextFactoryBuilder
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
 
+  HttpClientFactory httpClientFactory;
+
   @Override
   public ConnectionValidationResult validate(HttpClient httpClient) {
     return ConnectionValidationResult.success();
@@ -191,6 +194,8 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
     }
 
     verifyConnectionsParameters();
+
+    httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
@@ -206,7 +211,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
 
   @Override
   public HttpClient connect() throws ConnectionException {
-    String threadNamePrefix = String.format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), configName);
+    String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(muleContext), configName);
 
     HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
         .setUriParameters(new DefaultUriParameters(protocol, host, port)).setAuthentication(authentication)
@@ -214,7 +219,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
         .setMaxConnections(maxConnections).setUsePersistentConnections(usePersistentConnections)
         .setConnectionIdleTimeout(connectionIdleTimeout).setThreadNamePrefix(threadNamePrefix).setOwnerName(configName).build();
 
-    HttpClientFactory httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
     HttpClient httpClient;
     if (httpClientFactory == null) {
       httpClient = new GrizzlyHttpClient(configuration);
