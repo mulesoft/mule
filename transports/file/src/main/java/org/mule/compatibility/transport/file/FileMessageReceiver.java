@@ -188,12 +188,19 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver {
           Lock fileLock = lockFactory.createLock(file.getName());
           if (fileLock.tryLock()) {
             try {
+              //Skipping empty files
+              if (file.length() == 0) {
+                if (logger.isDebugEnabled()) {
+                  logger.debug("Found empty file '" + file.getName() + "'. Skipping file.");
+                }
+                continue;
+              }
               String fileAbsolutePath = file.getAbsolutePath();
               try {
                 filesBeingProcessingObjectStore.store(fileAbsolutePath, fileAbsolutePath);
 
                 if (logger.isDebugEnabled()) {
-                  logger.debug(String.format("Flag for '%s' stored successfully.", fileAbsolutePath));
+                  logger.debug("Flag for '" + fileAbsolutePath + "' stored successfully.");
                 }
               } catch (ObjectAlreadyExistsException e) {
                 if (logger.isDebugEnabled()) {

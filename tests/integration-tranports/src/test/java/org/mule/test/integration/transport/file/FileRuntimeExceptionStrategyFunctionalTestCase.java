@@ -7,6 +7,8 @@
 package org.mule.test.integration.transport.file;
 
 import static org.junit.Assert.fail;
+import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.util.FileUtils.writeStringToFile;
 
 import org.mule.compatibility.transport.file.ExpressionFilenameParser;
 import org.mule.functional.junit4.FunctionalTestCase;
@@ -31,8 +33,10 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends FunctionalTe
 
   @Test
   public void testExceptionInTransformer() throws Exception {
-    File f = FileUtils.newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
+    File f = newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
     f.createNewFile();
+    // If file is empty it won't be processed
+    writeStringToFile(f, "test", (String) null);
 
     // try a couple of times with backoff strategy, then fail
     File errorFile = FileUtils.newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());

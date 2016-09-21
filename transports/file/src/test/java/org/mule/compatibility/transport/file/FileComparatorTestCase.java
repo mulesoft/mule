@@ -8,12 +8,13 @@ package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.util.FileUtils.writeStringToFile;
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -28,6 +29,7 @@ public class FileComparatorTestCase extends FunctionalTestCase {
   public static final String FILE_NAMES[] = {"first", "second"};
   public static final String COMPONENT_NAME = "FolderTO";
   public static final String INPUT_FOLDER = "in";
+  public static final String ENCODING = null;
 
   @Override
   protected String getConfigFile() {
@@ -46,11 +48,13 @@ public class FileComparatorTestCase extends FunctionalTestCase {
     ((FunctionalTestComponent) getComponent(COMPONENT_NAME)).setEventCallback(callback);
 
     ((Connector) muleContext.getRegistry().lookupObject(FILE_CONNECTOR_NAME)).stop();
-    File f1 = FileUtils.newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator + FILE_NAMES[0]).getAbsolutePath());
+    File f1 = newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator + FILE_NAMES[0]).getAbsolutePath());
     assertTrue(f1.createNewFile());
+    writeStringToFile(f1, FILE_NAMES[0], ENCODING);
     Thread.sleep(1000);
-    File f2 = FileUtils.newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator + FILE_NAMES[1]).getAbsolutePath());
+    File f2 = newFile(getFileInsideWorkingDirectory(INPUT_FOLDER + File.separator + FILE_NAMES[1]).getAbsolutePath());
     assertTrue(f2.createNewFile());
+    writeStringToFile(f2, FILE_NAMES[0], ENCODING);
     Thread.sleep(1000);
     ((Connector) muleContext.getRegistry().lookupObject(FILE_CONNECTOR_NAME)).start();
     assertTrue(countDown.await(TIMEOUT, TimeUnit.MILLISECONDS));

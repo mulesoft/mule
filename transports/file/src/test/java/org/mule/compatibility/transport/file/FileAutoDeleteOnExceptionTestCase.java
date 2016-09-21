@@ -7,6 +7,7 @@
 package org.mule.compatibility.transport.file;
 
 import static org.junit.Assert.assertFalse;
+import static org.mule.runtime.core.util.FileUtils.writeStringToFile;
 
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -58,6 +59,8 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase {
   @Test
   public void testDoesNotAutoDeleteFileOnException() throws Exception {
     File target = createTestFile(testFolder1);
+    writeStringToFile(target, "test", (String) null);
+
     // Starts file endpoint polling
     muleContext.start();
 
@@ -72,6 +75,7 @@ public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase {
   @Test
   public void testAutoDeletesFileOnExceptionIfFileWasTransformed() throws Exception {
     File target = createTestFile(testFolder2);
+    writeStringToFile(target, "test", (String) null);
 
     // Starts file endpoint polling
     muleContext.start();
