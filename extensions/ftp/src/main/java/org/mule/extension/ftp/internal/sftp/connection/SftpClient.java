@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 public class SftpClient {
 
   private static Logger LOGGER = LoggerFactory.getLogger(SftpClient.class);
+  private static final int FILE_NOT_FOUND_ERROR_CODE = 2;
 
   public static final String CHANNEL_SFTP = "sftp";
   public static final String STRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
@@ -113,7 +114,7 @@ public class SftpClient {
     try {
       return new SftpFileAttributes(path, sftp.stat(path.toString()));
     } catch (SftpException e) {
-      if (e.getMessage().contains(FileNotFoundException.class.getName())) {
+      if (e.id == FILE_NOT_FOUND_ERROR_CODE) {
         return null;
       }
       throw exception("Could not obtain attributes for path " + path, e);
