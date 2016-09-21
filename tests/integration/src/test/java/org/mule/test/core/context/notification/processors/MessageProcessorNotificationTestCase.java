@@ -6,6 +6,7 @@
  */
 package org.mule.test.core.context.notification.processors;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.runtime.core.api.Event;
@@ -15,6 +16,7 @@ import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.test.core.context.notification.Node;
 import org.mule.test.core.context.notification.RestrictedNode;
 
@@ -27,7 +29,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Ignore("MULE-10185 - ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
 public class MessageProcessorNotificationTestCase extends AbstractMessageProcessorNotificationTestCase {
 
   @Rule
@@ -145,7 +146,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         .serial(prePost())
         .serial(prePost());
 
-    // assertNotNull(runFlow("in-async", TEST_PAYLOAD));
+    assertNotNull(flowRunner("in-async").withPayload(TEST_PAYLOAD).run());
 
     assertNotifications();
   }
@@ -222,7 +223,8 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
         .serial(prePost())
         .serial(prePost());
 
-    expectedException.expect(ComponentException.class);
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(ComponentException.class));
     flowRunner("rollback-es").withPayload(TEST_PAYLOAD).run();
 
     assertNotifications();
@@ -243,16 +245,12 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
   public void compositeSource() throws Exception {
     specificationFactory = () -> new Node()
         .serial(prePost()) // call throw cs1
-        .serial(prePost())
-        .serial(prePost())
-        .serial(prePost()) // call throw cs4
-    ;
+        .serial(prePost());
 
     CompositeMessageSource composite =
         (CompositeMessageSource) ((Flow) muleContext.getRegistry().lookupFlowConstruct("composite-source")).getMessageSource();
     assertNotNull(((TestMessageSource) composite.getSources().get(0)).fireEvent(getTestEvent(TEST_PAYLOAD)));
     assertNotNull(((TestMessageSource) composite.getSources().get(1)).fireEvent(getTestEvent(TEST_PAYLOAD)));
-
 
     assertNotifications();
   }
@@ -366,6 +364,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
             .parallelSynch(post().serial(prePost())));
 
     assertNotNull(flowRunner("until-successful").withPayload(TEST_PAYLOAD).run());
+    muleContext.getClient().request("test://out-us", getTestTimeoutSecs()).getRight().get();
 
     assertNotifications();
   }
@@ -379,6 +378,7 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
             .parallelSynch(post().serial(prePost())));
 
     assertNotNull(flowRunner("until-successful-with-processor-chain").withPayload(TEST_PAYLOAD).run());
+    muleContext.getClient().request("test://out-us", getTestTimeoutSecs()).getRight().get();
 
     assertNotifications();
   }
@@ -388,10 +388,11 @@ public class MessageProcessorNotificationTestCase extends AbstractMessageProcess
     specificationFactory = () -> new Node()
         .serial(pre())
         .serial(new Node()
-            .parallelSynch(pre().serial(prePost()).serial(post()))
+            .parallelSynch(pre().serial(pre()).serial(prePost()).serial(post()).serial(prePost()).serial(post()))
             .parallelSynch(post().serial(prePost())));
 
     assertNotNull(flowRunner("until-successful-with-enricher").withPayload(TEST_PAYLOAD).run());
+    muleContext.getClient().request("test://out-us", getTestTimeoutSecs()).getRight().get();
 
     assertNotifications();
   }

@@ -10,12 +10,11 @@ import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -25,13 +24,15 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.config.i18n.CoreMessages;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.management.stats.RouterStatistics;
@@ -303,5 +304,11 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
   public void setMuleContext(MuleContext context) {
     super.setMuleContext(context);
     notificationTemplate.setMuleContext(context);
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    super.setFlowConstruct(flowConstruct);
+    notificationTemplate.setFlowConstruct(flowConstruct);
   }
 }

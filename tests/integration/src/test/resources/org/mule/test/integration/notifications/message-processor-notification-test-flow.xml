@@ -152,8 +152,8 @@
 
     <flow name="all3">
         <all>
-            <logger message="check"/>
-            <logger message="check"/>
+            <logger message="check1"/>
+            <logger message="check2"/>
         </all>
         <logger message="Log after a scope"/>
     </flow>
@@ -198,9 +198,12 @@
 
     <flow name="until-successful-with-enricher">
         <until-successful objectStore-ref="objectStore">
-            <enricher source="#[payload]" target="#[payload]">
-                <append-string-transformer message="Hello"/>
-            </enricher>
+            <processor-chain>
+                <enricher source="#[payload]" target="#[payload]">
+                    <append-string-transformer message="Hello"/>
+                </enricher>
+                <test:queue name="out-us"/>
+            </processor-chain>
         </until-successful>
         <append-string-transformer message="Hello"/>
     </flow>
@@ -292,7 +295,7 @@
                 <echo-component/>
             </on-error-propagate>
             <on-error-continue>
-                <echo-component/>
+                <logger message="continue"/>
             </on-error-continue>
         </error-handler>
     </flow>
@@ -339,9 +342,9 @@
 
     <flow name="chunkAggregator">
         <message-chunk-splitter messageSize="1"/>
-        <logger level="INFO"/>
+        <logger message="1"/>
         <message-chunk-aggregator/>
-        <logger level="INFO"/>
+        <logger message="2"/>
     </flow>
 
     <flow name="combineCollections">

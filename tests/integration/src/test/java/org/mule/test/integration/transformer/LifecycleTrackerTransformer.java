@@ -32,8 +32,10 @@ public class LifecycleTrackerTransformer extends AbstractTransformer implements 
 
   @Override
   public void setMuleContext(final MuleContext context) {
-    tracker.add("setMuleContext");
-    muleContext = context;
+    if (muleContext == null) {
+      tracker.add("setMuleContext");
+      muleContext = context;
+    }
   }
 
 

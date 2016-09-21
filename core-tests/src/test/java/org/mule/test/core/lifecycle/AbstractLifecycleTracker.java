@@ -20,7 +20,8 @@ import java.util.List;
  */
 public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContextAware {
 
-  private final List<String> tracker = new ArrayList<String>();
+  private final List<String> tracker = new ArrayList<>();
+  private MuleContext muleContext;
 
   public List<String> getTracker() {
     return tracker;
@@ -30,22 +31,30 @@ public abstract class AbstractLifecycleTracker implements Lifecycle, MuleContext
     getTracker().add("setProperty");
   }
 
+  @Override
   public void setMuleContext(final MuleContext context) {
-    getTracker().add("setMuleContext");
+    if (muleContext == null) {
+      getTracker().add("setMuleContext");
+      this.muleContext = context;
+    }
   }
 
+  @Override
   public void initialise() throws InitialisationException {
     getTracker().add("initialise");
   }
 
+  @Override
   public void start() throws MuleException {
     getTracker().add("start");
   }
 
+  @Override
   public void stop() throws MuleException {
     getTracker().add("stop");
   }
 
+  @Override
   public void dispose() {
     getTracker().add("dispose");
   }

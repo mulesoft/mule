@@ -12,9 +12,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -56,9 +56,12 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   public MessageProcessorChain build() throws MuleException {
     LinkedList<Processor> tempList = new LinkedList<>();
 
+    final LinkedList<Processor> builtProcessors = new LinkedList<>();
+
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
+      builtProcessors.addFirst(processor);
       if (processor instanceof InterceptingMessageProcessor) {
         InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
         // Processor is intercepting so we can't simply iterate
@@ -68,7 +71,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
             interceptingProcessor.setListener(tempList.get(0));
           } else {
             final DefaultMessageProcessorChain innerChain = createInnerChain(tempList);
-            innerChain.setTemplateMuleContext(muleContext);
+            innerChain.setMuleContext(muleContext);
             interceptingProcessor.setListener(innerChain);
           }
         }
@@ -82,15 +85,17 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     // Create the final chain using the current tempList after reserve iteration is complete. This temp
     // list contains the first n processors in the chain that are not intercepting.. with processor n+1
     // having been injected as the listener of processor n
-    final InterceptingChainLifecycleWrapper chain = buildMessageProcessorChain(createOuterChain(tempList));
-    chain.setTemplateMuleContext(muleContext);
+    final InterceptingChainLifecycleWrapper chain = buildMessageProcessorChain(createOuterChain(tempList), builtProcessors);
+    chain.setMuleContext(muleContext);
+    chain.setFlowConstruct(flowConstruct);
     return chain;
   }
 
-  protected InterceptingChainLifecycleWrapper buildMessageProcessorChain(DefaultMessageProcessorChain chain) {
+  protected InterceptingChainLifecycleWrapper buildMessageProcessorChain(DefaultMessageProcessorChain chain,
+                                                                         List<Processor> builtProcessors) {
     // Wrap with something that can apply lifecycle to all processors which are otherwise not visable from
     // DefaultMessageProcessorChain
-    return new InterceptingChainLifecycleWrapper(chain, processors, "wrapper for " + name);
+    return new InterceptingChainLifecycleWrapper(chain, builtProcessors, "wrapper for " + name);
   }
 
   protected DefaultMessageProcessorChain createInnerChain(LinkedList<Processor> tempList) {

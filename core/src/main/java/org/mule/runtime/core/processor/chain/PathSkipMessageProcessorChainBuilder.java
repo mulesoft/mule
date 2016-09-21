@@ -8,6 +8,9 @@ package org.mule.runtime.core.processor.chain;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.Processor;
+
+import java.util.List;
 
 /**
  * Constructs a chain of {@link org.mule.runtime.core.api.processor.Processor}s and wraps the invocation of the chain in a
@@ -26,7 +29,8 @@ public class PathSkipMessageProcessorChainBuilder extends DefaultMessageProcesso
   }
 
   @Override
-  protected InterceptingChainLifecycleWrapper buildMessageProcessorChain(DefaultMessageProcessorChain chain) {
-    return new InterceptingChainLifecycleWrapperPathSkip(chain, processors, name);
+  protected InterceptingChainLifecycleWrapper buildMessageProcessorChain(DefaultMessageProcessorChain chain,
+                                                                         List<Processor> builtProcessors) {
+    return new InterceptingChainLifecycleWrapperPathSkip(chain, builtProcessors, name);
   }
 }

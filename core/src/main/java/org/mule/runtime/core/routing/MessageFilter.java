@@ -7,8 +7,8 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -124,6 +124,7 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
+    super.setFlowConstruct(flowConstruct);
     if (!onUnacceptedFlowConstruct && unacceptedMessageProcessor instanceof FlowConstructAware) {
       ((FlowConstructAware) unacceptedMessageProcessor).setFlowConstruct(flowConstruct);
     }

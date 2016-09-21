@@ -10,22 +10,22 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.MessageProcessors;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.StringUtils;
@@ -96,12 +96,9 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
   public void setEnrichmentMessageProcessor(Processor enrichmentProcessor) {
     if (!(enrichmentProcessor instanceof MessageProcessorChain)) {
       this.enrichmentProcessor = MessageProcessors.singletonChain(muleContext, enrichmentProcessor);
+      ((MuleContextAware) this.enrichmentProcessor).setMuleContext(muleContext);
     } else {
       this.enrichmentProcessor = enrichmentProcessor;
-    }
-
-    if (this.enrichmentProcessor instanceof DefaultMessageProcessorChain) {
-      ((DefaultMessageProcessorChain) this.enrichmentProcessor).setTemplateMuleContext(muleContext);
     }
   }
 
@@ -218,13 +215,5 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
       return eventToEnrich;
     }
 
-  }
-
-  @Override
-  public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
-    if (this.enrichmentProcessor instanceof DefaultMessageProcessorChain) {
-      ((DefaultMessageProcessorChain) this.enrichmentProcessor).setTemplateMuleContext(muleContext);
-    }
   }
 }
