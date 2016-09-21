@@ -118,7 +118,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    for (Object processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof FlowConstructAware) {
         ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
       }
@@ -173,7 +173,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    for (Object processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof MessagingExceptionHandlerAware) {
         ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
       }
@@ -182,7 +182,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setMuleContext(MuleContext context) {
-    for (Object processor : processors) {
+    for (Processor processor : processors) {
       if (processor instanceof MuleContextAware) {
         ((MuleContextAware) processor).setMuleContext(context);
       }
