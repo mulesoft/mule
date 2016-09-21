@@ -6,26 +6,18 @@
  */
 package org.mule.extension.ftp.internal.sftp.connection;
 
-import static java.lang.String.format;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableList;
+import com.jcraft.jsch.*;
+import org.mule.extension.file.common.api.FileWriteMode;
 import org.mule.extension.ftp.api.sftp.SftpFileAttributes;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
-import org.mule.extension.file.common.api.FileWriteMode;
-
-import com.google.common.base.Supplier;
-import com.google.common.collect.ImmutableList;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,8 +26,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.jcraft.jsch.ChannelSftp.SSH_FX_NO_SUCH_FILE;
+import static java.lang.String.format;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 /**
  * Wrapper around jsch sftp library which provides access to basic sftp commands.
@@ -113,7 +107,7 @@ public class SftpClient {
     try {
       return new SftpFileAttributes(path, sftp.stat(path.toString()));
     } catch (SftpException e) {
-      if (e.getMessage().contains(FileNotFoundException.class.getName())) {
+      if (e.id == SSH_FX_NO_SUCH_FILE) {
         return null;
       }
       throw exception("Could not obtain attributes for path " + path, e);
