@@ -35,9 +35,9 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
+                <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="address"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="previous"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="victim"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -894,8 +894,8 @@
     <xs:complexType name="org.mule.test.heisenberg.extension.model.SaleInfo">
         <xs:complexContent>
             <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
-                <xs:attribute type="mule:expressionInt" use="required" name="amount"></xs:attribute>
                 <xs:attribute type="mule:expressionString" use="required" name="details"></xs:attribute>
+                <xs:attribute type="mule:expressionInt" use="required" name="amount"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
