@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.MuleRuntimeException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -36,7 +37,9 @@ public class BlobDbType extends ResolvedDbType {
   public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException {
     if (value instanceof InputStream) {
       try {
-        value = toByteArray((InputStream) value);
+        Blob blob = statement.getConnection().createBlob();
+        blob.setBytes(1, toByteArray((InputStream) value));
+        value = blob;
       } catch (IOException e) {
         throw new MuleRuntimeException(createStaticMessage("Could not consume inputStream in parameter of index " + index), e);
       }
