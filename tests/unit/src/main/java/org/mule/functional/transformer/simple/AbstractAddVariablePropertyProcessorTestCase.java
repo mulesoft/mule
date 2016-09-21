@@ -84,7 +84,7 @@ public abstract class AbstractAddVariablePropertyProcessorTestCase extends Abstr
     addVariableProcessor.setMuleContext(mockMuleContext);
 
     message = InternalMessage.builder().payload("").build();
-    event = eventBuilder().build();
+    event = eventBuilder().message(message).session(mockSession).build();
   }
 
   @Test

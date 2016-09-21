@@ -52,7 +52,7 @@ public class TestEventBuilder {
   private Map<String, Object> sessionProperties = new HashMap<>();
 
   private String sourceCorrelationId = null;
-  private GroupCorrelation correlation = null;
+  private GroupCorrelation correlation = new GroupCorrelation(null, null);
 
   private Map<String, Object> variables = new HashMap<>();
 
