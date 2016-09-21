@@ -26,23 +26,17 @@ import static org.mule.runtime.extension.api.introspection.parameter.ExpressionS
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber.DEFAULT_CONNECTION_PROVIDER_NAME;
+import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
+import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_LOADER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.arrayOf;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.objectTypeBuilder;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.EXTENSION_DESCRIPTION;
-import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
-
-import com.google.common.reflect.TypeToken;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
@@ -103,6 +97,8 @@ import org.mule.test.vegan.extension.PaulMcCartneySource;
 import org.mule.test.vegan.extension.VeganAttributes;
 import org.mule.test.vegan.extension.VeganExtension;
 
+import com.google.common.reflect.TypeToken;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -114,6 +110,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @SmallTest
@@ -205,7 +204,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     ConfigurationDeclaration configuration = extensionDeclaration.getConfigurations().get(1);
     assertThat(configuration, is(notNullValue()));
     assertThat(configuration.getName(), equalTo(EXTENDED_CONFIG_NAME));
-    assertThat(configuration.getParameters(), hasSize(29));
+    assertThat(configuration.getParameters(), hasSize(27));
     assertParameter(configuration.getParameters(), "extendedProperty", "", toMetadataType(String.class), true, SUPPORTED, null);
   }
 
@@ -344,7 +343,7 @@ public class AnnotationsBasedDescriberTestCase extends AbstractAnnotationsBasedD
     assertThat(conf.getName(), equalTo(DEFAULT_CONFIG_NAME));
 
     List<ParameterDeclaration> parameters = conf.getParameters();
-    assertThat(parameters, hasSize(28));
+    assertThat(parameters, hasSize(26));
 
     assertParameter(parameters, "myName", "", toMetadataType(String.class), false, SUPPORTED, HEISENBERG);
     assertParameter(parameters, "age", "", toMetadataType(Integer.class), false, SUPPORTED, AGE);

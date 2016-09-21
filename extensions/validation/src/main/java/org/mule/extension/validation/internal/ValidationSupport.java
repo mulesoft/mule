@@ -53,11 +53,9 @@ abstract class ValidationSupport {
 
   private ValidationResult evaluateCustomMessage(ValidationResult result, ValidationContext validationContext) {
     String customMessage = validationContext.getOptions().getMessage();
-    if (!StringUtils.isBlank(customMessage)) {
-      result = error(muleContext.getExpressionLanguage().parse(customMessage, validationContext.getMuleEvent(), null));
-    }
-
-    return result;
+    return StringUtils.isBlank(customMessage)
+        ? result
+        : error(customMessage);
   }
 
   protected ValidationContext createContext(ValidationOptions options, Event muleEvent, ValidationExtension config) {

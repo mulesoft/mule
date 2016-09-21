@@ -6,8 +6,6 @@
  */
 package org.mule.extension.validation.api;
 
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
-import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 
@@ -32,7 +30,6 @@ public final class ValidationOptions {
    * this value are to manually check if this is an expression and evaluate it in case that the validation failed
    */
   @Parameter
-  @Expression(LITERAL)
   @Optional
   private String message = null;
 

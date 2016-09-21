@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.AGE;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEAPON;
@@ -71,7 +70,6 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
   private static final String MONEY = "1000000";
   private static final String LAB_ADDRESS = "Pollos Hermanos";
   private static final String FIRST_ENDEVOUR = "Gray Matter Technologies";
-  private static final String LITERAL_EXPRESSION = "#[money]";
   private static final int DEATH_YEAR = 2011;
   private static final HealthStatus INITIAL_HEALTH = HealthStatus.CANCER;
   private static final HealthStatus FINAL_HEALTH = HealthStatus.DEAD;
@@ -165,7 +163,6 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     assertDeathsBySeason(heisenberg);
     assertMonthlyIncomes(heisenberg);
     assertLabeledRicin(heisenberg);
-    assertLiteralExpressions(heisenberg);
   }
 
 
@@ -243,11 +240,6 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
     assertNotNull(door);
     assertThat(door.getVictim(), equalTo(victim));
     assertThat(door.getAddress(), equalTo(address));
-  }
-
-  private void assertLiteralExpressions(HeisenbergExtension heisenberg) {
-    assertThat(heisenberg.getLiteralExpressionWitouthDefault(), equalTo(LITERAL_EXPRESSION));
-    assertThat(heisenberg.getLiteralExpressionWithDefault(), equalTo(PAYLOAD));
   }
 
   public static Calendar getDateOfBirth() {
