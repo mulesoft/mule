@@ -90,6 +90,11 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     loadConfiguration("org/mule/test/integration/transaction/xa-transactional-block-config.xml");
   }
 
+  @Test(expected = InitialisationException.class)
+  public void unknownErrorFilteringNotAllowed() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/unknown-error-filtering-config.xml");
+  }
+
   private void loadConfiguration(String configuration) throws MuleException, InterruptedException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();

@@ -15,14 +15,13 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.functional.exceptions.FunctionalTestException;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.util.CharSetUtils;
@@ -30,7 +29,6 @@ import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -275,32 +273,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     }
   }
 
-  @Test
-  public void typeMatch() throws Exception {
-    verifyFlow("onErrorPropagateTypeMatch");
-    Optional<InternalMessage> customPath = muleContext.getClient().request("queue://custom1", TIMEOUT).getRight();
-    assertThat(customPath.isPresent(), is(false));
-    Optional<InternalMessage> anyPath = muleContext.getClient().request("queue://any1", TIMEOUT).getRight();
-    assertThat(anyPath.isPresent(), is(false));
-  }
 
-  @Test
-  public void typeMatchAny() throws Exception {
-    verifyFlow("onErrorPropagateTypeMatchAny");
-    Optional<InternalMessage> customPath = muleContext.getClient().request("queue://custom2", TIMEOUT).getRight();
-    assertThat(customPath.isPresent(), is(false));
-  }
-
-  @Test
-  public void typeMatchSeveral() throws Exception {
-    verifyFlow("onErrorPropagateTypeMatchSeveral", true);
-    Optional<InternalMessage> anyPath = muleContext.getClient().request("queue://any", TIMEOUT).getRight();
-    assertThat(anyPath.isPresent(), is(false));
-    verifyFlow("onErrorPropagateTypeMatchSeveral", false);
-    anyPath = muleContext.getClient().request("queue://any", TIMEOUT).getRight();
-    assertThat(anyPath.isPresent(), is(false));
-
-  }
 
   private void verifyFlow(String flowName, Object payload) throws InterruptedException {
     try {
