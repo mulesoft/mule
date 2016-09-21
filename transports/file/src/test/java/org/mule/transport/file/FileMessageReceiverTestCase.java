@@ -66,7 +66,7 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         Service mockComponent = mock(Service.class);
 
         return new FileMessageReceiver(connector, mockComponent, endpoint,
-           read.getRoot().getAbsolutePath(), move.getRoot().getAbsolutePath(), null, 1000);
+            read.getRoot().getAbsolutePath(), move.getRoot().getAbsolutePath(), null, 1000);
     }
 
     @Override

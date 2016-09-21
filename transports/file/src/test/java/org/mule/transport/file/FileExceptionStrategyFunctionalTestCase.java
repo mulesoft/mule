@@ -10,6 +10,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.util.FileUtils.writeStringToFile;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
@@ -24,7 +25,6 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.util.FileUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.io.File;
@@ -277,7 +277,7 @@ public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
         folder.mkdirs();
         File target = File.createTempFile("data", ".txt", folder);
         target.deleteOnExit();
-        FileUtils.writeStringToFile(target, testMessage, encoding);
+        writeStringToFile(target, testMessage, encoding);
         return target;
     }
 
