@@ -39,7 +39,6 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
@@ -86,7 +85,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
       ConfigurationProvider configurationProvider = muleContext.getRegistry().get(configName);
       DbConnectionProvider connectionProvider =
           (DbConnectionProvider) configurationProvider
-              .get(eventBuilder().message(InternalMessage.of("")).build())
+              .get(testEvent)
               .getConnectionProvider().get();
       return connectionProvider.getDataSource();
     } catch (Exception e) {

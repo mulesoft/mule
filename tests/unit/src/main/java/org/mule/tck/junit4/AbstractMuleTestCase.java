@@ -18,6 +18,7 @@ import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -253,6 +254,13 @@ public abstract class AbstractMuleTestCase {
     if (testCaseName == null) {
       testCaseName = this.getClass().getName();
     }
+  }
+
+  protected Event testEvent;
+
+  @Before
+  public void buildTestEvent() throws MuleException {
+    testEvent = eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
   }
 
   @AfterClass
