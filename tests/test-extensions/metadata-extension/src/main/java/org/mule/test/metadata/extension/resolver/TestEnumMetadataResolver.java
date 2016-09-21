@@ -29,11 +29,14 @@ public class TestEnumMetadataResolver implements MetadataContentResolver<AnimalC
 
   @Override
   public MetadataType getContentMetadata(MetadataContext context, AnimalClade key)
-    throws MetadataResolvingException, ConnectionException {
+      throws MetadataResolvingException, ConnectionException {
     switch (key) {
-      case MAMMAL: return loader.load(Bear.class);
-      case FISH: return loader.load(SwordFish.class);
-      default: throw new MetadataResolvingException("Cannot identify animal", INVALID_METADATA_KEY);
+      case MAMMAL:
+        return loader.load(Bear.class);
+      case FISH:
+        return loader.load(SwordFish.class);
+      default:
+        throw new MetadataResolvingException("Cannot identify animal", INVALID_METADATA_KEY);
     }
   }
 }

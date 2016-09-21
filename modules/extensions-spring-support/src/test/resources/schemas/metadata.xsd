@@ -737,7 +737,7 @@
         </xs:complexContent>
     </xs:complexType>
     <xs:simpleType name="org.mule.test.metadata.extension.model.animals.AnimalCladeEnumType">
-        <xs:union>                         s
+        <xs:union>
             <xs:simpleType>
                 <xs:restriction base="xs:string">
                     <xs:enumeration value="MAMMAL"></xs:enumeration>

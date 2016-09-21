@@ -27,9 +27,8 @@ public class TestBooleanMetadataResolver implements MetadataContentResolver<Bool
 
   @Override
   public MetadataType getContentMetadata(MetadataContext context, Boolean key)
-    throws MetadataResolvingException, ConnectionException {
-    if (key)
-    {
+      throws MetadataResolvingException, ConnectionException {
+    if (key) {
       return loader.load(SwordFish.class);
     }
     throw new MetadataResolvingException("false key", INVALID_METADATA_KEY);
