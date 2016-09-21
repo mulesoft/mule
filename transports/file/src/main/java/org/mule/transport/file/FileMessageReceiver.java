@@ -214,6 +214,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     {
                         try
                         {
+                            //Skipping empty files
+                            if (file.length() == 0)
+                            {
+                                if (logger.isDebugEnabled())
+                                {
+                                    logger.debug("Found empty file '" + file.getName() + "'. Skipping file.");
+                                }
+                                continue;
+                            }
                             String fileAbsolutePath = file.getAbsolutePath();
                             try
                             {
@@ -221,7 +230,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
                                 if (logger.isDebugEnabled())
                                 {
-                                    logger.debug(String.format("Flag for '%s' stored successfully.", fileAbsolutePath));
+                                    logger.debug("Flag for '" + fileAbsolutePath + "' stored successfully.");
                                 }
                             }
                             catch (ObjectAlreadyExistsException e)
