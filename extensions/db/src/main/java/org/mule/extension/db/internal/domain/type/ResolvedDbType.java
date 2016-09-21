@@ -7,6 +7,12 @@
 
 package org.mule.extension.db.internal.domain.type;
 
+import static org.apache.commons.io.IOUtils.toByteArray;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.core.api.MuleRuntimeException;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -25,6 +31,13 @@ public class ResolvedDbType extends AbstractDbType {
     if (value == null) {
       statement.setNull(index, id);
     } else {
+      if (value instanceof InputStream) {
+        try {
+          value = toByteArray((InputStream) value);
+        } catch (IOException e) {
+          throw new MuleRuntimeException(createStaticMessage("Could not consume inputStream in parameter of index " + index), e);
+        }
+      }
       statement.setObject(index, value, id);
     }
   }
