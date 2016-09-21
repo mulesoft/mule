@@ -163,7 +163,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @DefaultTlsContextFactoryBuilder
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
 
-  HttpClientFactory httpClientFactory;
+  private HttpClientFactory httpClientFactory;
 
   @Override
   public ConnectionValidationResult validate(HttpClient httpClient) {
