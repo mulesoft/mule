@@ -6,12 +6,14 @@
  */
 package org.mule.test.integration.transformer;
 
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
 public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTestCase {
 
@@ -29,6 +31,6 @@ public class TransformerTrackerLifecycleTestCase extends AbstractIntegrationTest
     muleContext.dispose();
 
     assertThat(ltt.getTracker(),
-               contains("setMuleContext", "setProperty", "setMuleContext", "initialise", "start", "stop", "dispose"));
+               contains("setMuleContext", "setProperty", "initialise", "start", "stop", "dispose"));
   }
 }

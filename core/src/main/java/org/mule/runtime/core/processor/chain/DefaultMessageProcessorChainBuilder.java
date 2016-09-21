@@ -12,9 +12,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -68,7 +68,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
             interceptingProcessor.setListener(tempList.get(0));
           } else {
             final DefaultMessageProcessorChain innerChain = createInnerChain(tempList);
-            innerChain.setTemplateMuleContext(muleContext);
+            innerChain.setMuleContext(muleContext);
             interceptingProcessor.setListener(innerChain);
           }
         }
@@ -83,7 +83,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     // list contains the first n processors in the chain that are not intercepting.. with processor n+1
     // having been injected as the listener of processor n
     final InterceptingChainLifecycleWrapper chain = buildMessageProcessorChain(createOuterChain(tempList));
-    chain.setTemplateMuleContext(muleContext);
+    chain.setMuleContext(muleContext);
+    chain.setFlowConstruct(flowConstruct);
     return chain;
   }
 

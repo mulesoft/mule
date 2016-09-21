@@ -41,7 +41,9 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain 
   }
 
   public static DefaultMessageProcessorChain from(MuleContext muleContext, Processor messageProcessor) {
-    return new DefaultMessageProcessorChain(messageProcessor);
+    final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(messageProcessor);
+    chain.setMuleContext(muleContext);
+    return chain;
   }
 
   public static MessageProcessorChain from(MuleContext muleContext, Processor... messageProcessors) throws MuleException {
@@ -60,7 +62,9 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain 
         .execute();
   }
 
-  public void setTemplateMuleContext(MuleContext context) {
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
     messageProcessorExecutionTemplate.setMuleContext(context);
   }
 

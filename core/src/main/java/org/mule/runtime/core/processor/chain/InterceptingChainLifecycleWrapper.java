@@ -55,10 +55,17 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
     return messageProcessorExecutionTemplate.execute(event1 -> InterceptingChainLifecycleWrapper.super.process(event1), event);
   }
 
-  public void setTemplateMuleContext(MuleContext context) {
+  @Override
+  public void setMuleContext(MuleContext context) {
+    super.setMuleContext(context);
     messageProcessorExecutionTemplate.setMuleContext(context);
-    chain.setTemplateMuleContext(context);
+    chain.setMuleContext(context);
   }
+
+  // public void setTemplateMuleContext(MuleContext context) {
+  // messageProcessorExecutionTemplate.setMuleContext(context);
+  // chain.setTemplateMuleContext(context);
+  // }
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {

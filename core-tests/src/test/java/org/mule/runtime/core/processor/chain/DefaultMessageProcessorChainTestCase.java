@@ -31,7 +31,6 @@ import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleSession;
@@ -43,6 +42,7 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
@@ -746,7 +746,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
   public void testNestedResponseProcessorEndOfChain() throws MuleException, Exception {
     DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
     final DefaultMessageProcessorChain chain = DefaultMessageProcessorChain.from(muleContext, getAppendingMP("1"));
-    chain.setTemplateMuleContext(muleContext);
+    chain.setMuleContext(muleContext);
     final ResponseMessageProcessorAdapter responseMessageProcessorAdapter = new ResponseMessageProcessorAdapter(chain);
     responseMessageProcessorAdapter.setMuleContext(muleContext);
     builder.chain(responseMessageProcessorAdapter);
@@ -770,7 +770,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
 
     Event event = getTestEventUsingFlow("0");
     final DefaultMessageProcessorChain chain = DefaultMessageProcessorChain.from(muleContext, scatterGatherRouter);
-    chain.setTemplateMuleContext(muleContext);
+    chain.setMuleContext(muleContext);
     InternalMessage result = process(chain, Event.builder(event).message(event.getMessage()).build()).getMessage();
     assertThat(result.getPayload().getValue(), instanceOf(List.class));
     List<InternalMessage> resultMessage = (List<InternalMessage>) result.getPayload().getValue();
@@ -790,7 +790,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTes
     choiceRouter.addRoute(getAppendingMP("3"), new AcceptAllFilter());
 
     final DefaultMessageProcessorChain chain = DefaultMessageProcessorChain.from(muleContext, choiceRouter);
-    chain.setTemplateMuleContext(muleContext);
+    chain.setMuleContext(muleContext);
     assertThat(process(chain, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01"));
 
     assertEquals(isMultipleThreadsUsed() ? 2 : 1, threads);

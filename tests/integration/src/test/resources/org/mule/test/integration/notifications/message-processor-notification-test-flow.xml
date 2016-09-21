@@ -152,10 +152,10 @@
 
     <flow name="all3">
         <all>
-            <logger message="check1" level="WARN"/>
-            <logger message="check2" level="WARN"/>
+            <logger message="check1"/>
+            <logger message="check2"/>
         </all>
-        <logger message="Log after a scope" level="WARN"/>
+        <logger message="Log after a scope"/>
     </flow>
 
     <flow name="foreach">
@@ -295,7 +295,7 @@
                 <echo-component/>
             </on-error-propagate>
             <on-error-continue>
-                <logger level="WARN" message="continue"/>
+                <logger message="continue"/>
             </on-error-continue>
         </error-handler>
     </flow>
@@ -342,9 +342,9 @@
 
     <flow name="chunkAggregator">
         <message-chunk-splitter messageSize="1"/>
-        <logger level="WARN" message="1"/>
+        <logger message="1"/>
         <message-chunk-aggregator/>
-        <logger level="WARN" message="2"/>
+        <logger message="2"/>
     </flow>
 
     <flow name="combineCollections">

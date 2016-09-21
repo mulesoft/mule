@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -181,9 +180,6 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         new DefaultMessageProcessorChainBuilder(this.flowConstruct);
     try {
       configuredMessageProcessors = defaultMessageProcessorChainBuilder.chain(getMessageProcessors()).build();
-      if (configuredMessageProcessors instanceof FlowConstructAware) {
-        ((FlowConstructAware) configuredMessageProcessors).setFlowConstruct(flowConstruct);
-      }
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }

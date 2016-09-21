@@ -9,8 +9,8 @@ package org.mule.runtime.core.processor.chain;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
@@ -22,10 +22,10 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -118,7 +118,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
-    for (Processor processor : processors) {
+    for (Object processor : processors) {
       if (processor instanceof FlowConstructAware) {
         ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
       }
@@ -173,7 +173,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setMessagingExceptionHandler(MessagingExceptionHandler messagingExceptionHandler) {
-    for (Processor processor : processors) {
+    for (Object processor : processors) {
       if (processor instanceof MessagingExceptionHandlerAware) {
         ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(messagingExceptionHandler);
       }
@@ -182,7 +182,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
 
   @Override
   public void setMuleContext(MuleContext context) {
-    for (Processor processor : processors) {
+    for (Object processor : processors) {
       if (processor instanceof MuleContextAware) {
         ((MuleContextAware) processor).setMuleContext(context);
       }
