@@ -37,17 +37,15 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
   }
 
   @Test
-  public void testNotProcessingEmptyFile() throws Exception
-  {
+  public void testNotProcessingEmptyFile() throws Exception {
     FileMessageReceiver fmr = (FileMessageReceiver) getMessageReceiver();
     read.newFile("empty.tmp");
     fmr.initialise();
     fmr.doInitialise();
-    fmr.setListener(new Processor()
-    {
+    fmr.setListener(new Processor() {
+
       @Override
-      public Event process(Event event) throws MuleException
-      {
+      public Event process(Event event) throws MuleException {
         fail("Should not process empty file");
         return null;
       }
