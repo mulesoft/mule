@@ -9,12 +9,12 @@ package org.mule.runtime.core.processor.chain;
 import static java.util.Arrays.asList;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
 import java.util.ArrayList;

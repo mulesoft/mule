@@ -8,18 +8,20 @@ package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
+
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -179,6 +181,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
         new DefaultMessageProcessorChainBuilder(this.flowConstruct);
     try {
       configuredMessageProcessors = defaultMessageProcessorChainBuilder.chain(getMessageProcessors()).build();
+      if (configuredMessageProcessors instanceof FlowConstructAware) {
+        ((FlowConstructAware) configuredMessageProcessors).setFlowConstruct(flowConstruct);
+      }
     } catch (MuleException e) {
       throw new InitialisationException(e, this);
     }

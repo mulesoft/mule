@@ -17,10 +17,8 @@ import java.util.List;
 
 import org.apache.commons.collections.Factory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("MULE-10185 - ArtifactClassLoaderRunner CXF issue when running all tests, works when executed isolated")
 public class MulticastingRouterNotificationTestCase extends AbstractMessageProcessorNotificationTestCase {
 
   @Override

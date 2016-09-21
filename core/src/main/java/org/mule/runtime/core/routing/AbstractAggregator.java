@@ -7,12 +7,11 @@
 package org.mule.runtime.core.routing;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
@@ -49,7 +48,6 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
 
   protected EventCorrelator eventCorrelator;
   protected MuleContext muleContext;
-  protected FlowConstruct flowConstruct;
 
   private long timeout = 0;
   private boolean failOnTimeout = true;
@@ -175,11 +173,6 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
   @Override
   public void setFailOnTimeout(boolean failOnTimeout) {
     this.failOnTimeout = failOnTimeout;
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    this.flowConstruct = flowConstruct;
   }
 
   public void setProcessedGroupsObjectStore(ObjectStore<Long> processedGroupsObjectStore) {

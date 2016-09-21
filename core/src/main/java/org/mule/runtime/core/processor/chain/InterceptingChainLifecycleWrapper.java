@@ -8,8 +8,8 @@ package org.mule.runtime.core.processor.chain;
 
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.Processor;
@@ -62,6 +62,7 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
 
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
+    messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
     chain.setFlowConstruct(flowConstruct);
     super.setFlowConstruct(flowConstruct);
   }

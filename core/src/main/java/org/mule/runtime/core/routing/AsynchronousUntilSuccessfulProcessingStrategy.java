@@ -13,10 +13,9 @@ import static org.mule.runtime.core.util.StringUtils.DASH;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
 
 import org.mule.runtime.core.VoidMuleEvent;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
@@ -24,6 +23,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.ExceptionHelper;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -95,8 +95,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
   @Override
   protected Event doRoute(Event event, FlowConstruct flow) throws MuleException {
     try {
-      final Event event1 = event;
-      final Serializable eventStoreKey = storeEvent(event1, flow);
+      final Serializable eventStoreKey = storeEvent(event, flow);
       scheduleForProcessing(eventStoreKey, true);
       if (getUntilSuccessfulConfiguration().getAckExpression() == null) {
         return VoidMuleEvent.getInstance();
@@ -265,8 +264,7 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
 
   private void retrieveAndProcessEvent(final Serializable eventStoreKey) throws ObjectStoreException {
     final Event persistedEvent = getUntilSuccessfulConfiguration().getObjectStore().retrieve(eventStoreKey);
-    final Event mutableEvent = persistedEvent;
-    processEvent(mutableEvent);
+    processEvent(persistedEvent);
     removeFromStore(eventStoreKey);
   }
 
