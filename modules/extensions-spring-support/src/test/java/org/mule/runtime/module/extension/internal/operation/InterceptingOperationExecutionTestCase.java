@@ -17,7 +17,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -43,7 +42,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
 
   @Override
   protected void doSetUp() throws Exception {
-    config = getConfigurationFromRegistry("banana", eventBuilder().message(InternalMessage.of("")).build(), muleContext);
+    config = getConfigurationFromRegistry("banana", testEvent, muleContext);
   }
 
   @Test

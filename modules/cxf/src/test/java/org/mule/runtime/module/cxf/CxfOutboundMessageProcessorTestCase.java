@@ -22,7 +22,8 @@ import org.junit.Test;
 public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>"
-      + "<ns1:echo xmlns:ns1=\"http://simple.component.api.core.runtime.mule.org/\">" + "<ns1:return>hello</ns1:return>"
+      + "<ns1:echo xmlns:ns1=\"http://simple.component.api.core.runtime.mule.org/\">"
+      + "<ns1:return>" + TEST_PAYLOAD + "</ns1:return>"
       + "</ns1:echo>" + "</soap:Body></soap:Envelope>";
 
   boolean gotEvent = false;
@@ -55,12 +56,12 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTest
     };
     processor.setListener(messageProcessor);
 
-    Event response = processor.process(eventBuilder().message(InternalMessage.of("hello")).build());
+    Event response = processor.process(eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build());
     assertThat(processor.getClient().getRequestContext().isEmpty(), is(true));
     assertThat(processor.getClient().getResponseContext().isEmpty(), is(true));
     Object payload = response.getMessage().getPayload().getValue();
     assertThat(payload, instanceOf(String.class));
-    assertThat((String) payload, is("hello"));
+    assertThat((String) payload, is(TEST_PAYLOAD));
     assertThat(gotEvent, is(true));
   }
 

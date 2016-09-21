@@ -18,7 +18,6 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.Ricin;
 
@@ -29,7 +28,7 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
     Event event = getHeisenbergEvent();
-    Event anotherEvent = eventBuilder().message(InternalMessage.of("")).build();
+    Event anotherEvent = testEvent;
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
     assertThat(config, is(sameInstance(anotherConfig)));

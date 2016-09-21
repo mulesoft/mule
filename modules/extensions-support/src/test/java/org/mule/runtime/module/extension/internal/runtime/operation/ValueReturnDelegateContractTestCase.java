@@ -23,7 +23,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.module.extension.internal.runtime.OperationContextAdapter;
@@ -55,8 +54,6 @@ public abstract class ValueReturnDelegateContractTestCase extends AbstractMuleTe
 
   @Before
   public void before() throws MuleException {
-    FlowConstruct flow = mock(FlowConstruct.class);
-    when(flow.getMuleContext()).thenReturn(muleContext);
     event = eventBuilder().message(InternalMessage.builder().payload("").attributes(attributes).build()).build();
     delegate = createReturnDelegate();
     when(operationContext.getEvent()).thenReturn(event);

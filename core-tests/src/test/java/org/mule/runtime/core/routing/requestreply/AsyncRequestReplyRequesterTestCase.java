@@ -66,12 +66,10 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setListener(target);
     asyncReplyMP.setReplySource(target.getMessageSource());
 
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    Event resultEvent = asyncReplyMP.process(event);
+    Event resultEvent = asyncReplyMP.process(testEvent);
 
     // Can't assert same because we copy event when we receive async reply
-    assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
+    assertEquals(testEvent.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
   }
 
   @Test
@@ -84,12 +82,10 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
     asyncReplyMP.setListener(asyncMP);
     asyncReplyMP.setReplySource(target.getMessageSource());
 
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    Event resultEvent = asyncReplyMP.process(event);
+    Event resultEvent = asyncReplyMP.process(testEvent);
 
     // Can't assert same because we copy event for async and also on async reply currently
-    assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
+    assertEquals(testEvent.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
   }
 
   @Test
@@ -133,8 +129,6 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
       }
     };
 
-    final Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
     final CountDownLatch processingLatch = new CountDownLatch(1);
 
     Processor target = mock(Processor.class);
@@ -148,7 +142,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
     Thread thread = new Thread(() -> {
       try {
-        responseEvent[0] = asyncReplyMP.process(event);
+        responseEvent[0] = asyncReplyMP.process(testEvent);
       } catch (MuleException e) {
         exceptionThrown[0] = true;
       } finally {
@@ -180,13 +174,11 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestC
 
         @Override
         public void run() {
-          Event event;
           try {
-            event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-            Event resultEvent = asyncReplyMP.process(event);
+            Event resultEvent = asyncReplyMP.process(testEvent);
 
             // Can't assert same because we copy event for async currently
-            assertEquals(event.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
+            assertEquals(testEvent.getMessageAsString(muleContext), resultEvent.getMessageAsString(muleContext));
             count.incrementAndGet();
             logger.debug("Finished " + count.get());
           } catch (Exception e) {

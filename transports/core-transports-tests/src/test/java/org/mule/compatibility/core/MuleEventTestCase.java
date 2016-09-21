@@ -39,8 +39,6 @@ import org.junit.Test;
 
 public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
 
-  private static final String TEST_PAYLOAD = "anyValuePayload";
-
   @Test
   public void testEventSerialization() throws Exception {
     InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, null,
@@ -103,7 +101,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
 
   private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
-    return eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
+    return testEvent;
   }
 
   @Test

@@ -9,12 +9,10 @@ package org.mule.runtime.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -59,7 +57,6 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   public void testStreamPayloadSerialization() throws Exception {
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final InternalMessage message = InternalMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
-    Flow flow = getTestFlow(muleContext);
     setCurrentEvent(eventBuilder().message(message).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 

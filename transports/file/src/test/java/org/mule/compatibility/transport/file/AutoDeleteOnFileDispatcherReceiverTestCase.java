@@ -35,7 +35,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   public void testAutoDeleteFalseOnDispatcher() throws Exception {
     ((FileConnector) connector).setAutoDelete(false);
 
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("TestData")).build());
+    setCurrentEvent(testEvent);
 
     InternalMessage message =
         muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName + "?connector=FileConnector", 50000).getRight()
@@ -55,7 +55,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   public void testAutoDeleteTrueOnDispatcher() throws Exception {
     ((FileConnector) connector).setAutoDelete(true);
 
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("TestData")).build());
+    setCurrentEvent(testEvent);
 
     InternalMessage message = muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName, 50000).getRight().get();
     assertNotNull(message.getPayload().getValue());

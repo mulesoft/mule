@@ -11,8 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.encryption.EncryptionTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 
@@ -25,14 +23,11 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
 
   @Test
   public void testEncrypt() throws Exception {
-    String msg = "Test Message";
-
-    Event event = eventBuilder().message(InternalMessage.of(msg)).build();
-    setCurrentEvent(event);
+    setCurrentEvent(testEvent);
 
     EncryptionTransformer etrans = new EncryptionTransformer();
     etrans.setStrategy(kbStrategy);
-    Object result = etrans.doTransform(msg.getBytes(), UTF_8);
+    Object result = etrans.doTransform(TEST_PAYLOAD.getBytes(), UTF_8);
 
     assertNotNull(result);
     InputStream inputStream = (InputStream) result;

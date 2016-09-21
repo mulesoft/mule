@@ -12,10 +12,8 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.tck.MuleTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
@@ -51,11 +49,8 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
   @Test
   public void staticHeisenbergWasInjected() throws Exception {
     assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     HeisenbergExtension heisenberg =
-        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG,
-                                                         eventBuilder().message(InternalMessage.of("")).build(),
-                                                         muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, testEvent, muleContext);
     assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
   }
 

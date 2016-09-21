@@ -34,16 +34,13 @@ import org.junit.Test;
 
 public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
-  private static final String TEST_PAYLOAD = "anyValuePayload";
-
   @Test
   public void testEventSerialization() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of("payload")).build();
-    setCurrentEvent(event);
+    setCurrentEvent(testEvent);
 
     Transformer transformer = createSerializableToByteArrayTransformer();
     transformer.setMuleContext(muleContext);
-    Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(event);
+    Serializable serialized = (Serializable) createSerializableToByteArrayTransformer().transform(testEvent);
     assertNotNull(serialized);
     ByteArrayToObject trans = new ByteArrayToObject();
     trans.setMuleContext(muleContext);
@@ -95,7 +92,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
-    return eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
+    return testEvent;
   }
 
   @Test
@@ -169,14 +166,12 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarNonexistent() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of("whatever")).build();
-    event.getVariable("foo").getValue();
+    testEvent.getVariable("foo").getValue();
   }
 
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarDataTypeNonexistent() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of("whatever")).build();
-    event.getVariable("foo").getDataType();
+    testEvent.getVariable("foo").getDataType();
   }
 
   private static class TestEventTransformer extends AbstractTransformer {

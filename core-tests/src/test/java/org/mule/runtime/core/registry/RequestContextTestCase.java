@@ -24,16 +24,14 @@ public class RequestContextTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testSetExceptionPayloadAcrossThreads() throws InterruptedException, MuleException {
-    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).build();
-    runThread(event, false);
-    runThread(event, true);
+    runThread(testEvent, false);
+    runThread(testEvent, true);
   }
 
   @Test
   public void testFailureWithoutThreadSafeEvent() throws InterruptedException, MuleException {
-    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).build();
-    runThread(event, false);
-    runThread(event, true);
+    runThread(testEvent, false);
+    runThread(testEvent, true);
   }
 
   protected void runThread(Event event, boolean doTest) throws InterruptedException {

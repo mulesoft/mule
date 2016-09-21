@@ -19,7 +19,6 @@ import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.GlobalVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -68,7 +67,6 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
   protected void doVarDataTypeTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     testEvent = setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);
 
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);

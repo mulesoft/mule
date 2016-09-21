@@ -63,7 +63,7 @@ public class MulticastingRouterTestCase extends AbstractMuleContextEndpointTestC
     endpoints.add(mockendpoint2);
     router.setRoutes(endpoints);
 
-    assertTrue(router.isMatch(eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build(), mock(Event.Builder.class)));
+    assertTrue(router.isMatch(testEvent, mock(Event.Builder.class)));
 
     when(mockendpoint1.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer());
     when(mockendpoint2.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer());

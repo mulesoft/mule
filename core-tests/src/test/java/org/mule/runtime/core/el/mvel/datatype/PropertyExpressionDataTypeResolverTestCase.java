@@ -55,7 +55,6 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     testEvent.getSession().setProperty("foo", EXPRESSION_VALUE, expectedDataType);
 
     assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));

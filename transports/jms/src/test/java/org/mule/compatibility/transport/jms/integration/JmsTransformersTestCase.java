@@ -13,7 +13,6 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import org.mule.compatibility.transport.jms.transformers.AbstractJmsTransformer;
 import org.mule.compatibility.transport.jms.transformers.JMSMessageToObject;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.compression.CompressionStrategy;
 import org.mule.runtime.core.util.compression.GZipCompression;
@@ -67,7 +66,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformObjectMessage() throws Exception {
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
+    setCurrentEvent(testEvent);
 
     ObjectMessage oMsg = session.createObjectMessage();
     File f = FileUtils.newFile("/some/random/path");
@@ -85,7 +84,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformTextMessage() throws Exception {
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
+    setCurrentEvent(testEvent);
 
     String text = "This is a test TextMessage";
     TextMessage tMsg = session.createTextMessage();
@@ -104,7 +103,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformMapMessage() throws Exception {
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
+    setCurrentEvent(testEvent);
 
     Map p = new HashMap();
     p.put("Key1", "Value1");
@@ -131,7 +130,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformMapToObjectMessage() throws Exception {
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
+    setCurrentEvent(testEvent);
 
     Map p = new HashMap();
     p.put("Key1", "Value1");
@@ -160,7 +159,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformByteMessage() throws Exception {
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
+    setCurrentEvent(testEvent);
 
     AbstractJmsTransformer trans = new SessionEnabledObjectToJMSMessage(session);
     trans.setReturnDataType(DataType.fromType(BytesMessage.class));
@@ -180,7 +179,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
 
   @Test
   public void testTransformStreamMessage() throws Exception {
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
+    setCurrentEvent(testEvent);
 
     String text = "Test Text";
     int i = 97823;
@@ -219,7 +218,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase {
   // http://en.wikipedia.org/wiki/Zip_of_death
   @Test
   public void testCompressedBytesMessage() throws Exception {
-    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
+    setCurrentEvent(testEvent);
 
     // use GZIP
     CompressionStrategy compressor = new GZipCompression();

@@ -22,7 +22,6 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.context.WorkManagerSource;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.construct.Flow;
@@ -59,16 +58,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessOneWay() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    Event result = messageProcessor.process(event);
+    Event result = messageProcessor.process(testEvent);
 
     assertThat(latch.await(10000, TimeUnit.MILLISECONDS), is(true));
     assertThat(target.sensedEvent, notNullValue());
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
-    assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
+    assertNotSame(testEvent, target.sensedEvent);
+    assertEquals(testEvent.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
     assertSame(VoidMuleEvent.getInstance(), result);
     assertNull(exceptionThrown);
@@ -80,16 +77,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    Event result = messageProcessor.process(event);
+    Event result = messageProcessor.process(testEvent);
 
     latch.await(10000, TimeUnit.MILLISECONDS);
     assertNotNull(target.sensedEvent);
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
-    assertNotSame(event, target.sensedEvent);
-    assertEquals(event.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
+    assertNotSame(testEvent, target.sensedEvent);
+    assertEquals(testEvent.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
     assertSame(VoidMuleEvent.getInstance(), result);
     assertNull(exceptionThrown);
@@ -101,12 +96,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      messageProcessor.process(event);
+      messageProcessor.process(testEvent);
       fail("Exception expected");
     } catch (Exception e) {
       assertTrue(e instanceof MessagingException);
@@ -118,12 +112,11 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      assertAsync(messageProcessor, event);
+      assertAsync(messageProcessor, testEvent);
       fail("Exception expected");
     } catch (Exception e) {
     } finally {

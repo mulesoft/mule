@@ -57,7 +57,6 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     testEvent.getSession().setProperty("foo", "bar");
 
     final Builder builder = Event.builder(testEvent);

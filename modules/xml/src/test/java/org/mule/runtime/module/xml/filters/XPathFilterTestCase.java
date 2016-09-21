@@ -70,7 +70,6 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
   public void testAcceptMessage() throws Exception {
     final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
-    Event event = eventBuilder().message(InternalMessage.builder().nullPayload().build()).build();
     XPathFilter filter = new XPathFilter() {
 
       @Override
@@ -84,10 +83,10 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
       }
     };
 
-    Builder builder = Event.builder(event);
-    assertFalse("shouldn't accept a message if no payload is set.", filter.accept(event, builder));
+    Builder builder = Event.builder(nullPayloadEvent);
+    assertFalse("shouldn't accept a message if no payload is set.", filter.accept(nullPayloadEvent, builder));
 
-    event = eventBuilder().message(InternalMessage.of(new Object())).build();
+    Event event = eventBuilder().message(InternalMessage.of(new Object())).build();
     filter.setPattern("/some/pattern = null");
     builder = Event.builder(event);
     assertTrue(filter.accept(event, builder));

@@ -13,7 +13,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -35,36 +34,33 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testWireTapNoFilter() throws Exception {
-    Event event = eventBuilder().message(InternalMessage.of("data")).build();
-    Event primaryOutput = wireTap.process(event);
+    Event primaryOutput = wireTap.process(testEvent);
 
-    assertSame(event, primaryOutput);
+    assertSame(testEvent, primaryOutput);
 
     assertNotNull(tapListener.event);
-    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(event.getMessage().getPayload().getValue()));
+    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(testEvent.getMessage().getPayload().getValue()));
   }
 
   @Test
   public void testWireTapFilterAccepted() throws Exception {
     wireTap.setFilter((message, builder) -> true);
 
-    Event event = eventBuilder().message(InternalMessage.of("data")).build();
-    Event primaryOutput = wireTap.process(event);
+    Event primaryOutput = wireTap.process(testEvent);
 
-    assertSame(event, primaryOutput);
+    assertSame(testEvent, primaryOutput);
 
     assertNotNull(tapListener.event);
-    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(event.getMessage().getPayload().getValue()));
+    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(testEvent.getMessage().getPayload().getValue()));
   }
 
   @Test
   public void testWireTapFilterUnaccepted() throws Exception {
     wireTap.setFilter((message, builder) -> false);
 
-    Event event = eventBuilder().message(InternalMessage.of("data")).build();
-    Event primaryOutput = wireTap.process(event);
+    Event primaryOutput = wireTap.process(testEvent);
 
-    assertSame(event, primaryOutput);
+    assertSame(testEvent, primaryOutput);
 
     assertNull(tapListener.event);
   }
@@ -73,10 +69,9 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   public void testWireTapNullTap() throws Exception {
     wireTap.setTap(null);
 
-    Event event = eventBuilder().message(InternalMessage.of("data")).build();
-    Event primaryOutput = wireTap.process(event);
+    Event primaryOutput = wireTap.process(testEvent);
 
-    assertSame(event, primaryOutput);
+    assertSame(testEvent, primaryOutput);
   }
 
 }

@@ -85,21 +85,19 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
    */
   @Test
   public void testSessionProperties() throws Exception {
-    InternalMessage message = InternalMessage.builder().payload("Test Message").build();
-    Event event = eventBuilder().message(message).build();
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     String string = "bar";
-    event.getSession().setProperty("fooString", string);
+    testEvent.getSession().setProperty("fooString", string);
 
     Date date = new Date(0);
-    event.getSession().setProperty("fooDate", date);
+    testEvent.getSession().setProperty("fooDate", date);
 
     List<String> list = createList();
-    event.getSession().setProperty("fooList", list);
+    testEvent.getSession().setProperty("fooList", list);
 
-    message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
-    event = Event.builder(event).message(message).build();
+    InternalMessage message = handler.storeSessionInfoToMessage(testEvent.getSession(), testEvent.getMessage(), muleContext);
+    Event event = Event.builder(testEvent).message(message).build();
     // store save session to outbound, move it to the inbound
     // for retrieve to deserialize
     final Builder builder = Event.builder(event);
@@ -126,14 +124,12 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
    */
   @Test
   public void testNonSerializableSessionProperties() throws Exception {
-    InternalMessage message = InternalMessage.builder().payload("Test Message").build();
-    Event event = eventBuilder().message(message).build();
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     NotSerializableClass clazz = new NotSerializableClass();
-    event.getSession().setProperty("foo", clazz);
-    message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
-    event = Event.builder(event).message(message).build();
+    testEvent.getSession().setProperty("foo", clazz);
+    InternalMessage message = handler.storeSessionInfoToMessage(testEvent.getSession(), testEvent.getMessage(), muleContext);
+    Event event = Event.builder(testEvent).message(message).build();
     // store save session to outbound, move it to the inbound
     // for retrieve to deserialize
     final Builder builder = Event.builder(event);
@@ -150,16 +146,14 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase {
    */
   @Test
   public void testSecurityContext() throws Exception {
-    InternalMessage message = InternalMessage.builder().payload("Test Message").build();
-    Event event = eventBuilder().message(message).build();
     SessionHandler handler = new SerializeAndEncodeSessionHandler();
 
     Credentials credentials = new MuleCredentials("joe", "secret".toCharArray());
     SecurityContext sc = new DefaultSecurityContextFactory().create(new DefaultMuleAuthentication(credentials));
-    event.getSession().setSecurityContext(sc);
+    testEvent.getSession().setSecurityContext(sc);
 
-    message = handler.storeSessionInfoToMessage(event.getSession(), event.getMessage(), muleContext);
-    event = Event.builder(event).message(message).build();
+    InternalMessage message = handler.storeSessionInfoToMessage(testEvent.getSession(), testEvent.getMessage(), muleContext);
+    Event event = Event.builder(testEvent).message(message).build();
     // store save session to outbound, move it to the inbound
     // for retrieve to deserialize
     final Builder builder = Event.builder(event);

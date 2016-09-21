@@ -25,16 +25,14 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFilterPass() throws Exception {
-    MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
+    MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_PAYLOAD), false, null);
     SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
     mp.setListener(listener);
 
-    Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    Event resultEvent = mp.process(inEvent);
+    Event resultEvent = mp.process(testEvent);
 
     assertNotNull(listener.event);
-    assertEquals(inEvent.getMessage(), resultEvent.getMessage());
+    assertEquals(testEvent.getMessage(), resultEvent.getMessage());
   }
 
   @Test
@@ -43,7 +41,6 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setListener(out);
 
-    final Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     Event resultEvent = mp.process(testEvent);
 
     assertNull(out.event);
@@ -52,18 +49,16 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFilterPassUnacceptedMP() throws Exception {
-    MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
+    MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_PAYLOAD), false, null);
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
     mp.setListener(out);
     mp.setUnacceptedMessageProcessor(unaccepted);
 
-    Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
-
-    Event resultEvent = mp.process(inEvent);
+    Event resultEvent = mp.process(testEvent);
 
     assertNotNull(out.event);
-    assertEquals(inEvent.getMessage(), resultEvent.getMessage());
+    assertEquals(testEvent.getMessage(), resultEvent.getMessage());
     assertNull(unaccepted.event);
   }
 

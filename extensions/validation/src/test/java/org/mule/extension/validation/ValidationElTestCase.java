@@ -38,10 +38,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   @Test
   public void email() throws Exception {
     final String expression = "#[validator.validateEmail(email)]";
-    Event event = Event
-        .builder(eventBuilder().message(InternalMessage.of("")).build())
-        .addVariable("email", VALID_EMAIL)
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("")).addVariable("email", VALID_EMAIL).build();
 
     assertValid(expression, event);
 
@@ -54,11 +51,8 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
     final String regex = "[tT]rue";
     final String expression = "#[validator.matchesRegex(payload, regexp, caseSensitive)]";
 
-    Event event = Event.builder(eventBuilder()
-        .message(InternalMessage.of("true")).build())
-        .addVariable("regexp", regex)
-        .addVariable("caseSensitive", false)
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("true")).addVariable("regexp", regex)
+        .addVariable("caseSensitive", false).build();
 
     assertValid(expression, event);
 
@@ -131,7 +125,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void size() throws Exception {
-    assertValid("#[validator.validateSize('John', 0, 4)]", eventBuilder().message(InternalMessage.of("")).build());
+    assertValid("#[validator.validateSize('John', 0, 4)]", testEvent);
     assertInvalid("#[validator.validateSize(payload, 1, 4)]",
                   eventBuilder().message(InternalMessage.of(ImmutableList.of())).build());
   }
@@ -139,17 +133,17 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   @Test
   public void notNull() throws Exception {
     final String expression = "#[validator.isNotNull(payload)]";
-    assertValid(expression, eventBuilder().message(InternalMessage.of("")).build());
+    assertValid(expression, testEvent);
 
-    assertInvalid(expression, eventBuilder().message((InternalMessage.builder().nullPayload().build())).build());
+    assertInvalid(expression, nullPayloadEvent);
   }
 
   @Test
   public void isNull() throws Exception {
     final String expression = "#[validator.isNull(payload)]";
-    assertValid(expression, eventBuilder().message(InternalMessage.builder().nullPayload().build()).build());
+    assertValid(expression, nullPayloadEvent);
 
-    assertInvalid(expression, eventBuilder().message(InternalMessage.of("")).build());
+    assertInvalid(expression, testEvent);
   }
 
   @Test

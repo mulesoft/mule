@@ -14,7 +14,6 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -154,8 +153,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.setMethodName("testMethod3");
     invoker.setArgumentExpressionsString("#[payload:]");
     invoker.initialise();
-    assertEquals("hello echo",
-                 invoker.process(eventBuilder().message(InternalMessage.of("hello")).build()).getMessageAsString(muleContext));
+    assertEquals(TEST_PAYLOAD + " echo", invoker.process(testEvent).getMessageAsString(muleContext));
   }
 
   @Test

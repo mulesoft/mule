@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -35,18 +34,14 @@ public class PetStoreThreadingProfileTestCase extends ExtensionFunctionalTestCas
   @Test
   public void customThreadingProfile() throws Exception {
     PetStoreConnector connector =
-        ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile",
-                                                         eventBuilder().message(InternalMessage.of("")).build(),
-                                                         muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile", testEvent, muleContext);
     assertThreadingProfile(connector.getThreadingProfile());
   }
 
   @Test
   public void noThreadingProfile() throws Exception {
     PetStoreConnector connector =
-        ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile",
-                                                         eventBuilder().message(InternalMessage.of("")).build(),
-                                                         muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile", testEvent, muleContext);
     assertThat(connector.getThreadingProfile(), is(nullValue()));
   }
 

@@ -257,10 +257,12 @@ public abstract class AbstractMuleTestCase {
   }
 
   protected Event testEvent;
+  protected Event nullPayloadEvent;
 
   @Before
   public void buildTestEvent() throws MuleException {
     testEvent = eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
+    nullPayloadEvent = eventBuilder().message(InternalMessage.builder().nullPayload().build()).build();
   }
 
   @AfterClass

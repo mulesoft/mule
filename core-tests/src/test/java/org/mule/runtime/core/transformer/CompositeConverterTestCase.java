@@ -21,9 +21,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -158,14 +156,12 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
   public void appliesTransformerChainOnMessage() throws Exception {
     CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
     MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
-    InternalMessage message = mock(InternalMessage.class);
-    Event event = eventBuilder().message(message).build();
     compositeConverter.setMuleContext(muleContext);
     TransformationService transformationService = mock(TransformationService.class);
     doReturn(transformationService).when(muleContext).getTransformationService();
 
-    compositeConverter.process(event);
+    compositeConverter.process(testEvent);
 
-    verify(transformationService, times(1)).applyTransformers(eq(event.getMessage()), eq(event), eq(compositeConverter));
+    verify(transformationService, times(1)).applyTransformers(eq(testEvent.getMessage()), eq(testEvent), eq(compositeConverter));
   }
 }

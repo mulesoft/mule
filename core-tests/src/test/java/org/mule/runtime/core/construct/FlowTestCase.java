@@ -22,7 +22,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -130,15 +129,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = directInboundMessageSource.process(eventBuilder()
-        .message(InternalMessage.of("hello"))
-        .exchangePattern(REQUEST_RESPONSE)
-        .build());
+    Event response = directInboundMessageSource.process(testEvent);
 
-    assertEquals("helloabcdef", response.getMessageAsString(muleContext));
+    assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), response.getVariable("thread").getValue());
 
-    assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
+    assertEquals(TEST_PAYLOAD + "abc", sensingMessageProcessor.event.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getVariable("thread").getValue());
 
   }
@@ -173,9 +169,6 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.initialise();
 
     try {
-      final Event testEvent = eventBuilder()
-          .message(InternalMessage.of("hello"))
-          .build();
       directInboundMessageSource.process(testEvent);
       fail("exception expected");
     } catch (Exception e) {
@@ -212,26 +205,17 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
 
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    Event response = directInboundMessageSource.process(eventBuilder()
-        .message(InternalMessage.of("hello"))
-        .exchangePattern(REQUEST_RESPONSE)
-        .build());
-    assertEquals("hello12abcdef34", response.getMessageAsString(muleContext));
+    Event response = directInboundMessageSource.process(testEvent);
+    assertEquals(TEST_PAYLOAD + "12abcdef34", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
         .resetAndUpdate();
-    response = directInboundMessageSource.process(eventBuilder()
-        .message(InternalMessage.of("hello"))
-        .exchangePattern(REQUEST_RESPONSE)
-        .build());
-    assertEquals("hello2abcdef3", response.getMessageAsString(muleContext));
+    response = directInboundMessageSource.process(testEvent);
+    assertEquals(TEST_PAYLOAD + "2abcdef3", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).reset();
-    response = directInboundMessageSource.process(eventBuilder()
-        .message(InternalMessage.of("hello"))
-        .exchangePattern(REQUEST_RESPONSE)
-        .build());
-    assertEquals("helloabcdef", response.getMessageAsString(muleContext));
+    response = directInboundMessageSource.process(testEvent);
+    assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
   }
 
   @Test

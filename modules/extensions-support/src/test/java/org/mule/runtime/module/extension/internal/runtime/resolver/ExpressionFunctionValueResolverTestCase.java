@@ -19,7 +19,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -33,12 +32,10 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
   private static final ExpressionFunction INTEGER_EXPRESSION_FUNCTION =
       new ExpressionFunction(INTEGER_EXPRESSION, toMetadataType(Integer.class), muleContext);
 
-  private Event event;
   private MVELExpressionLanguage expressionLanguage;
 
   @Override
   protected void doSetUp() throws Exception {
-    event = eventBuilder().message(InternalMessage.of("test")).build();
     expressionLanguage = spy((MVELExpressionLanguage) muleContext.getExpressionLanguage());
     DefaultMuleContext defaultMuleContext = (DefaultMuleContext) muleContext;
     defaultMuleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);
@@ -73,12 +70,12 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
 
   private void assertExpressionFunction(Function<Event, Integer> function, Object value) {
     assertThat(function, is(not(nullValue())));
-    Integer apply = function.apply(event);
+    Integer apply = function.apply(testEvent);
     assertThat(apply, is(value));
   }
 
   public <T> Function<Event, T> getResolvedFunction(String expression, MetadataType type) throws MuleException {
-    return new ExpressionFunctionValueResolver<T>(expression, type, muleContext).resolve(event);
+    return new ExpressionFunctionValueResolver<T>(expression, type, muleContext).resolve(testEvent);
   }
 
 }

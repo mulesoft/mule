@@ -15,7 +15,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
@@ -99,10 +98,7 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
   }
 
   private void checkProxyConfig() throws Exception {
-    ConfigurationInstance config =
-        getConfigurationInstanceFromRegistry("config" + flowName,
-                                             eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build(),
-                                             muleContext);
+    ConfigurationInstance config = getConfigurationInstanceFromRegistry("config" + flowName, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
     ProxyConfig proxyConfig = provider.getProxyConfig();

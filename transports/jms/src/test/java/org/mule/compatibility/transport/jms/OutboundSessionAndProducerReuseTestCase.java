@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -260,7 +259,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
 
     reset(connectionFactory);
 
-    outboundEndpoint.process(eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build());
+    outboundEndpoint.process(testEvent);
 
     verify(connectionFactory, times(0)).createConnection();
     verify(connection, times(1)).createSession(anyBoolean(), anyInt());
