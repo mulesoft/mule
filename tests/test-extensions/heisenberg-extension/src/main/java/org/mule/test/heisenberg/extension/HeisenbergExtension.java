@@ -7,12 +7,10 @@
 package org.mule.test.heisenberg.extension;
 
 import static org.mule.runtime.extension.api.Category.SELECT;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.LITERAL;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
@@ -75,7 +73,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   public static final String RICIN_PACKS_SUMMARY = "A set of ricin packs";
   public static final String PERSONAL_INFORMATION_GROUP_NAME = "Personal Information";
   public static final String PARAMETER_OVERRIDED_DISPLAY_NAME = "Parameter Custom Display Name";
-  public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "literalExpressionWithoutDefault";
+  public static final String PARAMETER_ORIGINAL_OVERRIDED_DISPLAY_NAME = "weaponValueMap";
 
   private int initialise = 0;
   private int start = 0;
@@ -153,6 +151,7 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   @Parameter
   @Optional
+  @DisplayName(PARAMETER_OVERRIDED_DISPLAY_NAME)
   private Map<String, Weapon> weaponValueMap;
 
   /**
@@ -180,17 +179,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
   @Optional
   @Text
   private String firstEndevour;
-
-  @Parameter
-  @Optional(defaultValue = PAYLOAD)
-  @Expression(LITERAL)
-  private String literalExpressionWithDefault;
-
-  @Parameter
-  @Optional
-  @Expression(LITERAL)
-  @DisplayName(PARAMETER_OVERRIDED_DISPLAY_NAME)
-  private String literalExpressionWithoutDefault;
 
   @Parameter
   @Optional
@@ -302,14 +290,6 @@ public class HeisenbergExtension implements Lifecycle, MuleContextAware {
 
   public String getFirstEndevour() {
     return firstEndevour;
-  }
-
-  public String getLiteralExpressionWithDefault() {
-    return literalExpressionWithDefault;
-  }
-
-  public String getLiteralExpressionWitouthDefault() {
-    return literalExpressionWithoutDefault;
   }
 
   public Function<Event, WeaponType> getWeaponTypeFunction() {

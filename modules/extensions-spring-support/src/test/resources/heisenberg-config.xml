@@ -24,8 +24,7 @@
                        finalHealth="DEAD"
                        candidateDoors="candidateDoors"
                        labAddress="#['Pollos Hermanos']"
-                       weaponTypeFunction="#[weaponType]"
-                       literalExpressionWithoutDefault="#[money]">
+                       weaponTypeFunction="#[weaponType]">
         <heisenberg:enemies>
             <heisenberg:enemy value="Gustavo Fring"/>
             <heisenberg:enemy value="Hank"/>
@@ -100,8 +99,7 @@
                        candidateDoors="${candidateDoors}"
                        labAddress="#['Pollos Hermanos']"
                        deathsBySeasons="${deathsBySeasons}"
-                       labeledRicin="${labeledRicin}"
-                       literalExpressionWithoutDefault="#[money]">
+                       labeledRicin="${labeledRicin}">
         <heisenberg:enemies>
             <heisenberg:enemy value="${fring}"/>
             <heisenberg:enemy value="${hank}"/>
@@ -137,8 +135,7 @@
                        labAddress="#['Pollos Hermanos']"
                        monthlyIncomes="monthlyIncomes"
                        deathsBySeasons="deathsBySeasons"
-                       labeledRicin="labeledRicins"
-                       literalExpressionWithoutDefault="#[money]">
+                       labeledRicin="labeledRicins">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
@@ -158,8 +155,7 @@
                        weaponTypeFunction="#[weaponType]"
                        monthlyIncomes="#[[12000L, 500L]]"
                        deathsBySeasons="#[['s01':['emilio', 'domingo'], 's02':['tuco', 'tortuga']]]"
-                       labeledRicin="#[app.registry.labeledRicins]"
-                       literalExpressionWithoutDefault="#[money]">
+                       labeledRicin="#[app.registry.labeledRicins]">
         <heisenberg:enemies>
             <heisenberg:enemy value="#[gustavoFring]"/>
             <heisenberg:enemy value="#[hank]"/>
@@ -194,8 +190,7 @@
                        monthlyIncomes="#[app.registry.monthlyIncomes]"
                        deathsBySeasons="#[app.registry.deathsBySeasons]"
                        labeledRicin="#[app.registry.labeledRicins]"
-                       weapon="#[weapon]"
-                       literalExpressionWithoutDefault="#[money]">
+                       weapon="#[weapon]">
         <heisenberg:first-endevour><![CDATA[Gray Matter Technologies]]></heisenberg:first-endevour>
     </heisenberg:config>
 
