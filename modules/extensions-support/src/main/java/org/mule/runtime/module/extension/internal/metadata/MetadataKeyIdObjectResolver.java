@@ -15,6 +15,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
+import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
@@ -51,20 +52,19 @@ final class MetadataKeyIdObjectResolver {
 
   private static final DsqlParser dsqlParser = DsqlParser.getInstance();
 
-
   /**
    * Given a {@link ComponentModel} and a {@link Map} key, return the populated key in the Type that the {@link Component}
    * parameter requires.
    *
    * @param component the component model that contains the parameter annotated with {@link MetadataKeyId}
-   * @param key the {@link MetadataKey} associated to the {@link MetadataKeyId}
+   * @param key       the {@link MetadataKey} associated to the {@link MetadataKeyId}
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
    * @throws MetadataResolvingException if:
-   *         <ul>
-   *         <li>Parameter types is not instantiable</li>
-   *         <li>{@param key} does not provide the required levels</li>
-   *         <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
-   *         </ul>
+   *                                    <ul>
+   *                                    <li>Parameter types is not instantiable</li>
+   *                                    <li>{@param key} does not provide the required levels</li>
+   *                                    <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
+   *                                    </ul>
    */
   public Object resolve(ComponentModel component, MetadataKey key) throws MetadataResolvingException {
     final List<ParameterModel> metadataKeyParts = getMetadataKeyParts(component);
@@ -92,10 +92,16 @@ final class MetadataKeyIdObjectResolver {
       }
 
       @Override
+      public void visitBoolean(BooleanType booleanType) {
+        keyValueHolder.set(Boolean.valueOf(key.getId()));
+      }
+
+      @Override
       public void visitString(StringType stringType) {
         String id = key.getId();
-        Optional<QueryParameterModelProperty> query = getQueryModelProperty(componentModel);
-        if (query.isPresent() && isDsqlQuery(id)) {
+        if (metadataKeyType.isEnum()) {
+          keyValueHolder.set(Enum.valueOf((Class) metadataKeyType, id));
+        } else if (getQueryModelProperty(componentModel).isPresent() && isDsqlQuery(id)) {
           DsqlQuery dsqlQuery = dsqlParser.parse(id);
           keyValueHolder.set(dsqlQuery);
         } else {
@@ -124,7 +130,7 @@ final class MetadataKeyIdObjectResolver {
    * Resolves the KeyIdObject for a MultiLevel {@link MetadataKeyId}
    *
    * @param componentModel model property of the {@link MetadataKeyId} parameter
-   * @param key key containing the values of each level
+   * @param key            key containing the values of each level
    * @return the KeyIdObject for the {@link MetadataKeyId} parameter
    * @throws MetadataResolvingException
    */

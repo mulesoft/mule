@@ -125,6 +125,14 @@
         <metadata:should-inherit-operation-resolvers config-ref="config" type="PERSON"/>
     </flow>
 
+    <flow name="enumMetadataKey">
+        <metadata:enum-metadata-key config-ref="config" type="MAMMAL"/>
+    </flow>
+
+    <flow name="booleanMetadataKey">
+        <metadata:boolean-metadata-key config-ref="config" type="true"/>
+    </flow>
+
     <flow name="shouldInheritExtensionResolvers">
         <metadata:should-inherit-extension-resolvers config-ref="config" type="PERSON"/>
     </flow>

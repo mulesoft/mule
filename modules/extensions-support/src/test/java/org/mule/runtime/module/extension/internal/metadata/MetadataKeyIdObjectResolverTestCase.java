@@ -181,19 +181,6 @@ public class MetadataKeyIdObjectResolverTestCase {
     keyIdObjectResolver.resolve(componentModel, invalidMetadataKey);
   }
 
-  @Test
-  public void failToResolveWithInvalidKeyIdParam() throws MetadataResolvingException {
-    exception.expect(MetadataResolvingException.class);
-    exception
-        .expectMessage(is(
-                          "'Boolean' type is invalid for MetadataKeyId parameters, use String type instead. Affecting component: 'SomeOperation'"));
-
-    setParameters(continentParam);
-    setMetadataKeyIdModelProperty(Boolean.class);
-
-    keyIdObjectResolver.resolve(componentModel, newKey("true", "booleanParam").build());
-  }
-
   public void setParameters(ParameterModel... parameterModels) {
     when(componentModel.getParameterModels()).thenReturn(Arrays.asList(parameterModels));
   }

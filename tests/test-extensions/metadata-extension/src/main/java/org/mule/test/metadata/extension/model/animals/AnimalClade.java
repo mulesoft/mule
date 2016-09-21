@@ -6,7 +6,6 @@
  */
 package org.mule.test.metadata.extension.model.animals;
 
-public interface Animal {
-
-  AnimalClade getClade();
+public enum AnimalClade {
+  MAMMAL, FISH, BIRD
 }

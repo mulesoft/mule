@@ -13,9 +13,9 @@ import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.N
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA;
-
 import org.mule.runtime.core.api.Event;
 import org.mule.test.metadata.extension.LocationKey;
+import org.mule.test.metadata.extension.model.animals.AnimalClade;
 
 import org.junit.Test;
 
@@ -54,5 +54,19 @@ public class RuntimeMetadataTestCase extends MetadataExtensionFunctionalTestCase
     Event event = flowRunner(NATIVE_QUERY_FLOW).run();
     String nativeQuery = (String) event.getMessage().getPayload().getValue();
     assertThat(nativeQuery.trim(), is(NATIVE_QUERY));
+  }
+
+  @Test
+  public void enumMetadataKey() throws Exception {
+    Event event = flowRunner(ENUM_METADATA_KEY).run();
+    AnimalClade key = (AnimalClade) event.getMessage().getPayload().getValue();
+    assertThat(key, is(AnimalClade.MAMMAL));
+  }
+
+  @Test
+  public void booleanMetadataKey() throws Exception {
+    Event event = flowRunner(BOOLEAN_METADATA_KEY).run();
+    boolean key = (boolean) event.getMessage().getPayload().getValue();
+    assertThat(key, is(true));
   }
 }

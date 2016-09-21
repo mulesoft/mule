@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension.model.animals;
 
+import static org.mule.test.metadata.extension.model.animals.AnimalClade.MAMMAL;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 
 @XmlHints(allowTopLevelDefinition = true)
@@ -19,5 +20,10 @@ public class Bear implements Animal {
 
   public void setBearName(String bearName) {
     this.bearName = bearName;
+  }
+
+  @Override
+  public AnimalClade getClade() {
+    return MAMMAL;
   }
 }
