@@ -49,7 +49,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -116,7 +115,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
                                                 (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                     equalTo(compileMuleArtifactDep))),
-                                                argThat(new ListOfElements(0)),
+                                                (List<Dependency>) argThat(empty()),
                                                 argThat(instanceOf(DependencyFilter.class))))
                                                     .thenReturn(newArrayList(muleCoreArtifactFile, muleArtifactFile));
 
@@ -135,7 +134,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                                                    (List<Dependency>) argThat(
                                                                               hasItems(equalTo(compileMuleCoreDep),
                                                                                        equalTo(compileMuleArtifactDep))),
-                                                   argThat(new ListOfElements(0)),
+                                                   (List<Dependency>) argThat(empty()),
                                                    argThat(instanceOf(DependencyFilter.class)));
   }
 
@@ -192,21 +191,4 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     return artifactDescriptorResult;
   }
 
-  class ListOfElements extends ArgumentMatcher<List> {
-
-    private int size;
-
-    public ListOfElements(int size) {
-      this.size = size;
-    }
-
-    public String toString() {
-      return "[list of " + size + " elements]";
-    }
-
-    @Override
-    public boolean matches(Object argument) {
-      return ((List) argument).size() == size;
-    }
-  }
 }
