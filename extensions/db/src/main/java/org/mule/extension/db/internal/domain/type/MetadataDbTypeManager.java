@@ -83,10 +83,12 @@ public class MetadataDbTypeManager implements DbTypeManager {
       while (resultSetIterator.hasNext()) {
         Map<String, Object> typeRecord = resultSetIterator.next();
 
-        Number data_type = (Number) typeRecord.get(METADATA_TYPE_ID_COLUMN);
-        String type_name = (String) typeRecord.get(METADATA_TYPE_NAME_COLUMN);
+        Number dataType = (Number) typeRecord.get(METADATA_TYPE_ID_COLUMN);
+        String typeName = (String) typeRecord.get(METADATA_TYPE_NAME_COLUMN);
 
-        ResolvedDbType resolvedDbType = new ResolvedDbType(data_type.intValue(), type_name);
+        DbType resolvedDbType = dataType.equals(Types.BLOB)
+            ? new BlobDbType(dataType.intValue(), typeName)
+            : new ResolvedDbType(dataType.intValue(), typeName);
 
         if (!isUserDefinedType(resolvedDbType)) {
           registerType(resolvedDbType);
