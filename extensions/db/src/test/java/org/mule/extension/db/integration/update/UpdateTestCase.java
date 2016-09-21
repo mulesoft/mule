@@ -19,6 +19,7 @@ import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
 import org.mule.runtime.api.message.Message;
 
+import java.io.ByteArrayInputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,16 @@ public class UpdateTestCase extends AbstractDbIntegrationTestCase {
     new Random().nextBytes(picture);
 
     Message response = flowRunner("updateBlob").withPayload(picture).run().getMessage();
+    assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
+    assertPlanetRecordsFromQuery("Mars");
+  }
+
+  @Test
+  public void updateBlobWithStream() throws Exception {
+    byte[] picture = new byte[100];
+    new Random().nextBytes(picture);
+
+    Message response = flowRunner("updateBlob").withPayload(new ByteArrayInputStream(picture)).run().getMessage();
     assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
     assertPlanetRecordsFromQuery("Mars");
   }
