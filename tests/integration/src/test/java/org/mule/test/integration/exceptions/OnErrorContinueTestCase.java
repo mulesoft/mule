@@ -9,15 +9,16 @@ package org.mule.test.integration.exceptions;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -141,6 +142,15 @@ public class OnErrorContinueTestCase extends AbstractIntegrationTestCase {
     result = flowRunner("onErrorTypeMatchSeveral").withPayload(false).run().getMessage();
     assertThat(result, is(notNullValue()));
     assertThat(getPayloadAsString(result), is("false apt1 apt2"));
+  }
+
+  public static class FailingProcessor implements Processor {
+
+    @Override
+    public Event process(Event event) throws MuleException {
+      throw new RetryPolicyExhaustedException(createStaticMessage("Error."), new Object());
+    }
+
   }
 
   public static class LoadNewsProcessor extends AbstractAnnotatedObject implements Processor {

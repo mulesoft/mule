@@ -1716,13 +1716,6 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:enumeration>
-                    <xsd:enumeration value="UNKNOWN">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                Error type for which there's no a clear reason of the failure.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
                     <xsd:enumeration value="REDELIVERY_EXHAUSTED">
                         <xsd:annotation>
                             <xsd:documentation>

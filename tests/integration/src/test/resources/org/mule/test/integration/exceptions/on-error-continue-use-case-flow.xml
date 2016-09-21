@@ -89,12 +89,12 @@
 
     <flow name="onErrorTypeMatch">
         <append-string-transformer message=" apt1"/>
-        <test:component throwException="true"/>
+        <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$FailingProcessor"/>
         <error-handler>
             <on-error-continue type="EXPRESSION">
                 <append-string-transformer message=" nope"/>
             </on-error-continue>
-            <on-error-continue type="UNKNOWN">
+            <on-error-continue type="CONNECTIVITY">
                 <append-string-transformer message=" apt2"/>
             </on-error-continue>
             <on-error-continue type="ANY">
@@ -120,7 +120,7 @@
         <choice>
             <when expression="#[payload]">
                 <append-string-transformer message=" apt1"/>
-                <test:component throwException="true"/>
+                <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$FailingProcessor"/>
             </when>
             <otherwise>
                 <append-string-transformer message=" apt1"/>
@@ -128,7 +128,7 @@
             </otherwise>
         </choice>
         <error-handler>
-            <on-error-continue type="TRANSFORMATION, UNKNOWN">
+            <on-error-continue type="TRANSFORMATION, CONNECTIVITY">
                 <append-string-transformer message=" apt2"/>
             </on-error-continue>
             <on-error-continue type="ANY">
