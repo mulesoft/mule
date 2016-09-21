@@ -6,8 +6,11 @@
  */
 package org.mule.test.integration.transport.file;
 
+import static org.junit.Assert.fail;
+import static org.mule.util.FileUtils.writeStringToFile;
+import static org.mule.util.FileUtils.newFile;
+
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -15,8 +18,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.fail;
 
 public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -38,11 +39,13 @@ public class FileRuntimeExceptionStrategyFunctionalTestCase extends AbstractServ
     @Test
     public void testExceptionInTransformer() throws Exception
     {
-        File f = FileUtils.newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
+        File f = newFile(getFileInsideWorkingDirectory("in/test.txt").getAbsolutePath());
         f.createNewFile();
+        // If file is empty it won't be processed
+        writeStringToFile(f, "test", (String) null);
 
         // try a couple of times with backoff strategy, then fail
-        File errorFile = FileUtils.newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());
+        File errorFile = newFile(getFileInsideWorkingDirectory("errors/test-0.out").getAbsolutePath());
         boolean testSucceded = false;
         int timesTried = 0;
         while (timesTried <= 3)
