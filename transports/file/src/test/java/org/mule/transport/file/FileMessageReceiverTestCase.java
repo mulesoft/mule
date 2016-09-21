@@ -6,27 +6,55 @@
  */
 package org.mule.transport.file;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractMessageReceiverTestCase;
-import org.mule.util.FileUtils;
 
-import java.io.File;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-    File read = FileUtils.newFile("testcasedata/read");
-    File move = FileUtils.newFile("testcasedata/move");
+    @Rule
+    public TemporaryFolder read = new TemporaryFolder();
+
+    @Rule
+    public TemporaryFolder move = new TemporaryFolder();
 
     public void testReceiver() throws Exception
     {
         // FIX A bit hard testing receive from a unit simple as we need to reg
         // listener etc.
         // file endpoint functions tests for this
+    }
+
+    @Test
+    public void testNotProcessingEmptyFile() throws Exception
+    {
+        FileMessageReceiver fmr = (FileMessageReceiver) getMessageReceiver();
+        read.newFile("empty.tmp");
+        fmr.initialise();
+        fmr.doInitialise();
+        fmr.setListener(new MessageProcessor()
+        {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                fail("Should not process empty file");
+                return null;
+            }
+        });
+        fmr.doConnect();
+        fmr.poll();
     }
 
     @Override
@@ -37,11 +65,8 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
         Service mockComponent = mock(Service.class);
 
-        read.deleteOnExit();
-        move.deleteOnExit();
-
         return new FileMessageReceiver(connector, mockComponent, endpoint,
-            read.getAbsolutePath(), move.getAbsolutePath(), null, 1000);
+            read.getRoot().getAbsolutePath(), move.getRoot().getAbsolutePath(), null, 1000);
     }
 
     @Override
