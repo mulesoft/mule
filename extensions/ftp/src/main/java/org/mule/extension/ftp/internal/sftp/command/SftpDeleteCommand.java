@@ -6,16 +6,16 @@
  */
 package org.mule.extension.ftp.internal.sftp.command;
 
-import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.extension.file.common.api.FileAttributes;
 import org.mule.extension.file.common.api.command.DeleteCommand;
 import org.mule.extension.ftp.internal.sftp.connection.SftpClient;
 import org.mule.extension.ftp.internal.sftp.connection.SftpFileSystem;
+import org.slf4j.Logger;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * A {@link SftpCommand} which implements the {@link DeleteCommand} contract
@@ -47,14 +47,14 @@ public final class SftpDeleteCommand extends SftpCommand implements DeleteComman
     } else {
       deleteFile(path);
     }
-
-    logDelete(path);
   }
 
   private void deleteFile(String path) {
     fileSystem.verifyNotLocked(Paths.get(path));
     LOGGER.debug("Preparing to delete file '{}'", path);
     client.deleteFile(path);
+
+    logDelete(path);
   }
 
   private void deleteDirectory(String path) {
