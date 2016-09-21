@@ -13,13 +13,9 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.NullMessageProcessor;
-import org.mule.tck.MuleTestUtils;
 
 import org.junit.Test;
 
@@ -39,10 +35,8 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     Processor endpointProcessor =
         endpoint.getMessageProcessorsFactory().createInboundMessageProcessorChain(endpoint, getTestFlow(muleContext),
                                                                                   new NullMessageProcessor());
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    assertEquals("01231abc2", endpointProcessor.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("0"))
+    assertEquals("01231abc2", endpointProcessor.process(eventBuilder().message(InternalMessage.of("0"))
         .build()).getMessageAsString(muleContext));
   }
 

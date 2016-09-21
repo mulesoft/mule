@@ -14,13 +14,10 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.el.datetime.DateTime;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -70,11 +67,8 @@ public abstract class AbstractObjectSerializerContractTestCase extends AbstractM
 
     DateTime dateTime = new DateTime(calendar, locale);
     dateTime.changeTimeZone("Pacific/Midway");
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(dateTime))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of(dateTime)).build();
     byte[] bytes = serializer.serialize(event.getMessage());
 
     InternalMessage message = serializer.deserialize(bytes);

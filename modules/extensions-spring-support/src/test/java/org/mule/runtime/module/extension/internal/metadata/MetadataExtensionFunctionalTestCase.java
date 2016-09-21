@@ -29,13 +29,10 @@ import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.tck.MuleTestUtils;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
@@ -119,10 +116,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
 
   @Before
   public void setup() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
-        .build();
+    event = eventBuilder().message(InternalMessage.of("")).build();
     metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }

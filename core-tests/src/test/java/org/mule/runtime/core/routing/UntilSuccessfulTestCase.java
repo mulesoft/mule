@@ -12,16 +12,13 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -63,7 +60,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   }
 
   private UntilSuccessful untilSuccessful;
-  private FlowConstruct flowConstruct;
 
   private ListableObjectStore<Event> objectStore;
   private ConfigurableMessageProcessor targetMessageProcessor;
@@ -73,7 +69,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     untilSuccessful = buildUntiSuccessful(1000L);
-    flowConstruct = MuleTestUtils.getTestFlow(muleContext);
   }
 
   private UntilSuccessful buildUntiSuccessful(Long millisBetweenRetries) throws Exception {
@@ -106,9 +101,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("test_data"))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of("test_data")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
   }
@@ -119,9 +112,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new ByteArrayInputStream("test_data".getBytes())))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of(new ByteArrayInputStream("test_data".getBytes()))).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
   }
@@ -132,9 +123,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("test_data"))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of("test_data")).build();
     assertThat(untilSuccessful.process(testEvent).getMessageAsString(muleContext), equalTo("ACK"));
     waitDelivery();
   }
@@ -145,9 +134,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("test_data"))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of("test_data")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
   }
@@ -159,9 +146,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("ERROR"))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of("ERROR")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventAborted(testEvent);
   }
@@ -172,9 +157,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("ERROR"))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of("ERROR")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventAborted(testEvent);
   }
@@ -186,9 +169,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("ERROR"))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of("ERROR")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
     assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
@@ -196,9 +177,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testPreExistingEvents() throws Exception {
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("test_data"))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of("test_data")).build();
     objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, getTestFlow(muleContext),
                                                                                         muleContext),
                       testEvent);

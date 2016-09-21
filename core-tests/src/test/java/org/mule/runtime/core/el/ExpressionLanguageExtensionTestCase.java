@@ -15,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.mvel2.compiler.AbstractParser;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -110,18 +109,14 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testVariableAlias() throws Exception {
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("foo"))
-        .build();
+    Event event = Event.builder(context).message(InternalMessage.of("foo")).build();
 
     assertThat(expressionLanguage.evaluate("p", event, flowConstruct), is("foo"));
   }
 
   @Test
   public void testAssignValueToVariableAlias() throws Exception {
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
-        .build();
+    Event event = Event.builder(context).message(InternalMessage.of("")).build();
 
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.evaluate("p='bar'", event, eventBuilder, flowConstruct);
@@ -130,10 +125,7 @@ public class ExpressionLanguageExtensionTestCase extends AbstractELTestCase {
 
   @Test
   public void testMuleMessageAvailableAsVariable() throws Exception {
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
-        .build();
-    InternalMessage message = event.getMessage();
+    Event event = Event.builder(context).message(InternalMessage.of("")).build();
     expressionLanguage.evaluate("p=m.uniqueId", event, flowConstruct);
   }
 

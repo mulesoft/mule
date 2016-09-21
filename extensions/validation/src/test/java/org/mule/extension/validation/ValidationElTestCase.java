@@ -14,12 +14,9 @@ import static org.mule.extension.validation.ValidationTestCase.VALID_EMAIL;
 import static org.mule.extension.validation.ValidationTestCase.VALID_URL;
 
 import org.mule.extension.validation.api.NumberType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.common.collect.ImmutableList;
@@ -31,12 +28,10 @@ import org.junit.Test;
 
 public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
-  private FlowConstruct flowConstruct;
   private ExpressionLanguage expressionLanguage;
 
   @Override
   protected void doSetUp() throws Exception {
-    flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     expressionLanguage = muleContext.getExpressionLanguage();
   }
 
@@ -44,7 +39,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   public void email() throws Exception {
     final String expression = "#[validator.validateEmail(email)]";
     Event event = Event
-        .builder(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(InternalMessage.of("")).build())
+        .builder(eventBuilder().message(InternalMessage.of("")).build())
         .addVariable("email", VALID_EMAIL)
         .build();
 
@@ -59,7 +54,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
     final String regex = "[tT]rue";
     final String expression = "#[validator.matchesRegex(payload, regexp, caseSensitive)]";
 
-    Event event = Event.builder(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    Event event = Event.builder(eventBuilder()
         .message(InternalMessage.of("true")).build())
         .addVariable("regexp", regex)
         .addVariable("caseSensitive", false)
@@ -81,7 +76,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   public void isTime() throws Exception {
     final String time = "12:08 PM";
 
-    Event event = Event.builder(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    Event event = Event.builder(eventBuilder()
         .message(InternalMessage.of(time)).build())
         .addVariable("validPattern", "h:mm a")
         .addVariable("invalidPattern", "yyMMddHHmmssZ")
@@ -136,31 +131,25 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void size() throws Exception {
-    assertValid("#[validator.validateSize('John', 0, 4)]",
-                Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(InternalMessage.of("")).build());
+    assertValid("#[validator.validateSize('John', 0, 4)]", eventBuilder().message(InternalMessage.of("")).build());
     assertInvalid("#[validator.validateSize(payload, 1, 4)]",
-                  Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-                      .message(InternalMessage.of(ImmutableList.of())).build());
+                  eventBuilder().message(InternalMessage.of(ImmutableList.of())).build());
   }
 
   @Test
   public void notNull() throws Exception {
     final String expression = "#[validator.isNotNull(payload)]";
-    assertValid(expression,
-                Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(InternalMessage.of("")).build());
+    assertValid(expression, eventBuilder().message(InternalMessage.of("")).build());
 
-    assertInvalid(expression, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message((InternalMessage.builder().nullPayload().build())).build());
+    assertInvalid(expression, eventBuilder().message((InternalMessage.builder().nullPayload().build())).build());
   }
 
   @Test
   public void isNull() throws Exception {
     final String expression = "#[validator.isNull(payload)]";
-    assertValid(expression, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().nullPayload().build()).build());
+    assertValid(expression, eventBuilder().message(InternalMessage.builder().nullPayload().build()).build());
 
-    assertInvalid(expression, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("")).build());
+    assertInvalid(expression, eventBuilder().message(InternalMessage.of("")).build());
   }
 
   @Test
@@ -180,19 +169,15 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   @Test
   public void ip() throws Exception {
     final String expression = "#[validator.validateIp(payload)]";
-    assertValid(expression, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("127.0.0.1")).build());
-    assertInvalid(expression, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("ET phone home")).build());
+    assertValid(expression, eventBuilder().message(InternalMessage.of("127.0.0.1")).build());
+    assertInvalid(expression, eventBuilder().message(InternalMessage.of("ET phone home")).build());
   }
 
   @Test
   public void url() throws Exception {
     final String expression = "#[validator.validateUrl(payload)]";
-    assertValid(expression, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(VALID_URL)).build());
-    assertInvalid(expression, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(INVALID_URL)).build());
+    assertValid(expression, eventBuilder().message(InternalMessage.of(VALID_URL)).build());
+    assertInvalid(expression, eventBuilder().message(InternalMessage.of(INVALID_URL)).build());
   }
 
   private <T extends Number> void assertNumberValue(String expression, NumberType numberType, T value, T minValue, T maxValue,
@@ -208,7 +193,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   private Event getNumberValidationEvent(Object value, NumberType numberType, Object minValue, Object maxValue)
       throws Exception {
-    Event event = Event.builder(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    Event event = Event.builder(eventBuilder()
         .message(InternalMessage.of(value)).build())
         .addVariable("numberType", numberType)
         .addVariable("minValue", minValue)
@@ -219,13 +204,11 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   }
 
   private void assertEmpty(Object value, boolean expected) throws Exception {
-    testExpression("#[validator.isEmpty(payload)]", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(value)).build(), expected);
+    testExpression("#[validator.isEmpty(payload)]", eventBuilder().message(InternalMessage.of(value)).build(), expected);
   }
 
   private void assertNotEmpty(Object value, boolean expected) throws Exception {
-    testExpression("#[validator.notEmpty(payload)]", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(value)).build(), expected);
+    testExpression("#[validator.notEmpty(payload)]", eventBuilder().message(InternalMessage.of(value)).build(), expected);
   }
 
   private boolean evaluate(String expression, Event event) {

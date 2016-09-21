@@ -7,7 +7,6 @@
 package org.mule.tck.junit4;
 
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
@@ -16,11 +15,9 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.config.builders.TransportsConfigurationBuilder;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -84,12 +81,10 @@ public abstract class AbstractMuleContextEndpointTestCase extends AbstractMuleCo
   }
 
   public static Event getTestEvent(Object data, InboundEndpoint endpoint) throws Exception {
-    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
 
-    return populateFieldsFromInboundEndpoint(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(factory.create(data, endpoint.getEncoding()))
-        .flow(flowConstruct).session(new DefaultMuleSession()).build(), endpoint);
+    return populateFieldsFromInboundEndpoint(eventBuilder().message(factory.create(data, endpoint.getEncoding()))
+        .session(new DefaultMuleSession()).build(), endpoint);
   }
 
   public static TestConnector getTestConnector() throws Exception {

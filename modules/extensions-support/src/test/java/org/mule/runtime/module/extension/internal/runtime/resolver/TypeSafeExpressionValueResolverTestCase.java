@@ -18,12 +18,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
@@ -33,13 +31,11 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
   private static final String HELLO_WORLD = "Hello World!";
 
-  private FlowConstruct flowConstruct;
   private MVELExpressionLanguage expressionLanguage;
 
   @Override
   protected void doSetUp() throws Exception {
     muleContext = spy(muleContext);
-    flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     expressionLanguage = spy((MVELExpressionLanguage) muleContext.getExpressionLanguage());
 
     when(muleContext.getExpressionLanguage()).thenReturn(expressionLanguage);
@@ -48,41 +44,31 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
   @Test
   public void expressionLanguageWithoutTransformation() throws Exception {
     assertResolved(getResolver("#['Hello ' + payload]", String.class)
-        .resolve(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of("World!"))
-            .build()), HELLO_WORLD, never());
+        .resolve(eventBuilder().message(InternalMessage.of("World!")).build()), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionTemplateWithoutTransformation() throws Exception {
     assertResolved(getResolver("Hello #[payload]", String.class)
-        .resolve(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of("World!"))
-            .build()), HELLO_WORLD, times(1));
+        .resolve(eventBuilder().message(InternalMessage.of("World!")).build()), HELLO_WORLD, times(1));
   }
 
   @Test
   public void constant() throws Exception {
     assertResolved(getResolver("Hello World!", String.class)
-        .resolve(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of(HELLO_WORLD))
-            .build()), HELLO_WORLD, never());
+        .resolve(eventBuilder().message(InternalMessage.of(HELLO_WORLD)).build()), HELLO_WORLD, never());
   }
 
   @Test
   public void expressionWithTransformation() throws Exception {
     assertResolved(getResolver("#[true]", String.class)
-        .resolve(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of(HELLO_WORLD))
-            .build()), "true", never());
+        .resolve(eventBuilder().message(InternalMessage.of(HELLO_WORLD)).build()), "true", never());
   }
 
   @Test
   public void templateWithTransformation() throws Exception {
     assertResolved(getResolver("tru#['e']", String.class)
-        .resolve(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of(HELLO_WORLD))
-            .build()), "true", times(1));
+        .resolve(eventBuilder().message(InternalMessage.of(HELLO_WORLD)).build()), "true", times(1));
   }
 
   @Test(expected = IllegalArgumentException.class)

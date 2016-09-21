@@ -12,11 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
 import org.junit.Ignore;
@@ -32,11 +28,8 @@ public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 
   @Test
   public void parseApiConfigurationFromConfig() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     HttpRequesterConfig config =
-        getConfigurationFromRegistry("ramlConfig", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of(TEST_PAYLOAD))
-            .build(), muleContext);
+        getConfigurationFromRegistry("ramlConfig", eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build(), muleContext);
 
     assertNotNull(config.getApiConfiguration());
     assertThat(config.getApiConfiguration().getLocation(), equalTo("TestFile.raml"));

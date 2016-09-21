@@ -22,18 +22,15 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.RoutingException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.routing.filters.ExpressionFilter;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Before;
@@ -62,10 +59,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
     when(mockUntilSuccessfulConfiguration.getThreadingProfile()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getObjectStore()).thenReturn(null);
     when(mockUntilSuccessfulConfiguration.getDlqMP()).thenReturn(null);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_DATA))
-        .build();
+    event = eventBuilder().message(InternalMessage.of(TEST_DATA)).build();
     setCurrentEvent(null);
   }
 
@@ -102,10 +96,7 @@ public class SynchronousUntilSuccessfulProcessingStrategyTestCase extends Abstra
 
   @Test
   public void alwaysFailUsingFailureExpression() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    when(mockRoute.process(any(Event.class))).thenReturn(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_DATA))
-        .build());
+    when(mockRoute.process(any(Event.class))).thenReturn(eventBuilder().message(InternalMessage.of(TEST_DATA)).build());
     when(mockUntilSuccessfulConfiguration.getFailureExpressionFilter()).thenReturn(mockAlwaysTrueFailureExpressionFilter);
     SynchronousUntilSuccessfulProcessingStrategy processingStrategy = createProcessingStrategy();
     try {

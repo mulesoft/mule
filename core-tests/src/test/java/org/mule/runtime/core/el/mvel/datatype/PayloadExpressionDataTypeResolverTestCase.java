@@ -18,12 +18,9 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -52,11 +49,8 @@ public class PayloadExpressionDataTypeResolverTestCase extends AbstractMuleConte
     MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     testEvent = Event.builder(testEvent).message(InternalMessage.builder(testEvent.getMessage()).payload(TEST_MESSAGE)
         .mediaType(expectedDataType.getMediaType()).build()).build();

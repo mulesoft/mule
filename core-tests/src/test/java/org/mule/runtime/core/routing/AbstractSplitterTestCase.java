@@ -12,15 +12,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.routing.filters.AcceptAllFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -49,11 +46,8 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(apple);
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    final Event inEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(fruitBowl))
-        .build();
+    final Event inEvent = eventBuilder().message(InternalMessage.of(fruitBowl)).build();
 
     Event resultEvent = splitter.process(inEvent);
 
@@ -85,11 +79,8 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(apple);
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    final Event inEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(fruitBowl))
-        .build();
+    final Event inEvent = eventBuilder().message(InternalMessage.of(fruitBowl)).build();
 
     Event resultEvent = splitter.process(inEvent);
 

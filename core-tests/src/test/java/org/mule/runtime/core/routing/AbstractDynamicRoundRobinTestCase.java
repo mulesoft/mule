@@ -7,8 +7,8 @@
 package org.mule.runtime.core.routing;
 
 
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.MessageExchangePattern;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -16,7 +16,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -72,11 +71,8 @@ public class AbstractDynamicRoundRobinTestCase extends AbstractMuleContextTestCa
   }
 
   protected Event getEventWithId(String id) throws Exception {
-    return Event.builder(DefaultEventContext.create(MuleTestUtils.getTestFlow(muleContext), TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(TEST_MESSAGE).build())
-        .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
-        .addVariable(ID_PROPERTY_NAME, id)
-        .build();
+    return eventBuilder().message(InternalMessage.builder().payload(TEST_MESSAGE).build()).exchangePattern(REQUEST_RESPONSE)
+        .addVariable(ID_PROPERTY_NAME, id).build();
   }
 
   public static class LetterMessageProcessor implements Processor {

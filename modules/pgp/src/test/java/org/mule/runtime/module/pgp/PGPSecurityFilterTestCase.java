@@ -12,13 +12,10 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.MuleTestUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,11 +45,10 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase {
 
     byte[] msg = loadEncryptedMessage();
     Map<String, Serializable> props = createMessageProperties();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
     flowRunner("echo")
-        .withPayload(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.builder().payload(new String(msg)).inboundProperties(props).build()).build())
+        .withPayload(eventBuilder().message(InternalMessage.builder().payload(new String(msg)).inboundProperties(props).build())
+            .build())
         .asynchronously().run();
 
     InternalMessage message = client.request("test://output", RECEIVE_TIMEOUT).getRight().get();

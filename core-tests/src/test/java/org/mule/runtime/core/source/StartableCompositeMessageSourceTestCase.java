@@ -10,17 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.util.ObjectUtils;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -40,10 +37,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     listener = getSensingNullMessageProcessor();
     listener2 = getSensingNullMessageProcessor();
     compositeSource = getCompositeSource();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     source = new NullMessageSource(testEvent);
   }
 

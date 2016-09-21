@@ -15,12 +15,9 @@ import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -42,12 +39,9 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .addVariable("foo", EXPRESSION_VALUE, expectedDataType)
-        .build();
+    Event testEvent =
+        eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).addVariable("foo", EXPRESSION_VALUE, expectedDataType).build();
 
     assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }
@@ -60,11 +54,8 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     MVELExpressionLanguage expressionLanguage = (MVELExpressionLanguage) muleContext.getExpressionLanguage();
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     testEvent.getSession().setProperty("foo", EXPRESSION_VALUE, expectedDataType);
 
     assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));

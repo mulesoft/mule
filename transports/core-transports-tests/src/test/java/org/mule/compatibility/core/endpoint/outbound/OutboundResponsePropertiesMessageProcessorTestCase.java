@@ -10,17 +10,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.AbstractEndpointBuilder;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 
 import org.junit.Test;
@@ -37,11 +34,8 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
     mp.setListener(event -> {
       // return event with same payload but no properties
       try {
-        Flow flow = getTestFlow(muleContext);
-        return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-            .message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue()).build())
-            .exchangePattern(REQUEST_RESPONSE)
-            .flow(flow).session(new DefaultMuleSession()).build();
+        return eventBuilder().message(InternalMessage.builder().payload(event.getMessage().getPayload().getValue()).build())
+            .exchangePattern(REQUEST_RESPONSE).session(new DefaultMuleSession()).build();
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

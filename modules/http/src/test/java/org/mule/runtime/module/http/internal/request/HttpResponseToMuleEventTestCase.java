@@ -13,9 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_REASON_PROPERTY;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.exception.MessagingException;
@@ -24,7 +22,6 @@ import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponseBuilder;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -60,9 +57,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
     builder.setStatusCode(200);
     builder.setReasonPhrase("OK");
     httpResponse = builder.build();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().nullPayload().build()).build();
+    event = eventBuilder().message(InternalMessage.builder().nullPayload().build()).build();
   }
 
   @Test
@@ -74,8 +69,7 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void previousInboundPropertiesAreRemoved() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    event = eventBuilder()
         .message(InternalMessage.builder().nullPayload().addInboundProperty("TestInboundProperty", TEST_VALUE).build()).build();
     Event result = httpResponseToMuleEvent.convert(event, httpResponse, null);
     assertThat(result.getMessage().getInboundProperty("TestInboundProperty"), nullValue());

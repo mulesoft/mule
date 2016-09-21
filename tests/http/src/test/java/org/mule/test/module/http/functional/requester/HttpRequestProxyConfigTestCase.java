@@ -15,15 +15,11 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -103,12 +99,9 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
   }
 
   private void checkProxyConfig() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry("config" + flowName,
-                                             Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-                                                 .message(InternalMessage.of(TEST_PAYLOAD))
-                                                 .build(),
+                                             eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build(),
                                              muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();

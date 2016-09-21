@@ -20,13 +20,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Converter;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -161,8 +159,7 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     CompositeConverter compositeConverter = new CompositeConverter(mockConverterA, mockConverterB);
     MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
     InternalMessage message = mock(InternalMessage.class);
-    Event event = Event.builder(DefaultEventContext.create(MuleTestUtils.getTestFlow(muleContext), TEST_CONNECTOR))
-        .message(message).build();
+    Event event = eventBuilder().message(message).build();
     compositeConverter.setMuleContext(muleContext);
     TransformationService transformationService = mock(TransformationService.class);
     doReturn(transformationService).when(muleContext).getTransformationService();

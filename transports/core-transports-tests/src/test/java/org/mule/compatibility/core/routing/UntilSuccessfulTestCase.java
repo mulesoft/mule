@@ -15,16 +15,13 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -109,12 +106,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.setDeadLetterQueue(dlqEndpointBuilder);
     untilSuccessful.initialise();
     untilSuccessful.start();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    assertSame(VoidMuleEvent.getInstance(),
-               untilSuccessful.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-                   .message(InternalMessage.of("ERROR"))
-                   .build()));
+    assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(eventBuilder().message(InternalMessage.of("ERROR")).build()));
 
     pollingProber.check(new JUnitProbe() {
 

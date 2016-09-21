@@ -15,14 +15,12 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.transport.ssl.MockHandshakeCompletedEvent;
 import org.mule.compatibility.transport.ssl.MockSslSocket;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -54,9 +52,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
                                                                               (HttpConnector) messageReceiver.getConnector()));
 
     InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    messageProcessTemplate
-        .beforeRouteEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(message).build());
+    messageProcessTemplate.beforeRouteEvent(eventBuilder().message(message).build());
   }
 
   @Test
@@ -74,9 +70,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
     InternalMessage message = InternalMessage.builder().payload(TEST_MESSAGE).build();
     messageContext.acquireMessage();
     serverConnection.readRequest();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event muleEvent = messageContext
-        .beforeRouteEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(message).build());
+    Event muleEvent = messageContext.beforeRouteEvent(eventBuilder().message(message).build());
     assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
     assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.PEER_CERTIFICATES));
   }

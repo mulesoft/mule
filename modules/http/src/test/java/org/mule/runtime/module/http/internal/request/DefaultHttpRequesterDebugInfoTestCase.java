@@ -30,16 +30,13 @@ import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.URI_DEBUG;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.USERNAME_DEBUG;
 import static org.mule.runtime.module.http.internal.request.DefaultHttpRequester.WORKSTATION_DEBUG;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.FieldDebugInfoMatcher.fieldLike;
 import static org.mule.tck.junit4.matcher.ObjectDebugInfoMatcher.objectLike;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.debug.FieldDebugInfo;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.requester.HttpSendBodyMode;
 import org.mule.runtime.module.http.internal.HttpParam;
 import org.mule.runtime.module.http.internal.HttpSingleParam;
@@ -99,9 +96,7 @@ public class DefaultHttpRequesterDebugInfoTestCase extends AbstractMuleContextTe
     requester.setRequestBuilder(createRequestBuilder());
 
     message = InternalMessage.builder().payload(TEST_MESSAGE).build();
-    Flow flow = getTestFlow(muleContext);
-    event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
-        .exchangePattern(REQUEST_RESPONSE).flow(flow).build();
+    event = eventBuilder().message(message).exchangePattern(REQUEST_RESPONSE).build();
   }
 
   @Test

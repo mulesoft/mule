@@ -22,14 +22,21 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTestCase {
 
+  private FlowConstruct flowConstruct;
+
+  @Before
+  public void before() throws Exception {
+    flowConstruct = getTestFlow(muleContext);
+  }
+
   @Test
   public void testBadMatch() throws Exception {
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
-    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new StringBuilder("foo")))
         .exchangePattern(REQUEST_RESPONSE)
@@ -44,7 +51,6 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTest
     CallableEntryPointResolver resolver = new CallableEntryPointResolver();
     final Apple apple = new Apple();
     apple.setMuleContext(muleContext);
-    FlowConstruct flowConstruct = getTestFlow(muleContext);
     final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
         .message(InternalMessage.of(new StringBuilder("blah")))
         .exchangePattern(REQUEST_RESPONSE)

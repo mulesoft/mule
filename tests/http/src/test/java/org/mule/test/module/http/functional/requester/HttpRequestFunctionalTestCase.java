@@ -21,13 +21,10 @@ import static org.mule.test.module.http.functional.matcher.HttpMessageAttributes
 
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -56,10 +53,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultPortHttp() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_PAYLOAD))
-        .build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
@@ -70,10 +64,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultPortHttps() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_PAYLOAD))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
@@ -84,10 +75,7 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultTlsContextHttps() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_PAYLOAD))
-        .build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
     ConfigurationInstance config =
         getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();

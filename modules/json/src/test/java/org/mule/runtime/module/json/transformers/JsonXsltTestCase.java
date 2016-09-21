@@ -6,12 +6,8 @@
  */
 package org.mule.runtime.module.json.transformers;
 
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -76,8 +72,6 @@ public class JsonXsltTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = MessageTransformerException.class)
   public void invalidInputShouldThrow() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    transformer.transform(new Object(), Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().nullPayload().build()).build());
+    transformer.transform(new Object(), eventBuilder().message(InternalMessage.builder().nullPayload().build()).build());
   }
 }

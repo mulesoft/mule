@@ -13,23 +13,18 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleSession;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
@@ -72,9 +67,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
     fs.setFailureExpression("#[payload is Integer]");
     fs.initialise();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    assertEquals("abc", fs.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    assertEquals("abc", fs.process(eventBuilder()
         .message(InternalMessage.of(""))
         .build()).getMessageAsString(muleContext));
   }
@@ -84,9 +78,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     Processor nullReturningMp = event -> null;
     FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
     fs.initialise();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    assertNull(fs.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    assertNull(fs.process(eventBuilder()
         .message(InternalMessage.of(""))
         .build()));
   }
@@ -96,10 +89,9 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     Processor nullEventMp = event -> Event.builder(event).message(null).build();
     FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
     fs.initialise();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
     try {
-      fs.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+      fs.process(eventBuilder()
           .message(InternalMessage.of(""))
           .build());
       fail("Exception expected");
@@ -116,13 +108,10 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     };
     FirstSuccessful router = createFirstSuccessfulRouter(checkForceSyncFlag);
     router.initialise();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
     // the configured message processor will blow up if the router did not force processing
     // on same thread
-    router.process(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build());
+    router.process(eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build());
   }
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws MuleException {
@@ -138,9 +127,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
   private String getPayload(Processor mp, MuleSession session, String message) throws Exception {
     InternalMessage msg = InternalMessage.builder().payload(message).build();
     try {
-      Flow flow = getTestFlow(muleContext);
-      Event event = mp.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(msg)
-          .exchangePattern(REQUEST_RESPONSE).flow(flow).session(session).build());
+      Event event = mp.process(eventBuilder().message(msg).exchangePattern(REQUEST_RESPONSE).session(session).build());
       InternalMessage returnedMessage = event.getMessage();
       if (event.getError().isPresent()) {
         return EXCEPTION_SEEN;
@@ -175,8 +162,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
         } else {
           msg = InternalMessage.builder().payload("No " + rejectIfMatches).build();
         }
-        Event muleEvent = Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR))
-            .message(msg).exchangePattern(ONE_WAY).flow(getTestFlow(muleContext)).error(error).build();
+        Event muleEvent = eventBuilder().message(msg).exchangePattern(ONE_WAY).error(error).build();
         return muleEvent;
       } catch (Exception e) {
         throw new DefaultMuleException(e);

@@ -21,14 +21,11 @@ import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.getGoo
 import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.toStream;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -107,36 +104,24 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void good() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    validator.validate(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(goodJson))
-        .build(), muleContext);
+    validator.validate(eventBuilder().message(InternalMessage.of(goodJson)).build(), muleContext);
   }
 
   @Test(expected = JsonSchemaValidationException.class)
   public void bad() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    validator.validate(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(badJson))
-        .build(), muleContext);
+    validator.validate(eventBuilder().message(InternalMessage.of(badJson)).build(), muleContext);
   }
 
   @Test(expected = JsonSchemaValidationException.class)
   public void bad2() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    validator.validate(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(badJson2))
-        .build(), muleContext);
+    validator.validate(eventBuilder().message(InternalMessage.of(badJson2)).build(), muleContext);
   }
 
   @Test
   public void goodThroughTransformer() throws Exception {
     muleContext.getRegistry().registerTransformer(new AppleToJson(goodJson));
     try {
-      FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-      validator.validate(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-          .message(InternalMessage.of(new Apple()))
-          .build(), muleContext);
+      validator.validate(eventBuilder().message(InternalMessage.of(new Apple())).build(), muleContext);
     } catch (JsonSchemaValidationException e) {
       if (goodJson instanceof InputStream) {
         // do nothing, streams are not supported through transformation

@@ -10,11 +10,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 
 import java.util.Map;
 
@@ -31,8 +28,7 @@ public class VariablesTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    event = Event.builder(context)
         .message(InternalMessage.of(""))
         .build();
   }

@@ -24,7 +24,6 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
@@ -107,7 +106,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessOneWayEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    Event event = eventBuilder()
         .message(InternalMessage.of("hello"))
         .exchangePattern(ONE_WAY)
         .build();
@@ -131,7 +130,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = directInboundMessageSource.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    Event response = directInboundMessageSource.process(eventBuilder()
         .message(InternalMessage.of("hello"))
         .exchangePattern(REQUEST_RESPONSE)
         .build());
@@ -174,7 +173,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.initialise();
 
     try {
-      final Event testEvent = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+      final Event testEvent = eventBuilder()
           .message(InternalMessage.of("hello"))
           .build();
       directInboundMessageSource.process(testEvent);
@@ -213,7 +212,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
 
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    Event response = directInboundMessageSource.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    Event response = directInboundMessageSource.process(eventBuilder()
         .message(InternalMessage.of("hello"))
         .exchangePattern(REQUEST_RESPONSE)
         .build());
@@ -221,14 +220,14 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
         .resetAndUpdate();
-    response = directInboundMessageSource.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    response = directInboundMessageSource.process(eventBuilder()
         .message(InternalMessage.of("hello"))
         .exchangePattern(REQUEST_RESPONSE)
         .build());
     assertEquals("hello2abcdef3", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).reset();
-    response = directInboundMessageSource.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    response = directInboundMessageSource.process(eventBuilder()
         .message(InternalMessage.of("hello"))
         .exchangePattern(REQUEST_RESPONSE)
         .build());

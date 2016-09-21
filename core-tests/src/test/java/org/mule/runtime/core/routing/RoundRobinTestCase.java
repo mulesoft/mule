@@ -19,11 +19,10 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -81,9 +80,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(singletonList(TEST_MESSAGE)).build();
 
-    Flow flow = getTestFlow(muleContext);
-    roundRobin.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
-        .exchangePattern(REQUEST_RESPONSE).flow(flow).build());
+    roundRobin.process(eventBuilder().message(message).exchangePattern(REQUEST_RESPONSE).build());
 
     verify(route1).process(any(Event.class));
     verify(route2, never()).process(any(Event.class));

@@ -20,7 +20,6 @@ import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
@@ -36,10 +35,7 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
 
   @Test
   public void blockingProcess() throws MuleException, Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event request = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    Event request = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     Event response = nonBlockingMessageProcessor.process(request);
 
     // Test processor echos request so we can assert request equals response.

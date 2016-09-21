@@ -114,7 +114,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
 
   private MuleEventContext createMuleEventContext(Object payload, Map<String, Serializable> inboundProperties) throws Exception {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
-    return new DefaultMuleEventContext(getTestFlow(muleContext),
+    return new DefaultMuleEventContext(flowConstruct,
                                        Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
                                            .message(InternalMessage.builder().payload(payload)
                                                .inboundProperties(inboundProperties)

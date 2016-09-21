@@ -20,10 +20,8 @@ import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.mvel2.integration.impl.CachedMapVariableResolverFactory;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.DelegateVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.GlobalVariableResolverFactory;
@@ -33,7 +31,6 @@ import org.mule.runtime.core.el.mvel.MessageVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.StaticVariableResolverFactory;
 import org.mule.runtime.core.el.mvel.VariableVariableResolverFactory;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.nio.charset.Charset;
@@ -56,11 +53,8 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
   protected void doAssignmentDataTypePropagationTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     final Builder builder = Event.builder(testEvent);
     CompiledExpression compiledExpression = compileMelExpression(expression, testEvent, builder);
@@ -74,11 +68,8 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
   protected void doInnerAssignmentDataTypePropagationTest(String expression) throws Exception {
     final DataType expectedDataType = DataType.builder().type(Map.class).mediaType(UNKNOWN).charset(CUSTOM_ENCODING).build();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     final Map<String, String> propertyValue = new HashMap<>();
     propertyValue.put(INNER_PROPERTY_NAME, TEST_MESSAGE);
     testEvent = setVariable(testEvent, propertyValue, expectedDataType);

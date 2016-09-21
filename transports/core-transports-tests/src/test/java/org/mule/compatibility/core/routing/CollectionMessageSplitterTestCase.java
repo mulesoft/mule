@@ -16,17 +16,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.CollectionSplitter;
 import org.mule.runtime.core.routing.outbound.IteratorMessageSequence;
 import org.mule.runtime.core.session.DefaultMuleSession;
@@ -122,13 +119,11 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
   @Test
   public void testEmptySequence() throws Exception {
     Object payload = Collections.emptySet();
-    Flow fc = getTestFlow(muleContext);
     MuleSession session = new DefaultMuleSession();
     InternalMessage toSplit = InternalMessage.builder().payload(payload).build();
     CollectionSplitter splitter = new CollectionSplitter();
     splitter.setMuleContext(muleContext);
-    Event event =
-        Event.builder(DefaultEventContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session).build();
+    Event event = eventBuilder().message(toSplit).session(session).build();
     event = populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint("ep"));
     assertSame(VoidMuleEvent.getInstance(), splitter.process(event));
   }
@@ -139,7 +134,6 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
   }
 
   private void assertRouted(Object payload, int count, boolean counted) throws Exception, MuleException {
-    Flow fc = getTestFlow(muleContext);
     MuleSession session = new DefaultMuleSession();
 
     Map<String, Serializable> inboundProps = new HashMap<>();
@@ -168,8 +162,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleContextEndpoi
     splitter.setMuleContext(muleContext);
     Grabber grabber = new Grabber();
     splitter.setListener(grabber);
-    final Builder builder =
-        Event.builder(DefaultEventContext.create(fc, TEST_CONNECTOR)).message(toSplit).flow(fc).session(session);
+    final Builder builder = eventBuilder().message(toSplit).session(session);
     for (Map.Entry<String, Object> entry : invocationProps.entrySet()) {
       builder.addVariable(entry.getKey(), entry.getValue());
     }

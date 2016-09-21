@@ -24,8 +24,6 @@ import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequester;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -373,9 +371,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     // attempts to send/dispatch/request are made on a stopped/stopping connector
     // This should fail because the connector is not started!
     try {
-      out.process(Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR))
-          .message(InternalMessage.of("data"))
-          .build());
+      out.process(eventBuilder().message(InternalMessage.of("data")).build());
       fail("cannot send on a connector that is not started");
     } catch (MessagingException e) {
       // expected
@@ -393,9 +389,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     OutboundEndpoint out2 =
         getTestOutboundEndpoint("out2", "test://out2?exchangePattern=request-response", null, null, null, connector);
     // This causes the first instance out2 dispatcher to be created
-    out2.process(Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR))
-        .message(InternalMessage.of("data"))
-        .build());
+    out2.process(eventBuilder().message(InternalMessage.of("data")).build());
 
     // At this point there should be two idle, but the build server reports one, I suspect its a timing issues
     assertEquals(2, connector.dispatchers.getNumIdle());
@@ -415,9 +409,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     assertDispatcherStartedConnected(out, true, true);
     assertDispatcherStartedConnected(out2, true, true);
 
-    out.process(Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR))
-        .message(InternalMessage.of("data"))
-        .build());
+    out.process(eventBuilder().message(InternalMessage.of("data")).build());
     assertEquals(2, connector.dispatchers.getNumIdle());
     assertDispatcherStartedConnected(out, true, true);
 

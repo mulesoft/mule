@@ -7,8 +7,17 @@
 package org.mule.tck.junit4;
 
 import static org.junit.Assume.assumeThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.util.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.core.util.StringMessageUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -203,6 +212,16 @@ public abstract class AbstractMuleTestCase {
    */
   protected boolean isFailOnTimeout() {
     return true;
+  }
+
+  /**
+   * Creates a basic event builder with its context already set.
+   * 
+   * @return a basic event builder with its context already set.
+   */
+  protected static Builder eventBuilder() throws MuleException {
+    FlowConstruct flowConstruct = getTestFlow(mock(MuleContext.class, RETURNS_DEEP_STUBS));
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR));
   }
 
   @After

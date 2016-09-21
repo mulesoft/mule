@@ -12,13 +12,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.routing.filters.EqualsFilter;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -31,11 +28,8 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
     SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
     mp.setListener(listener);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event inEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     Event resultEvent = mp.process(inEvent);
 
@@ -48,11 +42,8 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, null);
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setListener(out);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    final Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    final Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
     Event resultEvent = mp.process(testEvent);
 
     assertNull(out.event);
@@ -66,11 +57,8 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
     mp.setListener(out);
     mp.setUnacceptedMessageProcessor(unaccepted);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event inEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .build();
+    Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).build();
 
     Event resultEvent = mp.process(inEvent);
 
@@ -85,12 +73,8 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, unaccepted);
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setListener(out);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event inEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_MESSAGE))
-        .exchangePattern(ONE_WAY)
-        .build();
+    Event inEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).exchangePattern(ONE_WAY).build();
 
     Event resultEvent = mp.process(inEvent);
 

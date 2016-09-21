@@ -10,12 +10,9 @@ import static org.mule.test.heisenberg.extension.model.types.WeaponType.FIRE_WEA
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.ArrayUtils;
-import org.mule.tck.MuleTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Ricin;
@@ -74,9 +71,7 @@ public class AbstractConfigParserTestCase extends ExtensionFunctionalTestCase {
 
   protected Event getHeisenbergEvent() throws Exception {
     WEAPON.setMicrogramsPerKilo(10L);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
+    Event event = eventBuilder().message(InternalMessage.of(""))
         .addVariable("lidia", LIDIA)
         .addVariable("myName", HeisenbergExtension.HEISENBERG)
         .addVariable("age", HeisenbergExtension.AGE)

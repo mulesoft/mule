@@ -12,11 +12,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -38,10 +35,7 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testWireTapNoFilter() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("data"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("data")).build();
     Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);
@@ -53,11 +47,8 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testWireTapFilterAccepted() throws Exception {
     wireTap.setFilter((message, builder) -> true);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("data"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("data")).build();
     Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);
@@ -69,11 +60,8 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testWireTapFilterUnaccepted() throws Exception {
     wireTap.setFilter((message, builder) -> false);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("data"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("data")).build();
     Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);
@@ -84,11 +72,8 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testWireTapNullTap() throws Exception {
     wireTap.setTap(null);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("data"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("data")).build();
     Event primaryOutput = wireTap.process(event);
 
     assertSame(event, primaryOutput);

@@ -14,10 +14,8 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.routing.filter.Filter;
@@ -28,7 +26,6 @@ import org.mule.runtime.core.routing.filters.PayloadTypeFilter;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -106,10 +103,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
 
   private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_PAYLOAD))
-        .build();
+    return eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
   }
 
   @Test
@@ -119,11 +113,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new ByteArrayInputStream(payload.toString().getBytes())))
-        .flow(flowConstruct)
-        .build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);

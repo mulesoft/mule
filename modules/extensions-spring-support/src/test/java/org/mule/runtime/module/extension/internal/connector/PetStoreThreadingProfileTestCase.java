@@ -12,12 +12,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.ThreadingProfile;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -38,24 +34,18 @@ public class PetStoreThreadingProfileTestCase extends ExtensionFunctionalTestCas
 
   @Test
   public void customThreadingProfile() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     PetStoreConnector connector =
         ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile",
-                                                         Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-                                                             .message(InternalMessage.of(""))
-                                                             .build(),
+                                                         eventBuilder().message(InternalMessage.of("")).build(),
                                                          muleContext);
     assertThreadingProfile(connector.getThreadingProfile());
   }
 
   @Test
   public void noThreadingProfile() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     PetStoreConnector connector =
         ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile",
-                                                         Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-                                                             .message(InternalMessage.of(""))
-                                                             .build(),
+                                                         eventBuilder().message(InternalMessage.of("")).build(),
                                                          muleContext);
     assertThat(connector.getThreadingProfile(), is(nullValue()));
   }

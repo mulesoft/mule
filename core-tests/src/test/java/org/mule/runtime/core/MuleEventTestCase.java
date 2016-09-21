@@ -12,19 +12,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.routing.filters.PayloadTypeFilter;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -43,10 +38,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testEventSerialization() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("payload"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("payload")).build();
     setCurrentEvent(event);
 
     Transformer transformer = createSerializableToByteArrayTransformer();
@@ -103,10 +95,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(TEST_PAYLOAD))
-        .build();
+    return eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
   }
 
   @Test
@@ -116,11 +105,9 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    Event testEvent = eventBuilder()
         .message(InternalMessage.of(new ByteArrayInputStream(payload.toString().getBytes())))
         .exchangePattern(REQUEST_RESPONSE)
-        .flow(flowConstruct)
         .build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
@@ -141,16 +128,12 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
     List<Transformer> transformers = new ArrayList<>();
     transformers.add(trans1);
     transformers.add(trans2);
-
-    Filter filter = new PayloadTypeFilter(Object.class);
-    getTestFlow(muleContext);
   }
 
 
   @Test(expected = UnsupportedOperationException.class)
   public void testFlowVarNamesAddImmutable() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    Event event = eventBuilder()
         .message(InternalMessage.of("whatever"))
         .addVariable("test", "val")
         .build();
@@ -158,8 +141,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
   }
 
   public void testFlowVarNamesRemoveMutable() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    Event event = eventBuilder()
         .message(InternalMessage.of("whatever"))
         .addVariable("test", "val")
         .build();
@@ -170,8 +152,7 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testFlowVarsNotShared() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+    Event event = eventBuilder()
         .message(InternalMessage.of("whatever"))
         .addVariable("foo", "bar")
         .build();
@@ -188,19 +169,13 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarNonexistent() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("whatever"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("whatever")).build();
     event.getVariable("foo").getValue();
   }
 
   @Test(expected = NoSuchElementException.class)
   public void testGetFlowVarDataTypeNonexistent() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("whatever"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("whatever")).build();
     event.getVariable("foo").getDataType();
   }
 

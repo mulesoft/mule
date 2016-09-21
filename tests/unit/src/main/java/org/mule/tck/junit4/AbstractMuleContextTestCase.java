@@ -10,12 +10,16 @@ import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.metadata.DataType;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.TransformationService;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
@@ -299,6 +303,16 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     flow.setMessageProcessors(Collections.singletonList((Processor) component));
     muleContext.getRegistry().registerFlowConstruct(flow);
     return flow;
+  }
+
+  /**
+   * Creates a basic event builder with its context already set.
+   * 
+   * @return a basic event builder with its context already set.
+   */
+  protected static Builder eventBuilder() throws MuleException {
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).flow(flowConstruct);
   }
 
   protected boolean isStartContext() {

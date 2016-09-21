@@ -15,10 +15,8 @@ import static org.mockito.Matchers.contains;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.el.context.AbstractELTestCase;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.tck.size.SmallTest;
@@ -49,9 +47,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichReplacePayload() throws Exception {
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("foo"))
-        .build();
+    Event event = Event.builder(context).message(InternalMessage.of("foo")).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("message.payload", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getMessage().getPayload().getValue(), is("bar"));
@@ -70,18 +66,14 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
       }
     };
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(apple))
-        .build();
+    Event event = Event.builder(context).message(InternalMessage.of(apple)).build();
     expressionLanguage.enrich("message.payload.appleCleaner", event, Event.builder(event), flowConstruct, fruitCleaner);
     assertThat(apple.getAppleCleaner(), is(fruitCleaner));
   }
 
   @Test
   public void enrichMessageProperty() throws Exception {
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("foo"))
-        .build();
+    Event event = Event.builder(context).message(InternalMessage.of("foo")).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("message.outboundProperties.foo", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getMessage().getOutboundProperty("foo"), is("bar"));
@@ -90,9 +82,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
   @Test
   public void enrichMessageAttachment() throws Exception {
     DataHandler dataHandler = new DataHandler(new Object(), "test/xml");
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("foo"))
-        .build();
+    Event event = Event.builder(context).message(InternalMessage.of("foo")).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("message.outboundAttachments.foo", event, eventBuilder, flowConstruct, dataHandler);
     assertThat(eventBuilder.build().getMessage().getOutboundAttachment("foo"), is(dataHandler));
@@ -100,9 +90,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichFlowVariable() throws Exception {
-    Flow flow = new Flow("flow", muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).flow(flow).build();
+    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("flowVars['foo']", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getVariable("foo").getValue(), is("bar"));
@@ -111,9 +99,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichSessionVariable() throws Exception {
-    Flow flow = new Flow("flow", muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).flow(flow).build();
+    Event event = eventBuilder().message(InternalMessage.builder().payload("").build()).exchangePattern(ONE_WAY).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("sessionVars['foo']", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getSession().getProperty("foo"), equalTo("bar"));
@@ -122,9 +108,7 @@ public class ExpressionLanguageEnrichmentTestCase extends AbstractELTestCase {
 
   @Test
   public void enrichWithDolarPlaceholder() throws Exception {
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
-        .build();
+    Event event = Event.builder(context).message(InternalMessage.of("")).build();
     Event.Builder eventBuilder = Event.builder(event);
     expressionLanguage.enrich("message.outboundProperties.put('foo', $)", event, eventBuilder, flowConstruct, "bar");
     assertThat(eventBuilder.build().getMessage().getOutboundProperty("foo"), is("bar"));

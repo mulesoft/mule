@@ -16,7 +16,6 @@ import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -71,7 +70,7 @@ public class ExceptionTestCase extends AbstractELTestCase {
   }
 
   private Event createEvent() throws Exception {
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload("").build()).flow(flowConstruct).error(mockError).build();
+    return Event.builder(context).message(InternalMessage.builder().payload("").build()).flow(flowConstruct).error(mockError)
+        .build();
   }
 }

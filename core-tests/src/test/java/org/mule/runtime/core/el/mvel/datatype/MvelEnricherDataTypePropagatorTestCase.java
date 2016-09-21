@@ -12,12 +12,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.mvel2.MVEL.compileExpression;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.mvel2.ParserContext;
 import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
@@ -41,7 +39,7 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
   @Before
   public void before() throws Exception {
-    event = Event.builder(DefaultEventContext.create(getTestFlow(muleContext), TEST_CONNECTOR)).build();
+    event = eventBuilder().build();
   }
 
   @Test

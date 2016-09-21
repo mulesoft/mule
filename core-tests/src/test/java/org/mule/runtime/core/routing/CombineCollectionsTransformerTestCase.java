@@ -9,12 +9,9 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.simple.CombineCollectionsTransformer;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -36,10 +33,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
   @Test
   public void testMuleMessageCollectionMerge() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("hello"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("hello")).build();
 
     List list = new ArrayList<>();
     list.add(InternalMessage.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
@@ -57,10 +51,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
   @Test
   public void testMuleMessageMerge() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("hello"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("hello")).build();
 
     List<Object> payload = new ArrayList<>();
     payload.add(Arrays.asList("1", "2", "3"));

@@ -15,13 +15,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.config.MuleProperties;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.regex.Pattern;
@@ -186,11 +183,7 @@ public class RegExFilterTestCase extends AbstractMuleContextTestCase {
   public void matchesValueFromFlowVar() throws Exception {
     regExWithValue.setValue("#[flowVars.value]");
     regExWithValue.initialise();
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    final Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(""))
-        .addVariable("value", "code with the mules")
-        .build();
+    final Event event = eventBuilder().message(InternalMessage.of("")).addVariable("value", "code with the mules").build();
     assertThat(regExWithValue.accept(event, mock(Event.Builder.class)), is(true));
   }
 

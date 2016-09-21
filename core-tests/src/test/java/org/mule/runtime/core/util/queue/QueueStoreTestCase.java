@@ -13,13 +13,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.util.queue.QueueConfiguration.MAXIMUM_CAPACITY;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
@@ -123,11 +120,8 @@ public abstract class QueueStoreTestCase extends AbstractMuleContextTestCase {
   public void offerSeveralRetrieveAllMuleEvents() throws Exception {
     QueueStore queue = createQueue();
     ArrayList<Event> events = new ArrayList<>(NUMBER_OF_ITEMS);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-      Event testEvent = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-          .message(InternalMessage.of("some data"))
-          .build();
+      Event testEvent = eventBuilder().message(InternalMessage.of("some data")).build();
       events.add(testEvent);
       queue.offer(testEvent, 0, NUMBER_OF_ITEMS);
 

@@ -21,20 +21,17 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.util.FileUtils.newFile;
 import static org.mule.runtime.core.util.store.QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.serialization.SerializationException;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.UUID;
 import org.mule.runtime.core.util.queue.objectstore.QueueKey;
 import org.mule.tck.NonSerializableObject;
@@ -166,9 +163,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     String id = UUID.getUUID();
     QueueKey key = new QueueKey(QUEUE_NAME, id);
     InternalMessage msg = InternalMessage.builder().payload("Hello").build();
-    Flow flow = getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(msg).exchangePattern(ONE_WAY)
-        .flow(flow).build();
+    Event event = eventBuilder().message(msg).exchangePattern(ONE_WAY).build();
 
     ListableObjectStore<Serializable> monitored = new MonitoredObjectStoreWrapper(store);
     monitored.store(key, event);

@@ -12,12 +12,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -42,10 +39,7 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
   public void testVariableFilterEL() throws Exception {
     ExpressionFilter filter = new ExpressionFilter("flowVars['foo']=='bar'");
     filter.setMuleContext(muleContext);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("blah")).build();
     assertTrue(!filter.accept(event, mock(Event.Builder.class)));
     event = Event.builder(event).addVariable("foo", "bar").build();
     assertTrue(filter.accept(event, mock(Event.Builder.class)));
@@ -69,11 +63,8 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
   public void testVariableFilterWithNotEL() throws Exception {
     ExpressionFilter filter = new ExpressionFilter("flowVars['foo']!='bar'");
     filter.setMuleContext(muleContext);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("blah")).build();
 
     assertTrue(filter.accept(event, mock(Event.Builder.class)));
     event = Event.builder(event).addVariable("foo", "bar").build();
@@ -104,11 +95,8 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
   public void testVariableFilterWithNotNullEL() throws Exception {
     ExpressionFilter filter = new ExpressionFilter("flowVars['foo']!=null");
     filter.setMuleContext(muleContext);
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
 
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("blah"))
-        .build();
+    Event event = eventBuilder().message(InternalMessage.of("blah")).build();
 
     assertTrue(!filter.accept(event, mock(Event.Builder.class)));
     event = Event.builder(event).message(removeProperty(event.getMessage())).build();

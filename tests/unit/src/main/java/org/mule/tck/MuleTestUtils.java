@@ -14,6 +14,7 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
 
 /**
@@ -43,7 +44,7 @@ public final class MuleTestUtils {
     return spy;
   }
 
-  public static Flow getTestFlow(MuleContext context) throws Exception {
+  public static Flow getTestFlow(MuleContext context) throws MuleException {
     final Flow flow = new Flow(APPLE_FLOW, context);
     if (context.getRegistry() != null) {
       context.getRegistry().registerFlowConstruct(flow);

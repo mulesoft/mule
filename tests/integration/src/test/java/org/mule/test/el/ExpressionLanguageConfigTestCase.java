@@ -9,12 +9,8 @@ package org.mule.test.el;
 import static org.junit.Assert.assertEquals;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.test.AbstractIntegrationTestCase;
 
 import java.text.DateFormat;
@@ -72,19 +68,14 @@ public class ExpressionLanguageConfigTestCase extends AbstractIntegrationTestCas
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContext() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    assertEquals("123appended",
-                 el.evaluate("appendPayload()", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-                     .message(InternalMessage.of("123"))
-                     .build(), getTestFlow(muleContext)));
+    assertEquals("123appended", el.evaluate("appendPayload()", eventBuilder().message(InternalMessage.of("123")).build(),
+                                            getTestFlow(muleContext)));
   }
 
   @Test
   public void testExpressionLanguageGlobalFunctionUsingMessageContextAndImport() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    assertEquals("321", el.evaluate("reversePayload()", Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("123"))
-        .build(), getTestFlow(muleContext)));
+    assertEquals("321", el.evaluate("reversePayload()", eventBuilder().message(InternalMessage.of("123")).build(),
+                                    getTestFlow(muleContext)));
   }
 
   @Test

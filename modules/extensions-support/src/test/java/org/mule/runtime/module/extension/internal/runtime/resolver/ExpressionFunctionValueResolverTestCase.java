@@ -16,14 +16,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.function.Function;
@@ -41,10 +38,7 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
 
   @Override
   protected void doSetUp() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("test"))
-        .build();
+    event = eventBuilder().message(InternalMessage.of("test")).build();
     expressionLanguage = spy((MVELExpressionLanguage) muleContext.getExpressionLanguage());
     DefaultMuleContext defaultMuleContext = (DefaultMuleContext) muleContext;
     defaultMuleContext.getRegistry().registerObject(OBJECT_EXPRESSION_LANGUAGE, expressionLanguage);

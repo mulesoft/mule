@@ -17,11 +17,7 @@ import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
@@ -66,11 +62,8 @@ public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void tls() throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
     PetStoreConnector connector =
-        getConfigurationFromRegistry(configName, Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-            .message(InternalMessage.of(""))
-            .build(), muleContext);
+        getConfigurationFromRegistry(configName, eventBuilder().message(InternalMessage.of("")).build(), muleContext);
     TlsContextFactory tls = connector.getTlsContext();
     assertThat(tls, is(notNullValue()));
 

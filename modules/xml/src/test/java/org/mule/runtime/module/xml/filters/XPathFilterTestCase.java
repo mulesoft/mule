@@ -15,13 +15,10 @@ import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.RETURNS_DEFAULTS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.module.xml.xpath.SaxonXpathEvaluator;
@@ -72,11 +69,8 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
   @Test
   public void testAcceptMessage() throws Exception {
     final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    FlowConstruct flowConstruct = getTestFlow(muleContext);
 
-    Event event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.builder().nullPayload().build())
-        .build();
+    Event event = eventBuilder().message(InternalMessage.builder().nullPayload().build()).build();
     XPathFilter filter = new XPathFilter() {
 
       @Override
@@ -93,9 +87,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
     Builder builder = Event.builder(event);
     assertFalse("shouldn't accept a message if no payload is set.", filter.accept(event, builder));
 
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new Object()))
-        .build();
+    event = eventBuilder().message(InternalMessage.of(new Object())).build();
     filter.setPattern("/some/pattern = null");
     builder = Event.builder(event);
     assertTrue(filter.accept(event, builder));
@@ -103,9 +95,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
     assertEquals("/some/pattern", filter.getPattern().trim());
     assertSame(document, builder.build().getMessage().getPayload().getValue());
 
-    event = Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of(new Object()))
-        .build();
+    event = eventBuilder().message(InternalMessage.of(new Object())).build();
     builder = Event.builder(event);
     filter.setExpectedValue(null);
     assertTrue(filter.accept(event, builder));

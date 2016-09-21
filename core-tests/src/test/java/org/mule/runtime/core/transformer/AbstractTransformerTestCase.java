@@ -13,14 +13,10 @@ import static org.junit.Assert.fail;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 
@@ -34,10 +30,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
   @Override
   protected void doSetUp() throws Exception {
     // setup a dummy context for transformers that are event aware
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    setCurrentEvent(Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
-        .message(InternalMessage.of("test"))
-        .build());
+    setCurrentEvent(eventBuilder().message(InternalMessage.of("test")).build());
   }
 
   @Override
