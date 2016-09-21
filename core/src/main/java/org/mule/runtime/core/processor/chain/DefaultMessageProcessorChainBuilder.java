@@ -56,12 +56,12 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   public MessageProcessorChain build() throws MuleException {
     LinkedList<Processor> tempList = new LinkedList<>();
 
-    final List<Processor> builtProcessors = new ArrayList<>(processors.size());
+    final LinkedList<Processor> builtProcessors = new LinkedList<>();
 
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
-      builtProcessors.add(processor);
+      builtProcessors.addFirst(processor);
       if (processor instanceof InterceptingMessageProcessor) {
         InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
         // Processor is intercepting so we can't simply iterate
