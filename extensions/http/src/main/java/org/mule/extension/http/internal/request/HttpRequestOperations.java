@@ -115,7 +115,7 @@ public class HttpRequestOperations {
     HttpRequester requester =
         new HttpRequester.Builder().setUri(resolvedUri).setMethod(method).setFollowRedirects(resolvedFollowRedirects)
             .setRequestStreamingMode(resolvedStreamingMode).setSendBodyMode(resolvedSendBody).setSource(source)
-            .setAuthentication(config.getAuthentication()).setParseResponse(resolvedParseResponse)
+            .setAuthentication(client.getDefaultAuthentication()).setParseResponse(resolvedParseResponse)
             .setResponseTimeout(resolvedTimeout).setResponseValidator(resolvedValidator).setConfig(config).build();
 
     // TODO MULE-10340 See how the flowConstruct calling this operation can be retrieved

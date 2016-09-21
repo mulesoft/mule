@@ -7,23 +7,17 @@
 package org.mule.extension.http.internal.request.validator;
 
 import static org.mule.extension.http.internal.HttpConnector.API_CONFIGURATION;
-import static org.mule.extension.http.internal.HttpConnector.AUTHENTICATION;
 import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.request.RamlApiConfiguration;
-import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.internal.request.HttpRequestOperations;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -46,14 +40,7 @@ import javax.inject.Inject;
 @Configuration(name = "request-config")
 @ConnectionProviders(HttpRequesterProvider.class)
 @Operations({HttpRequestOperations.class})
-public class HttpRequesterConfig implements Initialisable, Stoppable {
-
-  // TODO: document
-  @Parameter
-  @Optional
-  @Summary("Authentication method to use for the HTTP request")
-  @Placement(tab = AUTHENTICATION)
-  private HttpAuthentication authentication;
+public class HttpRequesterConfig implements Initialisable {
 
   /**
    * Base path to use for all requests that reference this config.
@@ -133,7 +120,6 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
   @Inject
   private MuleContext muleContext;
   private CookieManager cookieManager;
-  private boolean stopped = false;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -166,10 +152,6 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
     return responseTimeout;
   }
 
-  public HttpAuthentication getAuthentication() {
-    return authentication;
-  }
-
   public boolean isEnableCookies() {
     return enableCookies;
   }
@@ -186,13 +168,4 @@ public class HttpRequesterConfig implements Initialisable, Stoppable {
     return muleContext;
   }
 
-  @Override
-  public void stop() throws MuleException {
-    stopIfNeeded(this.authentication);
-    stopped = true;
-  }
-
-  public boolean isStopped() {
-    return stopped;
-  }
 }

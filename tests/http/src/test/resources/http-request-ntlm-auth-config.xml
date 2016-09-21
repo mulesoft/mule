@@ -7,10 +7,11 @@
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:request-config name="ntlmConfigWithDomain">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-        <httpn:authentication>
-            <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor"/>
-        </httpn:authentication>
+        <httpn:request-connection host="localhost" port="${httpPort}">
+            <httpn:authentication>
+                <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor"/>
+            </httpn:authentication>
+        </httpn:request-connection>
     </httpn:request-config>
 
     <flow name="ntlmAuthRequestWithDomain">
@@ -18,10 +19,11 @@
     </flow>
 
     <httpn:request-config name="ntlmConfigWithoutDomain">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-        <httpn:authentication>
-            <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox"/>
-        </httpn:authentication>
+        <httpn:request-connection host="localhost" port="${httpPort}">
+            <httpn:authentication>
+                <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox"/>
+            </httpn:authentication>
+        </httpn:request-connection>
     </httpn:request-config>
 
     <flow name="ntlmAuthRequestWithoutDomain">
@@ -29,10 +31,11 @@
     </flow>
 
     <httpn:request-config name="ntlmConfigWithWorkstation">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-        <httpn:authentication>
-            <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor" workstation="LightCity"/>
-        </httpn:authentication>
+        <httpn:request-connection host="localhost" port="${httpPort}">
+            <httpn:authentication>
+                <httpn:ntlm-authentication username="Zaphod" password="Beeblebrox" domain="Ursa-Minor" workstation="LightCity"/>
+            </httpn:authentication>
+        </httpn:request-connection>
     </httpn:request-config>
 
     <flow name="ntlmAuthRequestWithWorkstation">
