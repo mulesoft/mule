@@ -6,12 +6,13 @@
  */
 package org.mule.extension.file;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Paths;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.core.StringContains.containsString;
 
 public class FileCreateDirectoryTestCase extends FileConnectorTestCase {
 
@@ -33,6 +34,7 @@ public class FileCreateDirectoryTestCase extends FileConnectorTestCase {
     final String directory = "washerefirst";
     temporaryFolder.newFolder(directory);
     expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    expectedException.expectMessage(containsString(temporaryFolder.getRoot().getAbsolutePath()));
 
     doCreateDirectory(directory);
   }

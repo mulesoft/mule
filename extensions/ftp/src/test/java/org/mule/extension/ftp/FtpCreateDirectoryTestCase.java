@@ -6,14 +6,15 @@
  */
 package org.mule.extension.ftp;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
 import org.mule.extension.FtpTestHarness;
 
 import java.nio.file.Paths;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThat;
 
 public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
 
@@ -39,7 +40,7 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
     final String directory = "washerefirst";
     testHarness.makeDir(directory);
     testHarness.expectedException().expectCause(instanceOf(IllegalArgumentException.class));
-
+    testHarness.expectedException().expectMessage(containsString(testHarness.getWorkingDirectory()));
     doCreateDirectory(directory);
   }
 

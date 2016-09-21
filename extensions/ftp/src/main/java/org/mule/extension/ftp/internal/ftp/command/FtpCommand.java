@@ -6,23 +6,23 @@
  */
 package org.mule.extension.ftp.internal.ftp.command;
 
-import static java.lang.String.format;
+import org.apache.commons.net.ftp.FTPClient;
+import org.mule.extension.file.common.api.FileAttributes;
+import org.mule.extension.file.common.api.FileConnectorConfig;
 import org.mule.extension.file.common.api.FileSystem;
+import org.mule.extension.file.common.api.command.FileCommand;
 import org.mule.extension.ftp.api.FtpFileAttributes;
 import org.mule.extension.ftp.internal.AbstractFtpCopyDelegate;
 import org.mule.extension.ftp.internal.FtpCopyDelegate;
 import org.mule.extension.ftp.internal.ftp.connection.FtpFileSystem;
 import org.mule.runtime.api.message.MuleEvent;
-import org.mule.extension.file.common.api.FileAttributes;
-import org.mule.extension.file.common.api.FileConnectorConfig;
-import org.mule.extension.file.common.api.command.FileCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.String.format;
 
 /**
  * Base class for {@link FileCommand} implementations that target a FTP/SFTP server
@@ -166,7 +166,7 @@ public abstract class FtpCommand<C extends FtpFileSystem> extends FileCommand<C>
     FileAttributes targetFile = getFile(directoryPath);
 
     if (targetFile != null) {
-      throw new IllegalArgumentException(format("Directory '%s' already exists", directoryPath));
+      throw new IllegalArgumentException(format("Directory '%s' already exists", path.toAbsolutePath()));
     }
 
     mkdirs(path);
