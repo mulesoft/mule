@@ -6,12 +6,13 @@
  */
 package org.mule.extension.file.internal.command;
 
-import static java.lang.String.format;
 import org.mule.extension.file.common.api.command.CreateDirectoryCommand;
 import org.mule.extension.file.internal.LocalFileSystem;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static java.lang.String.format;
 
 /**
  * A {@link LocalFileCommand} which implements the {@link CreateDirectoryCommand} contract
@@ -35,7 +36,7 @@ public final class LocalCreateDirectoryCommand extends LocalFileCommand implemen
     Path target = resolvePath(directoryPath);
 
     if (Files.exists(target)) {
-      throw new IllegalArgumentException(format("Directory '%s' already exists", target));
+      throw new IllegalArgumentException(format("Directory '%s' already exists", target.toAbsolutePath()));
     }
 
     mkdirs(target);
