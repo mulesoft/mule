@@ -7,8 +7,11 @@
 package org.mule.extension.http.internal.request.grizzly;
 
 import static com.ning.http.client.Realm.AuthScheme.NTLM;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONNECTION;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CLOSE;
+import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
@@ -18,6 +21,7 @@ import org.mule.extension.http.internal.request.client.HttpClientConfiguration;
 import org.mule.extension.socket.api.socket.tcp.TcpClientSocketProperties;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.util.IOUtils;
@@ -67,21 +71,23 @@ public class GrizzlyHttpClient implements HttpClient {
   private static final Logger logger = LoggerFactory.getLogger(GrizzlyHttpClient.class);
 
   private UriParameters uriParameters;
+  private HttpAuthentication authentication;
   private final TlsContextFactory tlsContextFactory;
-  private final ProxyConfig proxyConfig;
 
+  private final ProxyConfig proxyConfig;
   private final TcpClientSocketProperties clientSocketProperties;
   private int maxConnections;
   private boolean usePersistentConnections;
   private int connectionIdleTimeout;
-  private String threadNamePrefix;
 
+  private String threadNamePrefix;
   private String ownerName;
   private AsyncHttpClient asyncHttpClient;
   private SSLContext sslContext;
 
   public GrizzlyHttpClient(HttpClientConfiguration config) {
     this.uriParameters = config.getUriParameters();
+    this.authentication = config.getAuthentication();
     this.tlsContextFactory = config.getTlsContextFactory();
     this.proxyConfig = config.getProxyConfig();
     this.clientSocketProperties = config.getClientSocketProperties();
@@ -93,7 +99,8 @@ public class GrizzlyHttpClient implements HttpClient {
   }
 
   @Override
-  public void start() {
+  public void start() throws MuleException {
+    startIfNeeded(authentication);
     AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
     builder.setAllowPoolingConnections(true);
 
@@ -205,6 +212,11 @@ public class GrizzlyHttpClient implements HttpClient {
   @Override
   public UriParameters getDefaultUriParameters() {
     return uriParameters;
+  }
+
+  @Override
+  public HttpAuthentication getDefaultAuthentication() {
+    return authentication;
   }
 
   @Override
@@ -356,7 +368,8 @@ public class GrizzlyHttpClient implements HttpClient {
   }
 
   @Override
-  public void stop() {
+  public void stop() throws MuleException {
+    stopIfNeeded(authentication);
     asyncHttpClient.close();
   }
 }

@@ -6,15 +6,19 @@
  */
 package org.mule.extension.http.internal.request.validator;
 
+import static java.lang.String.format;
+import static org.mule.extension.http.internal.HttpConnector.AUTHENTICATION;
 import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.TLS;
 import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
 import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
+import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.client.DefaultUriParameters;
@@ -27,11 +31,10 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
@@ -148,33 +151,19 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Placement(tab = "Sockets")
   private TcpClientSocketProperties clientSocketProperties;
 
+  /**
+   * Authentication method to use for the HTTP request.
+   */
+  @Parameter
+  @Optional
+  @Placement(tab = AUTHENTICATION)
+  private HttpAuthentication authentication;
+
   @Inject
   @DefaultTlsContextFactoryBuilder
   private TlsContextFactoryBuilder defaultTlsContextFactoryBuilder;
 
-  @Override
-  public HttpClient connect() throws ConnectionException {
-    String threadNamePrefix = String.format(THREAD_NAME_PREFIX_PATTERN, ThreadNameHelper.getPrefix(muleContext), configName);
-
-    HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
-        .setUriParameters(new DefaultUriParameters(protocol, host, port)).setTlsContextFactory(tlsContextFactory)
-        .setProxyConfig(proxyConfig).setClientSocketProperties(clientSocketProperties).setMaxConnections(maxConnections)
-        .setUsePersistentConnections(usePersistentConnections).setConnectionIdleTimeout(connectionIdleTimeout)
-        .setThreadNamePrefix(threadNamePrefix).setOwnerName(configName).build();
-
-    HttpClientFactory httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
-    HttpClient httpClient;
-    if (httpClientFactory == null) {
-      httpClient = new GrizzlyHttpClient(configuration);
-    } else {
-      httpClient = httpClientFactory.create(configuration);
-    }
-
-    return httpClient;
-  }
-
-  @Override
-  public void disconnect(HttpClient httpClient) {}
+  private HttpClientFactory httpClientFactory;
 
   @Override
   public ConnectionValidationResult validate(HttpClient httpClient) {
@@ -200,8 +189,13 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
     if (tlsContextFactory != null) {
       initialiseIfNeeded(tlsContextFactory);
     }
+    if (authentication != null) {
+      initialiseIfNeeded(authentication);
+    }
 
     verifyConnectionsParameters();
+
+    httpClientFactory = muleContext.getRegistry().get(OBJECT_HTTP_CLIENT_FACTORY);
   }
 
   private void verifyConnectionsParameters() throws InitialisationException {
@@ -215,6 +209,29 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
     }
   }
 
+  @Override
+  public HttpClient connect() throws ConnectionException {
+    String threadNamePrefix = format(THREAD_NAME_PREFIX_PATTERN, getPrefix(muleContext), configName);
+
+    HttpClientConfiguration configuration = new HttpClientConfiguration.Builder()
+        .setUriParameters(new DefaultUriParameters(protocol, host, port)).setAuthentication(authentication)
+        .setTlsContextFactory(tlsContextFactory).setProxyConfig(proxyConfig).setClientSocketProperties(clientSocketProperties)
+        .setMaxConnections(maxConnections).setUsePersistentConnections(usePersistentConnections)
+        .setConnectionIdleTimeout(connectionIdleTimeout).setThreadNamePrefix(threadNamePrefix).setOwnerName(configName).build();
+
+    HttpClient httpClient;
+    if (httpClientFactory == null) {
+      httpClient = new GrizzlyHttpClient(configuration);
+    } else {
+      httpClient = httpClientFactory.create(configuration);
+    }
+
+    return httpClient;
+  }
+
+  @Override
+  public void disconnect(HttpClient httpClient) {}
+
   public Function<Event, Integer> getPort() {
     return port;
   }
@@ -225,5 +242,9 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
 
   public TlsContextFactory getTlsContext() {
     return tlsContextFactory;
+  }
+
+  public HttpAuthentication getAuthentication() {
+    return authentication;
   }
 }

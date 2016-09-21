@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal.request.client;
 
+import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.client.UriParameters;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
@@ -20,6 +21,7 @@ import org.mule.runtime.api.tls.TlsContextFactory;
 public class HttpClientConfiguration {
 
   private final UriParameters uriParameters;
+  private final HttpAuthentication authentication;
   private final TlsContextFactory tlsContextFactory;
   private final ProxyConfig proxyConfig;
   private final TcpClientSocketProperties clientSocketProperties;
@@ -29,11 +31,13 @@ public class HttpClientConfiguration {
   private final String threadNamePrefix;
   private final String ownerName;
 
-  private HttpClientConfiguration(UriParameters uriParameters, TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
+  private HttpClientConfiguration(UriParameters uriParameters, HttpAuthentication authentication,
+                                  TlsContextFactory tlsContextFactory, ProxyConfig proxyConfig,
                                   TcpClientSocketProperties clientSocketProperties, int maxConnections,
                                   boolean usePersistentConnections, int connectionIdleTimeout, String threadNamePrefix,
                                   String ownerName) {
     this.uriParameters = uriParameters;
+    this.authentication = authentication;
     this.tlsContextFactory = tlsContextFactory;
     this.proxyConfig = proxyConfig;
     this.clientSocketProperties = clientSocketProperties;
@@ -46,6 +50,10 @@ public class HttpClientConfiguration {
 
   public UriParameters getUriParameters() {
     return uriParameters;
+  }
+
+  public HttpAuthentication getAuthentication() {
+    return authentication;
   }
 
   public TlsContextFactory getTlsContextFactory() {
@@ -83,6 +91,7 @@ public class HttpClientConfiguration {
   public static class Builder {
 
     private UriParameters uriParameters;
+    private HttpAuthentication authentication;
     private TlsContextFactory tlsContextFactory;
     private ProxyConfig proxyConfig;
     private TcpClientSocketProperties clientSocketProperties;
@@ -94,6 +103,11 @@ public class HttpClientConfiguration {
 
     public Builder setUriParameters(UriParameters uriParameters) {
       this.uriParameters = uriParameters;
+      return this;
+    }
+
+    public Builder setAuthentication(HttpAuthentication authentication) {
+      this.authentication = authentication;
       return this;
     }
 
@@ -138,8 +152,9 @@ public class HttpClientConfiguration {
     }
 
     public HttpClientConfiguration build() {
-      return new HttpClientConfiguration(uriParameters, tlsContextFactory, proxyConfig, clientSocketProperties, maxConnections,
-                                         usePersistentConnections, connectionIdleTimeout, threadNamePrefix, ownerName);
+      return new HttpClientConfiguration(uriParameters, authentication, tlsContextFactory, proxyConfig, clientSocketProperties,
+                                         maxConnections, usePersistentConnections, connectionIdleTimeout, threadNamePrefix,
+                                         ownerName);
     }
   }
 }

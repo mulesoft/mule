@@ -7,10 +7,11 @@
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:request-config name="basicConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-        <httpn:authentication>
-            <httpn:basic-authentication username="#[user]" password="#[password]" preemptive="#[preemptive]" />
-        </httpn:authentication>
+        <httpn:request-connection host="localhost" port="${httpPort}">
+            <httpn:authentication>
+                <httpn:basic-authentication username="#[user]" password="#[password]" preemptive="#[preemptive]" />
+            </httpn:authentication>
+        </httpn:request-connection>
     </httpn:request-config>
 
     <flow name="basicAuthRequest">
@@ -18,10 +19,11 @@
     </flow>
 
     <httpn:request-config name="digestConfig">
-        <httpn:request-connection host="localhost" port="${httpPort}"/>
-        <httpn:authentication>
-            <httpn:digest-authentication username="#[user]" password="#[password]" />
-        </httpn:authentication>
+        <httpn:request-connection host="localhost" port="${httpPort}">
+            <httpn:authentication>
+                <httpn:digest-authentication username="#[user]" password="#[password]" />
+            </httpn:authentication>
+        </httpn:request-connection>
     </httpn:request-config>
 
     <flow name="digestAuthRequest">

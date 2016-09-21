@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.api.request.client;
 
+import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequest;
@@ -28,9 +29,13 @@ public interface HttpClient extends Startable, Stoppable {
   UriParameters getDefaultUriParameters();
 
   /**
+   * Returns the default {@link HttpAuthentication} to be used on requests.
+   */
+  HttpAuthentication getDefaultAuthentication();
+
+  /**
    * Sends a HttpRequest blocking the current thread until a response is available for the request times out.
    */
   HttpResponse send(HttpRequest request, int responseTimeout, boolean followRedirects, HttpRequestAuthentication authentication)
       throws IOException, TimeoutException;
-
 }
