@@ -30,34 +30,34 @@
     </httpn:request-config>
 
     <flow name="default">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" key="ANY"/>
+        <httpn:request config-ref="noFollowRedirects" path="testPath"/>
     </flow>
 
     <flow name="followRedirects">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="true" key="ANY"/>
+        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="true"/>
     </flow>
 
     <flow name="dontFollowRedirects">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="false" key="ANY"/>
+        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="false"/>
     </flow>
 
     <flow name="followRedirectsExpression">
-        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[redirect]" key="ANY"/>
+        <httpn:request config-ref="noFollowRedirects" path="testPath" followRedirects="#[redirect]"/>
     </flow>
 
     <flow name="fromConfig">
-        <httpn:request config-ref="withFollowRedirects" path="testPath" key="ANY"/>
+        <httpn:request config-ref="withFollowRedirects" path="testPath"/>
     </flow>
 
     <flow name="overrideConfig">
-        <httpn:request config-ref="withFollowRedirects" path="testPath" followRedirects="true" key="ANY"/>
+        <httpn:request config-ref="withFollowRedirects" path="testPath" followRedirects="true"/>
     </flow>
 
     <flow name="fromConfigExpression">
-        <httpn:request config-ref="withFollowRedirectsExpression" path="testPath" key="ANY"/>
+        <httpn:request config-ref="withFollowRedirectsExpression" path="testPath"/>
     </flow>
 
     <flow name="followRedirectsHttps">
-        <httpn:request config-ref="httpsConfig" path="testPath" followRedirects="true" key="ANY"/>
+        <httpn:request config-ref="httpsConfig" path="testPath" followRedirects="true"/>
     </flow>
 </mule>

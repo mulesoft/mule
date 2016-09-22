@@ -14,11 +14,11 @@
     </httpn:request-config>
 
     <flow name="clientCookiesEnabled" >
-        <httpn:request config-ref="requesterConfigCookiesEnabled" path="#[path]" method="GET"  key="ANY"/>
+        <httpn:request config-ref="requesterConfigCookiesEnabled" path="#[path]" method="GET"/>
     </flow>
 
     <flow name="clientCookiesDisabled" >
-        <httpn:request config-ref="requesterConfigCookiesDisabled" path="/" method="GET"  key="ANY"/>
+        <httpn:request config-ref="requesterConfigCookiesDisabled" path="/" method="GET"/>
     </flow>
 
 </mule>

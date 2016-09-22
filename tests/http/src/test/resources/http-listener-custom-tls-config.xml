@@ -42,11 +42,11 @@
 
 
     <flow name="testFlowGlobalContextClient">
-        <httpn:request config-ref="clientGlobalConfig" port="${port1}" path="/" method="GET" key="ANY"/>
+        <httpn:request config-ref="clientGlobalConfig" port="${port1}" path="/" method="GET"/>
     </flow>
 
     <flow name="testFlowNestedContextClient">
-        <httpn:request config-ref="clientGlobalConfig" port="${port2}" path="/" method="POST" key="ANY"/>
+        <httpn:request config-ref="clientGlobalConfig" port="${port2}" path="/" method="POST"/>
     </flow>
 
 </mule>

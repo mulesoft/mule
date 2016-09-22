@@ -15,7 +15,7 @@
     </httpn:request-config>
 
     <flow name="executeRequest">
-        <httpn:request config-ref="basicConfig" path="/basic" method="GET" key="ANY">
+        <httpn:request config-ref="basicConfig" path="/basic" method="GET">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="0..599" />
             </httpn:response-validator>

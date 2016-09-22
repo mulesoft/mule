@@ -11,19 +11,19 @@
     </httpn:request-config>
 
     <flow name="payloadSourceFlow">
-        <httpn:request config-ref="config" path="test" method="POST" source="#[payload]"  key="ANY"/>
+        <httpn:request config-ref="config" path="test" method="POST" source="#[payload]"/>
     </flow>
 
     <flow name="customSourceFlow">
-        <httpn:request config-ref="config" path="test" method="POST" source="#[customSource]"  key="ANY"/>
+        <httpn:request config-ref="config" path="test" method="POST" source="#[customSource]"/>
     </flow>
 
     <flow name="payloadTargetFlow">
-        <httpn:request config-ref="config" path="test" method="POST" key="ANY"/>
+        <httpn:request config-ref="config" path="test" method="POST"/>
     </flow>
 
     <flow name="customTargetFlow">
-        <httpn:request config-ref="config" path="test" method="POST" target="customTarget"  key="ANY"/>
+        <httpn:request config-ref="config" path="test" method="POST" target="customTarget"/>
     </flow>
 
 </mule>

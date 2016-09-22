@@ -20,7 +20,7 @@
     </httpn:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" method="POST" path="requestPath"  key="ANY"/>
+        <httpn:request config-ref="requestConfig" method="POST" path="requestPath"/>
     </flow>
 
     <!-- MULE-8956 -->
@@ -39,7 +39,7 @@
         <set-payload value="#['&lt;root&gt;&lt;node&gt;value&lt;/node&gt;&lt;/root&gt;']"/>
     </flow>
     <flow name="blockingRequest">
-        <httpn:request config-ref="blockingRequestConfig" path="remote" method="GET" key="ANY"/>
+        <httpn:request config-ref="blockingRequestConfig" path="remote" method="GET"/>
         <set-variable variableName="remotePayload" value="#[xpath3('/root/node/text()')]"/>
         <set-payload value="#[remotePayload]"/>
     </flow>

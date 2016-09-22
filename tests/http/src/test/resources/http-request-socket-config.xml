@@ -26,11 +26,11 @@
     </httpn:request-config>
 
     <flow name="globalConfigFlow">
-        <httpn:request config-ref="globalConfig" path="/global" method="POST"  key="ANY"/>
+        <httpn:request config-ref="globalConfig" path="/global" method="POST"/>
     </flow>
 
     <flow name="nestedConfigFlow">
-        <httpn:request config-ref="nestedConfig" path="/nested" method="POST"  key="ANY"/>
+        <httpn:request config-ref="nestedConfig" path="/nested" method="POST"/>
     </flow>
 
 </mule>

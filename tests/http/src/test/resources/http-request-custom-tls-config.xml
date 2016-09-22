@@ -29,10 +29,10 @@
 
 
     <flow name="testFlowGlobalContext">
-        <httpn:request config-ref="globalConfig" path="requestPath" method="POST"  key="ANY"/>
+        <httpn:request config-ref="globalConfig" path="requestPath" method="POST"/>
     </flow>
     <flow name="testFlowNestedContext">
-        <httpn:request config-ref="nestedConfig" path="requestPath" method="POST"  key="ANY"/>
+        <httpn:request config-ref="nestedConfig" path="requestPath" method="POST"/>
     </flow>
 
 </mule>

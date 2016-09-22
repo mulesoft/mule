@@ -40,7 +40,7 @@
     </flow>
 
     <flow name="requestFlow">
-        <httpn:request path="${path}" method="#[method]" config-ref="requestConfig" sendBodyMode="ALWAYS"  key="ANY"/>
+        <httpn:request path="${path}" method="#[method]" config-ref="requestConfig" sendBodyMode="ALWAYS"/>
     </flow>
 
 

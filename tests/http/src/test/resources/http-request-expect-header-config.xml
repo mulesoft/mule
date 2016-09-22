@@ -11,7 +11,7 @@
     </httpn:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000" key="ANY">
+        <httpn:request config-ref="requestConfig" method="POST" path="/" responseTimeout="20000">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="0..599" />
             </httpn:response-validator>

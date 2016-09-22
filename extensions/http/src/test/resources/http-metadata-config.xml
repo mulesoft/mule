@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="reqConfig">
+        <httpn:request-connection host="localhost" protocol="HTTP" port="1010"/>
+    </httpn:request-config>
+
+    <flow name="anyExplicit">
+        <httpn:request path="/" config-ref="reqConfig" outputType="ANY"/>
+    </flow>
+
+    <flow name="anyImplicit">
+        <httpn:request path="/" config-ref="reqConfig"/>
+    </flow>
+
+    <flow name="multipart">
+        <httpn:request path="/multipart" config-ref="reqConfig" outputType="MULTIPART"/>
+    </flow>
+
+    <flow name="form">
+        <httpn:request path="/form" config-ref="reqConfig" outputType="FORM"/>
+    </flow>
+
+    <flow name="stream">
+        <httpn:request path="/stream" config-ref="reqConfig" outputType="STREAM"/>
+    </flow>
+
+</mule>

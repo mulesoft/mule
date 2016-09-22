@@ -40,10 +40,10 @@
     </flow>
 
     <flow name="testInsecureRequest">
-        <httpn:request config-ref="insecureClient" path="/" method="POST"  key="ANY"/>
+        <httpn:request config-ref="insecureClient" path="/" method="POST"/>
     </flow>
 
     <flow name="testSecureRequest">
-        <httpn:request config-ref="secureClient" path="/" method="POST"  key="ANY"/>
+        <httpn:request config-ref="secureClient" path="/" method="POST"/>
     </flow>
 </mule>

@@ -30,11 +30,11 @@
 
 
     <flow name="validCertFlow">
-        <httpn:request config-ref="validCertHttpConfig" path="requestPath" method="POST" key="ANY"/>
+        <httpn:request config-ref="validCertHttpConfig" path="requestPath" method="POST"/>
     </flow>
 
     <flow name="missingCertFlow">
-        <httpn:request config-ref="missingCertHttpConfig" path="requestPath" method="POST" key="ANY"/>
+        <httpn:request config-ref="missingCertHttpConfig" path="requestPath" method="POST"/>
     </flow>
 
 </mule>

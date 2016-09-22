@@ -65,7 +65,7 @@
     </flow>
 
     <flow name="12Client1Server">
-        <httpn:request config-ref="requestConfig1" path="/" method="POST" key="ANY"/>
+        <httpn:request config-ref="requestConfig1" path="/" method="POST"/>
     </flow>
 
     <flow name="12Server">
@@ -74,7 +74,7 @@
     </flow>
 
     <flow name="12Client12Server">
-        <httpn:request config-ref="requestConfig2" path="/" method="POST" key="ANY"/>
+        <httpn:request config-ref="requestConfig2" path="/" method="POST"/>
     </flow>
 
     <flow name="serverFlow3">
@@ -83,6 +83,6 @@
     </flow>
 
     <flow name="12CipherClient1CipherServer">
-        <httpn:request config-ref="requestConfig3" path="/" method="POST" key="ANY"/>
+        <httpn:request config-ref="requestConfig3" path="/" method="POST"/>
     </flow>
 </mule>

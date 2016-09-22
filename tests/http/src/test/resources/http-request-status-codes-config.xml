@@ -11,7 +11,7 @@
     </httpn:request-config>
 
     <flow name="default">
-        <httpn:request config-ref="requestConfig" path="status" key="ANY">
+        <httpn:request config-ref="requestConfig" path="status">
             <httpn:request-builder>
                 <httpn:query-params>
                     <httpn:query-param key="code" value="#[code]" />
@@ -21,7 +21,7 @@
     </flow>
 
     <flow name="success">
-        <httpn:request config-ref="requestConfig" path="status" key="ANY">
+        <httpn:request config-ref="requestConfig" path="status">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="409" />
             </httpn:response-validator>
@@ -34,7 +34,7 @@
     </flow>
 
     <flow name="failure">
-        <httpn:request config-ref="requestConfig" path="status" key="ANY">
+        <httpn:request config-ref="requestConfig" path="status">
             <httpn:response-validator>
                 <httpn:failure-status-code-validator values="201" />
             </httpn:response-validator>
