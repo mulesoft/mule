@@ -49,7 +49,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
   public void logAddAndRetrieve() throws Exception {
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-    transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent);
+    transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent());
     transactionJournal.close();
     transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
@@ -65,7 +65,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
   public void logAddFirstAndRetrieve() throws Exception {
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-    transactionJournal.logAddFirst(TX_ID, mockQueueInfo, testEvent);
+    transactionJournal.logAddFirst(TX_ID, mockQueueInfo, testEvent());
     transactionJournal.close();
     transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
@@ -81,7 +81,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
   public void logRemoveAndRetrieve() throws Exception {
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-    transactionJournal.logRemove(TX_ID, mockQueueInfo, testEvent);
+    transactionJournal.logRemove(TX_ID, mockQueueInfo, testEvent());
     transactionJournal.close();
     transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     Multimap<Xid, XaQueueTxJournalEntry> allEntries = transactionJournal.getAllLogEntries();
@@ -121,7 +121,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
     for (int i = 0; i < numberOfOffers; i++) {
-      transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent);
+      transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent());
     }
     transactionJournal.logCommit(TX_ID);
     transactionJournal.close();
@@ -136,7 +136,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
     for (int i = 0; i < numberOfOffers; i++) {
-      transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent);
+      transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent());
     }
     transactionJournal.close();
     transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
@@ -151,7 +151,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
     int numberOfOffers = 1000;
     for (int i = 0; i < numberOfOffers; i++) {
-      transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent);
+      transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent());
     }
     transactionJournal.close();
     transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
@@ -168,7 +168,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
   public void logAddAndPrepare() throws Exception {
     XaTxQueueTransactionJournal transactionJournal =
         new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);
-    transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent);
+    transactionJournal.logAdd(TX_ID, mockQueueInfo, testEvent());
     transactionJournal.logPrepare(TX_ID);
     transactionJournal.close();
     transactionJournal = new XaTxQueueTransactionJournal(temporaryFolder.getRoot().getAbsolutePath(), muleContext);

@@ -45,11 +45,11 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
     MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-    final Builder builder = Event.builder(testEvent);
-    dataTypePropagator.propagate(typedValue, testEvent, builder, compiledExpression);
+    final Builder builder = Event.builder(testEvent());
+    dataTypePropagator.propagate(typedValue, testEvent(), builder, compiledExpression);
 
-    verify(propagator1).propagate(testEvent, builder, typedValue, compiledExpression);
-    verify(propagator2).propagate(testEvent, builder, typedValue, compiledExpression);
+    verify(propagator1).propagate(testEvent(), builder, typedValue, compiledExpression);
+    verify(propagator2).propagate(testEvent(), builder, typedValue, compiledExpression);
   }
 
   @Test
@@ -58,16 +58,16 @@ public class MvelEnricherDataTypePropagatorTestCase extends AbstractMuleContextT
 
     final List<EnricherDataTypePropagator> propagators = new ArrayList<>();
     propagators.add(propagator1);
-    final Builder builder = Event.builder(testEvent);
-    when(propagator1.propagate(testEvent, builder, typedValue, compiledExpression)).thenReturn(true);
+    final Builder builder = Event.builder(testEvent());
+    when(propagator1.propagate(testEvent(), builder, typedValue, compiledExpression)).thenReturn(true);
     propagators.add(propagator2);
 
     MvelEnricherDataTypePropagator dataTypePropagator = new MvelEnricherDataTypePropagator(propagators);
 
-    dataTypePropagator.propagate(typedValue, testEvent, builder, compiledExpression);
+    dataTypePropagator.propagate(typedValue, testEvent(), builder, compiledExpression);
 
-    verify(propagator1).propagate(testEvent, builder, typedValue, compiledExpression);
-    verify(propagator2, never()).propagate(testEvent, builder, typedValue, compiledExpression);
+    verify(propagator1).propagate(testEvent(), builder, typedValue, compiledExpression);
+    verify(propagator2, never()).propagate(testEvent(), builder, typedValue, compiledExpression);
   }
 
   private CompiledExpression compileMelExpression() {

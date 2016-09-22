@@ -259,7 +259,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
 
     reset(connectionFactory);
 
-    outboundEndpoint.process(testEvent);
+    outboundEndpoint.process(testEvent());
 
     verify(connectionFactory, times(0)).createConnection();
     verify(connection, times(1)).createSession(anyBoolean(), anyInt());

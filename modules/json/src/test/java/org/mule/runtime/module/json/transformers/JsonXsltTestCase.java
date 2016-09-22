@@ -71,6 +71,6 @@ public class JsonXsltTestCase extends AbstractMuleContextTestCase {
 
   @Test(expected = MessageTransformerException.class)
   public void invalidInputShouldThrow() throws Exception {
-    transformer.transform(new Object(), nullPayloadEvent);
+    transformer.transform(new Object(), nullPayloadEvent());
   }
 }

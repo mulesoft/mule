@@ -23,7 +23,7 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
 
   @Test
   public void testEncrypt() throws Exception {
-    setCurrentEvent(testEvent);
+    setCurrentEvent(testEvent());
 
     EncryptionTransformer etrans = new EncryptionTransformer();
     etrans.setStrategy(kbStrategy);

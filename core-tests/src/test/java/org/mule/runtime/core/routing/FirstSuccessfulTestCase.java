@@ -79,7 +79,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
     fs.initialise();
 
-    assertNull(fs.process(testEvent));
+    assertNull(fs.process(testEvent()));
   }
 
   @Test
@@ -89,7 +89,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
     fs.initialise();
 
     try {
-      fs.process(testEvent);
+      fs.process(testEvent());
       fail("Exception expected");
     } catch (CouldNotRouteOutboundMessageException e) {
       // this one was expected
@@ -107,7 +107,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
 
     // the configured message processor will blow up if the router did not force processing
     // on same thread
-    router.process(testEvent);
+    router.process(testEvent());
   }
 
   private FirstSuccessful createFirstSuccessfulRouter(Processor... processors) throws MuleException {

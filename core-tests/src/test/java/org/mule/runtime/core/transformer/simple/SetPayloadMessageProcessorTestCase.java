@@ -63,7 +63,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(null);
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent);
+    Event response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getValue(), is(nullValue()));
   }
@@ -75,7 +75,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
 
     when(expressionLanguage.isExpression(PLAIN_TEXT)).thenReturn(false);
 
-    Event response = setPayloadMessageProcessor.process(testEvent);
+    Event response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }
@@ -86,11 +86,11 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     when(expressionLanguage.isExpression(EXPRESSION)).thenReturn(true);
     setPayloadMessageProcessor.initialise();
     DefaultTypedValue typedValue = new DefaultTypedValue(PLAIN_TEXT, DataType.STRING);
-    when(expressionLanguage.evaluateTyped(EXPRESSION, testEvent, null)).thenReturn(typedValue);
-    when(expressionLanguage.evaluateTyped(eq(EXPRESSION), eq(testEvent), any(Event.Builder.class), eq(null)))
+    when(expressionLanguage.evaluateTyped(EXPRESSION, testEvent(), null)).thenReturn(typedValue);
+    when(expressionLanguage.evaluateTyped(eq(EXPRESSION), eq(testEvent()), any(Event.Builder.class), eq(null)))
         .thenReturn(typedValue);
 
-    Event response = setPayloadMessageProcessor.process(testEvent);
+    Event response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getValue(), is(PLAIN_TEXT));
   }
@@ -100,7 +100,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(null);
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent);
+    Event response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getDataType(), like(Object.class, MediaType.ANY, null));
   }
@@ -110,9 +110,9 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setValue(PLAIN_TEXT);
     setPayloadMessageProcessor.initialise();
 
-    setPayloadMessageProcessor.process(testEvent);
+    setPayloadMessageProcessor.process(testEvent());
 
-    assertThat(testEvent.getMessage().getPayload().getDataType(), like(String.class, MediaType.ANY, null));
+    assertThat(testEvent().getMessage().getPayload().getDataType(), like(String.class, MediaType.ANY, null));
   }
 
   @Test
@@ -121,7 +121,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setDataType(DataType.builder().charset(CUSTOM_ENCODING).build());
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent);
+    Event response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getDataType(), like(String.class, MediaType.ANY, CUSTOM_ENCODING));
   }
@@ -132,7 +132,7 @@ public class SetPayloadMessageProcessorTestCase extends AbstractMuleContextTestC
     setPayloadMessageProcessor.setDataType(DataType.builder().mediaType(MediaType.APPLICATION_XML).build());
     setPayloadMessageProcessor.initialise();
 
-    Event response = setPayloadMessageProcessor.process(testEvent);
+    Event response = setPayloadMessageProcessor.process(testEvent());
 
     assertThat(response.getMessage().getPayload().getDataType(), like(String.class, MediaType.APPLICATION_XML, null));
   }

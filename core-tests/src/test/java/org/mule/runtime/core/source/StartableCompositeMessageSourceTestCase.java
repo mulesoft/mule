@@ -35,7 +35,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     listener = getSensingNullMessageProcessor();
     listener2 = getSensingNullMessageProcessor();
     compositeSource = getCompositeSource();
-    source = new NullMessageSource(testEvent);
+    source = new NullMessageSource(testEvent());
   }
 
   protected StartableCompositeMessageSource getCompositeSource() {
@@ -60,7 +60,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
 
     compositeSource.start();
     source.triggerSource();
-    assertEquals(testEvent, listener.event);
+    assertEquals(testEvent(), listener.event);
   }
 
   @Test
@@ -71,7 +71,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     compositeSource.addSource(source);
 
     source.triggerSource();
-    assertEquals(testEvent, listener.event);
+    assertEquals(testEvent(), listener.event);
   }
 
   @Test
@@ -81,7 +81,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     compositeSource.start();
 
     source.triggerSource();
-    assertEquals(testEvent, listener.event);
+    assertEquals(testEvent(), listener.event);
     listener.clear();
 
     compositeSource.removeSource(source);
@@ -96,14 +96,14 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     compositeSource.start();
 
     source.triggerSource();
-    assertEquals(testEvent, listener.event);
+    assertEquals(testEvent(), listener.event);
 
     listener.clear();
     compositeSource.setListener(listener2);
 
     source.triggerSource();
     assertNull(listener.event);
-    assertEquals(testEvent, listener2.event);
+    assertEquals(testEvent(), listener2.event);
   }
 
   @Test
@@ -116,7 +116,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
 
     compositeSource.start();
     source.triggerSource();
-    assertEquals(testEvent, listener.event);
+    assertEquals(testEvent(), listener.event);
   }
 
   @Test

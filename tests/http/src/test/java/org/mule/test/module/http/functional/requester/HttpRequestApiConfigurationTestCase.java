@@ -27,7 +27,7 @@ public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 
   @Test
   public void parseApiConfigurationFromConfig() throws Exception {
-    HttpRequesterConfig config = getConfigurationFromRegistry("ramlConfig", testEvent, muleContext);
+    HttpRequesterConfig config = getConfigurationFromRegistry("ramlConfig", testEvent(), muleContext);
 
     assertNotNull(config.getApiConfiguration());
     assertThat(config.getApiConfiguration().getLocation(), equalTo("TestFile.raml"));

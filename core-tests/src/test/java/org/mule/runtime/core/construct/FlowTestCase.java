@@ -129,7 +129,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = directInboundMessageSource.process(testEvent);
+    Event response = directInboundMessageSource.process(testEvent());
 
     assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), response.getVariable("thread").getValue());
@@ -169,7 +169,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.initialise();
 
     try {
-      directInboundMessageSource.process(testEvent);
+      directInboundMessageSource.process(testEvent());
       fail("exception expected");
     } catch (Exception e) {
     }
@@ -205,16 +205,16 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
 
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    Event response = directInboundMessageSource.process(testEvent);
+    Event response = directInboundMessageSource.process(testEvent());
     assertEquals(TEST_PAYLOAD + "12abcdef34", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
         .resetAndUpdate();
-    response = directInboundMessageSource.process(testEvent);
+    response = directInboundMessageSource.process(testEvent());
     assertEquals(TEST_PAYLOAD + "2abcdef3", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).reset();
-    response = directInboundMessageSource.process(testEvent);
+    response = directInboundMessageSource.process(testEvent());
     assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
   }
 

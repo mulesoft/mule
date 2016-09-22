@@ -58,7 +58,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
   @Test
   public void testMessageAwareTransformerChainedWithObjectToJMSMessage() throws Exception {
-    setCurrentEvent(testEvent);
+    setCurrentEvent(testEvent());
 
     InternalMessage message = InternalMessage.of("This is a test TextMessage");
 

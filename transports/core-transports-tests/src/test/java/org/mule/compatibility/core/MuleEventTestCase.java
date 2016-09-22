@@ -101,7 +101,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
 
   private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
-    return testEvent;
+    return testEvent();
   }
 
   @Test

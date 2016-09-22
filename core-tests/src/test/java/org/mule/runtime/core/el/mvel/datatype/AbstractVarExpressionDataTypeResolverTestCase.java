@@ -67,17 +67,17 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
   protected void doVarDataTypeTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    testEvent = setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);
+    Event event = setVariable(testEvent(), EXPRESSION_VALUE, expectedDataType);
 
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);
-    final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(testEvent, parserConfiguration);
+    final MVELExpressionLanguageContext context = createMvelExpressionLanguageContext(event, parserConfiguration);
 
     CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(parserConfiguration));
     // Expression must be executed, otherwise the variable accessor is not properly configured
     MVEL.executeExpression(compiledExpression, context);
 
-    assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(expressionDataTypeResolver.resolve(event, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
   protected MVELExpressionLanguageContext createMvelExpressionLanguageContext(Event testEvent,

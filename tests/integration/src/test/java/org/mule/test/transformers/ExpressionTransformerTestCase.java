@@ -55,7 +55,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase {
     argument.setMuleContext(muleContext);
     transformer.addArgument(argument);
 
-    Object result = transformer.transformMessage(testEvent, null);
+    Object result = transformer.transformMessage(testEvent(), null);
     assertTrue(result instanceof InternalMessage);
     InternalMessage transformedMessage = (InternalMessage) result;
 

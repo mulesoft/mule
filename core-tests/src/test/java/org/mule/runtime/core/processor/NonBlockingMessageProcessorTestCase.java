@@ -35,10 +35,10 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
 
   @Test
   public void blockingProcess() throws MuleException, Exception {
-    Event response = nonBlockingMessageProcessor.process(testEvent);
+    Event response = nonBlockingMessageProcessor.process(testEvent());
 
     // Test processor echos request so we can assert request equals response.
-    assertThat(response, equalTo(testEvent));
+    assertThat(response, equalTo(testEvent()));
   }
 
   @Test

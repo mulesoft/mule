@@ -34,14 +34,14 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Before
   public void before() throws Exception {
-    when(messageProcessor.process(any(Event.class))).thenReturn(testEvent);
+    when(messageProcessor.process(any(Event.class))).thenReturn(testEvent());
   }
 
   @Test
   public void yieldsNestedProcessor() throws Exception {
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
-    NestedProcessor nestedProcessor = resolver.resolve(testEvent);
+    NestedProcessor nestedProcessor = resolver.resolve(testEvent());
     Object response = nestedProcessor.process();
     assertThat((String) response, is(TEST_PAYLOAD));
 
@@ -49,15 +49,15 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
     verify(messageProcessor).process(captor.capture());
 
     Event capturedEvent = captor.getValue();
-    assertThat(capturedEvent, is(testEvent));
+    assertThat(capturedEvent, is(testEvent()));
   }
 
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
-    NestedProcessor resolved1 = resolver.resolve(testEvent);
-    NestedProcessor resolved2 = resolver.resolve(testEvent);
+    NestedProcessor resolved1 = resolver.resolve(testEvent());
+    NestedProcessor resolved2 = resolver.resolve(testEvent());
 
     assertThat(resolved1, is(not(sameInstance(resolved2))));
   }

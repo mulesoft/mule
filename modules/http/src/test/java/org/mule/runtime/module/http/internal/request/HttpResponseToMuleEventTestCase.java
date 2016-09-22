@@ -14,9 +14,9 @@ import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.internal.domain.InputStreamHttpEntity;
@@ -59,8 +59,8 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
   }
 
   @Test
-  public void responseHeadersAreMappedAsInboundProperties() throws MessagingException {
-    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent, httpResponse, null);
+  public void responseHeadersAreMappedAsInboundProperties() throws MuleException {
+    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent(), httpResponse, null);
     assertThat(result.getMessage().getInboundProperty(TEST_HEADER), equalTo(TEST_VALUE));
     assertThat(result.getMessage().getInboundProperty(TEST_MULTIPLE_HEADER), equalTo(asList(TEST_VALUE, TEST_VALUE)));
   }
@@ -74,21 +74,21 @@ public class HttpResponseToMuleEventTestCase extends AbstractMuleContextTestCase
   }
 
   @Test
-  public void responseBodyIsSetAsPayload() throws MessagingException {
-    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent, httpResponse, null);
+  public void responseBodyIsSetAsPayload() throws MuleException {
+    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent(), httpResponse, null);
     InputStream responseStream = (InputStream) result.getMessage().getPayload().getValue();
     assertThat(IOUtils.toString(responseStream), equalTo(TEST_MESSAGE));
   }
 
   @Test
-  public void statusCodeIsSetAsInboundProperty() throws MessagingException {
-    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent, httpResponse, null);
+  public void statusCodeIsSetAsInboundProperty() throws MuleException {
+    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent(), httpResponse, null);
     assertThat(result.getMessage().getInboundProperty(HTTP_STATUS_PROPERTY), equalTo(200));
   }
 
   @Test
-  public void responsePhraseIsSetAsInboundProperty() throws MessagingException {
-    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent, httpResponse, null);
+  public void responsePhraseIsSetAsInboundProperty() throws MuleException {
+    Event result = httpResponseToMuleEvent.convert(nullPayloadEvent(), httpResponse, null);
     assertThat(result.getMessage().getInboundProperty(HTTP_REASON_PROPERTY), equalTo("OK"));
   }
 

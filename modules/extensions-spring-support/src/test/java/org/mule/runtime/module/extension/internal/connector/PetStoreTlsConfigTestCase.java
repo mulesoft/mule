@@ -61,7 +61,7 @@ public class PetStoreTlsConfigTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void tls() throws Exception {
-    PetStoreConnector connector = getConfigurationFromRegistry(configName, testEvent, muleContext);
+    PetStoreConnector connector = getConfigurationFromRegistry(configName, testEvent(), muleContext);
     TlsContextFactory tls = connector.getTlsContext();
     assertThat(tls, is(notNullValue()));
 

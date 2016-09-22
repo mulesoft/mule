@@ -29,10 +29,10 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
     mp.setListener(listener);
 
-    Event resultEvent = mp.process(testEvent);
+    Event resultEvent = mp.process(testEvent());
 
     assertNotNull(listener.event);
-    assertEquals(testEvent.getMessage(), resultEvent.getMessage());
+    assertEquals(testEvent().getMessage(), resultEvent.getMessage());
   }
 
   @Test
@@ -41,7 +41,7 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     SensingNullMessageProcessor out = getSensingNullMessageProcessor();
     mp.setListener(out);
 
-    Event resultEvent = mp.process(testEvent);
+    Event resultEvent = mp.process(testEvent());
 
     assertNull(out.event);
     assertNull(resultEvent);
@@ -55,10 +55,10 @@ public class MessageFilterTestCase extends AbstractMuleContextTestCase {
     mp.setListener(out);
     mp.setUnacceptedMessageProcessor(unaccepted);
 
-    Event resultEvent = mp.process(testEvent);
+    Event resultEvent = mp.process(testEvent());
 
     assertNotNull(out.event);
-    assertEquals(testEvent.getMessage(), resultEvent.getMessage());
+    assertEquals(testEvent().getMessage(), resultEvent.getMessage());
     assertNull(unaccepted.event);
   }
 
