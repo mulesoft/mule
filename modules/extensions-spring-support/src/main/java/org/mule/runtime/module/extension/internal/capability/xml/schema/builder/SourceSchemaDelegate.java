@@ -16,7 +16,6 @@ import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 
 import javax.xml.namespace.QName;
@@ -26,17 +25,13 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0.0
  */
-class SourceSchemaDelegate {
+class SourceSchemaDelegate extends ExecutableTypeSchemaDelegate {
 
-  private final SchemaBuilder builder;
-  private final ObjectFactory objectFactory;
-
-  public SourceSchemaDelegate(SchemaBuilder builder, ObjectFactory objectFactory) {
-    this.builder = builder;
-    this.objectFactory = objectFactory;
+  SourceSchemaDelegate(SchemaBuilder builder) {
+    super(builder);
   }
 
-  public void registerMessageSource(SourceModel sourceModel, DslElementSyntax dslSyntax) {
+  void registerMessageSource(SourceModel sourceModel, DslElementSyntax dslSyntax) {
     String typeName = capitalize(sourceModel.getName()) + TYPE_SUFFIX;
     registerSourceElement(sourceModel, typeName, dslSyntax);
     registerSourceType(typeName, sourceModel, dslSyntax);
@@ -53,7 +48,7 @@ class SourceSchemaDelegate {
 
   private void registerSourceType(String name, SourceModel sourceModel, DslElementSyntax dslSyntax) {
     final ExtensionType extensionType =
-        builder.registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
+        registerExecutableType(name, sourceModel, MULE_ABSTRACT_MESSAGE_SOURCE_TYPE, dslSyntax);
     ExplicitGroup sequence = extensionType.getSequence();
 
     if (sequence == null) {

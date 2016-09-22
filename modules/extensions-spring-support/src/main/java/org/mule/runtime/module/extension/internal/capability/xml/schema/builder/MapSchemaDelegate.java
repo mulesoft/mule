@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.capability.xml.schema.builder;
 
+import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_KEY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
@@ -20,6 +22,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
@@ -74,6 +77,19 @@ final class MapSchemaDelegate {
 
     valueType.accept(new MetadataTypeVisitor() {
 
+      /**
+       * For a Map with an {@link ObjectType} as value.
+       * The resulting {@link ComplexType} declares a sequence of either a {@code ref} or a {@code choice}.
+       * <p/>
+       * It creates an element {@code ref} to the concrete element whose {@code type} is the {@link ComplexType} associated
+       * to the {@code objectType}
+       * <p/>
+       * In the case of having a {@link DslElementSyntax#isWrapped wrapped} {@link ObjectType}, then a
+       * {@link ExplicitGroup Choice} group that can receive a {@code ref} to any subtype that this wrapped type might have,
+       * be it either a top-level element for the mule schema, or if it can only be declared as child of this element.
+       *
+       * @param objectType the item's type
+       */
       @Override
       public void visitObject(ObjectType objectType) {
         final boolean shouldGenerateChildElement = entryValueDsl.supportsChildDeclaration();
@@ -82,10 +98,12 @@ final class MapSchemaDelegate {
             .add(builder.createAttribute(ATTRIBUTE_NAME_VALUE, valueType, !shouldGenerateChildElement, SUPPORTED));
 
         if (shouldGenerateChildElement) {
-          DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType);
+          DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType).orElseThrow(
+            ()-> new IllegalArgumentException(format("The given type [%s] cannot be represented as a child element in Map entries",
+                                                     getId(objectType))));
 
           if (typeDsl.isWrapped()) {
-            ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(objectType, ZERO, UNBOUNDED);
+            ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(typeDsl, objectType, ZERO, UNBOUNDED);
             entryComplexType.setChoice(choice);
 
           } else {

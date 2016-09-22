@@ -130,10 +130,10 @@ public abstract class ExtensionDefinitionParser {
   static final String CHILD_ELEMENT_KEY_SUFFIX = ">>";
   protected final ExtensionParsingContext parsingContext;
   protected final List<ObjectParsingDelegate> objectParsingDelegates = ImmutableList
-      .of(new FixedTypeParsingDelegate(PoolingProfile.class), new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
-          new FixedTypeParsingDelegate(TlsContextFactory.class), new FixedTypeParsingDelegate(ThreadingProfile.class),
-          new DefaultObjectParsingDelegate());
-  protected final DslSyntaxResolver dslSyntaxResolver;
+    .of(new FixedTypeParsingDelegate(PoolingProfile.class), new FixedTypeParsingDelegate(RetryPolicyTemplate.class),
+        new FixedTypeParsingDelegate(TlsContextFactory.class), new FixedTypeParsingDelegate(ThreadingProfile.class),
+        new DefaultObjectParsingDelegate());
+  protected final DslSyntaxResolver dslResolver;
   protected final Builder baseDefinitionBuilder;
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
   private final ConversionService conversionService = new DefaultConversionService();
@@ -141,7 +141,7 @@ public abstract class ExtensionDefinitionParser {
   private final Map<String, AttributeDefinition.Builder> parameters = new HashMap<>();
   private final List<ComponentBuildingDefinition> parsedDefinitions = new ArrayList<>();
   private final List<ValueResolverParsingDelegate> valueResolverParsingDelegates =
-      ImmutableList.of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
+    ImmutableList.of(new CharsetValueResolverParsingDelegate(), new MediaTypeValueResolverParsingDelegate());
   private final ValueResolverParsingDelegate defaultValueResolverParsingDelegate = new DefaultValueResolverParsingDelegate();
   protected final MuleContext muleContext;
 
@@ -149,13 +149,13 @@ public abstract class ExtensionDefinitionParser {
    * Creates a new instance
    *
    * @param baseDefinitionBuilder a {@link Builder} used as a prototype to generate new defitintions
-   * @param dslSyntaxResolver a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
-   * @param parsingContext the {@link ExtensionParsingContext} in which {@code this} parser operates
+   * @param dslSyntaxResolver     a {@link DslSyntaxResolver} instance associated with the {@link ExtensionModel} being parsed
+   * @param parsingContext        the {@link ExtensionParsingContext} in which {@code this} parser operates
    */
   protected ExtensionDefinitionParser(Builder baseDefinitionBuilder, DslSyntaxResolver dslSyntaxResolver,
                                       ExtensionParsingContext parsingContext, MuleContext muleContext) {
     this.baseDefinitionBuilder = baseDefinitionBuilder;
-    this.dslSyntaxResolver = dslSyntaxResolver;
+    this.dslResolver = dslSyntaxResolver;
     this.parsingContext = parsingContext;
     this.muleContext = muleContext;
   }
@@ -174,8 +174,8 @@ public abstract class ExtensionDefinitionParser {
     AttributeDefinition parametersDefinition = fromFixedValue(new HashMap<>()).build();
     if (!parameters.isEmpty()) {
       KeyAttributeDefinitionPair[] attributeDefinitions = parameters.entrySet().stream()
-          .map(entry -> newBuilder().withAttributeDefinition(entry.getValue().build()).withKey(entry.getKey()).build())
-          .toArray(KeyAttributeDefinitionPair[]::new);
+        .map(entry -> newBuilder().withAttributeDefinition(entry.getValue().build()).withKey(entry.getKey()).build())
+        .toArray(KeyAttributeDefinitionPair[]::new);
       parametersDefinition = fromMultipleDefinitions(attributeDefinitions).build();
     }
 
@@ -200,7 +200,7 @@ public abstract class ExtensionDefinitionParser {
    */
   protected void parseParameters(List<ParameterModel> parameters) {
     parameters.forEach(parameter -> {
-      final DslElementSyntax paramDsl = dslSyntaxResolver.resolve(parameter);
+      final DslElementSyntax paramDsl = dslResolver.resolve(parameter);
       parameter.getType().accept(new MetadataTypeVisitor() {
 
         @Override
@@ -225,10 +225,10 @@ public abstract class ExtensionDefinitionParser {
             }
 
             addDefinition(baseDefinitionBuilder.copy()
-                .withIdentifier(paramDsl.getElementName())
-                .withTypeDefinition(fromType(String.class))
-                .withTypeConverter(converter)
-                .build());
+                            .withIdentifier(paramDsl.getElementName())
+                            .withTypeDefinition(fromType(String.class))
+                            .withTypeConverter(converter)
+                            .build());
           } else {
             defaultVisit(stringType);
           }
@@ -269,7 +269,7 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param parameter a {@link ParameterModel}
+   * @param parameter      a {@link ParameterModel}
    * @param dictionaryType a {@link DictionaryType}
    */
   protected void parseMapParameters(ParameterModel parameter, DictionaryType dictionaryType, DslElementSyntax paramDsl) {
@@ -280,12 +280,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents a {@link DictionaryType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param dictionaryType the parameter's {@link DictionaryType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param dictionaryType    the parameter's {@link DictionaryType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required
+   * @param required          whether the parameter is required
    */
   protected void parseMapParameters(String key, String name, DictionaryType dictionaryType, Object defaultValue,
                                     ExpressionSupport expressionSupport, boolean required, DslElementSyntax paramDsl,
@@ -307,7 +307,7 @@ public abstract class ExtensionDefinitionParser {
     final String mapElementName = paramDsl.getElementName();
 
     addParameter(getChildKey(key), fromChildMapConfiguration(keyClass, valueClass).withWrapperIdentifier(mapElementName)
-        .withDefaultValue(defaultValue));
+      .withDefaultValue(defaultValue));
 
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(mapElementName).withTypeDefinition(fromType(mapType)).build());
 
@@ -323,22 +323,22 @@ public abstract class ExtensionDefinitionParser {
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         addDefinition(baseDefinitionBuilder.copy()
-            .withIdentifier(valueChildElementDsl.getElementName())
-            .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
-            .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true,
-                                                      modelProperties, false))
-            .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true,
-                                                   modelProperties, false))
-            .build());
+                        .withIdentifier(valueChildElementDsl.getElementName())
+                        .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
+                        .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true,
+                                                                  modelProperties, false))
+                        .withTypeConverter(value -> resolverOf(parameterName, valueType, value, null, expressionSupport, true,
+                                                               modelProperties, false))
+                        .build());
       }
 
       @Override
       public void visitObject(ObjectType objectType) {
         defaultVisit(objectType);
         if (valueChildElementDsl.supportsTopLevelDeclaration()
-            || (valueChildElementDsl.supportsChildDeclaration() && !valueChildElementDsl.isWrapped())) {
+          || (valueChildElementDsl.supportsChildDeclaration() && !valueChildElementDsl.isWrapped())) {
           try {
-            new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslSyntaxResolver,
+            new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
                                           parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
           } catch (ConfigurationException e) {
             throw new MuleRuntimeException(createStaticMessage("Could not create parser for map complex type"), e);
@@ -357,20 +357,20 @@ public abstract class ExtensionDefinitionParser {
             @Override
             protected void visitBasicType(MetadataType metadataType) {
               addDefinition(baseDefinitionBuilder.copy().withIdentifier(valueListGenericDsl.get().getElementName())
-                  .withTypeDefinition(fromType(getType(metadataType)))
-                  .withTypeConverter(
-                                     value -> resolverOf(parameterName, metadataType, value, getDefaultValue(metadataType),
-                                                         getExpressionSupport(metadataType), false, modelProperties))
-                  .build());
+                              .withTypeDefinition(fromType(getType(metadataType)))
+                              .withTypeConverter(
+                                value -> resolverOf(parameterName, metadataType, value, getDefaultValue(metadataType),
+                                                    getExpressionSupport(metadataType), false, modelProperties))
+                              .build());
             }
 
             @Override
             protected void defaultVisit(MetadataType metadataType) {
               addDefinition(baseDefinitionBuilder.copy().withIdentifier(valueListGenericDsl.get().getElementName())
-                  .withTypeDefinition(fromType(ValueResolver.class))
-                  .withObjectFactoryType(TopLevelParameterObjectFactory.class)
-                  .withConstructorParameterDefinition(fromFixedValue(arrayType.getType()).build())
-                  .withConstructorParameterDefinition(fromFixedValue(getContextClassLoader()).build()).build());
+                              .withTypeDefinition(fromType(ValueResolver.class))
+                              .withObjectFactoryType(TopLevelParameterObjectFactory.class)
+                              .withConstructorParameterDefinition(fromFixedValue(arrayType.getType()).build())
+                              .withConstructorParameterDefinition(fromFixedValue(getContextClassLoader()).build()).build());
             }
           });
         }
@@ -393,12 +393,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ArrayType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param arrayType the parameter's {@link ArrayType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param arrayType         the parameter's {@link ArrayType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required
+   * @param required          whether the parameter is required
    */
   protected void parseCollectionParameter(String key, String name, ArrayType arrayType, Object defaultValue,
                                           ExpressionSupport expressionSupport, boolean required, DslElementSyntax parameterDsl,
@@ -416,7 +416,7 @@ public abstract class ExtensionDefinitionParser {
     final String collectionElementName = parameterDsl.getElementName();
     addParameter(getChildKey(key), fromChildConfiguration(collectionType).withWrapperIdentifier(collectionElementName));
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(collectionElementName).withTypeDefinition(fromType(collectionType))
-        .build());
+                    .build());
 
 
     Optional<DslElementSyntax> collectionItemDsl = parameterDsl.getGeneric(arrayType.getType());
@@ -429,9 +429,9 @@ public abstract class ExtensionDefinitionParser {
         @Override
         protected void visitBasicType(MetadataType metadataType) {
           Builder itemDefinitionBuilder = baseDefinitionBuilder.copy().withIdentifier(itemIdentifier).withNamespace(itemNamespace)
-              .withTypeDefinition(fromType(getType(metadataType)))
-              .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),
-                                                     getExpressionSupport(metadataType), false, modelProperties));
+            .withTypeDefinition(fromType(getType(metadataType)))
+            .withTypeConverter(value -> resolverOf(name, metadataType, value, getDefaultValue(metadataType).orElse(null),
+                                                   getExpressionSupport(metadataType), false, modelProperties));
 
           addDefinition(itemDefinitionBuilder.build());
         }
@@ -441,7 +441,7 @@ public abstract class ExtensionDefinitionParser {
           DslElementSyntax itemDsl = collectionItemDsl.get();
           if (itemDsl.supportsTopLevelDeclaration() || itemDsl.supportsChildDeclaration()) {
             try {
-              new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslSyntaxResolver,
+              new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
                                             parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
             } catch (ConfigurationException e) {
               throw new MuleRuntimeException(createStaticMessage("Could not create parser for collection complex type"), e);
@@ -474,12 +474,12 @@ public abstract class ExtensionDefinitionParser {
 
     if (isExpressionFunction(expectedType) && value != null) {
       resolver =
-          new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt(expectedType, 1, typeLoader).get(),
-                                                muleContext);
+        new ExpressionFunctionValueResolver<>((String) value, getGenericTypeAt(expectedType, 1, typeLoader).get(),
+                                              muleContext);
     }
     if (isExpressionResolver(modelProperties) && value != null) {
       resolver =
-          new ExpressionBasedParameterResolverValueResolver<>((String) value, expectedType, muleContext);
+        new ExpressionBasedParameterResolverValueResolver<>((String) value, expectedType, muleContext);
     }
 
     final Class<Object> expectedClass = getType(expectedType);
@@ -513,13 +513,30 @@ public abstract class ExtensionDefinitionParser {
         }
 
         @Override
+        public void visitObject(ObjectType objectType) {
+
+          ValueResolver valueResolver;
+          Optional<? extends ParsingDelegate> delegate = locateParsingDelegate(valueResolverParsingDelegates, objectType);
+          Optional<DslElementSyntax> typeDsl = dslResolver.resolve(objectType);
+
+          if (delegate.isPresent() && typeDsl.isPresent()) {
+            valueResolver = (ValueResolver) delegate.get().parse(value.toString(), objectType, typeDsl.get(), muleContext);
+          } else {
+            valueResolver = acceptsReferences
+              ? defaultValueResolverParsingDelegate.parse(value.toString(), objectType, null, muleContext)
+              : new StaticValueResolver<>(value);
+          }
+
+          resolverValueHolder.set(valueResolver);
+        }
+
+        @Override
         protected void defaultVisit(MetadataType metadataType) {
           ValueResolver delegateResolver = locateParsingDelegate(valueResolverParsingDelegates, metadataType)
-              .map(delegate -> delegate.parse(value.toString(), metadataType, dslSyntaxResolver.resolve(metadataType),
-                                              muleContext))
-              .orElseGet(() -> acceptsReferences ? defaultValueResolverParsingDelegate
-                  .parse(value.toString(), metadataType, dslSyntaxResolver.resolve(metadataType), muleContext)
-                  : new StaticValueResolver<>(value));
+            .map(delegate -> delegate.parse(value.toString(), metadataType, null, muleContext))
+            .orElseGet(() -> acceptsReferences
+              ? defaultValueResolverParsingDelegate.parse(value.toString(), metadataType, null, muleContext)
+              : new StaticValueResolver<>(value));
 
           resolverValueHolder.set(delegateResolver);
         }
@@ -534,8 +551,8 @@ public abstract class ExtensionDefinitionParser {
 
     if (resolver.isDynamic() && expressionSupport == NOT_SUPPORTED) {
       throw new IllegalArgumentException(
-                                         format("An expression value was given for parameter '%s' but it doesn't support expressions",
-                                                parameterName));
+        format("An expression value was given for parameter '%s' but it doesn't support expressions",
+               parameterName));
     }
 
     if (!resolver.isDynamic() && expressionSupport == REQUIRED && required) {
@@ -565,12 +582,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for parsing the given {@code parameterModel} as an element attribute
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param type the parameter's type
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param type              the parameter's type
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required or not
+   * @param required          whether the parameter is required or not
    * @return an {@link AttributeDefinition.Builder}
    */
   protected AttributeDefinition.Builder parseAttributeParameter(String key, String name, MetadataType type, Object defaultValue,
@@ -583,10 +600,10 @@ public abstract class ExtensionDefinitionParser {
                                                               ExpressionSupport expressionSupport, boolean required,
                                                               boolean acceptsReferences, Set<ModelProperty> modelProperties) {
     AttributeDefinition.Builder definitionBuilder =
-        fromSimpleParameter(name,
-                            value -> resolverOf(name, type, value, defaultValue, expressionSupport, required, modelProperties,
-                                                acceptsReferences))
-                                                    .withDefaultValue(defaultValue);
+      fromSimpleParameter(name,
+                          value -> resolverOf(name, type, value, defaultValue, expressionSupport, required, modelProperties,
+                                              acceptsReferences))
+        .withDefaultValue(defaultValue);
     addParameter(key, definitionBuilder);
 
     return definitionBuilder;
@@ -606,12 +623,12 @@ public abstract class ExtensionDefinitionParser {
   /**
    * Registers a definition for a {@link ParameterModel} which represents an {@link ObjectType}
    *
-   * @param key the key that the parsed value should have on the parsed parameter's map
-   * @param name the parameter's name
-   * @param type an {@link ObjectType}
-   * @param defaultValue the parameter's default value
+   * @param key               the key that the parsed value should have on the parsed parameter's map
+   * @param name              the parameter's name
+   * @param type              an {@link ObjectType}
+   * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
-   * @param required whether the parameter is required or not
+   * @param required          whether the parameter is required or not
    * @param modelProperties
    */
   protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue,
@@ -623,11 +640,11 @@ public abstract class ExtensionDefinitionParser {
     final String elementName = elementDsl.getElementName();
 
     if (elementDsl.supportsChildDeclaration() && !elementDsl.isWrapped()
-        && !parsingContext.isRegistered(elementName, elementNamespace)) {
+      && !parsingContext.isRegistered(elementName, elementNamespace)) {
       try {
         new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), elementName, elementNamespace, type, getContextClassLoader(),
-                                      dslSyntaxResolver, parsingContext, muleContext).parse()
-                                          .forEach(definition -> addDefinition(definition));
+                                      dslResolver, parsingContext, muleContext).parse()
+          .forEach(definition -> addDefinition(definition));
       } catch (Exception e) {
         throw new MuleRuntimeException(new ConfigurationException(e));
       }
@@ -640,17 +657,17 @@ public abstract class ExtensionDefinitionParser {
     parseAttributeParameter(key, name, type, defaultValue, expressionSupport, required, acceptsReferences, modelProperties);
 
     ObjectParsingDelegate delegate = (ObjectParsingDelegate) locateParsingDelegate(objectParsingDelegates, type)
-        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type "
-            + getType(type).getName())));
+      .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not find a parsing delegate for type "
+                                                                        + getType(type).getName())));
 
     addParameter(getChildKey(key), delegate.parse(name, type, elementDsl, muleContext));
   }
 
   private <M extends MetadataType, T> Optional<ParsingDelegate<M, T>> locateParsingDelegate(
-                                                                                            List<? extends ParsingDelegate<M, T>> delegatesList,
-                                                                                            M metadataType) {
+    List<? extends ParsingDelegate<M, T>> delegatesList,
+    M metadataType) {
     return (Optional<ParsingDelegate<M, T>>) delegatesList.stream().filter(candidate -> candidate.accepts(metadataType))
-        .findFirst();
+      .findFirst();
   }
 
   /**
@@ -674,19 +691,19 @@ public abstract class ExtensionDefinitionParser {
                  fromChildConfiguration(NestedProcessorValueResolver.class).withWrapperIdentifier(processorElementName));
 
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(processorElementName)
-        .withTypeDefinition(fromType(NestedProcessorValueResolver.class))
-        .withConstructorParameterDefinition(fromChildConfiguration(Processor.class).build()).build());
+                    .withTypeDefinition(fromType(NestedProcessorValueResolver.class))
+                    .withConstructorParameterDefinition(fromChildConfiguration(Processor.class).build()).build());
   }
 
   private void parseNestedProcessorList(ParameterModel parameterModel) {
     final String processorElementName = hyphenize(parameterModel.getName());
     addParameter(getChildKey(parameterModel.getName()), fromChildCollectionConfiguration(NestedProcessorListValueResolver.class)
-        .withWrapperIdentifier(processorElementName));
+      .withWrapperIdentifier(processorElementName));
 
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(processorElementName)
-        .withTypeDefinition(fromType(NestedProcessorListValueResolver.class))
-        .withConstructorParameterDefinition(fromChildCollectionConfiguration(Processor.class).build())
-        .build());
+                    .withTypeDefinition(fromType(NestedProcessorListValueResolver.class))
+                    .withConstructorParameterDefinition(fromChildCollectionConfiguration(Processor.class).build())
+                    .build());
 
   }
 
@@ -714,8 +731,8 @@ public abstract class ExtensionDefinitionParser {
 
   private boolean isExpressionResolver(Set<ModelProperty> modelProperties) {
     return modelProperties
-        .stream()
-        .anyMatch(property -> property instanceof ParameterResolverTypeModelProperty);
+      .stream()
+      .anyMatch(property -> property instanceof ParameterResolverTypeModelProperty);
   }
 
   private ValueResolver doParseDate(Object value, Class<?> type) {

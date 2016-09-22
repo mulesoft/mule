@@ -9,12 +9,14 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema.builder
 import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
+import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNBOUNDED;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
+import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
@@ -55,11 +57,27 @@ class CollectionSchemaDelegate {
                                                                collectionDsl.getAttributeName())));
     genericType.accept(new MetadataTypeVisitor() {
 
+      /**
+       * For a Collection with an {@link ObjectType} as generic.
+       * The generated {@link ComplexType} declares a sequence of either a {@code ref} or a {@code choice}.
+       * <p/>
+       * It creates an element {@code ref} to the concrete element whose {@code type} is the {@link ComplexType} associated
+       * to the {@code objectType}
+       * <p/>
+       * In the case of having a {@link DslElementSyntax#isWrapped wrapped} {@link ObjectType}, then a
+       * {@link ExplicitGroup Choice} group that can receive a {@code ref} to any subtype that this wrapped type might have,
+       * be it either a top-level element for the mule schema, or if it can only be declared as child of this element.
+       *
+       * @param objectType the item's type
+       */
       @Override
       public void visitObject(ObjectType objectType) {
-        DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType);
+        DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType)
+          .orElseThrow(()-> new IllegalArgumentException(format("The given type [%s] cannot be represented as a collection item",
+                                                                getId(objectType))));
+
         if (typeDsl.isWrapped()) {
-          ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(objectType, ZERO, UNBOUNDED);
+          ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(typeDsl, objectType, ZERO, UNBOUNDED);
           sequence.getParticle().add(objectFactory.createChoice(choice));
         } else {
           TopLevelElement collectionItemElement = builder.createTypeRef(typeDsl, objectType, false);
@@ -68,6 +86,12 @@ class CollectionSchemaDelegate {
         }
       }
 
+      /**
+       * For a Collection with any other type as generic.
+       * The generated {@link ComplexType} declares a sequence of child elements with an inline declaration of the type
+       *
+       * @param metadataType the item's type
+       */
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         final LocalComplexType complexType = new LocalComplexType();

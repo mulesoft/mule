@@ -37,8 +37,7 @@ public class DefaultValueResolverParsingDelegate implements ValueResolverParsing
    * @return A {@link ValueResolver} that performs a registry lookup using the given {@code key}
    */
   @Override
-  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl,
-                                     MuleContext muleContext) {
+  public ValueResolver<Object> parse(String key, MetadataType metadataType, DslElementSyntax elementDsl, MuleContext muleContext) {
     return new RegistryLookupValueResolver<>(key, muleContext);
   }
 }
