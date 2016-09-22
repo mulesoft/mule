@@ -8,7 +8,6 @@ package org.mule.module.ws.consumer;
 
 import org.mule.module.cxf.support.StreamClosingInterceptor;
 
-import javax.xml.soap.SOAPConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.interceptor.Fault;
@@ -29,15 +28,14 @@ public class NamespaceSaverStaxInterceptor extends AbstractPhaseInterceptor<Mess
         getAfter().add(StaxInInterceptor.class.getName());
     }
 
+    @Override
     public void handleMessage(Message message) throws Fault
     {
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
 
         if (reader != null)
         {
-            NamespaceRestorerXMLStreamReader replacement = new NamespaceRestorerXMLStreamReader(reader)
-                    .blackList(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)
-                    .blackList(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
+            NamespaceRestorerXMLStreamReader replacement = new NamespaceRestorerXMLStreamReader(reader);
 
             message.setContent(XMLStreamReader.class, replacement);
             message.setContent(NamespaceRestorerXMLStreamReader.class, replacement);
