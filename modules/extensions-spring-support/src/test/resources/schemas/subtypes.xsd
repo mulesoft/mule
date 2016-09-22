@@ -85,8 +85,8 @@
     <xs:complexType name="org.mule.test.subtypes.extension.CarDoor">
         <xs:complexContent>
             <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.Door">
-                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="color"></xs:attribute>
-                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" name="handle"></xs:attribute>
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="required" name="color"></xs:attribute>
+                <xs:attribute xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="mule:expressionString" use="optional" default="button" name="handle"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
