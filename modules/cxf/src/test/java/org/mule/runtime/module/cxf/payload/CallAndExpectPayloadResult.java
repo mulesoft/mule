@@ -10,8 +10,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 class CallAndExpectPayloadResult implements CallAndExpect {
 

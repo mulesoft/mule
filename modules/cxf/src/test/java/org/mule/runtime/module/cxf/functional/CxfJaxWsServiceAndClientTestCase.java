@@ -9,17 +9,20 @@ package org.mule.runtime.module.cxf.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.extension.http.api.HttpConstants;
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase {
+public class CxfJaxWsServiceAndClientTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
@@ -34,6 +37,11 @@ public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase {
   private static final String RESPONSE_PAYLOAD = "<soap:Envelope " + "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
       + "<soap:Body>" + "<ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\">" + "<return>"
       + "Hello\u2297 Test Message" + "</return>" + "</ns2:sayHiResponse>" + "</soap:Body>" + "</soap:Envelope>";
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

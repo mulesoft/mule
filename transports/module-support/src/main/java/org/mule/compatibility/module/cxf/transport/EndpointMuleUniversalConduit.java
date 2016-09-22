@@ -8,7 +8,7 @@ package org.mule.compatibility.module.cxf.transport;
 
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
+import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK;
 
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;

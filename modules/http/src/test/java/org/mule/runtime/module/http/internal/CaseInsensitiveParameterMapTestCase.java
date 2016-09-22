@@ -12,6 +12,8 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.model.ParameterMap;
+
 import org.junit.Test;
 
 public class CaseInsensitiveParameterMapTestCase extends ParameterMapTestCase {

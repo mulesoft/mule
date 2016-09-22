@@ -9,17 +9,24 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ClientSimpleFrontendTestCase extends FunctionalTestCase {
+public class ClientSimpleFrontendTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

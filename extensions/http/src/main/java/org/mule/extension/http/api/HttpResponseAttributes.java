@@ -6,7 +6,7 @@
  */
 package org.mule.extension.http.api;
 
-import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.core.model.ParameterMap;
 
 /**
  * Representation of an HTTP response message attributes.

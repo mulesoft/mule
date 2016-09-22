@@ -2,17 +2,22 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
 
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
     <spring:bean name="usernameTokenValidator" class="org.mule.runtime.module.cxf.wssec.UsernameTokenTestValidator"/>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:request-config>
 
     <flow name="cxfClient">
         <set-variable variableName="originalPayload" value="#[message.payload]" />
@@ -27,11 +32,11 @@
                 </cxf:ws-config>
             </cxf:ws-security>
         </cxf:jaxws-client>
-        <http:request path="services/greeter" method="POST" config-ref="requestConfig"/>
+        <httpn:request path="services/greeter" method="POST" config-ref="requestConfig"/>
     </flow>
 
     <flow name="greeterService">
-        <http:listener path="services/greeter" config-ref="listenerConfig"/>
+        <httpn:listener path="services/greeter" config-ref="listenerConfig"/>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.wssec.GreeterWithLatch">
             <cxf:ws-security>
                 <cxf:ws-config>

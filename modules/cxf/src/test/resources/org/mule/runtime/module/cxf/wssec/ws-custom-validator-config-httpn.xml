@@ -2,17 +2,22 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
     <spring:bean name="usernameTokenValidator" class="org.mule.runtime.module.cxf.wssec.UsernameTokenTestValidator"/>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:request-config>
 
     <flow name="cxfClient">
         <cxf:jaxws-client clientClass="org.apache.hello_world_soap_http.SOAPService" port="SoapPort"
@@ -26,14 +31,16 @@
                 </cxf:ws-config>
             </cxf:ws-security>
         </cxf:jaxws-client>
-        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" >
-            <http:success-status-code-validator values="0..599"/>
-        </http:request>
+        <httpn:request config-ref="requestConfig" path="/services/greeter" method="POST" >
+            <httpn:response-validator>
+                <httpn:success-status-code-validator values="0..599"/>
+            </httpn:response-validator>
+        </httpn:request>
 
     </flow>
 
     <flow name="greeterService">
-        <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" parseRequest="false" />
+        <httpn:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" parseRequest="false" />
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.wssec.GreeterWithLatch">
             <cxf:ws-security>
                 <cxf:ws-config>

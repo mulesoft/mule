@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
            http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+
     <flow name="helloService">
-        <http:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/hello" config-ref="listenerConfig" allowedMethods="POST" />
         <response>
             <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
         </response>
@@ -20,18 +23,21 @@
         <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
     </flow>
 
-    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:request-config>
+
     <flow name="helloServiceClient" processingStrategy="synchronous">
         <response>
             <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureAnyDataType" />
         </response>
         <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
-        <http:request config-ref="requestConfig" path="/hello" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/hello" method="POST" />
     </flow>
 
     <flow name="helloProxy">
-        <http:listener path="/hello-proxy" config-ref="listenerConfig"/>
+        <httpn:listener path="/hello-proxy" config-ref="listenerConfig"/>
         <response>
             <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
         </response>
@@ -42,11 +48,11 @@
         </response>
         <cxf:proxy-client />
         <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
-        <http:request path="/hello" method="POST" config-ref="requestConfig"/>
+        <httpn:request path="/hello" method="POST" config-ref="requestConfig"/>
     </flow>
 
     <flow name="echoService">
-        <http:listener path="/echo" config-ref="listenerConfig"/>
+        <httpn:listener path="/echo" config-ref="listenerConfig"/>
         <response>
             <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
         </response>
@@ -56,7 +62,7 @@
     </flow>
 
     <flow name="greeterService">
-        <http:listener path="greeter" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="greeter" config-ref="listenerConfig" allowedMethods="POST" />
         <response>
             <component class="org.mule.runtime.module.cxf.functional.CxfDataTypeTestCase$EnsureXmlDataType" />
         </response>

@@ -10,9 +10,10 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 
+import org.mule.extension.http.internal.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -68,11 +69,9 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
     try {
       int status = client.executeMethod(get);
       assertEquals(UNAUTHORIZED.getStatusCode(), status);
-      String expectedMessage = String.format(
-                                             "Registered authentication is set to org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter "
-                                                 + "but there was no security context on the session. Authentication denied on connector %s",
-                                             get.getURI().getURI());
-      assertThat(get.getResponseBodyAsString(), startsWith(expectedMessage));
+      assertThat(get.getResponseBodyAsString(),
+                 startsWith("Registered authentication is set to " + HttpBasicAuthenticationFilter.class.getName()
+                     + " but there was no security context on the session. Authentication denied on connector"));
     } finally {
       get.releaseConnection();
     }
@@ -93,10 +92,8 @@ public class HttpSecurityFilterFunctionalTestCase extends AbstractHttpSecurityTe
       int status = client.executeMethod(post);
       assertEquals(UNAUTHORIZED.getStatusCode(), status);
       assertThat(post.getResponseBodyAsString(),
-                 startsWith(String.format(
-                                          "Registered authentication is set to org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter "
-                                              + "but there was no security context on the session. Authentication denied on connector %s",
-                                          post.getURI().getURI())));
+                 startsWith("Registered authentication is set to " + HttpBasicAuthenticationFilter.class.getName()
+                     + " but there was no security context on the session. Authentication denied on connector"));
     } finally {
       post.releaseConnection();
     }

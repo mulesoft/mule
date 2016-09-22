@@ -6,20 +6,22 @@
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
         http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
         http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig" protocol="HTTPS" host="localhost" port="${port2}">
-        <tls:context>
-            <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
-        </tls:context>
-    </http:listener-config>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection protocol="HTTPS" host="localhost" port="${port2}">
+            <tls:context>
+                <tls:key-store path="serverKeystore" keyPassword="mulepassword" password="mulepassword"/>
+            </tls:context>
+        </httpn:listener-connection>
+    </httpn:listener-config>
 
     <spring:beans>
         <ss:authentication-manager alias="authenticationManager">
@@ -36,8 +38,8 @@
     </mule-ss:security-manager>
     
     <flow name="secure">
-        <http:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
-        <http:basic-security-filter realm="mule-realm"/>
+        <httpn:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:basic-security-filter realm="mule-realm"/>
         <cxf:simple-service serviceClass="org.mule.runtime.core.component.simple.EchoComponent"/>
 
         <echo-component/>

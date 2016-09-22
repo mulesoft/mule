@@ -8,7 +8,9 @@ package org.mule.runtime.module.cxf.functional;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
 import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
@@ -19,13 +21,18 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase {
+public class EndpointBindsToCorrectWdslPortTestCase extends ExtensionFunctionalTestCase {
 
   private static final String FLOW_HTTPN =
       "org/mule/runtime/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow-httpn.xml";
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

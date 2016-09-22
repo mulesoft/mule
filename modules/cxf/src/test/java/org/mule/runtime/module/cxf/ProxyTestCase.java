@@ -15,17 +15,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
+import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.cxf.testmodels.AsyncService;
 import org.mule.runtime.module.cxf.testmodels.AsyncServiceWithSoapAction;
@@ -40,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyTestCase extends FunctionalTestCase {
+public class ProxyTestCase extends ExtensionFunctionalTestCase {
 
   private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
       newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -60,6 +62,11 @@ public class ProxyTestCase extends FunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {
@@ -320,7 +327,7 @@ public class ProxyTestCase extends FunctionalTestCase {
     String resString = getPayloadAsString(result);
     assertFalse("Status code should not be 'OK' when the proxied endpoint returns a fault",
                 String.valueOf(OK.getStatusCode()).equals(result.getOutboundProperty("http.status")));
-    assertTrue(resString.indexOf("Fault") != -1);
+    assertThat(resString, containsString("Fault"));
   }
 
   @Test
@@ -544,19 +551,19 @@ public class ProxyTestCase extends FunctionalTestCase {
 
   protected Map<String, Serializable> prepareOneWayTestProperties() {
     Map<String, Serializable> props = new HashMap<>();
-    props.put("SOAPAction", "");
+    props.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, "");
     return props;
   }
 
   protected Map<String, Serializable> prepareOneWayWithSoapActionTestProperties() {
     Map<String, Serializable> props = new HashMap<>();
-    props.put("SOAPAction", "send");
+    props.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, "send");
     return props;
   }
 
   protected Map<String, Serializable> prepareOneWaySpoofingTestProperties() {
     Map<String, Serializable> props = new HashMap<>();
-    props.put("SOAPAction", "hiddenAction");
+    props.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, "hiddenAction");
     return props;
   }
 }

@@ -11,8 +11,6 @@ import org.mule.runtime.module.cxf.testmodels.CxfEnabledFaultMessage;
 
 import javax.jws.WebService;
 
-import org.apache.cxf.interceptor.Fault;
-
 @WebService(endpointInterface = "org.mule.runtime.module.cxf.TestServiceFault", serviceName = "TestServiceFault")
 public class TestServiceFaultImpl implements TestServiceFault {
 

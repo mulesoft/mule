@@ -8,9 +8,13 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.runtime.module.cxf.config.ProxyServiceFactoryBean;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.List;
 
@@ -18,14 +22,23 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
+import org.junit.Rule;
 import org.junit.Test;
 
-public class ConfigurationTestCase extends FunctionalTestCase {
+public class ConfigurationTestCase extends ExtensionFunctionalTestCase {
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {
     return "configuration-conf-flow-httpn.xml";
   }
+
+  @Rule
+  public DynamicPort dynamicPort1 = new DynamicPort("port1");
 
   @Test
   public void testBusConfiguration() throws Exception {

@@ -9,10 +9,13 @@ package org.mule.runtime.module.cxf.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.SystemUtils;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -30,12 +33,17 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase {
+public class ProxyServiceServingWsdlMule4092TestCase extends ExtensionFunctionalTestCase {
 
   private String expectedWsdlFileName;
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

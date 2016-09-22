@@ -7,7 +7,7 @@
 package org.mule.extension.http.internal.request.builder;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 
 /**

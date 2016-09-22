@@ -3,22 +3,29 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <custom-transformer name="throwsException" class="org.mule.runtime.module.cxf.ExceptionStrategyTestCase$CxfTransformerThrowsExceptions"/>
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-    <http:request-config name="requestConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:request-config>
 
     <!-- Test Service -->
 
     <!-- Jaxws Service with exception thrown by component with default exception strategy -->
     <flow name="FlowServiceFault">
-        <http:listener path="testServiceWithFault" config-ref="listenerConfig"/>
+        <httpn:listener path="testServiceWithFault" config-ref="listenerConfig">
+            <httpn:response-builder statusCode="#[flowVars['http.status']]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFaultImpl"/>
         <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
         <default-exception-strategy/>
@@ -26,7 +33,9 @@
 
     <!-- Jaxws Service with exception thrown by transformer with default exception strategy -->
     <flow name="FlowServiceFaultTransformerException">
-        <http:listener path="testServiceWithException" config-ref="listenerConfig"/>
+        <httpn:listener path="testServiceWithException" config-ref="listenerConfig">
+            <httpn:response-builder statusCode="#[flowVars['http.status']]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
         <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
         <transformer ref="throwsException"/>
@@ -37,13 +46,17 @@
     <!-- Test Client -->
 
     <flow name="helloFlow">
-        <http:listener path="hello" config-ref="listenerConfig"/>
+        <httpn:listener path="hello" config-ref="listenerConfig">
+            <httpn:response-builder statusCode="#[flowVars['http.status']]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl"/>
         <component class="org.mule.runtime.module.cxf.example.HelloWorldImpl" />
     </flow>
 
     <flow name="helloFault">
-        <http:listener path="helloFault" config-ref="listenerConfig"/>
+        <httpn:listener path="helloFault" config-ref="listenerConfig">
+            <httpn:response-builder statusCode="#[flowVars['http.status']]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.TestServiceFault"/>
         <component class="org.mule.runtime.module.cxf.TestServiceFaultImpl" />
     </flow>
@@ -51,9 +64,11 @@
     <flow name="FlowWithClientWithFaultDefaultException" processingStrategy="synchronous">
         <processor-chain>
             <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.TestServiceFault" operation="sayHi"/>
-            <http:request path="helloFault" method="POST" config-ref="requestConfig">
-                <http:success-status-code-validator values="0..599"/>
-            </http:request>
+            <httpn:request path="helloFault" method="POST" config-ref="requestConfig">
+                <httpn:response-validator>
+                    <httpn:success-status-code-validator values="0..599" />
+                </httpn:response-validator>
+            </httpn:request>
         </processor-chain>
         <object-to-string-transformer/>
         <append-string-transformer message="APPEND"/>
@@ -63,7 +78,7 @@
 
     <flow name="FlowWithClientAndTransformerExceptionDefaultException" processingStrategy="synchronous">
         <cxf:jaxws-client serviceClass="org.mule.runtime.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
-        <http:request path="hello" method="POST" config-ref="requestConfig"/>
+        <httpn:request path="hello" method="POST" config-ref="requestConfig"/>
         <object-to-string-transformer/>
         <append-string-transformer message="APPEND"/>
         <transformer ref="throwsException"/>
@@ -75,13 +90,15 @@
     <!-- Test Proxy -->
 
     <flow name="FlowProxyWithTransformerExceptionDefaultStrategy">
-        <http:listener path="proxyExceptionStrategy" config-ref="listenerConfig"/>
+        <httpn:listener path="proxyExceptionStrategy" config-ref="listenerConfig">
+            <httpn:response-builder statusCode="#[flowVars['http.status']]"/>
+        </httpn:listener>
         <cxf:proxy-service/>
 
         <transformer ref="throwsException"/>
 
         <cxf:proxy-client />
-        <http:request path="hello" method="POST" config-ref="requestConfig"/>
+        <httpn:request path="hello" method="POST" config-ref="requestConfig"/>
         <default-exception-strategy/>
     </flow>
 

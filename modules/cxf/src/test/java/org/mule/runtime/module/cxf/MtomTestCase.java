@@ -8,7 +8,10 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayOutputStream;
@@ -31,10 +34,15 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Broken on removing services")
-public class MtomTestCase extends FunctionalTestCase {
+public class MtomTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {
@@ -65,8 +73,8 @@ public class MtomTestCase extends FunctionalTestCase {
     File file = new File("src/test/resources/mtom-conf-service.xml");
     DataHandler dh = new DataHandler(new FileDataSource(file));
 
-    Holder<String> name = new Holder<String>("test");
-    Holder<DataHandler> info = new Holder<DataHandler>(dh);
+    Holder<String> name = new Holder<>("test");
+    Holder<DataHandler> info = new Holder<>(dh);
 
     port.testXop(name, info);
 

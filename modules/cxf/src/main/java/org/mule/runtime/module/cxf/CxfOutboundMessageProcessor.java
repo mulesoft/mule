@@ -7,27 +7,28 @@
 package org.mule.runtime.module.cxf;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
+import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.cxf.CxfConstants.OPERATION;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.CloneableMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.ExceptionHelper;
-import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.core.exception.WrapperErrorMessageAwareException;
 import org.mule.runtime.core.message.PartAttributes;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.i18n.CxfMessages;
@@ -196,7 +197,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       // Set custom soap action if set on the event or endpoint
       String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
       if (soapAction != null) {
-        props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
+        props.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
       }
 
       clientProxy.getRequestContext().putAll(props);

@@ -10,12 +10,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.extension.http.api.HttpConstants.Methods;
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
-import org.mule.runtime.module.http.api.HttpConstants.Methods;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.xml.util.XMLUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -28,7 +31,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfBasicTestCase extends FunctionalTestCase {
+public class CxfBasicTestCase extends ExtensionFunctionalTestCase {
 
   public static final MediaType APP_SOAP_XML = MediaType.create("application", "soap+xml");
 
@@ -38,6 +41,11 @@ public class CxfBasicTestCase extends FunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

@@ -12,6 +12,7 @@ import static org.mule.extension.http.api.HttpMetadataKey.MULTIPART;
 import static org.mule.extension.http.api.HttpMetadataKey.STREAM;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
@@ -23,8 +24,8 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.io.InputStream;
 import java.util.HashMap;

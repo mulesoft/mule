@@ -9,13 +9,15 @@ package org.mule.runtime.module.cxf.issues;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -33,7 +35,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyMule6829TestCase extends FunctionalTestCase {
+public class ProxyMule6829TestCase extends ExtensionFunctionalTestCase {
 
   private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
       newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -43,6 +45,11 @@ public class ProxyMule6829TestCase extends FunctionalTestCase {
 
   private Latch latch;
   private TestCxfEventCallback testCxfEventCallback;
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

@@ -8,7 +8,9 @@ package org.mule.runtime.module.cxf.wssec;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -17,12 +19,17 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UsernameTokenTestCase extends FunctionalTestCase {
+public class UsernameTokenTestCase extends ExtensionFunctionalTestCase {
 
   private Latch greetLatch;
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String[] getConfigFiles() {

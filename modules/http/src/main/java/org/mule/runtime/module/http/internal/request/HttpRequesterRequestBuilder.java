@@ -7,10 +7,10 @@
 package org.mule.runtime.module.http.internal.request;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.http.internal.HttpMessageBuilder;
 import org.mule.runtime.module.http.internal.HttpParamType;
-import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.util.List;
 

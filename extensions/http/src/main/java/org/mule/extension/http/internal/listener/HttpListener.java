@@ -15,12 +15,13 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
-import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.extension.http.internal.HttpMetadataResolver;
+import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.Error;
@@ -244,6 +245,11 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
                         .setStatusCode(attributes.getStatusCode())
                         .setReasonPhrase(attributes.getReasonPhrase());
                     attributes.getHeaders().forEach(failureResponseBuilder::addHeader);
+
+                    if (errorMessage.getPayload().getValue() == null) {
+                      errorMessage = Message.builder(errorMessage).payload(messagingException.getMessage()).build();
+                    }
+
                     exceptionEvent = Event.builder(event).message((InternalMessage) errorMessage).build();
                   } else {
                     failureResponseBuilder = createDefaultFailureResponseBuilder(messagingException);

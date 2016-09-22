@@ -7,14 +7,19 @@
 
 package org.mule.runtime.module.cxf;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.extension.http.api.HttpConstants;
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ApplicationContextBuilder;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.HttpConstants;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -32,7 +37,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase {
+public class ProxyWSDLRewriteSchemaLocationsTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public final DynamicPort httpPortProxy = new DynamicPort("portProxy");
@@ -45,13 +50,30 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase 
   private MuleContext mockServerContext;
 
   @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
+
+  @Override
   protected String getConfigFile() {
     return "wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-httpn.xml";
   }
 
   @Override
   protected void doSetUpBeforeMuleContextCreation() throws Exception {
-    ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder();
+    ApplicationContextBuilder applicationContextBuilder = new ApplicationContextBuilder() {
+
+      /**
+       * Adds a {@link ConfigurationBuilder} that sets the {@link #extensionManager} into the {@link #muleContext}. This
+       * {@link ConfigurationBuilder} is set as the first element of the {@code builders} {@link List}
+       *
+       * @param builders the list of {@link ConfigurationBuilder}s that will be used to initialise the {@link #muleContext}
+       */
+      @Override
+      protected final void addBuilders(List<ConfigurationBuilder> builders) {
+        ProxyWSDLRewriteSchemaLocationsTestCase.this.addBuilders(builders);
+      }
+    };
     applicationContextBuilder
         .setApplicationResources(new String[] {"wsdlAndXsdMockServer/proxy-wsdl-rewrite-schema-locations-conf-server-httpn.xml"});
     mockServerContext = applicationContextBuilder.build();
@@ -74,7 +96,7 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase 
             .send(proxyAddress + "?wsdl", InternalMessage.builder().nullPayload().build(), HTTP_REQUEST_OPTIONS)
             .getRight();
 
-    Set<String> expectedParametersValues = new HashSet<String>();
+    Set<String> expectedParametersValues = new HashSet<>();
     expectedParametersValues.addAll(Arrays.asList("xsd=xsd0"));
 
     List<Element> schemaImports = getSchemaImports(getWsdl(response));
@@ -83,7 +105,7 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends FunctionalTestCase 
       int parametersStart = schemaLocation.indexOf("?");
       String locationPath = schemaLocation.substring(0, parametersStart);
 
-      assertEquals(proxyAddress, locationPath);
+      assertThat(locationPath, is(proxyAddress));
 
       String queryString = schemaLocation.substring(parametersStart + 1);
       expectedParametersValues.remove(queryString);
