@@ -4,20 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.http.functional.requester;
+package org.mule.extension.http;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationFromRegistry;
-
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("MULE-10531")
 public class HttpRequestApiConfigurationTestCase extends AbstractHttpTestCase {
 
   @Override

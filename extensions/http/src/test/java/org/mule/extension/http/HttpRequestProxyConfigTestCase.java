@@ -4,14 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.test.module.http.functional.requester;
+
+package org.mule.extension.http;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getConfigurationInstanceFromRegistry;
-
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
 import org.mule.extension.http.internal.request.validator.HttpRequesterProvider;
@@ -20,7 +20,6 @@ import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.module.http.functional.AbstractHttpTestCase;
 import org.mule.test.runner.RunnerDelegateTo;
 
 import java.io.IOException;
@@ -33,7 +32,6 @@ import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
@@ -41,7 +39,6 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunnerDelegateTo(Parameterized.class)
-@Ignore("MULE-10531")
 public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
 
   private static final String PROXY_HOST = "localhost";
@@ -165,4 +162,5 @@ public class HttpRequestProxyConfigTestCase extends AbstractHttpTestCase {
       }
     }
   }
+
 }
