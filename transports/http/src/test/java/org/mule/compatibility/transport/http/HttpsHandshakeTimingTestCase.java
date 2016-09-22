@@ -50,7 +50,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
         messageReceiver.createMessageProcessTemplate(new HttpServerConnection(socket, messageReceiver.getEndpoint().getEncoding(),
                                                                               (HttpConnector) messageReceiver.getConnector()));
 
-    messageProcessTemplate.beforeRouteEvent(testEvent);
+    messageProcessTemplate.beforeRouteEvent(testEvent());
   }
 
   @Test
@@ -67,7 +67,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleContextEndpointTes
 
     messageContext.acquireMessage();
     serverConnection.readRequest();
-    Event muleEvent = messageContext.beforeRouteEvent(testEvent);
+    Event muleEvent = messageContext.beforeRouteEvent(testEvent());
     assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.LOCAL_CERTIFICATES));
     assertNotNull(muleEvent.getMessage().getOutboundProperty(HttpsConnector.PEER_CERTIFICATES));
   }

@@ -58,14 +58,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessOneWay() throws Exception {
-    Event result = messageProcessor.process(testEvent);
+    Event result = messageProcessor.process(testEvent());
 
     assertThat(latch.await(10000, TimeUnit.MILLISECONDS), is(true));
     assertThat(target.sensedEvent, notNullValue());
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
-    assertNotSame(testEvent, target.sensedEvent);
-    assertEquals(testEvent.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
+    assertNotSame(testEvent(), target.sensedEvent);
+    assertEquals(testEvent().getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
     assertSame(VoidMuleEvent.getInstance(), result);
     assertNull(exceptionThrown);
@@ -77,14 +77,14 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
 
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event result = messageProcessor.process(testEvent);
+    Event result = messageProcessor.process(testEvent());
 
     latch.await(10000, TimeUnit.MILLISECONDS);
     assertNotNull(target.sensedEvent);
     // Event is not the same because it gets copied in
     // AbstractMuleEventWork#run()
-    assertNotSame(testEvent, target.sensedEvent);
-    assertEquals(testEvent.getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
+    assertNotSame(testEvent(), target.sensedEvent);
+    assertEquals(testEvent().getMessageAsString(muleContext), target.sensedEvent.getMessageAsString(muleContext));
 
     assertSame(VoidMuleEvent.getInstance(), result);
     assertNull(exceptionThrown);
@@ -100,7 +100,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      messageProcessor.process(testEvent);
+      messageProcessor.process(testEvent());
       fail("Exception expected");
     } catch (Exception e) {
       assertTrue(e instanceof MessagingException);
@@ -116,7 +116,7 @@ public class AsyncDelegateMessageProcessorTestCase extends AbstractMuleContextTe
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      assertAsync(messageProcessor, testEvent);
+      assertAsync(messageProcessor, testEvent());
       fail("Exception expected");
     } catch (Exception e) {
     } finally {

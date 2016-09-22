@@ -160,8 +160,9 @@ public class CompositeConverterTestCase extends AbstractMuleTestCase {
     TransformationService transformationService = mock(TransformationService.class);
     doReturn(transformationService).when(muleContext).getTransformationService();
 
-    compositeConverter.process(testEvent);
+    compositeConverter.process(testEvent());
 
-    verify(transformationService, times(1)).applyTransformers(eq(testEvent.getMessage()), eq(testEvent), eq(compositeConverter));
+    verify(transformationService, times(1)).applyTransformers(eq(testEvent().getMessage()), eq(testEvent()),
+                                                              eq(compositeConverter));
   }
 }

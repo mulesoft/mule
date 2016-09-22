@@ -50,7 +50,7 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
   public void staticHeisenbergWasInjected() throws Exception {
     assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
     HeisenbergExtension heisenberg =
-        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, testEvent, muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, testEvent(), muleContext);
     assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
   }
 

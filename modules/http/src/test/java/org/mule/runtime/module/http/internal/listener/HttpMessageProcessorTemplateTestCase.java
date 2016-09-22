@@ -129,7 +129,7 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
   private Event createMockEvent() throws Exception {
     when(muleContext.getTransformationService().transform(any(InternalMessage.class), any(DataType.class)))
         .thenReturn(InternalMessage.builder().payload("".getBytes(UTF_8)).build());
-    return spy(this.testEvent);
+    return spy(this.testEvent());
   }
 
 }

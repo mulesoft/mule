@@ -256,13 +256,27 @@ public abstract class AbstractMuleTestCase {
     }
   }
 
-  protected Event testEvent;
-  protected Event nullPayloadEvent;
+  private Event _testEvent;
+  private Event _nullPayloadEvent;
 
-  @Before
-  public void buildTestEvent() throws MuleException {
-    testEvent = eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
-    nullPayloadEvent = eventBuilder().message(InternalMessage.builder().nullPayload().build()).build();
+  protected Event testEvent() throws MuleException {
+    if (_testEvent == null) {
+      _testEvent = eventBuilder().message(InternalMessage.of(TEST_PAYLOAD)).build();
+    }
+    return _testEvent;
+  }
+
+  protected Event nullPayloadEvent() throws MuleException {
+    if (_nullPayloadEvent == null) {
+      _nullPayloadEvent = eventBuilder().message(InternalMessage.builder().nullPayload().build()).build();
+    }
+    return _nullPayloadEvent;
+  }
+
+  @After
+  public void clearTestEvents() throws MuleException {
+    _testEvent = null;
+    _nullPayloadEvent = null;
   }
 
   @AfterClass

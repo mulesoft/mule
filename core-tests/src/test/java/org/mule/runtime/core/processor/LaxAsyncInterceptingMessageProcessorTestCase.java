@@ -20,7 +20,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessRequestResponse() throws Exception {
-    assertSync(messageProcessor, testEvent);
+    assertSync(messageProcessor, testEvent());
   }
 
   @Override
@@ -30,7 +30,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      assertSync(messageProcessor, testEvent);
+      assertSync(messageProcessor, testEvent());
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
@@ -43,7 +43,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      assertSync(messageProcessor, testEvent);
+      assertSync(messageProcessor, testEvent());
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(transaction);
     }

@@ -53,27 +53,27 @@ public class HttpRequestFunctionalTestCase extends AbstractHttpRequestTestCase {
   @Test
   public void requestConfigDefaultPortHttp() throws Exception {
     ConfigurationInstance config =
-        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent, muleContext);
+        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTP_REQUEST_CONFIG_NAME, testEvent(), muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
-    assertThat(provider.getPort().apply(testEvent), is(HTTP.getDefaultPort()));
+    assertThat(provider.getPort().apply(testEvent()), is(HTTP.getDefaultPort()));
   }
 
   @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultPortHttps() throws Exception {
     ConfigurationInstance config =
-        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
+        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
-    assertThat(provider.getPort().apply(testEvent), is(HTTPS.getDefaultPort()));
+    assertThat(provider.getPort().apply(testEvent()), is(HTTPS.getDefaultPort()));
   }
 
   @Ignore("MULE-10531")
   @Test
   public void requestConfigDefaultTlsContextHttps() throws Exception {
     ConfigurationInstance config =
-        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent, muleContext);
+        getConfigurationInstanceFromRegistry(DEFAULT_PORT_HTTPS_REQUEST_CONFIG_NAME, testEvent(), muleContext);
     ConnectionProviderWrapper providerWrapper = (ConnectionProviderWrapper) config.getConnectionProvider().get();
     HttpRequesterProvider provider = (HttpRequesterProvider) providerWrapper.getDelegate();
     assertThat(provider.getTlsContext(), notNullValue());

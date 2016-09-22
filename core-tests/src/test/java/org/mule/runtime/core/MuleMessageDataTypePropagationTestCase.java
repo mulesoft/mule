@@ -257,7 +257,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
   @Test
   public void setsDefaultFlowVariableDataType() throws Exception {
-    Event muleEvent = Event.builder(testEvent).addVariable(TEST_PROPERTY, TEST_PAYLOAD).build();
+    Event muleEvent = Event.builder(testEvent()).addVariable(TEST_PROPERTY, TEST_PAYLOAD).build();
 
     assertVariableDataType(muleEvent, STRING);
   }
@@ -266,25 +266,25 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public void setsCustomFlowVariableDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    Event muleEvent = Event.builder(testEvent).addVariable(TEST_PROPERTY, TEST_PAYLOAD, dataType).build();
+    Event muleEvent = Event.builder(testEvent()).addVariable(TEST_PROPERTY, TEST_PAYLOAD, dataType).build();
 
     assertVariableDataType(muleEvent, dataType);
   }
 
   @Test
   public void setsDefaultSessionVariableDataType() throws Exception {
-    testEvent.getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD);
+    testEvent().getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD);
 
-    assertSessionVariableDataType(testEvent, STRING);
+    assertSessionVariableDataType(testEvent(), STRING);
   }
 
   @Test
   public void setsCustomSessionVariableDataType() throws Exception {
     DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
 
-    testEvent.getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD, dataType);
+    testEvent().getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD, dataType);
 
-    assertSessionVariableDataType(testEvent, dataType);
+    assertSessionVariableDataType(testEvent(), dataType);
   }
 
   @Test

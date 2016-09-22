@@ -34,14 +34,14 @@ public class PetStoreThreadingProfileTestCase extends ExtensionFunctionalTestCas
   @Test
   public void customThreadingProfile() throws Exception {
     PetStoreConnector connector =
-        ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile", testEvent, muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry("customThreadingProfile", testEvent(), muleContext);
     assertThreadingProfile(connector.getThreadingProfile());
   }
 
   @Test
   public void noThreadingProfile() throws Exception {
     PetStoreConnector connector =
-        ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile", testEvent, muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry("noThreadingProfile", testEvent(), muleContext);
     assertThat(connector.getThreadingProfile(), is(nullValue()));
   }
 

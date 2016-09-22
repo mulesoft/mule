@@ -53,14 +53,13 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
   protected void doAssignmentDataTypePropagationTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    final Builder builder = Event.builder(testEvent);
-    CompiledExpression compiledExpression = compileMelExpression(expression, testEvent, builder);
-    testEvent = builder.build();
+    final Builder builder = Event.builder(testEvent());
+    CompiledExpression compiledExpression = compileMelExpression(expression, testEvent(), builder);
+    Event event = builder.build();
+    dataTypePropagator.propagate(event, builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
+    event = builder.build();
 
-    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
-    testEvent = builder.build();
-
-    assertThat(getVariableDataType(testEvent), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(getVariableDataType(event), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
   protected void doInnerAssignmentDataTypePropagationTest(String expression) throws Exception {
@@ -68,17 +67,17 @@ public abstract class AbstractVarAssignmentDataTypePropagatorTestCase extends Ab
 
     final Map<String, String> propertyValue = new HashMap<>();
     propertyValue.put(INNER_PROPERTY_NAME, TEST_MESSAGE);
-    testEvent = setVariable(testEvent, propertyValue, expectedDataType);
+    Event event = setVariable(testEvent(), propertyValue, expectedDataType);
 
-    final Builder builder = Event.builder(testEvent);
-    CompiledExpression compiledExpression = compileMelExpression(expression, testEvent, builder);
-    testEvent = builder.build();
+    final Builder builder = Event.builder(event);
+    CompiledExpression compiledExpression = compileMelExpression(expression, event, builder);
+    event = builder.build();
 
     // Attempts to propagate a different dataType, which should be ignored
-    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue<>(propertyValue, DataType.STRING), compiledExpression);
-    testEvent = builder.build();
+    dataTypePropagator.propagate(event, builder, new DefaultTypedValue<>(propertyValue, DataType.STRING), compiledExpression);
+    event = builder.build();
 
-    assertThat(getVariableDataType(testEvent), like(Map.class, UNKNOWN, CUSTOM_ENCODING));
+    assertThat(getVariableDataType(event), like(Map.class, UNKNOWN, CUSTOM_ENCODING));
   }
 
   protected abstract DataType getVariableDataType(Event event);

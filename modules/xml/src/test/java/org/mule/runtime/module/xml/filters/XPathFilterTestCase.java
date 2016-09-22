@@ -83,8 +83,8 @@ public class XPathFilterTestCase extends AbstractMuleTestCase {
       }
     };
 
-    Builder builder = Event.builder(nullPayloadEvent);
-    assertFalse("shouldn't accept a message if no payload is set.", filter.accept(nullPayloadEvent, builder));
+    Builder builder = Event.builder(nullPayloadEvent());
+    assertFalse("shouldn't accept a message if no payload is set.", filter.accept(nullPayloadEvent(), builder));
 
     Event event = eventBuilder().message(InternalMessage.of(new Object())).build();
     filter.setPattern("/some/pattern = null");

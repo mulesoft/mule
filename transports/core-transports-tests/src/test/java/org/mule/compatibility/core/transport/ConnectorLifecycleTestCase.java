@@ -370,7 +370,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     // attempts to send/dispatch/request are made on a stopped/stopping connector
     // This should fail because the connector is not started!
     try {
-      out.process(testEvent);
+      out.process(testEvent());
       fail("cannot send on a connector that is not started");
     } catch (MessagingException e) {
       // expected
@@ -388,7 +388,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     OutboundEndpoint out2 =
         getTestOutboundEndpoint("out2", "test://out2?exchangePattern=request-response", null, null, null, connector);
     // This causes the first instance out2 dispatcher to be created
-    out2.process(testEvent);
+    out2.process(testEvent());
 
     // At this point there should be two idle, but the build server reports one, I suspect its a timing issues
     assertEquals(2, connector.dispatchers.getNumIdle());
@@ -408,7 +408,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     assertDispatcherStartedConnected(out, true, true);
     assertDispatcherStartedConnected(out2, true, true);
 
-    out.process(testEvent);
+    out.process(testEvent());
     assertEquals(2, connector.dispatchers.getNumIdle());
     assertDispatcherStartedConnected(out, true, true);
 

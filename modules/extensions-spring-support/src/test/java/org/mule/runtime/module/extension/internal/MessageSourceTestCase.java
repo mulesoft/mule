@@ -72,7 +72,7 @@ public class MessageSourceTestCase extends ExtensionFunctionalTestCase {
   }
 
   private HeisenbergExtension locateConfig() throws Exception {
-    return (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", testEvent).getValue();
+    return (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", testEvent()).getValue();
   }
 
   private void startFlow(String flowName) throws Exception {

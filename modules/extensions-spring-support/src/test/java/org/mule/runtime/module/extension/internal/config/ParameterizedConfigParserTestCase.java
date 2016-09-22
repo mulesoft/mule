@@ -106,7 +106,7 @@ public class ParameterizedConfigParserTestCase extends AbstractConfigParserTestC
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
     Event event = getHeisenbergEvent();
-    Event anotherEvent = testEvent;
+    Event anotherEvent = testEvent();
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
     assertThat(config, is(sameInstance(anotherConfig)));

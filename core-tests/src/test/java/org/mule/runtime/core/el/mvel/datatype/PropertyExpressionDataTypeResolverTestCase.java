@@ -55,9 +55,9 @@ public class PropertyExpressionDataTypeResolverTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    testEvent.getSession().setProperty("foo", EXPRESSION_VALUE, expectedDataType);
+    testEvent().getSession().setProperty("foo", EXPRESSION_VALUE, expectedDataType);
 
-    assertThat(expressionDataTypeResolver.resolve(testEvent, compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(expressionDataTypeResolver.resolve(testEvent(), compiledExpression), like(String.class, JSON, CUSTOM_ENCODING));
   }
 
 }

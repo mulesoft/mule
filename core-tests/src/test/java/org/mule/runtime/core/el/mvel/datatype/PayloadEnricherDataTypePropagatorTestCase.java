@@ -51,10 +51,11 @@ public class PayloadEnricherDataTypePropagatorTestCase extends AbstractMuleConte
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression(expression, new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    final Builder builder = Event.builder(testEvent);
-    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
-    testEvent = builder.build();
+    final Builder builder = Event.builder(testEvent());
+    dataTypePropagator.propagate(testEvent(), builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType),
+                                 compiledExpression);
+    final Event event = builder.build();
 
-    assertThat(testEvent.getMessage().getPayload().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
+    assertThat(event.getMessage().getPayload().getDataType(), like(String.class, JSON, CUSTOM_ENCODING));
   }
 }

@@ -68,14 +68,14 @@ public class ExpressionFunctionValueResolverTestCase extends AbstractMuleContext
     assertExpressionFunction(function, 321);
   }
 
-  private void assertExpressionFunction(Function<Event, Integer> function, Object value) {
+  private void assertExpressionFunction(Function<Event, Integer> function, Object value) throws MuleException {
     assertThat(function, is(not(nullValue())));
-    Integer apply = function.apply(testEvent);
+    Integer apply = function.apply(testEvent());
     assertThat(apply, is(value));
   }
 
   public <T> Function<Event, T> getResolvedFunction(String expression, MetadataType type) throws MuleException {
-    return new ExpressionFunctionValueResolver<T>(expression, type, muleContext).resolve(testEvent);
+    return new ExpressionFunctionValueResolver<T>(expression, type, muleContext).resolve(testEvent());
   }
 
 }

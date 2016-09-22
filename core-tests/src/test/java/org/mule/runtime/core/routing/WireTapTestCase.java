@@ -34,33 +34,33 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testWireTapNoFilter() throws Exception {
-    Event primaryOutput = wireTap.process(testEvent);
+    Event primaryOutput = wireTap.process(testEvent());
 
-    assertSame(testEvent, primaryOutput);
+    assertSame(testEvent(), primaryOutput);
 
     assertNotNull(tapListener.event);
-    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(testEvent.getMessage().getPayload().getValue()));
+    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(testEvent().getMessage().getPayload().getValue()));
   }
 
   @Test
   public void testWireTapFilterAccepted() throws Exception {
     wireTap.setFilter((message, builder) -> true);
 
-    Event primaryOutput = wireTap.process(testEvent);
+    Event primaryOutput = wireTap.process(testEvent());
 
-    assertSame(testEvent, primaryOutput);
+    assertSame(testEvent(), primaryOutput);
 
     assertNotNull(tapListener.event);
-    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(testEvent.getMessage().getPayload().getValue()));
+    assertThat(tapListener.event.getMessage().getPayload().getValue(), equalTo(testEvent().getMessage().getPayload().getValue()));
   }
 
   @Test
   public void testWireTapFilterUnaccepted() throws Exception {
     wireTap.setFilter((message, builder) -> false);
 
-    Event primaryOutput = wireTap.process(testEvent);
+    Event primaryOutput = wireTap.process(testEvent());
 
-    assertSame(testEvent, primaryOutput);
+    assertSame(testEvent(), primaryOutput);
 
     assertNull(tapListener.event);
   }
@@ -69,9 +69,9 @@ public class WireTapTestCase extends AbstractMuleContextTestCase {
   public void testWireTapNullTap() throws Exception {
     wireTap.setTap(null);
 
-    Event primaryOutput = wireTap.process(testEvent);
+    Event primaryOutput = wireTap.process(testEvent());
 
-    assertSame(testEvent, primaryOutput);
+    assertSame(testEvent(), primaryOutput);
   }
 
 }

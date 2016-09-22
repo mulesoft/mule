@@ -125,7 +125,7 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void size() throws Exception {
-    assertValid("#[validator.validateSize('John', 0, 4)]", testEvent);
+    assertValid("#[validator.validateSize('John', 0, 4)]", testEvent());
     assertInvalid("#[validator.validateSize(payload, 1, 4)]",
                   eventBuilder().message(InternalMessage.of(ImmutableList.of())).build());
   }
@@ -133,17 +133,17 @@ public class ValidationElTestCase extends AbstractMuleContextTestCase {
   @Test
   public void notNull() throws Exception {
     final String expression = "#[validator.isNotNull(payload)]";
-    assertValid(expression, testEvent);
+    assertValid(expression, testEvent());
 
-    assertInvalid(expression, nullPayloadEvent);
+    assertInvalid(expression, nullPayloadEvent());
   }
 
   @Test
   public void isNull() throws Exception {
     final String expression = "#[validator.isNull(payload)]";
-    assertValid(expression, nullPayloadEvent);
+    assertValid(expression, nullPayloadEvent());
 
-    assertInvalid(expression, testEvent);
+    assertInvalid(expression, testEvent());
   }
 
   @Test

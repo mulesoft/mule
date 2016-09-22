@@ -57,10 +57,10 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    testEvent.getSession().setProperty("foo", "bar");
+    testEvent().getSession().setProperty("foo", "bar");
 
-    final Builder builder = Event.builder(testEvent);
-    dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
+    final Builder builder = Event.builder(testEvent());
+    dataTypePropagator.propagate(testEvent(), builder, new DefaultTypedValue(TEST_MESSAGE, expectedDataType), compiledExpression);
 
     assertThat(builder.build().getSession().getPropertyDataType("foo"), like(String.class, JSON, CUSTOM_ENCODING));
   }
