@@ -229,7 +229,7 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
                                          ExtensionParsingContext parsingContext) {
     Optional<DslElementSyntax> dslElement = dslSyntaxResolver.resolve(parameterType);
     if (!dslElement.isPresent() ||
-      parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getNamespace())) {
+        parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getNamespace())) {
       return;
     }
 
@@ -239,8 +239,8 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
       public void visitObject(ObjectType objectType) {
         DslElementSyntax pojoDsl = dslElement.get();
         if (pojoDsl.supportsTopLevelDeclaration() ||
-          (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped()) ||
-          parsingContext.getAllSubTypes().contains(objectType)) {
+            (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped()) ||
+            parsingContext.getAllSubTypes().contains(objectType)) {
 
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
                                                   parsingContext, muleContext));

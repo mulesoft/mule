@@ -124,7 +124,8 @@ final class ObjectTypeSchemaDelegate {
                                       ExplicitGroup all) {
 
     DslElementSyntax typeDsl = builder.getDslResolver().resolve(metadataType)
-      .orElseThrow(()-> new IllegalArgumentException(format("The given type [%s] is not eligible for Import", getId(metadataType))));
+        .orElseThrow(() -> new IllegalArgumentException(format("The given type [%s] is not eligible for Import",
+                                                               getId(metadataType))));
 
     if (paramDsl.isWrapped()) {
 
@@ -133,7 +134,8 @@ final class ObjectTypeSchemaDelegate {
       objectElement.setAnnotation(builder.createDocAnnotation(description));
 
       if (typeDsl.isWrapped()) {
-        objectElement.getComplexType().setSequence(builder.createTypeRefChoiceLocalOrGlobal(typeDsl, metadataType, ZERO, UNBOUNDED));
+        objectElement.getComplexType()
+            .setSequence(builder.createTypeRefChoiceLocalOrGlobal(typeDsl, metadataType, ZERO, UNBOUNDED));
 
       } else {
         ExplicitGroup sequence = new ExplicitGroup();
@@ -165,7 +167,8 @@ final class ObjectTypeSchemaDelegate {
   private LocalComplexType createComplexTypeWithAbstractElementRef(MetadataType type) {
 
     DslElementSyntax typeDsl = builder.getDslResolver().resolve(type).orElseThrow(
-      () -> new IllegalArgumentException(format("No element ref can be created for the given type [%s]", getId(type))));
+                                                                                  () -> new IllegalArgumentException(format("No element ref can be created for the given type [%s]",
+                                                                                                                            getId(type))));
 
     LocalComplexType complexType = new LocalComplexType();
     if (typeDsl.isWrapped()) {
@@ -382,7 +385,8 @@ final class ObjectTypeSchemaDelegate {
     return substitutionGroup;
   }
 
-  private void createGlobalMuleExtensionAbstractElement(QName typeQName, DslElementSyntax typeDsl, Optional<DslElementSyntax> baseDsl) {
+  private void createGlobalMuleExtensionAbstractElement(QName typeQName, DslElementSyntax typeDsl,
+                                                        Optional<DslElementSyntax> baseDsl) {
     QName globalSubGroup;
     if (baseDsl.isPresent()) {
       DslElementSyntax base = baseDsl.get();

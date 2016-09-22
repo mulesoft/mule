@@ -73,8 +73,8 @@ class CollectionSchemaDelegate {
       @Override
       public void visitObject(ObjectType objectType) {
         DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType)
-          .orElseThrow(()-> new IllegalArgumentException(format("The given type [%s] cannot be represented as a collection item",
-                                                                getId(objectType))));
+            .orElseThrow(() -> new IllegalArgumentException(format("The given type [%s] cannot be represented as a collection item",
+                                                                   getId(objectType))));
 
         if (typeDsl.isWrapped()) {
           ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(typeDsl, objectType, ZERO, UNBOUNDED);

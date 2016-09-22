@@ -66,7 +66,7 @@ abstract class ExecutableTypeSchemaDelegate {
   }
 
   protected ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base,
-                                       DslElementSyntax dslSyntax) {
+                                                 DslElementSyntax dslSyntax) {
     TopLevelComplexType complexType = new TopLevelComplexType();
     complexType.setName(name);
 
@@ -122,7 +122,7 @@ abstract class ExecutableTypeSchemaDelegate {
   private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs) {
     QName ref = MULE_MESSAGE_PROCESSOR_TYPE;
     TypeRestrictionModelProperty restrictionCapability =
-      parameterModel.getModelProperty(TypeRestrictionModelProperty.class).orElse(null);
+        parameterModel.getModelProperty(TypeRestrictionModelProperty.class).orElse(null);
     if (restrictionCapability != null) {
       ref = getSubstitutionGroup(restrictionCapability.getType());
       ref = new QName(ref.getNamespaceURI(), getGroupName(ref.getLocalPart()), ref.getPrefix());

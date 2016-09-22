@@ -92,7 +92,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     final ExpressionSupport expressionSupport = getExpressionSupport(fieldType);
 
     Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(fieldName);
-    if (!fieldDsl.isPresent() && !isParameterGroup(objectField)){
+    if (!fieldDsl.isPresent() && !isParameterGroup(objectField)) {
       throw new IllegalArgumentException(format("The field [%s] does not belong to the structure of [%s]", fieldName, name));
     }
 
@@ -139,17 +139,19 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(), emptySet());
+        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                                 emptySet());
       }
 
       @Override
       public void visitDictionary(DictionaryType dictionaryType) {
-        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(), emptySet());
+        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                           emptySet());
       }
     });
   }
 
-  private boolean isParameterGroup(ObjectFieldType type){
+  private boolean isParameterGroup(ObjectFieldType type) {
     return type.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
   }
 }

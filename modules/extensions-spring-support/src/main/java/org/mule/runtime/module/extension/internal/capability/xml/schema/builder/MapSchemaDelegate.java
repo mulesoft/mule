@@ -99,8 +99,8 @@ final class MapSchemaDelegate {
 
         if (shouldGenerateChildElement) {
           DslElementSyntax typeDsl = builder.getDslResolver().resolve(objectType).orElseThrow(
-            ()-> new IllegalArgumentException(format("The given type [%s] cannot be represented as a child element in Map entries",
-                                                     getId(objectType))));
+                                                                                              () -> new IllegalArgumentException(format("The given type [%s] cannot be represented as a child element in Map entries",
+                                                                                                                                        getId(objectType))));
 
           if (typeDsl.isWrapped()) {
             ExplicitGroup choice = builder.createTypeRefChoiceLocalOrGlobal(typeDsl, objectType, ZERO, UNBOUNDED);
