@@ -23,6 +23,14 @@ import java.util.Map;
 public class EmailBuilder {
 
   /**
+   * The "From" sender address. The person that is going to send the messages,
+   * if not set, it defaults to the from address specified in the config.
+   */
+  @Optional
+  @Parameter
+  private String fromAddress;
+
+  /**
    * The recipient addresses of "To" (primary) type.
    */
   @Parameter
@@ -50,25 +58,11 @@ public class EmailBuilder {
   private List<String> replyToAddresses;
 
   /**
-   * The headers that this email carry.
-   */
-  @Optional
-  @Parameter
-  private Map<String, String> headers;
-
-  /**
    * The subject of the email.
    */
   @Optional(defaultValue = "[No Subject]")
   @Parameter
   private String subject;
-
-  /**
-   * the attachments bounded to be sent with the email.
-   */
-  @Optional
-  @Parameter
-  private List<EmailAttachment> attachments;
 
   /**
    * the text body of the email.
@@ -78,12 +72,18 @@ public class EmailBuilder {
   private EmailBody body;
 
   /**
-   * The "From" sender address. The person that is going to send the messages,
-   * if not set, it defaults to the from address specified in the config.
+   * the attachments bounded to be sent with the email.
    */
   @Optional
   @Parameter
-  private String fromAddress;
+  private List<EmailAttachment> attachments;
+
+  /**
+   * The headers that this email carry.
+   */
+  @Optional
+  @Parameter
+  private Map<String, String> headers;
 
   /**
    * Creates a new instance.

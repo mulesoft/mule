@@ -11,9 +11,6 @@
                 <email:to-addresses>
                     <email:to-address value="pablo.musumeci@mulesoft.com"/>
                 </email:to-addresses>
-                <email:body contentType="text/plain">
-                    <email:content>Email Content</email:content>
-                </email:body>
                 <email:cc-addresses>
                     <email:cc-address value="pablo.musumeci@mulesoft.com"/>
                 </email:cc-addresses>
@@ -21,6 +18,9 @@
                     <email:bcc-address value="esteban.wasinger@mulesoft.com"/>
                     <email:bcc-address value="alejandro.g.marra@mulesoft.com"/>
                 </email:bcc-addresses>
+                <email:body contentType="text/plain">
+                    <email:content>Email Content</email:content>
+                </email:body>
                 <email:attachments>
                     <email:email-attachment content="#[app.registry.jsonAttachmentResource.getURL()]" id="json-attachment"/>
                     <email:email-attachment content="#['This is the email text attachment']" id="text-attachment"
