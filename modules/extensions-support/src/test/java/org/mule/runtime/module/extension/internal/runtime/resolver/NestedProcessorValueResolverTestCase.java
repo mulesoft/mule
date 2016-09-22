@@ -34,7 +34,8 @@ public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTes
 
   @Before
   public void before() throws Exception {
-    when(messageProcessor.process(any(Event.class))).thenReturn(testEvent());
+    final Event testEvent = testEvent();
+    when(messageProcessor.process(any(Event.class))).thenReturn(testEvent);
   }
 
   @Test
