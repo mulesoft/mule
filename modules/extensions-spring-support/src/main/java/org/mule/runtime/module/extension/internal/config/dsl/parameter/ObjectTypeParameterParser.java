@@ -96,7 +96,6 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
       throw new IllegalArgumentException(format("The field [%s] does not belong to the structure of [%s]", fieldName, name));
     }
 
-    //final DslElementSyntax childDsl = fieldDslDeclaration.get();
     fieldType.accept(new MetadataTypeVisitor() {
 
       @Override

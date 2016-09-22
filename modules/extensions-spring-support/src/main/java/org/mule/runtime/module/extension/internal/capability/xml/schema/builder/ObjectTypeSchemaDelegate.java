@@ -320,7 +320,6 @@ final class ObjectTypeSchemaDelegate {
       return;
     }
 
-    //registerPojoComplexType(type, baseType, description);
     QName typeQName = getTypeQName(typeDsl, type);
     TopLevelElement abstractElement = registerAbstractElement(typeQName, typeDsl, baseType);
     if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped()) ||
