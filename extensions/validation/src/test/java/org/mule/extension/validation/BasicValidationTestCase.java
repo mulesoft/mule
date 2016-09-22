@@ -91,7 +91,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
   }
 
   private FlowRunner configureTimeRunner(FlowRunner runner, String time, String pattern) {
-    return runner.withPayload(time).withFlowVariable("pattern", pattern);
+    return runner.withPayload(time).withVariable("pattern", pattern);
   }
 
   @Test
@@ -99,13 +99,13 @@ public class BasicValidationTestCase extends ValidationTestCase {
     final String regex = "[tT]rue";
 
     FlowRunner runner =
-        flowRunner("matchesRegex").withPayload("true").withFlowVariable("regexp", regex).withFlowVariable("caseSensitive", false);
+        flowRunner("matchesRegex").withPayload("true").withVariable("regexp", regex).withVariable("caseSensitive", false);
     assertValid(runner);
 
     String testValue = "TRUE";
     assertValid(runner.withPayload(testValue));
 
-    assertInvalid(runner.withFlowVariable("caseSensitive", true), messages.regexDoesNotMatch(testValue, regex));
+    assertInvalid(runner.withVariable("caseSensitive", true), messages.regexDoesNotMatch(testValue, regex));
 
     testValue = "tTrue";
     assertInvalid(runner.withPayload(testValue), messages.regexDoesNotMatch(testValue, regex));
@@ -238,12 +238,12 @@ public class BasicValidationTestCase extends ValidationTestCase {
   }
 
   private void assertCustomValidator(String flowName, String customMessage, String expectedMessage) throws Exception {
-    Exception e = flowRunner(flowName).withPayload("").withFlowVariable("customMessage", customMessage).runExpectingException();
+    Exception e = flowRunner(flowName).withPayload("").withVariable("customMessage", customMessage).runExpectingException();
     assertThat(e.getCause().getMessage(), is(expectedMessage));
   }
 
   private void cofigureGetAllRunner(FlowRunner runner, String email, String url) {
-    runner.withPayload("").withFlowVariable("url", url).withFlowVariable(EMAIL_VALIDATION_FLOW, email);
+    runner.withPayload("").withVariable("url", url).withVariable(EMAIL_VALIDATION_FLOW, email);
   }
 
   private void assertInvalidEmail(String address) throws Exception {
@@ -272,7 +272,7 @@ public class BasicValidationTestCase extends ValidationTestCase {
 
   private FlowRunner configureSizeValidationRunner(FlowRunner runner, Object value, int minLength, int maxLength)
       throws Exception {
-    runner.withPayload(value).withFlowVariable("minLength", minLength).withFlowVariable("maxLength", maxLength);
+    runner.withPayload(value).withVariable("minLength", minLength).withVariable("maxLength", maxLength);
 
     return runner;
   }

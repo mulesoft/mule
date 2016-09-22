@@ -7,9 +7,10 @@
 package org.mule.runtime.module.xml.transformers.xml.xquery;
 
 import static java.lang.Runtime.getRuntime;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
@@ -17,7 +18,10 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.object.SingletonObjectFactory;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.xml.transformer.XQueryTransformer;
 import org.mule.tck.MuleTestUtils;
@@ -64,7 +68,8 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
   @Test
   public void testParallelTransformation() throws Exception {
     final Transformer transformer = getTransformer();
-    final Flow testFlow = MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_FLOW, muleContext, false, muleContext);
+    final Flow testFlow = new Flow(MuleTestUtils.APPLE_FLOW, muleContext);
+    testFlow.setMessageProcessors(singletonList(new DefaultJavaComponent(new SingletonObjectFactory(muleContext))));
 
     long startTime = System.currentTimeMillis();
 
@@ -73,7 +78,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCa
         try {
           setCurrentEvent(Event.builder(DefaultEventContext.create(testFlow, TEST_CONNECTOR))
               .message(InternalMessage.builder().payload("test").build()).exchangePattern(REQUEST_RESPONSE).flow(testFlow)
-              .session(getTestSession(testFlow, muleContext)).build());
+              .session(new DefaultMuleSession()).build());
         } catch (Exception e1) {
           e1.printStackTrace();
           return;

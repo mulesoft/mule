@@ -114,7 +114,7 @@ public class DynamicRoundRobinTestCase extends DynamicRouterTestCase {
     FlowRunner runner = flowRunner(flowName).withPayload(TEST_MESSAGE);
     if (flowVars != null) {
       for (String key : flowVars.keySet()) {
-        runner = runner.withFlowVariable(key, flowVars.get(key));
+        runner = runner.withVariable(key, flowVars.get(key));
       }
     }
     Event response = runner.run();

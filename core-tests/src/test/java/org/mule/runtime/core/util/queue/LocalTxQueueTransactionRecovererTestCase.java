@@ -12,18 +12,19 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
-import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionJournal;
 import org.mule.runtime.core.util.journal.queue.LocalTxQueueTransactionRecoverer;
 import org.mule.runtime.core.util.xa.ResourceManagerException;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -31,7 +32,6 @@ import org.junit.rules.TemporaryFolder;
 public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContextTestCase {
 
   public static final String QUEUE_NAME = "inQueue";
-  public static final String MESSAGE_CONTENT = "data";
   private static final int TIMEOUT = 10;
 
   @Rule
@@ -60,7 +60,6 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
 
   @Test
   public void pollAndFailThenRecover() throws Exception {
-    Event testEvent = getTestEvent(MESSAGE_CONTENT);
     inQueue.offer(testEvent, 0, TIMEOUT);
     Serializable value = persistentTransactionContext.poll(inQueue, 100000);
     assertThat(inQueue.poll(TIMEOUT), nullValue());
@@ -76,9 +75,8 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
 
   @Test
   public void pollAndFailThenRecoverWithTwoElements() throws Exception {
-    final String MESSAGE_CONTENT_2 = MESSAGE_CONTENT + "2";
-    Event testEvent = getTestEvent(MESSAGE_CONTENT);
-    Event testEvent2 = getTestEvent(MESSAGE_CONTENT_2);
+    final String MESSAGE_CONTENT_2 = TEST_PAYLOAD + "2";
+    Event testEvent2 = eventBuilder().message(InternalMessage.of(MESSAGE_CONTENT_2)).build();
 
     inQueue.offer(testEvent, 0, TIMEOUT);
     inQueue.offer(testEvent2, 0, TIMEOUT);
@@ -95,12 +93,11 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
 
     muleEvent = (Event) inQueue.poll(TIMEOUT);
     assertThat(muleEvent, notNullValue());
-    assertThat(muleEvent.getMessage().getPayload().getValue().toString(), is(MESSAGE_CONTENT)); // recovered element
+    assertThat(muleEvent.getMessage().getPayload().getValue().toString(), is(TEST_PAYLOAD)); // recovered element
   }
 
   @Test
   public void failBetweenLogEntryWriteAndRealPoolThenRecover() throws Exception {
-    Event testEvent = getTestEvent(MESSAGE_CONTENT);
     inQueue.offer(testEvent, 0, TIMEOUT);
     persistentTransactionContext.poll(inQueue, TIMEOUT);
     txLog.close();
@@ -132,7 +129,6 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
   public void offerAndFailThenRecover() throws Exception {
     final DefaultQueueStore outQueue = new DefaultQueueStore(QUEUE_NAME, muleContext, new DefaultQueueConfiguration(0, true));
     persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(outQueue));
-    Event testEvent = getTestEvent(MESSAGE_CONTENT);
     persistentTransactionContext.offer(outQueue, testEvent, TIMEOUT);
     assertThat(outQueue.poll(TIMEOUT), nullValue());
     txLog.close();
@@ -148,7 +144,6 @@ public class LocalTxQueueTransactionRecovererTestCase extends AbstractMuleContex
     txLog = new TestTransactionLogger(temporaryFolder.getRoot().getAbsolutePath(), muleContext).failDuringLogCommit();
     final DefaultQueueStore outQueue = new DefaultQueueStore(QUEUE_NAME, muleContext, new DefaultQueueConfiguration(0, true));
     persistentTransactionContext = new PersistentQueueTransactionContext(txLog, createQueueProvider(outQueue));
-    Event testEvent = getTestEvent(MESSAGE_CONTENT);
     persistentTransactionContext.offer(outQueue, testEvent, TIMEOUT);
     try {
       persistentTransactionContext.doCommit();

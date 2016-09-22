@@ -38,7 +38,7 @@ public class WireTapCxfTestCase extends AbstractIntegrationTestCase {
         + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 
     MuleClient client = muleContext.getClient();
-    InternalMessage response = client.send(url, getTestMuleMessage(msg), newOptions().method(POST.name()).build()).getRight();
+    InternalMessage response = client.send(url, InternalMessage.of(msg), newOptions().method(POST.name()).build()).getRight();
     assertNotNull(response);
 
     String responseString = getPayloadAsString(response);

@@ -12,9 +12,10 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,7 +50,7 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
   public void staticHeisenbergWasInjected() throws Exception {
     assertCorrectProviderInjected(STATIC_HEISENBERG, dependent.getStaticHeisenberg());
     HeisenbergExtension heisenberg =
-        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, getTestEvent(""), muleContext);
+        ExtensionsTestUtils.getConfigurationFromRegistry(STATIC_HEISENBERG, testEvent, muleContext);
     assertThat(heisenberg.getPersonalInfo().getAge(), is(50));
   }
 
@@ -58,7 +59,7 @@ public class ExtensionAsInjectedDependenciesTestCase extends ExtensionFunctional
     assertCorrectProviderInjected(DYNAMIC_AGE_HEISENBERG, dependent.getDynamicAgeHeisenberg());
 
     final int age = 52;
-    Event event = Event.builder(getTestEvent("")).addVariable("age", age).build();
+    Event event = eventBuilder().message(InternalMessage.of("")).addVariable("age", age).build();
 
     HeisenbergExtension heisenberg = ExtensionsTestUtils.getConfigurationFromRegistry(DYNAMIC_AGE_HEISENBERG, event, muleContext);
     assertThat(heisenberg.getPersonalInfo().getAge(), is(age));

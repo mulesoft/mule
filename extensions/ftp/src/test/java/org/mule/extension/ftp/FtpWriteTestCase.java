@@ -114,7 +114,7 @@ public class FtpWriteTestCase extends FtpConnectorTestCase {
 
     testHarness.write(filePath, "overwrite me!");
 
-    Event event = flowRunner("readAndWrite").withFlowVariable("path", filePath).run();
+    Event event = flowRunner("readAndWrite").withVariable("path", filePath).run();
 
     assertThat(event.getMessageAsString(muleContext), equalTo(HELLO_WORLD));
   }

@@ -86,8 +86,8 @@ public class HttpRequestPathsTestCase extends AbstractHttpRequestTestCase {
   }
 
   private void assertRequestUri(String flowName, String basePath, String requestPath, String expectedUri) throws Exception {
-    flowRunner(flowName).withPayload(TEST_MESSAGE).withFlowVariable("basePath", basePath)
-        .withFlowVariable("requestPath", requestPath).run();
+    flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("basePath", basePath)
+        .withVariable("requestPath", requestPath).run();
     assertThat(uri, equalTo(expectedUri));
   }
 }

@@ -12,9 +12,10 @@ import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_STATUS_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.security.MuleCredentials;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -38,7 +39,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase {
   @Test
   public void testAuthenticationFailureNoContext() throws Exception {
     org.mule.runtime.core.api.client.MuleClient client = muleContext.getClient();
-    InternalMessage m = client.send(getUrl(), getTestMuleMessage()).getRight();
+    InternalMessage m = client.send(getUrl(), InternalMessage.of(TEST_PAYLOAD)).getRight();
     assertNotNull(m);
     int status = m.getInboundProperty(HTTP_STATUS_PROPERTY, -1);
     assertEquals(UNAUTHORIZED.getStatusCode(), status);

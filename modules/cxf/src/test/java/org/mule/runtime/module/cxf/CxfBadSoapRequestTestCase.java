@@ -47,7 +47,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase {
             + "<request xmlns=\"http://www.muleumo.org\">Bad Request</request>" + "</ssss>" + "</soap:Body>" + "</soap:Envelope>";
 
     InternalMessage reply = client.send("http://localhost:" + dynamicPort.getNumber() + "/services/TestComponent",
-                                        getTestMuleMessage(soapRequest), HTTP_REQUEST_OPTIONS)
+                                        InternalMessage.of(soapRequest), HTTP_REQUEST_OPTIONS)
         .getRight();
 
     assertNotNull(reply);

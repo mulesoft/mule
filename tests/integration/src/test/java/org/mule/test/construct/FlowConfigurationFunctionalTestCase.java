@@ -20,10 +20,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.functional.junit4.TransactionConfigEnum.ACTION_NONE;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -109,8 +110,12 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     TestSimpleMessageSource source1 = (TestSimpleMessageSource) sources.get(0);
     TestSimpleMessageSource source2 = (TestSimpleMessageSource) sources.get(1);
 
-    assertEquals("01xyz", getPayloadAsString(source1.fireEvent(getTestEvent("0")).getMessage()));
-    assertEquals("01xyz", getPayloadAsString(source2.fireEvent(getTestEvent("0")).getMessage()));
+    assertEquals("01xyz", getPayloadAsString(source1.fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("0"))
+        .build()).getMessage()));
+    assertEquals("01xyz", getPayloadAsString(source2.fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("0"))
+        .build()).getMessage()));
   }
 
   @Test
@@ -542,7 +547,9 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("customMessageSource");
     TestMessageSource source = (TestMessageSource) flow.getMessageSource();
 
-    Event result = source.fireEvent(getTestEvent("a"));
+    Event result = source.fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("a"))
+        .build());
     assertEquals("abcd", result.getMessageAsString(muleContext));
   }
 
@@ -552,7 +559,9 @@ public class FlowConfigurationFunctionalTestCase extends AbstractIntegrationTest
     CompositeMessageSource compositeSource = (CompositeMessageSource) flow.getMessageSource();
     TestMessageSource source = (TestMessageSource) compositeSource.getSources().get(0);
 
-    Event result = source.fireEvent(getTestEvent("a"));
+    Event result = source.fireEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of("a"))
+        .build());
     assertEquals("abcd", result.getMessageAsString(muleContext));
   }
 

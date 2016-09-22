@@ -33,15 +33,13 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
   @Test
   public void testMuleMessageCollectionMerge() throws Exception {
-    Event event = getTestEvent("hello");
-
     List list = new ArrayList<>();
     list.add(InternalMessage.builder().collectionPayload(new String[] {"1", "2", "3"}).build());
     list.add(InternalMessage.builder().payload("4").build());
     list.add(InternalMessage.builder().collectionPayload(new String[] {"5", "6", "7"}).build());
     InternalMessage collection = InternalMessage.builder().collectionPayload(list, InternalMessage.class).build();
 
-    event = Event.builder(event).message(collection).build();
+    Event event = Event.builder(testEvent).message(collection).build();
 
     Event response = merger.process(event);
 
@@ -51,13 +49,12 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTe
 
   @Test
   public void testMuleMessageMerge() throws Exception {
-    Event event = getTestEvent("hello");
-
     List<Object> payload = new ArrayList<>();
     payload.add(Arrays.asList("1", "2", "3"));
     payload.add("4");
     payload.add(Arrays.asList("5", "6", "7"));
-    event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(payload).build()).build();
+    Event event =
+        Event.builder(testEvent).message(InternalMessage.builder(testEvent.getMessage()).payload(payload).build()).build();
 
     Event response = merger.process(event);
 

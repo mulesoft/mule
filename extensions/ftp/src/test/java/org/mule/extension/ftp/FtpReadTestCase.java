@@ -75,7 +75,7 @@ public class FtpReadTestCase extends FtpConnectorTestCase {
 
   @Test
   public void readWithForcedMimeType() throws Exception {
-    Event event = flowRunner("readWithForcedMimeType").withFlowVariable("path", HELLO_PATH).run();
+    Event event = flowRunner("readWithForcedMimeType").withVariable("path", HELLO_PATH).run();
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getPrimaryType(), equalTo("test"));
     assertThat(event.getMessage().getPayload().getDataType().getMediaType().getSubType(), equalTo("test"));
   }

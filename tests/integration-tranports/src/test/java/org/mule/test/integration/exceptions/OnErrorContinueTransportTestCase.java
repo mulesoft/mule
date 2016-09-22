@@ -6,6 +6,7 @@
  */
 package org.mule.test.integration.exceptions;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
@@ -13,8 +14,8 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
@@ -28,7 +29,6 @@ import javax.jws.WebService;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,13 +74,13 @@ public class OnErrorContinueTransportTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).tlsContextFactory(tlsContextFactory).responseTimeout(TIMEOUT).build();
-    InternalMessage response = client.send(endpointUri, getTestMuleMessage(JSON_REQUEST), httpRequestOptions).getRight();
+    InternalMessage response = client.send(endpointUri, InternalMessage.of(JSON_REQUEST), httpRequestOptions).getRight();
     assertThat(response, IsNull.<Object>notNullValue());
     // compare the structure and values but not the attributes' order
     ObjectMapper mapper = new ObjectMapper();
     JsonNode actualJsonNode = mapper.readTree(getPayloadAsString(response));
     JsonNode expectedJsonNode = mapper.readTree(JSON_RESPONSE);
-    assertThat(actualJsonNode, Is.is(expectedJsonNode));
+    assertThat(actualJsonNode, is(expectedJsonNode));
   }
 
   public static final String MESSAGE = "some message";

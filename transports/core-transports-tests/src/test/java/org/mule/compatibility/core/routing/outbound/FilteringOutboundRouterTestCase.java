@@ -13,14 +13,15 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.outbound.EndpointMulticastingRouter;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -68,19 +69,19 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     assertEquals(filter, router.getFilter());
 
     InternalMessage message = InternalMessage.builder().payload("test event").build();
+    Event event = eventBuilder().message(message).build();
 
-    assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
+    assertTrue(router.isMatch(event, mock(Event.Builder.class)));
 
     when(mockEndpoint.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer());
     MuleSession session = mock(MuleSession.class);
-    Flow flow = getTestFlow();
-    router.route(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow)
-        .session(session).build());
+    router.route(eventBuilder().message(message).session(session).build());
 
     // Test with transform
     message = InternalMessage.builder().payload(new Exception("test event")).build();
+    event = eventBuilder().message(message).build();
 
-    assertTrue(!router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
+    assertTrue(!router.isMatch(event, mock(Event.Builder.class)));
 
     router.setTransformers(Arrays.<Transformer>asList(new AbstractTransformer() {
 
@@ -90,7 +91,8 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
       }
     }));
 
-    assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
+    event = eventBuilder().message(message).build();
+    assertTrue(router.isMatch(event, mock(Event.Builder.class)));
   }
 
   @Test
@@ -113,7 +115,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     assertEquals(filter, router.getFilter());
 
     InternalMessage message = InternalMessage.builder().payload("test event").build();
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
     Event event = Event.builder(context).message(message).flow(flow).build();
     when(mockEndpoint.process(any(Event.class))).thenAnswer(new MuleEventCheckAnswer(event));
@@ -143,11 +145,9 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleContextEndpoint
     Map<String, Serializable> m = new HashMap<>();
     m.put("barValue", "bar");
     InternalMessage message = InternalMessage.builder().payload("test event").outboundProperties(m).build();
-    Flow flow = getTestFlow();
-    final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
-    Event event = Event.builder(context).message(message).flow(flow).build();
+    Event event = eventBuilder().message(message).build();
 
-    assertTrue(router.isMatch(getTestEvent(message), mock(Event.Builder.class)));
+    assertTrue(router.isMatch(eventBuilder().message(message).build(), mock(Event.Builder.class)));
     OutboundEndpoint ep = (OutboundEndpoint) router.getRoute(0, event);
     // MULE-2690: assert that templated targets are not mutated
     assertNotSame(endpoint1, ep);

@@ -37,7 +37,7 @@ public class ProxyWithValidationTestCase extends FunctionalTestCase {
   @Test
   public void acceptsRequestWithCData() throws Exception {
     InternalMessage response = muleContext.getClient().send("http://localhost:" + httpPort.getNumber() + "/services/Echo",
-                                                            getTestMuleMessage(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS)
+                                                            InternalMessage.of(SAMPLE_REQUEST), HTTP_REQUEST_OPTIONS)
         .getRight();
 
     assertTrue(getPayloadAsString(response).contains("bla"));

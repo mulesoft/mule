@@ -9,23 +9,23 @@ package org.mule.compatibility.core;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.MuleRegistry;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.MessageFilter;
 import org.mule.runtime.core.routing.filters.PayloadTypeFilter;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
-import org.mule.tck.MuleEndpointTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -38,8 +38,6 @@ import org.junit.Test;
 
 
 public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
-
-  private static final String TEST_PAYLOAD = "anyValuePayload";
 
   @Test
   public void testEventSerialization() throws Exception {
@@ -103,12 +101,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
 
   private Event createEventToSerialize() throws Exception {
     createAndRegisterTransformersEndpointBuilderService();
-    InboundEndpoint endpoint = getEndpointFactory().getInboundEndpoint(
-                                                                       MuleEndpointTestUtils
-                                                                           .lookupEndpointBuilder(muleContext.getRegistry(),
-                                                                                                  "epBuilderTest"));
-    Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("appleService");
-    return getTestEvent(TEST_PAYLOAD);
+    return testEvent;
   }
 
   @Test
@@ -118,7 +111,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     for (int i = 0; i < 108; i++) {
       payload.append("1234567890");
     }
-    Event testEvent = getTestEvent(new ByteArrayInputStream(payload.toString().getBytes()));
+    Event testEvent = eventBuilder().message(InternalMessage.of(new ByteArrayInputStream(payload.toString().getBytes()))).build();
     setCurrentEvent(testEvent);
     byte[] serializedEvent = muleContext.getObjectSerializer().serialize(testEvent);
     testEvent = muleContext.getObjectSerializer().deserialize(serializedEvent);
@@ -147,7 +140,7 @@ public class MuleEventTestCase extends AbstractMuleContextEndpointTestCase {
     endpointBuilder.addMessageProcessor(new MessageFilter(filter));
     registerEndpointBuilder(muleContext.getRegistry(), "epBuilderTest", endpointBuilder);
 
-    getTestFlow();
+    getTestFlow(muleContext);
   }
 
   private static class TestEventTransformer extends AbstractTransformer {

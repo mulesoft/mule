@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -41,7 +42,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void filterShouldAcceptStringInput() throws Exception {
-    Event event = getTestEvent(EXPECTED_JSON, muleContext);
+    Event event = eventBuilder().message(InternalMessage.of(EXPECTED_JSON)).build();
     Builder builder = Event.builder(event);
     boolean accepted = filter.accept(event, builder);
     assertTrue(accepted);
@@ -50,7 +51,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void filterShouldAcceptReaderInput() throws Exception {
-    Event event = getTestEvent(new StringReader(EXPECTED_JSON), muleContext);
+    Event event = eventBuilder().message(InternalMessage.of(new StringReader(EXPECTED_JSON))).build();
     Builder builder = Event.builder(event);
     boolean accepted = filter.accept(event, builder);
     assertTrue(accepted);
@@ -59,7 +60,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void filterShouldAcceptByteArrayInput() throws Exception {
-    Event event = getTestEvent(EXPECTED_JSON.getBytes(), muleContext);
+    Event event = eventBuilder().message(InternalMessage.of(EXPECTED_JSON.getBytes())).build();
     Builder builder = Event.builder(event);
     boolean accepted = filter.accept(event, builder);
     assertTrue(accepted);
@@ -68,7 +69,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void filterShouldAcceptInputStreamInput() throws Exception {
-    Event event = getTestEvent(new ByteArrayInputStream(EXPECTED_JSON.getBytes()), muleContext);
+    Event event = eventBuilder().message(InternalMessage.of(new ByteArrayInputStream(EXPECTED_JSON.getBytes()))).build();
     Builder builder = Event.builder(event);
     boolean accepted = filter.accept(event, builder);
     assertTrue(accepted);
@@ -77,7 +78,7 @@ public class JsonSchemaJsonValidationTestCase extends AbstractMuleContextTestCas
 
   @Test
   public void filterShouldNotAcceptInvalidJson() throws Exception {
-    Event event = getTestEvent(BAD_JSON, muleContext);
+    Event event = eventBuilder().message(InternalMessage.of(BAD_JSON)).build();
     boolean accepted = filter.accept(event, Event.builder(event));
     assertFalse(accepted);
   }

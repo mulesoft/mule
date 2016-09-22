@@ -63,7 +63,7 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
       throws Exception {
     configureResourceResponsesForRefreshToken(oauthConfigName, userId, failureStatusCode);
 
-    final Event result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
+    final Event result = flowRunner(flowName).withPayload("message").withVariable("userId", userId).run();
     assertThat(getPayloadAsString(result.getMessage()), is(RESOURCE_RESULT));
 
     wireMockRule.verify(postRequestedFor(urlEqualTo(TOKEN_PATH))
@@ -90,7 +90,7 @@ public class AbstractAuthorizationCodeRefreshTokenConfigTestCase extends Abstrac
   }
 
   private Event runFlow(String flowName, String userId) throws Exception {
-    final Event result = flowRunner(flowName).withPayload("message").withFlowVariable("userId", userId).run();
+    final Event result = flowRunner(flowName).withPayload("message").withVariable("userId", userId).run();
     return result;
   }
 

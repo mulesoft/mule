@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultEventContext;
@@ -27,7 +28,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextEndpoint
 
   @Test
   public void testIdempotentReceiver() throws Exception {
-    Flow flow2 = getTestFlow();
+    Flow flow2 = getTestFlow(muleContext);
     Flow flow = flow2;
 
     MuleSession session = mock(MuleSession.class);

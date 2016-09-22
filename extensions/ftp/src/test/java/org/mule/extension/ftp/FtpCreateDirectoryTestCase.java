@@ -53,6 +53,6 @@ public class FtpCreateDirectoryTestCase extends FtpConnectorTestCase {
   }
 
   private void doCreateDirectory(String directory) throws Exception {
-    flowRunner("createDirectory").withFlowVariable("directory", directory).run();
+    flowRunner("createDirectory").withVariable("directory", directory).run();
   }
 }

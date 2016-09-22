@@ -8,10 +8,13 @@ package org.mule.runtime.core.mule.model;
 
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.DefaultMuleEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.model.InvocationResult;
 import org.mule.runtime.core.model.resolvers.MethodHeaderPropertyEntryPointResolver;
@@ -110,10 +113,13 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextT
   }
 
   private MuleEventContext createMuleEventContext(Object payload, Map<String, Serializable> inboundProperties) throws Exception {
-    return new DefaultMuleEventContext(getTestFlow(),
-                                       getTestEvent(InternalMessage.builder().payload(payload)
-                                           .inboundProperties(inboundProperties)
-                                           .build()));
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
+    return new DefaultMuleEventContext(flowConstruct,
+                                       Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR))
+                                           .message(InternalMessage.builder().payload(payload)
+                                               .inboundProperties(inboundProperties)
+                                               .build())
+                                           .build());
   }
 
   public static class TestFruitCleaner {

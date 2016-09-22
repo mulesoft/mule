@@ -17,18 +17,19 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageDispatcher;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MessageRequester;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -271,7 +272,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
   @Test
   public void testReceiversLifecycle() throws Exception {
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     flow.start();
     try {
       connector.registerListener(getTestInboundEndpoint("in", "test://in"), getSensingNullMessageProcessor(), flow);
@@ -321,7 +322,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
   @Test
   public void testReceiversServiceLifecycle() throws Exception {
-    Flow flow = MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_SERVICE, muleContext, false);
+    final Flow flow = new Flow(MuleTestUtils.APPLE_SERVICE, muleContext);
     InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
     flow.setMessageSource(endpoint);
     connector = (TestConnector) endpoint.getConnector();
@@ -369,7 +370,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     // attempts to send/dispatch/request are made on a stopped/stopping connector
     // This should fail because the connector is not started!
     try {
-      out.process(getTestEvent("data"));
+      out.process(testEvent);
       fail("cannot send on a connector that is not started");
     } catch (MessagingException e) {
       // expected
@@ -387,7 +388,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     OutboundEndpoint out2 =
         getTestOutboundEndpoint("out2", "test://out2?exchangePattern=request-response", null, null, null, connector);
     // This causes the first instance out2 dispatcher to be created
-    out2.process(getTestEvent("data"));
+    out2.process(testEvent);
 
     // At this point there should be two idle, but the build server reports one, I suspect its a timing issues
     assertEquals(2, connector.dispatchers.getNumIdle());
@@ -407,7 +408,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
     assertDispatcherStartedConnected(out, true, true);
     assertDispatcherStartedConnected(out2, true, true);
 
-    out.process(getTestEvent("data"));
+    out.process(testEvent);
     assertEquals(2, connector.dispatchers.getNumIdle());
     assertDispatcherStartedConnected(out, true, true);
 
@@ -607,7 +608,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleContextEndpointTestC
 
     InboundEndpoint in = getTestInboundEndpoint("out", "test://out", null, null, null, connector);
 
-    connector.registerListener(in, getSensingNullMessageProcessor(), getTestFlow());
+    connector.registerListener(in, getSensingNullMessageProcessor(), getTestFlow(muleContext));
 
     assertThat(connector.isConnected(), is(false));
     assertThat(actuallyConnected.get(), is(false));

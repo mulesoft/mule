@@ -162,7 +162,7 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
   public void testHttpAlwaysRollbackUsingMuleClient() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage response =
-        client.send(format("http://localhost:%s", dynamicPort1.getNumber()), getTestMuleMessage(JSON_REQUEST),
+        client.send(format("http://localhost:%s", dynamicPort1.getNumber()), InternalMessage.of(JSON_REQUEST),
                     newOptions().disableStatusCodeValidation().responseTimeout(TIMEOUT).build())
             .getRight();
     assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(500));
@@ -185,12 +185,12 @@ public class OnErrorPropagateTestCase extends FunctionalTestCase {
     final HttpRequestOptions httpRequestOptions =
         newOptions().method(POST.name()).disableStatusCodeValidation().responseTimeout(TIMEOUT).build();
     for (int i = 1; i <= EXPECTED_SHORT_DELIVERED_TIMES; i++) {
-      response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), getTestMuleMessage(MESSAGE),
+      response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), InternalMessage.of(MESSAGE),
                              httpRequestOptions)
           .getRight();
       assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(500));
     }
-    response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), getTestMuleMessage(MESSAGE),
+    response = client.send(format("http://localhost:%s", dynamicPort2.getNumber()), InternalMessage.of(MESSAGE),
                            httpRequestOptions)
         .getRight();
     assertThat(response.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(200));

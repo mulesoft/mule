@@ -11,10 +11,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -48,8 +46,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     final InternalMessage message =
         InternalMessage.builder().payload(new NonSerializable()).addOutboundProperty("foo", "bar").build();
 
-    Flow flow = getTestFlow();
-    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
+    setCurrentEvent(eventBuilder().message(message).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
     assertTrue(deserializedMessage.getPayload().getValue() instanceof byte[]);
@@ -60,8 +57,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   public void testStreamPayloadSerialization() throws Exception {
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
     final InternalMessage message = InternalMessage.builder().payload(stream).addOutboundProperty("foo", "bar").build();
-    Flow flow = getTestFlow();
-    setCurrentEvent(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).build());
+    setCurrentEvent(eventBuilder().message(message).build());
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
     assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());

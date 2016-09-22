@@ -13,6 +13,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.core.api.component.LifecycleAdapter;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
@@ -52,7 +54,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase {
     PooledJavaComponent component = new PooledJavaComponent(getDefaultObjectFactory(), createDefaultPoolingProfile());
     assertNull(component.lifecycleAdapterPool);
 
-    component.setFlowConstruct(getTestFlow());
+    component.setFlowConstruct(getTestFlow(muleContext));
     component.setMuleContext(muleContext);
     component.initialise();
     assertNull(component.lifecycleAdapterPool);
@@ -252,7 +254,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase {
   private PooledJavaComponent createPooledComponent(PoolingProfile poolingProfile, ObjectFactory objectFactory) throws Exception {
     PooledJavaComponent component = new PooledJavaComponent(objectFactory, poolingProfile);
     component.setMuleContext(muleContext);
-    component.setFlowConstruct(getTestFlow());
+    component.setFlowConstruct(getTestFlow(muleContext));
     component.initialise();
     component.start();
     return component;

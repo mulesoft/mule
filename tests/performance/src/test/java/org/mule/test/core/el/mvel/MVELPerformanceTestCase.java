@@ -7,8 +7,8 @@
 package org.mule.test.core.el.mvel;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
@@ -49,7 +49,7 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   public void before() throws Exception {
     ((MVELExpressionLanguage) muleContext.getExpressionLanguage()).setAutoResolveVariables(false);
     event = createMuleEvent();
-    flow = getTestFlow();
+    flow = getTestFlow(muleContext);
     // Warmup
     for (int i = 0; i < 5000; i++) {
       muleContext.getExpressionLanguage().evaluate(mel, event, flow);
@@ -102,14 +102,11 @@ public class MVELPerformanceTestCase extends AbstractMuleContextTestCase {
   }
 
   protected Event createMuleEvent() {
-    Flow flow;
     try {
-      flow = getTestFlow();
+      return eventBuilder().message(InternalMessage.builder().payload(payload).build()).exchangePattern(ONE_WAY).build();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    return Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(payload).build()).exchangePattern(ONE_WAY).flow(flow).build();
   }
 
 }

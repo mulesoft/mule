@@ -16,8 +16,8 @@ import org.mule.functional.functional.FunctionalTestComponent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ResolverException;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
@@ -153,7 +153,8 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void redelivery() throws Exception {
-    MessageRedeliveredException exception = new MessageRedeliveredException("3", 1, 1, getTestEvent("0"), mockMP);
+    MessageRedeliveredException exception =
+        new MessageRedeliveredException("3", 1, 1, eventBuilder().message(InternalMessage.of("0")).build(), mockMP);
     callTypeAndThrowException(exception, "0 redelivery");
   }
 
@@ -167,7 +168,7 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
   private void callTypeAndThrowException(Exception exception, String expectedMessage) throws Exception {
     InternalMessage response = flowRunner("matchesHandlerUsingType")
         .withPayload("0")
-        .withFlowVariable("exception", exception)
+        .withVariable("exception", exception)
         .run()
         .getMessage();
     assertThat(getPayloadAsString(response), is(expectedMessage));

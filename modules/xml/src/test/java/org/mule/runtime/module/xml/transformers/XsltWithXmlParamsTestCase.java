@@ -29,7 +29,7 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase {
   @Test
   public void xmlSourceParam() throws Exception {
     Event event = flowRunner("xmlSourceParam").withPayload(XMLTestUtils.toSource("simple.xml"))
-        .withFlowVariable("xml", XMLTestUtils.toSource("test.xml")).run();
+        .withVariable("xml", XMLTestUtils.toSource("test.xml")).run();
 
     assertExpected(event);
   }
@@ -37,7 +37,7 @@ public class XsltWithXmlParamsTestCase extends FunctionalTestCase {
   @Test
   public void xmlStringParam() throws Exception {
     Event event = flowRunner("xmlStringParam").withPayload(XMLTestUtils.toSource("simple.xml"))
-        .withFlowVariable("xml", XMLTestUtils.toSource("test.xml")).run();
+        .withVariable("xml", XMLTestUtils.toSource("test.xml")).run();
 
     assertExpected(event);
   }

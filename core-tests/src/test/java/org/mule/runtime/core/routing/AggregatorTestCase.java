@@ -21,6 +21,7 @@ import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.correlation.EventCorrelatorCallback;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -37,8 +38,8 @@ public class AggregatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testMessageAggregator() throws Exception {
-    Flow flow = getTestFlow("test", Apple.class);
-    MuleSession session = getTestSession(flow, muleContext);
+    Flow flow = getTestFlowWithComponent("test", Apple.class);
+    MuleSession session = new DefaultMuleSession();
 
     TestEventAggregator router = new TestEventAggregator(3);
     router.setMuleContext(muleContext);

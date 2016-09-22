@@ -10,17 +10,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.routing.AsynchronousUntilSuccessfulProcessingStrategy.buildQueueKey;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.api.store.ObjectStoreException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.test.AbstractIntegrationTestCase;
@@ -74,11 +73,9 @@ public class PersistentStore6007TestCase extends AbstractIntegrationTestCase {
 
     static void addEvents() throws Exception {
       for (String str : new String[] {"A", "B", "C"}) {
-        Flow flow = getTestFlow();
-        Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-            .message(InternalMessage.builder().payload(str).build()).exchangePattern(ONE_WAY).flow(flow)
+        Event event = eventBuilder().message(InternalMessage.builder().payload(str).build()).exchangePattern(ONE_WAY)
             .session(new DefaultMuleSession()).build();
-        events.put(buildQueueKey(event, getTestFlow(), muleContext), event);
+        events.put(buildQueueKey(event, getTestFlow(muleContext), muleContext), event);
       }
     }
 

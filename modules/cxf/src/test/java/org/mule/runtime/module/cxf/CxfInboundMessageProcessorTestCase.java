@@ -9,6 +9,7 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -42,9 +43,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     };
     processor.setListener(messageProcessor);
 
-    Event event = getTestEvent(msg);
-
-    Event response = processor.process(event);
+    Event response = processor.process(eventBuilder().message(InternalMessage.of(msg)).build());
 
     Object payload = response.getMessage().getPayload().getValue();
     assertTrue(payload instanceof OutputHandler);
@@ -65,9 +64,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     };
     processor.setListener(messageProcessor);
 
-    Event event = getTestEvent(msg);
-
-    Event response = processor.process(event);
+    Event response = processor.process(eventBuilder().message(InternalMessage.of(msg)).build());
 
     assertTrue(gotEvent);
     assertNull(response);
@@ -83,7 +80,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestC
     builder.setConfiguration(config);
     builder.setServiceClass(Echo.class);
     builder.setMuleContext(muleContext);
-    builder.setFlowConstruct(getTestFlow());
+    builder.setFlowConstruct(getTestFlow(muleContext));
 
     CxfInboundMessageProcessor processor = builder.build();
     processor.initialise();

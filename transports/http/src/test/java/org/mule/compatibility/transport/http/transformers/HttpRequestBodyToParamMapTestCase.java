@@ -17,6 +17,7 @@ import static org.mule.compatibility.transport.http.HttpConstants.FORM_URLENCODE
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_GET;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_POST;
 import static org.mule.compatibility.transport.http.HttpConstants.METHOD_PUT;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -58,7 +59,7 @@ public class HttpRequestBodyToParamMapTestCase extends AbstractMuleContextTestCa
     when(transformationService.transform(any(InternalMessage.class), any(DataType.class)))
         .thenAnswer(inv -> (InternalMessage) inv.getArguments()[0]);
 
-    flow = getTestFlow();
+    flow = getTestFlow(muleContext);
     context = DefaultEventContext.create(flow, TEST_CONNECTOR);
   }
 

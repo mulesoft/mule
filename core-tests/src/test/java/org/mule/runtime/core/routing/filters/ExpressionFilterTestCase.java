@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
@@ -38,9 +39,8 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
   public void testVariableFilterEL() throws Exception {
     ExpressionFilter filter = new ExpressionFilter("flowVars['foo']=='bar'");
     filter.setMuleContext(muleContext);
-    Event event = getTestEvent("blah");
-    assertTrue(!filter.accept(event, mock(Event.Builder.class)));
-    event = Event.builder(event).addVariable("foo", "bar").build();
+    assertTrue(!filter.accept(testEvent, mock(Event.Builder.class)));
+    Event event = Event.builder(testEvent).addVariable("foo", "bar").build();
     assertTrue(filter.accept(event, mock(Event.Builder.class)));
   }
 
@@ -63,10 +63,8 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     ExpressionFilter filter = new ExpressionFilter("flowVars['foo']!='bar'");
     filter.setMuleContext(muleContext);
 
-    Event event = getTestEvent("blah");
-
-    assertTrue(filter.accept(event, mock(Event.Builder.class)));
-    event = Event.builder(event).addVariable("foo", "bar").build();
+    assertTrue(filter.accept(testEvent, mock(Event.Builder.class)));
+    Event event = Event.builder(testEvent).addVariable("foo", "bar").build();
     assertTrue(!filter.accept(event, mock(Event.Builder.class)));
     event = Event.builder(event).addVariable("foo", "car").build();
     assertTrue(filter.accept(event, mock(Event.Builder.class)));
@@ -95,10 +93,8 @@ public class ExpressionFilterTestCase extends AbstractMuleContextTestCase {
     ExpressionFilter filter = new ExpressionFilter("flowVars['foo']!=null");
     filter.setMuleContext(muleContext);
 
-    Event event = getTestEvent("blah");
-
-    assertTrue(!filter.accept(event, mock(Event.Builder.class)));
-    event = Event.builder(event).message(removeProperty(event.getMessage())).build();
+    assertTrue(!filter.accept(testEvent, mock(Event.Builder.class)));
+    Event event = Event.builder(testEvent).message(removeProperty(testEvent.getMessage())).build();
     assertTrue(!filter.accept(event, mock(Event.Builder.class)));
     event = Event.builder(event).addVariable("foo", "car").build();
     assertTrue(filter.accept(event, mock(Event.Builder.class)));

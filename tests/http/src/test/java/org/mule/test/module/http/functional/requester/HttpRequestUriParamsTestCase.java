@@ -29,8 +29,8 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendsUriParamsFromList() throws Exception {
-    flowRunner("uriParamList").withPayload(TEST_MESSAGE).withFlowVariable("paramName", "testParam2")
-        .withFlowVariable("paramValue", "testValue2").run();
+    flowRunner("uriParamList").withPayload(TEST_MESSAGE).withVariable("paramName", "testParam2")
+        .withVariable("paramValue", "testValue2").run();
     assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
   }
 
@@ -39,7 +39,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
     Map<String, String> params = new HashMap<>();
     params.put("testParam1", "testValue1");
     params.put("testParam2", "testValue2");
-    flowRunner("uriParamMap").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
+    flowRunner("uriParamMap").withPayload(TEST_MESSAGE).withVariable("params", params).run();
 
     assertThat(uri, equalTo("/testPath/testValue1/testValue2"));
   }
@@ -49,7 +49,7 @@ public class HttpRequestUriParamsTestCase extends AbstractHttpRequestTestCase {
     Map<String, String> params = new HashMap<>();
     params.put("testParam1", "testValueNew");
     params.put("testParam2", "testValue2");
-    flowRunner("uriParamOverride").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
+    flowRunner("uriParamOverride").withPayload(TEST_MESSAGE).withVariable("params", params).run();
 
     assertThat(uri, equalTo("/testPath/testValueNew/testValue2"));
   }

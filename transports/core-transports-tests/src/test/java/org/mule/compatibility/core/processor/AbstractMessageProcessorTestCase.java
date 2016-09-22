@@ -9,6 +9,7 @@ package org.mule.compatibility.core.processor;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
@@ -22,16 +23,16 @@ import org.mule.compatibility.core.endpoint.EndpointAware;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.MessageExchangePattern;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.SecurityNotificationListener;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.filter.Filter;
 import org.mule.runtime.core.api.security.SecurityFilter;
@@ -44,6 +45,7 @@ import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.routing.MessageFilter;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
@@ -125,10 +127,9 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
   }
 
   protected Event createTestInboundEvent(InboundEndpoint endpoint) throws Exception {
-    Flow flow = getTestFlow();
-    final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build()).flow(flow)
-        .session(getTestSession(null, muleContext)).build();
+    final Event event = eventBuilder()
+        .message(InternalMessage.builder().payload(TEST_MESSAGE).addOutboundProperty("prop1", "value1").build())
+        .session(new DefaultMuleSession()).build();
     return populateFieldsFromInboundEndpoint(event, endpoint);
   }
 
@@ -198,13 +199,13 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleConte
     props.put("prop1", "value1");
     props.put("port", 12345);
 
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
     if (exceptionListener != null) {
       flow.setExceptionListener(exceptionListener);
     }
     final Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.builder().payload(TEST_MESSAGE).outboundProperties(props).build()).flow(flow)
-        .session(getTestSession(null, muleContext)).build();
+        .session(new DefaultMuleSession()).build();
     return populateFieldsFromInboundEndpoint(event, getTestInboundEndpoint(REQUEST_RESPONSE));
   }
 

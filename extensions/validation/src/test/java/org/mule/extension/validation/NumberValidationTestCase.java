@@ -69,7 +69,7 @@ public class NumberValidationTestCase extends ValidationTestCase {
   }
 
   private FlowRunner configureNumberValidationRunner(FlowRunner runner, Object value, Object minValue, Object maxValue) {
-    return runner.withPayload(value).withFlowVariable("minValue", minValue).withFlowVariable("maxValue", maxValue)
-        .withFlowVariable("numberType", numberType);
+    return runner.withPayload(value).withVariable("minValue", minValue).withVariable("maxValue", maxValue)
+        .withVariable("numberType", numberType);
   }
 }

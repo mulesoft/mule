@@ -15,7 +15,9 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.GET;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -58,7 +60,9 @@ public class HttpUndefinedMethodsBodyTestCase extends FunctionalTestCase {
 
   private void sendRequestAndAssertMethod(String payload, String expectedContent) throws Exception {
     Flow flow = (Flow) getFlowConstruct("requestFlow");
-    Event event = Event.builder(getTestEvent(payload)).addVariable("method", method).build();
+    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of(payload))
+        .addVariable("method", method).build();
     event = flow.process(event);
 
     assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(OK.getStatusCode()));

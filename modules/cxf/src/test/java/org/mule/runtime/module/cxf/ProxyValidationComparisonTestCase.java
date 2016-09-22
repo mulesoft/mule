@@ -55,7 +55,7 @@ public class ProxyValidationComparisonTestCase extends FunctionalTestCase {
 
   private InternalMessage getResponseFor(String path) throws MuleException {
     return muleContext.getClient().send(String.format("http://localhost:%s/services/%s", httpPort.getNumber(), path),
-                                        getTestMuleMessage(ONE_LINER_REQUEST), HTTP_REQUEST_OPTIONS)
+                                        InternalMessage.of(ONE_LINER_REQUEST), HTTP_REQUEST_OPTIONS)
         .getRight();
   }
 

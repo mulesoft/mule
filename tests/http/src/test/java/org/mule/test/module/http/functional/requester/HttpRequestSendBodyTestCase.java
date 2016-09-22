@@ -56,14 +56,14 @@ public class HttpRequestSendBodyTestCase extends AbstractHttpRequestTestCase {
   }
 
   private void assertEmptyBody(String flowName, Object payload, String method) throws Exception {
-    flowRunner(flowName).withPayload(payload).withFlowVariable("method", method).run();
+    flowRunner(flowName).withPayload(payload).withVariable("method", method).run();
 
     assertThat(body, equalTo(""));
     assertThat(headers.containsKey("Content-Length"), is(false));
   }
 
   private void assertNotEmptyBody(String flowName, Object payload, String method) throws Exception {
-    flowRunner(flowName).withPayload(payload).withFlowVariable("method", method).run();
+    flowRunner(flowName).withPayload(payload).withVariable("method", method).run();
 
     assertThat(body, equalTo(TEST_MESSAGE));
     assertThat(headers.containsKey("Content-Length"), is(true));

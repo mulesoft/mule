@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -51,7 +52,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
 
   @Before
   public void before() throws Exception {
-    flow = getTestFlow();
+    flow = getTestFlow(muleContext);
     messageContext = DefaultEventContext.create(flow, TEST_CONNECTOR);
     muleEvent = Event.builder(messageContext).message(muleMessage).exchangePattern(REQUEST_RESPONSE).flow(flow).build();
   }

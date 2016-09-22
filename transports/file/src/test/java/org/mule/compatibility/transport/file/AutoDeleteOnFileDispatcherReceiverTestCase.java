@@ -12,7 +12,6 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 
 import org.mule.compatibility.core.api.transport.Connector;
 import org.mule.compatibility.core.registry.MuleRegistryTransportHelper;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
@@ -36,8 +35,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   public void testAutoDeleteFalseOnDispatcher() throws Exception {
     ((FileConnector) connector).setAutoDelete(false);
 
-    Event event = getTestEvent("TestData");
-    setCurrentEvent(event);
+    setCurrentEvent(testEvent);
 
     InternalMessage message =
         muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName + "?connector=FileConnector", 50000).getRight()
@@ -57,8 +55,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleCont
   public void testAutoDeleteTrueOnDispatcher() throws Exception {
     ((FileConnector) connector).setAutoDelete(true);
 
-    Event event = getTestEvent("TestData");
-    setCurrentEvent(event);
+    setCurrentEvent(testEvent);
 
     InternalMessage message = muleContext.getClient().request(getTestEndpointURI() + "/" + tempDirName, 50000).getRight().get();
     assertNotNull(message.getPayload().getValue());

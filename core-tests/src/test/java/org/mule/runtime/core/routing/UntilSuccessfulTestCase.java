@@ -10,10 +10,12 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
@@ -73,7 +75,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     UntilSuccessful untilSuccessful = new UntilSuccessful();
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultErrorHandler());
-    untilSuccessful.setFlowConstruct(getTestFlow());
+    untilSuccessful.setFlowConstruct(getTestFlow(muleContext));
     untilSuccessful.setMaxRetries(2);
 
     if (millisBetweenRetries != null) {
@@ -99,7 +101,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent("test_data");
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
   }
@@ -110,7 +111,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent(new ByteArrayInputStream("test_data".getBytes()));
+    final Event testEvent = eventBuilder().message(InternalMessage.of(new ByteArrayInputStream("test_data".getBytes()))).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
   }
@@ -121,7 +122,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent("test_data");
     assertThat(untilSuccessful.process(testEvent).getMessageAsString(muleContext), equalTo("ACK"));
     waitDelivery();
   }
@@ -132,7 +132,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent("test_data");
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
   }
@@ -144,7 +143,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent("ERROR");
+    final Event testEvent = eventBuilder().message(InternalMessage.of("ERROR")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventAborted(testEvent);
   }
@@ -155,7 +154,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent("ERROR");
+    final Event testEvent = eventBuilder().message(InternalMessage.of("ERROR")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventAborted(testEvent);
   }
@@ -167,7 +166,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent("ERROR");
+    final Event testEvent = eventBuilder().message(InternalMessage.of("ERROR")).build();
     assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
     ponderUntilEventProcessed(testEvent);
     assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
@@ -175,8 +174,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void testPreExistingEvents() throws Exception {
-    final Event testEvent = getTestEvent("test_data");
-    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, getTestFlow(), muleContext),
+    objectStore.store(new AsynchronousUntilSuccessfulProcessingStrategy().buildQueueKey(testEvent, getTestFlow(muleContext),
+                                                                                        muleContext),
                       testEvent);
     untilSuccessful.initialise();
     untilSuccessful.start();

@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.sourceTimesStarted;
 import static org.mule.test.heisenberg.extension.HeisenbergSource.CORE_POOL_SIZE_ERROR_MESSAGE;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -71,7 +72,7 @@ public class MessageSourceTestCase extends ExtensionFunctionalTestCase {
   }
 
   private HeisenbergExtension locateConfig() throws Exception {
-    return (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", getTestEvent("")).getValue();
+    return (HeisenbergExtension) muleContext.getExtensionManager().getConfiguration("heisenberg", testEvent).getValue();
   }
 
   private void startFlow(String flowName) throws Exception {

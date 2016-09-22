@@ -28,7 +28,9 @@ public class VariablesTestCase extends AbstractELTestCase {
 
   @Before
   public void setup() throws Exception {
-    event = getTestEvent("");
+    event = Event.builder(context)
+        .message(InternalMessage.of(""))
+        .build();
   }
 
   @Test

@@ -6,26 +6,28 @@
  */
 package org.mule.tck.junit4;
 
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.component.DefaultJavaComponent;
 import org.mule.runtime.core.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.config.builders.DefaultsConfigurationBuilder;
 import org.mule.runtime.core.config.builders.SimpleConfigurationBuilder;
@@ -33,17 +35,18 @@ import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
+import org.mule.runtime.core.object.SingletonObjectFactory;
 import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.TestingWorkListener;
 import org.mule.tck.TriggerableMessageSource;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -290,56 +293,26 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
     // template method
   }
 
-  /**
-   * @return creates a new {@link InternalMessage} with a test payload
-   */
-  @Deprecated
-  protected InternalMessage getTestMuleMessage() {
-    return getTestMuleMessage(TEST_PAYLOAD);
+  public static Flow getTestFlowWithComponent(String name, Class<?> clazz) throws Exception {
+    final SingletonObjectFactory of = new SingletonObjectFactory(clazz, null);
+    of.initialise();
+    final JavaComponent component = new DefaultJavaComponent(of);
+    ((MuleContextAware) component).setMuleContext(muleContext);
+
+    final Flow flow = new Flow(name, muleContext);
+    flow.setMessageProcessors(Collections.singletonList((Processor) component));
+    muleContext.getRegistry().registerFlowConstruct(flow);
+    return flow;
   }
 
   /**
-   * @param message
-   * @return creates a new {@link InternalMessage} with message as payload
+   * Creates a basic event builder with its context already set.
+   * 
+   * @return a basic event builder with its context already set.
    */
-  @Deprecated
-  protected InternalMessage getTestMuleMessage(Object message) {
-    return InternalMessage.builder().payload(message).build();
-  }
-
-  public static Event getTestEvent(Object data, FlowConstruct service) throws Exception {
-    return MuleTestUtils.getTestEvent(data, service, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-  }
-
-  public static Event getTestEvent(Object data, MuleContext muleContext) throws Exception {
-    return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-  }
-
-  public static Event getTestEvent(InternalMessage data) throws Exception {
-    FlowConstruct flowConstruct = MuleTestUtils.getTestFlow(muleContext);
-    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).message(data)
-        .exchangePattern(REQUEST_RESPONSE).flow(flowConstruct).session(MuleTestUtils.getTestSession(flowConstruct, muleContext))
-        .build();
-  }
-
-  public static Event getTestEvent(Object data) throws Exception {
-    return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-  }
-
-  public static Event getTestEvent(Object data, MessageExchangePattern mep) throws Exception {
-    return MuleTestUtils.getTestEvent(data, mep, muleContext);
-  }
-
-  public static MuleSession getTestSession(Flow flow, MuleContext context) {
-    return MuleTestUtils.getTestSession(flow, context);
-  }
-
-  public static Flow getTestFlow() throws Exception {
-    return MuleTestUtils.getTestFlow(muleContext);
-  }
-
-  public static Flow getTestFlow(String name, Class<?> clazz) throws Exception {
-    return MuleTestUtils.getTestFlow(name, clazz, muleContext);
+  protected static Builder eventBuilder() throws MuleException {
+    FlowConstruct flowConstruct = getTestFlow(muleContext);
+    return Event.builder(DefaultEventContext.create(flowConstruct, TEST_CONNECTOR)).flow(flowConstruct);
   }
 
   protected boolean isStartContext() {

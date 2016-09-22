@@ -50,7 +50,7 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase {
   @Test
   public void deleteReadFile() throws Exception {
     assertThat(testHarness.fileExists(HELLO_PATH), is(true));
-    flowRunner("delete").withFlowVariable("delete", HELLO_PATH).run();
+    flowRunner("delete").withVariable("delete", HELLO_PATH).run();
 
     assertThat(testHarness.fileExists(HELLO_PATH), is(false));
   }
@@ -75,7 +75,7 @@ public class FtpDeleteTestCase extends FtpConnectorTestCase {
   }
 
   private void doDelete(String path) throws Exception {
-    flowRunner("delete").withFlowVariable("delete", path).run();
+    flowRunner("delete").withVariable("delete", path).run();
   }
 
   private void assertExists(boolean exists, String... paths) throws Exception {

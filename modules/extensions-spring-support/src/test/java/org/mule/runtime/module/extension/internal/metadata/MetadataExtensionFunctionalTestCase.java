@@ -13,6 +13,7 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getMetadata;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -29,10 +30,11 @@ import org.mule.runtime.api.metadata.resolving.FailureCode;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.test.metadata.extension.MetadataExtension;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -114,7 +116,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
 
   @Before
   public void setup() throws Exception {
-    event = getTestEvent("");
+    event = eventBuilder().message(InternalMessage.of("")).build();
     metadataManager = muleContext.getRegistry().lookupObject(MuleMetadataManager.class);
     personType = getMetadata(PERSON_METADATA_KEY.getId());
   }

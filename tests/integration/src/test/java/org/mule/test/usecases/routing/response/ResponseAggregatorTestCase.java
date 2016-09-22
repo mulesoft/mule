@@ -16,8 +16,8 @@ import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
@@ -57,10 +57,8 @@ public class ResponseAggregatorTestCase extends AbstractIntegrationTestCase {
     RelaxedAsyncReplyMP mp = new RelaxedAsyncReplyMP();
 
     try {
-      Event event = getTestEvent("message1");
-      final InternalMessage message = InternalMessage.builder(event.getMessage()).build();
-      event = Event.builder(event).message(message).correlationId(event.getCorrelationId())
-          .groupCorrelation(new GroupCorrelation(1, null)).build();
+      Event event =
+          eventBuilder().message(InternalMessage.of("message1")).groupCorrelation(new GroupCorrelation(1, null)).build();
 
       SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
       mp.setListener(listener);

@@ -38,7 +38,7 @@ public class CustomSerializationProtocolTestCase extends FunctionalTestCase {
     NonSerializableMessageObject message = new NonSerializableMessageObject(1, "Hello", true);
 
     for (int i = 0; i < messages; i++) {
-      client.dispatch("vm://in", getTestMuleMessage(message));
+      client.dispatch("vm://in", InternalMessage.of(message));
     }
 
     for (int i = 0; i < messages; i++) {

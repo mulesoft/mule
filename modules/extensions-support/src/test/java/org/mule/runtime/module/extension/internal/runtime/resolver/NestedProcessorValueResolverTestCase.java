@@ -29,39 +29,35 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class NestedProcessorValueResolverTestCase extends AbstractMuleContextTestCase {
 
-  private static final String RESPONSE = "Hello world!";
-
   @Mock
   private Processor messageProcessor;
 
   @Before
   public void before() throws Exception {
-    when(messageProcessor.process(any(Event.class))).thenReturn(getTestEvent(RESPONSE));
+    when(messageProcessor.process(any(Event.class))).thenReturn(testEvent);
   }
 
   @Test
   public void yieldsNestedProcessor() throws Exception {
-    Event muleEvent = getTestEvent("");
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
-    NestedProcessor nestedProcessor = resolver.resolve(muleEvent);
+    NestedProcessor nestedProcessor = resolver.resolve(testEvent);
     Object response = nestedProcessor.process();
-    assertThat((String) response, is(sameInstance(RESPONSE)));
+    assertThat((String) response, is(TEST_PAYLOAD));
 
     ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(Event.class);
     verify(messageProcessor).process(captor.capture());
 
     Event capturedEvent = captor.getValue();
-    assertThat(capturedEvent, is(muleEvent));
+    assertThat(capturedEvent, is(testEvent));
   }
 
   @Test
   public void alwaysGivesDifferentInstances() throws Exception {
-    Event muleEvent = getTestEvent("");
     NestedProcessorValueResolver resolver = new NestedProcessorValueResolver(messageProcessor);
     resolver.setMuleContext(muleContext);
-    NestedProcessor resolved1 = resolver.resolve(muleEvent);
-    NestedProcessor resolved2 = resolver.resolve(muleEvent);
+    NestedProcessor resolved1 = resolver.resolve(testEvent);
+    NestedProcessor resolved2 = resolver.resolve(testEvent);
 
     assertThat(resolved1, is(not(sameInstance(resolved2))));
   }

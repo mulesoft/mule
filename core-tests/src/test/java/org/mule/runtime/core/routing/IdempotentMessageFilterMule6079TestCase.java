@@ -8,6 +8,7 @@ package org.mule.runtime.core.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
@@ -43,7 +44,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
    */
   @Test
   public void testRaceConditionOnAcceptAndProcess() throws Exception {
-    flow = getTestFlow();
+    flow = getTestFlow(muleContext);
 
     session = Mockito.mock(MuleSession.class);
 

@@ -33,8 +33,7 @@ public abstract class PetStoreConnectionTestCase extends ExtensionFunctionalTest
 
   @Test
   public void getPets() throws Exception {
-    ConfigurationInstance config =
-        muleContext.getExtensionManager().getConfiguration("petstore", getTestEvent(""));
+    ConfigurationInstance config = muleContext.getExtensionManager().getConfiguration("petstore", testEvent);
     assertThat(config, is(notNullValue()));
 
     Event response = runFlow("getPets");

@@ -139,7 +139,7 @@ public class HttpRequestStreamingTestCase extends AbstractHttpRequestTestCase {
   }
 
   public Event runFlowWithPayload(String flow, Object payload) throws Exception {
-    return flowRunner(flow).withPayload(payload).withFlowVariable(HEADERS, headersToSend).run();
+    return flowRunner(flow).withPayload(payload).withVariable(HEADERS, headersToSend).run();
   }
 
   private void addHeader(String name, String value) {

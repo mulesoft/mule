@@ -7,8 +7,6 @@
 package org.mule.runtime.module.spring.security.filters.http;
 
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
@@ -34,7 +32,8 @@ public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTe
   public void testAuthenticationHeaderFailure() throws Exception {
     Event oldEvent = getCurrentEvent();
 
-    Event event = getTestEvent(InternalMessage.builder().payload("a").addInboundProperty(AUTHORIZATION, "Basic a").build());
+    Event event = eventBuilder()
+        .message(InternalMessage.builder().payload("a").addInboundProperty(AUTHORIZATION, "Basic a").build()).build();
     setCurrentEvent(event);
 
     HttpBasicAuthenticationFilter filter = new HttpBasicAuthenticationFilter();

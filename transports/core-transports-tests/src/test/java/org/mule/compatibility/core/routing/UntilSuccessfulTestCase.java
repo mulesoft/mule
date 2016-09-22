@@ -11,13 +11,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.compatibility.core.routing.EndpointDlqUntilSuccessful;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.store.ListableObjectStore;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
@@ -75,14 +76,14 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     EndpointDlqUntilSuccessful untilSuccessful = new EndpointDlqUntilSuccessful();
     untilSuccessful.setMuleContext(muleContext);
     untilSuccessful.setMessagingExceptionHandler(muleContext.getDefaultErrorHandler());
-    untilSuccessful.setFlowConstruct(getTestFlow());
+    untilSuccessful.setFlowConstruct(getTestFlow(muleContext));
     untilSuccessful.setMaxRetries(2);
 
     if (millisBetweenRetries != null) {
       untilSuccessful.setMillisBetweenRetries(millisBetweenRetries);
     }
 
-    objectStore = new SimpleMemoryObjectStore<Event>();
+    objectStore = new SimpleMemoryObjectStore<>();
     untilSuccessful.setObjectStore(objectStore);
 
     targetMessageProcessor = new ConfigurableMessageProcessor();
@@ -106,8 +107,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase {
     untilSuccessful.initialise();
     untilSuccessful.start();
 
-    final Event testEvent = getTestEvent("ERROR");
-    assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(testEvent));
+    assertSame(VoidMuleEvent.getInstance(), untilSuccessful.process(eventBuilder().message(InternalMessage.of("ERROR")).build()));
 
     pollingProber.check(new JUnitProbe() {
 

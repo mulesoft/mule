@@ -10,8 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -38,9 +39,8 @@ public class SoapRequestNoMethodParamTestCase extends FunctionalTestCase {
 
   @Test
   public void testCXFSoapRequest() throws Exception {
-    InternalMessage message = getTestMuleMessage(request);
     InternalMessage msg = muleContext.getClient().send("http://localhost:" + port1.getValue() + "/services/TestComponent",
-                                                       getTestMuleMessage(request), HTTP_REQUEST_OPTIONS)
+                                                       InternalMessage.of(request), HTTP_REQUEST_OPTIONS)
         .getRight();
 
     assertNotNull(msg);

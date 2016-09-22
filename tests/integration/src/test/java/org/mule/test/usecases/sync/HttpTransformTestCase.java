@@ -11,14 +11,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.transformer.compression.GZipUncompressTransformer;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
   public void testTransform() throws Exception {
     MuleClient client = muleContext.getClient();
     InternalMessage message = client.send(String.format("http://localhost:%d/RemoteService", httpPort1.getNumber()),
-                                          getTestMuleMessage("payload"), HTTP_REQUEST_OPTIONS)
+                                          InternalMessage.of("payload"), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(message);
     GZipUncompressTransformer gu = new GZipUncompressTransformer();
@@ -58,11 +59,11 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
   @Test
   public void testBinary() throws Exception {
     MuleClient client = muleContext.getClient();
-    ArrayList<Integer> payload = new ArrayList<Integer>();
+    ArrayList<Integer> payload = new ArrayList<>();
     payload.add(42);
     InternalMessage message =
         client.send(String.format("http://localhost:%d/RemoteService", httpPort2.getNumber()),
-                    getTestMuleMessage(muleContext.getObjectSerializer().serialize(payload)), HTTP_REQUEST_OPTIONS)
+                    InternalMessage.of(muleContext.getObjectSerializer().serialize(payload)), HTTP_REQUEST_OPTIONS)
             .getRight();
     assertNotNull(message);
     ByteArrayToSerializable bas = new ByteArrayToSerializable();
@@ -74,7 +75,6 @@ public class HttpTransformTestCase extends AbstractIntegrationTestCase {
 
   @Test
   public void testBinaryWithBridge() throws Exception {
-    MuleClient client = muleContext.getClient();
     Object payload = Arrays.asList(42);
     InternalMessage message = flowRunner("LocalService").withPayload(payload).run().getMessage();
     assertNotNull(message);

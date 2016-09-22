@@ -62,12 +62,12 @@ public abstract class FtpConnectorTestCase extends MuleArtifactFunctionalTestCas
 
   protected void doWrite(String flow, String path, Object content, FileWriteMode mode, boolean createParent, String encoding)
       throws Exception {
-    flowRunner(flow).withFlowVariable("path", path).withFlowVariable("createParent", createParent).withFlowVariable("mode", mode)
-        .withFlowVariable("encoding", encoding).withPayload(content).run();
+    flowRunner(flow).withVariable("path", path).withVariable("createParent", createParent).withVariable("mode", mode)
+        .withVariable("encoding", encoding).withPayload(content).run();
   }
 
   private MuleEvent getPath(String path) throws Exception {
-    return flowRunner("read").withFlowVariable("path", path).run();
+    return flowRunner("read").withVariable("path", path).run();
   }
 
   protected String readPathAsString(String path) throws Exception {

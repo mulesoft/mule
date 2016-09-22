@@ -67,7 +67,6 @@ public abstract class AbstractVarExpressionDataTypeResolverTestCase extends Abst
   protected void doVarDataTypeTest(String expression) throws Exception {
     DataType expectedDataType = DataType.builder().type(String.class).mediaType(JSON).charset(CUSTOM_ENCODING).build();
 
-    Event testEvent = getTestEvent(TEST_MESSAGE);
     testEvent = setVariable(testEvent, EXPRESSION_VALUE, expectedDataType);
 
     final ParserConfiguration parserConfiguration = MVELExpressionLanguage.createParserConfiguration(Collections.EMPTY_MAP);

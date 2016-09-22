@@ -104,8 +104,8 @@ public class XQuery3TestCase extends FunctionalTestCase {
   }
 
   private void assertMultipleInputs(String flowName, Object books, Object cities) throws Exception {
-    List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(input).withFlowVariable("books", books)
-        .withFlowVariable("cities", cities).run().getMessage().getPayload().getValue();
+    List<Element> elements = (List<Element>) flowRunner(flowName).withPayload(input).withVariable("books", books)
+        .withVariable("cities", cities).run().getMessage().getPayload().getValue();
 
     assertThat(elements, hasSize(1));
 

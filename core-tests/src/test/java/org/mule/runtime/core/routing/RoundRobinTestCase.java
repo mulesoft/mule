@@ -13,16 +13,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   public void testRoundRobin() throws Exception {
     RoundRobin rr = new RoundRobin();
     rr.setMuleContext(muleContext);
-    MuleSession session = getTestSession(null, muleContext);
+    MuleSession session = new DefaultMuleSession();
     List<TestProcessor> routes = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       routes.add(new TestProcessor());
@@ -53,7 +54,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
     rr.setRoutes(new ArrayList<Processor>(routes));
     List<Thread> threads = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
-      threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestFlow())));
+      threads.add(new Thread(new TestDriver(session, rr, NUMBER_OF_MESSAGES, getTestFlow(muleContext))));
     }
     for (Thread t : threads) {
       t.start();
@@ -79,9 +80,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     InternalMessage message = InternalMessage.builder().payload(singletonList(TEST_MESSAGE)).build();
 
-    Flow flow = getTestFlow();
-    roundRobin.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
-        .exchangePattern(REQUEST_RESPONSE).flow(flow).build());
+    roundRobin.process(eventBuilder().message(message).exchangePattern(REQUEST_RESPONSE).build());
 
     verify(route1).process(any(Event.class));
     verify(route2, never()).process(any(Event.class));

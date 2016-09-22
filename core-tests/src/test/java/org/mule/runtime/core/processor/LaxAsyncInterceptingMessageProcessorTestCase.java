@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.core.processor;
 
-import org.mule.runtime.core.api.Event;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.transaction.TransactionCoordination;
@@ -19,20 +20,17 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessRequestResponse() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
-
-    assertSync(messageProcessor, event);
+    assertSync(messageProcessor, testEvent);
   }
 
   @Override
   @Test
   public void testProcessOneWayWithTx() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      assertSync(messageProcessor, event);
+      assertSync(messageProcessor, testEvent);
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
@@ -41,12 +39,11 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
   @Override
   @Test
   public void testProcessRequestResponseWithTx() throws Exception {
-    Event event = getTestEvent(TEST_MESSAGE);
     Transaction transaction = new TestTransaction(muleContext);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
     try {
-      assertSync(messageProcessor, event);
+      assertSync(messageProcessor, testEvent);
     } finally {
       TransactionCoordination.getInstance().unbindTransaction(transaction);
     }
@@ -57,7 +54,7 @@ public class LaxAsyncInterceptingMessageProcessorTestCase extends AsyncIntercept
       throws Exception {
     LaxAsyncInterceptingMessageProcessor mp = new LaxAsyncInterceptingMessageProcessor(new TestWorkManagerSource());
     mp.setMuleContext(muleContext);
-    mp.setFlowConstruct(getTestFlow());
+    mp.setFlowConstruct(getTestFlow(muleContext));
     mp.setListener(listener);
     return mp;
   }

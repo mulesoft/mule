@@ -12,18 +12,16 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleSession;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.processor.simple.AbstractRemoveVariablePropertyProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -69,9 +67,7 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     removeVariableProcessor.setMuleContext(mockMuleContext);
 
     message = InternalMessage.builder().payload("").build();
-    Flow flow = getTestFlow();
-    event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message).flow(flow).session(mockSession)
-        .build();
+    event = eventBuilder().message(message).session(mockSession).build();
   }
 
   @Test

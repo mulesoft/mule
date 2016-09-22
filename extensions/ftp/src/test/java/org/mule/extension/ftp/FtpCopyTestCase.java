@@ -213,8 +213,8 @@ public class FtpCopyTestCase extends FtpConnectorTestCase {
 
   private void doExecute(String flowName, String source, String target, boolean overwrite, boolean createParentFolder)
       throws Exception {
-    flowRunner(flowName).withFlowVariable(SOURCE_DIRECTORY_NAME, source).withFlowVariable("target", target)
-        .withFlowVariable("overwrite", overwrite).withFlowVariable("createParent", createParentFolder).run();
+    flowRunner(flowName).withVariable(SOURCE_DIRECTORY_NAME, source).withVariable("target", target)
+        .withVariable("overwrite", overwrite).withVariable("createParent", createParentFolder).run();
   }
 
   protected void assertCopy(String target) throws Exception {

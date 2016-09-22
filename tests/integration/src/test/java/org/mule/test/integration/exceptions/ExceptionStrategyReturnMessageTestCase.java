@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.component.ComponentException;
@@ -40,7 +41,7 @@ public class ExceptionStrategyReturnMessageTestCase extends AbstractIntegrationT
 
   @Test
   public void testReturnPayloadCustomStrategy() throws Exception {
-    Event event = flowRunner("InputService").withPayload(getTestMuleMessage("Test Message")).run();
+    Event event = flowRunner("InputService").withPayload("Test Message").run();
     InternalMessage msg = event.getMessage();
 
     assertNotNull(msg);

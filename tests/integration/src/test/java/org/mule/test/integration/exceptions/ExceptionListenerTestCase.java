@@ -10,19 +10,19 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.test.AbstractIntegrationTestCase;
+
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionStrategyNotificationListener;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import org.junit.Test;
 
@@ -47,24 +47,21 @@ public class ExceptionListenerTestCase extends AbstractIntegrationTestCase {
 
     exceptionStrategyStartNotification = null;
     exceptionStrategyEndNotification = null;
-    muleContext.getNotificationManager().addListener(new ExceptionStrategyNotificationListener<ExceptionStrategyNotification>() {
-
-      @Override
-      public void onNotification(ExceptionStrategyNotification notification) {
-        if (notification.getAction() == ExceptionStrategyNotification.PROCESS_START) {
-          exceptionStrategyStartNotification = notification;
-        } else if (notification.getAction() == ExceptionStrategyNotification.PROCESS_END) {
-          exceptionStrategyEndNotification = notification;
-        }
+    final ExceptionStrategyNotificationListener listener = notification -> {
+      if (notification.getAction() == ExceptionStrategyNotification.PROCESS_START) {
+        exceptionStrategyStartNotification = notification;
+      } else if (notification.getAction() == ExceptionStrategyNotification.PROCESS_END) {
+        exceptionStrategyEndNotification = notification;
       }
-    });
+    };
+    muleContext.getNotificationManager().addListener(listener);
   }
 
   @Test
   public void testExceptionStrategyFromComponent() throws Exception {
     assertQueueIsEmpty("test://error.queue");
 
-    flowRunner("mycomponent").withPayload(getTestMuleMessage("test")).asynchronously().run();
+    flowRunner("mycomponent").withPayload("test").asynchronously().run();
 
     assertQueueIsEmpty("test://component.out");
 

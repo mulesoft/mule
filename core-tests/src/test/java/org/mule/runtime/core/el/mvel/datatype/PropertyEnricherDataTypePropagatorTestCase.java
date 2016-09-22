@@ -17,6 +17,7 @@ import org.mule.mvel2.compiler.CompiledExpression;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -40,8 +41,7 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event testEvent = getTestEvent(TEST_MESSAGE);
-    testEvent = Event.builder(testEvent).addVariable("foo", "bar").build();
+    Event testEvent = eventBuilder().message(InternalMessage.of(TEST_MESSAGE)).addVariable("foo", "bar").build();
 
     final Builder builder = Event.builder(testEvent);
     dataTypePropagator.propagate(testEvent, builder, new DefaultTypedValue<>(TEST_MESSAGE, expectedDataType), compiledExpression);
@@ -57,7 +57,6 @@ public class PropertyEnricherDataTypePropagatorTestCase extends AbstractMuleCont
     final CompiledExpression compiledExpression =
         (CompiledExpression) compileExpression("foo = 'unused'", new ParserContext(expressionLanguage.getParserConfiguration()));
 
-    Event testEvent = getTestEvent(TEST_MESSAGE);
     testEvent.getSession().setProperty("foo", "bar");
 
     final Builder builder = Event.builder(testEvent);

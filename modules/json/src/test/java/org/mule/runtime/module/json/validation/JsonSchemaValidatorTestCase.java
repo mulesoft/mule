@@ -22,6 +22,7 @@ import static org.mule.runtime.module.json.validation.JsonSchemaTestUtils.toStre
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
@@ -103,24 +104,24 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase {
 
   @Test
   public void good() throws Exception {
-    validator.validate(getTestEvent(goodJson), muleContext);
+    validator.validate(eventBuilder().message(InternalMessage.of(goodJson)).build(), muleContext);
   }
 
   @Test(expected = JsonSchemaValidationException.class)
   public void bad() throws Exception {
-    validator.validate(getTestEvent(badJson), muleContext);
+    validator.validate(eventBuilder().message(InternalMessage.of(badJson)).build(), muleContext);
   }
 
   @Test(expected = JsonSchemaValidationException.class)
   public void bad2() throws Exception {
-    validator.validate(getTestEvent(badJson2), muleContext);
+    validator.validate(eventBuilder().message(InternalMessage.of(badJson2)).build(), muleContext);
   }
 
   @Test
   public void goodThroughTransformer() throws Exception {
     muleContext.getRegistry().registerTransformer(new AppleToJson(goodJson));
     try {
-      validator.validate(getTestEvent(new Apple()), muleContext);
+      validator.validate(eventBuilder().message(InternalMessage.of(new Apple())).build(), muleContext);
     } catch (JsonSchemaValidationException e) {
       if (goodJson instanceof InputStream) {
         // do nothing, streams are not supported through transformation
@@ -128,12 +129,6 @@ public class JsonSchemaValidatorTestCase extends AbstractMuleContextTestCase {
         throw e;
       }
     }
-  }
-
-  @Override
-  public int getTestTimeoutSecs() {
-    // TODO Auto-generated method stub
-    return 100 * super.getTestTimeoutSecs();
   }
 
   private class AppleToJson extends AbstractMessageTransformer implements DiscoverableTransformer {

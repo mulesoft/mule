@@ -32,7 +32,7 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase 
   public void doTest() throws Exception {
     ExceptionListener exceptionListener = new ExceptionListener(muleContext);
     expectedException.expectCause(instanceOf(ComponentException.class));
-    InternalMessage result = flowRunner("the-service").withPayload(getTestMuleMessage()).run().getMessage();
+    InternalMessage result = flowRunner("the-service").withPayload(TEST_PAYLOAD).run().getMessage();
     // processing is async, give time for the exception notificator to run
     exceptionListener.waitUntilAllNotificationsAreReceived();
 

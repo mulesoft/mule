@@ -13,11 +13,12 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.InputStream;
 
@@ -45,14 +46,13 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     // this will submit the xml via a POST request
-    InternalMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", getTestMuleMessage(xml), httpOptions)
-            .getRight();
+    InternalMessage message = client
+        .send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", InternalMessage.of(xml), httpOptions).getRight();
     assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
 
     // This won't pass the filter
     xml = getClass().getResourceAsStream("validation1.xml");
-    message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", getTestMuleMessage(xml), httpOptions)
+    message = client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-parse", InternalMessage.of(xml), httpOptions)
         .getRight();
     assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
   }
@@ -66,9 +66,8 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
     MuleClient client = muleContext.getClient();
 
     // this will submit the xml via a POST request
-    InternalMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", getTestMuleMessage(xml), httpOptions)
-            .getRight();
+    InternalMessage message = client
+        .send("http://localhost:" + dynamicPort.getNumber() + "/xml-xslt-parse", InternalMessage.of(xml), httpOptions).getRight();
     assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
   }
 
@@ -82,17 +81,17 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
 
     // this will submit the xml via a POST request
     InternalMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions).getRight();
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", InternalMessage.of(xml), httpOptions).getRight();
     assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
 
     xml = getClass().getResourceAsStream("validation2.xml");
     message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions).getRight();
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", InternalMessage.of(xml), httpOptions).getRight();
     assertThat(406, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
 
     xml = getClass().getResourceAsStream("validation3.xml");
     message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", getTestMuleMessage(xml), httpOptions).getRight();
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/validate", InternalMessage.of(xml), httpOptions).getRight();
     assertThat(200, is(message.<Integer>getInboundProperty(HTTP_STATUS_PROPERTY)));
   }
 
@@ -103,7 +102,7 @@ public class XmlSendTestCase extends AbstractIntegrationTestCase {
 
     // this will submit the xml via a POST request
     InternalMessage message =
-        client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", getTestMuleMessage(xml), httpOptions).getRight();
+        client.send("http://localhost:" + dynamicPort.getNumber() + "/extract", InternalMessage.of(xml), httpOptions).getRight();
     assertThat(getPayloadAsString(message), equalTo("some"));
   }
 }

@@ -125,8 +125,8 @@ public class PetStoreConnectionPoolingTestCase extends PetStoreConnectionTestCas
 
   protected Future<PetStoreClient> getClientOnLatch() {
     return executorService
-        .submit(() -> (PetStoreClient) flowRunner("getClientOnLatch").withPayload("").withFlowVariable("testLatch", testLatch)
-            .withFlowVariable("connectionLatch", connectionLatch).run().getMessage().getPayload().getValue());
+        .submit(() -> (PetStoreClient) flowRunner("getClientOnLatch").withPayload("").withVariable("testLatch", testLatch)
+            .withVariable("connectionLatch", connectionLatch).run().getMessage().getPayload().getValue());
   }
 
   @Override

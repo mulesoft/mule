@@ -140,7 +140,7 @@ public class OnErrorContinueTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
     InternalMessage result =
         client.send("http://localhost:" + dynamicPort.getNumber() + "/testProxyWithTransformerExceptionCatchStrategy",
-                    getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
+                    InternalMessage.of(requestPayload), HTTP_REQUEST_OPTIONS)
             .getRight();
     String resString = getPayloadAsString(result);
     assertEquals(String.valueOf(OK.getStatusCode()), result.getInboundProperty(HTTP_STATUS_PROPERTY).toString());

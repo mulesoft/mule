@@ -27,7 +27,7 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
 
   @Test
   public void inlineScriptMutateVariable() throws Exception {
-    flowRunner("inlineScriptMutateVariable").withPayload("").withFlowVariable("foo", "bar").run();
+    flowRunner("inlineScriptMutateVariable").withPayload("").withVariable("foo", "bar").run();
   }
 
   @Test
@@ -37,7 +37,7 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
 
   @Test
   public void inlineScriptMutateVariablesMap() throws Exception {
-    flowRunner("inlineScriptMutateVariablesMap").withPayload("").withFlowVariable("foo", "bar").run();
+    flowRunner("inlineScriptMutateVariablesMap").withPayload("").withVariable("foo", "bar").run();
   }
 
   @Test
@@ -47,8 +47,8 @@ public class GroovyScriptFlowFunctionalTestCase extends GroovyScriptServiceFunct
 
   @Test
   public void scriptExpressionVariables() throws Exception {
-    flowRunner("scriptExpressionVariables").withPayload("").withFlowVariable("prop1", "Received")
-        .withFlowVariable("prop2", "A-OK").run();
+    flowRunner("scriptExpressionVariables").withPayload("").withVariable("prop1", "Received")
+        .withVariable("prop2", "A-OK").run();
   }
 
   @Override

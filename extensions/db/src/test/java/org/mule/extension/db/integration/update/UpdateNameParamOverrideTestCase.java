@@ -76,7 +76,7 @@ public class UpdateNameParamOverrideTestCase extends AbstractDbIntegrationTestCa
 
   @Test
   public void usesExpressionParam() throws Exception {
-    Message response = flowRunner("expressionParam").withFlowVariable("type", 3).run().getMessage();
+    Message response = flowRunner("expressionParam").withVariable("type", 3).run().getMessage();
     assertAffectedRows((StatementResult) response.getPayload().getValue(), 1);
 
     List<Map<String, String>> result = selectData("select * from PLANET where POSITION=3", getDefaultDataSource());

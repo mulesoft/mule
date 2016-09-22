@@ -21,15 +21,15 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
-import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.enricher.MessageEnricher;
@@ -58,9 +58,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     });
     enricher.initialise();
 
-    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(testEvent).getMessage();
     assertEquals("test", result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload().getValue());
+    assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
   }
 
   @Test
@@ -74,9 +74,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
           .message(InternalMessage.builder(event.getMessage()).addOutboundProperty("header1", "test").build()).build();
     });
 
-    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(testEvent).getMessage();
     assertEquals("test", result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload().getValue());
+    assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
   }
 
   @Test
@@ -97,13 +97,13 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
           .build()).build();
     });
 
-    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(testEvent).getMessage();
 
     assertNull(result.getOutboundProperty("myHeader"));
     assertEquals("test2", result.getOutboundProperty("myHeader2"));
     assertEquals("test3", result.getOutboundProperty("myHeader3"));
 
-    assertEquals("", result.getPayload().getValue());
+    assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
   }
 
   @Test
@@ -113,9 +113,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.addEnrichExpressionPair(new EnrichExpressionPair("#[message.outboundProperties.myHeader]"));
     enricher.setEnrichmentMessageProcessor(event -> null);
 
-    InternalMessage result = enricher.process(getTestEvent("")).getMessage();
+    InternalMessage result = enricher.process(testEvent).getMessage();
     assertNull(result.getOutboundProperty("myHeader"));
-    assertEquals("", result.getPayload().getValue());
+    assertEquals(TEST_PAYLOAD, result.getPayload().getValue());
   }
 
   @Test
@@ -128,7 +128,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     });
 
     try {
-      enricher.process(getTestEvent(""));
+      enricher.process(testEvent);
       fail("Expected a MessagingException");
     } catch (MessagingException e) {
       assertThat(e.getMessage(), is("Expected."));
@@ -144,8 +144,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setEnrichmentMessageProcessor(event -> {
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build();
     });
-    Event in = getTestEvent("");
-    in = Event.builder(in).message(InternalMessage.builder(in.getMessage()).addOutboundProperty("foo", "bar").build()).build();
+    Event in = eventBuilder().message(InternalMessage.builder().payload("").addOutboundProperty("foo", "bar").build()).build();
     Event out = enricher.process(in);
     assertThat(out.getCorrelationId(), equalTo(in.getCorrelationId()));
     assertThat(out.getMessage().getOutboundProperty("foo"), equalTo("bar"));
@@ -160,9 +159,8 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setEnrichmentMessageProcessor(event -> {
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build();
     });
-    Event in = getTestEvent("");
+    Event in = eventBuilder().message(InternalMessage.of("")).addVariable("flowFoo", "bar").build();
     in.getSession().setProperty("sessionFoo", "bar");
-    in = Event.builder(in).addVariable("flowFoo", "bar").build();
 
     Event out = enricher.process(in);
 
@@ -178,11 +176,9 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setEnrichmentMessageProcessor(event -> {
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("enriched").build()).build();
     });
-    Event in = getTestEvent("");
+    Event out = enricher.process(testEvent);
 
-    Event out = enricher.process(in);
-
-    assertEquals("", out.getMessage().getPayload().getValue());
+    assertEquals(TEST_PAYLOAD, out.getMessage().getPayload().getValue());
   }
 
   @Test
@@ -194,9 +190,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).addInboundProperty("foo", "bar").build())
           .build();
     });
-    Event in = getTestEvent("");
-
-    Event out = enricher.process(in);
+    Event out = enricher.process(testEvent);
 
     assertNull(out.getMessage().getOutboundProperty("foo"));
   }
@@ -209,9 +203,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setEnrichmentMessageProcessor(event -> {
       return Event.builder(event).addVariable("flowFoo", "bar").build();
     });
-    Event in = getTestEvent("");
-
-    Event out = enricher.process(in);
+    Event out = enricher.process(testEvent);
 
     assertThat(out.getVariableNames(), not(contains("flowFoo")));
   }
@@ -225,9 +217,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
       event.getSession().setProperty("sessionFoo", "bar");
       return event;
     });
-    Event in = getTestEvent("");
-
-    Event out = enricher.process(in);
+    Event out = enricher.process(testEvent);
 
     assertNull(out.getSession().getProperty("sessionFoo"));
   }
@@ -240,9 +230,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setEnrichmentMessageProcessor(event -> {
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("bar").build()).build();
     });
-    Event in = getTestEvent("");
-
-    Event out = enricher.process(in);
+    Event out = enricher.process(testEvent);
 
     assertEquals("bar", out.getVariable("foo").getValue());
   }
@@ -255,9 +243,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
     enricher.setEnrichmentMessageProcessor(event -> {
       return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload("bar").build()).build();
     });
-    Event in = getTestEvent("");
-
-    Event out = enricher.process(in);
+    Event out = enricher.process(testEvent);
 
     assertEquals("bar", out.getSession().getProperty("foo"));
   }
@@ -327,9 +313,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
       return Event.builder(event)
           .message(InternalMessage.builder(event.getMessage()).payload("bar").mediaType(dataType.getMediaType()).build()).build();
     });
-    Event in = getTestEvent("");
-
-    Event out = enricher.process(in);
+    Event out = enricher.process(testEvent);
 
     assertEquals("bar", out.getVariable("foo").getValue());
     assertThat(out.getVariable("foo").getDataType(), DataTypeMatcher.like(String.class, JSON, UTF_16));

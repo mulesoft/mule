@@ -12,7 +12,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
+
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultEventContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -73,7 +77,9 @@ public class HttpsMultipleConnectorsTestCase extends FunctionalTestCase {
     Flow client = (Flow) getFlowConstruct("client");
 
     try {
-      client.process(getTestEvent(TEST_MESSAGE));
+      client.process(Event.builder(DefaultEventContext.create(client, TEST_CONNECTOR))
+          .message(InternalMessage.of(TEST_MESSAGE))
+          .build());
       fail();
     } catch (MessagingException e) {
       assertThat(e.getCause(), hasCause(instanceOf(SSLHandshakeException.class)));

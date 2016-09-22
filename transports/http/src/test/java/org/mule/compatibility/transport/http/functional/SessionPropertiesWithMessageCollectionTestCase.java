@@ -7,17 +7,16 @@
 package org.mule.compatibility.transport.http.functional;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -56,7 +55,9 @@ public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTe
     for (int i = 0; i < numberOfElements; i++) {
       inputData.add(String.valueOf(i));
     }
-    Event responseEvent = flow.process(getTestEvent(inputData));
+    Event responseEvent = flow.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+        .message(InternalMessage.of(inputData))
+        .build());
     assertThat(((List<String>) responseEvent.getSession().<List>getProperty("recordsToUpdate")).size(), is(numberOfElements));
   }
 

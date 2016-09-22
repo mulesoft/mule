@@ -30,7 +30,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleContextTes
   @Override
   protected void doSetUp() throws Exception {
     // setup a dummy context for transformers that are event aware
-    setCurrentEvent(getTestEvent("test"));
+    setCurrentEvent(testEvent);
   }
 
   @Override

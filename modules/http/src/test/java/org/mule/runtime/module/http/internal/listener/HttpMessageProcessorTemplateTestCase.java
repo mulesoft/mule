@@ -27,9 +27,8 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.exception.MessagingException;
@@ -37,7 +36,6 @@ import org.mule.runtime.core.execution.ResponseCompletionCallback;
 import org.mule.runtime.module.http.internal.domain.response.HttpResponse;
 import org.mule.runtime.module.http.internal.listener.async.HttpResponseReadyCallback;
 import org.mule.runtime.module.http.internal.listener.async.ResponseStatusCallback;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -129,14 +127,9 @@ public class HttpMessageProcessorTemplateTestCase extends AbstractMuleTestCase {
   }
 
   private Event createMockEvent() throws Exception {
-    InternalMessage testMessage = InternalMessage.builder().payload("").build();
-
-    Event testEvent =
-        spy(Event.builder(DefaultEventContext.create(MuleTestUtils.getTestFlow(muleContext), TEST_CONNECTOR))
-            .message(testMessage).build());
     when(muleContext.getTransformationService().transform(any(InternalMessage.class), any(DataType.class)))
         .thenReturn(InternalMessage.builder().payload("".getBytes(UTF_8)).build());
-    return testEvent;
+    return spy(this.testEvent);
   }
 
 }

@@ -9,6 +9,7 @@ package org.mule.compatibility.core.routing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mule.compatibility.core.DefaultMuleEventEndpointUtils.populateFieldsFromInboundEndpoint;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.runtime.core.DefaultEventContext;
@@ -48,7 +49,7 @@ public class IdempotentMessageFilterMule6079TestCase extends AbstractMuleContext
   @Test
   public void testRaceConditionOnAcceptAndProcess() throws Exception {
     inboundEndpoint = getTestInboundEndpoint("Test", "test://Test?exchangePattern=one-way");
-    flow = getTestFlow();
+    flow = getTestFlow(muleContext);
 
     session = Mockito.mock(MuleSession.class);
 

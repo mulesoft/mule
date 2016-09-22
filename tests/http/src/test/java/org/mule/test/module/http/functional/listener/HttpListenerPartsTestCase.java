@@ -34,6 +34,7 @@ import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.TRANSFER_ENCODING;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.CHUNKED;
 import static org.mule.runtime.module.http.api.HttpHeaders.Values.MULTIPART_FORM_DATA;
+
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -134,7 +135,8 @@ public class HttpListenerPartsTestCase extends AbstractHttpTestCase {
 
   @Test
   public void respondWithSeveralAttachments() throws Exception {
-    InternalMessage response = muleContext.getClient().send(getUrl(filePath.getValue()), getTestMuleMessage()).getRight();
+    InternalMessage response =
+        muleContext.getClient().send(getUrl(filePath.getValue()), InternalMessage.of(TEST_PAYLOAD)).getRight();
     assertThat(response.getPayload().getValue(), instanceOf(MultiPartPayload.class));
     assertThat((MultiPartPayload) response.getPayload().getValue(), hasSize(2));
 

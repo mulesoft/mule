@@ -7,48 +7,31 @@
 package org.mule.runtime.core.registry;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class RequestContextTestCase extends AbstractMuleTestCase {
 
-  private FlowConstruct flow;
-
-  @Before
-  public void before() {
-    flow = mock(FlowConstruct.class);
-    when(flow.getMuleContext()).thenReturn(mock(MuleContext.class));
+  @Test
+  public void testSetExceptionPayloadAcrossThreads() throws InterruptedException, MuleException {
+    runThread(testEvent, false);
+    runThread(testEvent, true);
   }
 
   @Test
-  public void testSetExceptionPayloadAcrossThreads() throws InterruptedException {
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload("").build()).build();
-    runThread(event, false);
-    runThread(event, true);
-  }
-
-  @Test
-  public void testFailureWithoutThreadSafeEvent() throws InterruptedException {
-    Event event = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
-        .message(InternalMessage.builder().payload("").build()).build();
-    runThread(event, false);
-    runThread(event, true);
+  public void testFailureWithoutThreadSafeEvent() throws InterruptedException, MuleException {
+    runThread(testEvent, false);
+    runThread(testEvent, true);
   }
 
   protected void runThread(Event event, boolean doTest) throws InterruptedException {

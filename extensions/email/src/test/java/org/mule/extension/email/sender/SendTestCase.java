@@ -79,7 +79,7 @@ public class SendTestCase extends SMTPTestCase {
 
     assertThat(customEncoding, is(notNullValue()));
 
-    flowRunner(SEND_ENCODED_MESSAGE).withPayload(WEIRD_CHAR_MESSAGE).withFlowVariable("encoding", customEncoding).run();
+    flowRunner(SEND_ENCODED_MESSAGE).withPayload(WEIRD_CHAR_MESSAGE).withVariable("encoding", customEncoding).run();
 
     Message[] messages = getReceivedMessagesAndAssertCount(1);
     Object content = ((String) messages[0].getContent()).trim();

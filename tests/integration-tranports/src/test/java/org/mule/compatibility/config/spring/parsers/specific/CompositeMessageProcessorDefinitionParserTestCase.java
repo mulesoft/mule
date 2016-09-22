@@ -8,10 +8,12 @@ package org.mule.compatibility.config.spring.parsers.specific;
 
 import static org.junit.Assert.assertEquals;
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.lookupEndpointBuilder;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.NullMessageProcessor;
 
@@ -31,10 +33,11 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
     assertEquals(2, endpoint.getMessageProcessors().size());
 
     Processor endpointProcessor =
-        endpoint.getMessageProcessorsFactory().createInboundMessageProcessorChain(endpoint, getTestFlow(),
+        endpoint.getMessageProcessorsFactory().createInboundMessageProcessorChain(endpoint, getTestFlow(muleContext),
                                                                                   new NullMessageProcessor());
 
-    assertEquals("01231abc2", endpointProcessor.process(getTestEvent("0")).getMessageAsString(muleContext));
+    assertEquals("01231abc2", endpointProcessor.process(eventBuilder().message(InternalMessage.of("0"))
+        .build()).getMessageAsString(muleContext));
   }
 
 }

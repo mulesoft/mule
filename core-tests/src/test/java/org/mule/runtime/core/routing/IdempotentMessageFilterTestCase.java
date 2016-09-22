@@ -9,6 +9,7 @@ package org.mule.runtime.core.routing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.EventContext;
@@ -25,7 +26,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void testIdempotentReceiver() throws Exception {
-    Flow flow = getTestFlow();
+    Flow flow = getTestFlow(muleContext);
 
     MuleSession session = mock(MuleSession.class);
 
@@ -39,7 +40,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
     final EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR);
 
     InternalMessage okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    Event event = Event.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    Event event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();
 
     // This one will process the event on the target endpoint
     Event processedEvent = ir.process(event);
@@ -47,7 +48,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 
     // This will not process, because the ID is a duplicate
     okMessage = InternalMessage.builder().payload("OK").addOutboundProperty("id", "1").build();
-    event = Event.builder(context).message(okMessage).flow(getTestFlow()).session(session).build();
+    event = Event.builder(context).message(okMessage).flow(getTestFlow(muleContext)).session(session).build();
     processedEvent = ir.process(event);
     assertNull(processedEvent);
   }

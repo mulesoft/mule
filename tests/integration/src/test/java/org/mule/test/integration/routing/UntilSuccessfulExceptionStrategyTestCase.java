@@ -7,7 +7,6 @@
 package org.mule.test.integration.routing;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 
@@ -61,7 +60,7 @@ public class UntilSuccessfulExceptionStrategyTestCase extends AbstractIntegratio
   }
 
   private void testHandlingOfFailures(String entryPoint) throws Exception {
-    Event event = flowRunner(entryPoint).withPayload(getTestMuleMessage()).run();
+    Event event = flowRunner(entryPoint).withPayload(TEST_PAYLOAD).run();
     InternalMessage response = event.getMessage();
     assertThat(event.getError().isPresent(), is(false));
     assertThat(getPayloadAsString(response), is("ok"));

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.component;
 
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -77,7 +79,7 @@ public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCa
   @Test
   public void testLifecycle() throws Exception {
     SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Apple());
-    component.setFlowConstruct(getTestFlow());
+    component.setFlowConstruct(getTestFlow(muleContext));
     component.setMuleContext(muleContext);
     component.initialise();
     component.start();

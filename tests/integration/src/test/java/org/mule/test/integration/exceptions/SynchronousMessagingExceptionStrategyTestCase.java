@@ -17,28 +17,28 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
 
   @Test
   public void testTransformer() throws Exception {
-    flowRunner("Transformer").withPayload(getTestMuleMessage()).asynchronously().run();
+    flowRunner("Transformer").withPayload(TEST_PAYLOAD).asynchronously().run();
     exceptionListener.waitUntilAllNotificationsAreReceived();
     systemExceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testComponent() throws Exception {
-    flowRunner("Component").withPayload(getTestMuleMessage()).asynchronously().run();
+    flowRunner("Component").withPayload(TEST_PAYLOAD).asynchronously().run();
     exceptionListener.waitUntilAllNotificationsAreReceived();
     systemExceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testProcessorInboundRouter() throws Exception {
-    flowRunner("ProcessorInboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
+    flowRunner("ProcessorInboundRouter").withPayload(TEST_PAYLOAD).asynchronously().run();
     exceptionListener.waitUntilAllNotificationsAreReceived();
     systemExceptionListener.assertNotInvoked();
   }
 
   @Test
   public void testProcessorOutboundRouter() throws Exception {
-    flowRunner("ProcessorOutboundRouter").withPayload(getTestMuleMessage()).asynchronously().run();
+    flowRunner("ProcessorOutboundRouter").withPayload(TEST_PAYLOAD).asynchronously().run();
     exceptionListener.waitUntilAllNotificationsAreReceived();
     systemExceptionListener.assertNotInvoked();
   }

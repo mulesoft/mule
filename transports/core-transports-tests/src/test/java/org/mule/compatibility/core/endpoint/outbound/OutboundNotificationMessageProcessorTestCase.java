@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.core.context.notification.EndpointMessageNotification.MESSAGE_DISPATCH_END;
 import static org.mule.compatibility.core.context.notification.EndpointMessageNotification.MESSAGE_SEND_END;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.processor.AbstractMessageProcessorTestCase;
@@ -62,7 +63,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
     OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, null, null, REQUEST_RESPONSE, null);
     Processor mp = new OutboundNotificationMessageProcessor(endpoint);
     SensingNullReplyToHandler nullReplyToHandler = new SensingNullReplyToHandler();
-    Event event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, getTestFlow());
+    Event event = getNonBlockingTestEventUsingFlow(TEST_MESSAGE, nullReplyToHandler, getTestFlow(muleContext));
     mp.process(event);
 
     assertMessageNotification(listener, endpoint, event, MESSAGE_SEND_END);

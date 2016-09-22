@@ -22,12 +22,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
+import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
+import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.BOOLEAN;
-import static org.mule.test.metadata.extension.resolver.TestNoConfigMetadataResolver.KeyIds.STRING;
 
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -37,16 +37,15 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
-import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
@@ -62,13 +61,13 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.runtime.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutor;
 import org.mule.runtime.extension.api.runtime.operation.OperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
+import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.NullExceptionEnricher;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -242,8 +241,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   protected Event configureEvent() throws Exception {
     when(message.getPayload().getDataType().getMediaType()).thenReturn(MediaType.create("*", "*", defaultCharset()));
     when(message.getPayload().getValue()).thenReturn(TEST_PAYLOAD);
-    Event event = Event.builder(DefaultEventContext.create(getTestFlow(), TEST_CONNECTOR)).message(message).build();
-    return event;
+    return eventBuilder().message(message).build();
   }
 
   protected OperationMessageProcessor setUpOperationMessageProcessor() throws Exception {

@@ -127,6 +127,6 @@ public class FileRenameTestCase extends FileConnectorTestCase {
   }
 
   private void doRename(String flow, String source, String to, boolean overwrite) throws Exception {
-    flowRunner(flow).withFlowVariable("path", source).withFlowVariable("to", to).withFlowVariable("overwrite", overwrite).run();
+    flowRunner(flow).withVariable("path", source).withVariable("to", to).withVariable("overwrite", overwrite).run();
   }
 }

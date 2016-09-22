@@ -22,13 +22,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.I18nMessage;
@@ -36,7 +36,6 @@ import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
-import org.mule.tck.MuleTestUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -106,7 +105,10 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessOneWayEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event event = MuleTestUtils.getTestEvent("hello", ONE_WAY, muleContext);
+    Event event = eventBuilder()
+        .message(InternalMessage.of("hello"))
+        .exchangePattern(ONE_WAY)
+        .build();
     Event response = directInboundMessageSource.process(event);
 
     new PollingProber(50, 5).check(new JUnitProbe() {
@@ -127,12 +129,12 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
   public void testProcessRequestResponseEndpoint() throws Exception {
     flow.initialise();
     flow.start();
-    Event response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
+    Event response = directInboundMessageSource.process(testEvent);
 
-    assertEquals("helloabcdef", response.getMessageAsString(muleContext));
+    assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), response.getVariable("thread").getValue());
 
-    assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString(muleContext));
+    assertEquals(TEST_PAYLOAD + "abc", sensingMessageProcessor.event.getMessageAsString(muleContext));
     assertEquals(Thread.currentThread(), sensingMessageProcessor.event.getVariable("thread").getValue());
 
   }
@@ -167,7 +169,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
     flow.initialise();
 
     try {
-      directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", muleContext));
+      directInboundMessageSource.process(testEvent);
       fail("exception expected");
     } catch (Exception e) {
     }
@@ -203,17 +205,17 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
 
     String pipelineId = flow.dynamicPipeline(null).injectBefore(appendPre, new StringAppendTransformer("2"))
         .injectAfter(new StringAppendTransformer("3"), appendPost2).resetAndUpdate();
-    Event response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-    assertEquals("hello12abcdef34", response.getMessageAsString(muleContext));
+    Event response = directInboundMessageSource.process(testEvent);
+    assertEquals(TEST_PAYLOAD + "12abcdef34", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).injectBefore(new StringAppendTransformer("2")).injectAfter(new StringAppendTransformer("3"))
         .resetAndUpdate();
-    response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-    assertEquals("hello2abcdef3", response.getMessageAsString(muleContext));
+    response = directInboundMessageSource.process(testEvent);
+    assertEquals(TEST_PAYLOAD + "2abcdef3", response.getMessageAsString(muleContext));
 
     flow.dynamicPipeline(pipelineId).reset();
-    response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", REQUEST_RESPONSE, muleContext));
-    assertEquals("helloabcdef", response.getMessageAsString(muleContext));
+    response = directInboundMessageSource.process(testEvent);
+    assertEquals(TEST_PAYLOAD + "abcdef", response.getMessageAsString(muleContext));
   }
 
   @Test

@@ -6,28 +6,27 @@
  */
 package org.mule.runtime.core.source;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.core.util.ObjectUtils;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.util.ObjectUtils;
 
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 public class StartableCompositeMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   protected SensingNullMessageProcessor listener;
   protected SensingNullMessageProcessor listener2;
   protected StartableCompositeMessageSource compositeSource;
-  protected Event testEvent;
   protected NullMessageSource source;
 
   @Override
@@ -36,7 +35,6 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
     listener = getSensingNullMessageProcessor();
     listener2 = getSensingNullMessageProcessor();
     compositeSource = getCompositeSource();
-    testEvent = getTestEvent(TEST_MESSAGE);
     source = new NullMessageSource(testEvent);
   }
 
@@ -153,6 +151,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
       this.event = event;
     }
 
+    @Override
     public void setListener(Processor listener) {
       this.listener = listener;
     }
@@ -163,10 +162,12 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleContext
       }
     }
 
+    @Override
     public void start() throws MuleException {
       started = true;
     }
 
+    @Override
     public void stop() throws MuleException {
       started = false;
     }

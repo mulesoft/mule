@@ -8,11 +8,9 @@ package org.mule.test.core;
 
 import static org.mule.runtime.core.MessageExchangePattern.ONE_WAY;
 
-import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.Event.Builder;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -145,14 +143,12 @@ public class MuleEventCopyPerformanceTestCase extends AbstractMuleContextTestCas
   }
 
   protected Event createMuleEvent(InternalMessage message, int numProperties) {
-    Flow flow;
+    final Event.Builder builder;
     try {
-      flow = getTestFlow();
+      builder = eventBuilder().message(message).exchangePattern(ONE_WAY);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    final Event.Builder builder = Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR)).message(message)
-        .exchangePattern(ONE_WAY).flow(flow);
     for (int i = 1; i <= numProperties; i++) {
       builder.addVariable("FlOwVaRiAbLeKeY" + i, "val");
     }

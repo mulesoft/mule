@@ -28,9 +28,6 @@ import static org.mockito.Mockito.when;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
 import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
-import org.mule.compatibility.transport.jms.Jms102bSupport;
-import org.mule.compatibility.transport.jms.Jms11Support;
-import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
@@ -55,9 +52,7 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.springframework.jms.connection.SingleConnectionFactory;
 
 /**
@@ -104,82 +99,36 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
   }
 
   private void setupMockSession() throws JMSException {
-    when(connection.createSession(false, 1)).then(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return createSessionMock();
-      }
-    });
-    doAnswer(new Answer() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        connectionExceptionListener = (ExceptionListener) invocation.getArguments()[0];
-        return null;
-      }
+    when(connection.createSession(false, 1)).then(invocation -> createSessionMock());
+    doAnswer(invocation -> {
+      connectionExceptionListener = (ExceptionListener) invocation.getArguments()[0];
+      return null;
     }).when(connection).setExceptionListener(any(ExceptionListener.class));
-    when(connection.getExceptionListener()).thenAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return connectionExceptionListener;
-      }
-    });
-    doAnswer(new Answer() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        connectionClientId = (String) invocation.getArguments()[0];
-        return null;
-      }
+    when(connection.getExceptionListener()).thenAnswer(invocation -> connectionExceptionListener);
+    doAnswer(invocation -> {
+      connectionClientId = (String) invocation.getArguments()[0];
+      return null;
     }).when(connection).setClientID(any(String.class));
-    when(connection.getClientID()).thenAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return connectionClientId;
-      }
-    });
+    when(connection.getClientID()).thenAnswer(invocation -> connectionClientId);
   }
 
   private QueueSession createSessionMock() throws JMSException {
     QueueSession mock = mock(QueueSession.class);
-    when(mock.createProducer(any(Destination.class))).then(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return createProducerMock();
-      }
-    });
-    when(mock.createConsumer(any(Destination.class))).then(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return mock(MessageConsumer.class);
-      }
-    });
-    when(mock.createTextMessage(anyString())).then(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        ActiveMQTextMessage msg = new ActiveMQTextMessage();
-        msg.setText((String) invocation.getArguments()[0]);
-        return msg;
-      }
+    when(mock.createProducer(any(Destination.class))).then(invocation -> createProducerMock());
+    when(mock.createConsumer(any(Destination.class))).then(invocation -> mock(MessageConsumer.class));
+    when(mock.createTextMessage(anyString())).then(invocation -> {
+      ActiveMQTextMessage msg = new ActiveMQTextMessage();
+      msg.setText((String) invocation.getArguments()[0]);
+      return msg;
     });
     return mock;
   }
 
   private MessageProducer createProducerMock() throws JMSException {
     MessageProducer mock = mock(MessageProducer.class);
-    doAnswer(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        messageSentLatch.countDown();
-        return null;
-      }
+    doAnswer(invocation -> {
+      messageSentLatch.countDown();
+      return null;
     }).when(mock).send(any(Message.class), anyInt(), anyInt(), anyLong());
     return mock;
   }
@@ -250,13 +199,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
     QueueConnectionFactory connectionFactory = mock(QueueConnectionFactory.class);
     QueueConnection queueConnection = mock(QueueConnection.class);
     when(connectionFactory.createQueueConnection()).thenReturn(queueConnection);
-    when(queueConnection.createQueueSession(false, 1)).then(new Answer<Object>() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        return createSessionMock();
-      }
-    });
+    when(queueConnection.createQueueSession(false, 1)).then(invocation -> createSessionMock());
 
     connector.setConnectionFactory(connectionFactory);
     connector.setJmsSupport(new Jms102bSupport(connector));
@@ -316,7 +259,7 @@ public class OutboundSessionAndProducerReuseTestCase extends AbstractMuleContext
 
     reset(connectionFactory);
 
-    outboundEndpoint.process(getTestEvent(TEST_MESSAGE));
+    outboundEndpoint.process(testEvent);
 
     verify(connectionFactory, times(0)).createConnection();
     verify(connection, times(1)).createSession(anyBoolean(), anyInt());

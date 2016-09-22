@@ -11,12 +11,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.DefaultEventContext;
-import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.EventContext;
 import org.mule.runtime.core.api.MuleSession;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.message.GroupCorrelation;
+import org.mule.runtime.core.session.DefaultMuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -30,8 +31,8 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void testMessageProcessor() throws Exception {
-    MuleSession session = getTestSession(null, muleContext);
-    Flow flow = getTestFlow("test", Apple.class);
+    MuleSession session = new DefaultMuleSession();
+    Flow flow = getTestFlowWithComponent("test", Apple.class);
     assertNotNull(flow);
 
     MessageChunkAggregator router = new MessageChunkAggregator();
@@ -45,10 +46,10 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase 
 
     EventContext context = DefaultEventContext.create(flow, TEST_CONNECTOR, "foo");
 
-    Event event1 = Event.builder(context).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(getTestFlow())
+    Event event1 = Event.builder(context).message(message1).groupCorrelation(new GroupCorrelation(3, null)).flow(flow)
         .session(session).build();
-    Event event2 = Event.builder(context).message(message2).flow(getTestFlow()).session(session).build();
-    Event event3 = Event.builder(context).message(message3).flow(getTestFlow()).session(session).build();
+    Event event2 = Event.builder(context).message(message2).flow(flow).session(session).build();
+    Event event3 = Event.builder(context).message(message3).flow(flow).session(session).build();
 
     assertNull(router.process(event1));
     assertNull(router.process(event2));

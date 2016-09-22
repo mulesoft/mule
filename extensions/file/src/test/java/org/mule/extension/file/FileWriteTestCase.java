@@ -107,7 +107,7 @@ public class FileWriteTestCase extends FileConnectorTestCase {
     File file = temporaryFolder.newFile();
     FileUtils.writeStringToFile(file, "overwrite me!");
 
-    Event event = flowRunner("readAndWrite").withFlowVariable("path", file.getAbsolutePath()).run();
+    Event event = flowRunner("readAndWrite").withVariable("path", file.getAbsolutePath()).run();
 
     assertThat(event.getMessageAsString(muleContext), equalTo(HELLO_WORLD));
   }

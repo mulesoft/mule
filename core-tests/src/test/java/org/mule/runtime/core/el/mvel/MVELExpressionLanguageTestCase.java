@@ -29,13 +29,13 @@ import org.mule.mvel2.optimizers.OptimizerFactory;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.expression.InvalidExpressionException;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.config.MuleManifest;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
@@ -238,14 +238,14 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void regexFunction() throws Exception {
-    assertEquals("foo", evaluate("regex('TEST(\\\\w+)TEST')", getTestEvent("TESTfooTEST")));
+    final Event testEvent = eventBuilder().message(InternalMessage.of("TESTfooTEST")).build();
+    assertEquals("foo", evaluate("regex('TEST(\\\\w+)TEST')", testEvent));
   }
 
   @Test
   public void appTakesPrecedenceOverEverything() throws Exception {
     mvel.setAliases(Collections.singletonMap("app", "'other1'"));
-    Event event = getTestEvent("");
-    event = Event.builder(event).addVariable("app", "otherb").build();
+    Event event = eventBuilder().message(InternalMessage.of("")).addVariable("app", "otherb").build();
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("app", "otherc"));
     mvel.initialise();
@@ -255,8 +255,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void messageTakesPrecedenceOverEverything() throws Exception {
     mvel.setAliases(Collections.singletonMap("message", "'other1'"));
-    Event event = getTestEvent("");
-    event = Event.builder(event).addVariable("message", "other2").build();
+    Event event = eventBuilder().message(InternalMessage.of("")).addVariable("message", "other2").build();
     muleContext.getRegistry().registerObject("foo",
                                              (ExpressionLanguageExtension) context -> context.addVariable("message", "other3"));
     mvel.initialise();
@@ -265,8 +264,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void extensionTakesPrecedenceOverAutoResolved() throws Exception {
-    Event event = getTestEvent("");
-    event = Event.builder(event).addVariable("foo", "other").build();
+    Event event = eventBuilder().message(InternalMessage.of("")).addVariable("foo", "other").build();
     muleContext.getRegistry().registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "bar"));
     mvel.initialise();
     assertEquals("bar", evaluate("foo", event));
@@ -283,8 +281,6 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
   @Test
   public void aliasTakesPrecedenceOverExtension() throws Exception {
     mvel.setAliases(Collections.singletonMap("foo", "'bar'"));
-    Event event = getTestEvent("");
-    event = Event.builder(event).addVariable("foo", "other").build();
     mvel.initialise();
     assertEquals("bar", evaluate("foo"));
   }
@@ -559,7 +555,7 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void collectionAccessPayloadChangedMULE7506() throws Exception {
-    Event event = getTestEvent(new String[] {"1", "2"});
+    Event event = eventBuilder().message(InternalMessage.of(new String[] {"1", "2"})).build();
     assertEquals("1", mvel.evaluate("payload[0]", event, flowConstruct));
     event = Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(singletonList("1")).build()).build();
     assertEquals("1", mvel.evaluate("payload[0]", event, flowConstruct));

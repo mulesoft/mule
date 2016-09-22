@@ -116,7 +116,7 @@ public class ExceptionStrategyTestCase extends FunctionalTestCase {
     latch = new CountDownLatch(1);
     registerExceptionNotificationListener();
     InternalMessage response = client.send("http://localhost:" + dynamicPort.getNumber() + "/proxyExceptionStrategy",
-                                           getTestMuleMessage(requestPayload), HTTP_REQUEST_OPTIONS)
+                                           InternalMessage.of(requestPayload), HTTP_REQUEST_OPTIONS)
         .getRight();
     assertNotNull(response);
     assertTrue(getPayloadAsString(response).contains("<faultstring>"));

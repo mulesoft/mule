@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
 
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.core.DefaultEventContext;
@@ -35,11 +35,10 @@ public class NonBlockingMessageProcessorTestCase extends AbstractMuleContextTest
 
   @Test
   public void blockingProcess() throws MuleException, Exception {
-    Event request = getTestEvent(TEST_MESSAGE);
-    Event response = nonBlockingMessageProcessor.process(request);
+    Event response = nonBlockingMessageProcessor.process(testEvent);
 
     // Test processor echos request so we can assert request equals response.
-    assertThat(response, equalTo(request));
+    assertThat(response, equalTo(testEvent));
   }
 
   @Test

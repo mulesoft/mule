@@ -28,7 +28,7 @@ public class SingleConfigParserTestCase extends AbstractConfigParserTestCase {
   @Test
   public void configWithExpressionFunctionIsSameInstanceForDifferentEvents() throws Exception {
     Event event = getHeisenbergEvent();
-    Event anotherEvent = getTestEvent("");
+    Event anotherEvent = testEvent;
     HeisenbergExtension config = lookupHeisenberg(HEISENBERG_BYNAME, event);
     HeisenbergExtension anotherConfig = lookupHeisenberg(HEISENBERG_BYNAME, anotherEvent);
     assertThat(config, is(sameInstance(anotherConfig)));

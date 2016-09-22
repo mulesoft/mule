@@ -42,7 +42,7 @@ public class InterceptingOperationExecutionTestCase extends ExtensionFunctionalT
 
   @Override
   protected void doSetUp() throws Exception {
-    config = getConfigurationFromRegistry("banana", getTestEvent(""), muleContext);
+    config = getConfigurationFromRegistry("banana", testEvent, muleContext);
   }
 
   @Test

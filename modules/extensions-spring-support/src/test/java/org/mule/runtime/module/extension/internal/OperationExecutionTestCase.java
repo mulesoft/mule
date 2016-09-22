@@ -6,12 +6,28 @@
  */
 package org.mule.runtime.module.extension.internal;
 
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatcher;
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
+import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
+import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
+import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
+import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
+import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -42,28 +58,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.hasSize;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatcher;
+
 import static org.hamcrest.collection.IsMapContaining.hasKey;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.CALL_GUS_MESSAGE;
-import static org.mule.test.heisenberg.extension.HeisenbergOperations.CURE_CANCER_MESSAGE;
-import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
-import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
-import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
-import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -162,8 +164,8 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void optionalParameterWithDefaultOverride() throws Exception {
-    Event event = flowRunner("customKillWithoutDefault").withPayload(EMPTY_STRING).withFlowVariable("goodbye", GOODBYE_MESSAGE)
-        .withFlowVariable("victim", VICTIM).run();
+    Event event = flowRunner("customKillWithoutDefault").withPayload(EMPTY_STRING).withVariable("goodbye", GOODBYE_MESSAGE)
+        .withVariable("victim", VICTIM).run();
 
     assertKillPayload(event);
   }
@@ -231,7 +233,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void operationWithInlineListParameter() throws Exception {
     List<String> response = (List<String>) flowRunner("knockManyWithInlineList").withPayload(EMPTY_STRING)
-        .withFlowVariable("victim", "Saul").run().getMessage().getPayload().getValue();
+        .withVariable("victim", "Saul").run().getMessage().getPayload().getValue();
     assertThat(response, Matchers.contains(knock("Inline Skyler"), knock("Saul")));
   }
 
@@ -240,7 +242,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     List<KnockeableDoor> doors = Arrays.asList(new KnockeableDoor("Skyler"), new KnockeableDoor("Saul"));
 
     List<String> response =
-        (List<String>) flowRunner("knockManyByExpression").withPayload(EMPTY_STRING).withFlowVariable("doors", doors)
+        (List<String>) flowRunner("knockManyByExpression").withPayload(EMPTY_STRING).withVariable("doors", doors)
             .run().getMessage().getPayload().getValue();
     assertThat(response, Matchers.contains(knock("Skyler"), knock("Saul")));
   }
@@ -273,7 +275,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     Ricin ricinWeapon = new Ricin();
     ricinWeapon.setMicrogramsPerKilo(10L);
 
-    Event event = flowRunner("killWithWeapon").withPayload(EMPTY).withFlowVariable("weapon", ricinWeapon).run();
+    Event event = flowRunner("killWithWeapon").withPayload(EMPTY).withVariable("weapon", ricinWeapon).run();
     assertThat(event.getMessageAsString(muleContext), is(KILL_RESULT));
   }
 
@@ -292,7 +294,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     ricinWeapon2.setMicrogramsPerKilo(10L);
 
     List<Weapon> weaponList = Arrays.asList(ricinWeapon1, ricinWeapon2);
-    Event event = flowRunner("killWithMultipleWeapons").withPayload(EMPTY).withFlowVariable("weapons", weaponList).run();
+    Event event = flowRunner("killWithMultipleWeapons").withPayload(EMPTY).withVariable("weapons", weaponList).run();
 
     List<String> result = weaponList.stream().map(Weapon::kill).collect(Collectors.toList());
     assertThat(event.getMessage().getPayload().getValue(), is(result));
@@ -449,7 +451,7 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void assertDynamicVictim(String flowName, String victim) throws Exception {
-    assertKnockedDoor(getPayloadAsString(flowRunner(flowName).withPayload(EMPTY_STRING).withFlowVariable("victim", victim).run()
+    assertKnockedDoor(getPayloadAsString(flowRunner(flowName).withPayload(EMPTY_STRING).withVariable("victim", victim).run()
         .getMessage()), victim);
   }
 
@@ -462,16 +464,17 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   }
 
   private void assertKillByPayload(String flowName) throws Exception {
-    assertKillPayload(flowRunner(flowName).withPayload(VICTIM).withFlowVariable("goodbye", GOODBYE_MESSAGE).run());
+    assertKillPayload(flowRunner(flowName).withPayload(VICTIM).withVariable("goodbye", GOODBYE_MESSAGE).run());
   }
 
   private void doTestExpressionEnemy(Object enemyIndex) throws Exception {
-    Event event = flowRunner("expressionEnemy").withPayload(EMPTY).withFlowVariable("enemy", enemyIndex).run();
+    Event event = flowRunner("expressionEnemy").withPayload(EMPTY).withVariable("enemy", enemyIndex).run();
 
     assertThat(event.getMessageAsString(muleContext), is(GUSTAVO_FRING));
   }
 
   private HeisenbergExtension getConfig(String name) throws Exception {
-    return ExtensionsTestUtils.getConfigurationFromRegistry(name, getTestEvent(EMPTY_STRING), muleContext);
+    return ExtensionsTestUtils
+        .getConfigurationFromRegistry(name, eventBuilder().message(InternalMessage.of(EMPTY_STRING)).build(), muleContext);
   }
 }

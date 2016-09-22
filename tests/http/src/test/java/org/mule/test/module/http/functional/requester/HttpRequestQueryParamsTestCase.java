@@ -24,8 +24,8 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
 
   @Test
   public void sendsQueryParamsFromList() throws Exception {
-    flowRunner("queryParamList").withPayload(TEST_MESSAGE).withFlowVariable("paramName", "testName2")
-        .withFlowVariable("paramValue", "testValue2").run();
+    flowRunner("queryParamList").withPayload(TEST_MESSAGE).withVariable("paramName", "testName2")
+        .withVariable("paramValue", "testValue2").run();
 
     assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
   }
@@ -35,7 +35,7 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
     Map<String, String> params = new HashMap<>();
     params.put("testName1", "testValue1");
     params.put("testName2", "testValue2");
-    flowRunner("queryParamMap").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
+    flowRunner("queryParamMap").withPayload(TEST_MESSAGE).withVariable("params", params).run();
     assertThat(uri, equalTo("/testPath?testName1=testValue1&testName2=testValue2"));
   }
 
@@ -45,7 +45,7 @@ public class HttpRequestQueryParamsTestCase extends AbstractHttpRequestTestCase 
     Map<String, String> params = new HashMap<>();
     params.put("testName1", "testValueNew");
     params.put("testName2", "testValue2");
-    flowRunner("multipleQueryParam").withPayload(TEST_MESSAGE).withFlowVariable("params", params).run();
+    flowRunner("multipleQueryParam").withPayload(TEST_MESSAGE).withVariable("params", params).run();
 
     assertThat(uri, equalTo("/testPath?testName1=testValue1&testName1=testValueNew&testName2=testValue2"));
   }

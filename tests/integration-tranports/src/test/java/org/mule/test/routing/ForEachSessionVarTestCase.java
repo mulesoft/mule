@@ -9,9 +9,9 @@ package org.mule.test.routing;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
@@ -26,6 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 public class ForEachSessionVarTestCase extends FunctionalTestCase {
 
@@ -43,7 +45,7 @@ public class ForEachSessionVarTestCase extends FunctionalTestCase {
     expectedArray.add("Hello World A");
     expectedArray.add("Hello World B");
 
-    flowRunner("test-foreachFlow1").withPayload(getTestMuleMessage()).run();
+    flowRunner("test-foreachFlow1").withPayload(TEST_PAYLOAD).run();
 
     // propierty should exist in the session and the message
     assertThat(event.getSession().<Collection<String>>getProperty(MY_SESSION_LIST), is(expectedArray));
@@ -78,7 +80,7 @@ public class ForEachSessionVarTestCase extends FunctionalTestCase {
     }
 
     CountDownLatch latch = new CountDownLatch(size);
-    flowRunner("foreachWithAsync").withPayload(list).withFlowVariable("latch", latch).run();
+    flowRunner("foreachWithAsync").withPayload(list).withVariable("latch", latch).run();
 
     latch.await(10, TimeUnit.SECONDS);
   }

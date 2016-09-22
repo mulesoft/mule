@@ -73,7 +73,7 @@ public class InsertTestCase extends AbstractDbIntegrationTestCase {
   }
 
   private Message doInsertParameterized(int id, String planet) throws Exception {
-    return flowRunner("insertParameterized").withPayload(planet).withFlowVariable("id", id).run().getMessage();
+    return flowRunner("insertParameterized").withPayload(planet).withVariable("id", id).run().getMessage();
   }
 
   private void assertInsert(StatementResult result, String planetName) throws SQLException {

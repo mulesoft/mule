@@ -34,11 +34,8 @@ public class MuleEventWorkTestCase extends AbstractMuleContextTestCase {
   protected void doSetUp() throws Exception {
     super.doSetUp();
     // Create a dummy event and give it some properties
-    originalEvent = getTestEvent("test");
-    originalEvent = Event.builder(originalEvent).message(InternalMessage.builder(originalEvent.getMessage())
-        .addOutboundProperty("test", "val")
-        .addOutboundProperty("test2", "val2")
-        .build()).build();
+    originalEvent = eventBuilder().message(InternalMessage.builder().payload("test").addOutboundProperty("test", "val")
+        .addOutboundProperty("test2", "val2").build()).build();
     setCurrentEvent(originalEvent);
   }
 

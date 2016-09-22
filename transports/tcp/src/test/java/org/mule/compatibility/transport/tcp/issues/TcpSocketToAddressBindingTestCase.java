@@ -90,7 +90,7 @@ public class TcpSocketToAddressBindingTestCase extends AbstractTcpSocketToAddres
        * Request not using loopback address to endpoint listening at all local addresses should get an appropriate response.
        */
       result = client.send(getTransportName() + "://" + inetAddress.getHostAddress() + ":" + dynamicPort3.getNumber(),
-                           getTestMuleMessage(TEST_MESSAGE))
+                           InternalMessage.of(TEST_MESSAGE))
           .getRight();
       assertThat(getPayloadAsString(result), is(TEST_MESSAGE + " Received"));
     }

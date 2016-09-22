@@ -47,7 +47,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    Event inEvent = Event.builder(getTestEvent("")).message(InternalMessage.builder().payload(fruitBowl).build()).build();
+    final Event inEvent = eventBuilder().message(InternalMessage.of(fruitBowl)).build();
 
     Event resultEvent = splitter.process(inEvent);
 
@@ -80,7 +80,7 @@ public class AbstractSplitterTestCase extends AbstractMuleContextTestCase {
     fruitBowl.addFruit(banana);
     fruitBowl.addFruit(orange);
 
-    Event inEvent = Event.builder(getTestEvent("")).message(InternalMessage.builder().payload(fruitBowl).build()).build();
+    final Event inEvent = eventBuilder().message(InternalMessage.of(fruitBowl)).build();
 
     Event resultEvent = splitter.process(inEvent);
 

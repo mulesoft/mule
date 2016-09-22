@@ -94,7 +94,7 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
 
   @Test
   public void transactionCommitFailureTriggersExceptionStrategy() throws Exception {
-    transactionCommitFailureExecutesExceptionStrategy(getTestMuleMessage());
+    transactionCommitFailureExecutesExceptionStrategy(InternalMessage.of(TEST_PAYLOAD));
   }
 
   @Test
@@ -118,7 +118,7 @@ public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
     SystemExceptionListener systemExceptionListener = new SystemExceptionListener(muleContext);
     getFunctionalTestComponent(TRANSACTION_COMMIT_FAILS_FLOW).setEventCallback(replaceTransactionWithMockAndFailComponent());
     ExceptionListener exceptionListener = new ExceptionListener(muleContext);
-    muleContext.getClient().dispatch(IN_3_VM_ENDPOINT, getTestMuleMessage());
+    muleContext.getClient().dispatch(IN_3_VM_ENDPOINT, InternalMessage.of(TEST_PAYLOAD));
     exceptionListener.waitUntilAllNotificationsAreReceived();
     stopFlowConstruct(TRANSACTION_COMMIT_FAILS_FLOW);
     systemExceptionListener.waitUntilAllNotificationsAreReceived();

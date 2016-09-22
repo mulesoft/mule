@@ -54,14 +54,14 @@ public class MessageContextTestCase extends AbstractELTestCase {
 
   @Test
   public void message() throws Exception {
-    Event event = getTestEvent("foo");
+    Event event = Event.builder(context).message(InternalMessage.of("foo")).build();
     assertTrue(evaluate("message", event) instanceof MessageContext);
     assertEquals("foo", evaluate("message.payload", event));
   }
 
   @Test
   public void assignToMessage() throws Exception {
-    Event event = getTestEvent("");
+    Event event = Event.builder(context).message(InternalMessage.of("")).build();
     assertImmutableVariable("message='foo'", event);
   }
 

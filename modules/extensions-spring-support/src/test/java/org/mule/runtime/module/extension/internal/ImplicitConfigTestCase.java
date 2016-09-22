@@ -50,7 +50,7 @@ public class ImplicitConfigTestCase extends ExtensionFunctionalTestCase {
   public void getImplicitConfig() throws Exception {
     final Integer defaultValue = 42;
     ImplicitConfigExtension config = (ImplicitConfigExtension) flowRunner("implicitConfig").withPayload("")
-        .withFlowVariable("optionalWithDefault", defaultValue).run().getMessage().getPayload().getValue();
+        .withVariable("optionalWithDefault", defaultValue).run().getMessage().getPayload().getValue();
 
 
     assertThat(config, is(notNullValue()));

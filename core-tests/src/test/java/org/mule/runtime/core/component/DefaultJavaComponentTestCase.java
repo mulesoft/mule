@@ -6,18 +6,22 @@
  */
 package org.mule.runtime.core.component;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.tck.MuleTestUtils.getTestFlow;
+
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.object.ObjectFactory;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.test.core.lifecycle.LifecycleTrackerComponent;
 import org.mule.runtime.core.object.PrototypeObjectFactory;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.test.core.lifecycle.LifecycleTrackerComponent;
 
 import org.junit.Test;
 
@@ -43,7 +47,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
   @Test
   public void testLifecycle() throws Exception {
     DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
-    component.setFlowConstruct(getTestFlow());
+    component.setFlowConstruct(getTestFlow(muleContext));
     component.setMuleContext(muleContext);
     component.initialise();
     component.start();
@@ -65,7 +69,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
   public void testComponentDisposal() throws Exception {
     DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
 
-    component.setFlowConstruct(getTestFlow());
+    component.setFlowConstruct(getTestFlow(muleContext));
     component.setMuleContext(muleContext);
     component.initialise();
     component.start();
@@ -83,7 +87,8 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase {
   public void testServicePropagatedLifecycle() throws Exception {
 
     LifecycleTrackerComponent component = new LifecycleTrackerComponent();
-    Flow flow = MuleTestUtils.getTestFlow(MuleTestUtils.APPLE_FLOW, component, false, muleContext);
+    final Flow flow = new Flow(MuleTestUtils.APPLE_FLOW, muleContext);
+    flow.setMessageProcessors(singletonList((Processor) component));
     flow.initialise();
     assertTrue(component.getTracker().contains("initialise"));
   }

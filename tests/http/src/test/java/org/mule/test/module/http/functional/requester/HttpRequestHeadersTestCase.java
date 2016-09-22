@@ -44,8 +44,8 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
 
   @Test
   public void sendsHeadersFromList() throws Exception {
-    flowRunner("headerList").withPayload(TEST_MESSAGE).withFlowVariable("headerName", "testName2")
-        .withFlowVariable("headerValue", "testValue2").run();
+    flowRunner("headerList").withPayload(TEST_MESSAGE).withVariable("headerName", "testName2")
+        .withVariable("headerValue", "testValue2").run();
 
     assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
     assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
@@ -56,7 +56,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
     Map<String, String> params = new HashMap<>();
     params.put("testName1", "testValue1");
     params.put("testName2", "testValue2");
-    flowRunner("headerMap").withPayload(TEST_MESSAGE).withFlowVariable("headers", params).run();
+    flowRunner("headerMap").withPayload(TEST_MESSAGE).withVariable("headers", params).run();
 
     assertThat(getFirstReceivedHeader("testName1"), equalTo("testValue1"));
     assertThat(getFirstReceivedHeader("testName2"), equalTo("testValue2"));
@@ -68,7 +68,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
     Map<String, String> params = new HashMap<>();
     params.put("testName1", "testValueNew");
     params.put("testName2", "testValue2");
-    flowRunner("headerOverride").withPayload(TEST_MESSAGE).withFlowVariable("headers", params).run();
+    flowRunner("headerOverride").withPayload(TEST_MESSAGE).withVariable("headers", params).run();
 
     final Collection<String> values = headers.get("testName1");
     assertThat(values, Matchers.containsInAnyOrder(Arrays.asList("testValue1", "testValueNew").toArray(new String[2])));
@@ -79,7 +79,7 @@ public class HttpRequestHeadersTestCase extends AbstractHttpRequestTestCase {
   public void allowsUserAgentOverride() throws Exception {
     Map<String, String> params = new HashMap<>();
     params.put("User-Agent", "TEST");
-    flowRunner("headerMap").withPayload(TEST_MESSAGE).withFlowVariable("headers", params).run();
+    flowRunner("headerMap").withPayload(TEST_MESSAGE).withVariable("headers", params).run();
 
     assertThat(getFirstReceivedHeader("User-Agent"), equalTo("TEST"));
   }
