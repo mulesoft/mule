@@ -8,6 +8,11 @@
 package org.mule.runtime.core.util.store;
 
 import static org.mule.runtime.core.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.runtime.core.util.FileUtils.moveFileToDirectory;
+import static org.mule.runtime.core.util.FileUtils.newFile;
+import static org.mule.runtime.core.util.FileUtils.cleanDirectory;
+import static org.mule.runtime.core.util.FileUtils.readFileToString;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.serialization.ObjectSerializer;
@@ -20,7 +25,6 @@ import org.mule.runtime.core.api.store.ObjectStoreNotAvaliableException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
-import org.mule.runtime.core.util.FileUtils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -47,6 +51,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
 
   private static final String OBJECT_FILE_EXTENSION = ".obj";
   private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
+  public static final String CORRUPTED_FOLDER = "corrupted-files";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final MuleContext muleContext;
   private final ObjectSerializer serializer;
@@ -75,7 +80,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   private String readPartitionFileName(File partitionDirectory) throws ObjectStoreNotAvaliableException {
     File partitionDescriptorFile = new File(partitionDirectory, PARTITION_DESCRIPTOR_FILE);
     try {
-      return FileUtils.readFileToString(partitionDescriptorFile);
+      return readFileToString(partitionDescriptorFile);
     } catch (IOException e) {
       throw new ObjectStoreNotAvaliableException(e);
     }
@@ -126,7 +131,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   public void clear() throws ObjectStoreException {
     synchronized (realKeyToUUIDIndex) {
       try {
-        FileUtils.cleanDirectory(this.partitionDirectory);
+        cleanDirectory(this.partitionDirectory);
       } catch (IOException e) {
         throw new ObjectStoreException(I18nMessageFactory.createStaticMessage("Could not clear ObjectStore"), e);
       }
@@ -206,6 +211,16 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
     }
   }
 
+  private void moveToCorruptedFilesFolder(File file) throws IOException {
+    String workingDirectory = (new File(muleContext.getConfiguration().getWorkingDirectory()))
+        .toPath().normalize().toString();
+
+    String diffFolder = file.getAbsolutePath().split(workingDirectory)[1];
+    File corruptedFile = new File(muleContext.getConfiguration().getWorkingDirectory()
+        + File.separator + CORRUPTED_FOLDER + diffFolder);
+    moveFileToDirectory(file, corruptedFile.getParentFile(), true);
+  }
+
   private synchronized void loadStoredKeysAndFileNames() throws ObjectStoreException {
     /*
      * by re-checking this condition here we can avoid contention in {@link #assureLoaded}. The amount of times that this
@@ -219,8 +234,18 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
       File[] files = listValuesFiles();
       for (int i = 0; i < files.length; i++) {
         File file = files[i];
-        StoreValue<T> storeValue = deserialize(file);
-        realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+        try {
+          StoreValue<T> storeValue = deserialize(file);
+          realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+        } catch (ObjectStoreException e) {
+          if (logger.isWarnEnabled()) {
+            logger.warn(String.format(
+                                      "Could not deserialize the ObjectStore file: %s. The file will be skipped " +
+                                          "and moved " + "to the Garbage folder",
+                                      file.getName()));
+          }
+          moveToCorruptedFilesFolder(file);
+        }
       }
 
       loaded = true;
@@ -265,7 +290,7 @@ public class PersistentObjectStorePartition<T extends Serializable> implements L
   protected File createFileToStoreObject() throws ObjectStoreException {
     String filename = org.mule.runtime.core.util.UUID.getUUID() + OBJECT_FILE_EXTENSION;
     try {
-      return FileUtils.newFile(partitionDirectory, filename);
+      return newFile(partitionDirectory, filename);
     } catch (MuleRuntimeException mre) {
       throw new ObjectStoreException(mre);
     }
