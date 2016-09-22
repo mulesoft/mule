@@ -8,6 +8,11 @@
 package org.mule.util.store;
 
 import static org.mule.api.store.ObjectStoreManager.UNBOUNDED;
+import static org.mule.util.FileUtils.moveFileToDirectory;
+import static org.mule.util.FileUtils.readFileToString;
+import static org.mule.util.FileUtils.cleanDirectory;
+import static org.mule.util.FileUtils.newFile;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.store.ExpirableObjectStore;
@@ -49,6 +54,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
 
     private static final String OBJECT_FILE_EXTENSION = ".obj";
     private static final String PARTITION_DESCRIPTOR_FILE = "partition-descriptor";
+    public static final String CORRUPTED_FOLDER = "corrupted-files";
     protected final Log logger = LogFactory.getLog(this.getClass());
     private final MuleContext muleContext;
 
@@ -79,7 +85,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
         File partitionDescriptorFile = new File(partitionDirectory, PARTITION_DESCRIPTOR_FILE);
         try
         {
-            return FileUtils.readFileToString(partitionDescriptorFile);
+            return readFileToString(partitionDescriptorFile);
         }
         catch (IOException e)
         {
@@ -145,7 +151,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
         {
             try
             {
-                FileUtils.cleanDirectory(this.partitionDirectory);
+                cleanDirectory(this.partitionDirectory);
             }
             catch (IOException e)
             {
@@ -244,6 +250,17 @@ public class PersistentObjectStorePartition<T extends Serializable>
         }
     }
 
+    private void moveToCorruptedFilesFolder(File file) throws IOException
+    {
+        String workingDirectory = (new File(muleContext.getConfiguration().getWorkingDirectory()))
+                .toPath().normalize().toString();
+
+        String diffFolder = file.getAbsolutePath().split(workingDirectory)[1];
+        File corruptedFile = new File(muleContext.getConfiguration().getWorkingDirectory()
+                                      + File.separator + CORRUPTED_FOLDER + diffFolder);
+        moveFileToDirectory(file, corruptedFile.getParentFile(), true);
+    }
+
     private synchronized void loadStoredKeysAndFileNames() throws ObjectStoreException
     {
         /*
@@ -263,8 +280,21 @@ public class PersistentObjectStorePartition<T extends Serializable>
             for (int i = 0; i < files.length; i++)
             {
                 File file = files[i];
-                StoreValue<T> storeValue = deserialize(file);
-                realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+                try
+                {
+                    StoreValue<T> storeValue = deserialize(file);
+                    realKeyToUUIDIndex.put(storeValue.getKey(), file.getName());
+                }
+                catch (ObjectStoreException e)
+                {
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn(String.format(
+                                "Could not deserialize the ObjectStore file: %s. The file will be skipped and moved " +
+                                "to the Garbage folder", file.getName()));
+                    }
+                    moveToCorruptedFilesFolder(file);
+                }
             }
 
             loaded = true;
@@ -324,7 +354,7 @@ public class PersistentObjectStorePartition<T extends Serializable>
         String filename = org.mule.util.UUID.getUUID() + OBJECT_FILE_EXTENSION;
         try
         {
-            return FileUtils.newFile(partitionDirectory, filename);
+            return newFile(partitionDirectory, filename);
         }
         catch (MuleRuntimeException mre)
         {
