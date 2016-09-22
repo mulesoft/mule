@@ -82,10 +82,6 @@ public class DataSourceFactory implements Disposable {
     StandardDataSource dataSource =
         dataSourceConfig.isUseXaTransactions() ? new StandardXADataSource() : new StandardDataSource();
     dataSource.setDriverName(dataSourceConfig.getDriverClassName());
-    if (dataSourceConfig.getConnectionTimeout() >= 0) {
-      dataSource.setLoginTimeout(new Long(dataSourceConfig.getConnectionTimeoutUnit()
-          .toSeconds(dataSourceConfig.getConnectionTimeout())).intValue());
-    }
     dataSource.setPassword(dataSourceConfig.getPassword());
     dataSource.setTransactionIsolation(dataSourceConfig.getTransactionIsolation().getCode());
     dataSource.setUrl(dataSourceConfig.getUrl());

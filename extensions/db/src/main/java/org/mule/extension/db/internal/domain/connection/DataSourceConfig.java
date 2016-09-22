@@ -7,6 +7,10 @@
 
 package org.mule.extension.db.internal.domain.connection;
 
+import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.param.TransactionIsolation;
 import org.mule.runtime.api.config.DatabasePoolingProfile;
@@ -16,14 +20,6 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-
-import java.util.concurrent.TimeUnit;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 
 /**
  * Maintains configuration information about how to build a {@link javax.sql.DataSource}
@@ -67,26 +63,6 @@ public class DataSourceConfig {
   private String password;
 
   /**
-   * Maximum time that the data source will wait while attempting to connect to a database. A value of zero (default) specifies
-   * that the timeout is the default system timeout if there is one; otherwise, it specifies that there is no timeout.
-   */
-  @Parameter
-  @Optional(defaultValue = "0")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION_TIMEOUT_CONFIGURATION, order = 1)
-  private Integer connectionTimeout;
-
-
-  /**
-   * A {@link TimeUnit} which qualifies the {@link #connectionTimeout}
-   */
-  @Parameter
-  @Optional(defaultValue = "SECONDS")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION_TIMEOUT_CONFIGURATION, order = 2)
-  private TimeUnit connectionTimeoutUnit = SECONDS;
-
-  /**
    * The transaction isolation level to set on the driver when connecting the database.
    */
   @Parameter
@@ -127,14 +103,6 @@ public class DataSourceConfig {
     return driverClassName;
   }
 
-  public int getConnectionTimeout() {
-    return connectionTimeout;
-  }
-
-  public TimeUnit getConnectionTimeoutUnit() {
-    return connectionTimeoutUnit;
-  }
-
   public String getPassword() {
     return password;
   }
@@ -157,14 +125,6 @@ public class DataSourceConfig {
 
   public void setDriverClassName(String driverClassName) {
     this.driverClassName = driverClassName;
-  }
-
-  public void setConnectionTimeout(Integer connectionTimeout) {
-    this.connectionTimeout = connectionTimeout;
-  }
-
-  public void setConnectionTimeoutUnit(TimeUnit connectionTimeoutUnit) {
-    this.connectionTimeoutUnit = connectionTimeoutUnit;
   }
 
   public void setUser(String user) {
