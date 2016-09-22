@@ -12,14 +12,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,9 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 //TODO: MULE-9702 Remove once the tests are migrated.
-@ArtifactClassLoaderRunnerConfig(plugins = {"org.mule.modules:mule-module-sockets"},
-    providedInclusions = "org.mule.modules:mule-module-sockets")
-public class BasicHttpTestCase extends MuleArtifactFunctionalTestCase {
+public class BasicHttpTestCase extends AbstractHttpTestCase {
 
   @Rule
   public DynamicPort clientPort = new DynamicPort("clientPort");
