@@ -11,7 +11,7 @@
     </httpn:request-config>
 
     <flow name="formParam">
-        <httpn:request config-ref="config" path="testPath" method="POST"  key="ANY"/>
+        <httpn:request config-ref="config" path="testPath" method="POST"/>
     </flow>
 
 

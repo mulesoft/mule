@@ -14,7 +14,7 @@
     </httpn:listener-config> 
     
     <flow name="client">
-        <httpn:request path="/" config-ref="reqConfig" key="ANY">
+        <httpn:request path="/" config-ref="reqConfig" outputType="ANY">
             <httpn:request-builder>
                 <httpn:query-params>
                     <httpn:query-param key="query" value="param"/>

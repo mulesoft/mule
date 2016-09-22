@@ -10,7 +10,7 @@
         <httpn:request-connection host="localhost" port="${httpPort}" maxConnections="1"/>
     </httpn:request-config>
     <flow name="limitedConnections">
-        <httpn:request config-ref="requestConfig" path="testPath"  key="ANY"/>
+        <httpn:request config-ref="requestConfig" path="testPath"/>
     </flow>
 
 </mule>

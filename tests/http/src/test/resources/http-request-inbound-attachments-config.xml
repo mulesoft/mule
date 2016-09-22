@@ -11,7 +11,7 @@
     </httpn:request-config>
 
     <flow name="requestFlow">
-        <httpn:request config-ref="requestConfig" path="path" method="POST"  key="ANY"/>
+        <httpn:request config-ref="requestConfig" path="path" method="POST"/>
     </flow>
 
 </mule>

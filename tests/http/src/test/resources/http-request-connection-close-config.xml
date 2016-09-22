@@ -25,7 +25,7 @@
     </httpn:request-config>
 
     <flow name="testFlowHttps">
-        <httpn:request path="testPath" config-ref="httpsConfig" key="ANY"/>
+        <httpn:request path="testPath" config-ref="httpsConfig"/>
     </flow>
 
 </mule>

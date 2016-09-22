@@ -17,7 +17,7 @@
     </httpn:request-config>
 
     <flow name="requestFlowLocalhost">
-        <httpn:request config-ref="requestConfig" host="127.0.0.1" path="/"  method="POST" key="ANY">
+        <httpn:request config-ref="requestConfig" host="127.0.0.1" path="/"  method="POST">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="200,201,404"/>
             </httpn:response-validator>
@@ -25,7 +25,7 @@
     </flow>
 
     <flow name="requestFlowFQDN">
-        <httpn:request config-ref="requestConfig" host="localhost.localdomain" path="/"  method="POST" key="ANY">
+        <httpn:request config-ref="requestConfig" host="localhost.localdomain" path="/"  method="POST">
             <httpn:response-validator>
                 <httpn:success-status-code-validator values="200,201,404"/>
             </httpn:response-validator>

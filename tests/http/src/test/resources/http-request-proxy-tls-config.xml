@@ -30,7 +30,7 @@
     </httpn:listener-config>
 
     <flow name="clientFlow">
-        <httpn:request config-ref="requestConfig" path="#[path]" method="POST"  key="ANY"/>
+        <httpn:request config-ref="requestConfig" path="#[path]" method="POST"/>
     </flow>
 
     <flow name="serverFlow">

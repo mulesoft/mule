@@ -14,7 +14,7 @@
         </httpn:request-connection>
     </httpn:request-config>
     <flow name="ntlmFlow">
-        <httpn:request config-ref="ntlmProxy" path="requestPath"  key="ANY"/>
+        <httpn:request config-ref="ntlmProxy" path="requestPath"/>
     </flow>
 
 </mule>

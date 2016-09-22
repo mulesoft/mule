@@ -26,7 +26,7 @@
     </flow>
 
     <flow name="client">
-        <httpn:request path="test" config-ref="requestConfig" key="ANY">
+        <httpn:request path="test" config-ref="requestConfig">
             <httpn:request-builder>
                 <httpn:headers>
                     <httpn:header key="CusTomName2" value="CustomValue"/>

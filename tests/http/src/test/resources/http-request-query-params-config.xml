@@ -11,7 +11,7 @@
     </httpn:request-config>
 
     <flow name="queryParamList">
-        <httpn:request config-ref="config" path="testPath" method="POST" key="ANY">
+        <httpn:request config-ref="config" path="testPath" method="POST">
             <httpn:request-builder>
                 <httpn:query-params>
                     <httpn:query-param key="testName1" value="testValue1" />
@@ -22,19 +22,19 @@
     </flow>
 
     <flow name="queryParamMap">
-        <httpn:request config-ref="config" path="testPath"  key="ANY">
+        <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder queryParams="#[params]"/>
         </httpn:request>
     </flow>
 
     <flow name="multipleQueryParam">
-        <httpn:request config-ref="config" path="testPath" key="ANY">
+        <httpn:request config-ref="config" path="testPath">
             <httpn:request-builder queryParams="#[params]"/>
         </httpn:request>
     </flow>
 
     <flow name="queryParamNulls">
-        <httpn:request config-ref="config" path="testPath"  key="ANY">
+        <httpn:request config-ref="config" path="testPath">
                 <!-- Not currently supported. -->
                 <!--<httpn:request-builder queryParams="#[{'testName1':null, 'testName2': [null]}]"/>-->
             <httpn:request-builder queryParams="#[{'testName1':null, 'testName2': null}]"/>

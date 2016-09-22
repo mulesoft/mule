@@ -14,11 +14,11 @@
     </httpn:request-config>
 
     <flow name="persistentRequestFlow">
-        <httpn:request config-ref="persistentRequestConfig" method="GET" path="/"  key="ANY"/>
+        <httpn:request config-ref="persistentRequestConfig" method="GET" path="/"/>
     </flow>
 
     <flow name="nonPersistentRequestFlow">
-        <httpn:request config-ref="nonPersistentRequestConfig" method="GET" path="/"  key="ANY"/>
+        <httpn:request config-ref="nonPersistentRequestConfig" method="GET" path="/"/>
     </flow>
 
 

@@ -20,7 +20,7 @@ import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
 import org.mule.extension.http.api.listener.builder.HttpListenerResponseBuilder;
 import org.mule.extension.http.internal.listener.server.HttpListenerConfig;
-import org.mule.extension.http.internal.request.validator.HttpMetadataResolver;
+import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.runtime.api.execution.CompletionHandler;
 import org.mule.runtime.api.execution.ExceptionCallback;
 import org.mule.runtime.api.message.Error;

@@ -13,7 +13,7 @@
     </httpn:request-config>
 
     <flow name="RefAnonymousProxy">
-        <httpn:request config-ref="configRefAnonymousProxy" path="requestPath"  key="ANY"/>
+        <httpn:request config-ref="configRefAnonymousProxy" path="requestPath"/>
     </flow>
 
     <!-- Inner Anonymous Proxy -->
@@ -25,7 +25,7 @@
         </httpn:request-connection>
     </httpn:request-config>
     <flow name="InnerAnonymousProxy">
-        <httpn:request config-ref="configInnerAnonymousProxy" path="requestPath" key="ANY"/>
+        <httpn:request config-ref="configInnerAnonymousProxy" path="requestPath"/>
     </flow>
 
 
@@ -36,7 +36,7 @@
     </httpn:request-config>
 
     <flow name="RefUserPassProxy">
-        <httpn:request config-ref="configRefUserPassProxy" path="requestPath" key="ANY"/>
+        <httpn:request config-ref="configRefUserPassProxy" path="requestPath"/>
     </flow>
 
     <!-- Inner Username/Password Proxy -->
@@ -50,7 +50,7 @@
     </httpn:request-config>
 
     <flow name="InnerUserPassProxy">
-        <httpn:request config-ref="configInnerUserPassProxy" path="requestPath"  key="ANY"/>
+        <httpn:request config-ref="configInnerUserPassProxy" path="requestPath"/>
     </flow>
 
 
@@ -61,7 +61,7 @@
     </httpn:request-config>
 
     <flow name="RefNtlmProxy">
-        <httpn:request config-ref="configRefNtlmProxy" path="requestPath"  key="ANY"/>
+        <httpn:request config-ref="configRefNtlmProxy" path="requestPath"/>
     </flow>
 
     <!-- Inner Ntlm Proxy -->
@@ -74,7 +74,7 @@
     </httpn:request-config>
 
     <flow name="InnerNtlmProxy">
-        <httpn:request config-ref="configInnerNtlmProxy" path="requestPath"  key="ANY"/>
+        <httpn:request config-ref="configInnerNtlmProxy" path="requestPath"/>
     </flow>
 
 </mule>

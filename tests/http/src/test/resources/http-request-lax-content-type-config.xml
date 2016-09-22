@@ -19,7 +19,7 @@
 
         <set-payload value="{ &quot;key1&quot; : &quot;value, &quot;key2&quot; : 2 }"/>
 
-        <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET"  key="ANY">
+        <httpn:request config-ref="requesterConfig" port="${httpPort}" path="requestServer" method="GET">
             <httpn:request-builder>
                 <httpn:headers>
                     <httpn:header key="Content-Type" value="invalidMimeType"/>

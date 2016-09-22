@@ -45,11 +45,11 @@
     </flow>
 
     <flow name="testFlowClientWithCertificate">
-        <httpn:request config-ref="requestConfigWithCertificate" path="/" method="POST" key="ANY"/>
+        <httpn:request config-ref="requestConfigWithCertificate" path="/" method="POST"/>
     </flow>
 
     <flow name="testFlowClientWithoutCertificate">
-        <httpn:request config-ref="requestConfigWithoutCertificate" path="/" method="POST" key="ANY"/>
+        <httpn:request config-ref="requestConfigWithoutCertificate" path="/" method="POST"/>
     </flow>
 
 
