@@ -17,16 +17,9 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
-import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.tck.message.StringAttributes;
 
-import com.google.common.reflect.TypeToken;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -74,29 +67,6 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
   @Test
   public void sourceDoesNotSupportDynamicContentMetadata() throws Exception {
     final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
-  }
-
-  @Test
-  public void getSourceStaticOutputMetadata() throws IOException {
-    final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
-    assertExpectedOutput(componentMetadata.getOutputMetadata(), new TypeToken<Map<String, Object>>() {}.getType(),
-                         StringAttributes.class);
-  }
-
-  @Test
-  public void getSourceParametersStaticMetadata() throws IOException {
-    final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
-    final List<MetadataResult<ParameterMetadataDescriptor>> parametersMetadata = componentMetadata.getParametersMetadata();
-
-    assertThat(parametersMetadata.size(), is(1));
-    final MetadataResult<ParameterMetadataDescriptor> typeMetadataDescriptor = parametersMetadata.get(0);
-    assertExpectedType(typeMetadataDescriptor, TYPE_PARAMETER_NAME, String.class);
-  }
-
-  @Test
-  public void sourceDoesNotSupportStaticContentMetadata() {
-    final ComponentMetadataDescriptor componentMetadata = getComponentStaticMetadata();
     assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
   }
 }

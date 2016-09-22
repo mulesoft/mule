@@ -17,7 +17,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -28,7 +27,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.T
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.setRequires;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-
 import org.mule.metadata.api.model.StringType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -253,23 +251,6 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   }
 
   protected abstract OperationMessageProcessor createOperationMessageProcessor();
-
-  @Test
-  public void getOperationStaticMetadata() throws Exception {
-    MetadataResult<ComponentMetadataDescriptor> metadata = messageProcessor.getMetadata();
-
-    verify(metadataResolverFactory, never()).getContentResolver();
-    verify(metadataResolverFactory, never()).getOutputResolver();
-
-    assertThat(metadata.isSuccess(), is(true));
-
-    assertThat(metadata.get().getOutputMetadata().get().getPayloadMetadata().get().getType(), is(outputMock.getType()));
-
-    assertThat(metadata.get().getContentMetadata().get().get().getType(), is(stringType));
-
-    assertThat(metadata.get().getParametersMetadata().size(), is(1));
-    assertThat(metadata.get().getParametersMetadata().get(0).get().getType(), is(stringType));
-  }
 
   @Test
   public void getOperationDynamicMetadata() throws Exception {

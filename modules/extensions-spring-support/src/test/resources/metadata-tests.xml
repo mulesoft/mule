@@ -168,8 +168,16 @@
         <metadata:simple-multi-level-key-resolver config-ref="dynamic-config" continent="AMERICA" country="USA" city="SFO"/>
     </flow>
 
+    <flow name="metadataKeyDefaultValue">
+        <metadata:metadata-key-with-default-value config-ref="config"/>
+    </flow>
+
+    <flow name="multilevelMetadataKeyDefaultValue">
+        <metadata:simple-multi-level-key-resolver config-ref="config"/>
+    </flow>
+
     <flow name="pagedOperationMetadata">
-        <metadata:paged-operation-metadata config-ref="dynamic-config"
+        <metadata:paged-operation-metadata config-ref="config"
                                            animal="#[new org.mule.test.metadata.extension.model.animals.Bear()"/>
     </flow>
 

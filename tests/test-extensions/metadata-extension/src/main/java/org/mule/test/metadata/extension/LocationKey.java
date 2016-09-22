@@ -10,18 +10,22 @@ import static org.apache.commons.lang.builder.EqualsBuilder.reflectionEquals;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
+import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 public class LocationKey {
 
+  @Optional(defaultValue = "AMERICA")
   @MetadataKeyPart(order = 1)
   @Parameter
   private String continent;
 
+  @Optional(defaultValue = "USA")
   @MetadataKeyPart(order = 2)
   @Parameter
   private String country;
 
+  @Optional(defaultValue = "SFO")
   @DisplayName("State | City")
   @MetadataKeyPart(order = 3)
   @Parameter

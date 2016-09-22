@@ -13,8 +13,6 @@ import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.extension.api.dsql.DsqlParser.isDsqlQuery;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getAnnotatedFields;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -23,18 +21,17 @@ import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.util.ClassUtils;
 import org.mule.runtime.core.util.ValueHolder;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyPart;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.QueryParameterModelProperty;
-import org.mule.runtime.module.extension.internal.util.FieldSetter;
+import org.mule.runtime.module.extension.internal.runtime.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -51,32 +48,33 @@ import java.util.Optional;
 final class MetadataKeyIdObjectResolver {
 
   private static final DsqlParser dsqlParser = DsqlParser.getInstance();
+  private final ComponentModel component;
+  private final List<ParameterModel> keyParts;
+
+  public MetadataKeyIdObjectResolver(ComponentModel component, List<ParameterModel> keyParts) {
+    this.component = component;
+    this.keyParts = keyParts;
+  }
 
   /**
-   * Given a {@link ComponentModel} and a {@link Map} key, return the populated key in the Type that the {@link Component}
+   * Given {@link MetadataKey}, return the populated key in the Type that the {@link Component}
    * parameter requires.
    *
-   * @param component the component model that contains the parameter annotated with {@link MetadataKeyId}
-   * @param key       the {@link MetadataKey} associated to the {@link MetadataKeyId}
+   * @param key the {@link MetadataKey} associated to the {@link MetadataKeyId}
    * @return a new instance of the {@link MetadataKeyId} parameter {@code type} with the values of the passed {@link MetadataKey}
    * @throws MetadataResolvingException if:
    *                                    <ul>
    *                                    <li>Parameter types is not instantiable</li>
    *                                    <li>{@param key} does not provide the required levels</li>
-   *                                    <li>{@link MetadataKeyId} is not found in the {@link ComponentModel}</li>
    *                                    </ul>
    */
-  public Object resolve(ComponentModel component, MetadataKey key) throws MetadataResolvingException {
-    final List<ParameterModel> metadataKeyParts = getMetadataKeyParts(component);
-    return isKeyLessComponent(metadataKeyParts) ? new NullMetadataKey().getId() : resolveMetadataKeyWhenPresent(key, component);
-  }
+  public Object resolve(MetadataKey key) throws MetadataResolvingException {
 
-  private Object resolveMetadataKeyWhenPresent(MetadataKey key, ComponentModel componentModel) throws MetadataResolvingException {
+    if (keyParts.isEmpty()) {
+      return "";
+    }
 
-    final MetadataKeyIdModelProperty keyIdModelProperty = componentModel.getModelProperty(MetadataKeyIdModelProperty.class)
-        .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId "
-            + "parameter associated", componentModel.getName())));
-
+    final MetadataKeyIdModelProperty keyIdModelProperty = findMetadataKeyIdModelProperty(component);
     final MetadataType metadataType = keyIdModelProperty.getType();
     final Class<?> metadataKeyType = getType(metadataType);
     final ValueHolder<Object> keyValueHolder = new ValueHolder<>();
@@ -88,7 +86,7 @@ final class MetadataKeyIdObjectResolver {
       protected void defaultVisit(MetadataType metadataType) {
         exceptionValueHolder.set(buildException(format("'%s' type is invalid for MetadataKeyId parameters, "
             + "use String type instead. Affecting component: '%s'",
-                                                       metadataKeyType.getSimpleName(), componentModel.getName())));
+                                                       metadataKeyType.getSimpleName(), component.getName())));
       }
 
       @Override
@@ -101,7 +99,7 @@ final class MetadataKeyIdObjectResolver {
         String id = key.getId();
         if (metadataKeyType.isEnum()) {
           keyValueHolder.set(Enum.valueOf((Class) metadataKeyType, id));
-        } else if (getQueryModelProperty(componentModel).isPresent() && isDsqlQuery(id)) {
+        } else if (getQueryModelProperty().isPresent() && isDsqlQuery(id)) {
           DsqlQuery dsqlQuery = dsqlParser.parse(id);
           keyValueHolder.set(dsqlQuery);
         } else {
@@ -112,7 +110,8 @@ final class MetadataKeyIdObjectResolver {
       @Override
       public void visitObject(ObjectType objectType) {
         try {
-          keyValueHolder.set(resolveMultiLevelKey(componentModel, key, metadataKeyType));
+          final Map<Field, String> fieldValueMap = keyToFieldValueMap(key);
+          keyValueHolder.set(instantiateFromFieldValue(metadataKeyType, fieldValueMap));
         } catch (MetadataResolvingException e) {
           exceptionValueHolder.set(e);
         }
@@ -127,69 +126,95 @@ final class MetadataKeyIdObjectResolver {
   }
 
   /**
-   * Resolves the KeyIdObject for a MultiLevel {@link MetadataKeyId}
+   * Returns the populated key in the Type that the {@link Component} parameter requires by looking for default values, if no
+   * {@link MetadataKeyId} is present an empty value is returned since is a key less {@link Component}.
+   * <p>
+   * If a key should be built and there is at least one default value missing an {@link IllegalArgumentException} is thrown.
    *
-   * @param componentModel model property of the {@link MetadataKeyId} parameter
-   * @param key            key containing the values of each level
-   * @return the KeyIdObject for the {@link MetadataKeyId} parameter
-   * @throws MetadataResolvingException
+   * @return a new instance of the {@link MetadataKeyId} parameter {@code type}.
+   * @throws MetadataResolvingException if the Parameter type is not instantiable.
+   * @throws IllegalArgumentException   if cannot found the required default values for an specified key.
    */
-  private Object resolveMultiLevelKey(ComponentModel componentModel, MetadataKey key, Class metadataKeyType)
-      throws MetadataResolvingException {
-    final Map<Field, String> fieldValueMap = toFieldValueMap(metadataKeyType, key);
+  public Object resolve() throws MetadataResolvingException {
 
-    Object metadataKeyId;
-    try {
-      metadataKeyId = ClassUtils.instanciateClass(metadataKeyType);
-    } catch (Exception e) {
-      throw buildException(format("MetadataKey object of type '%s' from the component '%s' could not be instantiated",
-                                  metadataKeyType.getSimpleName(), componentModel.getName()),
-                           e);
+    if (keyParts.isEmpty()) {
+      return "";
     }
 
-    fieldValueMap.entrySet()
-        .forEach(entry -> new FieldSetter<Object, String>(entry.getKey()).set(metadataKeyId, entry.getValue()));
-    return metadataKeyId;
+    if (!keyParts.stream().allMatch(p -> p.getDefaultValue() != null)) {
+      throw new IllegalArgumentException("Could not build metadata key from an object that does"
+          + " not have a default value for all it's components.");
+    }
+
+    if (keyParts.size() == 1) {
+      return keyParts.get(0).getDefaultValue().toString();
+    }
+
+    final MetadataKeyIdModelProperty keyIdModelProperty = findMetadataKeyIdModelProperty(component);
+
+    Map<Field, String> fieldValueMap = keyParts.stream()
+        .filter(p -> p.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
+        .collect(toMap(p -> p.getModelProperty(DeclaringMemberModelProperty.class).get().getDeclaringField(),
+                       p -> p.getDefaultValue().toString()));
+
+    return instantiateFromFieldValue(getType(keyIdModelProperty.getType()), fieldValueMap);
   }
 
+  private MetadataKeyIdModelProperty findMetadataKeyIdModelProperty(ComponentModel component)
+      throws MetadataResolvingException {
+    return component.getModelProperty(MetadataKeyIdModelProperty.class)
+        .orElseThrow(() -> buildException(format("Component '%s' doesn't have a MetadataKeyId "
+            + "parameter associated", component.getName())));
+  }
 
-  private Map<Field, String> toFieldValueMap(Class type, MetadataKey key) throws MetadataResolvingException {
-    final Map<String, Field> metadataKeyParts = getAnnotatedFields(type, MetadataKeyPart.class)
-        .stream()
+  private Object instantiateFromFieldValue(Class<?> metadataKeyType, Map<Field, String> fieldValueMap)
+      throws MetadataResolvingException {
+    try {
+      DefaultObjectBuilder objectBuilder = new DefaultObjectBuilder<>(metadataKeyType);
+      fieldValueMap.forEach((f, v) -> objectBuilder.addPropertyResolver(f, new StaticValueResolver<String>(v)));
+      return objectBuilder.build(null);
+    } catch (Exception e) {
+      throw buildException(format("MetadataKey object of type '%s' from the component '%s' could not be instantiated",
+                                  metadataKeyType.getSimpleName(), component.getName()),
+                           e);
+    }
+  }
+
+  private Map<Field, String> keyToFieldValueMap(MetadataKey key) throws MetadataResolvingException {
+    final Map<String, Field> fieldParts = keyParts.stream()
+        .filter(p -> p.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
+        .map(p -> p.getModelProperty(DeclaringMemberModelProperty.class).get().getDeclaringField())
         .collect(toMap(Field::getName, identity()));
+
     final Map<String, String> currentParts = getCurrentParts(key);
-    final List<String> missingParts = metadataKeyParts.keySet()
+    final List<String> missingParts = fieldParts.keySet()
         .stream()
         .filter(partName -> !currentParts.containsKey(partName))
         .collect(toList());
 
     if (!missingParts.isEmpty()) {
-      throw new MetadataResolvingException(format("The given MetadataKey does not provide all the required levels. "
-          + "Missing levels: %s", missingParts), INVALID_METADATA_KEY);
+      throw buildException(format("The given MetadataKey does not provide all the required levels. Missing levels: %s",
+                                  missingParts));
     }
 
-    return currentParts.entrySet().stream().filter(keyEntry -> metadataKeyParts.containsKey(keyEntry.getKey()))
-        .collect(toMap(keyEntry -> metadataKeyParts.get(keyEntry.getKey()), Map.Entry::getValue));
+    return currentParts.entrySet().stream().filter(keyEntry -> fieldParts.containsKey(keyEntry.getKey()))
+        .collect(toMap(keyEntry -> fieldParts.get(keyEntry.getKey()), Map.Entry::getValue));
   }
 
   private Map<String, String> getCurrentParts(MetadataKey key) throws MetadataResolvingException {
-    Map<String, String> metadataKeyParts = new HashMap<>();
-    metadataKeyParts.put(key.getPartName(), key.getId());
+    Map<String, String> keyParts = new HashMap<>();
+    keyParts.put(key.getPartName(), key.getId());
 
     while (!key.getChilds().isEmpty()) {
-      checkOneChildPerLevel(key);
+      if (key.getChilds().size() > 1) {
+        final List<String> keyNames = key.getChilds().stream().map(MetadataKey::getId).collect(toList());
+        throw buildException(format("MetadataKey used for Metadata resolution must only have one child per level. "
+            + "Key '%s' has %s as children.", key.getId(), keyNames));
+      }
       key = key.getChilds().iterator().next();
-      metadataKeyParts.put(key.getPartName(), key.getId());
+      keyParts.put(key.getPartName(), key.getId());
     }
-    return metadataKeyParts;
-  }
-
-  private void checkOneChildPerLevel(MetadataKey key) throws MetadataResolvingException {
-    if (key.getChilds().size() > 1) {
-      final List<String> keyNames = key.getChilds().stream().map(MetadataKey::getId).collect(toList());
-      throw buildException(format("MetadataKey used for Metadata resolution must only have one child per level. "
-          + "Key '%s' has %s as children.", key.getId(), keyNames));
-    }
+    return keyParts;
   }
 
   private MetadataResolvingException buildException(String message) {
@@ -201,12 +226,8 @@ final class MetadataKeyIdObjectResolver {
         : new MetadataResolvingException(message, INVALID_METADATA_KEY, cause);
   }
 
-  private boolean isKeyLessComponent(List<ParameterModel> metadataKeyParts) {
-    return metadataKeyParts.isEmpty();
-  }
-
-  private Optional<QueryParameterModelProperty> getQueryModelProperty(ComponentModel componentModel) {
-    return componentModel.getParameterModels().stream()
+  private Optional<QueryParameterModelProperty> getQueryModelProperty() {
+    return component.getParameterModels().stream()
         .filter(p -> p.getModelProperty(QueryParameterModelProperty.class).isPresent())
         .map(p -> p.getModelProperty(QueryParameterModelProperty.class).get())
         .findAny();

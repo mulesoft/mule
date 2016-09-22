@@ -6,6 +6,7 @@
  */
 package org.mule.test.metadata.extension;
 
+import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.Query;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
@@ -60,6 +61,13 @@ public class MetadataOperations extends MetadataOperationsParent {
   public Object outputMetadataWithKeyId(@Connection MetadataConnection connection, @MetadataKeyId String type,
                                         @Optional @Content Object content) {
     return null;
+  }
+
+  @MetadataScope(keysResolver = TestOutputResolverWithKeyResolver.class, outputResolver = TestOutputResolverWithKeyResolver.class)
+  public Object metadataKeyWithDefaultValue(@Connection MetadataConnection connection,
+                                            @Optional(defaultValue = CAR) @MetadataKeyId String type,
+                                            @Optional @Content Object content) {
+    return type;
   }
 
   @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,

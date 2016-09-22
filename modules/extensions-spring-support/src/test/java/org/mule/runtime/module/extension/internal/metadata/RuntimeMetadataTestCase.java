@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.query.NativeQueryOutputResolver.NATIVE_QUERY;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
@@ -68,5 +69,11 @@ public class RuntimeMetadataTestCase extends MetadataExtensionFunctionalTestCase
     Event event = flowRunner(BOOLEAN_METADATA_KEY).run();
     boolean key = (boolean) event.getMessage().getPayload().getValue();
     assertThat(key, is(true));
+  }
+
+  @Test
+  public void metadataKeyDefaultValue() throws Exception {
+    Event event = flowRunner(METADATA_KEY_DEFAULT_VALUE).run();
+    assertThat(event.getMessage().getPayload().getValue(), is(CAR));
   }
 }

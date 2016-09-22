@@ -159,6 +159,6 @@ public class MetadataNegativeTestCase extends MetadataExtensionFunctionalTestCas
     final MetadataKey metadataKey = newKey(AMERICA, CONTINENT).withChild(newKey(USA, COUNTRY)).build();
 
     final MetadataResult<ComponentMetadataDescriptor> metadataResult = metadataManager.getMetadata(componentId, metadataKey);
-    assertFailure(metadataResult, "", FailureCode.INVALID_METADATA_KEY, "");
+    assertFailure(metadataResult, "Missing levels: [city]", FailureCode.INVALID_METADATA_KEY, "");
   }
 }
