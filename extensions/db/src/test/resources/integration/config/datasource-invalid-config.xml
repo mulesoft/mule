@@ -7,7 +7,10 @@
 
 
     <db:config name="invalidDbConfig">
-        <db:connection dataSource="#[flowVars.jdbcDataSource]" user="This parameter violates the optional exclusiveness condition"/>
+        <db:my-sql-connection >
+            <db:database-url url="url"/>
+            <db:my-sql-parameters host="0.0.0.0" port="123"/>
+        </db:my-sql-connection>
     </db:config>
 
     <flow name="usesBeanDatasourceConfig">
