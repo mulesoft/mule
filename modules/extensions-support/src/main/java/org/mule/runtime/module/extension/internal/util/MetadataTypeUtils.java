@@ -112,8 +112,8 @@ public final class MetadataTypeUtils {
   public static boolean isInstantiable(MetadataType metadataType) {
     try {
       return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable)
-        .orElse(metadataType.getMetadataFormat().equals(JAVA) && IntrospectionUtils.isInstantiable(getType(metadataType)));
-    } catch (Exception e){
+          .orElse(metadataType.getMetadataFormat().equals(JAVA) && IntrospectionUtils.isInstantiable(getType(metadataType)));
+    } catch (Exception e) {
       return false;
     }
   }
@@ -123,10 +123,10 @@ public final class MetadataTypeUtils {
   }
 
   public static boolean isFinal(MetadataType metadataType) {
-    try{
+    try {
       return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isFinal)
-        .orElse(metadataType.getMetadataFormat().equals(JAVA) && Modifier.isFinal(getType(metadataType).getModifiers()));
-    } catch (Exception e){
+          .orElse(metadataType.getMetadataFormat().equals(JAVA) && Modifier.isFinal(getType(metadataType).getModifiers()));
+    } catch (Exception e) {
       return false;
     }
   }
@@ -134,8 +134,8 @@ public final class MetadataTypeUtils {
   public static String getId(MetadataType metadataType) {
     try {
       return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
-        .orElse(metadataType.getMetadataFormat().equals(JAVA) ? getType(metadataType).getName() : "");
-    } catch (Exception e){
+          .orElse(metadataType.getMetadataFormat().equals(JAVA) ? getType(metadataType).getName() : "");
+    } catch (Exception e) {
       return "";
     }
   }
