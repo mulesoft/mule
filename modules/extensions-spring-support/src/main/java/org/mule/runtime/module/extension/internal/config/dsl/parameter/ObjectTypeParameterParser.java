@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
@@ -32,6 +33,8 @@ import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinition
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
+import java.util.Optional;
+
 /**
  * A {@link ExtensionDefinitionParser} for parsing extension objects that can be defined as named top level elements and be placed
  * in the mule registry.
@@ -50,23 +53,23 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
   private final String namespace;
 
   public ObjectTypeParameterParser(Builder definition, ObjectType type, ClassLoader classLoader,
-                                   DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context,
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
                                    MuleContext muleContext) {
-    super(definition, dslSyntaxResolver, context, muleContext);
+    super(definition, dslResolver, context, muleContext);
     this.type = type;
     this.classLoader = classLoader;
-    this.typeDsl = dslSyntaxResolver.resolve(type);
+    this.typeDsl = dslResolver.resolve(type).orElseThrow(() -> new IllegalArgumentException("Non parseable object"));
     this.name = typeDsl.getElementName();
     this.namespace = typeDsl.getNamespace();
   }
 
   public ObjectTypeParameterParser(Builder definition, String name, String namespace, ObjectType type, ClassLoader classLoader,
-                                   DslSyntaxResolver dslSyntaxResolver, ExtensionParsingContext context,
+                                   DslSyntaxResolver dslResolver, ExtensionParsingContext context,
                                    MuleContext muleContext) {
-    super(definition, dslSyntaxResolver, context, muleContext);
+    super(definition, dslResolver, context, muleContext);
     this.type = type;
     this.classLoader = classLoader;
-    this.typeDsl = dslSyntaxResolver.resolve(type);
+    this.typeDsl = dslResolver.resolve(type).orElseThrow(() -> new IllegalArgumentException("Non parseable object"));
     this.name = name;
     this.namespace = namespace;
   }
@@ -87,7 +90,11 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
     final boolean acceptsReferences = acceptsReferences(objectField);
     final Object defaultValue = getDefaultValue(fieldType).orElse(null);
     final ExpressionSupport expressionSupport = getExpressionSupport(fieldType);
-    final DslElementSyntax childDsl = typeDsl.getChild(fieldName).orElse(dslSyntaxResolver.resolve(fieldType));
+
+    Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(fieldName);
+    if (!fieldDsl.isPresent() && !isParameterGroup(objectField)) {
+      throw new IllegalArgumentException(format("The field [%s] does not belong to the structure of [%s]", fieldName, name));
+    }
 
     fieldType.accept(new MetadataTypeVisitor() {
 
@@ -98,7 +105,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
       @Override
       public void visitString(StringType stringType) {
-        if (childDsl.supportsChildDeclaration()) {
+        if (fieldDsl.get().supportsChildDeclaration()) {
           addParameter(fieldName, fromChildConfiguration(String.class).withWrapperIdentifier(fieldName));
           addDefinition(baseDefinitionBuilder.copy()
               .withIdentifier(fieldName)
@@ -114,7 +121,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (objectField.getAnnotation(FlattenedTypeAnnotation.class).isPresent()) {
+        if (isParameterGroup(objectField)) {
           objectType.getFields().forEach(field -> parseField(field));
           return;
         }
@@ -122,22 +129,28 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
         if (!parsingContext.isRegistered(name, namespace)) {
           parsingContext.registerObjectType(name, namespace, type);
           parseObjectParameter(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
-                               childDsl, emptySet());
+                               fieldDsl.get(), emptySet());
         } else {
-          parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences, childDsl,
-                      emptySet());
+          parseObject(fieldName, fieldName, objectType, defaultValue, expressionSupport, false, acceptsReferences,
+                      fieldDsl.get(), emptySet());
         }
       }
 
       @Override
       public void visitArrayType(ArrayType arrayType) {
-        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, childDsl, emptySet());
+        parseCollectionParameter(fieldName, fieldName, arrayType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                                 emptySet());
       }
 
       @Override
       public void visitDictionary(DictionaryType dictionaryType) {
-        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, childDsl, emptySet());
+        parseMapParameters(fieldName, fieldName, dictionaryType, defaultValue, expressionSupport, false, fieldDsl.get(),
+                           emptySet());
       }
     });
+  }
+
+  private boolean isParameterGroup(ObjectFieldType type) {
+    return type.getAnnotation(FlattenedTypeAnnotation.class).isPresent();
   }
 }

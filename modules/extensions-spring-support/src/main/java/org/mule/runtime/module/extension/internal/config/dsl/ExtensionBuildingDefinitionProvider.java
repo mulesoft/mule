@@ -227,8 +227,9 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
   private void registerTopLevelParameter(final MetadataType parameterType, Builder definitionBuilder,
                                          ClassLoader extensionClassLoader, DslSyntaxResolver dslSyntaxResolver,
                                          ExtensionParsingContext parsingContext) {
-    DslElementSyntax elementDsl = dslSyntaxResolver.resolve(parameterType);
-    if (parsingContext.isRegistered(elementDsl.getElementName(), elementDsl.getNamespace())) {
+    Optional<DslElementSyntax> dslElement = dslSyntaxResolver.resolve(parameterType);
+    if (!dslElement.isPresent() ||
+        parsingContext.isRegistered(dslElement.get().getElementName(), dslElement.get().getNamespace())) {
       return;
     }
 
@@ -236,8 +237,10 @@ public class ExtensionBuildingDefinitionProvider implements ComponentBuildingDef
 
       @Override
       public void visitObject(ObjectType objectType) {
-        if (elementDsl.supportsTopLevelDeclaration() || (elementDsl.supportsChildDeclaration() && elementDsl.isWrapped())
-            || parsingContext.getAllSubTypes().contains(objectType)) {
+        DslElementSyntax pojoDsl = dslElement.get();
+        if (pojoDsl.supportsTopLevelDeclaration() ||
+            (pojoDsl.supportsChildDeclaration() && pojoDsl.isWrapped()) ||
+            parsingContext.getAllSubTypes().contains(objectType)) {
 
           parseWith(new ObjectTypeParameterParser(definitionBuilder, objectType, extensionClassLoader, dslSyntaxResolver,
                                                   parsingContext, muleContext));

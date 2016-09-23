@@ -30,12 +30,10 @@ import javax.xml.namespace.QName;
  *
  * @since 4.0.0
  */
-class OperationSchemaDelegate {
-
-  private final SchemaBuilder builder;
+class OperationSchemaDelegate extends ExecutableTypeSchemaDelegate {
 
   public OperationSchemaDelegate(SchemaBuilder builder) {
-    this.builder = builder;
+    super(builder);
   }
 
   public void registerOperation(OperationModel operationModel, DslElementSyntax dslSyntax) {
@@ -54,15 +52,14 @@ class OperationSchemaDelegate {
   }
 
   private void registerOperationType(String name, OperationModel operationModel, DslElementSyntax dslSyntax) {
-    ExtensionType operationType =
-        builder.registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, dslSyntax);
+    ExtensionType operationType = registerExecutableType(name, operationModel, MULE_ABSTRACT_MESSAGE_PROCESSOR_TYPE, dslSyntax);
     addTargetParameter(operationType, operationModel);
   }
 
   private QName getOperationSubstitutionGroup(OperationModel operationModel) {
     ValueHolder<QName> substitutionGroup = new ValueHolder<>(MULE_ABSTRACT_MESSAGE_PROCESSOR);
     operationModel.getModelProperty(ExtendingOperationModelProperty.class)
-        .ifPresent(property -> substitutionGroup.set(builder.getSubstitutionGroup(property.getType())));
+        .ifPresent(property -> substitutionGroup.set(getSubstitutionGroup(property.getType())));
 
     return substitutionGroup.get();
   }

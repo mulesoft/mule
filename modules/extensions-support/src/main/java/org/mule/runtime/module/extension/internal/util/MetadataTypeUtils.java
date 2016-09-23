@@ -10,7 +10,6 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.metadata.api.annotation.EnumAnnotation;
-import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -111,8 +110,12 @@ public final class MetadataTypeUtils {
   }
 
   public static boolean isInstantiable(MetadataType metadataType) {
-    return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable)
+    try {
+      return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isInstantiable)
         .orElse(metadataType.getMetadataFormat().equals(JAVA) && IntrospectionUtils.isInstantiable(getType(metadataType)));
+    } catch (Exception e){
+      return false;
+    }
   }
 
   public static boolean hasExposedFields(MetadataType metadataType) {
@@ -120,13 +123,21 @@ public final class MetadataTypeUtils {
   }
 
   public static boolean isFinal(MetadataType metadataType) {
-    return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isFinal)
+    try{
+      return metadataType.getAnnotation(ClassInformationAnnotation.class).map(ClassInformationAnnotation::isFinal)
         .orElse(metadataType.getMetadataFormat().equals(JAVA) && Modifier.isFinal(getType(metadataType).getModifiers()));
+    } catch (Exception e){
+      return false;
+    }
   }
 
   public static String getId(MetadataType metadataType) {
-    return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
+    try {
+      return org.mule.metadata.utils.MetadataTypeUtils.getTypeId(metadataType)
         .orElse(metadataType.getMetadataFormat().equals(JAVA) ? getType(metadataType).getName() : "");
+    } catch (Exception e){
+      return "";
+    }
   }
 
   public static boolean isExtensible(MetadataType metadataType) {

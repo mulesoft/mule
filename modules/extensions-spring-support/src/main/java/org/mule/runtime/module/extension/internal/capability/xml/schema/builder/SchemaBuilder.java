@@ -10,35 +10,26 @@ import static java.lang.String.format;
 import static java.math.BigInteger.ONE;
 import static java.math.BigInteger.ZERO;
 import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.SUPPORTED;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.sanitizeName;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.THREADING_PROFILE_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.TLS_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.capability.xml.schema.builder.ObjectTypeSchemaDelegate.getAbstractElementName;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.getId;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.ATTRIBUTE_NAME_VALUE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.CONFIG_ATTRIBUTE_DESCRIPTION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.GROUP_SUFFIX;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_MESSAGE_PROCESSOR;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_RECONNECTION_STRATEGY;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_ABSTRACT_THREADING_PROFILE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_OPERATION_TRANSACTIONAL_ACTION_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_EXTENSION_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_MESSAGE_PROCESSOR_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.MULE_TLS_SCHEMA_LOCATION;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.OPERATION_SUBSTITUTION_GROUP_SUFFIX;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_NAMESPACE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SPRING_FRAMEWORK_SCHEMA_LOCATION;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.STRING;
-import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.SUBSTITUTABLE_NAME;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.TLS_CONTEXT_TYPE;
 import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.XML_NAMESPACE;
 import org.mule.metadata.api.ClassTypeLoader;
@@ -50,11 +41,8 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.NestedProcessor;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.core.util.ValueHolder;
-import org.mule.runtime.extension.api.annotation.Extensible;
 import org.mule.runtime.extension.api.connectivity.OperationTransactionalAction;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
@@ -63,7 +51,6 @@ import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsT
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
@@ -75,28 +62,23 @@ import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslSyntaxResolver;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Annotation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Attribute;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Documentation;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExtensionType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.FormChoice;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Group;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.GroupRef;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Import;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.LocalSimpleType;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NamedGroup;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.NoFixedFacet;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ObjectFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Restriction;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Schema;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.SchemaTypeConversion;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelComplexType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.TopLevelSimpleType;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Union;
 import org.mule.runtime.module.extension.internal.model.property.InfrastructureParameterModelProperty;
-import org.mule.runtime.module.extension.internal.model.property.TypeRestrictionModelProperty;
 import org.mule.runtime.module.extension.internal.xml.SchemaConstants;
 
 import com.google.common.collect.ImmutableMap;
@@ -104,7 +86,6 @@ import com.google.common.collect.ImmutableMap;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -121,17 +102,16 @@ import javax.xml.namespace.QName;
  */
 public final class SchemaBuilder {
 
-  private static final String UNBOUNDED = "unbounded";
   private static final String GLOBAL_ABSTRACT_ELEMENT_MASK = "global-%s";
 
   private final Set<StringType> registeredEnums = new LinkedHashSet<>();
-  private final Map<String, NamedGroup> substitutionGroups = new LinkedHashMap<>();
+
   private final ObjectFactory objectFactory = new ObjectFactory();
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   private final ConfigurationSchemaDelegate configurationSchemaDelegate = new ConfigurationSchemaDelegate(this);
   private final ConnectionProviderSchemaDelegate connectionProviderSchemaDelegate = new ConnectionProviderSchemaDelegate(this);
   private final OperationSchemaDelegate operationSchemaDelegate = new OperationSchemaDelegate(this);
-  private final SourceSchemaDelegate sourceSchemaDelegate = new SourceSchemaDelegate(this, objectFactory);
+  private final SourceSchemaDelegate sourceSchemaDelegate = new SourceSchemaDelegate(this);
   private final CollectionSchemaDelegate collectionDelegate = new CollectionSchemaDelegate(this);
   private final ObjectTypeSchemaDelegate objectTypeDelegate = new ObjectTypeSchemaDelegate(this);
   private final MapSchemaDelegate mapDelegate = new MapSchemaDelegate(this);
@@ -190,8 +170,11 @@ public final class SchemaBuilder {
   }
 
   private SchemaBuilder withTypes(Collection<ObjectType> types) {
-    types.stream().filter(t -> dslResolver.resolve(t).supportsTopLevelDeclaration())
-        .forEach(t -> objectTypeDelegate.registerPojoType(t, t.getDescription().orElse(EMPTY)));
+    types.stream().filter(t -> {
+      Optional<DslElementSyntax> typeDsl = dslResolver.resolve(t);
+      return typeDsl.isPresent() && typeDsl.get().supportsTopLevelDeclaration();
+    }).forEach(t -> objectTypeDelegate.registerPojoType(t, t.getDescription().orElse(EMPTY)));
+
     return this;
   }
 
@@ -425,14 +408,35 @@ public final class SchemaBuilder {
   }
 
 
-  ExplicitGroup createTypeRefChoiceLocalOrGlobal(MetadataType type, BigInteger minOccurs, String maxOccurs) {
-    DslElementSyntax typeDsl = dslResolver.resolve(type);
-
+  /**
+   * Creates a {@link ExplicitGroup Choice} group that supports {@code refs} to both the {@code global} and {@code local}
+   * abstract elements for the given {@code type}.
+   * This is required in order to allow subtypes that support top-level declaration along with other subtypes that
+   * support only local declarations as childs.
+   * <p/>
+   * For example, a resulting choice group for a type of name {@code TypeName} will look like:
+   *
+   * <xs:complexType>
+   *  <xs:choice minOccurs="1" maxOccurs="1">
+   *    <xs:element minOccurs="0" maxOccurs="1" ref="ns:abstract-type-name"></xs:element>
+   *    <xs:element minOccurs="0" maxOccurs="1" ref="ns:global-abstract-type-name"></xs:element>
+   *  </xs:choice>
+   * </xs:complexType>
+   * <p/>
+   *
+   * @param typeDsl {@link DslElementSyntax} of the referenced type
+   * @param type the {@link MetadataType type} of the base element that will be referenced
+   * @param minOccurs {@link BigInteger#ZERO} if the {@code group} is optional or {@link BigInteger#ONE} if required
+   * @param maxOccurs the maximum number of occurrences for this group
+   * @return a {@link ExplicitGroup Choice} group with the necessary options for this case
+   */
+  ExplicitGroup createTypeRefChoiceLocalOrGlobal(DslElementSyntax typeDsl, MetadataType type, BigInteger minOccurs,
+                                                 String maxOccurs) {
     if (importedTypes.get(type) == null) {
       objectTypeDelegate.registerPojoType(type, EMPTY);
       objectTypeDelegate.registerAbstractElement(type, typeDsl);
       if (typeDsl.supportsTopLevelDeclaration() || (typeDsl.supportsChildDeclaration() && typeDsl.isWrapped())) {
-        objectTypeDelegate.registerConcreteGlobalElement(typeDsl, EMPTY, typeDsl.getAbstractElementName(),
+        objectTypeDelegate.registerConcreteGlobalElement(typeDsl, EMPTY, getAbstractElementName(typeDsl),
                                                          objectTypeDelegate.getTypeQName(typeDsl, type));
       }
     }
@@ -441,11 +445,11 @@ public final class SchemaBuilder {
     choice.setMinOccurs(minOccurs);
     choice.setMaxOccurs(maxOccurs);
 
-    QName refAbstract = new QName(typeDsl.getNamespaceUri(), typeDsl.getAbstractElementName(), typeDsl.getNamespace());
+    QName refAbstract = new QName(typeDsl.getNamespaceUri(), getAbstractElementName(typeDsl), typeDsl.getNamespace());
     TopLevelElement localAbstractElementRef = createRefElement(refAbstract, false);
     choice.getParticle().add(objectFactory.createElement(localAbstractElementRef));
 
-    QName refGlobal = new QName(typeDsl.getNamespaceUri(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, typeDsl.getAbstractElementName()),
+    QName refGlobal = new QName(typeDsl.getNamespaceUri(), format(GLOBAL_ABSTRACT_ELEMENT_MASK, getAbstractElementName(typeDsl)),
                                 typeDsl.getNamespace());
     TopLevelElement topLevelElementRef = createRefElement(refGlobal, false);
     choice.getParticle().add(objectFactory.createElement(topLevelElementRef));
@@ -453,96 +457,38 @@ public final class SchemaBuilder {
     return choice;
   }
 
+  /**
+   * Creates a {@code ref} to the abstract element of the given {@code type} based on its {@code typeDsl} declaration.
+   * Anywhere this ref element is used, the schema will allow to declare an xml element with a substitution group that matches
+   * the referenced abstract-element
+   * <p/>
+   * For example, if we create this ref element to the type of name {@code TypeName}:
+   *
+   * <xs:element minOccurs="0" maxOccurs="1" ref="ns:abstract-type-name"></xs:element>
+   *
+   * <p/>
+   * Then, any of the following elements are allowed to be used where the ref exists:
+   *
+   * <xs:element type="ns:org.mule.test.SomeType" substitutionGroup="ns:abstract-type-name" name="some-type"></xs:element>
+   *
+   * <xs:element type="ns:org.mule.test.OtherType" substitutionGroup="ns:abstract-type-name" name="other-type"></xs:element>
+   *
+   * @param typeDsl {@link DslElementSyntax} of the referenced {@code type}
+   * @param type {@link MetadataType} of the referenced {@code type}
+   * @param isRequired whether or not the element element is required
+   * @return the {@link TopLevelElement element} representing the reference
+   */
   TopLevelElement createTypeRef(DslElementSyntax typeDsl, ObjectType type, boolean isRequired) {
 
     if (importedTypes.get(type) == null) {
       objectTypeDelegate.registerPojoType(type, EMPTY);
       objectTypeDelegate.registerAbstractElement(type, typeDsl);
-      objectTypeDelegate.registerConcreteGlobalElement(typeDsl, EMPTY, typeDsl.getAbstractElementName(),
+      objectTypeDelegate.registerConcreteGlobalElement(typeDsl, EMPTY, getAbstractElementName(typeDsl),
                                                        objectTypeDelegate.getTypeQName(typeDsl, type));
     }
 
-    QName refQName = new QName(typeDsl.getNamespaceUri(), typeDsl.getAbstractElementName(), typeDsl.getNamespace());
+    QName refQName = new QName(typeDsl.getNamespaceUri(), getAbstractElementName(typeDsl), typeDsl.getNamespace());
     return createRefElement(refQName, isRequired);
-  }
-
-  QName getSubstitutionGroup(Class<?> type) {
-    return new QName(schema.getTargetNamespace(), registerExtensibleElement(type));
-  }
-
-  private String registerExtensibleElement(Class<?> type) {
-    Extensible extensible = type.getAnnotation(Extensible.class);
-    checkArgument(extensible != null, format("Type %s is not extensible", type.getName()));
-
-    String name = extensible.alias();
-    if (StringUtils.isBlank(name)) {
-      name = type.getName() + OPERATION_SUBSTITUTION_GROUP_SUFFIX;
-    }
-
-    NamedGroup group = substitutionGroups.get(name);
-    if (group == null) {
-      // register abstract element to serve as substitution
-      TopLevelElement element = new TopLevelElement();
-      element.setName(name);
-      element.setAbstract(true);
-      element.setSubstitutionGroup(MULE_ABSTRACT_MESSAGE_PROCESSOR);
-      schema.getSimpleTypeOrComplexTypeOrGroup().add(element);
-
-      group = new NamedGroup();
-      group.setName(getGroupName(name));
-      schema.getSimpleTypeOrComplexTypeOrGroup().add(group);
-
-      substitutionGroups.put(name, group);
-
-      element = new TopLevelElement();
-      element.setRef(new QName(schema.getTargetNamespace(), name));
-      group.getChoice().getParticle().add(objectFactory.createElement(element));
-    }
-
-    return name;
-  }
-
-  private String getGroupName(String name) {
-    return name + GROUP_SUFFIX;
-  }
-
-  ExtensionType registerExecutableType(String name, ParameterizedModel parameterizedModel, QName base,
-                                       DslElementSyntax dslSyntax) {
-    TopLevelComplexType complexType = new TopLevelComplexType();
-    complexType.setName(name);
-
-    ComplexContent complexContent = new ComplexContent();
-    complexType.setComplexContent(complexContent);
-    final ExtensionType complexContentExtension = new ExtensionType();
-    complexContentExtension.setBase(base);
-    complexContent.setExtension(complexContentExtension);
-
-    if (dslSyntax.requiresConfig()) {
-      Attribute configAttr = createAttribute(CONFIG_ATTRIBUTE, CONFIG_ATTRIBUTE_DESCRIPTION, true, SUBSTITUTABLE_NAME);
-      complexContentExtension.getAttributeOrAttributeGroup().add(configAttr);
-    }
-
-    final ExplicitGroup all = new ExplicitGroup();
-    complexContentExtension.setSequence(all);
-
-    for (final ParameterModel parameterModel : parameterizedModel.getParameterModels()) {
-      MetadataType parameterType = parameterModel.getType();
-
-      if (isOperation(parameterType)) {
-        String maxOccurs = parameterType instanceof ArrayType ? UNBOUNDED : "1";
-        generateNestedProcessorElement(all, parameterModel, maxOccurs);
-      } else {
-        parameterType.accept(getParameterDeclarationVisitor(complexContentExtension, all, parameterModel));
-      }
-    }
-
-    if (all.getParticle().isEmpty()) {
-      complexContentExtension.setSequence(null);
-    }
-
-    schema.getSimpleTypeOrComplexTypeOrGroup().add(complexType);
-
-    return complexContentExtension;
   }
 
   MetadataTypeVisitor getParameterDeclarationVisitor(final ExtensionType extensionType, final ExplicitGroup all,
@@ -632,26 +578,6 @@ public final class SchemaBuilder {
     return importXml;
   }
 
-  private boolean isOperation(MetadataType type) {
-    ValueHolder<Boolean> isOperation = new ValueHolder<>(false);
-    type.accept(new MetadataTypeVisitor() {
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        if (NestedProcessor.class.isAssignableFrom(getType(objectType))) {
-          isOperation.set(true);
-        }
-      }
-
-      @Override
-      public void visitArrayType(ArrayType arrayType) {
-        arrayType.getType().accept(this);
-      }
-    });
-
-    return isOperation.get();
-  }
-
   private void addTlsSupport(ExtensionType extensionType, ExplicitGroup all) {
     if (!requiresTls) {
       importTlsNamespace();
@@ -677,39 +603,7 @@ public final class SchemaBuilder {
     return element;
   }
 
-  private void generateNestedProcessorElement(ExplicitGroup all, ParameterModel parameterModel, String maxOccurs) {
-    LocalComplexType collectionComplexType = new LocalComplexType();
-    GroupRef group = generateNestedProcessorGroup(parameterModel, maxOccurs);
-    collectionComplexType.setGroup(group);
-    collectionComplexType.setAnnotation(createDocAnnotation(parameterModel.getDescription()));
-
-    TopLevelElement collectionElement = new TopLevelElement();
-    collectionElement.setName(hyphenize(parameterModel.getName()));
-    collectionElement.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
-    collectionElement.setMaxOccurs(maxOccurs);
-    collectionElement.setComplexType(collectionComplexType);
-    collectionElement.setAnnotation(createDocAnnotation(EMPTY));
-    all.getParticle().add(objectFactory.createElement(collectionElement));
-  }
-
-  private GroupRef generateNestedProcessorGroup(ParameterModel parameterModel, String maxOccurs) {
-    QName ref = MULE_MESSAGE_PROCESSOR_TYPE;
-    TypeRestrictionModelProperty restrictionCapability =
-        parameterModel.getModelProperty(TypeRestrictionModelProperty.class).orElse(null);
-    if (restrictionCapability != null) {
-      ref = getSubstitutionGroup(restrictionCapability.getType());
-      ref = new QName(ref.getNamespaceURI(), getGroupName(ref.getLocalPart()), ref.getPrefix());
-    }
-
-    GroupRef group = new GroupRef();
-    group.setRef(ref);
-    group.setMinOccurs(parameterModel.isRequired() ? ONE : ZERO);
-    group.setMaxOccurs(maxOccurs);
-
-    return group;
-  }
-
-  private Attribute createAttribute(String name, String description, boolean optional, QName type) {
+  Attribute createAttribute(String name, String description, boolean optional, QName type) {
     Attribute attr = new Attribute();
     attr.setName(name);
     attr.setUse(optional ? SchemaConstants.USE_OPTIONAL : SchemaConstants.USE_REQUIRED);
