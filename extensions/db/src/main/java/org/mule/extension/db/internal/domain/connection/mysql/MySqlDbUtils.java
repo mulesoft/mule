@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.db.api.config;
+package org.mule.extension.db.internal.domain.connection.mysql;
 
 import java.net.URI;
 import java.net.URISyntaxException;

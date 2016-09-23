@@ -6,17 +6,12 @@
  */
 package org.mule.extension.db.internal.domain.connection.generic;
 
-import org.mule.extension.db.api.param.TransactionIsolation;
-import org.mule.extension.db.internal.domain.connection.AdvancedDbParameters;
-import org.mule.extension.db.api.config.DataSourceConfig;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
+import org.mule.extension.db.internal.domain.connection.BaseDbConnectionParameters;
 import org.mule.extension.db.internal.domain.connection.DbConnectionParameters;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
@@ -25,7 +20,7 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
  *
  * @since 4.0
  */
-public class GenericConnectionParameters implements DbConnectionParameters {
+public final class GenericConnectionParameters extends BaseDbConnectionParameters implements DataSourceConfig {
 
   /**
    * JDBC URL to be used to connect to the database.
@@ -42,45 +37,23 @@ public class GenericConnectionParameters implements DbConnectionParameters {
   @Placement(group = CONNECTION, order = 2)
   private String driverClassName;
 
-  @ParameterGroup
-  private AdvancedDbParameters avancedParameters;
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public Optional<DataSourceConfig> getDataSourceConfig() {
-    return Optional.of(new DataSourceConfig() {
+  public String getUrl() {
+    return url;
+  }
 
-      @Override
-      public String getUrl() {
-        return url;
-      }
+  @Override
+  public String getDriverClassName() {
+    return driverClassName;
+  }
 
-      @Override
-      public String getDriverClassName() {
-        return driverClassName;
-      }
+  @Override
+  public String getPassword() {
+    return null;
+  }
 
-      @Override
-      public String getPassword() {
-        return null;
-      }
-
-      @Override
-      public String getUser() {
-        return null;
-      }
-
-      @Override
-      public TransactionIsolation getTransactionIsolation() {
-        return avancedParameters.getTransactionIsolation();
-      }
-
-      @Override
-      public boolean isUseXaTransactions() {
-        return avancedParameters.isUseXaTransactions();
-      }
-    });
+  @Override
+  public String getUser() {
+    return null;
   }
 }

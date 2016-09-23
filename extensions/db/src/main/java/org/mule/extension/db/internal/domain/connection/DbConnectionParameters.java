@@ -6,8 +6,6 @@
  */
 package org.mule.extension.db.internal.domain.connection;
 
-import org.mule.extension.db.api.config.DataSourceConfig;
-
 import java.util.Optional;
 
 import javax.sql.DataSource;

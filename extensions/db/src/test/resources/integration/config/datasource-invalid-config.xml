@@ -7,9 +7,7 @@
 
 
     <db:config name="invalidDbConfig">
-        <db:my-sql-connection >
-            <db:database-url url="url"/>
-            <db:my-sql-parameters host="0.0.0.0" port="123"/>
+        <db:my-sql-connection host="0.0.0.0" port="3306">
         </db:my-sql-connection>
     </db:config>
 

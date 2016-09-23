@@ -6,49 +6,115 @@
  */
 package org.mule.extension.db.internal.domain.connection.derby;
 
-import org.mule.extension.db.api.config.DerbyDataSourceConfig;
-import org.mule.extension.db.api.config.DataSourceConfig;
-import org.mule.extension.db.api.config.DatabaseUrlConfig;
-import org.mule.extension.db.internal.domain.connection.DbConnectionParameters;
-import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
+import org.mule.extension.db.internal.domain.connection.BaseDbConnectionParameters;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-import static org.mule.extension.db.internal.domain.connection.DbConnectionUtils.enrichWithDriverClass;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
- * Parameter group of exclusive connection parameters for Derby Databases.
+ * {@link DataSourceConfig} implementation for Derby databases.
  *
  * @since 4.0
  */
-@ExclusiveOptionals(isOneRequired = true)
-public class DerbyConnectionParameters implements DbConnectionParameters {
+public final class DerbyConnectionParameters extends BaseDbConnectionParameters implements DataSourceConfig {
 
+  private static final String JDBC_URL_PREFIX = "jdbc:derby";
   private static final String DERBY_DRIVER_CLASS = "org.apache.derby.jdbc.EmbeddedDriver";
 
   /**
-   * {@link DataSourceConfig} that lets you connect to the Derby database using a JDBC URL
+   * Name of the database
    */
-  @Optional
   @Parameter
-  private DatabaseUrlConfig databaseUrl;
+  @Optional
+  @Placement(group = CONNECTION, order = 1)
+  private String database;
 
   /**
-   * {@link DataSourceConfig} specialization for Derby databases
+   * Specifies the type of SubsubProtocol to be used by Derby. The avaiable options are:
+   * 'directory', 'memory', 'classpath' and 'jar'.
    */
-  @Optional
   @Parameter
-  private DerbyDataSourceConfig derbyParameters;
+  @Optional(defaultValue = "directory")
+  @Placement(group = CONNECTION, order = 2)
+  private String subsubProtocol;
 
+  /**
+   * Indicates if the database should be created if it this not exist.
+   */
+  @Parameter
+  @Optional(defaultValue = "false")
+  @Placement(group = CONNECTION, order = 3)
+  private boolean create;
+
+  /**
+   * Specifies a list of custom key-value connectionProperties for the config.
+   */
+  @Parameter
+  @Optional
+  @Placement(tab = ADVANCED)
+  private Map<String, String> connectionProperties = new HashMap<>();
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public java.util.Optional<DataSourceConfig> getDataSourceConfig() {
-    if (databaseUrl != null) {
-      enrichWithDriverClass(databaseUrl, DERBY_DRIVER_CLASS);
-      return java.util.Optional.of(databaseUrl);
+  public String getUrl() {
+    StringBuilder buf = new StringBuilder();
+    buf.append(JDBC_URL_PREFIX);
+
+    if (subsubProtocol != null) {
+      buf.append(":");
+      buf.append(subsubProtocol);
     }
-    if (derbyParameters != null) {
-      return java.util.Optional.of(derbyParameters);
+    if (database != null) {
+      buf.append(":");
+      buf.append(database);
     }
-    return java.util.Optional.empty();
+
+    if (create) {
+      buf.append(";create=true");
+    }
+
+    if (connectionProperties != null) {
+      connectionProperties.entrySet().forEach(entry -> {
+        buf.append(";");
+        buf.append(entry.getKey());
+        buf.append("=");
+        buf.append(entry.getValue());
+      });
+    }
+
+    return buf.toString();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getDriverClassName() {
+    return DERBY_DRIVER_CLASS;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getPassword() {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getUser() {
+    return null;
   }
 }

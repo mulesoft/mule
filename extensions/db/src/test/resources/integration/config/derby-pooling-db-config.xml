@@ -6,8 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:config name="pooledJdbcConfig">
-        <db:derby-connection>
-            <db:database-url url="jdbc:derby:muleEmbeddedDB;create=true"/>
+        <db:derby-connection database="target/muleEmbeddedDB" create="true">
             <db:pooling-profile maxPoolSize="2" minPoolSize="0" maxWait="1"/>
             <db:custom-data-types>
                 <!-- Derby uses JAVA_OBJECT for UDT-->

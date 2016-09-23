@@ -6,13 +6,15 @@
  */
 package org.mule.extension.db.internal.domain.connection.datasource;
 
-import org.mule.extension.db.internal.domain.connection.DbConnectionParameters;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
+
+import java.util.Optional;
 
 import javax.sql.DataSource;
 import javax.sql.XADataSource;
@@ -25,28 +27,25 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
  *
  * @since 4.0
  */
-@DisplayName("Data Source Connection")
+@DisplayName("Data Source Reference Connection")
 @Alias("data-source")
-public class DataSourceConnectionProvider extends DbConnectionProvider {
+public class DataSourceReferenceConnectionProvider extends DbConnectionProvider {
 
   /**
    * Reference to a JDBC {@link DataSource} object. This object is typically created using Spring.
    * When using XA transactions, an {@link XADataSource} object must be provided.
    */
   @Parameter
-  @Alias("dataSource")
   @Placement(group = CONNECTION)
-  //This, non optimal, name is due that this field clashes with the one defined in DbConnectionProvider
-  private DataSource aDataSource;
+  private DataSource dataSourceRef;
 
   @Override
-  public DbConnectionParameters getConnectionParameters() {
-    return new DbConnectionParameters() {
+  public Optional<DataSource> getDataSource() {
+    return Optional.ofNullable(dataSourceRef);
+  }
 
-      @Override
-      public java.util.Optional<DataSource> getDataSource() {
-        return java.util.Optional.of(aDataSource);
-      }
-    };
+  @Override
+  public Optional<DataSourceConfig> getDataSourceConfig() {
+    return Optional.empty();
   }
 }

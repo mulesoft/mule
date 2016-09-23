@@ -6,45 +6,94 @@
  */
 package org.mule.extension.db.internal.domain.connection.mysql;
 
-import org.mule.extension.db.api.config.MySqlDataSourceConfig;
-import org.mule.extension.db.api.config.DataSourceConfig;
-import org.mule.extension.db.api.config.DatabaseUrlConfig;
-import org.mule.extension.db.internal.domain.connection.DbConnectionParameters;
-import org.mule.runtime.extension.api.annotation.Alias;
-import org.mule.runtime.extension.api.annotation.ExclusiveOptionals;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
+import org.mule.extension.db.internal.domain.connection.BaseDbConnectionParameters;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.param.display.Password;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
-import static org.mule.extension.db.internal.domain.connection.DbConnectionUtils.enrichWithDriverClass;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mule.extension.db.internal.domain.connection.mysql.MySqlDbUtils.getEffectiveUrl;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 
 /**
- * Parameter group of exclusive connection parameters for MySql Databases.
+ * {@link DataSourceConfig} implementation for MySQL databases.
  *
  * @since 4.0
  */
-@ExclusiveOptionals(isOneRequired = true)
-public class MySqlConnectionParameters implements DbConnectionParameters {
+public final class MySqlConnectionParameters extends BaseDbConnectionParameters implements DataSourceConfig {
 
   private static final String MYSQL_DRIVER_CLASS = "com.mysql.jdbc.Driver";
+  private static final String MY_SQL_PREFIX = "jdbc:mysql://";
 
-  @Optional
+  /**
+   * Configures the host of the database
+   */
   @Parameter
-  @Alias("mySqlParameters")
-  private MySqlDataSourceConfig mySqlParameters;
+  @Placement(group = CONNECTION, order = 1)
+  private String host;
 
-  @Optional
+  /**
+   * Configures the port of the database
+   */
   @Parameter
-  private DatabaseUrlConfig databaseUrl;
+  @Placement(group = CONNECTION, order = 2)
+  private Integer port;
+
+  /**
+   * The user that is used for authentication against the database
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION, order = 3)
+  private String user;
+
+  /**
+   * The password that is used for authentication against the database
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION, order = 4)
+  @Password
+  private String password;
+
+  /**
+   * The name of the database
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION, order = 5)
+  private String database;
+
+  /**
+   * Specifies a list of custom key-value connectionProperties for the config.
+   */
+  @Parameter
+  @Optional
+  @Placement(tab = ADVANCED)
+  private Map<String, String> connectionProperties = new HashMap<>();
 
   @Override
-  public java.util.Optional<DataSourceConfig> getDataSourceConfig() {
-    if (databaseUrl != null) {
-      enrichWithDriverClass(databaseUrl, MYSQL_DRIVER_CLASS);
-      return java.util.Optional.of(databaseUrl);
-    }
-    if (mySqlParameters != null) {
-      return java.util.Optional.of(mySqlParameters);
-    }
-    return java.util.Optional.empty();
+  public String getUrl() {
+    return MySqlDbUtils.getEffectiveUrl(MY_SQL_PREFIX, host, port, database, connectionProperties);
+  }
+
+  @Override
+  public String getDriverClassName() {
+    return MYSQL_DRIVER_CLASS;
+  }
+
+  @Override
+  public String getPassword() {
+    return password;
+  }
+
+  @Override
+  public String getUser() {
+    return user;
   }
 }

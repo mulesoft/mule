@@ -6,12 +6,16 @@
  */
 package org.mule.extension.db.internal.domain.connection.generic;
 
-import org.mule.extension.db.internal.domain.connection.DbConnectionParameters;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+
+import java.util.Optional;
+
+import javax.sql.DataSource;
 
 /**
  * {@link ConnectionProvider} that creates connections for any kind of database using a JDBC URL
@@ -25,7 +29,12 @@ public class GenericConnectionProvider extends DbConnectionProvider {
   private GenericConnectionParameters connectionParameters;
 
   @Override
-  public DbConnectionParameters getConnectionParameters() {
-    return connectionParameters;
+  public Optional<DataSource> getDataSource() {
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<DataSourceConfig> getDataSourceConfig() {
+    return Optional.ofNullable(connectionParameters);
   }
 }

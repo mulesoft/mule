@@ -13,7 +13,6 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 
-import org.mule.extension.db.api.config.DataSourceConfig;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.exception.connection.ConnectionClosingException;
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
@@ -165,21 +164,22 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
     disposeIfNeeded(dataSourceFactory, LOGGER);
   }
 
-  public abstract DbConnectionParameters getConnectionParameters();
+  public abstract java.util.Optional<DataSource> getDataSource();
+
+  public abstract java.util.Optional<DataSourceConfig> getDataSourceConfig();
 
   private DbConnection createDbConnection(Connection connection) throws Exception {
     return new DefaultDbConnection(connection, resolvedCustomTypes);
   }
 
   private DataSource obtainDataSource() throws SQLException {
-    final DbConnectionParameters connectionParameters = getConnectionParameters();
-    final java.util.Optional<DataSource> optionalDataSource = connectionParameters.getDataSource();
+    final java.util.Optional<DataSource> optionalDataSource = getDataSource();
     final DataSource dataSource;
 
     if (optionalDataSource.isPresent()) {
       dataSource = optionalDataSource.get();
     } else {
-      final DataSourceConfig dataSourceConfig = connectionParameters.getDataSourceConfig()
+      final DataSourceConfig dataSourceConfig = getDataSourceConfig()
           .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not create DataSource for DB config, no DataSource or DataSourceConfig has been provided "
               + configName)));
       dataSource = createDataSource(dataSourceConfig);
@@ -222,7 +222,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
     return new DataSourceFactory(configName, muleContext);
   }
 
-  public DataSource getDataSource() {
+  public DataSource getConfiguredDataSource() {
     return dataSource;
   }
 }

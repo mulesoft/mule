@@ -6,11 +6,15 @@
  */
 package org.mule.extension.db.internal.domain.connection.mysql;
 
-import org.mule.extension.db.internal.domain.connection.DbConnectionParameters;
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+
+import java.util.Optional;
+
+import javax.sql.DataSource;
 
 /**
  * Creates connections to a MySQL database.
@@ -22,10 +26,15 @@ import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 public class MySqlConnectionProvider extends DbConnectionProvider {
 
   @ParameterGroup
-  private MySqlConnectionParameters parameters;
+  private MySqlConnectionParameters mySqlParameters;
 
   @Override
-  public DbConnectionParameters getConnectionParameters() {
-    return parameters;
+  public Optional<DataSource> getDataSource() {
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<DataSourceConfig> getDataSourceConfig() {
+    return Optional.ofNullable(mySqlParameters);
   }
 }

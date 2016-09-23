@@ -7,7 +7,6 @@
 
 package org.mule.extension.db.internal.domain.connection;
 
-import org.mule.extension.db.api.config.DataSourceConfig;
 import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.internal.domain.xa.CompositeDataSourceDecorator;
 import org.mule.runtime.api.tx.DataSourceDecorator;
