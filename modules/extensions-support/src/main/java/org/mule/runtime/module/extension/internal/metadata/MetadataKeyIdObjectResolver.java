@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
+import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
@@ -71,7 +72,7 @@ final class MetadataKeyIdObjectResolver {
   public Object resolve(MetadataKey key) throws MetadataResolvingException {
 
     if (keyParts.isEmpty()) {
-      return "";
+      return NullMetadataKey.ID;
     }
 
     final MetadataKeyIdModelProperty keyIdModelProperty = findMetadataKeyIdModelProperty(component);
@@ -138,7 +139,7 @@ final class MetadataKeyIdObjectResolver {
   public Object resolve() throws MetadataResolvingException {
 
     if (keyParts.isEmpty()) {
-      return "";
+      return NullMetadataKey.ID;
     }
 
     if (!keyParts.stream().allMatch(p -> p.getDefaultValue() != null)) {
