@@ -20,8 +20,6 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getContentParameter;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isNullType;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.subTypesUnion;
@@ -59,6 +57,7 @@ import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
@@ -444,5 +443,18 @@ public class MetadataMediator {
   private interface MetadataDelegate {
 
     MetadataType resolve() throws MetadataResolvingException, ConnectionException;
+
+  }
+
+  private List<ParameterModel> getMetadataKeyParts(RuntimeComponentModel componentModel) {
+    return componentModel.getParameterModels().stream()
+        .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+        .collect(toList());
+  }
+
+  private java.util.Optional<ParameterModel> getContentParameter(ComponentModel component) {
+    return component.getParameterModels().stream()
+        .filter(p -> p.getModelProperty(MetadataContentModelProperty.class).isPresent())
+        .findFirst();
   }
 }

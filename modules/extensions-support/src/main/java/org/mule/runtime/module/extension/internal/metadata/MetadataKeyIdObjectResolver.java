@@ -70,60 +70,20 @@ final class MetadataKeyIdObjectResolver {
    *                                    </ul>
    */
   public Object resolve(MetadataKey key) throws MetadataResolvingException {
-
-    if (keyParts.isEmpty()) {
+    if (isKeyLess()) {
       return NullMetadataKey.ID;
     }
-
     final MetadataKeyIdModelProperty keyIdModelProperty = findMetadataKeyIdModelProperty(component);
-    final MetadataType metadataType = keyIdModelProperty.getType();
-    final Class<?> metadataKeyType = getType(metadataType);
-    final ValueHolder<Object> keyValueHolder = new ValueHolder<>();
-    final ValueHolder<MetadataResolvingException> exceptionValueHolder = new ValueHolder<>();
-
-    metadataType.accept(new MetadataTypeVisitor() {
+    MetadataType type = keyIdModelProperty.getType();
+    KeyMetadataTypeVisitor visitor = new KeyMetadataTypeVisitor(key.getId(), getType(type)) {
 
       @Override
-      protected void defaultVisit(MetadataType metadataType) {
-        exceptionValueHolder.set(buildException(format("'%s' type is invalid for MetadataKeyId parameters, "
-            + "use String type instead. Affecting component: '%s'",
-                                                       metadataKeyType.getSimpleName(), component.getName())));
+      protected Map<Field, String> getFieldValuesMap() throws MetadataResolvingException {
+        return keyToFieldValueMap(key);
       }
-
-      @Override
-      public void visitBoolean(BooleanType booleanType) {
-        keyValueHolder.set(Boolean.valueOf(key.getId()));
-      }
-
-      @Override
-      public void visitString(StringType stringType) {
-        String id = key.getId();
-        if (metadataKeyType.isEnum()) {
-          keyValueHolder.set(Enum.valueOf((Class) metadataKeyType, id));
-        } else if (getQueryModelProperty().isPresent() && isDsqlQuery(id)) {
-          DsqlQuery dsqlQuery = dsqlParser.parse(id);
-          keyValueHolder.set(dsqlQuery);
-        } else {
-          keyValueHolder.set(id);
-        }
-      }
-
-      @Override
-      public void visitObject(ObjectType objectType) {
-        try {
-          final Map<Field, String> fieldValueMap = keyToFieldValueMap(key);
-          keyValueHolder.set(instantiateFromFieldValue(metadataKeyType, fieldValueMap));
-        } catch (MetadataResolvingException e) {
-          exceptionValueHolder.set(e);
-        }
-      }
-    });
-
-    if (exceptionValueHolder.get() != null) {
-      throw exceptionValueHolder.get();
-    }
-
-    return keyValueHolder.get();
+    };
+    type.accept(visitor);
+    return visitor.getResultId();
   }
 
   /**
@@ -138,7 +98,7 @@ final class MetadataKeyIdObjectResolver {
    */
   public Object resolve() throws MetadataResolvingException {
 
-    if (keyParts.isEmpty()) {
+    if (isKeyLess()) {
       return NullMetadataKey.ID;
     }
 
@@ -147,18 +107,21 @@ final class MetadataKeyIdObjectResolver {
           + " not have a default value for all it's components.");
     }
 
-    if (keyParts.size() == 1) {
-      return keyParts.get(0).getDefaultValue().toString();
-    }
-
+    String id = keyParts.get(0).getDefaultValue().toString();
     final MetadataKeyIdModelProperty keyIdModelProperty = findMetadataKeyIdModelProperty(component);
+    MetadataType type = keyIdModelProperty.getType();
+    KeyMetadataTypeVisitor visitor = new KeyMetadataTypeVisitor(id, getType(type)) {
 
-    Map<Field, String> fieldValueMap = keyParts.stream()
-        .filter(p -> p.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
-        .collect(toMap(p -> p.getModelProperty(DeclaringMemberModelProperty.class).get().getDeclaringField(),
-                       p -> p.getDefaultValue().toString()));
-
-    return instantiateFromFieldValue(getType(keyIdModelProperty.getType()), fieldValueMap);
+      @Override
+      protected Map<Field, String> getFieldValuesMap() {
+        return keyParts.stream()
+            .filter(p -> p.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
+            .collect(toMap(p -> p.getModelProperty(DeclaringMemberModelProperty.class).get().getDeclaringField(),
+                           p -> p.getDefaultValue().toString()));
+      }
+    };
+    type.accept(visitor);
+    return visitor.getResultId();
   }
 
   private MetadataKeyIdModelProperty findMetadataKeyIdModelProperty(ComponentModel component)
@@ -232,5 +195,64 @@ final class MetadataKeyIdObjectResolver {
         .filter(p -> p.getModelProperty(QueryParameterModelProperty.class).isPresent())
         .map(p -> p.getModelProperty(QueryParameterModelProperty.class).get())
         .findAny();
+  }
+
+  private boolean isKeyLess() {
+    return keyParts.isEmpty();
+  }
+
+  private abstract class KeyMetadataTypeVisitor extends MetadataTypeVisitor {
+
+    private final ValueHolder<Object> keyValueHolder = new ValueHolder<>();
+    private final ValueHolder<MetadataResolvingException> exceptionValueHolder = new ValueHolder<>();
+    private String id;
+    private Class metadataKeyType;
+
+    public KeyMetadataTypeVisitor(String id, Class metadataKeyType) {
+      this.id = id;
+      this.metadataKeyType = metadataKeyType;
+    }
+
+    @Override
+    protected void defaultVisit(MetadataType metadataType) {
+      exceptionValueHolder.set(buildException(format("'%s' type is invalid for MetadataKeyId parameters, "
+          + "use String type instead. Affecting component: '%s'",
+                                                     metadataKeyType.getSimpleName(), component.getName())));
+    }
+
+    @Override
+    public void visitBoolean(BooleanType booleanType) {
+      keyValueHolder.set(Boolean.valueOf(id));
+    }
+
+    @Override
+    public void visitString(StringType stringType) {
+      if (metadataKeyType.isEnum()) {
+        keyValueHolder.set(Enum.valueOf(metadataKeyType, id));
+      } else if (getQueryModelProperty().isPresent() && isDsqlQuery(id)) {
+        DsqlQuery dsqlQuery = dsqlParser.parse(id);
+        keyValueHolder.set(dsqlQuery);
+      } else {
+        keyValueHolder.set(id);
+      }
+    }
+
+    @Override
+    public void visitObject(ObjectType objectType) {
+      try {
+        keyValueHolder.set(instantiateFromFieldValue(metadataKeyType, getFieldValuesMap()));
+      } catch (MetadataResolvingException e) {
+        exceptionValueHolder.set(e);
+      }
+    }
+
+    protected abstract Map<Field, String> getFieldValuesMap() throws MetadataResolvingException;
+
+    public Object getResultId() throws MetadataResolvingException {
+      if (exceptionValueHolder.get() != null) {
+        throw exceptionValueHolder.get();
+      }
+      return keyValueHolder.get();
+    }
   }
 }

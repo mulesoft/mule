@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasProperty;
@@ -18,7 +19,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMetadataKeyParts;
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
@@ -34,6 +34,7 @@ import org.mule.test.metadata.extension.LocationKey;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -150,6 +151,7 @@ public class MetadataKeyIdObjectResolverTestCase {
   @Test
   public void resolveDefaultSingleKey() throws MetadataResolvingException {
     setParameters(continentParam);
+    setMetadataKeyIdModelProperty(String.class);
     when(continentParam.getDefaultValue()).thenReturn(AMERICA);
     keyIdObjectResolver = new MetadataKeyIdObjectResolver(componentModel, getMetadataKeyParts(componentModel));
     final Object key = keyIdObjectResolver.resolve();
@@ -262,5 +264,11 @@ public class MetadataKeyIdObjectResolverTestCase {
 
   private class NotInstantiableClass {
 
+  }
+
+  private List<ParameterModel> getMetadataKeyParts(ComponentModel component) {
+    return component.getParameterModels().stream()
+        .filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
+        .collect(toList());
   }
 }

@@ -51,8 +51,6 @@ import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.introspection.property.MetadataContentModelProperty;
-import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
 import org.mule.runtime.extension.api.introspection.streaming.PagingProvider;
 import org.mule.runtime.extension.api.runtime.operation.InterceptingCallback;
@@ -445,16 +443,6 @@ public final class IntrospectionUtils {
     }
 
     return sourceType.getSimpleName();
-  }
-
-  public static java.util.Optional<ParameterModel> getContentParameter(ComponentModel component) {
-    return component.getParameterModels().stream().filter(p -> p.getModelProperty(MetadataContentModelProperty.class).isPresent())
-        .findFirst();
-  }
-
-  public static List<ParameterModel> getMetadataKeyParts(ComponentModel component) {
-    return component.getParameterModels().stream().filter(p -> p.getModelProperty(MetadataKeyPartModelProperty.class).isPresent())
-        .collect(toList());
   }
 
   /**
