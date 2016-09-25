@@ -8,6 +8,9 @@ package org.mule.compatibility.module.spring.security;
 
 import org.mule.runtime.module.spring.security.SecureHttpPollingFunctionalTestCase;
 
+import org.junit.Ignore;
+
+@Ignore("MULE-9705 - Migrate Spring security tests")
 public class SSSecureHttpPollingFunctionalTestCase extends SecureHttpPollingFunctionalTestCase {
 
   @Override
