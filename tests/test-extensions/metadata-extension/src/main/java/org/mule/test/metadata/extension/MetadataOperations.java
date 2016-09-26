@@ -19,6 +19,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
+import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
@@ -186,7 +187,13 @@ public class MetadataOperations extends MetadataOperationsParent {
   }
 
   @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
-  public void contentParameterShouldNotGenerateChildElement(@Content Map<String, Object> mapContent) {}
+  public void contentParameterShouldNotGenerateMapChildElement(@Content Map<String, Object> mapContent) {}
+
+  @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
+  public void contentParameterShouldNotGenerateListChildElement(@Content List<String> listContent) {}
+
+  @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
+  public void contentParameterShouldNotGeneratePojoChildElement(@Content Bear animalContent) {}
 
   @Query(translator = MetadataExtensionQueryTranslator.class,
       entityResolver = MetadataExtensionEntityResolver.class,
