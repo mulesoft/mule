@@ -81,6 +81,7 @@ public class SchemaGeneratorTestCase extends AbstractMuleTestCase {
     final ExtensionFactory extensionFactory = new DefaultExtensionFactory(new SpiServiceRegistry(), classLoader);
 
     final Map<Class<?>, String> extensions = new LinkedHashMap<Class<?>, String>() {
+
       {
         put(HeisenbergExtension.class, "heisenberg.xsd");
         put(TestConnector.class, "basic.xsd");
