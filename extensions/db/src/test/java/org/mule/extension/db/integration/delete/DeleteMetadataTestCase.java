@@ -21,6 +21,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -57,6 +58,7 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void deleteNoParametersInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = 'Mars'");
@@ -64,6 +66,7 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void deleteParameterizedInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = :name");
@@ -74,6 +77,7 @@ public class DeleteMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void deleteWithExpressionInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("deleteMetadata", "DELETE FROM PLANET WHERE name = #[payload]");

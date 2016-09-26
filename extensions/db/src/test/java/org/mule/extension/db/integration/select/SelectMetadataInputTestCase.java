@@ -27,9 +27,11 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
+@Ignore("TODO MULE-10641")
 public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
 
   public SelectMetadataInputTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
