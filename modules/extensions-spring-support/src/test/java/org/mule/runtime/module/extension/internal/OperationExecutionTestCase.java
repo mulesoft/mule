@@ -16,6 +16,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.test.heisenberg.extension.HeisenbergConnectionProvider.SAUL_OFFICE_NUMBER;
@@ -27,7 +28,6 @@ import static org.mule.test.heisenberg.extension.model.HealthStatus.DEAD;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.HEALTHY;
 import static org.mule.test.heisenberg.extension.model.KnockeableDoor.knock;
 import static org.mule.test.heisenberg.extension.model.Ricin.RICIN_KILL_MESSAGE;
-
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -41,6 +41,7 @@ import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import org.mule.test.heisenberg.extension.model.CarDealer;
 import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
@@ -64,8 +65,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatcher;
-
-import static org.hamcrest.collection.IsMapContaining.hasKey;
 
 public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
@@ -374,15 +373,40 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Test
   public void abstractParameterWithSubtypesAndParameterGroup() throws Exception {
-    Investment investement = (Investment) flowRunner("investment").run().getMessage().getPayload().getValue();
-    assertThat(investement, is(instanceOf(CarWash.class)));
+    Investment investment = (Investment) flowRunner("investment").run().getMessage().getPayload().getValue();
+    assertThat(investment, is(instanceOf(CarWash.class)));
 
-    CarWash carWash = (CarWash) investement;
+    CarWash carWash = (CarWash) investment;
     assertThat(carWash.getCommercialName(), is("A1"));
     assertThat(carWash.getInvestmentInfo(), is(notNullValue()));
     assertThat(carWash.getInvestmentInfo().getValuation(), equalTo(100L));
     assertThat(carWash.getCarsPerMinute(), is(5));
     assertThat(carWash.isApproved(), is(true));
+    assertThat(carWash.getInvestmentSpinOffs(), is(notNullValue()));
+    assertThat(carWash.getInvestmentSpinOffs().get("other-car-wash"), is(instanceOf(CarWash.class)));
+
+    CarWash spinOff = (CarWash) carWash.getInvestmentSpinOffs().get("other-car-wash");
+    assertThat(spinOff.getCommercialName(), is("B1"));
+    assertThat(spinOff.getInvestmentInfo(), is(notNullValue()));
+    assertThat(spinOff.getInvestmentInfo().getValuation(), equalTo(10L));
+    assertThat(spinOff.getCarsPerMinute(), is(1));
+    assertThat(spinOff.getDiscardedInvestments(), is(notNullValue()));
+    assertThat(spinOff.getDiscardedInvestments().size(), is(1));
+    assertThat(spinOff.getDiscardedInvestments().get(0), is(instanceOf(CarDealer.class)));
+
+    CarDealer discarded = (CarDealer) spinOff.getDiscardedInvestments().get(0);
+    assertThat(discarded.getCommercialName(), is("Premium Cars"));
+    assertThat(discarded.getCarStock(), is(50));
+    assertThat(discarded.getInvestmentInfo(), is(notNullValue()));
+    assertThat(discarded.getInvestmentInfo().getValuation(), equalTo(666L));
+    assertThat(discarded.getInvestmentInfo().getInvestmentPlanB(), is(instanceOf(CarDealer.class)));
+
+    CarDealer planB = (CarDealer) discarded.getInvestmentInfo().getInvestmentPlanB();
+    assertThat(planB.getCommercialName(), is("Not So Premium Cars"));
+    assertThat(planB.getCarStock(), is(5));
+    assertThat(planB.getInvestmentInfo(), is(notNullValue()));
+    assertThat(planB.getInvestmentInfo().getValuation(), equalTo(333L));
+
   }
 
   @Test

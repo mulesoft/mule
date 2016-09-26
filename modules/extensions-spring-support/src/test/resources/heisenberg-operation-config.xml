@@ -226,7 +226,21 @@
     <flow name="investment">
         <heisenberg:approve>
             <heisenberg:investment>
-                <heisenberg:car-wash commercialName="A1" valuation="100" carsPerMinute="5"/>
+                <heisenberg:car-wash commercialName="A1" valuation="100" carsPerMinute="5">
+                    <heisenberg:investment-spin-offs>
+                        <heisenberg:investment-spin-off key="other-car-wash">
+                            <heisenberg:car-wash commercialName="B1" valuation="10" carsPerMinute="1">
+                                <heisenberg:discarded-investments>
+                                    <heisenberg:car-dealer commercialName="Premium Cars" valuation="666" carStock="50">
+                                        <heisenberg:investment-plan-b>
+                                            <heisenberg:car-dealer commercialName="Not So Premium Cars" valuation="333" carStock="5"/>
+                                        </heisenberg:investment-plan-b>
+                                    </heisenberg:car-dealer>
+                                </heisenberg:discarded-investments>
+                            </heisenberg:car-wash>
+                        </heisenberg:investment-spin-off>
+                    </heisenberg:investment-spin-offs>
+                </heisenberg:car-wash>
             </heisenberg:investment>
         </heisenberg:approve>
     </flow>
