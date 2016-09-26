@@ -9,9 +9,6 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.runtime.module.cxf.config.ProxyServiceFactoryBean;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -25,12 +22,7 @@ import org.apache.cxf.message.Message;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ConfigurationTestCase extends ExtensionFunctionalTestCase {
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
+public class ConfigurationTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Override
   protected String getConfigFile() {

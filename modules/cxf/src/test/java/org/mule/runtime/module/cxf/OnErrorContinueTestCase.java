@@ -14,13 +14,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.extension.http.api.HttpConstants;
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -41,7 +39,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class OnErrorContinueTestCase extends ExtensionFunctionalTestCase {
+public class OnErrorContinueTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private static final String requestPayload =
       "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
@@ -64,15 +62,10 @@ public class OnErrorContinueTestCase extends ExtensionFunctionalTestCase {
           "</soap:Envelope>";
 
   public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions()
-      .method(org.mule.extension.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
+      .method(POST.name()).disableStatusCodeValidation().build();
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

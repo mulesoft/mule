@@ -11,9 +11,6 @@ import static junit.framework.Assert.assertEquals;
 import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -29,7 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-public class ProxyWSDLRewriteAddressTestCase extends ExtensionFunctionalTestCase {
+public class ProxyWSDLRewriteAddressTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
       newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -39,11 +36,6 @@ public class ProxyWSDLRewriteAddressTestCase extends ExtensionFunctionalTestCase
 
   private static final String SINGLE_PORT = "StockQuoteSoap";
   private static final String SERVICE_LOCATION = "http://www.webservicex.net/stockquote.asmx";
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

@@ -13,11 +13,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.MessagingException;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import javax.xml.ws.soap.SOAPFaultException;
@@ -25,15 +23,10 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class WsSecurityConfigMelExpressionTestCase extends ExtensionFunctionalTestCase {
+public class WsSecurityConfigMelExpressionTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

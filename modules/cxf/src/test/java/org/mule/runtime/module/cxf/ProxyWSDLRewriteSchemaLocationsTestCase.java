@@ -10,13 +10,10 @@ package org.mule.runtime.module.cxf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.api.HttpConstants;
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.junit4.ApplicationContextBuilder;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -37,7 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-public class ProxyWSDLRewriteSchemaLocationsTestCase extends ExtensionFunctionalTestCase {
+public class ProxyWSDLRewriteSchemaLocationsTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public final DynamicPort httpPortProxy = new DynamicPort("portProxy");
@@ -45,14 +42,9 @@ public class ProxyWSDLRewriteSchemaLocationsTestCase extends ExtensionFunctional
   @Rule
   public final DynamicPort httpPortMockServer = new DynamicPort("portMockServer");
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
 
   private MuleContext mockServerContext;
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

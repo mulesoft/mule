@@ -11,9 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
@@ -32,15 +29,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("MULE-10618")
-public class HolderNonBlockingTestCase extends ExtensionFunctionalTestCase {
+public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

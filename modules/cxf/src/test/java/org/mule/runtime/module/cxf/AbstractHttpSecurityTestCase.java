@@ -8,9 +8,6 @@ package org.mule.runtime.module.cxf;
 
 import static org.mule.extension.http.api.HttpConstants.Protocols.HTTPS;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import java.io.IOException;
@@ -24,7 +21,7 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.junit.Before;
 
-public class AbstractHttpSecurityTestCase extends ExtensionFunctionalTestCase {
+public class AbstractHttpSecurityTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Before
   public void setUp() throws Exception {
@@ -36,11 +33,6 @@ public class AbstractHttpSecurityTestCase extends ExtensionFunctionalTestCase {
     SSLSocketFactory factory = tlsContextFactory.createSslContext().getSocketFactory();
     Protocol httpsWithTrustStore = new Protocol(HTTPS.getScheme(), getSocketFactory(factory), HTTPS.getDefaultPort());
     Protocol.registerProtocol(HTTPS.getScheme(), httpsWithTrustStore);
-  }
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
   }
 
   private static ProtocolSocketFactory getSocketFactory(final SSLSocketFactory factory) {

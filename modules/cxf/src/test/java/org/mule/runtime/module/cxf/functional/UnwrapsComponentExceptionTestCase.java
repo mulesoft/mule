@@ -10,10 +10,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.runtime.module.cxf.example.HelloWorld;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -22,7 +20,7 @@ import javax.jws.WebService;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UnwrapsComponentExceptionTestCase extends ExtensionFunctionalTestCase {
+public class UnwrapsComponentExceptionTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   public static final String ERROR_MESSAGE = "Changos!!!";
 
@@ -32,11 +30,6 @@ public class UnwrapsComponentExceptionTestCase extends ExtensionFunctionalTestCa
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

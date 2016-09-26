@@ -8,11 +8,9 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -26,18 +24,13 @@ import org.dom4j.Element;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfBadSoapRequestTestCase extends ExtensionFunctionalTestCase {
+public class CxfBadSoapRequestTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions()
-      .method(org.mule.extension.http.api.HttpConstants.Methods.POST.name()).disableStatusCodeValidation().build();
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
+      newOptions().method(POST.name()).disableStatusCodeValidation().build();
 
   @Override
   protected String getConfigFile() {

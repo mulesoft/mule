@@ -13,6 +13,8 @@ import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticM
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getVariableValueOrNull;
 import static org.mule.runtime.core.util.IOUtils.toDataHandler;
 import static org.mule.runtime.module.cxf.CxfConstants.OPERATION;
+import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
+import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
 
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MediaType;
@@ -195,9 +197,9 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
       props.put("holder", responseHolder);
 
       // Set custom soap action if set on the event or endpoint
-      String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+      String soapAction = event.getMessage().getOutboundProperty(SOAP_ACTION_PROPERTY);
       if (soapAction != null) {
-        props.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
+        props.put(SOAP_ACTION_PROPERTY_CAPS, soapAction);
       }
 
       clientProxy.getRequestContext().putAll(props);

@@ -9,9 +9,6 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.ByteArrayOutputStream;
@@ -34,15 +31,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Broken on removing services")
-public class MtomTestCase extends ExtensionFunctionalTestCase {
+public class MtomTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

@@ -12,27 +12,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import org.mule.extension.http.api.HttpAttributes;
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HeaderPropertiesTestCase extends ExtensionFunctionalTestCase {
+public class HeaderPropertiesTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

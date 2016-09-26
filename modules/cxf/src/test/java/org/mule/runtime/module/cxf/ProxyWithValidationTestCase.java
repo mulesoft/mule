@@ -10,9 +10,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -20,7 +17,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyWithValidationTestCase extends ExtensionFunctionalTestCase {
+public class ProxyWithValidationTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
       newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -31,11 +28,6 @@ public class ProxyWithValidationTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public final DynamicPort httpPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

@@ -9,13 +9,10 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.cxf.CxfBasicTestCase.APP_SOAP_XML;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.api.HttpConstants.Methods;
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
@@ -34,19 +31,14 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("MULE-10618")
-public class CxfBackToBlockingTestCase extends ExtensionFunctionalTestCase {
+public class CxfBackToBlockingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(Methods.POST.name()).build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
 
   private String echoWsdl;
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

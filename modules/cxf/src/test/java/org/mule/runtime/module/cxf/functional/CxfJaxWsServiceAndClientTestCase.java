@@ -8,26 +8,24 @@ package org.mule.runtime.module.cxf.functional;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.extension.http.api.HttpConstants;
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfJaxWsServiceAndClientTestCase extends ExtensionFunctionalTestCase {
+public class CxfJaxWsServiceAndClientTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
 
   private static final String REQUEST_PAYLOAD =
       "<soap:Envelope \n" + "           xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"
@@ -37,11 +35,6 @@ public class CxfJaxWsServiceAndClientTestCase extends ExtensionFunctionalTestCas
   private static final String RESPONSE_PAYLOAD = "<soap:Envelope " + "xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
       + "<soap:Body>" + "<ns2:sayHiResponse xmlns:ns2=\"http://example.cxf.module.runtime.mule.org/\">" + "<return>"
       + "Hello\u2297 Test Message" + "</return>" + "</ns2:sayHiResponse>" + "</soap:Body>" + "</soap:Envelope>";
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {
