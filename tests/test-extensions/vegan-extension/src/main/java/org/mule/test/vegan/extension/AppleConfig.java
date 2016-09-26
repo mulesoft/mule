@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Configuration(name = APPLE)
-@Operations({EatAppleOperation.class, SpreadVeganismOperation.class})
+@Operations({EatAppleOperation.class, SpreadVeganismOperation.class, VeganFidelityOperation.class})
 @Sources({HarvestApplesSource.class, PaulMcCartneySource.class})
 @ConnectionProviders(VeganAppleConnectionProvider.class)
 public class AppleConfig {
