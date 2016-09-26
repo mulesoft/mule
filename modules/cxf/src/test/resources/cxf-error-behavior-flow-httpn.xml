@@ -112,7 +112,7 @@
 
     <flow name="FlowProxyWithFault">
         <httpn:listener path="testProxyWithFault" config-ref="listenerConfig">
-            <httpn:response-builder statusCode="#[flowVars.sc]"/>
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
         </httpn:listener>
         <cxf:proxy-service />
         <cxf:proxy-client />
@@ -121,7 +121,7 @@
                 <httpn:success-status-code-validator values="0..599" />
             </httpn:response-validator>
         </httpn:request>
-        <set-variable variableName="sc" value="#[message.attributes.statusCode]"/>
+<!--         <set-variable variableName="sc" value="#[message.attributes.statusCode]"/> -->
     </flow>
 
     <flow name="FlowProxyWithTransformerException">

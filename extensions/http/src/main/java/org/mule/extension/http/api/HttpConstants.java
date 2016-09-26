@@ -115,14 +115,18 @@ public abstract class HttpConstants {
     }
 
     public static String getReasonPhraseForStatusCode(int statusCode) {
+      final HttpStatus statusByCode = getStatusByCode(statusCode);
+      return statusByCode == null ? null : statusByCode.getReasonPhrase();
+    }
+
+    public static HttpStatus getStatusByCode(int statusCode) {
       for (HttpStatus httpStatus : HttpStatus.values()) {
         if (httpStatus.getStatusCode() == statusCode) {
-          return httpStatus.getReasonPhrase();
+          return httpStatus;
         }
       }
 
       return null;
     }
   }
-
 }

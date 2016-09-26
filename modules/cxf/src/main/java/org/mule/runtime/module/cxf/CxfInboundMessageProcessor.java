@@ -421,6 +421,13 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
     HttpStatus responseCode = OK;
+    final ParameterMap responseParams = new ParameterMap();
+
+    if (message.getAttributes() instanceof HttpResponseAttributes) {
+      responseCode = HttpStatus.getStatusByCode(((HttpResponseAttributes) message.getAttributes()).getStatusCode());
+      responseParams.putAll(((HttpResponseAttributes) message.getAttributes()).getHeaders());
+    }
+
     if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
       // For one-way operations, no envelope should be returned
       // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
@@ -454,10 +461,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         responseCode = INTERNAL_SERVER_ERROR;
       }
     }
-    final InternalMessage responseMessage =
-        builder.attributes(new HttpResponseAttributes(responseCode.getStatusCode(), responseCode.getReasonPhrase(),
-                                                      new ParameterMap()))
-            .build();
+    final InternalMessage responseMessage = builder
+        .attributes(new HttpResponseAttributes(responseCode.getStatusCode(), responseCode.getReasonPhrase(), responseParams))
+        .build();
     return Event.builder(responseEvent).message(responseMessage).build();
   }
 
