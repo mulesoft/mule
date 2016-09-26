@@ -22,6 +22,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -58,6 +59,7 @@ public class UpdateMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void updateNoParametersInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("updateMetadata", "update Planet set position = 1 where name = 'Mars'");
@@ -65,6 +67,7 @@ public class UpdateMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void updateParameterizedInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("updateMetadata", "update PLANET set NAME= :name where NAME='Mars'");
@@ -75,6 +78,7 @@ public class UpdateMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void updateWithExpressionInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("updateMetadata", "update PLANET set NAME='#[data]' where POSITION=#[type]");

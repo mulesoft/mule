@@ -22,6 +22,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -59,6 +60,7 @@ public class InsertMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void insertNoParametersInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("insertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, 'Mercury')");
@@ -66,6 +68,7 @@ public class InsertMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void insertParameterizedInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("insertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)");
@@ -76,6 +79,7 @@ public class InsertMetadataTestCase extends AbstractDbIntegrationTestCase {
   }
 
   @Test
+  @Ignore("TODO MULE-10641")
   public void insertWithExpressionInputMetadata() throws Exception {
     ParameterMetadataDescriptor parameters =
         getInputMetadata("insertMetadata", "INSERT INTO PLANET(POSITION, NAME) VALUES (777, #[payload])");
