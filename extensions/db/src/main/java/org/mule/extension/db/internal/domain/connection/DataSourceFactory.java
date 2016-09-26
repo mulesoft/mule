@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.internal.domain.connection;
 
+import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.internal.domain.xa.CompositeDataSourceDecorator;
 import org.mule.runtime.api.tx.DataSourceDecorator;
 import org.mule.runtime.api.config.DatabasePoolingProfile;
@@ -52,20 +53,20 @@ public class DataSourceFactory implements Disposable {
    * @return a non null dataSource
    * @throws SQLException in case there is a problem creating the dataSource
    */
-  public DataSource create(DataSourceConfig dataSourceConfig) throws SQLException {
+  public DataSource create(DataSourceConfig dataSourceConfig, DbPoolingProfile poolingProfile) throws SQLException {
     DataSource dataSource;
 
-    if (dataSourceConfig.getPoolingProfile() == null) {
+    if (poolingProfile == null) {
       dataSource = createSingleDataSource(dataSourceConfig);
     } else {
-      dataSource = createPooledDataSource(dataSourceConfig);
+      dataSource = createPooledDataSource(dataSourceConfig, poolingProfile);
     }
 
     if (dataSourceConfig.isUseXaTransactions()) {
-      dataSource = decorateDataSource(dataSource, dataSourceConfig.getPoolingProfile());
+      dataSource = decorateDataSource(dataSource, poolingProfile);
     }
 
-    if (!(dataSourceConfig.getPoolingProfile() == null || dataSourceConfig.isUseXaTransactions())) {
+    if (!(poolingProfile == null || dataSourceConfig.isUseXaTransactions())) {
       pooledDataSources.add(dataSource);
     } else if (dataSource instanceof Disposable) {
       disposableDataSources.add((Disposable) dataSource);
@@ -90,11 +91,12 @@ public class DataSourceFactory implements Disposable {
     return dataSource;
   }
 
-  protected DataSource createPooledDataSource(DataSourceConfig dataSourceConfig) throws SQLException {
+  protected DataSource createPooledDataSource(DataSourceConfig dataSourceConfig, DbPoolingProfile poolingProfile)
+      throws SQLException {
     if (dataSourceConfig.isUseXaTransactions()) {
       return createSingleDataSource(dataSourceConfig);
     } else {
-      return createPooledStandardDataSource(createSingleDataSource(dataSourceConfig), dataSourceConfig.getPoolingProfile());
+      return createPooledStandardDataSource(createSingleDataSource(dataSourceConfig), poolingProfile);
     }
   }
 

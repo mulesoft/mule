@@ -87,7 +87,7 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
           (DbConnectionProvider) configurationProvider
               .get(testEvent())
               .getConnectionProvider().get();
-      return connectionProvider.getDataSource();
+      return connectionProvider.getConfiguredDataSource();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

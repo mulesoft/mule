@@ -10,7 +10,10 @@ import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+
+import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.exception.connection.ConnectionClosingException;
 import org.mule.extension.db.api.exception.connection.ConnectionCommitException;
 import org.mule.extension.db.api.exception.connection.ConnectionCreationException;
@@ -25,16 +28,15 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.ConfigName;
 import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -46,6 +48,7 @@ import javax.sql.DataSource;
 import javax.sql.XAConnection;
 
 import org.apache.commons.lang.StringUtils;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-@DisplayName("Generic DB Connection")
-public class DbConnectionProvider implements ConnectionProvider<DbConnection>, Initialisable, Disposable {
+public abstract class DbConnectionProvider implements ConnectionProvider<DbConnection>, Initialisable, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DbConnectionProvider.class);
 
@@ -65,9 +67,6 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
   @Inject
   private MuleContext muleContext;
 
-  @ParameterGroup
-  protected ConnectionParameters connectionParameters;
-
   /**
    * Specifies non-standard custom data types
    */
@@ -76,10 +75,19 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
   @Expression(NOT_SUPPORTED)
   private List<CustomDataType> customDataTypes = emptyList();
 
+  /**
+   * Provides a way to configure database connection pooling.
+   */
+  @Parameter
+  @Optional
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED)
+  private DbPoolingProfile poolingProfile;
+
   private DataSourceFactory dataSourceFactory;
   private List<DbType> resolvedCustomTypes = emptyList();
-  private DataSource dataSource = null;
   private JdbcConnectionFactory jdbcConnectionFactory = new JdbcConnectionFactory();
+  private DataSource dataSource;
 
   @Override
   public final DbConnection connect() throws ConnectionException {
@@ -96,10 +104,6 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
     } catch (Exception e) {
       throw new ConnectionCreationException(e);
     }
-  }
-
-  protected DbConnection createDbConnection(Connection connection) throws Exception {
-    return new DefaultDbConnection(connection, resolvedCustomTypes);
   }
 
   @Override
@@ -160,20 +164,32 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
     disposeIfNeeded(dataSourceFactory, LOGGER);
   }
 
-  private DataSource obtainDataSource() throws SQLException {
-    DataSource dataSource = connectionParameters.getDataSource();
-    if (dataSource == null) {
-      dataSource = createDataSource();
-    }
+  public abstract java.util.Optional<DataSource> getDataSource();
 
-    dataSource = dataSourceFactory.decorateDataSource(dataSource, connectionParameters.getDataSourceConfig().getPoolingProfile());
+  public abstract java.util.Optional<DataSourceConfig> getDataSourceConfig();
 
-    return dataSource;
+  private DbConnection createDbConnection(Connection connection) throws Exception {
+    return new DefaultDbConnection(connection, resolvedCustomTypes);
   }
 
-  protected DataSource createDataSource() throws SQLException {
-    connectionParameters.getDataSourceConfig().setUrl(getEffectiveUrl());
-    return dataSourceFactory.create(connectionParameters.getDataSourceConfig());
+  private DataSource obtainDataSource() throws SQLException {
+    final java.util.Optional<DataSource> optionalDataSource = getDataSource();
+    final DataSource dataSource;
+
+    if (optionalDataSource.isPresent()) {
+      dataSource = optionalDataSource.get();
+    } else {
+      final DataSourceConfig dataSourceConfig = getDataSourceConfig()
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Could not create DataSource for DB config, no DataSource or DataSourceConfig has been provided "
+              + configName)));
+      dataSource = createDataSource(dataSourceConfig);
+    }
+
+    return dataSourceFactory.decorateDataSource(dataSource, poolingProfile);
+  }
+
+  private DataSource createDataSource(DataSourceConfig dataSourceConfig) throws SQLException {
+    return dataSourceFactory.create(dataSourceConfig, poolingProfile);
   }
 
   private List<DbType> resolveCustomTypes() {
@@ -202,19 +218,11 @@ public class DbConnectionProvider implements ConnectionProvider<DbConnection>, I
         .collect(new ImmutableListCollector<>());
   }
 
-  protected ConnectionParameters getConnectionParameters() {
-    return connectionParameters;
-  }
-
   private DataSourceFactory createDataSourceFactory() {
     return new DataSourceFactory(configName, muleContext);
   }
 
-  protected String getEffectiveUrl() {
-    return connectionParameters.getDataSourceConfig().getUrl();
-  }
-
-  public DataSource getDataSource() {
+  public DataSource getConfiguredDataSource() {
     return dataSource;
   }
 }

@@ -11,8 +11,9 @@ import org.mule.extension.db.api.param.BulkQueryDefinition;
 import org.mule.extension.db.api.param.JdbcType;
 import org.mule.extension.db.api.param.QueryDefinition;
 import org.mule.extension.db.api.param.StoredProcedureCall;
-import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
+import org.mule.extension.db.internal.domain.connection.datasource.DataSourceReferenceConnectionProvider;
 import org.mule.extension.db.internal.domain.connection.derby.DerbyConnectionProvider;
+import org.mule.extension.db.internal.domain.connection.generic.GenericConnectionProvider;
 import org.mule.extension.db.internal.domain.connection.mysql.MySqlConnectionProvider;
 import org.mule.extension.db.internal.domain.type.CompositeDbTypeManager;
 import org.mule.extension.db.internal.domain.type.DbTypeManager;
@@ -39,7 +40,8 @@ import java.util.List;
  */
 @Extension(name = "Database", description = "Connector for connecting to relation Databases through the JDBC API")
 @Operations({DmlOperations.class, DdlOperations.class, BulkOperations.class})
-@ConnectionProviders({DbConnectionProvider.class, DerbyConnectionProvider.class, MySqlConnectionProvider.class})
+@ConnectionProviders({DataSourceReferenceConnectionProvider.class, GenericConnectionProvider.class, DerbyConnectionProvider.class,
+    MySqlConnectionProvider.class})
 @Xml(namespace = "db")
 @Export(classes = {StatementStreamingResultSetCloser.class, QueryDefinition.class, StoredProcedureCall.class,
     BulkQueryDefinition.class},

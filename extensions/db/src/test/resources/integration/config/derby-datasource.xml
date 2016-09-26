@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:config name="dbConfig">
-        <db:derby-connection url="jdbc:derby:muleEmbeddedDB;create=true">
+        <db:derby-connection database="target/muleEmbeddedDB" create="true">
             <db:custom-data-types>
                 <!-- Derby uses JAVA_OBJECT for UDT-->
                 <db:custom-data-type typeName="CONTACT_DETAILS" id="2000"/>

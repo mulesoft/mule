@@ -6,26 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import static java.lang.String.format;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.getHintsModelProperty;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import com.google.common.collect.ImmutableList;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -83,8 +67,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcess
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-
-import com.google.common.collect.ImmutableList;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -106,10 +90,26 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
+import static java.lang.String.format;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.getHintsModelProperty;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -629,7 +629,7 @@ public abstract class ExtensionDefinitionParser {
    * @param defaultValue      the parameter's default value
    * @param expressionSupport the parameter's {@link ExpressionSupport}
    * @param required          whether the parameter is required or not
-   * @param modelProperties
+   * @param modelProperties   parameter's {@link ModelProperty}s
    */
   protected void parseObjectParameter(String key, String name, ObjectType type, Object defaultValue,
                                       ExpressionSupport expressionSupport, boolean required, boolean acceptsReferences,
@@ -763,7 +763,7 @@ public abstract class ExtensionDefinitionParser {
     }
 
     if (value instanceof Date || value instanceof LocalDate || value instanceof LocalDateTime || value instanceof Calendar) {
-      return new StaticValueResolver(value);
+      return new StaticValueResolver<>(value);
     }
 
     throw new IllegalArgumentException(format("Could not transform value of type '%s' to a valid date type",
@@ -782,12 +782,12 @@ public abstract class ExtensionDefinitionParser {
 
     Class<?> type = getType(dateType);
     if (isExpression(value, parser)) {
-      return new TypeSafeExpressionValueResolver((String) value, type, muleContext);
+      return new TypeSafeExpressionValueResolver<>((String) value, type, muleContext);
     }
 
     if (value == null) {
       if (defaultValue == null) {
-        return new StaticValueResolver(null);
+        return new StaticValueResolver<>(null);
       }
 
       value = defaultValue;

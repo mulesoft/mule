@@ -6,11 +6,13 @@
  */
 package org.mule.extension.db.internal.domain.connection.derby;
 
+import org.mule.extension.db.internal.domain.connection.DataSourceConfig;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 
-import java.sql.SQLException;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
@@ -23,9 +25,16 @@ import javax.sql.DataSource;
 @Alias("derby")
 public class DerbyConnectionProvider extends DbConnectionProvider {
 
+  @ParameterGroup
+  private DerbyConnectionParameters derbyParameters;
+
   @Override
-  protected DataSource createDataSource() throws SQLException {
-    connectionParameters.getDataSourceConfig().setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-    return super.createDataSource();
+  public Optional<DataSource> getDataSource() {
+    return Optional.empty();
+  }
+
+  @Override
+  public Optional<DataSourceConfig> getDataSourceConfig() {
+    return Optional.ofNullable(derbyParameters);
   }
 }

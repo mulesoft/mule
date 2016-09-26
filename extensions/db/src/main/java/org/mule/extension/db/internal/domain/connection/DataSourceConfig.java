@@ -4,142 +4,49 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.extension.db.internal.domain.connection;
 
-import static org.mule.extension.db.api.param.TransactionIsolation.NOT_CONFIGURED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import org.mule.extension.db.api.config.DbPoolingProfile;
 import org.mule.extension.db.api.param.TransactionIsolation;
-import org.mule.runtime.api.config.DatabasePoolingProfile;
-import org.mule.runtime.extension.api.annotation.Expression;
-import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Optional;
-import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
-import org.mule.runtime.extension.api.annotation.param.display.Password;
-import org.mule.runtime.extension.api.annotation.param.display.Placement;
+
+import java.util.concurrent.TimeUnit;
+
+import javax.sql.DataSource;
 
 /**
- * Maintains configuration information about how to build a {@link javax.sql.DataSource}
+ * Contract for DataSource Configurations that are used to build {@link DataSource} instances
+ *
+ * @since 4.0
  */
-public class DataSourceConfig {
-
-  public static final String CONNECTION_TIMEOUT_CONFIGURATION = "Connection Timeout Configuration";
-  public static final String TRANSACTION_CONFIGURATION = "Transaction Configuration";
-  /**
-   * Fully-qualified name of the database driver class.
-   */
-  @Parameter
-  @Optional
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED)
-  private String driverClassName;
+public interface DataSourceConfig {
 
   /**
-   * URL used to connect to the database.
+   * The JDBC URL to be used to connect to the database
    */
-  @Parameter
-  @Optional
-  @Placement(group = CONNECTION)
-  private String url;
+  String getUrl();
 
   /**
-   * The user that is used for authentication against the database
+   * Full qualifier name of the Driver Class to connect to the database
    */
-  @Parameter
-  @Optional
-  @Placement(group = CONNECTION, order = 3)
-  private String user;
+  String getDriverClassName();
 
   /**
-   * The password that is used for authentication against the database.
+   * Password to use to login into the database
    */
-  @Parameter
-  @Optional
-  @Password
-  @Placement(group = CONNECTION, order = 4)
-  private String password;
+  String getPassword();
+
+  /**
+   * User to use to login into the database
+   */
+  String getUser();
 
   /**
    * The transaction isolation level to set on the driver when connecting the database.
    */
-  @Parameter
-  @Optional(defaultValue = "NOT_CONFIGURED")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = TRANSACTION_CONFIGURATION)
-  private TransactionIsolation transactionIsolation = NOT_CONFIGURED;
+  TransactionIsolation getTransactionIsolation();
 
   /**
-   * Indicates whether or not the created datasource has to support XA transactions. Default is false.
+   * Indicates whether or not the created datasource has to support XA transactions. Default is
+   * false.
    */
-  @Parameter
-  @Optional(defaultValue = "false")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = TRANSACTION_CONFIGURATION)
-  @DisplayName("Use XA Transactions")
-  private boolean useXaTransactions = false;
-
-  /**
-   * Provides a way to configure database connection pooling.
-   */
-  @Parameter
-  @Optional
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED)
-  private DbPoolingProfile poolingProfile;
-
-
-  public String getUrl() {
-    return url;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
-  public String getDriverClassName() {
-    return driverClassName;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public String getUser() {
-    return user;
-  }
-
-  public TransactionIsolation getTransactionIsolation() {
-    return transactionIsolation;
-  }
-
-  public boolean isUseXaTransactions() {
-    return useXaTransactions;
-  }
-
-  public DatabasePoolingProfile getPoolingProfile() {
-    return poolingProfile;
-  }
-
-  public void setDriverClassName(String driverClassName) {
-    this.driverClassName = driverClassName;
-  }
-
-  public void setUser(String user) {
-    this.user = user;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public void setTransactionIsolation(TransactionIsolation transactionIsolation) {
-    this.transactionIsolation = transactionIsolation;
-  }
-
-  public void setUseXaTransactions(boolean useXaTransactions) {
-    this.useXaTransactions = useXaTransactions;
-  }
+  boolean isUseXaTransactions();
 }
