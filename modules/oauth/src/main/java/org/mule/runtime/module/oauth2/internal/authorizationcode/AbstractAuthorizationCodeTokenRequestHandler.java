@@ -108,7 +108,7 @@ public abstract class AbstractAuthorizationCodeTokenRequestHandler extends Abstr
       }
     } else if (getOauthConfig().getLocalCallbackConfig() != null) {
       flowName =
-          flowName + getOauthConfig().getLocalCallbackConfig().getName() + " " + getOauthConfig().getLocalCallbackConfigPath();
+          flowName + getOauthConfig().getLocalCallbackConfig().getName() + "_" + getOauthConfig().getLocalCallbackConfigPath();
       httpListenerBuilder
           .setListenerConfig(getOauthConfig().getLocalCallbackConfig())
           .setPath(getOauthConfig().getLocalCallbackConfigPath());
