@@ -80,15 +80,37 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="redirectionUrl" type="xsd:string" use="optional">
+                <xsd:attribute name="localCallbackUrl" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The oauth authentication server will use this url to provide the authentication code to the
-                            Mule server so the mule server can
-                            retrieve the access token. If this attribute is provided mule will automatically create an
-                            endpoint in this url to be able to
-                            store the authentication code unless there’s already an endpoint registered to manually
-                            extract the authorization code
+                            If this attribute is provided mule will automatically create an
+                            endpoint in this url to be able to store the authentication code unless there’s already an
+                            endpoint registered to manually extract the authorization code.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="externalCallbackUrl" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The oauth authentication server will use this url to provide the
+                            authentication code to the Mule server so the mule server can retrieve the access token.
+                            Note that this must be the externally visible address of the callback, not the local one.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="localCallbackConfig-ref" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Listener configuration to be used instead of localCallbackUrl. Note that if using this you must
+                            also provide a localCallbackConfigPath separately.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="localCallbackConfigPath" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Local path for the listener that will be created according to localCallbackConfig, not required
+                            if using localCallbackUrl.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

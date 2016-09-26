@@ -52,7 +52,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
 
   @Test
   public void urlRedirectHandlerDoNotRetrieveAuthorizationCode() throws Exception {
-    Response response = Get(redirectUrl.getValue()).connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT).execute();
+    Response response = Get(localCallbackUrl.getValue()).connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT).execute();
     HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST.getStatusCode()));
   }
@@ -168,7 +168,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
   }
 
   private void verifyCallToRedirectUrlFails() throws IOException {
-    Response response = Get(format(redirectUrl.getValue() + "%s%s=%s", "?", CODE_PARAMETER, AUTHENTICATION_CODE))
+    Response response = Get(format(localCallbackUrl.getValue() + "%s%s=%s", "?", CODE_PARAMETER, AUTHENTICATION_CODE))
         .connectTimeout(REQUEST_TIMEOUT).socketTimeout(REQUEST_TIMEOUT).execute();
     HttpResponse httpResponse = response.returnResponse();
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(INTERNAL_SERVER_ERROR.getStatusCode()));
@@ -177,7 +177,7 @@ public class AuthorizationCodeAuthorizationFailureTestCase extends AbstractAutho
   private String getRedirectUrlWithOnCompleteUrlQueryParam() {
     StateEncoder stateEncoder = new StateEncoder(null);
     stateEncoder.encodeOnCompleteRedirectToInState(format("http://localhost:%s/afterLogin", onCompleteUrlPort.getNumber()));
-    return appendQueryParam(redirectUrl.getValue(), STATE_PARAMETER, stateEncoder.getEncodedState());
+    return appendQueryParam(localCallbackUrl.getValue(), STATE_PARAMETER, stateEncoder.getEncodedState());
   }
 
   private String getRedirectUrlWithOnCompleteUrlAndCodeQueryParams() {

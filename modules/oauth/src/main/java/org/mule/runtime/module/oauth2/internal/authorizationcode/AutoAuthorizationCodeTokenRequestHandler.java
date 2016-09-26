@@ -73,7 +73,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
    */
   @Override
   public void init() throws MuleException {
-    createListenerForRedirectUrl();
+    createListenerForCallbackUrl();
     muleEventLogger = new MuleEventLogger(logger, muleContext);
   }
 
@@ -180,7 +180,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
     formData.put(GRANT_TYPE_PARAMETER, GRANT_TYPE_AUTHENTICATION_CODE);
-    formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
+    formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getExternalCallbackUrl());
     return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(formData).build()).build();
   }
 
@@ -190,7 +190,7 @@ public class AutoAuthorizationCodeTokenRequestHandler extends AbstractAuthorizat
     formData.put(CLIENT_ID_PARAMETER, getOauthConfig().getClientId());
     formData.put(CLIENT_SECRET_PARAMETER, getOauthConfig().getClientSecret());
     formData.put(GRANT_TYPE_PARAMETER, OAuthConstants.GRANT_TYPE_REFRESH_TOKEN);
-    formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getRedirectionUrl());
+    formData.put(REDIRECT_URI_PARAMETER, getOauthConfig().getExternalCallbackUrl());
     return Event.builder(event).message(InternalMessage.builder(event.getMessage()).payload(formData).build()).build();
   }
 

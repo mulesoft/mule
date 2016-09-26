@@ -52,6 +52,13 @@ public abstract class AbstractAuthorizationCodeBasicTestCase extends AbstractOAu
 
   @Test
   public void localAuthorizationUrlRedirectsToOAuthAuthorizationUrl() throws Exception {
+    LoggedRequest request = getLoggedRequest();
+
+    AuthorizationRequestAsserter.create(request).assertMethodIsGet().assertClientIdIs(clientId.getValue())
+        .assertRedirectUriIs(localCallbackUrl.getValue()).assertResponseTypeIsCode();
+  }
+
+  protected LoggedRequest getLoggedRequest() throws Exception {
     wireMockRule.stubFor(get(urlMatching(AUTHORIZE_PATH + ".*")).willReturn(aResponse().withStatus(200)));
 
     Request.Get(localAuthorizationUrl.getValue()).connectTimeout(RECEIVE_TIMEOUT).socketTimeout(RECEIVE_TIMEOUT).execute();
@@ -59,9 +66,6 @@ public abstract class AbstractAuthorizationCodeBasicTestCase extends AbstractOAu
     final List<LoggedRequest> requests = findAll(getRequestedFor(urlMatching(AUTHORIZE_PATH + ".*")));
     assertThat(requests.size(), is(1));
 
-    AuthorizationRequestAsserter.create((requests.get(0))).assertMethodIsGet().assertClientIdIs(clientId.getValue())
-        .assertRedirectUriIs(redirectUrl.getValue()).assertResponseTypeIsCode();
+    return requests.get(0);
   }
-
-
 }

@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.util.AttributeEvaluator;
 import org.mule.runtime.module.http.api.HttpHeaders;
+import org.mule.runtime.module.http.api.listener.HttpListenerConfig;
 import org.mule.runtime.module.http.internal.domain.request.HttpRequestBuilder;
 import org.mule.runtime.module.oauth2.api.RequestAuthenticationException;
 import org.mule.runtime.module.oauth2.internal.AbstractGrantType;
@@ -40,7 +41,10 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
 
   private String clientId;
   private String clientSecret;
-  private String redirectionUrl;
+  private HttpListenerConfig localCallbackConfig;
+  private String localCallbackConfigPath;
+  private String localCallbackUrl;
+  private String externalCallbackUrl;
   private AuthorizationRequestHandler authorizationRequestHandler;
   private AbstractAuthorizationCodeTokenRequestHandler tokenRequestHandler;
   private MuleContext muleContext;
@@ -57,10 +61,6 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     this.clientSecret = clientSecret;
   }
 
-  public void setRedirectionUrl(final String redirectionUrl) {
-    this.redirectionUrl = redirectionUrl;
-  }
-
   public void setAuthorizationRequestHandler(final AuthorizationRequestHandler authorizationRequestHandler) {
     this.authorizationRequestHandler = authorizationRequestHandler;
   }
@@ -69,13 +69,44 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
     this.tokenRequestHandler = tokenRequestHandler;
   }
 
-  public ConfigOAuthContext getConfigOAuthContext() {
-    return tokenManagerConfig.getConfigOAuthContext();
+  public void setLocalCallbackConfig(HttpListenerConfig localCallbackConfig) {
+    this.localCallbackConfig = localCallbackConfig;
+  }
+
+  public void setLocalCallbackConfigPath(String localCallbackConfigPath) {
+    this.localCallbackConfigPath = localCallbackConfigPath;
+  }
+
+  public void setLocalCallbackUrl(String localCallbackUrl) {
+    this.localCallbackUrl = localCallbackUrl;
+  }
+
+  public void setExternalCallbackUrl(String externalCallbackUrl) {
+    this.externalCallbackUrl = externalCallbackUrl;
   }
 
   @Override
-  public String getRedirectionUrl() {
-    return redirectionUrl;
+  public HttpListenerConfig getLocalCallbackConfig() {
+    return localCallbackConfig;
+  }
+
+  @Override
+  public String getLocalCallbackConfigPath() {
+    return localCallbackConfigPath;
+  }
+
+  @Override
+  public String getLocalCallbackUrl() {
+    return localCallbackUrl;
+  }
+
+  @Override
+  public String getExternalCallbackUrl() {
+    return externalCallbackUrl;
+  }
+
+  public ConfigOAuthContext getConfigOAuthContext() {
+    return tokenManagerConfig.getConfigOAuthContext();
   }
 
   @Override
@@ -142,6 +173,12 @@ public class DefaultAuthorizationCodeGrantType extends AbstractGrantType
         resourceOwnerIdEvaluator = new AttributeEvaluator(ResourceOwnerOAuthContext.DEFAULT_RESOURCE_OWNER_ID);
       }
       resourceOwnerIdEvaluator.initialize(muleContext.getExpressionLanguage());
+      if (localCallbackConfig != null && localCallbackUrl != null) {
+        throw new IllegalArgumentException("Attributes localCallbackConfig and localCallbackUrl are mutually exclusive");
+      }
+      if ((localCallbackConfig == null) != (localCallbackConfigPath == null)) {
+        throw new IllegalArgumentException("Attributes localCallbackConfig and localCallbackConfigPath must be both present or absent");
+      }
     } catch (Exception e) {
       throw new InitialisationException(e, this);
     }

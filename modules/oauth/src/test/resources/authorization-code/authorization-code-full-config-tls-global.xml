@@ -21,7 +21,8 @@
         <oauth2:authorization-code-grant-type
                 clientId="${client.id}"
                 clientSecret="${client.secret}"
-                redirectionUrl="${redirect.url}"
+                localCallbackUrl="${local.callback.url}"
+                externalCallbackUrl="${local.callback.url}"
                 tokenManager-ref="tokenManagerConfig"
                 tlsContext-ref="tlsContext">
             <oauth2:authorization-request

@@ -10,17 +10,15 @@ import static org.mule.runtime.module.oauth2.internal.OAuthConstants.CODE_PARAME
 import org.mule.runtime.module.oauth2.asserter.OAuthContextFunctionAsserter;
 
 import org.apache.http.client.fluent.Request;
-import org.junit.Ignore;
 import org.junit.Test;
 
-public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizationCodeBasicTestCase {
+public class AuthorizationCodeLocalCallbackConfigTestCase extends AbstractAuthorizationCodeBasicTestCase {
 
   @Override
   protected String getConfigFile() {
-    return "authorization-code/authorization-code-minimal-config.xml";
+    return "authorization-code/authorization-code-localcallbackref-config.xml";
   }
 
-  @Ignore("MULE-6926: flaky test")
   @Test
   public void hitRedirectUrlAndGetToken() throws Exception {
     configureWireMockToExpectTokenPathRequestForAuthorizationCodeGrantType();
@@ -33,5 +31,4 @@ public class AuthorizationCodeMinimalConfigTestCase extends AbstractAuthorizatio
     OAuthContextFunctionAsserter.createFrom(muleContext.getExpressionLanguage(), "tokenManagerConfig")
         .assertAccessTokenIs(ACCESS_TOKEN).assertRefreshTokenIs(REFRESH_TOKEN);
   }
-
 }
