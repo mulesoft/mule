@@ -8,9 +8,6 @@ package org.mule.compatibility.module.spring.security;
 
 import org.mule.runtime.module.spring.security.AuthenticationAgainstMultipleProvidersTestCase;
 
-import org.junit.Ignore;
-
-@Ignore("MULE-9705 - Migrate Spring security tests")
 public class SSAuthenticationAgainstMultipleProvidersTestCase extends AuthenticationAgainstMultipleProvidersTestCase {
 
   @Override
