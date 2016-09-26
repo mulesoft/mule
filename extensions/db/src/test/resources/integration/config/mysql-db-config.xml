@@ -5,9 +5,11 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:mysql-config name="dbConfig" url="jdbc:mysql://localhost:3306/test">
-        <db:connection-properties>
-            <db:property key="user" value="root"/>
-        </db:connection-properties>
-    </db:mysql-config>
+    <db:config name="dbConfig">
+        <db:my-sql-connection url="localhost" port="3306" user="root" database="test">
+            <db:connection-properties>
+                <db:connection-property key="user" value="root"/>
+            </db:connection-properties>
+        </db:my-sql-connection>
+    </db:config>
 </mule>
