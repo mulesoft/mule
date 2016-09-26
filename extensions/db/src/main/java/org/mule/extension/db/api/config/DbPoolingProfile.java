@@ -49,7 +49,7 @@ public class DbPoolingProfile implements DatabasePoolingProfile {
   private int acquireIncrement = 1;
 
   /**
-   * Determines how many statements are cached per pooled connection. Defaults to 0, meaning statement caching is disabled
+   * Determines how many statements are cached per pooled connection. Defaults to 5, meaning statement caching is disabled
    */
   @Parameter
   @Optional(defaultValue = "5")
