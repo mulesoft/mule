@@ -232,13 +232,8 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    getProcessingStrategy().configureProcessors(getMessageProcessors(), new StageNameSource() {
-
-      @Override
-      public String getName() {
-        return AbstractPipeline.this.getName();
-      }
-    }, builder, muleContext);
+    getProcessingStrategy().configureProcessors(getMessageProcessors(), () -> AbstractPipeline.this.getName(), builder,
+                                                muleContext);
   }
 
   @Override
@@ -263,9 +258,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     if (processingStrategy instanceof NonBlockingProcessingStrategy && messageSource != null
         && !(messageSource instanceof NonBlockingMessageSource)) {
-      throw new FlowConstructInvalidException(CoreMessages
-          .createStaticMessage("The non-blocking processing strategy currently only supports " + "non-blocking messages sources"),
-                                              this);
+      throw new FlowConstructInvalidException(CoreMessages.createStaticMessage(String
+          .format("The non-blocking processing strategy (%s) currently only supports non-blocking messages sources (source is %s).",
+                  processingStrategy.toString(), messageSource.toString())), this);
     }
 
     if (!userConfiguredProcessingStrategy && redeliveryHandlerConfigured) {

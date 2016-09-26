@@ -1,21 +1,26 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
 http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:request-config>
 
     <flow name="proxyflow">
-        <http:listener path="/proxy-envelope" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/proxy-envelope" config-ref="listenerConfig" allowedMethods="POST" />
         <cxf:proxy-service payload="envelope"/>
 
         <cxf:proxy-client payload="envelope"/>
-        <http:request config-ref="requestConfig" path="/service" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/service" method="POST" />
     </flow>
 
     <flow name="serviceflow">
-        <http:listener path="/service" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/service" config-ref="listenerConfig" allowedMethods="POST" />
         <logger level="INFO"/>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.Greeter">
             <cxf:ws-security>

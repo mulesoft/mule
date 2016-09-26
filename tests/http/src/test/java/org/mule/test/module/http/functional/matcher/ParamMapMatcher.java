@@ -8,7 +8,7 @@ package org.mule.test.module.http.functional.matcher;
 
 import static org.junit.Assert.assertThat;
 
-import org.mule.runtime.module.http.internal.ParameterMap;
+import org.mule.runtime.core.model.ParameterMap;
 
 import java.util.List;
 import java.util.Map;

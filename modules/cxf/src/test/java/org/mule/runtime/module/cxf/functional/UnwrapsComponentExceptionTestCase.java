@@ -7,10 +7,11 @@
 package org.mule.runtime.module.cxf.functional;
 
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
+
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.runtime.module.cxf.example.HelloWorld;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -19,7 +20,7 @@ import javax.jws.WebService;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UnwrapsComponentExceptionTestCase extends FunctionalTestCase {
+public class UnwrapsComponentExceptionTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   public static final String ERROR_MESSAGE = "Changos!!!";
 

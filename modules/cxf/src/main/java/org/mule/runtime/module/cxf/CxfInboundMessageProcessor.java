@@ -6,35 +6,44 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.ACCEPTED;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.OK;
+import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
+import static org.mule.extension.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.extension.http.api.HttpHeaders.Names.HOST;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.TEXT;
 import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
-import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.HTTP_METHOD_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
+import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY;
+import static org.mule.runtime.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS;
 
+import org.mule.extension.http.api.HttpAttributes;
+import org.mule.extension.http.api.HttpConstants.HttpStatus;
 import org.mule.extension.http.api.HttpRequestAttributes;
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
-import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.connector.NonBlockingReplyToHandler;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.message.OutputHandler;
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.module.cxf.support.DelegatingOutputStream;
 import org.mule.runtime.module.cxf.transport.MuleUniversalDestination;
@@ -59,7 +68,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.endpoint.Server;
@@ -215,7 +223,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
   private String getUri(Event event) {
     String scheme = requestPropertyManager.getScheme(event);
-    String host = event.getMessage().getInboundProperty("Host");
+    String host = event.getMessage().getInboundProperty(HOST);
+    if (host == null && event.getMessage().getAttributes() instanceof HttpRequestAttributes) {
+      // TODO MULE-9857 Make message properties case sensitive
+      host = ((HttpRequestAttributes) event.getMessage().getAttributes()).getHeaders().get(HOST.toLowerCase());
+    }
     String ctx = requestPropertyManager.getRequestPath(event.getMessage());
 
     return scheme + "://" + host + ctx;
@@ -284,6 +296,9 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     m.setExchange(exchange);
     final InternalMessage muleReqMsg = event.getMessage();
     String method = muleReqMsg.getInboundProperty(HTTP_METHOD_PROPERTY);
+    if (method == null && muleReqMsg.getAttributes() instanceof HttpRequestAttributes) {
+      method = ((HttpRequestAttributes) muleReqMsg.getAttributes()).getMethod();
+    }
 
     MediaType ct = muleReqMsg.getPayload().getDataType().getMediaType();
     if (!ct.matches(ANY)) {
@@ -312,7 +327,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     // TODO: Not sure if this is 100% correct - DBD
     String soapAction = getSoapAction(event.getMessage());
-    m.put(SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
+    m.put(SOAP_ACTION_PROPERTY_CAPS, soapAction);
 
     org.apache.cxf.transport.Destination d;
 
@@ -340,13 +355,13 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         // Request-URI.
         // No value means that there is no indication of the intent of the message.
         soapActions.add(soapAction);
-        protocolHeaders.put(SoapBindingConstants.SOAP_ACTION, soapActions);
+        protocolHeaders.put(SOAP_ACTION_PROPERTY_CAPS, soapActions);
       }
 
       if (SoapJMSConstants.SOAP_JMS_NAMESPACE.equals(((MuleUniversalDestination) d).getEndpointInfo().getTransportId())) {
         String contentType = muleReqMsg.getInboundProperty(SoapJMSConstants.CONTENTTYPE_FIELD);
         if (contentType == null) {
-          contentType = "text/xml";
+          contentType = XML.toRfcString();
         }
         protocolHeaders.put(SoapJMSConstants.CONTENTTYPE_FIELD, Collections.singletonList(contentType));
 
@@ -357,7 +372,6 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             requestUri = httpRequestAttributes.getScheme() + "://" + httpRequestAttributes.getHeaders().get("host")
                 + httpRequestAttributes.getRequestUri();
           } else {
-            // TODO MULE-9705 remove this when http is fully migrated to the extension
             requestUri = muleReqMsg.getInboundProperty("http.scheme") + "://" + muleReqMsg.getInboundProperty("host")
                 + muleReqMsg.getInboundProperty("http.request.uri");
           }
@@ -406,10 +420,19 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     InternalMessage.Builder builder = InternalMessage.builder(message);
 
     BindingOperationInfo binding = exchange.get(BindingOperationInfo.class);
+    HttpStatus responseCode = OK;
+    final ParameterMap responseParams = new ParameterMap();
+
+    if (message.getAttributes() instanceof HttpResponseAttributes) {
+      responseCode = HttpStatus.getStatusByCode(((HttpResponseAttributes) message.getAttributes()).getStatusCode());
+      responseParams.putAll(((HttpResponseAttributes) message.getAttributes()).getHeaders());
+    }
+
     if (null != binding && null != binding.getOperationInfo() && binding.getOperationInfo().isOneWay()) {
       // For one-way operations, no envelope should be returned
       // (http://www.w3.org/TR/soap12-part2/#http-reqbindwaitstate)
       builder.addOutboundProperty(HTTP_STATUS_PROPERTY, ACCEPTED.getStatusCode());
+      responseCode = ACCEPTED;
       builder.nullPayload();
     } else {
       final Optional<Charset> charset = message.getPayload().getDataType().getMediaType().getCharset();
@@ -434,10 +457,14 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
       Exception ex = faultMsg.getContent(Exception.class);
       if (ex != null) {
         builder.exceptionPayload(new DefaultExceptionPayload(ex));
-        builder.addOutboundProperty(HTTP_STATUS_PROPERTY, 500);
+        builder.addOutboundProperty(HTTP_STATUS_PROPERTY, INTERNAL_SERVER_ERROR.getStatusCode());
+        responseCode = INTERNAL_SERVER_ERROR;
       }
     }
-    return Event.builder(responseEvent).message(builder.build()).build();
+    final InternalMessage responseMessage = builder
+        .attributes(new HttpResponseAttributes(responseCode.getStatusCode(), responseCode.getReasonPhrase(), responseParams))
+        .build();
+    return Event.builder(responseEvent).message(responseMessage).build();
   }
 
   protected boolean shouldSoapActionHeader() {
@@ -540,7 +567,11 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
   }
 
   protected String getSoapAction(InternalMessage message) {
-    String action = message.getInboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
+    String action = message.getInboundProperty(SOAP_ACTION_PROPERTY);
+    if (action == null && message.getAttributes() instanceof HttpAttributes) {
+      // TODO MULE-9857 Make message properties case sensitive
+      action = ((HttpAttributes) message.getAttributes()).getHeaders().get(SOAP_ACTION_PROPERTY.toLowerCase());
+    }
 
     if (action != null && action.startsWith("\"") && action.endsWith("\"") && action.length() >= 2) {
       action = action.substring(1, action.length() - 1);

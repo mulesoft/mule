@@ -7,20 +7,23 @@
 package org.mule.runtime.module.cxf;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_IGNORE_METHOD_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_METHOD_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_USER_PROPERTY;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.functional.functional.FunctionalTestNotification;
 import org.mule.functional.functional.FunctionalTestNotificationListener;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -34,7 +37,8 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener {
+public class CxfCustomHttpHeaderTestCase extends AbstractCxfOverHttpExtensionTestCase
+    implements FunctionalTestNotificationListener {
 
   private static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
       newOptions().method(POST.name()).disableStatusCodeValidation().build();
@@ -93,14 +97,18 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements F
 
     assertEquals(1, notificationMsgList.size());
 
+    final HttpRequestAttributes attributes = (HttpRequestAttributes) notificationMsgList.get(0).getAttributes();
     // MULE_USER should be allowed in
-    assertEquals("alan", notificationMsgList.get(0).getInboundProperty(MULE_USER_PROPERTY));
+    // TODO MULE-9857 Make message properties case sensitive
+    assertThat(attributes.getHeaders().get(MULE_USER_PROPERTY.toLowerCase()), is("alan"));
 
     // mule properties should be removed
-    assertNull(notificationMsgList.get(0).getInboundProperty(MULE_IGNORE_METHOD_PROPERTY));
+    // TODO MULE-9857 Make message properties case sensitive
+    assertThat(attributes.getHeaders().get(MULE_IGNORE_METHOD_PROPERTY.toLowerCase()), nullValue());
 
     // custom properties should be allowed in
-    assertEquals(myProperty, notificationMsgList.get(0).getInboundProperty(myProperty));
+    // TODO MULE-9857 Make message properties case sensitive
+    assertThat(attributes.getHeaders().get(myProperty.toLowerCase()), is(myProperty));
   }
 
   @Override

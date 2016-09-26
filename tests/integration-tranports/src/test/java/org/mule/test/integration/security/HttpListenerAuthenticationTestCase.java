@@ -12,9 +12,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpHeaders.Names.WWW_AUTHENTICATE;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
+
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
 
@@ -31,7 +34,7 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpListenerAuthenticationTestCase extends FunctionalTestCase {
+public class HttpListenerAuthenticationTestCase extends ExtensionFunctionalTestCase {
 
   private static final String BASIC_REALM_MULE_REALM = "Basic realm=\"mule-realm\"";
   private static final String VALID_USER = "user";
@@ -44,6 +47,11 @@ public class HttpListenerAuthenticationTestCase extends FunctionalTestCase {
 
   @Rule
   public DynamicPort listenPort = new DynamicPort("port");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

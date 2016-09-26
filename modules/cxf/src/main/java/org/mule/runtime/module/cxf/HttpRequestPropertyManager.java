@@ -6,24 +6,44 @@
  */
 package org.mule.runtime.module.cxf;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_LISTENER_PATH;
+import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY;
+import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_REQUEST_URI;
+import static org.mule.extension.http.api.HttpConstants.RequestProperties.HTTP_SCHEME;
+
+import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.StringUtils;
-import org.mule.runtime.module.http.api.HttpConstants;
 
 public class HttpRequestPropertyManager {
 
   public String getRequestPath(InternalMessage message) {
-    return message.getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_URI, StringUtils.EMPTY);
+    String requestUri = message.getInboundProperty(HTTP_REQUEST_URI);
+    if (requestUri == null && message.getAttributes() instanceof HttpRequestAttributes) {
+      requestUri = ((HttpRequestAttributes) message.getAttributes()).getRequestUri();
+    }
+    return requestUri != null ? requestUri : EMPTY;
   }
 
   public String getScheme(Event event) {
-    return event.getMessage().getInboundProperty(HttpConstants.RequestProperties.HTTP_SCHEME);
+    String scheme = event.getMessage().getInboundProperty(HTTP_SCHEME);
+    if (scheme == null && event.getMessage().getAttributes() instanceof HttpRequestAttributes) {
+      scheme = ((HttpRequestAttributes) event.getMessage().getAttributes()).getScheme();
+    }
+    return scheme;
   }
 
   public String getBasePath(InternalMessage message) {
-    String listenerPath = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_LISTENER_PATH);
-    String requestPath = message.getInboundProperty(HttpConstants.RequestProperties.HTTP_REQUEST_PATH_PROPERTY);
+    String listenerPath = message.getInboundProperty(HTTP_LISTENER_PATH);
+    if (listenerPath == null && message.getAttributes() instanceof HttpRequestAttributes) {
+      listenerPath = ((HttpRequestAttributes) message.getAttributes()).getListenerPath();
+    }
+    String requestPath = message.getInboundProperty(HTTP_REQUEST_PATH_PROPERTY);
+    if (requestPath == null && message.getAttributes() instanceof HttpRequestAttributes) {
+      requestPath = ((HttpRequestAttributes) message.getAttributes()).getRequestPath();
+    }
     if (listenerPath.contains(requestPath)) {
       return requestPath;
     }

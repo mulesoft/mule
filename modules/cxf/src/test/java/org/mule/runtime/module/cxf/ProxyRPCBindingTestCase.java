@@ -8,19 +8,20 @@
 package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertTrue;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.runtime.core.util.IOUtils;
+import org.mule.runtime.module.http.api.client.HttpRequestOptions;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ProxyRPCBindingTestCase extends FunctionalTestCase {
+public class ProxyRPCBindingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public final DynamicPort httpPortProxy = new DynamicPort("port1");
@@ -28,8 +29,7 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase {
   @Rule
   public final DynamicPort httpPortService = new DynamicPort("port2");
 
-  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS =
-      newOptions().method(org.mule.runtime.module.http.api.HttpConstants.Methods.POST.name()).build();
+  public static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
 
   private String getAllRequest;
   private String getAllResponse;
@@ -39,6 +39,7 @@ public class ProxyRPCBindingTestCase extends FunctionalTestCase {
     return "proxy-rpc-binding-conf-httpn.xml";
   }
 
+  @Override
   @Before
   public void doSetUp() throws Exception {
     getAllRequest = IOUtils.getResourceAsString("artistregistry-get-all-request.xml", getClass());

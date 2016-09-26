@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.util.AttributeEvaluator;
 
 public class HttpSingleParam extends HttpParam implements Initialisable, MuleContextAware {

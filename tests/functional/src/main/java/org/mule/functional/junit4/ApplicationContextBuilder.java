@@ -55,11 +55,18 @@ public class ApplicationContextBuilder {
   protected MuleContext doBuildContext() throws Exception {
     MuleContext context;
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();
+    List<ConfigurationBuilder> builders = new ArrayList<>();
     builders.add(getAppBuilder(this.applicationResources));
+    addBuilders(builders);
     configureMuleContext(muleContextBuilder);
     context = muleContextFactory.createMuleContext(builders, muleContextBuilder);
     return context;
+  }
+
+  // This sohuldn't be needed by Test cases but can be used by base testcases that wish to add further builders when
+  // creating the MuleContext.
+  protected void addBuilders(List<ConfigurationBuilder> builders) {
+    // No op
   }
 
   protected ConfigurationBuilder getAppBuilder(String[] configResource) throws Exception {

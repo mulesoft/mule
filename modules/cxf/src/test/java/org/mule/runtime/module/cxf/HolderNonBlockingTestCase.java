@@ -8,12 +8,11 @@ package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
 import org.mule.tck.SensingNullRequestResponseMessageProcessor;
@@ -25,10 +24,12 @@ import java.nio.charset.Charset;
 
 import javax.xml.ws.Holder;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HolderNonBlockingTestCase extends FunctionalTestCase {
+@Ignore("MULE-10618")
+public class HolderNonBlockingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

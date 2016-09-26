@@ -10,7 +10,6 @@ package org.mule.runtime.module.cxf;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.BindingType;
 
 @WebService

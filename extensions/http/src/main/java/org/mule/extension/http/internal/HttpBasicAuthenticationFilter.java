@@ -13,6 +13,7 @@ import static org.mule.runtime.core.config.i18n.CoreMessages.authFailedForUser;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
+
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.api.message.Message;
@@ -28,10 +29,10 @@ import org.mule.runtime.core.api.security.SecurityProviderNotFoundException;
 import org.mule.runtime.core.api.security.UnauthorisedException;
 import org.mule.runtime.core.api.security.UnknownAuthenticationTypeException;
 import org.mule.runtime.core.api.security.UnsupportedAuthenticationSchemeException;
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.core.security.AbstractAuthenticationFilter;
 import org.mule.runtime.core.security.DefaultMuleAuthentication;
 import org.mule.runtime.core.security.MuleCredentials;
-import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.filter.BasicUnauthorisedException;
 
 import org.apache.commons.logging.Log;
@@ -98,9 +99,9 @@ public class HttpBasicAuthenticationFilter extends AbstractAuthenticationFilter 
     }
     ParameterMap headers = new ParameterMap();
     headers.put(WWW_AUTHENTICATE, realmHeader);
-    return Message.builder(message).attributes(new HttpResponseAttributes(UNAUTHORIZED.getStatusCode(),
-                                                                          UNAUTHORIZED.getReasonPhrase(),
-                                                                          headers))
+    return Message.builder(message).nullPayload().attributes(new HttpResponseAttributes(UNAUTHORIZED.getStatusCode(),
+                                                                                        UNAUTHORIZED.getReasonPhrase(),
+                                                                                        headers))
         .build();
   }
 

@@ -8,23 +8,24 @@ package org.mule.runtime.module.cxf.functional;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.runtime.core.api.client.MuleClient;
-import org.mule.runtime.module.http.api.HttpConstants;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CxfJaxWsServiceAndClientTestCase extends FunctionalTestCase {
+public class CxfJaxWsServiceAndClientTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
 
-  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(HttpConstants.Methods.POST.name()).build();
+  private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
 
   private static final String REQUEST_PAYLOAD =
       "<soap:Envelope \n" + "           xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n"

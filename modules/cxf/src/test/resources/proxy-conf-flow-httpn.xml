@@ -7,7 +7,7 @@
       xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -15,24 +15,32 @@
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
                http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
     <mule-xml:xslt-transformer xsl-file="proxy.xsl"
         name="TestXslt" returnClass="org.mule.runtime.module.xml.transformer.DelayedResult" />
 
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:request-config>
 
     <flow name="testCDATA">
-        <http:listener path="/services/CDATAService" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/CDATAService" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service />
         <echo-component />
     </flow>
 
     <flow name="serverClientProxyEnvelopeWithValidation">
-        <http:listener path="/services/proxyEnvelopeWithValidation" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/proxyEnvelopeWithValidation" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="WebService2"
             wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
             validationEnabled="true" payload="envelope">
@@ -46,7 +54,9 @@
     </flow>
 
     <flow name="serverClientProxyBodyWithValidation">
-        <http:listener path="/services/proxyBodyWithValidation" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/proxyBodyWithValidation" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="WebService2"
             wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
             validationEnabled="true" payload="body">
@@ -60,7 +70,9 @@
     </flow>
 
     <flow name="serverClientProxyBodyWithValidationAndSchemas">
-        <http:listener path="/services/proxyBodyWithValidationAndSchemas" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/proxyBodyWithValidationAndSchemas" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="WebService2"
             wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org"
             validationEnabled="true" payload="body">
@@ -79,18 +91,22 @@
 
 
     <flow name="jaxwsProxy">
-        <http:listener path="/services/greeterProxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/greeterProxy" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
 
         <cxf:jaxws-client
                 clientClass="org.apache.hello_world_soap_http.SOAPService"
                 port="SoapPort" operation="greetMe"
                 wsdlLocation="classpath:/wsdl/hello_world.wsdl" />
-        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/greeter" method="POST" />
     </flow>
 
     <flow name="proxyWithTransform">
-        <http:listener path="/services/transform-proxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/transform-proxy" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" />
         <cxf:proxy-service />
 
@@ -98,19 +114,23 @@
             <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document" />
         </response>
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/greeter" method="POST" />
     </flow>
 
     <flow name="greeter-proxy">
-        <http:listener path="/services/greeter-proxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/greeter-proxy" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service />
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/greeter" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/greeter" method="POST" />
     </flow>
 
     <flow name="greeter-databinding-proxy">
-        <http:listener path="/services/greeter-databinding-proxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/greeter-databinding-proxy" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
 
         <component>
@@ -120,7 +140,9 @@
     </flow>
 
     <flow name="greeter">
-        <http:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/greeter" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
 
         <component>
@@ -130,13 +152,17 @@
     </flow>
 
     <flow name="serverEcho">
-        <http:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/Echo" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service />
         <log-component />
     </flow>
 
     <flow name="serverClientProxy">
-        <http:listener path="/services/proxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/proxy" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service>
             <cxf:inInterceptors>
                 <spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
@@ -147,52 +173,62 @@
         </cxf:proxy-service>
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
 
     <flow name="serverClientProxyEnvelope">
-        <http:listener path="/services/envelope-proxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/envelope-proxy" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service payload="envelope" />
 
         <cxf:proxy-client payload="envelope" />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
 
     <flow name="serverClientProxyWithWsdl">
-        <http:listener path="/services/proxyWithWsdl" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/proxyWithWsdl" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="WebService"
                            wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org" />
 
         <test:component />
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
 
     <flow name="serverClientProxyWithWsdl2">
-        <http:listener path="/services/proxyWithWsdl2" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/proxyWithWsdl2" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="WebService2"
                            wsdlLocation="localWsdl.wsdl" namespace="http://www.muleumo.org" />
 
         <test:component />
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
 
     <flow name="serverClientProxyWithTransform">
-        <http:listener path="/services/proxyWithTransform" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/proxyWithTransform" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service />
 
         <response>
             <transformer ref="TestXslt" />
         </response>
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
 
     <flow name="routeBasedNoWsdl">
-        <http:listener path="/services/routeBasedNoWsdl" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedNoWsdl" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service>
             <cxf:features>
                 <cxf-core:logging />
@@ -200,10 +236,12 @@
         </cxf:proxy-service>
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
     <flow name="routeBasedNoWsdl-async">
-        <http:listener path="/services/routeBasedNoWsdlAsync" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedNoWsdlAsync" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <async>
             <cxf:proxy-service>
                 <cxf:features>
@@ -212,12 +250,14 @@
             </cxf:proxy-service>
 
             <cxf:proxy-client />
-            <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+            <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
         </async>
     </flow>
 
     <flow name="routeBasedOnNoSoapAction">
-        <http:listener path="/services/routeBasedOnNoSoapAction" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedOnNoSoapAction" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service bindingId="WebServiceHttpBinding" namespace="http://www.muleumo.org" service="WebService" payload="body" wsdlLocation="localWsdl.wsdl" >
             <cxf:features>
                 <cxf-core:logging />
@@ -225,10 +265,12 @@
         </cxf:proxy-service>
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
     <flow name="routeBasedOnNoSoapActionNoWsdl">
-        <http:listener path="/services/routeBasedOnNoSoapActionNoWsdl" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedOnNoSoapActionNoWsdl" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service bindingId="WebServiceHttpBinding" namespace="http://www.muleumo.org" service="WebService" payload="body" wsdlLocation="localWsdl.wsdl" >
             <cxf:features>
                 <cxf-core:logging />
@@ -236,10 +278,12 @@
         </cxf:proxy-service>
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
     <flow name="routeBasedOnNoSoapAction-async">
-        <http:listener path="/services/routeBasedOnNoSoapActionAsync" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedOnNoSoapActionAsync" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <async>
             <cxf:proxy-service bindingId="WebService2HttpBinding" namespace="http://www.muleumo.org" service="WebService2" payload="body" wsdlLocation="localWsdl.wsdl" >
                 <cxf:features>
@@ -248,12 +292,12 @@
             </cxf:proxy-service>
 
             <cxf:proxy-client />
-            <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+            <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
         </async>
     </flow>
 
     <flow name="routeBasedOnSoapAction">
-        <http:listener path="/services/routeBasedOnSoapAction" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedOnSoapAction" config-ref="listenerConfig" allowedMethods="POST" />
         <cxf:proxy-service bindingId="EchoBinding" namespace="http://new.webservice.namespace" service="EchoService" payload="body"
                            wsdlLocation="echo-11.wsdl" >
             <cxf:features>
@@ -262,10 +306,12 @@
         </cxf:proxy-service>
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
     </flow>
     <flow name="routeBasedOnSoapAction-async">
-        <http:listener path="/services/routeBasedOnSoapActionAsync" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/routeBasedOnSoapActionAsync" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <async>
             <cxf:proxy-service bindingId="EchoBinding" namespace="http://new.webservice.namespace" service="EchoService" payload="body"
                                wsdlLocation="echo-11.wsdl" >
@@ -275,12 +321,14 @@
             </cxf:proxy-service>
 
             <cxf:proxy-client />
-            <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+            <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
         </async>
     </flow>
 
     <flow name="asyncService">
-        <http:listener path="/services/oneway" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/oneway" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncService"/>
 
         <component>
@@ -290,7 +338,9 @@
     </flow>
 
     <flow name="asyncServiceWithSoapAction">
-        <http:listener path="/services/onewayWithSoapAction" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/onewayWithSoapAction" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.testmodels.AsyncServiceWithSoapAction"/>
 
         <component>
@@ -308,7 +358,7 @@
         </message-filter>
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/Echo" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/Echo" method="POST" />
         <transformer ref="TestXslt" />
     </sub-flow>
 
@@ -320,11 +370,13 @@
         </message-filter>
 
         <cxf:proxy-client />
-        <http:request config-ref="requestConfig" path="/services/oneway" method="POST" responseTimeout="2000" />
+        <httpn:request config-ref="requestConfig" path="/services/oneway" method="POST" responseTimeout="2000" />
     </sub-flow>
 
      <flow name="proxyWithSoapFault">
-        <http:listener path="/proxyFault" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/proxyFault" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="SOAPService" wsdlLocation="classpath:/wsdl/hello_world_fault.wsdl" port="SoapPort"
                            namespace="http://apache.org/intfault" payload="envelope" validationEnabled="false"/>
         <script:component>
@@ -335,21 +387,27 @@
     </flow>
 
     <flow name="proxyEnvelopeWithXSLTTransformation">
-        <http:listener path="/services/envelope-xslt-proxy" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/services/envelope-xslt-proxy" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service payload="envelope"/>
 
         <mule-xml:dom-to-xml-transformer returnClass="java.lang.String"/>
     </flow>
 
     <flow name="proxyWithSoapJms">
-        <http:listener path="/proxyJms" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/proxyJms" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryJms.wsdl" port="EmployeeDirectoryPort"
                            namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false" soapVersion="1.2"/>
         <echo-component/>
     </flow>
 
     <flow name="proxyOneWay">
-        <http:listener path="/proxyOneWay" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/proxyOneWay" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
                            namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
                            
@@ -357,7 +415,9 @@
     </flow>
 
     <flow name="proxyOneWayFault">
-        <http:listener path="/proxyOneWayFault" config-ref="listenerConfig" allowedMethods="POST" />
+        <httpn:listener path="/proxyOneWayFault" config-ref="listenerConfig" allowedMethods="POST">
+            <httpn:response-builder statusCode="#[message.attributes.statusCode]"/>
+        </httpn:listener>
         <cxf:proxy-service service="EmployeeDirectory" wsdlLocation="employeeDirectoryOneWay.wsdl" port="EmployeeDirectoryPort"
                            namespace="http://employee.example.mule.org/" payload="body" validationEnabled="false"/>
                            

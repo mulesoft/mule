@@ -6,20 +6,23 @@
  */
 package org.mule.runtime.module.cxf.jaxws;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
+import org.mule.extension.http.api.HttpAttributes;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HeaderPropertiesTestCase extends FunctionalTestCase {
+public class HeaderPropertiesTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");
@@ -42,7 +45,8 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase {
 
     EventCallback callback = (context, component, muleContext) -> {
       InternalMessage msg = context.getMessage();
-      assertEquals("BAR", msg.getInboundProperty("FOO"));
+      // TODO MULE-9857 Make message properties case sensitive
+      assertThat(((HttpAttributes) msg.getAttributes()).getHeaders().get("FOO".toLowerCase()), is("BAR"));
     };
     testComponent.setEventCallback(callback);
 

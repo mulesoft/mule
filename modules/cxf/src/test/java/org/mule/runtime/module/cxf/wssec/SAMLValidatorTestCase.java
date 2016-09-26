@@ -9,8 +9,8 @@ package org.mule.runtime.module.cxf.wssec;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import org.apache.ws.security.WSPasswordCallback;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SAMLValidatorTestCase extends FunctionalTestCase {
+public class SAMLValidatorTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

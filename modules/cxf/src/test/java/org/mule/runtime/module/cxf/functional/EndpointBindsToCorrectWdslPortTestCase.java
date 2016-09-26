@@ -8,8 +8,8 @@ package org.mule.runtime.module.cxf.functional;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
 import org.mule.runtime.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -19,7 +19,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase {
+public class EndpointBindsToCorrectWdslPortTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private static final String FLOW_HTTPN =
       "org/mule/runtime/module/cxf/functional/endpoint-binds-to-correct-wdsl-port-flow-httpn.xml";

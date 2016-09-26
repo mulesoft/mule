@@ -9,6 +9,7 @@ package org.mule.runtime.module.cxf.support;
 
 import static com.google.common.net.HttpHeaders.CONTENT_ENCODING;
 
+import org.mule.extension.http.api.HttpAttributes;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.Arrays;
@@ -28,6 +29,10 @@ public abstract class AbstractProxyGZIPInterceptor extends AbstractPhaseIntercep
     boolean isEncoded = false;
 
     String contentEncoding = message.getInboundProperty(CONTENT_ENCODING);
+    if (contentEncoding == null && message.getAttributes() instanceof HttpAttributes) {
+      // TODO MULE-9857 Make message properties case sensitive
+      contentEncoding = ((HttpAttributes) message.getAttributes()).getHeaders().get(CONTENT_ENCODING.toLowerCase());
+    }
     if (contentEncoding == null) {
       contentEncoding = message.getInboundProperty(GZIPOutInterceptor.SOAP_JMS_CONTENTENCODING);
     }

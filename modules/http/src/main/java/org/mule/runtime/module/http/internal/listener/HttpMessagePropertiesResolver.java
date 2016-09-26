@@ -10,8 +10,9 @@ import static org.mule.runtime.module.http.internal.HttpParser.decodeQueryString
 import static org.mule.runtime.module.http.internal.HttpParser.decodeUriParams;
 import static org.mule.runtime.module.http.internal.HttpParser.extractPath;
 import static org.mule.runtime.module.http.internal.HttpParser.extractQueryParams;
+
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.module.http.api.HttpConstants;
-import org.mule.runtime.module.http.internal.ParameterMap;
 
 import java.io.Serializable;
 import java.security.cert.Certificate;

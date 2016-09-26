@@ -8,12 +8,13 @@
 package org.mule.runtime.module.cxf;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
-import static org.mule.runtime.module.http.api.HttpHeaders.Names.CONTENT_ENCODING;
+import static org.custommonkey.xmlunit.XMLUnit.compareXML;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mule.extension.http.api.HttpConstants.Methods.POST;
+import static org.mule.extension.http.api.HttpHeaders.Names.CONTENT_ENCODING;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.functional.junit4.FunctionalTestCase;
+
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
@@ -36,7 +37,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class GZIPEncodingTestCase extends FunctionalTestCase {
+public class GZIPEncodingTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private static final HttpRequestOptions HTTP_REQUEST_OPTIONS = newOptions().method(POST.name()).build();
 
@@ -85,8 +86,8 @@ public class GZIPEncodingTestCase extends FunctionalTestCase {
 
   private void validateResponse(InternalMessage response) throws Exception {
     String unzipped = unzip(new ByteArrayInputStream(getPayloadAsBytes(response)));
-    assertTrue(XMLUnit.compareXML(getAllResponse, unzipped).identical());
-    assertEquals(GZIP, response.getInboundProperty(CONTENT_ENCODING));
+    assertThat(unzipped, compareXML(getAllResponse, unzipped).identical(), is(true));
+    assertThat(response.getInboundProperty(CONTENT_ENCODING), is(GZIP));
   }
 
   private String unzip(InputStream input) throws IOException {

@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.http.internal.domain.request;
 
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.http.internal.domain.HttpEntity;
 
 public class HttpRequestBuilder {

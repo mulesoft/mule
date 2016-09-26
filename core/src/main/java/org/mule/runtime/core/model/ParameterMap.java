@@ -4,11 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.http.internal;
+package org.mule.runtime.core.model;
 
 import static java.util.Collections.unmodifiableMap;
-
-import org.mule.runtime.module.http.api.HttpParameters;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
@@ -24,10 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Implementation of {@link HttpParameters} that allows the aggregation of keys and access to the aggregated list or a single
- * value (the last).
+ * Implementation of a multi-map that allows the aggregation of keys and access to the aggregated list or a single value (the
+ * last).
  */
-public class ParameterMap implements HttpParameters, Serializable {
+public class ParameterMap implements Map<String, String>, Serializable {
 
   protected Map<String, LinkedList<String>> paramsMap;
 
@@ -103,6 +101,7 @@ public class ParameterMap implements HttpParameters, Serializable {
     paramsMap.put(key, newValue);
   }
 
+  @Override
   public String remove(Object key) {
     Collection<String> values = paramsMap.remove(key);
     if (values != null) {

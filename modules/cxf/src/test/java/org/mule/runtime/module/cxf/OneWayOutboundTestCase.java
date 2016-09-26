@@ -12,9 +12,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.ACCEPTED;
-import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
-import org.mule.functional.junit4.FunctionalTestCase;
+import static org.mule.extension.http.api.HttpConstants.HttpStatus.ACCEPTED;
+
+import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.module.cxf.testmodels.AsyncService;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -22,7 +22,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OneWayOutboundTestCase extends FunctionalTestCase {
+public class OneWayOutboundTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");
@@ -47,7 +47,7 @@ public class OneWayOutboundTestCase extends FunctionalTestCase {
 
   private void assertOneWayResponse(Event event) throws Exception {
     assertThat(event.getMessage().getPayload().getValue(), is(nullValue()));
-    assertThat(event.getMessage().<Integer>getInboundProperty(HTTP_STATUS_PROPERTY), is(ACCEPTED.getStatusCode()));
+    assertThat(((HttpResponseAttributes) event.getMessage().getAttributes()).getStatusCode(), is(ACCEPTED.getStatusCode()));
 
     AsyncService component = (AsyncService) getComponent("asyncService");
     assertTrue(component.getLatch().await(RECEIVE_TIMEOUT, MILLISECONDS));

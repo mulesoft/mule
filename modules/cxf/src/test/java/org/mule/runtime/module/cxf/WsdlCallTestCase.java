@@ -7,7 +7,7 @@
 package org.mule.runtime.module.cxf;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.functional.junit4.FunctionalTestCase;
+
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.InputStream;
@@ -20,7 +20,7 @@ import org.dom4j.io.SAXReader;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class WsdlCallTestCase extends FunctionalTestCase {
+public class WsdlCallTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Rule
   public final DynamicPort jettyPort = new DynamicPort("jettyPort");

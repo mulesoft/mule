@@ -9,8 +9,8 @@ package org.mule.runtime.module.oauth2.asserter;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.module.http.internal.HttpParser;
-import org.mule.runtime.module.http.internal.ParameterMap;
 import org.mule.runtime.module.oauth2.internal.OAuthConstants;
 
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;

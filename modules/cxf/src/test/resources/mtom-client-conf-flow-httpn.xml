@@ -3,18 +3,20 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
 
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <description>
       Show how to use MTOM with CXF and Mule.
     </description>
 
-    <http:request-config name="requestConfig" host="localhost" port="${port1}" />
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:request-config>
 
     <flow name="addEmployee" processingStrategy="synchronous">
         <poll>
@@ -30,13 +32,16 @@
                 <spring:bean class="org.mule.runtime.module.cxf.employee.AttachmentVerifyInterceptor"/>
             </cxf:outInterceptors>
         </cxf:jaxws-client>
-        <http:request config-ref="requestConfig" path="/services/employeeDirectory" method="POST" />
+        <httpn:request config-ref="requestConfig" path="/services/employeeDirectory" method="POST" />
     </flow>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+
 
     <flow name="employeeDirectoryService">
-        <http:listener path="/services/employeeDirectory" config-ref="listenerConfig" allowedMethods="POST" parseRequest="false" />
+        <httpn:listener path="/services/employeeDirectory" config-ref="listenerConfig" allowedMethods="POST" parseRequest="false" />
         <cxf:jaxws-service serviceClass="org.mule.runtime.module.cxf.employee.EmployeeDirectoryImpl"
                            mtomEnabled="true"/>
         <component>

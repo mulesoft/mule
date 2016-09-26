@@ -9,8 +9,8 @@ package org.mule.runtime.module.cxf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.api.Event;
 import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.api.Event;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;

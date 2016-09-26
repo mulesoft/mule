@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.cxf;
 
-import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
-import org.mule.functional.junit4.FunctionalTestCase;
+import static org.mule.extension.http.api.HttpConstants.Protocols.HTTPS;
+
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 
 import java.io.IOException;
@@ -21,7 +21,7 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.junit.Before;
 
-public class AbstractHttpSecurityTestCase extends FunctionalTestCase {
+public class AbstractHttpSecurityTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   @Before
   public void setUp() throws Exception {
@@ -40,14 +40,17 @@ public class AbstractHttpSecurityTestCase extends FunctionalTestCase {
 
       private SSLSocketFactory socketFactory = factory;
 
+      @Override
       public Socket createSocket(String host, int port) throws IOException {
         return socketFactory.createSocket(host, port);
       }
 
+      @Override
       public Socket createSocket(String host, int port, InetAddress localAddress, int localPort) throws IOException {
         return socketFactory.createSocket(host, port, localAddress, localPort);
       }
 
+      @Override
       public Socket createSocket(String host, int port, InetAddress localAddress, int localPort, HttpConnectionParams params)
           throws IOException {
         return createSocket(host, port, localAddress, localPort);

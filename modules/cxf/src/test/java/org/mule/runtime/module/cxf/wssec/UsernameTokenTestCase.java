@@ -8,8 +8,8 @@ package org.mule.runtime.module.cxf.wssec;
 
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.util.concurrent.Latch;
+import org.mule.runtime.module.cxf.AbstractCxfOverHttpExtensionTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.TimeUnit;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class UsernameTokenTestCase extends FunctionalTestCase {
+public class UsernameTokenTestCase extends AbstractCxfOverHttpExtensionTestCase {
 
   private Latch greetLatch;
 
