@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.isOneOf;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
@@ -18,7 +19,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.metadata.PartAwareMetadataKeyBuilder.newKey;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import static org.mule.tck.junit4.matcher.MetadataKeyMatcher.metadataKeyWithId;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.HOUSE;
@@ -26,6 +26,7 @@ import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
+import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.TIRES;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.AMERICA;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.EUROPE;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.SAN_FRANCISCO;
@@ -33,8 +34,10 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -43,20 +46,21 @@ import org.mule.runtime.api.metadata.MetadataManager;
 import org.mule.runtime.api.metadata.ProcessorId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
-import org.mule.test.metadata.extension.model.animals.SwordFish;
-import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Bear;
+import org.mule.test.metadata.extension.model.animals.SwordFish;
 import org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes;
 import org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Circle;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Square;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
+import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -131,21 +135,6 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
 
     assertThat(metadataDescriptor.getContentMetadata().isPresent(), is(true));
     assertExpectedType(metadataDescriptor.getContentMetadata().get(), "content", personType);
-  }
-
-  @Test
-  public void staticOperationMetadata() throws Exception {
-    componentId = new ProcessorId(CONTENT_AND_OUTPUT_METADATA_WITH_KEY_ID, FIRST_PROCESSOR_INDEX);
-
-    final ComponentMetadataDescriptor metadataDescriptor = getComponentStaticMetadata();
-
-    assertExpectedOutput(metadataDescriptor.getOutputMetadata(), Object.class, void.class);
-
-    assertThat(metadataDescriptor.getParametersMetadata().size(), is(1));
-    assertExpectedType(metadataDescriptor.getParametersMetadata().get(0), "type", String.class);
-
-    assertThat(metadataDescriptor.getContentMetadata().isPresent(), is(true));
-    assertExpectedType(metadataDescriptor.getContentMetadata().get(), "content", Object.class);
   }
 
   @Test
@@ -240,10 +229,10 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void messageAttributesNullTypeMetadata() throws Exception {
     componentId = new ProcessorId(MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA, FIRST_PROCESSOR_INDEX);
-
-    final ComponentMetadataDescriptor metadataDescriptor = getComponentStaticMetadata();
+    MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId);
+    assertThat(componentMetadata.isSuccess(), is(true));
+    ComponentMetadataDescriptor metadataDescriptor = componentMetadata.get();
     assertExpectedOutput(metadataDescriptor.getOutputMetadata(), ExtensionsTestUtils.TYPE_BUILDER.anyType().build(), void.class);
-
     assertThat(metadataDescriptor.getParametersMetadata(), empty());
   }
 
@@ -425,8 +414,9 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
   @Test
   public void pagedOperationMetadataTestCase() throws Exception {
     componentId = new ProcessorId("pagedOperationMetadata", FIRST_PROCESSOR_INDEX);
-    ComponentMetadataDescriptor metadata = getComponentStaticMetadata();
-    assertExpectedType(metadata.getParametersMetadata().get(0), "animal", Bear.class);
+    MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId);
+    assertThat(componentMetadata.isSuccess(), is(true));
+    assertExpectedType(componentMetadata.get().getParametersMetadata().get(0), "animal", Bear.class);
   }
 
   @Test
@@ -511,6 +501,40 @@ public class OperationMetadataTestCase extends MetadataExtensionFunctionalTestCa
     MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId, newKey("MAMMAL").build());
     assertThat(result.isSuccess(), is(true));
     assertThat(result.get().getContentMetadata().get().get().getType(), is(toMetadataType(Bear.class)));
+  }
+
+  @Test
+  public void metadataKeyDefaultValue() throws Exception {
+    componentId = new ProcessorId(METADATA_KEY_DEFAULT_VALUE, FIRST_PROCESSOR_INDEX);
+    MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId);
+    assertThat(result.isSuccess(), is(true));
+    MetadataType type = result.get().getOutputMetadata().get().getPayloadMetadata().get().getType();
+    assertThat(type, is(instanceOf(ObjectType.class)));
+    ObjectType objectType = (ObjectType) type;
+    assertThat(objectType.getFields(), hasSize(2));
+    objectType.getFields().forEach(f -> assertThat(f.getKey().getName().getLocalPart(), isOneOf(TIRES, BRAND)));
+  }
+
+  @Test
+  public void defaultValueMultilevelMetadataKey() throws Exception {
+    componentId = new ProcessorId(MULTILEVEL_METADATA_KEY_DEFAULT_VALUE, FIRST_PROCESSOR_INDEX);
+    final MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId);
+    assertThat(result.isSuccess(), is(true));
+    ComponentMetadataDescriptor descriptor = result.get();
+    ParameterMetadataDescriptor param = descriptor.getContentMetadata().get().get();
+    assertThat(param.getType(), is(instanceOf(ObjectType.class)));
+    assertThat(((ObjectType) param.getType()).getFields(), hasSize(3));
+  }
+
+  @Test
+  public void defaultValueMetadataKey() throws Exception {
+    componentId = new ProcessorId(METADATA_KEY_DEFAULT_VALUE, FIRST_PROCESSOR_INDEX);
+    final MetadataResult<ComponentMetadataDescriptor> result = metadataManager.getMetadata(componentId);
+    assertThat(result.isSuccess(), is(true));
+    ComponentMetadataDescriptor descriptor = result.get();
+    TypeMetadataDescriptor param = descriptor.getOutputMetadata().get().getPayloadMetadata().get();
+    assertThat(param.getType(), is(instanceOf(ObjectType.class)));
+    assertThat(((ObjectType) param.getType()).getFields(), hasSize(2));
   }
 
   /**

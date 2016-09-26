@@ -399,6 +399,25 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="MetadataKeyWithDefaultValueType" substitutionGroup="mule:abstract-message-processor" name="metadata-key-with-default-value"></xs:element>
+    <xs:complexType name="MetadataKeyWithDefaultValueType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:substitutableName" use="optional" name="config-ref">
+                    <xs:annotation>
+                        <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="CAR" name="type"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
+                <xs:attribute type="xs:string" use="optional" name="target">
+                    <xs:annotation>
+                        <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="OutputAndMetadataKeyCacheResolverType" substitutionGroup="mule:abstract-message-processor" name="output-and-metadata-key-cache-resolver"></xs:element>
     <xs:complexType name="OutputAndMetadataKeyCacheResolverType">
         <xs:complexContent>
@@ -546,9 +565,9 @@
                         <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="continent"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="country"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="city"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="AMERICA" name="continent"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="USA" name="country"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="SFO" name="city"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="content"></xs:attribute>
                 <xs:attribute type="xs:string" use="optional" name="target">
                     <xs:annotation>
@@ -566,9 +585,9 @@
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                     <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
                 </xs:sequence>
-                <xs:attribute type="mule:expressionString" use="required" name="continent"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="country"></xs:attribute>
-                <xs:attribute type="mule:expressionString" use="required" name="city"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="AMERICA" name="continent"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="USA" name="country"></xs:attribute>
+                <xs:attribute type="mule:expressionString" use="optional" default="SFO" name="city"></xs:attribute>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

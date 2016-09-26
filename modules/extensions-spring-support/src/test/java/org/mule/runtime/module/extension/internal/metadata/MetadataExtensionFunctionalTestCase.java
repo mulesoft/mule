@@ -93,6 +93,8 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String RESOLVER_OUTPUT_WITH_CONTEXT_CLASSLOADER = "resolverOutputWithContextClassLoader";
   protected static final String ENUM_METADATA_KEY = "enumMetadataKey";
   protected static final String BOOLEAN_METADATA_KEY = "booleanMetadataKey";
+  protected static final String METADATA_KEY_DEFAULT_VALUE = "metadataKeyDefaultValue";
+  protected static final String MULTILEVEL_METADATA_KEY_DEFAULT_VALUE = "multilevelMetadataKeyDefaultValue";
 
   protected static final String CONTINENT = "continent";
   protected static final String COUNTRY = "country";
@@ -129,13 +131,6 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId, key);
     assertThat(componentMetadata.getFailure().isPresent() ? componentMetadata.getFailure().get().getReason() : "No Failure",
                componentMetadata.isSuccess(), is(true));
-
-    return componentMetadata.get();
-  }
-
-  protected ComponentMetadataDescriptor getComponentStaticMetadata() {
-    MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId);
-    assertThat(componentMetadata.isSuccess(), is(true));
 
     return componentMetadata.get();
   }
