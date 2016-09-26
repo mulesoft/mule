@@ -12,7 +12,7 @@ import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 
 @Extension(name = VeganExtension.VEGAN)
-@Configurations({AppleConfig.class, BananaConfig.class, KiwiConfig.class, PeachConfig.class})
+@Configurations({AppleConfig.class, BananaConfig.class, KiwiConfig.class, PeachConfig.class, PearConfig.class})
 @Operations(VeganFidelityOperation.class)
 public class VeganExtension {
 

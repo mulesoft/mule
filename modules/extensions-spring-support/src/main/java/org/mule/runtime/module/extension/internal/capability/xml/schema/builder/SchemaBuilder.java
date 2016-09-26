@@ -246,7 +246,7 @@ public final class SchemaBuilder {
   }
 
   public SchemaBuilder registerConfigElement(final RuntimeConfigurationModel configurationModel) {
-    configurationSchemaDelegate.registerConfigElement(schema, configurationModel);
+    configurationSchemaDelegate.registerConfigElement(schema, configurationModel, dslResolver.resolve(configurationModel));
     return this;
   }
 

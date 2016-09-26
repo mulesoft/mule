@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.xml.SchemaConstants.UNB
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.xml.dsl.api.DslElementSyntax;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ComplexContent;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.Element;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.model.ExplicitGroup;
@@ -42,10 +43,11 @@ final class ConfigurationSchemaDelegate {
     this.builder = builder;
   }
 
-  public void registerConfigElement(Schema schema, final RuntimeConfigurationModel configurationModel) {
+  public void registerConfigElement(Schema schema, final RuntimeConfigurationModel configurationModel,
+                                    DslElementSyntax dslConfigElement) {
     this.schema = schema;
 
-    ExtensionType config = registerExtension(configurationModel.getName());
+    ExtensionType config = registerExtension(dslConfigElement.getElementName());
     config.getAttributeOrAttributeGroup().add(builder.createNameAttribute(true));
 
     final ExplicitGroup choice = new ExplicitGroup();
