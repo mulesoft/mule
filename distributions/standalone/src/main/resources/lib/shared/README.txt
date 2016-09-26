@@ -1,1 +1,0 @@
-Shared domain classloader folder. This folder has been deprecated. See https://www.mulesoft.org/jira/browse/MULE-7536

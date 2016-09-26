@@ -278,8 +278,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     services = getServicesFolder();
     services.mkdirs();
 
-    new File(muleHome, "lib/shared/default").mkdirs();
-
     applicationDeploymentListener = mock(DeploymentListener.class);
     domainDeploymentListener = mock(DeploymentListener.class);
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry();
