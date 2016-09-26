@@ -9,9 +9,13 @@ package org.mule.functional.config;
 import org.mule.functional.functional.AssertionMessageProcessor;
 import org.mule.functional.functional.InvocationCountMessageProcessor;
 import org.mule.functional.functional.ResponseAssertionMessageProcessor;
+import org.mule.functional.functional.SharedConfig;
+import org.mule.functional.functional.SharedSource;
 import org.mule.functional.testmodels.services.TestServiceComponent;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.runtime.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.runtime.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.runtime.config.spring.parsers.specific.TransformerMessageProcessorDefinitionParser;
 import org.mule.tck.processor.TestNonBlockingProcessor;
@@ -35,5 +39,9 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler {
     registerMuleBeanDefinitionParser("assert-intercepting",
                                      new MessageProcessorDefinitionParser(ResponseAssertionMessageProcessor.class));
     registerBeanDefinitionParser("queue", new QueueWriterMessageProcessorBeanDefinitionParser());
+
+    registerBeanDefinitionParser("shared-source", new ChildDefinitionParser("messageSource", SharedSource.class));
+    registerBeanDefinitionParser("shared-config", new MuleOrphanDefinitionParser(SharedConfig.class, true));
+
   }
 }

@@ -8,17 +8,25 @@ package org.mule.runtime.module.spring.remoting;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
 
-public class SpringRemotingTestCase extends FunctionalTestCase {
+public class SpringRemotingTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port1");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {
