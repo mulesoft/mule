@@ -572,6 +572,14 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+    <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ContentParameterShouldNotGenerateChildElementType" substitutionGroup="mule:abstract-message-processor" name="content-parameter-should-not-generate-child-element"></xs:element>
+    <xs:complexType name="ContentParameterShouldNotGenerateChildElementType">
+        <xs:complexContent>
+            <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+                <xs:attribute type="mule:expressionMap" use="required" name="mapContent"></xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
     <xs:element xmlns="http://www.mulesoft.org/schema/mule/metadata" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DoQueryType" substitutionGroup="mule:abstract-message-processor" name="do-query"></xs:element>
     <xs:complexType name="DoQueryType">
         <xs:complexContent>

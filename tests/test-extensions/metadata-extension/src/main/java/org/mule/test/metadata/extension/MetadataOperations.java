@@ -42,6 +42,7 @@ import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderRes
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
     contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
@@ -183,6 +184,9 @@ public class MetadataOperations extends MetadataOperationsParent {
   public boolean typeWithDeclaredSubtypesMetadata(Shape plainShape, Rectangle rectangleSubtype, Animal animal) {
     return false;
   }
+
+  @MetadataScope(contentResolver = TestContentResolverWithoutKeyResolver.class)
+  public void contentParameterShouldNotGenerateChildElement(@Content Map<String, Object> mapContent) {}
 
   @Query(translator = MetadataExtensionQueryTranslator.class,
       entityResolver = MetadataExtensionEntityResolver.class,
