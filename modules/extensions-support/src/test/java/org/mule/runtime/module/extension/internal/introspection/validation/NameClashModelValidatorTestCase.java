@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationM
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
+import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -27,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -246,8 +248,22 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     validate();
   }
 
+  @Test
+  public void notInlineDefinitionPassSuccessful() {
+    ParameterModel offending = getParameter(PLURAL_PARAM_NAME, Map.class);
+    mockXmlHintsInline(offending, false);
+    ParameterModel singular = getParameter(SINGULAR_PARAM_NAME, BankAccount.class);
+    when(configurationModel.getParameterModels()).thenReturn(singletonList(offending));
+    when(operationModel.getName()).thenReturn("mapSingularizeClash");
+    when(operationModel.getParameterModels()).thenReturn(singletonList(singular));
+    validate();
+  }
+
   private void validate() {
     validator.validate(extensionModel);
   }
 
+  private void mockXmlHintsInline(ParameterModel p, boolean inline) {
+    when(p.getModelProperty(XmlHintsModelProperty.class)).thenReturn(Optional.of(new XmlHintsModelProperty(inline, true, true)));
+  }
 }

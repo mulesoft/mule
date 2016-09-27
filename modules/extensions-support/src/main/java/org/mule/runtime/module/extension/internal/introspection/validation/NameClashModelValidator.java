@@ -276,8 +276,11 @@ public final class NameClashModelValidator implements ModelValidator {
 
                            private void validateSingular() {
                              String singularName = singularize(p.getName());
+                             boolean allowInline = p.getModelProperty(XmlHintsModelProperty.class)
+                                 .map(XmlHintsModelProperty::allowsInlineDefinition)
+                                 .orElse(true);
 
-                             if (singularName.equals(p.getName())) {
+                             if (singularName.equals(p.getName()) || !allowInline) {
                                return;
                              }
 
