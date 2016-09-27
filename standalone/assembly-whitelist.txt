@@ -361,8 +361,6 @@
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.1.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/yecht-1.1-jruby.jar
-/mule-standalone-${productVersion}/lib/shared
-/mule-standalone-${productVersion}/lib/shared/README.txt
 /mule-standalone-${productVersion}/lib/user
 /mule-standalone-${productVersion}/lib/user/junit-4.11.jar
 /mule-standalone-${productVersion}/lib/user/mule-tests-functional-${productVersion}.jar
