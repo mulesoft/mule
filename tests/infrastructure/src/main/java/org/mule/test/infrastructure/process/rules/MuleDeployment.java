@@ -52,6 +52,24 @@ import org.slf4j.LoggerFactory;
  *   }
  * }
  * </pre>
+ *
+ * <table>
+ *   <tr>
+ *     <td><b>System Property</b></td><td><b>Default Value</b></td><td><b>Description</b></td>
+ *   </tr>
+ *   <tr>
+ *     <td>mule.test.deleteOnExit</td><td>true</td><td>When false, keeps the used Mule Server under target/server/TEST_NAME</td>
+ *   </tr>
+ *   <tr>
+ *     <td>mule.test.stopOnExit</td><td>true</td><td>When false, keeps the used Mule Server running</td>
+ *   </tr>
+ *   <tr>
+ *     <td>mule.test.deployment.timeout</td><td>60000</td><td>Timeout for starting Mule (in milliseconds)</td>
+ *   </tr>
+ *   <tr>
+ *     <td>mule.test.debug</td><td>false</td><td>Mule server wait for remote debugger attachment.</td>
+ *   </tr>
+ * </table>
  */
 public class MuleDeployment extends MuleInstallation {
 
@@ -59,7 +77,7 @@ public class MuleDeployment extends MuleInstallation {
   private static final String DEFAULT_DEPLOYMENT_TIMEOUT = "60000";
   private static final boolean STOP_ON_EXIT = parseBoolean(getProperty("mule.test.stopOnExit", "true"));
   private static final boolean DEBUGGING_ENABLED = parseBoolean(getProperty("mule.test.debug", "false"));
-  public static final String DEBUG_PORT = "5005";
+  private static final String DEBUG_PORT = "5005";
   private static Logger logger = LoggerFactory.getLogger(MuleDeployment.class);
   private static PollingProber prober;
   private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));

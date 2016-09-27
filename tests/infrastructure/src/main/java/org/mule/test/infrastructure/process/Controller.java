@@ -34,12 +34,16 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.exec.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Controller {
 
+  private static Logger logger = LoggerFactory.getLogger(Controller.class);
   protected static final String ANCHOR_SUFFIX = "-anchor.txt";
   private static final IOFileFilter ANCHOR_FILTER = FileFilterUtils.suffixFileFilter(ANCHOR_SUFFIX);
   protected static final String STATUS = "Mule Enterprise Edition is running \\(([0-9]+)\\)\\.";
@@ -114,6 +118,7 @@ public abstract class Controller {
 
   protected int doExecution(DefaultExecutor executor, CommandLine commandLine, Map<Object, Object> env) {
     try {
+      logger.info("Executing: " + StringUtils.toString(commandLine.toStrings(), " "));
       return executor.execute(commandLine, env);
     } catch (ExecuteException e) {
       return e.getExitValue();
