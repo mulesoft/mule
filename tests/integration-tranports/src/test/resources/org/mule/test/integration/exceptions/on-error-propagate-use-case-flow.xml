@@ -15,10 +15,10 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
     <httpn:listener-config name="listenerConfig1">
-    	<httpn:request-connection host="localhost" port="${port1}"/>
+    	<httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
     <httpn:listener-config name="listenerConfig2">
-    	<httpn:request-connection host="localhost" port="${port2}"/>
+    	<httpn:listener-connection host="localhost" port="${port2}"/>
     </httpn:listener-config>
 
     <jms:activemq-connector name="activeMq" maxRedelivery="-1"/>

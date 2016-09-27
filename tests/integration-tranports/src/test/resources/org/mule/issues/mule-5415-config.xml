@@ -17,7 +17,7 @@
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
     <httpn:listener-config name="listenerConfig">
-    	<httpn:request-connection host="localhost" port="${port1}"/>
+    	<httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
 
     <httpt:body-to-parameter-map-transformer name="httpRequestToMapTransformer"/>

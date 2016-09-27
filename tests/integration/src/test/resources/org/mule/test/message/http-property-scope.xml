@@ -9,7 +9,7 @@
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:listener-config name="listenerConfig">
-    	<httpn:request-connection host="localhost" port="${port}"/>
+    	<httpn:listener-connection host="localhost" port="${port}"/>
     </httpn:listener-config>
 
     <flow name="foo">

@@ -9,14 +9,15 @@
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:listener-config name="listenerConfig">
-    	<httpn:listener-connection host="localhost" port="${port1}"/>
+    	<httpn:listener-connection host="localhost" port="${port}"/>
     </httpn:listener-config>
 
     <flow name="bridge">
         <httpn:listener path="in" config-ref="listenerConfig"/>
         <object-to-string-transformer/>
         <test:component logMessageDetails="true"/>
-        <copy-properties propertyName="X-Custom-Header"/>
+        <!-- TODO MULE-9857 Make message properties case sensitive -->
+        <set-property propertyName="X-Custom-Header" value="#[message.attributes.headers['x-custom-header']]"/>
         <test:queue name="out"/>
     </flow>
 

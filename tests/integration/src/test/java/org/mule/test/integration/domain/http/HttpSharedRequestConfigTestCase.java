@@ -8,11 +8,14 @@ package org.mule.test.integration.domain.http;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.module.http.internal.request.DefaultHttpRequester;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("MULE-10633")
 public class HttpSharedRequestConfigTestCase extends DomainFunctionalTestCase {
 
   private static final String FIRST_APP_NAME = "app-1";

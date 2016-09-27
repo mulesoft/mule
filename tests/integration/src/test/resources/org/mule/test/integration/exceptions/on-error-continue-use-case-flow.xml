@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
@@ -10,19 +10,23 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
-    <http:listener-config name="listenerConfigHttps" host="localhost" port="${port3}" protocol="HTTPS">
-        <tls:context>
-            <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit" />
-        </tls:context>
-    </http:listener-config>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+    <httpn:listener-config name="listenerConfigHttps">
+        <httpn:listener-connection host="localhost" port="${port3}" protocol="HTTPS">
+            <tls:context>
+                <tls:key-store path="ssltest-keystore.jks" keyPassword="changeit" password="changeit" />
+            </tls:context>
+        </httpn:listener-connection>
+    </httpn:listener-config>
 
     <flow name="httpContinueProcessingActualMessage">
-        <http:listener path="service" config-ref="listenerConfig"/>
+        <httpn:listener path="service" config-ref="listenerConfig"/>
         <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>
@@ -35,7 +39,7 @@
     </flow>
 
     <flow name="httpsContinueProcessingActualMessage">
-        <http:listener config-ref="listenerConfigHttps" path="httpsservice"/>
+        <httpn:listener config-ref="listenerConfigHttps" path="httpsservice"/>
         <json:json-to-object-transformer returnClass="org.mule.test.integration.exceptions.OnErrorContinueTestCase$NewsRequest"/>
         <custom-processor class="org.mule.test.integration.exceptions.OnErrorContinueTestCase$LoadNewsProcessor"/>
         <test:component throwException="true"/>

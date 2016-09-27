@@ -43,7 +43,11 @@ public class HttpMessageProcessorNotificationTestCase extends AbstractMessagePro
 
   @Parameterized.Parameters
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {{false}, {true}});
+
+    return Arrays.asList(new Object[][] {{false},
+        // TODO MULE-10618 reenable non-blocking
+        // {true}
+    });
   }
 
   @Override

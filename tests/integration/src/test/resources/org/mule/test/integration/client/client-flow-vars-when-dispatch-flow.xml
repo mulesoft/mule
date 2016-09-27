@@ -2,23 +2,25 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
            http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
 
     <flow name="innerFlow">
-        <http:listener path="innertest" config-ref="listenerConfig"/>
+        <httpn:listener path="innertest" config-ref="listenerConfig"/>
         <logger level="INFO"/>
     </flow>
 
     <flow name="innerFlowRequestResponse">
-        <http:listener path="innerrequestresponsetest" config-ref="listenerConfig"/>
+        <httpn:listener path="innerrequestresponsetest" config-ref="listenerConfig"/>
         <logger level="INFO"/>
     </flow>
 
@@ -28,7 +30,7 @@
     </spring:beans>
 
     <flow name="flowVarsFlowUsingProcessor">
-        <http:listener path="flowVarsFlowUsingProcessor" config-ref="listenerConfig"/>
+        <httpn:listener path="flowVarsFlowUsingProcessor" config-ref="listenerConfig"/>
         <set-variable variableName="team" value="Sales"/>
         <processor ref="myProcessor"/>
         <set-variable variableName="ammount" value="100"/>
@@ -37,7 +39,7 @@
     </flow>
 
     <flow name="flowVarsFlowUsingJavaComponent">
-        <http:listener path="flowVarsFlowUsingJavaComponent" config-ref="listenerConfig"/>
+        <httpn:listener path="flowVarsFlowUsingJavaComponent" config-ref="listenerConfig"/>
         <set-variable variableName="team" value="Sales"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchWithoutLosingVariablesTestCase$JavaComponentDispatchFlowUsingNewMuleClient"/>
         <set-variable variableName="ammount" value="100"/>

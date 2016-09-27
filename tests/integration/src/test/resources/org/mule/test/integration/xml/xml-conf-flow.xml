@@ -8,7 +8,7 @@
                http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <httpn:listener-config name="listenerConfig">
-    	<httpn:request-connection host="localhost" port="${port1}"/>
+    	<httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
 
     <mule-xml:namespace-manager includeConfigNamespaces="true">

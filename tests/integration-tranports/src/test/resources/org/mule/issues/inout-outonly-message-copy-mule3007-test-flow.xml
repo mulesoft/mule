@@ -14,7 +14,7 @@
     <jms:activemq-connector name="activemqConnector"/>
 
     <httpn:listener-config name="listenerConfig">
-    	<httpn:request-connection host="localhost" port="${port1}"/>
+    	<httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
 
     <flow name="StreamTestService">

@@ -13,7 +13,7 @@
     <spring:bean name="_muleEndpointFactory" class="org.mule.test.integration.CompositeSourceStartDelayTestCase$DelayedStartEndpointFactory"/>
 
     <httpn:listener-config name="listenerConfig">
-    	<httpn:request-connection host="localhost" port="${httpPort}"/>
+    	<httpn:listener-connection host="localhost" port="${httpPort}"/>
     </httpn:listener-config>
 
     <flow name="MainFlow">

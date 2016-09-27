@@ -10,13 +10,13 @@
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <httpn:listener-config name="listenerConfig1" host="localhost" port="${port1}">
+    <httpn:listener-config name="listenerConfig1">
 		<httpn:listener-connection host="localhost" port="${port1}"/>
     </httpn:listener-config>
-    <httpn:listener-config name="listenerConfig2" host="localhost" port="${port2}">
+    <httpn:listener-config name="listenerConfig2">
     	<httpn:listener-connection host="localhost" port="${port2}"/>
     </httpn:listener-config>
-    <httpn:request-config name="requestConfig" host="localhost" port="${port2}">
+    <httpn:request-config name="requestConfig">
     	<httpn:request-connection host="localhost" port="${port2}"/>
     </httpn:request-config>
 
