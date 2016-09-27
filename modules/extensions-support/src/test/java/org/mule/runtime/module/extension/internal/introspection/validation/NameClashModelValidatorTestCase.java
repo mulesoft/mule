@@ -7,21 +7,26 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.getParameter;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
+import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.introspection.config.RuntimeConfigurationModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.test.petstore.extension.BankAccount;
 
 import com.google.common.collect.ImmutableList;
+
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +43,8 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   private static final String CONFIG_NAME = "config";
   private static final String CONNECTION_PROVIDER_NAME = "connectionProvider";
   private static final String SIMPLE_PARAM_NAME = "simple";
+  private static final String PLURAL_PARAM_NAME = "accounts";
+  private static final String SINGULAR_PARAM_NAME = "account";
 
   @Mock
   private ExtensionModel extensionModel;
@@ -63,9 +70,9 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Before
   public void before() {
     when(extensionModel.getName()).thenReturn("extensionName");
-    when(extensionModel.getConfigurationModels()).thenReturn(asList(configurationModel));
-    when(extensionModel.getOperationModels()).thenReturn(asList(operationModel));
-    when(extensionModel.getConnectionProviders()).thenReturn(asList(connectionProviderModel));
+    when(extensionModel.getConfigurationModels()).thenReturn(singletonList(configurationModel));
+    when(extensionModel.getOperationModels()).thenReturn(singletonList(operationModel));
+    when(extensionModel.getConnectionProviders()).thenReturn(singletonList(connectionProviderModel));
 
     simpleConfigParam = getParameter(SIMPLE_PARAM_NAME, String.class);
     topLevelConfigParam = getParameter("topLevelConfigParam", Apple.class);
@@ -198,6 +205,44 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
     ParameterModel offending = getParameter(SIMPLE_PARAM_NAME, String.class);
     when(connectionProviderModel.getParameterModels())
         .thenReturn(asList(simpleConnectionProviderParam, topLevelConnectionProviderParam, offending));
+    validate();
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void mapSingularizeClashOnOperation() {
+    ParameterModel offending = getParameter(PLURAL_PARAM_NAME, Map.class);
+    ParameterModel singular = getParameter(SINGULAR_PARAM_NAME, String.class);
+    when(operationModel.getName()).thenReturn("mapSingularizeClash");
+    when(operationModel.getParameterModels()).thenReturn(asList(singular, offending));
+    validate();
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void listSingularizeClashOnOperation() {
+    ParameterModel offending = getParameter(PLURAL_PARAM_NAME, List.class);
+    ParameterModel singular = getParameter(SINGULAR_PARAM_NAME, String.class);
+    when(operationModel.getName()).thenReturn("listSingularizeClash");
+    when(operationModel.getParameterModels()).thenReturn(asList(singular, offending));
+    validate();
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void mapSingularizeClashWithTopLevel() {
+    ParameterModel account = getParameter(SINGULAR_PARAM_NAME, BankAccount.class);
+    when(configurationModel.getParameterModels()).thenReturn(singletonList(account));
+    ParameterModel offending = getParameter(PLURAL_PARAM_NAME, Map.class);
+    when(operationModel.getName()).thenReturn("mapSingularizeClash");
+    when(operationModel.getParameterModels()).thenReturn(singletonList(offending));
+    validate();
+  }
+
+  @Test(expected = IllegalModelDefinitionException.class)
+  public void mapSingularizeClashOnFinalCheck() {
+    ParameterModel offending = getParameter(PLURAL_PARAM_NAME, Map.class);
+    ParameterModel singular = getParameter(SINGULAR_PARAM_NAME, BankAccount.class);
+    when(configurationModel.getParameterModels()).thenReturn(singletonList(offending));
+    when(operationModel.getName()).thenReturn("mapSingularizeClash");
+    when(operationModel.getParameterModels()).thenReturn(singletonList(singular));
     validate();
   }
 

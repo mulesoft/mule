@@ -8,10 +8,17 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.NameUtils.singularize;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.hasExposedFields;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isInstantiable;
+import org.mule.metadata.api.model.ArrayType;
+import org.mule.metadata.api.model.DictionaryType;
+import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.visitor.MetadataTypeVisitor;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.ExtensionWalker;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -34,8 +41,10 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -66,6 +75,7 @@ public final class NameClashModelValidator implements ModelValidator {
 
     private final ExtensionModel extensionModel;
     private final Set<DescribedReference<Named>> namedObjects = new HashSet<>();
+    private final Map<String, DescribedParameter> singularizedObjects = new HashMap<>();
     private final Multimap<String, TopLevelParameter> topLevelParameters = LinkedListMultimap.create();
 
     public ValidationDelegate(ExtensionModel extensionModel) {
@@ -73,6 +83,7 @@ public final class NameClashModelValidator implements ModelValidator {
     }
 
     private void validate(ExtensionModel extensionModel) throws IllegalModelDefinitionException {
+
       new ExtensionWalker() {
 
         @Override
@@ -84,6 +95,7 @@ public final class NameClashModelValidator implements ModelValidator {
         public void onOperation(HasOperationModels owner, OperationModel model) {
           validateOperation(model);
           registerNamedObject(model);
+          validateSingularizingClash(model);
         }
 
         @Override
@@ -104,6 +116,7 @@ public final class NameClashModelValidator implements ModelValidator {
         private void defaultValidation(ParameterizedModel model) {
           validateParameterNames(model);
           registerNamedObject(model);
+          validateSingularizingClash(model);
         }
 
         private void registerNamedObject(Named named) {
@@ -118,26 +131,28 @@ public final class NameClashModelValidator implements ModelValidator {
     private void validateOperation(OperationModel operation) {
       validateParameterNames(operation);
       // Check clash between each operation and its parameters type
-      operation.getParameterModels().stream()
-          .forEach(parameterModel -> validateClash(operation.getName(), getType(parameterModel.getType()).getName(), "operation",
-                                                   "argument"));
+      operation.getParameterModels().forEach(parameterModel -> validateClash(operation.getName(),
+                                                                             getType(parameterModel.getType()).getName(),
+                                                                             "operation", "argument"));
     }
 
     private void validateParameterNames(ParameterizedModel model) {
       Set<String> repeatedParameters = collectRepeatedNames(model.getParameterModels());
       if (!repeatedParameters.isEmpty()) {
         throw new IllegalModelDefinitionException(format("Extension '%s' defines the %s '%s' which has parameters "
-            + "with repeated names. Offending parameters are: [%s]", extensionModel.getName(), model.getClass().getSimpleName(),
+            + "with repeated names. Offending parameters are: [%s]",
+                                                         extensionModel.getName(), model.getClass().getSimpleName(),
                                                          model.getName(), Joiner.on(",").join(repeatedParameters)));
       }
     }
 
     private void validateTopLevelParameter(ParameterModel parameter, ParameterizedModel owner) {
-      if (!isInstantiable(parameter.getType()) || !hasExposedFields(parameter.getType())) {
+      MetadataType metadataType = parameter.getType();
+      if (!isInstantiable(metadataType) || !hasExposedFields(metadataType)) {
         return;
       }
 
-      final Class<?> parameterType = getType(parameter.getType());
+      final Class<?> parameterType = getType(metadataType);
       final String ownerName = owner.getName();
       final String ownerType = owner.getClass().getSimpleName();
 
@@ -155,8 +170,9 @@ public final class NameClashModelValidator implements ModelValidator {
 
         if (repeated.isPresent()) {
           TopLevelParameter tp = repeated.get();
-          throw new IllegalModelDefinitionException(format("Extension '%s' defines an %s of name '%s' which contains parameter '%s' of complex type '%s'. However, "
-              + "%s of name '%s' defines a parameter of the same name but type '%s'. Complex parameter of different types cannot have the same name.",
+          throw new IllegalModelDefinitionException(
+                                                    format("Extension '%s' defines an %s of name '%s' which contains parameter '%s' of complex type '%s'. However, "
+                                                        + "%s of name '%s' defines a parameter of the same name but type '%s'. Complex parameter of different types cannot have the same name.",
                                                            extensionModel.getName(),
                                                            ownerType, ownerName,
                                                            parameter.getName(),
@@ -168,15 +184,44 @@ public final class NameClashModelValidator implements ModelValidator {
 
     private Set<String> collectRepeatedNames(List<? extends Named> namedObject) {
       Set<String> names = new HashSet<>();
-      Set<String> repeatedNames =
-          namedObject.stream().filter(parameter -> !names.add(parameter.getName())).map(Named::getName).collect(toSet());
-
-      return repeatedNames;
+      return namedObject.stream()
+          .filter(parameter -> !names.add(parameter.getName()))
+          .map(Named::getName).collect(toSet());
     }
 
     private void validateNameClashes(Collection<? extends Named>... collections) {
       Multimap<String, Named> names = LinkedListMultimap.create();
       stream(collections).flatMap(Collection::stream).forEach(named -> names.put(named.getName(), named));
+
+      Map<String, Named> singularClashes = names
+          .entries()
+          .stream()
+          .filter(e -> singularizedObjects.keySet().contains(e.getKey()))
+          .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+      if (!singularClashes.isEmpty()) {
+        StringBuilder builder = new StringBuilder(format("Extension '%s' contains %d parameters that clash when singularized. ",
+                                                         extensionModel.getName(), singularClashes.size()));
+
+        builder.append(singularClashes.keySet()
+            .stream()
+            .map(k -> {
+              DescribedParameter reference = singularizedObjects.get(k);
+              Collection<Named> namedElements = names.get(k);
+              if (!namedElements.isEmpty()) {
+                Named next = namedElements.iterator().next();
+                return format(
+                              "%s name '%s' contains parameter '%s' that clash when singularized with parameter '%s' in '%s'",
+                              reference.parent.getDescription(), reference.parent.getName(), reference.getName(), k,
+                              next.getName());
+              } else {
+                return "";
+              }
+            })
+            .collect(joining(", ")));
+
+        throw new IllegalModelDefinitionException(builder.toString());
+      }
 
       names.asMap().entrySet().forEach(entry -> {
         List<Named> values = (List<Named>) entry.getValue();
@@ -213,6 +258,65 @@ public final class NameClashModelValidator implements ModelValidator {
                                                          typeOfNewNamingModel));
       }
     }
+
+    private void validateSingularizingClash(ParameterizedModel model) {
+      List<ParameterModel> parameters = model.getParameterModels();
+      parameters.forEach(
+                         p -> p.getType().accept(new MetadataTypeVisitor() {
+
+                           @Override
+                           public void visitArrayType(ArrayType arrayType) {
+                             validateSingular();
+                           }
+
+                           @Override
+                           public void visitDictionary(DictionaryType dictionaryType) {
+                             validateSingular();
+                           }
+
+                           private void validateSingular() {
+                             String singularName = singularize(p.getName());
+
+                             if (singularName.equals(p.getName())) {
+                               return;
+                             }
+
+                             Optional<ParameterModel> clashingParam =
+                                 parameters.stream().filter(p -> p.getName().equals(singularName)).findAny();
+                             String describedReference = new DescribedReference<>(model).getDescription();
+                             Class<Object> type = getType(p.getType());
+                             String extensionName = extensionModel.getName();
+
+                             if (clashingParam.isPresent()) {
+                               throw new IllegalModelDefinitionException(format("Extension '%s' defines an %s of name '%s' which contains a '%s' "
+                                   + "parameter '%s' that when singularized clashes with another "
+                                   + "parameter '%s' in the same %s", extensionName,
+                                                                                describedReference, model.getName(),
+                                                                                type.getSimpleName(),
+                                                                                p.getName(), clashingParam.get().getName(),
+                                                                                describedReference));
+                             }
+
+                             Optional<String> nameClash =
+                                 topLevelParameters.keySet().stream().filter(name -> name.equals(singularName)).findAny();
+                             if (nameClash.isPresent()) {
+                               Collection<TopLevelParameter> tps = topLevelParameters.get(nameClash.get());
+                               if (!tps.isEmpty()) {
+                                 TopLevelParameter tp = tps.iterator().next();
+                                 throw new IllegalModelDefinitionException(
+                                                                           format("Extension '%s' defines an %s of name '%s' which contains a '%s' parameter '%s' that when singularized "
+                                                                               + "clashes with a parameter '%s' defined in the %s '%s'",
+                                                                                  extensionName,
+                                                                                  describedReference, model.getName(),
+                                                                                  type.getSimpleName(), p.getName(),
+                                                                                  tp.parameterModel.getName(), tp.owner,
+                                                                                  tp.ownerType));
+                               }
+                             }
+                             singularizedObjects.put(singularName, new DescribedParameter(p, model));
+                           }
+                         }));
+    }
   }
 
 
@@ -241,6 +345,7 @@ public final class NameClashModelValidator implements ModelValidator {
     }
   }
 
+
   private class TypedTopLevelParameter extends TopLevelParameter {
 
     public TypedTopLevelParameter(TopLevelParameter parameter) {
@@ -254,11 +359,8 @@ public final class NameClashModelValidator implements ModelValidator {
 
     @Override
     public boolean equals(Object obj) {
-      if (obj instanceof TypedTopLevelParameter) {
-        return type.equals(((TypedTopLevelParameter) obj).type);
-      }
+      return obj instanceof TypedTopLevelParameter && type.equals(((TypedTopLevelParameter) obj).type);
 
-      return false;
     }
 
     @Override
@@ -266,6 +368,7 @@ public final class NameClashModelValidator implements ModelValidator {
       return type.hashCode();
     }
   }
+
 
   private class DescribedReference<T extends Named> extends Reference<T> implements Named, Described {
 
@@ -296,18 +399,24 @@ public final class NameClashModelValidator implements ModelValidator {
 
     @Override
     public boolean equals(Object obj) {
-      if (obj instanceof DescribedReference) {
-        return super.equals(obj);
-      }
+      return obj instanceof DescribedReference && super.equals(obj);
 
-      return false;
     }
 
     @Override
     public int hashCode() {
       return super.hashCode();
     }
-
   }
 
+
+  private class DescribedParameter extends DescribedReference<ParameterModel> {
+
+    private DescribedReference<? extends Named> parent;
+
+    private DescribedParameter(ParameterModel value, ParameterizedModel parent) {
+      super(value);
+      this.parent = new DescribedReference<>(parent);
+    }
+  }
 }
