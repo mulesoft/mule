@@ -5,12 +5,7 @@
 
     <description>Empty Mule Application</description>
 
-<!--     <httpn:listener-config name="listenerConfig"> -->
-<!--         <httpn:listener-connection host="localhost" port="9999"/> -->
-<!--     </httpn:listener-config> -->
-
     <flow name="echo-service">
-<!--         <httpn:listener path="*" config-ref="listenerConfig"/> -->
         <component class="org.foo.EchoTest" />
     </flow>
 

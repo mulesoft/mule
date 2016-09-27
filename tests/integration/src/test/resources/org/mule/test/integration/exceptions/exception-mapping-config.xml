@@ -3,8 +3,6 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-<!--     <http:request-config name="requestConfig" usePersistentConnections="false"/> -->
-
     <flow name="transformationErrorFlow">
         <object-to-string-transformer/>
     </flow>
