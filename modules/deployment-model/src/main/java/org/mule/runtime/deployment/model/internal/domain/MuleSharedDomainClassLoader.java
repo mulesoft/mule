@@ -20,7 +20,7 @@ import java.net.URL;
 import java.util.List;
 
 /**
- * Load $MULE_HOME/lib/shared/<domain> libraries.
+ * Defines a {@link MuleArtifactClassLoader} for a domain artifact.
  */
 public class MuleSharedDomainClassLoader extends MuleArtifactClassLoader implements ArtifactClassLoader {
 

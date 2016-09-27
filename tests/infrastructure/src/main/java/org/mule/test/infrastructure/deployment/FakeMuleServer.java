@@ -214,8 +214,6 @@ public class FakeMuleServer {
     File confDir = createFolder("conf");
     URL log4jFile = getClass().getResource("/log4j2-test.xml");
     copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
-
-    createFolder("lib/shared/default");
   }
 
   private File createFolder(String folderName) {
