@@ -8,6 +8,10 @@ package org.mule.test.heisenberg.extension.model;
 
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
+import org.mule.runtime.extension.api.annotation.param.Optional;
+
+import java.util.List;
+import java.util.Map;
 
 public abstract class Investment {
 
@@ -15,6 +19,14 @@ public abstract class Investment {
 
   @Parameter
   private String commercialName;
+
+  @Parameter
+  @Optional
+  private List<Investment> discardedInvestments;
+
+  @Parameter
+  @Optional
+  private Map<String, Investment> investmentSpinOffs;
 
   @ParameterGroup
   private InvestmentInfo investmentInfo;
@@ -33,5 +45,13 @@ public abstract class Investment {
 
   public boolean isApproved() {
     return approved;
+  }
+
+  public List<Investment> getDiscardedInvestments() {
+    return discardedInvestments;
+  }
+
+  public Map<String, Investment> getInvestmentSpinOffs() {
+    return investmentSpinOffs;
   }
 }
