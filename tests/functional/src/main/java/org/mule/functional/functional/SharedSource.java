@@ -16,7 +16,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 
 /**
- * 
+ * Test source that is configured with a {@link SharedConfig}.
  *
  * @since 4.0
  */

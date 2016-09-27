@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.spring.security;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -22,8 +23,6 @@ import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.SecurityNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.junit4.rule.DynamicPort;
-
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +58,6 @@ public class SecureHttpPollingFunctionalTestCase extends ExtensionFunctionalTest
     assertThat(result, not(nullValue()));
     assertThat(result.getAttributes(), instanceOf(HttpResponseAttributes.class));
     assertThat(((HttpResponseAttributes) result.getAttributes()).getStatusCode(), is(401));
-    assertThat(latch.await(1000, TimeUnit.MILLISECONDS), is(true));
+    assertThat(latch.await(1000, MILLISECONDS), is(true));
   }
 }

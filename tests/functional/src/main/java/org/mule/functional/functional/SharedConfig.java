@@ -13,7 +13,7 @@ import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 
 /**
- * 
+ * Test config to test connectors at the domain level
  *
  * @since 4.0
  */
