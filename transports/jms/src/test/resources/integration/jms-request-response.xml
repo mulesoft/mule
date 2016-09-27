@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+
+    <flow name="JMSNoCorrelationIDTemporaryQueue">
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID == null]"/>
+        <jms:outbound-endpoint exchange-pattern="request-response" queue="in" connector-ref="jmsConnector1"/>
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID != null]"/>
+    </flow>
+
+    <flow name="JMSNoCorrelationIDFixedQueue">
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID == null]"/>
+        <set-property propertyName="JMSReplyTo" value="other"/>
+        <jms:outbound-endpoint exchange-pattern="request-response" queue="in" connector-ref="jmsConnector1"/>
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID != null]"/>
+    </flow>
+
+    <flow name="JMSInNoCorrelationID">
+        <jms:inbound-endpoint exchange-pattern="request-response" queue="in" connector-ref="jmsConnector1" />
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID == null]"/>
+        <test:component appendString=" #[context:serviceName]" logMessageDetails="true" waitTime="50"/>
+    </flow>
+
+
+
+    <flow name="JMSCorrelationIDTemporaryQueue">
+        <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid"/>
+        <jms:outbound-endpoint exchange-pattern="request-response" queue="inFixed" connector-ref="jmsConnector1"/>
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID == 'custom-cid']"/>
+    </flow>
+
+    <flow name="JMSCorrelationIDFixedQueue">
+        <set-property propertyName="JMSReplyTo" value="other"/>
+        <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid"/>
+        <jms:outbound-endpoint exchange-pattern="request-response" queue="inFixed" connector-ref="jmsConnector1"/>
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID == 'custom-cid']"/>
+    </flow>
+
+    <flow name="JMSInCustomCorrelationID">
+        <jms:inbound-endpoint exchange-pattern="request-response" queue="inFixed" connector-ref="jmsConnector1" />
+        <test:assert expression="#[message.inboundProperties.JMSCorrelationID == 'custom-cid']"/>
+        <test:component appendString=" #[context:serviceName]" logMessageDetails="true" waitTime="50"/>
+    </flow>
+
+
+
+</mule>

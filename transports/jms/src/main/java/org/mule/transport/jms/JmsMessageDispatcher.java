@@ -163,19 +163,25 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
 
             jmsMessage.setStringProperty(MULE_CORRELATION_ID_PROPERTY, resolveMuleCorrelationId(event));
-            jmsMessage.setJMSCorrelationID(resolveJmsCorrelationId(event));
+            if(!endpoint.getExchangePattern().hasResponse())
+            {
+                jmsMessage.setJMSCorrelationID(resolveJmsCorrelationId(event));
+            }
+            else
+            {
+                jmsMessage.setJMSCorrelationID(event.getMessage().getCorrelationId());
+            }
 
             //Allow overrides to alter the message if necessary
             processMessage(jmsMessage, event);
 
             if (useReplyToDestination && replyTo != null)
             {
-                final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
                 final int timeout = endpoint.getResponseTimeout();
 
                 if (completionHandler != null)
                 {
-                    internalNonBlockingSendAndReceive(session, producer, consumer, replyTo, jmsMessage, topic, ttl, priority, persistent, transacted, timeout, completionHandler);
+                    internalNonBlockingSendAndReceive(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent, transacted, timeout, completionHandler, event);
                     delayedCleanup = true;
                     return null;
                 }
@@ -185,17 +191,17 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                     {
                         if (topic)
                         {
-                            return internalBlockingSendAndAwait(consumer, producer, replyTo, jmsMessage, topic, ttl, priority, persistent, timeout);
+                            return internalBlockingSendAndAwait(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent, timeout, event);
 
                         }
                         else
                         {
-                            return internalBlockingSendAndReceive(producer, consumer, replyTo, jmsMessage, topic, ttl, priority, persistent, timeout);
+                            return internalBlockingSendAndReceive(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent, timeout, event);
                         }
                     }
                     finally
                     {
-                        closeConsumer(session, consumer, replyTo);
+                        closeReplyQueue(session, replyTo);
                     }
                 }
             }
@@ -220,29 +226,39 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return returnOriginalMessageAsReply ? createMuleMessage(jmsMessage) : null;
     }
 
-    private MuleMessage internalBlockingSendAndAwait(MessageConsumer consumer, MessageProducer producer, Destination replyTo,
-                                                     Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent, int timeout) throws Exception
+    private MuleMessage internalBlockingSendAndAwait(Session session, MessageProducer producer, Destination replyTo,
+                                                     Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent, int timeout, MuleEvent event) throws Exception
     {
-        // need to register a listener for a topic
-        Latch latch = new Latch();
-        LatchReplyToListener listener = new LatchReplyToListener(latch);
-        consumer.setMessageListener(listener);
 
         connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Waiting for response event for: " + timeout + " ms on " + replyTo);
-        }
+        final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
 
-        latch.await(timeout, TimeUnit.MILLISECONDS);
-        consumer.setMessageListener(null);
-        listener.release();
-        return createResponseMuleMessage(listener.getMessage(), replyTo);
+        try
+        {
+            // need to register a listener for a topic
+            Latch latch = new Latch();
+            LatchReplyToListener listener = new LatchReplyToListener(latch);
+            consumer.setMessageListener(listener);
+
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Waiting for response event for: " + timeout + " ms on " + replyTo);
+            }
+
+            latch.await(timeout, TimeUnit.MILLISECONDS);
+            consumer.setMessageListener(null);
+            listener.release();
+            return createResponseMuleMessage(listener.getMessage(), replyTo);
+        }
+        finally
+        {
+            closeConsumer(consumer);
+        }
     }
 
-    private MuleMessage internalBlockingSendAndReceive(MessageProducer producer, MessageConsumer consumer, Destination
-            replyTo, Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent, int timeout) throws Exception
+    private MuleMessage internalBlockingSendAndReceive(Session session, MessageProducer producer, Destination
+            replyTo, Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent, int timeout, MuleEvent event) throws Exception
     {
         connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
 
@@ -250,14 +266,23 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         {
             logger.debug("Waiting for non-blocking response event for: " + timeout + " ms on " + replyTo);
         }
-
-        Message result = consumer.receive(timeout);
-        return createResponseMuleMessage(result, replyTo);
+        final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
+        try
+        {
+            Message result = consumer.receive(timeout);
+            return createResponseMuleMessage(result, replyTo);
+        }
+        finally
+        {
+            closeConsumer(consumer);
+        }
     }
 
-    private void internalNonBlockingSendAndReceive(final Session session, final MessageProducer producer, final MessageConsumer consumer, final Destination
-            replyTo, Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent, final boolean transacted, int timeout, final CompletionHandler<MuleMessage, Exception> completionHandler) throws JMSException
+    private void internalNonBlockingSendAndReceive(final Session session, final MessageProducer producer, final Destination
+            replyTo, Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent, final boolean transacted, int timeout, final CompletionHandler<MuleMessage, Exception> completionHandler, MuleEvent event) throws JMSException
     {
+        connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
+        final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
         final TimerTask closeConsumerTask = new TimerTask()
         {
             @Override
@@ -277,6 +302,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
         };
+        connector.scheduleTimeoutTask(closeConsumerTask, endpoint.getResponseTimeout());
         consumer.setMessageListener(new CompletionHandlerReplyToListener(new CompletionHandler<Message,
                 Exception>()
         {
@@ -311,14 +337,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
             }
         }));
-        connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
-        connector.scheduleTimeoutTask(closeConsumerTask, endpoint.getResponseTimeout());
     }
 
     private void cleanup(MessageProducer producer, Session session, MessageConsumer consumer, Destination replyTo)
     {
         closeProducer(producer);
-        closeConsumer(session, consumer, replyTo);
+        closeConsumer(consumer);
+        closeReplyQueue(session, replyTo);
         closeSession(session);
     }
 
@@ -351,10 +376,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         return (muleTx != null && muleTx.hasResource(connector.getConnection()) || endpoint.getTransactionConfig().isTransacted());
     }
 
-    private void closeConsumer(Session session, MessageConsumer consumer, Destination replyTo)
+    private void closeReplyQueue(Session session, Destination replyTo)
     {
-        connector.closeQuietly(consumer);
-
         if (replyTo != null && (replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
         {
             if (replyTo instanceof TemporaryQueue)
@@ -367,6 +390,12 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
         }
     }
+
+    private void closeConsumer(MessageConsumer consumer)
+    {
+        connector.closeQuietly(consumer);
+    }
+
 
     private void closeProducer(MessageProducer producer)
     {
@@ -514,10 +543,18 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         //If we're not using
         if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
         {
-            selector = "JMSCorrelationID='" + jmsMessage.getJMSCorrelationID() + "'";
-            if (logger.isDebugEnabled())
+            if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
             {
-                logger.debug("ReplyTo Selector is: " + selector);
+                String jmsCorrelationId = jmsMessage.getJMSCorrelationID();
+                if (jmsCorrelationId == null)
+                {
+                    jmsCorrelationId = jmsMessage.getJMSMessageID();
+                }
+                selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("ReplyTo Selector is: " + selector);
+                }
             }
         }
 
