@@ -4,7 +4,7 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
       xmlns:httpt="http://www.mulesoft.org/schema/mule/transport/http"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
@@ -12,18 +12,20 @@
                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/transport/http http://www.mulesoft.org/schema/mule/transport/http/current/mule-transport-http.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
                http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+    	<httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
 
     <httpt:body-to-parameter-map-transformer name="httpRequestToMapTransformer"/>
     
     <mulexml:jaxb-context name="myJaxb" packageNames="org.mule.test.issues"/>
 
     <flow name="aero2BtsServiceInbound">
-        <http:listener path="*" config-ref="listenerConfig" />
+        <httpn:listener path="*" config-ref="listenerConfig" />
         <set-property propertyName="param1" value="value1" />
         <vm:outbound-endpoint path="secondFlow" transformer-refs="httpRequestToMapTransformer"
                               exchange-pattern="request-response"/>

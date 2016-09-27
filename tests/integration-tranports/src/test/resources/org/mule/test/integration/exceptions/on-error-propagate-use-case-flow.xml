@@ -2,7 +2,7 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xmlns:vm="http://www.mulesoft.org/schema/mule/transport/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
@@ -10,12 +10,16 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
        http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd
        http://www.mulesoft.org/schema/mule/transport/vm http://www.mulesoft.org/schema/mule/transport/vm/current/mule-transport-vm.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
 
-    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
-    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
+    <httpn:listener-config name="listenerConfig1">
+    	<httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+    <httpn:listener-config name="listenerConfig2">
+    	<httpn:request-connection host="localhost" port="${port2}"/>
+    </httpn:listener-config>
 
     <jms:activemq-connector name="activeMq" maxRedelivery="-1"/>
     <jms:activemq-connector name="activeMqRedelivery" maxRedelivery="${maxRedelivery}"/>
@@ -107,7 +111,7 @@
     </flow>
 
     <flow name="httpRollbackOnly">
-        <http:listener path="*" config-ref="listenerConfig1"/>
+        <httpn:listener path="*" config-ref="listenerConfig1"/>
         <test:component throwException="true"/>
         <error-handler>
             <on-error-propagate/>

@@ -2,13 +2,11 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:mule-ss="http://www.mulesoft.org/schema/mule/spring-security"
        xmlns:ss="http://www.springframework.org/schema/security"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/current/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-current.xsd">
 

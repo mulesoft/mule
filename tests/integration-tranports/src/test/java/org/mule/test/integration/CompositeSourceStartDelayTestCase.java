@@ -9,13 +9,13 @@ package org.mule.test.integration;
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.endpoint.DefaultEndpointFactory;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.util.endpoint.InboundEndpointWrapper;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.lifecycle.StartException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
+import org.mule.test.HttpExtensionFuntionalTestCase;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -24,7 +24,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class CompositeSourceStartDelayTestCase extends FunctionalTestCase {
+public class CompositeSourceStartDelayTestCase extends HttpExtensionFuntionalTestCase {
 
   public static final CountDownLatch startLatch = new CountDownLatch(1);
 

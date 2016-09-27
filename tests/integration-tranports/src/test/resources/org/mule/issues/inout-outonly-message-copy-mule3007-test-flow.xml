@@ -4,19 +4,21 @@
       xmlns:spring="http://www.springframework.org/schema/beans" 
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
       xmlns:jms="http://www.mulesoft.org/schema/mule/transport/jms" 
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/transport/jms http://www.mulesoft.org/schema/mule/transport/jms/current/mule-transport-jms.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <jms:activemq-connector name="activemqConnector"/>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+    	<httpn:request-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
 
     <flow name="StreamTestService">
-        <http:listener path="/services" config-ref="listenerConfig"/>
+        <httpn:listener path="/services" config-ref="listenerConfig"/>
         <jms:outbound-endpoint queue="queue" exchange-pattern="one-way"/>
     </flow>
 
