@@ -16,9 +16,11 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.test.runner.api.AetherClassPathClassifier;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
+import org.mule.test.runner.api.ArtifactClassificationTypeResolver;
 import org.mule.test.runner.api.ArtifactIsolatedClassLoaderBuilder;
 import org.mule.test.runner.api.ClassPathClassifier;
 import org.mule.test.runner.api.ClassPathUrlProvider;
+import org.mule.test.runner.api.DependencyResolver;
 import org.mule.test.runner.api.RepositorySystemFactory;
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 import org.mule.test.runner.maven.AutoDiscoverWorkspaceLocationResolver;
@@ -186,10 +188,12 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     WorkspaceLocationResolver workspaceLocationResolver = new AutoDiscoverWorkspaceLocationResolver(classPath,
                                                                                                     rootArtifactClassesFolder);
-    builder.setClassPathClassifier(new AetherClassPathClassifier(RepositorySystemFactory
+    final DependencyResolver dependencyResolver = RepositorySystemFactory
         .newLocalDependencyResolver(classPath,
                                     workspaceLocationResolver,
-                                    getMavenLocalRepository())));
+                                    getMavenLocalRepository());
+    builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
+                                                                 new ArtifactClassificationTypeResolver(dependencyResolver)));
 
     return builder.build();
   }
