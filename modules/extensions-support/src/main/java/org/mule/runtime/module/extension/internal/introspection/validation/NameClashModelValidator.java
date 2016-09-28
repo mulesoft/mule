@@ -8,10 +8,12 @@ package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import static org.mule.runtime.extension.api.util.NameUtils.singularize;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.hasExposedFields;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isInstantiable;
@@ -34,7 +36,6 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 
 import com.google.common.base.Joiner;
@@ -194,7 +195,7 @@ public final class NameClashModelValidator implements ModelValidator {
 
     private void validateNameClashes(Collection<? extends Named>... collections) {
       Multimap<String, Named> names = LinkedListMultimap.create();
-      stream(collections).flatMap(Collection::stream).forEach(named -> names.put(NameUtils.hyphenize(named.getName()), named));
+      stream(collections).flatMap(Collection::stream).forEach(named -> names.put(hyphenize(named.getName()), named));
       validateNameClashBetweenElements(names);
     }
 
@@ -220,7 +221,7 @@ public final class NameClashModelValidator implements ModelValidator {
             i++;
           }
 
-          errorMessage.append(format(" which alias name is '%s'. Names should be unique", entry.getKey()));
+          errorMessage.append(format(" which it's transformed DSL name is '%s'. DSL Names should be unique", entry.getKey()));
           throw new IllegalModelDefinitionException(errorMessage.toString());
         }
       });
@@ -229,17 +230,16 @@ public final class NameClashModelValidator implements ModelValidator {
     private void validateSingularizeNameClashesWithTopLevels() {
       Map<String, Collection<TopLevelParameter>> singularClashes = topLevelParameters.keySet().stream()
           .filter(k -> singularizedObjects.keySet().contains(k) && !topLevelParameters.get(k).isEmpty())
-          .collect(toMap(k -> k, topLevelParameters::get));
+          .collect(toMap(identity(), topLevelParameters::get));
 
       if (!singularClashes.isEmpty()) {
         List<String> errorMessages = new ArrayList<>();
         singularClashes.entrySet().forEach(e -> {
           DescribedParameter reference = singularizedObjects.get(e.getKey());
-          e.getValue().forEach(tp -> errorMessages.add(format(
-                                                              "%s '%s' contains parameter '%s' that clash when singularized with parameter '%s' from '%s'",
+          e.getValue().forEach(tp -> errorMessages.add(format("%s '%s' contains parameter '%s' that when transformed into "
+              + "DSL language clashes with parameter '%s' from '%s'",
                                                               reference.parent.getDescription(), reference.parent.getName(),
-                                                              reference.getName(),
-                                                              tp.getName(), tp.ownerType)));
+                                                              reference.getName(), tp.getName(), tp.ownerType)));
         });
 
         throw new IllegalModelDefinitionException(format("Extension '%s' contains %d parameters that clash when singularized. %s",
@@ -283,15 +283,14 @@ public final class NameClashModelValidator implements ModelValidator {
                                Optional<ParameterModel> clashParam =
                                    parameters.stream().filter(p -> p.getName().equals(singularName)).findAny();
                                String describedReference = new DescribedReference<>(model).getDescription();
-                               Class<Object> type = getType(p.getType());
 
                                if (clashParam.isPresent()) {
                                  throw new IllegalModelDefinitionException(
-                                                                           format("Extension '%s' defines an %s of name '%s' which contains a '%s' parameter '%s' that when singularized "
-                                                                               + "clashes with another parameter '%s' in the same %s",
+                                                                           format("Extension '%s' defines an %s of name '%s' which contains a parameter '%s' that when transformed to"
+                                                                               + "DSL language clashes with another parameter '%s' in the same %s",
                                                                                   extensionModel.getName(), describedReference,
-                                                                                  model.getName(), type.getSimpleName(),
-                                                                                  p.getName(), clashParam.get().getName(),
+                                                                                  model.getName(), p.getName(),
+                                                                                  clashParam.get().getName(),
                                                                                   describedReference));
                                }
                              }

@@ -255,7 +255,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void mapSingularizeClashWithTopLevel() {
     exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("parameter 'accounts' that clash when singularized with parameter 'account'");
+    exception.expectMessage("parameter 'accounts' that when transformed into DSL language clashes with parameter 'account'");
     ParameterModel account = getParameter(SINGULAR_PARAM_NAME, BankAccount.class);
     when(configurationModel.getParameterModels()).thenReturn(singletonList(account));
     ParameterModel offending = getParameter(PLURAL_PARAM_NAME, Map.class);
@@ -278,7 +278,7 @@ public class NameClashModelValidatorTestCase extends AbstractMuleTestCase {
   @Test
   public void differentNamesClashWhenHyphenized() {
     exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("contains 2 components 'config-name' and 'ConfigName' which alias name is 'config-name'");
+    exception.expectMessage("components 'config-name' and 'ConfigName' which it's transformed DSL name is 'config-name'");
     ConfigurationModel configuration = mock(ConfigurationModel.class);
     when(configuration.getName()).thenReturn("config-name");
     when(configurationModel.getName()).thenReturn("ConfigName");
