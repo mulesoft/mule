@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.http.api.HttpConstants.HttpStatus.UNAUTHORIZED;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 
-import org.mule.extension.http.internal.HttpBasicAuthenticationFilter;
+import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 

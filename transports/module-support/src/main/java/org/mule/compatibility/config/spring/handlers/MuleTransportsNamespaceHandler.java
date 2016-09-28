@@ -37,7 +37,7 @@ import org.mule.compatibility.module.cxf.config.JaxWsClientWithDecoupledEndpoint
 import org.mule.compatibility.module.cxf.config.ProxyClientWithDecoupledEndpointFactoryBean;
 import org.mule.compatibility.module.cxf.config.SimpleClientWithDecoupledEndpointFactoryBean;
 import org.mule.compatibility.module.management.agent.DefaultTransportJmxSupportAgent;
-import org.mule.extension.http.internal.HttpBasicAuthenticationFilter;
+import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.runtime.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.runtime.config.spring.parsers.MuleDefinitionParserConfiguration;

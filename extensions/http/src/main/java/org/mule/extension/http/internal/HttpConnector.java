@@ -6,10 +6,12 @@
  */
 package org.mule.extension.http.internal;
 
+import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.extension.http.api.request.authentication.BasicAuthentication;
 import org.mule.extension.http.api.request.authentication.DigestAuthentication;
 import org.mule.extension.http.api.request.authentication.HttpAuthentication;
 import org.mule.extension.http.api.request.authentication.NtlmAuthentication;
+import org.mule.extension.http.api.request.client.HttpClient;
 import org.mule.extension.http.api.request.proxy.DefaultProxyConfig;
 import org.mule.extension.http.api.request.proxy.NtlmProxyConfig;
 import org.mule.extension.http.api.request.proxy.ProxyConfig;
@@ -49,7 +51,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 @Import(type = TcpServerSocketProperties.class, from = "Sockets")
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/httpn", namespace = "httpn")
 @Export(resources = {"/META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties"},
-    classes = {HttpListenerConnectionManager.class})
+    classes = {HttpListenerConnectionManager.class, HttpBasicAuthenticationFilter.class, HttpClient.class})
 public class HttpConnector {
 
   public static final String URL_CONFIGURATION = "URL Configuration";
