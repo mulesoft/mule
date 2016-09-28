@@ -406,7 +406,6 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
     assertThat(planB.getCarStock(), is(5));
     assertThat(planB.getInvestmentInfo(), is(notNullValue()));
     assertThat(planB.getInvestmentInfo().getValuation(), equalTo(333L));
-
   }
 
   @Test

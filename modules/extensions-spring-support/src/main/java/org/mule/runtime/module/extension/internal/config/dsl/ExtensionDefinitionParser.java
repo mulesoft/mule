@@ -6,10 +6,26 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl;
 
-import com.google.common.collect.ImmutableList;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
+import static java.lang.String.format;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
+import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
+import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
+import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
+import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
+import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
+import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.getHintsModelProperty;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -67,8 +83,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.NestedProcess
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
+
+import com.google.common.collect.ImmutableList;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -90,26 +106,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import static java.lang.String.format;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getGenericTypeAt;
-import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
-import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildCollectionConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildMapConfiguration;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromFixedValue;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromMultipleDefinitions;
-import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromSimpleParameter;
-import static org.mule.runtime.config.spring.dsl.api.KeyAttributeDefinitionPair.newBuilder;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromMapEntryType;
-import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
-import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
-import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
-import static org.mule.runtime.extension.xml.dsl.api.XmlModelUtils.getHintsModelProperty;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Base class for parsers delegates which generate {@link ComponentBuildingDefinition} instances for the specific components types
@@ -312,18 +312,18 @@ public abstract class ExtensionDefinitionParser {
     addDefinition(baseDefinitionBuilder.copy().withIdentifier(mapElementName).withTypeDefinition(fromType(mapType)).build());
 
 
-    Optional<DslElementSyntax> mapValueDsl = paramDsl.getGeneric(valueType);
-    if (!mapValueDsl.isPresent()) {
+    Optional<DslElementSyntax> mapValueChildDsl = paramDsl.getGeneric(valueType);
+    if (!mapValueChildDsl.isPresent()) {
       return;
     }
 
-    DslElementSyntax valueChildElementDsl = mapValueDsl.get();
+    DslElementSyntax valueDsl = mapValueChildDsl.get();
     valueType.accept(new MetadataTypeVisitor() {
 
       @Override
       protected void defaultVisit(MetadataType metadataType) {
         addDefinition(baseDefinitionBuilder.copy()
-            .withIdentifier(valueChildElementDsl.getElementName())
+            .withIdentifier(valueDsl.getElementName())
             .withTypeDefinition(fromMapEntryType(keyClass, valueClass))
             .withKeyTypeConverter(value -> resolverOf(parameterName, keyType, value, null, expressionSupport, true,
                                                       modelProperties, false))
@@ -335,9 +335,10 @@ public abstract class ExtensionDefinitionParser {
       @Override
       public void visitObject(ObjectType objectType) {
         defaultVisit(objectType);
-        if (valueChildElementDsl.supportsTopLevelDeclaration()
-            || (valueChildElementDsl.supportsChildDeclaration() && !valueChildElementDsl.isWrapped())) {
+        if ((valueDsl.supportsTopLevelDeclaration() || (valueDsl.supportsChildDeclaration() && !valueDsl.isWrapped())) &&
+            !parsingContext.isRegistered(valueDsl.getElementName(), valueDsl.getNamespace())) {
           try {
+            parsingContext.registerObjectType(valueDsl.getElementName(), valueDsl.getNamespace(), objectType);
             new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
                                           parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
           } catch (ConfigurationException e) {
@@ -350,8 +351,8 @@ public abstract class ExtensionDefinitionParser {
       public void visitArrayType(ArrayType arrayType) {
         defaultVisit(arrayType);
 
-        Optional<DslElementSyntax> valueListGenericDsl = valueChildElementDsl.getGeneric(arrayType.getType());
-        if (valueChildElementDsl.supportsChildDeclaration() && valueListGenericDsl.isPresent()) {
+        Optional<DslElementSyntax> valueListGenericDsl = valueDsl.getGeneric(arrayType.getType());
+        if (valueDsl.supportsChildDeclaration() && valueListGenericDsl.isPresent()) {
           arrayType.getType().accept(new BasicTypeMetadataVisitor() {
 
             @Override
@@ -439,8 +440,10 @@ public abstract class ExtensionDefinitionParser {
         @Override
         public void visitObject(ObjectType objectType) {
           DslElementSyntax itemDsl = collectionItemDsl.get();
-          if (itemDsl.supportsTopLevelDeclaration() || itemDsl.supportsChildDeclaration()) {
+          if ((itemDsl.supportsTopLevelDeclaration() || itemDsl.supportsChildDeclaration()) &&
+              !parsingContext.isRegistered(itemDsl.getElementName(), itemDsl.getNamespace())) {
             try {
+              parsingContext.registerObjectType(itemDsl.getElementName(), itemDsl.getNamespace(), objectType);
               new ObjectTypeParameterParser(baseDefinitionBuilder.copy(), objectType, getContextClassLoader(), dslResolver,
                                             parsingContext, muleContext).parse().forEach(definition -> addDefinition(definition));
             } catch (ConfigurationException e) {

@@ -6,6 +6,8 @@
  */
 package org.mule.test.heisenberg.extension;
 
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.Event;
@@ -22,8 +24,8 @@ import org.mule.runtime.extension.api.annotation.param.UseConfig;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
-import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.runtime.extension.api.runtime.operation.OperationResult;
+import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
 import org.mule.tck.message.IntegerAttributes;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.HealthException;
@@ -32,6 +34,9 @@ import org.mule.test.heisenberg.extension.model.HealthStatus;
 import org.mule.test.heisenberg.extension.model.Investment;
 import org.mule.test.heisenberg.extension.model.KnockeableDoor;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;
+import org.mule.test.heisenberg.extension.model.RecursiveChainA;
+import org.mule.test.heisenberg.extension.model.RecursiveChainB;
+import org.mule.test.heisenberg.extension.model.RecursivePojo;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -44,9 +49,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 
 public class HeisenbergOperations {
 
@@ -165,7 +167,10 @@ public class HeisenbergOperations {
     throw new HealthException(CURE_CANCER_MESSAGE);
   }
 
-  public Investment approve(Investment investment) {
+  public Investment approve(Investment investment,
+                            @Optional RecursivePojo recursivePojo,
+                            @Optional RecursiveChainB recursiveChainB,
+                            @Optional RecursiveChainA recursiveChainA) {
     investment.approve();
     return investment;
   }

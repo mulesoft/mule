@@ -242,6 +242,14 @@
                     </heisenberg:investment-spin-offs>
                 </heisenberg:car-wash>
             </heisenberg:investment>
+            <heisenberg:recursive-pojo>
+                <heisenberg:childs>
+                    <heisenberg:recursive-pojo/>
+                </heisenberg:childs>
+                <heisenberg:mapped-childs>
+                    <heisenberg:mapped-child key="someKey" value="#[new org.mule.test.heisenberg.extension.model.RecursivePojo()"/>
+                </heisenberg:mapped-childs>
+            </heisenberg:recursive-pojo>
         </heisenberg:approve>
     </flow>
 
