@@ -13,6 +13,7 @@ import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
@@ -327,6 +328,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
     // mule-app.properties from the zip archive must have loaded properly
     assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
+
+    // Checks that the configuration's ID was properly configured
+    assertThat(app.getMuleContext().getConfiguration().getId(), equalTo(dummyAppDescriptorFileBuilder.getId()));
   }
 
   @Test

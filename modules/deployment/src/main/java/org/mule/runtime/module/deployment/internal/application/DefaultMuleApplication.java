@@ -169,7 +169,7 @@ public class DefaultMuleApplication implements Application {
     try {
       ArtifactContextBuilder artifactBuilder =
           new ArtifactContextBuilder().setArtifactProperties(descriptor.getAppProperties()).setArtifactType(APP)
-              .setArtifactInstallationDirectory(descriptor.getArtifactLocation())
+              .setArtifactName(descriptor.getName()).setArtifactInstallationDirectory(descriptor.getArtifactLocation())
               .setConfigurationFiles(descriptor.getAbsoluteResourcePaths()).setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins).setExecutionClassloader(deploymentClassLoader.getClassLoader())
               .setEnableLazyInit(lazy).setServiceRepository(serviceRepository);
