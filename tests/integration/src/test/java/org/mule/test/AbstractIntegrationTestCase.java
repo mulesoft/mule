@@ -19,7 +19,8 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
  * @since 4.0
  */
 @ArtifactClassLoaderRunnerConfig(
-    plugins = {"org.mule.modules:mule-module-validation", "org.mule.modules:mule-module-file"})
+    plugins = {"org.mule.modules:mule-module-validation", "org.mule.modules:mule-module-file",
+        "org.mule.modules:mule-module-http-ext", "org.mule.modules:mule-module-sockets"})
 public abstract class AbstractIntegrationTestCase extends MuleArtifactFunctionalTestCase {
 
 }

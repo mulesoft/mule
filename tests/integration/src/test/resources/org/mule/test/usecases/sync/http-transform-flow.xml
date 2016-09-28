@@ -3,16 +3,22 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans" 
       xmlns:xm="http://www.mulesoft.org/schema/mule/xml" 
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig1" host="localhost" port="${port1}"/>
-    <http:listener-config name="listenerConfig2" host="localhost" port="${port2}"/>
-    <http:request-config name="requestConfig" host="localhost" port="${port2}"/>
+    <httpn:listener-config name="listenerConfig1">
+		<httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
+    <httpn:listener-config name="listenerConfig2">
+    	<httpn:listener-connection host="localhost" port="${port2}"/>
+    </httpn:listener-config>
+    <httpn:request-config name="requestConfig">
+    	<httpn:request-connection host="localhost" port="${port2}"/>
+    </httpn:request-config>
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
     <byte-array-to-serializable-transformer name="ByteArrayToSerializable"/>
@@ -21,7 +27,7 @@
     <gzip-compress-transformer name="Compress"/>
 
     <flow name="HttpService">
-        <http:listener path="RemoteService" config-ref="listenerConfig1"/>
+        <httpn:listener path="RemoteService" config-ref="listenerConfig1"/>
         <transformer ref="ByteArrayToString"/>
         <response>
             <transformer ref="ObjectToXml"/>
@@ -31,7 +37,7 @@
     </flow>
 
     <flow name="HttpService2">
-        <http:listener path="RemoteService" config-ref="listenerConfig2"/>
+        <httpn:listener path="RemoteService" config-ref="listenerConfig2"/>
         <transformer ref="ByteArrayToSerializable"/>
         <response>
             <transformer ref="SerializableToByteArray"/>
@@ -41,7 +47,7 @@
 
     <flow name="LocalService">
         <transformer ref="SerializableToByteArray"/>
-        <http:request path="RemoteService" config-ref="requestConfig" method="POST"/>
+        <httpn:request path="RemoteService" config-ref="requestConfig" method="POST"/>
     </flow>
 
 </mule>

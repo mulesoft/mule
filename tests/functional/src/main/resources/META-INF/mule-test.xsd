@@ -223,4 +223,48 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="shared-source" type="sharedSourceType" substitutionGroup="mule:abstract-message-source">
+        <xsd:annotation>
+            <xsd:documentation>
+                Mock message source that links to a shared-config.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="sharedSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageSourceType">
+                <xsd:attribute name="config-ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the configuration element for this source.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="shared-config" type="sharedConfigType" substitutionGroup="mule:abstract-shared-extension">
+        <xsd:annotation>
+            <xsd:documentation>
+                Configuration element that can be put at a domain level
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="sharedConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="name" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the configuration in the registry, so that it can be referenced by the request message processor.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
 </xsd:schema>

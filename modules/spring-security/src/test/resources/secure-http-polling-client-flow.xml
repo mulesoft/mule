@@ -1,40 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
     xmlns:test="http://www.mulesoft.org/schema/mule/test"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:request-config name="secureRequestConfig" host="localhost" port="${port1}">
-        <http:basic-authentication username="marie" password="marie" preemptive="true"/>
-    </http:request-config>
+    <httpn:request-config name="secureRequestConfig">
+        <httpn:request-connection host="localhost" port="${port1}">
+            <httpn:authentication>
+                <httpn:basic-authentication username="marie" password="marie" preemptive="true"/>
+            </httpn:authentication>
+        </httpn:request-connection>
+    </httpn:request-config>
 
-    <http:request-config name="requestConfig" host="localhost" port="${port1}">
-        <http:basic-authentication username="dodgy" password="geezer" preemptive="true"/>
-    </http:request-config>
+    <httpn:request-config name="requestConfig">
+        <httpn:request-connection host="localhost" port="${port1}">
+            <httpn:authentication>
+                <httpn:basic-authentication username="dodgy" password="geezer" preemptive="true"/>
+            </httpn:authentication>
+        </httpn:request-connection>
+    </httpn:request-config>
 
     <!-- This uses the polling HTTP connector every 30 seconds -->
 
     <flow name="pollingUMO_authenticated">
         <poll frequency="2000">
-            <http:request path="/" config-ref="secureRequestConfig">
-                <http:success-status-code-validator values="0..599"/>
-            </http:request>
+            <httpn:request path="/" config-ref="secureRequestConfig">
+                <httpn:response-validator>
+                    <httpn:success-status-code-validator values="0..599"/>
+                </httpn:response-validator>
+            </httpn:request>
         </poll>
         <test:queue name="toclient"/>
     </flow>
 
     <flow name="pollingUMO_not_authenticated">
         <poll frequency="2000">
-            <http:request path="/" config-ref="requestConfig">
-                <http:success-status-code-validator values="0..599"/>
-            </http:request>
+            <httpn:request path="/" config-ref="requestConfig">
+                <httpn:response-validator>
+                    <httpn:success-status-code-validator values="0..599"/>
+                </httpn:response-validator>
+            </httpn:request>
         </poll>
-        <set-property propertyName="http.status" value="#[message.inboundProperties['http.status']]" />
         <test:queue name="toclient2"/>
     </flow>
 

@@ -12,10 +12,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.POST;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
-import org.mule.test.AbstractIntegrationTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.AbstractIntegrationTestCase;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -50,6 +51,6 @@ public class HttpJmsBridgeTestCase extends AbstractIntegrationTestCase {
     InternalMessage msg = client.request("test://out", RECEIVE_TIMEOUT).getRight().get();
     assertNotNull(msg);
     assertThat(getPayloadAsString(msg), is(payload));
-    assertThat(msg.getInboundProperty(customHeader), is("value"));
+    assertThat(msg.getOutboundProperty(customHeader), is("value"));
   }
 }

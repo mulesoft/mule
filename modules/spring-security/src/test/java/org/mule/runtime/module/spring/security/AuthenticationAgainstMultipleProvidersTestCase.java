@@ -7,7 +7,10 @@
 package org.mule.runtime.module.spring.security;
 
 import static org.junit.Assert.assertEquals;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.extension.http.internal.HttpConnector;
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.apache.commons.httpclient.Credentials;
@@ -20,7 +23,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTestCase {
+public class AuthenticationAgainstMultipleProvidersTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public DynamicPort httpPort1 = new DynamicPort("port1");
@@ -30,6 +33,11 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTe
 
   @Rule
   public DynamicPort httpPort3 = new DynamicPort("port3");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {

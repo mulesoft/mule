@@ -2,16 +2,18 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <httpn:listener-config name="listenerConfig">
+    	<httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
 
     <flow name="foo">
-        <http:listener path="foo" config-ref="listenerConfig"/>
+        <httpn:listener path="foo" config-ref="listenerConfig"/>
         <append-string-transformer message=" bar"/>
         <set-property propertyName="foo" value="#[message.inboundProperties.foo]"/>
         <echo-component/>

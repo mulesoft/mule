@@ -57,6 +57,7 @@ import static org.mule.runtime.module.deployment.internal.application.Properties
 import static org.mule.runtime.module.deployment.internal.application.TestApplicationFactory.createTestApplicationFactory;
 import static org.mule.runtime.module.service.ServiceDescriptorFactory.SERVICE_PROVIDER_CLASS_NAME;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
+
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -125,8 +126,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.mockito.verification.VerificationMode;
 
 @RunWith(Parameterized.class)
@@ -203,10 +202,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       new ApplicationFileBuilder("dummy-domain-app2").definedBy("empty-config.xml").deployedWith(PROPERTY_DOMAIN, "dummy-domain");
   private final ApplicationFileBuilder dummyDomainApp3FileBuilder = new ApplicationFileBuilder("dummy-domain-app3")
       .definedBy("bad-app-config.xml").deployedWith(PROPERTY_DOMAIN, "dummy-domain");
-  private final ApplicationFileBuilder httpAAppFileBuilder = new ApplicationFileBuilder("shared-http-app-a")
-      .definedBy("shared-http-a-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-http-domain");
-  private final ApplicationFileBuilder httpBAppFileBuilder = new ApplicationFileBuilder("shared-http-app-b")
-      .definedBy("shared-http-b-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-http-domain");
+  private final ApplicationFileBuilder sharedAAppFileBuilder = new ApplicationFileBuilder("shared-app-a")
+      .definedBy("shared-a-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-domain");
+  private final ApplicationFileBuilder sharedBAppFileBuilder = new ApplicationFileBuilder("shared-app-b")
+      .definedBy("shared-b-app-config.xml").deployedWith(PROPERTY_DOMAIN, "shared-domain");
 
   // Domain file builders
   private final DomainFileBuilder brokenDomainFileBuilder = new DomainFileBuilder("brokenDomain").corrupted();
@@ -224,10 +223,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
       new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
   private final DomainFileBuilder dummyUndeployableDomainFileBuilder = new DomainFileBuilder("dummy-undeployable-domain")
       .definedBy("empty-domain-config.xml").deployedWith("redeployment.enabled", "false");
-  private final DomainFileBuilder sharedHttpDomainFileBuilder =
-      new DomainFileBuilder("shared-http-domain").definedBy("shared-http-domain-config.xml");
-  private final DomainFileBuilder sharedHttpBundleDomainFileBuilder = new DomainFileBuilder("shared-http-domain")
-      .definedBy("shared-http-domain-config.xml").containing(httpAAppFileBuilder).containing(httpBAppFileBuilder);
+  private final DomainFileBuilder sharedDomainFileBuilder =
+      new DomainFileBuilder("shared-domain").definedBy("shared-domain-config.xml");
+  private final DomainFileBuilder sharedBundleDomainFileBuilder = new DomainFileBuilder("shared-domain")
+      .definedBy("shared-domain-config.xml").containing(sharedAAppFileBuilder).containing(sharedBAppFileBuilder);
 
   private final boolean parallelDeployment;
   protected File muleHome;
@@ -827,21 +826,21 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void redeployModifiedDomainAndRedeployFailedApps() throws Exception {
-    addExplodedDomainFromBuilder(sharedHttpBundleDomainFileBuilder);
+    addExplodedDomainFromBuilder(sharedBundleDomainFileBuilder);
 
-    // change shared http config name to use a wrong name
+    // change shared config name to use a wrong name
     File domainConfigFile =
-        new File(domainsDir + "/" + sharedHttpBundleDomainFileBuilder.getDeployedPath(), DOMAIN_CONFIG_FILE_LOCATION);
+        new File(domainsDir + "/" + sharedBundleDomainFileBuilder.getDeployedPath(), DOMAIN_CONFIG_FILE_LOCATION);
     String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
-    String wrongDomainFileContext = correctDomainConfigContent.replace("http-listener-config", "http-listener-config-wrong");
+    String wrongDomainFileContext = correctDomainConfigContent.replace("test-shared-config", "test-shared-config-wrong");
     FileUtils.copyInputStreamToFile(new ByteArrayInputStream(wrongDomainFileContext.getBytes()), domainConfigFile);
     long firstFileTimestamp = domainConfigFile.lastModified();
 
     startDeployment();
 
-    assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
-    assertDeploymentFailure(applicationDeploymentListener, httpAAppFileBuilder.getId());
-    assertDeploymentFailure(applicationDeploymentListener, httpBAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, sharedAAppFileBuilder.getId());
+    assertDeploymentFailure(applicationDeploymentListener, sharedBAppFileBuilder.getId());
 
     reset(applicationDeploymentListener);
     reset(domainDeploymentListener);
@@ -849,9 +848,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     FileUtils.copyInputStreamToFile(new ByteArrayInputStream(correctDomainConfigContent.getBytes()), domainConfigFile);
     alterTimestampIfNeeded(domainConfigFile, firstFileTimestamp);
 
-    assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, httpAAppFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, httpBAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, sharedAAppFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, sharedBAppFileBuilder.getId());
   }
 
   @Test
@@ -1462,63 +1461,32 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void synchronizesAppDeployFromClient() throws Exception {
-    final Action action = new Action() {
+    final Action action = () -> deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL());
 
-      @Override
-      public void perform() throws Exception {
-        deploymentService.deploy(dummyAppDescriptorFileBuilder.getArtifactFile().toURI().toURL());
-      }
-    };
-
-    final Action assertAction = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.getId());
-      }
-    };
+    final Action assertAction =
+        () -> verify(applicationDeploymentListener, never()).onDeploymentStart(dummyAppDescriptorFileBuilder.getId());
     doSynchronizedAppDeploymentActionTest(action, assertAction);
   }
 
   @Test
   public void synchronizesAppUndeployFromClient() throws Exception {
-    final Action action = new Action() {
+    final Action action = () -> deploymentService.undeploy(emptyAppFileBuilder.getId());
 
-      @Override
-      public void perform() throws Exception {
-        deploymentService.undeploy(emptyAppFileBuilder.getId());
-      }
-    };
-
-    final Action assertAction = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppFileBuilder.getId());
-      }
-    };
+    final Action assertAction =
+        () -> verify(applicationDeploymentListener, never()).onUndeploymentStart(emptyAppFileBuilder.getId());
     doSynchronizedAppDeploymentActionTest(action, assertAction);
   }
 
   @Test
   public void synchronizesAppRedeployFromClient() throws Exception {
-    final Action action = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        // Clears notification from first deployment
-        reset(applicationDeploymentListener);
-        deploymentService.redeploy(emptyAppFileBuilder.getId());
-      }
+    final Action action = () -> {
+      // Clears notification from first deployment
+      reset(applicationDeploymentListener);
+      deploymentService.redeploy(emptyAppFileBuilder.getId());
     };
 
-    final Action assertAction = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        verify(applicationDeploymentListener, never()).onDeploymentStart(emptyAppFileBuilder.getId());
-      }
-    };
+    final Action assertAction =
+        () -> verify(applicationDeploymentListener, never()).onDeploymentStart(emptyAppFileBuilder.getId());
     doSynchronizedAppDeploymentActionTest(action, assertAction);
   }
 
@@ -2157,14 +2125,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
   public void receivesDomainMuleContextDeploymentNotifications() throws Exception {
     // NOTE: need an integration test like this because DefaultMuleApplication
     // class cannot be unit tested.
-    addPackedDomainFromBuilder(sharedHttpDomainFileBuilder);
+    addPackedDomainFromBuilder(sharedDomainFileBuilder);
 
     startDeployment();
 
-    assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
-    assertMuleContextCreated(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
-    assertMuleContextInitialized(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
-    assertMuleContextConfigured(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
+    assertMuleContextCreated(domainDeploymentListener, sharedDomainFileBuilder.getId());
+    assertMuleContextInitialized(domainDeploymentListener, sharedDomainFileBuilder.getId());
+    assertMuleContextConfigured(domainDeploymentListener, sharedDomainFileBuilder.getId());
   }
 
   @Test
@@ -2374,15 +2342,15 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     startDeployment();
 
     // Deploy domain and apps and wait until success
-    addPackedDomainFromBuilder(sharedHttpDomainFileBuilder);
-    addPackedAppFromBuilder(httpAAppFileBuilder);
-    addPackedAppFromBuilder(httpBAppFileBuilder);
-    assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, httpAAppFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, httpBAppFileBuilder.getId());
+    addPackedDomainFromBuilder(sharedDomainFileBuilder);
+    addPackedAppFromBuilder(sharedAAppFileBuilder);
+    addPackedAppFromBuilder(sharedBAppFileBuilder);
+    assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, sharedAAppFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, sharedBAppFileBuilder.getId());
 
     // Ensure resources are registered at domain's registry
-    Domain domain = findADomain(sharedHttpDomainFileBuilder.getId());
+    Domain domain = findADomain(sharedDomainFileBuilder.getId());
     assertThat(domain.getMuleContext().getRegistry().get("http-listener-config"), not(is(nullValue())));
 
     ArtifactClassLoader initialArtifactClassLoader = domain.getArtifactClassLoader();
@@ -2391,33 +2359,33 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     reset(applicationDeploymentListener);
 
     // Force redeployment by touching the domain's config file
-    File domainFolder = new File(domainsDir.getPath(), sharedHttpDomainFileBuilder.getId());
-    File configFile = new File(domainFolder, sharedHttpDomainFileBuilder.getConfigFile());
+    File domainFolder = new File(domainsDir.getPath(), sharedDomainFileBuilder.getId());
+    File configFile = new File(domainFolder, sharedDomainFileBuilder.getConfigFile());
     long firstFileTimestamp = configFile.lastModified();
     FileUtils.touch(configFile);
     alterTimestampIfNeeded(configFile, firstFileTimestamp);
 
-    assertUndeploymentSuccess(applicationDeploymentListener, httpAAppFileBuilder.getId());
-    assertUndeploymentSuccess(applicationDeploymentListener, httpBAppFileBuilder.getId());
-    assertUndeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, sharedAAppFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, sharedBAppFileBuilder.getId());
+    assertUndeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
 
-    assertDeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, httpAAppFileBuilder.getId());
-    assertDeploymentSuccess(applicationDeploymentListener, httpBAppFileBuilder.getId());
+    assertDeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, sharedAAppFileBuilder.getId());
+    assertDeploymentSuccess(applicationDeploymentListener, sharedBAppFileBuilder.getId());
 
-    domain = findADomain(sharedHttpDomainFileBuilder.getId());
+    domain = findADomain(sharedDomainFileBuilder.getId());
     ArtifactClassLoader artifactClassLoaderAfterRedeployment = domain.getArtifactClassLoader();
 
     // Ensure that after redeployment the domain's class loader has changed
     assertThat(artifactClassLoaderAfterRedeployment, not(sameInstance(initialArtifactClassLoader)));
 
     // Undeploy domain and apps
-    removeAppAnchorFile(httpAAppFileBuilder.getId());
-    removeAppAnchorFile(httpBAppFileBuilder.getId());
-    removeDomainAnchorFile(sharedHttpDomainFileBuilder.getId());
-    assertUndeploymentSuccess(applicationDeploymentListener, httpAAppFileBuilder.getId());
-    assertUndeploymentSuccess(applicationDeploymentListener, httpBAppFileBuilder.getId());
-    assertUndeploymentSuccess(domainDeploymentListener, sharedHttpDomainFileBuilder.getId());
+    removeAppAnchorFile(sharedAAppFileBuilder.getId());
+    removeAppAnchorFile(sharedBAppFileBuilder.getId());
+    removeDomainAnchorFile(sharedDomainFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, sharedAAppFileBuilder.getId());
+    assertUndeploymentSuccess(applicationDeploymentListener, sharedBAppFileBuilder.getId());
+    assertUndeploymentSuccess(domainDeploymentListener, sharedDomainFileBuilder.getId());
   }
 
   @Test
@@ -2729,63 +2697,30 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void synchronizesDomainDeployFromClient() throws Exception {
-    final Action action = new Action() {
+    final Action action = () -> deploymentService.deployDomain(dummyDomainFileBuilder.getArtifactFile().toURI().toURL());
 
-      @Override
-      public void perform() throws Exception {
-        deploymentService.deployDomain(dummyDomainFileBuilder.getArtifactFile().toURI().toURL());
-      }
-    };
-
-    final Action assertAction = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        verify(domainDeploymentListener, never()).onDeploymentStart(dummyDomainFileBuilder.getId());
-      }
-    };
+    final Action assertAction = () -> verify(domainDeploymentListener, never()).onDeploymentStart(dummyDomainFileBuilder.getId());
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
   }
 
   @Test
   public void synchronizesDomainUndeployFromClient() throws Exception {
-    final Action action = new Action() {
+    final Action action = () -> deploymentService.undeployDomain(emptyDomainFileBuilder.getId());
 
-      @Override
-      public void perform() throws Exception {
-        deploymentService.undeployDomain(emptyDomainFileBuilder.getId());
-      }
-    };
-
-    final Action assertAction = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        verify(domainDeploymentListener, never()).onUndeploymentStart(emptyDomainFileBuilder.getId());
-      }
-    };
+    final Action assertAction =
+        () -> verify(domainDeploymentListener, never()).onUndeploymentStart(emptyDomainFileBuilder.getId());
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
   }
 
   @Test
   public void synchronizesDomainRedeployFromClient() throws Exception {
-    final Action action = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        // Clears notification from first deployment
-        reset(domainDeploymentListener);
-        deploymentService.redeployDomain(emptyDomainFileBuilder.getId());
-      }
+    final Action action = () -> {
+      // Clears notification from first deployment
+      reset(domainDeploymentListener);
+      deploymentService.redeployDomain(emptyDomainFileBuilder.getId());
     };
 
-    final Action assertAction = new Action() {
-
-      @Override
-      public void perform() throws Exception {
-        verify(domainDeploymentListener, never()).onDeploymentStart(emptyDomainFileBuilder.getId());
-      }
-    };
+    final Action assertAction = () -> verify(domainDeploymentListener, never()).onDeploymentStart(emptyDomainFileBuilder.getId());
     doSynchronizedDomainDeploymentActionTest(action, assertAction);
   }
 
@@ -2800,47 +2735,35 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
 
   private void doSynchronizedArtifactDeploymentActionTest(final Action deploymentAction, final Action assertAction,
                                                           DeploymentListener domainDeploymentListener, String artifactId) {
-    Thread deploymentServiceThread = new Thread(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          startDeployment();
-        } catch (MuleException e) {
-          throw new RuntimeException("Unable to start deployment service");
-        }
+    Thread deploymentServiceThread = new Thread(() -> {
+      try {
+        startDeployment();
+      } catch (MuleException e) {
+        throw new RuntimeException("Unable to start deployment service");
       }
     });
 
     final boolean[] deployedFromClient = new boolean[1];
 
-    doAnswer(new Answer() {
+    doAnswer(invocation -> {
 
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-
-        Thread deploymentClientThread = new Thread(new Runnable() {
-
-          @Override
-          public void run() {
-            try {
-              deploymentAction.perform();
-            } catch (Exception e) {
-              // Ignore
-            }
-          }
-        });
-
-        deploymentClientThread.start();
-        deploymentClientThread.join();
+      Thread deploymentClientThread = new Thread(() -> {
         try {
-          assertAction.perform();
-        } catch (AssertionError e) {
-          deployedFromClient[0] = true;
+          deploymentAction.perform();
+        } catch (Exception e) {
+          // Ignore
         }
+      });
 
-        return null;
+      deploymentClientThread.start();
+      deploymentClientThread.join();
+      try {
+        assertAction.perform();
+      } catch (AssertionError e) {
+        deployedFromClient[0] = true;
       }
+
+      return null;
     }).when(domainDeploymentListener).onDeploymentStart(artifactId);
 
     deploymentServiceThread.start();

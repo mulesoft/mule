@@ -6,18 +6,16 @@
  */
 package org.mule.issues;
 
-import static org.junit.Assert.assertNull;
-
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.HttpExtensionFuntionalTestCase;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class InOutOutOnlyMessageCopyMule3007TestCase extends FunctionalTestCase {
+public class InOutOutOnlyMessageCopyMule3007TestCase extends HttpExtensionFuntionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");

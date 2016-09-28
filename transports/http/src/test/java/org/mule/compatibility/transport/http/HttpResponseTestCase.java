@@ -11,9 +11,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.extension.socket.api.SocketsExtension;
+import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
@@ -23,11 +25,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
 
-public class HttpResponseTestCase extends FunctionalTestCase {
+public class HttpResponseTestCase extends ExtensionFunctionalTestCase {
 
   private static final String HTTP_BODY = "<html><head></head><body><p>This is the response body</p></body></html>";
 
@@ -36,6 +39,11 @@ public class HttpResponseTestCase extends FunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
+  @Override
+  protected Class<?>[] getAnnotatedExtensionClasses() {
+    return new Class[] {SocketsExtension.class, org.mule.extension.http.internal.HttpConnector.class};
+  }
 
   @Override
   protected String getConfigFile() {
@@ -106,6 +114,7 @@ public class HttpResponseTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("Currently not supported: Builders meant to be replaced by DW.")
   public void headersAreAddedWithGlobalResponseBuilderFromHttpModule() throws Exception {
     assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/global");
   }
@@ -116,6 +125,7 @@ public class HttpResponseTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("Currently not supported: Builders meant to be replaced by DW.")
   public void headersAreAddedWithGlobalErrorResponseBuilderFromHttpModule() throws Exception {
     assertHeaderInResponse("http://localhost:" + dynamicPort2.getNumber() + "/globalError");
   }

@@ -2,19 +2,21 @@
 <mule
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="http://www.mulesoft.org/schema/mule/core"
-        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
         xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
         xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+		http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <configuration shutdownTimeout="${contextShutdownTimeout}"/>
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${httpPort}"/>
+    <httpn:listener-config name="listenerConfig">
+    	<httpn:listener-connection host="localhost" port="${httpPort}"/>
+    </httpn:listener-config>
 
     <flow name="staticComponentFlow">
-        <http:listener path="staticComponent" config-ref="listenerConfig"/>
+        <httpn:listener path="staticComponent" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <static-component>
             <return-data>staticComponentResponse</return-data>
@@ -22,7 +24,7 @@
     </flow>
 
     <flow name="scriptComponentFlow">
-        <http:listener path="scriptComponent" config-ref="listenerConfig"/>
+        <httpn:listener path="scriptComponent" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <script:component>
             <script:script engine="groovy">return &quot;scriptComponentResponse&quot;;</script:script>
@@ -30,7 +32,7 @@
     </flow>
 
     <flow name="expressionTransformerFlow">
-        <http:listener path="expressionTransformer" config-ref="listenerConfig"/>
+        <httpn:listener path="expressionTransformer" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.shutdown.AbstractShutdownTimeoutRequestResponseTestCase$BlockMessageProcessor"/>
         <expression-transformer>
             <return-argument expression="return &quot;expressionTransformerResponse&quot;;" />

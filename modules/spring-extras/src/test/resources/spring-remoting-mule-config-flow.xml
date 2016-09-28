@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-              http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
     <spring:bean id="doSpringWork"
         class="org.mule.runtime.module.spring.remoting.DoSomeWork" />
@@ -19,7 +19,9 @@
     <custom-transformer name="springOutputXform"
         class="org.mule.runtime.module.spring.remoting.ObjectToRemoteInvocationResultTransformer" />
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
 
 
     <!-- SpringHttpInvokerComponent will receive a RemoteInvocation and execute 
@@ -30,7 +32,7 @@
             a byte[] from Http into a RemoteInvocation. Use springOutputXform to convert 
             a Object from the Mule pipeline into a RemoteInvocationResult and then into 
             a byte[]. -->
-        <http:listener path="springService" config-ref="listenerConfig"/>
+        <httpn:listener path="springService" config-ref="listenerConfig"/>
         <transformer ref="springInputXform" />
         <response>
             <transformer ref="springOutputXform" />

@@ -10,15 +10,18 @@ import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-10633")
 public class HttpSharePortTestCase extends DomainFunctionalTestCase {
 
   public static final String HELLO_WORLD_SERVICE_APP = "helloWorldServiceApp";

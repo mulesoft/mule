@@ -13,7 +13,9 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.io.IOException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 
+@Ignore("MULE-10633")
 public class HttpsSharePortTestCase extends HttpSharePortTestCase {
 
   private DefaultTlsContextFactory tlsContextFactory;

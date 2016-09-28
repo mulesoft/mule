@@ -2,26 +2,28 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+           http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port}"/>
+    <httpn:listener-config name="listenerConfig">
+        <httpn:listener-connection host="localhost" port="${port}"/>
+    </httpn:listener-config>
 
     <flow name="innerFlow">
-        <http:listener path="innertest" config-ref="listenerConfig"/>
+        <httpn:listener path="innertest" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$InnerFlowCountDownProcessor"/>
     </flow>
 
     <flow name="innerFlowRequestResponse">
-        <http:listener path="innerrequestresponsetest" config-ref="listenerConfig"/>
+        <httpn:listener path="innerrequestresponsetest" config-ref="listenerConfig"/>
         <custom-processor class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$InnerFlowCountDownProcessor"/>
     </flow>
 
     <flow name="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow">
-        <http:listener path="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow" config-ref="listenerConfig"/>
+        <httpn:listener path="catchExceptionJavaComponentToJavaComponentRequestResponseInnerFlow" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$SendInnerFlowThrowExceptionJavaComponent"/>
         <error-handler>
             <on-error-continue>
@@ -32,7 +34,7 @@
     </flow>
 
     <flow name="catchExceptionJavaComponentToJavaComponent">
-        <http:listener path="catchExceptionJavaComponentToJavaComponent" config-ref="listenerConfig"/>
+        <httpn:listener path="catchExceptionJavaComponentToJavaComponent" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
         <error-handler>
             <on-error-continue>
@@ -43,7 +45,7 @@
     </flow>
 
     <flow name="catchExceptionJavaComponentToMessageProcessor">
-        <http:listener path="catchExceptionJavaComponentToMessageProcessor" config-ref="listenerConfig"/>
+        <httpn:listener path="catchExceptionJavaComponentToMessageProcessor" config-ref="listenerConfig"/>
         <component class="org.mule.test.integration.client.MuleClientDispatchExceptionHandlingTestCase$DispatchInnerFlowThrowExceptionJavaComponent"/>
         <error-handler>
             <on-error-continue>
@@ -61,7 +63,7 @@
     </spring:beans>
 
     <flow name="catchExceptionMessageProcessorToJavaComponent">
-        <http:listener path="catchExceptionMessageProcessorToJavaComponent" config-ref="listenerConfig"/>
+        <httpn:listener path="catchExceptionMessageProcessorToJavaComponent" config-ref="listenerConfig"/>
         <processor ref="myProcessor"/>
         <error-handler>
             <on-error-continue>
@@ -72,7 +74,7 @@
     </flow>
 
     <flow name="catchExceptionMessageProcessorToMessageProcessor">
-        <http:listener path="catchExceptionMessageProcessorToMessageProcessor" config-ref="listenerConfig"/>
+        <httpn:listener path="catchExceptionMessageProcessorToMessageProcessor" config-ref="listenerConfig"/>
         <processor ref="myProcessor"/>
         <error-handler>
             <on-error-continue>

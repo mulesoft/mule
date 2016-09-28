@@ -6,12 +6,12 @@
  */
 package org.mule.test.integration.domain.classloader;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.listener.Callback;
+
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.rule.UseMuleLog4jContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -20,10 +20,11 @@ import org.mule.test.infrastructure.deployment.FakeMuleServer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.hamcrest.core.Is;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-10633, also, this uses FakeMuleServer which does not support loading extensions")
 public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleServerTestCase {
 
   public static final String HELLO_WORLD_APP = "hello-world";
@@ -48,18 +49,12 @@ public class ConnectorLevelMessageDispatchingTestCase extends AbstractFakeMuleSe
   private void verifyAppProcessMessageWithAppClassLoader(FakeMuleServer fakeMuleServer, String appName, String requestUrl)
       throws MuleException {
     MuleContext applicationContext = fakeMuleServer.findApplication(appName).getMuleContext();
-    final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<ClassLoader>();
+    final AtomicReference<ClassLoader> executionClassLoader = new AtomicReference<>();
     FlowExecutionListener flowExecutionListener = new FlowExecutionListener(applicationContext);
-    flowExecutionListener.addListener(new Callback<Event>() {
-
-      @Override
-      public void execute(Event source) {
-        executionClassLoader.set(Thread.currentThread().getContextClassLoader());
-      }
-    });
+    flowExecutionListener.addListener(source -> executionClassLoader.set(Thread.currentThread().getContextClassLoader()));
     applicationContext.getClient().send(String.format(requestUrl, dynamicPort.getNumber()), "test-data", null);
     flowExecutionListener.waitUntilFlowIsComplete();
-    assertThat(executionClassLoader.get(), Is.is(applicationContext.getExecutionClassLoader()));
+    assertThat(executionClassLoader.get(), is(applicationContext.getExecutionClassLoader()));
   }
 
 

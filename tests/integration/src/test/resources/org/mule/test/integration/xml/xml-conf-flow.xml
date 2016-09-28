@@ -2,12 +2,14 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
 
-    <http:listener-config name="listenerConfig" host="localhost" port="${port1}"/>
+    <httpn:listener-config name="listenerConfig">
+    	<httpn:listener-connection host="localhost" port="${port1}"/>
+    </httpn:listener-config>
 
     <mule-xml:namespace-manager includeConfigNamespaces="true">
         <mule-xml:namespace prefix="simple" uri="http://simple.component.mule.org/"/>
@@ -30,7 +32,7 @@
     </mule-xml:xpath-filter>
 
     <flow name="xmlParseFlow">
-        <http:listener path="xml-parse" config-ref="listenerConfig"/>
+        <httpn:listener path="xml-parse" config-ref="listenerConfig"/>
         <transformer ref="InputStreamToDOM"/>
         <message-filter throwOnUnaccepted="true">
             <filter ref="XPathFilter" />
@@ -39,7 +41,7 @@
     </flow>
 
     <flow name="xmlXsltParseFlow">
-        <http:listener path="xml-xslt-parse" config-ref="listenerConfig"/>
+        <httpn:listener path="xml-xslt-parse" config-ref="listenerConfig"/>
         <transformer ref="InputStreamToDOM"/>
         <transformer ref="TestXslTransformer"/>
         <mule-xml:xslt-transformer
@@ -52,7 +54,7 @@
     </flow>
 
     <flow name="validateFlow">
-        <http:listener path="validate" config-ref="listenerConfig"/>
+        <httpn:listener path="validate" config-ref="listenerConfig"/>
         <transformer ref="InputStreamToDOM"/>
         <message-filter throwOnUnaccepted="true">
             <mule-xml:schema-validation-filter schemaLocations="org/mule/test/integration/xml/schema1.xsd, org/mule/test/integration/xml/schema2.xsd"/>
@@ -61,7 +63,7 @@
     </flow>
 
     <flow name="extractor">
-        <http:listener path="extract" config-ref="listenerConfig" />
+        <httpn:listener path="extract" config-ref="listenerConfig" />
         <transformer ref="InputStreamToDOM"/>
         <mule-xml:xpath-extractor-transformer expression="/this/is" resultType="STRING"/>
     </flow>

@@ -13,17 +13,19 @@ import static org.junit.Assert.assertThat;
 import org.mule.functional.junit4.DomainFunctionalTestCase;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder;
 import org.mule.runtime.module.http.api.requester.HttpRequesterConfig;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore("MULE-10633")
 public class TlsSharedContextTestCase extends DomainFunctionalTestCase {
 
   private static final String DATA = "data";
