@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.parameter;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.mule.metadata.utils.MetadataTypeUtils.getDefaultValue;
 import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder.fromChildConfiguration;
@@ -14,7 +13,6 @@ import static org.mule.runtime.config.spring.dsl.api.AttributeDefinition.Builder
 import static org.mule.runtime.config.spring.dsl.api.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.acceptsReferences;
 import static org.mule.runtime.extension.api.introspection.declaration.type.TypeUtils.getExpressionSupport;
-
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
@@ -93,7 +91,7 @@ public class ObjectTypeParameterParser extends ExtensionDefinitionParser {
 
     Optional<DslElementSyntax> fieldDsl = typeDsl.getChild(fieldName);
     if (!fieldDsl.isPresent() && !isParameterGroup(objectField)) {
-      throw new IllegalArgumentException(format("The field [%s] does not belong to the structure of [%s]", fieldName, name));
+      return;
     }
 
     fieldType.accept(new MetadataTypeVisitor() {
