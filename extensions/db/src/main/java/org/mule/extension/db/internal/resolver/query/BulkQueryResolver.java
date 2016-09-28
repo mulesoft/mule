@@ -41,7 +41,7 @@ public class BulkQueryResolver extends AbstractQueryResolver<BulkQueryDefinition
         Optional<ParameterType> parameterType = definition.getParameterType(paramName);
         if (parameterType.isPresent()) {
           queryParams
-              .add(new DefaultInputQueryParam(inputParam.getIndex(), parameterType.get().getType().getDbType(), null, paramName));
+              .add(new DefaultInputQueryParam(inputParam.getIndex(), parameterType.get().getDbType(), null, paramName));
           return;
         }
       }

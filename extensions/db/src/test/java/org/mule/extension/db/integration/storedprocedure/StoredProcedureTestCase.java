@@ -17,11 +17,9 @@ import java.util.Map;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10511")
 public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
 
   public StoredProcedureTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
@@ -33,6 +31,7 @@ public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
     testDatabase.createStoredProcedureDoubleMyInt(getDefaultDataSource());
     testDatabase.createStoredProcedureConcatenateStrings(getDefaultDataSource());
     testDatabase.createStoredProcedureCountRecords(getDefaultDataSource());
+    testDatabase.createStoredProcedureMultiplyInts(getDefaultDataSource());
   }
 
   @Parameterized.Parameters

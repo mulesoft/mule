@@ -26,6 +26,10 @@ public abstract class AbstractStoredProcedureReturningStreamingResultsetsTestCas
   @Test
   public void getResultSet() throws Exception {
     Message response = flowRunner("getResultSet").run().getMessage();
+    assertResponse(response);
+  }
+
+  protected void assertResponse(Message response) {
     assertMessageContains(response, getAllPlanetRecords());
   }
 

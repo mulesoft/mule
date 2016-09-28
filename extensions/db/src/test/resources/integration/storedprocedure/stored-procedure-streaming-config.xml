@@ -8,9 +8,9 @@
     <flow name="streamingInOutParam">
         <db:stored-procedure streaming="true">
             <db:sql>{ call doubleMyInt(:myInt) }</db:sql>
-            <db:input-parameters>
-                <db:inout-param paramName="myInt" value="3"/>
-            </db:input-parameters>
+            <db:in-out-parameters>
+                <db:in-out-parameter key="myInt" value="3"/>
+            </db:in-out-parameters>
         </db:stored-procedure>
     </flow>
 

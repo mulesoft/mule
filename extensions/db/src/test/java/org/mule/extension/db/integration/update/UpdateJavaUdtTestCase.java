@@ -19,11 +19,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10511")
 public class UpdateJavaUdtTestCase extends AbstractDbIntegrationTestCase {
 
   public UpdateJavaUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {

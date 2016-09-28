@@ -67,7 +67,7 @@ public class DefaultParamTypeResolver implements ParamTypeResolver {
   }
 
   private Map<Integer, DbType> getParamTypesFromQueryTemplate(QueryTemplate queryTemplate) {
-    Map<Integer, DbType> paramTypes = new HashMap<Integer, DbType>();
+    Map<Integer, DbType> paramTypes = new HashMap<>();
 
     for (QueryParam queryParam : queryTemplate.getParams()) {
       paramTypes.put(queryParam.getIndex(), queryParam.getType());

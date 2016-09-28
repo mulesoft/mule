@@ -126,7 +126,7 @@ abstract class AbstractQueryResolver<T extends StatementDefinition> implements Q
         .anyMatch(type -> type == UnknownDbType.getInstance() || type instanceof DynamicDbType);
   }
 
-  private DbTypeManager createTypeManager(DbConnector connector, DbConnection connection) {
+  protected DbTypeManager createTypeManager(DbConnector connector, DbConnection connection) {
     List<DbTypeManager> typeManagers = new LinkedList<>();
     typeManagers.add(connector.getTypeManager());
 

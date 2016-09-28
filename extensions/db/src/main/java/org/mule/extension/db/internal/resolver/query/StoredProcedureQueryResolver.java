@@ -19,6 +19,8 @@ import org.mule.extension.db.internal.domain.param.DefaultOutputQueryParam;
 import org.mule.extension.db.internal.domain.param.QueryParam;
 import org.mule.extension.db.internal.domain.query.QueryTemplate;
 import org.mule.extension.db.internal.domain.type.DbType;
+import org.mule.extension.db.internal.domain.type.DbTypeManager;
+import org.mule.extension.db.internal.domain.type.DynamicDbType;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,24 +34,30 @@ public class StoredProcedureQueryResolver extends ParameterizedQueryResolver<Sto
 
     return new QueryTemplate(queryTemplate.getSqlText(),
                              queryTemplate.getType(),
-                             resolveParamTypes(queryTemplate, call),
+                             resolveParamTypes(queryTemplate, call, connector, connection),
                              queryTemplate.isDynamic());
   }
 
-  private List<QueryParam> resolveParamTypes(QueryTemplate queryTemplate, StoredProcedureCall call) {
+  private List<QueryParam> resolveParamTypes(QueryTemplate queryTemplate, StoredProcedureCall call, DbConnector connector,
+                                             DbConnection connection) {
+    DbTypeManager typeManager = createTypeManager(connector, connection);
     return queryTemplate.getParams().stream().map(param -> {
       String paramName = param.getName();
-
-      Optional<Object> parameterValue = call.getInputParameter(paramName);
-      if (parameterValue.isPresent()) {
-        return new DefaultInputQueryParam(param.getIndex(), param.getType(), parameterValue.get(), paramName);
-      }
 
       Optional<OutputParameter> outputParameter = call.getOutputParameter(paramName);
       if (outputParameter.isPresent()) {
         final ParameterType parameterType = outputParameter.get();
-        DbType type = parameterType.getType() != null ? parameterType.getType().getDbType() : param.getType();
+        DbType type = parameterType.getDbType() != null ? parameterType.getDbType() : param.getType();
+        if (type instanceof DynamicDbType) {
+          type = typeManager.lookup(connection, type.getName());
+        }
+
         return new DefaultOutputQueryParam(param.getIndex(), type, paramName);
+      }
+
+      Optional<Object> parameterValue = call.getInputParameter(paramName);
+      if (parameterValue.isPresent()) {
+        return new DefaultInputQueryParam(param.getIndex(), param.getType(), parameterValue.get(), paramName);
       }
 
       parameterValue = call.getInOutParameter(paramName);
@@ -59,5 +67,15 @@ public class StoredProcedureQueryResolver extends ParameterizedQueryResolver<Sto
 
       throw new IllegalArgumentException(format("Parameter '%s' was not bound for query '%s'", paramName, call.getSql()));
     }).collect(toCollection(LinkedList::new));
+  }
+
+  @Override
+  protected Optional<Object> getInputParameter(StoredProcedureCall statementDefinition, String parameterName) {
+    Optional<Object> value = super.getInputParameter(statementDefinition, parameterName);
+    if (!value.isPresent()) {
+      value = statementDefinition.getInOutParameter(parameterName);
+    }
+
+    return value;
   }
 }

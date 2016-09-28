@@ -7,9 +7,10 @@
 package org.mule.extension.db.api.param;
 
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
+import org.mule.extension.db.internal.domain.type.DbType;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Parameter;
-import org.mule.runtime.extension.api.annotation.param.Optional;
+import org.mule.runtime.extension.api.annotation.ParameterGroup;
 
 /**
  * Allows specifying the type of a given parameter
@@ -20,9 +21,9 @@ public class ParameterType {
 
   public ParameterType() {}
 
-  public ParameterType(String key, JdbcType type) {
+  public ParameterType(String key, TypeClassifier typeClassifier) {
     this.key = key;
-    this.type = type;
+    this.typeClassifier = typeClassifier;
   }
 
   /**
@@ -32,19 +33,14 @@ public class ParameterType {
   @Expression(NOT_SUPPORTED)
   private String key;
 
-  /**
-   * Parameter type name.
-   */
-  @Parameter
-  @Optional
-  @Expression(NOT_SUPPORTED)
-  private JdbcType type;
+  @ParameterGroup
+  private TypeClassifier typeClassifier;
 
   public String getKey() {
     return key;
   }
 
-  public JdbcType getType() {
-    return type;
+  public DbType getDbType() {
+    return typeClassifier.getDbType();
   }
 }

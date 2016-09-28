@@ -65,7 +65,7 @@ public class StoredProcedureCall extends ParameterizedStatementDefinition<Stored
   }
 
   public java.util.Optional<OutputParameter> getOutputParameter(String name) {
-    return outputParameters.stream().filter(p -> p.equals(name)).findFirst();
+    return outputParameters.stream().filter(p -> p.getKey().equals(name)).findFirst();
   }
 
   public java.util.Optional<Object> getInOutParameter(String name) {
