@@ -34,12 +34,14 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
+import org.mule.runtime.extension.api.util.NameUtils;
 import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -95,7 +97,7 @@ public final class NameClashModelValidator implements ModelValidator {
         public void onOperation(HasOperationModels owner, OperationModel model) {
           validateOperation(model);
           registerNamedObject(model);
-          validateSingularizingClash(model);
+          validateSingularizedNameClash(model);
         }
 
         @Override
@@ -116,7 +118,7 @@ public final class NameClashModelValidator implements ModelValidator {
         private void defaultValidation(ParameterizedModel model) {
           validateParameterNames(model);
           registerNamedObject(model);
-          validateSingularizingClash(model);
+          validateSingularizedNameClash(model);
         }
 
         private void registerNamedObject(Named named) {
@@ -124,6 +126,7 @@ public final class NameClashModelValidator implements ModelValidator {
         }
       }.walk(extensionModel);
 
+      validateSingularizeNameClashesWithTopLevels();
       validateNameClashes(namedObjects, topLevelParameters.values(),
                           topLevelParameters.values().stream().map(TypedTopLevelParameter::new).collect(toSet()));
     }
@@ -191,49 +194,22 @@ public final class NameClashModelValidator implements ModelValidator {
 
     private void validateNameClashes(Collection<? extends Named>... collections) {
       Multimap<String, Named> names = LinkedListMultimap.create();
-      stream(collections).flatMap(Collection::stream).forEach(named -> names.put(named.getName(), named));
+      stream(collections).flatMap(Collection::stream).forEach(named -> names.put(NameUtils.hyphenize(named.getName()), named));
+      validateNameClashBetweenElements(names);
+    }
 
-      Map<String, Named> singularClashes = names
-          .entries()
-          .stream()
-          .filter(e -> singularizedObjects.keySet().contains(e.getKey()))
-          .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-      if (!singularClashes.isEmpty()) {
-        StringBuilder builder = new StringBuilder(format("Extension '%s' contains %d parameters that clash when singularized. ",
-                                                         extensionModel.getName(), singularClashes.size()));
-
-        builder.append(singularClashes.keySet()
-            .stream()
-            .map(k -> {
-              DescribedParameter reference = singularizedObjects.get(k);
-              Collection<Named> namedElements = names.get(k);
-              if (!namedElements.isEmpty()) {
-                Named next = namedElements.iterator().next();
-                return format(
-                              "%s name '%s' contains parameter '%s' that clash when singularized with parameter '%s' in '%s'",
-                              reference.parent.getDescription(), reference.parent.getName(), reference.getName(), k,
-                              next.getName());
-              } else {
-                return "";
-              }
-            })
-            .collect(joining(", ")));
-
-        throw new IllegalModelDefinitionException(builder.toString());
-      }
-
+    private void validateNameClashBetweenElements(Multimap<String, Named> names) {
       names.asMap().entrySet().forEach(entry -> {
         List<Named> values = (List<Named>) entry.getValue();
         if (values.size() > 1) {
           Set<String> offendingTypes = values.stream().map(Named::getName).collect(toSet());
           StringBuilder errorMessage =
-              new StringBuilder(format("Extension '%s' contains %d ", extensionModel.getName(), values.size()));
+              new StringBuilder(format("Extension '%s' contains %d components ", extensionModel.getName(), values.size()));
 
           final int top = offendingTypes.size() - 1;
           int i = 0;
           for (String offender : offendingTypes) {
-            errorMessage.append(offender);
+            errorMessage.append(format("'%s'", offender));
 
             if (i + 1 == top) {
               errorMessage.append(" and ");
@@ -244,10 +220,32 @@ public final class NameClashModelValidator implements ModelValidator {
             i++;
           }
 
-          errorMessage.append(format(" which name is '%s'. Names should be unique", entry.getKey()));
+          errorMessage.append(format(" which alias name is '%s'. Names should be unique", entry.getKey()));
           throw new IllegalModelDefinitionException(errorMessage.toString());
         }
       });
+    }
+
+    private void validateSingularizeNameClashesWithTopLevels() {
+      Map<String, Collection<TopLevelParameter>> singularClashes = topLevelParameters.keySet().stream()
+          .filter(k -> singularizedObjects.keySet().contains(k) && !topLevelParameters.get(k).isEmpty())
+          .collect(toMap(k -> k, topLevelParameters::get));
+
+      if (!singularClashes.isEmpty()) {
+        List<String> errorMessages = new ArrayList<>();
+        singularClashes.entrySet().forEach(e -> {
+          DescribedParameter reference = singularizedObjects.get(e.getKey());
+          e.getValue().forEach(tp -> errorMessages.add(format(
+                                                              "%s '%s' contains parameter '%s' that clash when singularized with parameter '%s' from '%s'",
+                                                              reference.parent.getDescription(), reference.parent.getName(),
+                                                              reference.getName(),
+                                                              tp.getName(), tp.ownerType)));
+        });
+
+        throw new IllegalModelDefinitionException(format("Extension '%s' contains %d parameters that clash when singularized. %s",
+                                                         extensionModel.getName(), singularClashes.size(),
+                                                         errorMessages.stream().collect(joining(", "))));
+      }
     }
 
     private void validateClash(String existingNamingModel, String newNamingModel, String typeOfExistingNamingModel,
@@ -259,64 +257,45 @@ public final class NameClashModelValidator implements ModelValidator {
       }
     }
 
-    private void validateSingularizingClash(ParameterizedModel model) {
+    private void validateSingularizedNameClash(ParameterizedModel model) {
       List<ParameterModel> parameters = model.getParameterModels();
       parameters.forEach(
                          p -> p.getType().accept(new MetadataTypeVisitor() {
 
                            @Override
                            public void visitArrayType(ArrayType arrayType) {
-                             validateSingular();
+                             validateSingularizeNameClashWithOperationParameters();
                            }
 
                            @Override
                            public void visitDictionary(DictionaryType dictionaryType) {
-                             validateSingular();
+                             validateSingularizeNameClashWithOperationParameters();
                            }
 
-                           private void validateSingular() {
+                           private void validateSingularizeNameClashWithOperationParameters() {
                              String singularName = singularize(p.getName());
                              boolean allowInline = p.getModelProperty(XmlHintsModelProperty.class)
                                  .map(XmlHintsModelProperty::allowsInlineDefinition)
                                  .orElse(true);
 
-                             if (singularName.equals(p.getName()) || !allowInline) {
-                               return;
-                             }
+                             if (!singularName.equals(p.getName()) && allowInline) {
+                               singularizedObjects.put(singularName, new DescribedParameter(p, model));
+                               Optional<ParameterModel> clashParam =
+                                   parameters.stream().filter(p -> p.getName().equals(singularName)).findAny();
+                               String describedReference = new DescribedReference<>(model).getDescription();
+                               Class<Object> type = getType(p.getType());
 
-                             Optional<ParameterModel> clashingParam =
-                                 parameters.stream().filter(p -> p.getName().equals(singularName)).findAny();
-                             String describedReference = new DescribedReference<>(model).getDescription();
-                             Class<Object> type = getType(p.getType());
-                             String extensionName = extensionModel.getName();
-
-                             if (clashingParam.isPresent()) {
-                               throw new IllegalModelDefinitionException(format("Extension '%s' defines an %s of name '%s' which contains a '%s' "
-                                   + "parameter '%s' that when singularized clashes with another "
-                                   + "parameter '%s' in the same %s", extensionName,
-                                                                                describedReference, model.getName(),
-                                                                                type.getSimpleName(),
-                                                                                p.getName(), clashingParam.get().getName(),
-                                                                                describedReference));
-                             }
-
-                             Optional<String> nameClash =
-                                 topLevelParameters.keySet().stream().filter(name -> name.equals(singularName)).findAny();
-                             if (nameClash.isPresent()) {
-                               Collection<TopLevelParameter> tps = topLevelParameters.get(nameClash.get());
-                               if (!tps.isEmpty()) {
-                                 TopLevelParameter tp = tps.iterator().next();
+                               if (clashParam.isPresent()) {
                                  throw new IllegalModelDefinitionException(
                                                                            format("Extension '%s' defines an %s of name '%s' which contains a '%s' parameter '%s' that when singularized "
-                                                                               + "clashes with a parameter '%s' defined in the %s '%s'",
-                                                                                  extensionName,
-                                                                                  describedReference, model.getName(),
-                                                                                  type.getSimpleName(), p.getName(),
-                                                                                  tp.parameterModel.getName(), tp.owner,
-                                                                                  tp.ownerType));
+                                                                               + "clashes with another parameter '%s' in the same %s",
+                                                                                  extensionModel.getName(), describedReference,
+                                                                                  model.getName(), type.getSimpleName(),
+                                                                                  p.getName(), clashParam.get().getName(),
+                                                                                  describedReference));
                                }
                              }
-                             singularizedObjects.put(singularName, new DescribedParameter(p, model));
+
                            }
                          }));
     }
