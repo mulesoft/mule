@@ -42,10 +42,11 @@ public class ArtifactClassificationTypeResolver {
   /**
    * Creates an instance of this resolver.
    *
-   * @param dependencyResolver {@link DependencyResolver} to get artifact output.
+   * @param dependencyResolver {@link DependencyResolver} to get artifact output. Non null.
    */
   public ArtifactClassificationTypeResolver(DependencyResolver dependencyResolver) {
     checkNotNull(dependencyResolver, "dependencyResolver cannot be null");
+
     this.dependencyResolver = dependencyResolver;
   }
 
@@ -70,11 +71,11 @@ public class ArtifactClassificationTypeResolver {
   }
 
   private boolean isMuleModule(Artifact artifact) {
-    URL url = resolveRootArtifactUrls(artifact);
-    if (url == null) {
+    try {
+      return new URLClassLoader(new URL[] {resolveRootArtifactUrls(artifact)}, null).getResource(MULE_MODULE_PROPERTIES) != null;
+    } catch (ArtifactResolutionException e) {
       return false;
     }
-    return new URLClassLoader(new URL[] {url}, null).getResource(MULE_MODULE_PROPERTIES) != null;
   }
 
   /**
@@ -82,17 +83,15 @@ public class ArtifactClassificationTypeResolver {
    *
    * @param artifact {@link Artifact} being classified
    * @return {@link List} of {@link URL}s to be added to class loader
+   * @throws {@link ArtifactResolutionException} if the artifact doesn't have a JAR output file (target/classes when not packaged)
    */
-  private URL resolveRootArtifactUrls(Artifact artifact) {
+  private URL resolveRootArtifactUrls(Artifact artifact) throws ArtifactResolutionException {
     final DefaultArtifact jarArtifact = new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(),
                                                             JAR_EXTENSION, JAR_EXTENSION, artifact.getVersion());
     try {
       return dependencyResolver.resolveArtifact(jarArtifact).getArtifact().getFile().toURI().toURL();
     } catch (MalformedURLException e) {
       throw new IllegalStateException("Couldn't generate the URL for artifact: " + artifact);
-    } catch (ArtifactResolutionException e) {
-      logger.debug("'{}' artifact doesn't generate a JAR output", artifact);
-      return null;
     }
   }
 }

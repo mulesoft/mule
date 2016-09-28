@@ -90,7 +90,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   /**
    * Creates an instance of the classifier.
    *
-   * @param dependencyResolver {@link DependencyResolver} to resolve dependencies
+   * @param dependencyResolver {@link DependencyResolver} to resolve dependencies. Non null.
+   * @param artifactClassificationTypeResolver {@link ArtifactClassificationTypeResolver} to identify rootArtifact type. Non null.
    */
   public AetherClassPathClassifier(DependencyResolver dependencyResolver,
                                    ArtifactClassificationTypeResolver artifactClassificationTypeResolver) {
@@ -105,11 +106,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * Classifies {@link URL}s and {@link Dependency}s to define how the container, plugins and application class loaders should be
    * created.
    *
-   * @param context {@link ClassPathClassifierContext} to be used during the classification
+   * @param context {@link ClassPathClassifierContext} to be used during the classification. Non null.
    * @return {@link ArtifactUrlClassification} as result with the classification
    */
   @Override
   public ArtifactUrlClassification classify(final ClassPathClassifierContext context) {
+    checkNotNull(context, "context cannot be null");
+
     logger.debug("Building class loaders for rootArtifact: {}", context.getRootArtifact());
 
     List<Dependency> directDependencies;
@@ -610,7 +613,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       if (rootArtifactOutputFile != null) {
         appFiles.add(rootArtifactOutputFile);
       } else {
-        logger.warn("rootArtifact '{}' identified as {} but doesn't have an output JAR", rootArtifact, rootArtifactType);
+        logger.warn("rootArtifact '{}' identified as {} but doesn't have an output {} file", rootArtifact, rootArtifactType,
+                    JAR_EXTENSION);
       }
     } else {
       logger.debug("RootArtifact already classified as plugin or module, excluding it from application classification");
@@ -677,7 +681,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     try {
       return dependencyResolver.resolveArtifact(jarArtifact).getArtifact().getFile();
     } catch (ArtifactResolutionException e) {
-      logger.warn("'{}' rootArtifact output {} couldn't be resolved", rootArtifact, JAR_EXTENSION);
+      logger.warn("'{}' rootArtifact output {} file couldn't be resolved", rootArtifact, JAR_EXTENSION);
       return null;
     }
   }

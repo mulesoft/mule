@@ -27,6 +27,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
+import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
+import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -112,7 +115,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     Dependency compileMuleCoreDep = fooCoreDep.setScope(COMPILE);
     Dependency compileMuleArtifactDep = fooToolsArtifactDep.setScope(COMPILE);
     when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
-        .thenReturn(ArtifactClassificationType.MODULE);
+        .thenReturn(MODULE);
 
     ArtifactDescriptorResult defaultArtifactDescriptorResult = noManagedDependencies();
 
@@ -160,7 +163,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   @Test
   public void pluginSharedLibUrlsNotDeclaredLibraryAsDirectDependency() throws Exception {
     when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
-        .thenReturn(ArtifactClassificationType.PLUGIN);
+        .thenReturn(PLUGIN);
 
     when(context.getSharedPluginLibCoordinates()).thenReturn(newArrayList("org.foo.tools:foo-repository"));
     expectedException.expect(IllegalStateException.class);
@@ -172,7 +175,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   @Test
   public void pluginSharedLibUrlsInvalidCoordiantes() throws Exception {
     when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
-        .thenReturn(ArtifactClassificationType.PLUGIN);
+        .thenReturn(PLUGIN);
 
     when(context.getSharedPluginLibCoordinates()).thenReturn(newArrayList("foo-repository"));
     expectedException.expect(IllegalArgumentException.class);
@@ -183,7 +186,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
   @Test
   public void pluginSharedLibUrlsNoTransitiveNoManageDependenciesNoFilters() throws Exception {
     when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
-        .thenReturn(ArtifactClassificationType.APPLICATION);
+        .thenReturn(APPLICATION);
 
     when(context.getSharedPluginLibCoordinates())
         .thenReturn(newArrayList(derbyDriverDep.getArtifact().getGroupId() + ":" + derbyDriverDep.getArtifact().getArtifactId()));
