@@ -10,19 +10,26 @@ import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 import static java.sql.DriverManager.registerDriver;
 import static java.util.Collections.list;
+import static java.util.Locale.getDefault;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.Driver;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import org.junit.Test;
 
@@ -83,6 +90,39 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     ClassLoader resourceReleaserInstanceClassLoader = (ClassLoader) getClassLoaderMethod.invoke(resourceReleaserInstance);
 
     assertThat(resourceReleaserInstanceClassLoader, is((ClassLoader) classLoader));
+  }
+
+  @Test
+  public void cleanUpResourcesBundleFromDisposedClassLoader() throws Exception {
+    TestArtifactClassLoader classLoader = new TestArtifactClassLoader(
+                                                                      new TestArtifactClassLoader(Thread.currentThread()
+                                                                          .getContextClassLoader()));
+    String resourceReleaserClassLocation = "/".concat(DefaultResourceReleaser.class.getName().replace(".", "/")).concat(".class");
+    classLoader.setResourceReleaserClassLocation(resourceReleaserClassLocation);
+
+    Field cacheListField = ResourceBundle.class.getDeclaredField("cacheList");
+    cacheListField.setAccessible(true);
+    ((Map) cacheListField.get(null)).clear();
+
+    try {
+      ResourceBundle.getBundle("aBundle", getDefault(), classLoader);
+      fail("Found a bundle that is not supposed to present for this test");
+    } catch (MissingResourceException e) {
+      // Expected
+    }
+
+    classLoader.dispose();
+
+    Map actualCacheList = (Map) cacheListField.get(null);
+
+    assertThat(actualCacheList.size(), equalTo(0));
+
+    Field nonExistentBundleField = ResourceBundle.class.getDeclaredField("NONEXISTENT_BUNDLE");
+    nonExistentBundleField.setAccessible(true);
+    ResourceBundle nonExistentBundle = (ResourceBundle) nonExistentBundleField.get(null);
+    Field cacheKeyField = ResourceBundle.class.getDeclaredField("cacheKey");
+    cacheKeyField.setAccessible(true);
+    assertThat(cacheKeyField.get(nonExistentBundle), is(nullValue()));
   }
 
   private interface KeepResourceReleaserInstance {

@@ -12,9 +12,11 @@ import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
 
+import java.lang.reflect.Field;
 import java.sql.Driver;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.ResourceBundle;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -30,6 +32,32 @@ public class DefaultResourceReleaser implements ResourceReleaser {
   @Override
   public void release() {
     deregisterJdbcDrivers();
+
+    cleanUpResourceBundle();
+  }
+
+  private void cleanUpResourceBundle() {
+    try {
+      ResourceBundle.clearCache(this.getClass().getClassLoader());
+    } catch (Exception e) {
+      logger.warn("Couldn't clean up ResourceBundle. This can cause a memory leak.", e);
+    }
+
+    try {
+      // Even the cache is cleaned up there is a reference to a CacheKey that is hold by ResouceBundle.NONEXISTENT_BUNDLE
+      // so we have to cleanup this reference too instead of just leaving it and waiting for a next
+      // ResourceBundle.getBundle() call to a bundle that is missing that would change this reference
+      Field nonExistentBundleField = ResourceBundle.class.getDeclaredField("NONEXISTENT_BUNDLE");
+      nonExistentBundleField.setAccessible(true);
+
+      ResourceBundle resourceBundle = (ResourceBundle) nonExistentBundleField.get(null);
+
+      Field cacheKeyField = ResourceBundle.class.getDeclaredField("cacheKey");
+      cacheKeyField.setAccessible(true);
+      cacheKeyField.set(resourceBundle, null);
+    } catch (Exception e) {
+      logger.warn("Couldn't clean up ResourceBundle references. This can cause a memory leak.", e);
+    }
   }
 
   private void deregisterJdbcDrivers() {
