@@ -12,7 +12,6 @@ import static org.mule.runtime.core.util.Preconditions.checkNotNull;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MANIFEST_FILE_NAME;
-
 import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.extension.api.manifest.ExtensionManifest;
 import org.mule.runtime.module.extension.internal.manager.ExtensionManagerAdapter;
@@ -33,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PluginResourcesResolver {
 
-  private static final String PLUGIN_PROPERTIES = "META-INF/plugin.properties";
+  private static final String PLUGIN_PROPERTIES = "plugin.properties";
   private static final String COMMA_CHARACTER = ",";
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final ExtensionManagerAdapter extensionManager;
