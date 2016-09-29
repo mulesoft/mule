@@ -29,7 +29,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   private static final String DEFAULT_RESOURCE_RELEASER_CLASS_LOCATION =
-      "/org/mule/runtime/module/artifact/classloader/DefaultResourceReleaser.class";
+      "/org/mule/module/artifact/classloader/DefaultResourceReleaser.class";
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
