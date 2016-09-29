@@ -6,8 +6,9 @@
  */
 package org.mule.extension.ftp;
 
-import org.apache.commons.net.ftp.FTPFile;
-import org.junit.rules.TestRule;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import org.mule.extension.AbstractFtpTestHarness;
 import org.mule.extension.FtpTestHarness;
 import org.mule.extension.ftp.api.FtpFileAttributes;
@@ -23,9 +24,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.apache.commons.net.ftp.FTPFile;
+import org.junit.rules.TestRule;
 
 /**
  * Implementation of {@link FtpTestHarness} for classic FTP connections

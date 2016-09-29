@@ -6,9 +6,10 @@
  */
 package org.mule.extension;
 
+import org.mule.extension.ftp.api.FtpFileAttributes;
+
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TestRule;
-import org.mule.extension.ftp.api.FtpFileAttributes;
 
 /**
  * A {@link TestRule} which provides tools and environment for reusing the same test regardless of the remote server type (FTP,
@@ -94,7 +95,7 @@ public interface FtpTestHarness extends TestRule {
   String[] getFileList(String path) throws Exception;
 
   /**
-   * Returns Server Port
+   * @return Returns Server Port
    */
   int getServerPort() throws Exception;
 
