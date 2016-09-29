@@ -55,7 +55,7 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
    * @return an {@link Optional} {@link ParameterType}
    */
   public java.util.Optional<Object> getInputParameter(String name) {
-    return inputParameters.containsKey(name) ? of(inputParameters.get(name)) : empty();
+    return findParameter(inputParameters, name);
   }
 
   protected java.util.Optional<Object> findParameter(Map<String, Object> parameters, String name) {

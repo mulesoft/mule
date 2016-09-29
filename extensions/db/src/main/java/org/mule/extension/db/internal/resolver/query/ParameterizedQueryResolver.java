@@ -23,7 +23,7 @@ public class ParameterizedQueryResolver<T extends ParameterizedStatementDefiniti
         .map(p -> {
           final String parameterName = p.getName();
 
-          Optional<Object> parameterValue = statementDefinition.getInputParameter(parameterName);
+          Optional<Object> parameterValue = getInputParameter(statementDefinition, parameterName);
           if (parameterValue.isPresent()) {
             return new QueryParamValue(parameterName, parameterValue.get());
           } else {
@@ -31,5 +31,9 @@ public class ParameterizedQueryResolver<T extends ParameterizedStatementDefiniti
                                                       parameterName, statementDefinition.getSql()));
           }
         }).collect(toList());
+  }
+
+  protected Optional<Object> getInputParameter(T statementDefinition, String parameterName) {
+    return statementDefinition.getInputParameter(parameterName);
   }
 }

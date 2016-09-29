@@ -10,7 +10,7 @@
             <db:stored-procedure>
                 <db:sql>{ CALL getManagerDetails('Southwest', :out) }</db:sql>
                 <db:output-parameters>
-                    <db:output-parameter name="out" type="CONTACT_DETAILS"/>
+                    <db:output-parameter key="out" customType="CONTACT_DETAILS"/>
                 </db:output-parameters>
             </db:stored-procedure>
 

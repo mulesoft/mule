@@ -7,17 +7,24 @@
 
 package org.mule.extension.db.integration.storedprocedure;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mule.extension.db.integration.TestDbConfig.getResources;
+import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
+import static org.mule.extension.db.integration.TestRecordUtil.getEarthRecord;
+import static org.mule.extension.db.integration.TestRecordUtil.getMarsRecord;
+import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import org.mule.extension.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
+import org.mule.extension.db.integration.model.MySqlTestDatabase;
+import org.mule.runtime.api.message.Message;
 
 import java.util.List;
+import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.runners.Parameterized;
 
-@Ignore("MULE-10511")
 public class StoredProcedureReturningResultsetsTestCase extends AbstractStoredProcedureReturningStreamingResultsetsTestCase {
 
   public StoredProcedureReturningResultsetsTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
@@ -32,6 +39,21 @@ public class StoredProcedureReturningResultsetsTestCase extends AbstractStoredPr
   @Override
   protected String[] getFlowConfigurationResources() {
     return new String[] {"integration/storedprocedure/stored-procedure-returning-resultsets-config.xml"};
+  }
+
+  @Override
+  protected void assertResponse(Message response) {
+    Map payload = (Map) response.getPayload().getValue();
+
+    if (testDatabase instanceof MySqlTestDatabase) {
+      assertThat(payload.size(), equalTo(3));
+      assertThat(payload.get("updateCount1"), equalTo(0));
+    } else {
+      assertThat(payload.size(), equalTo(2));
+    }
+
+    assertRecords(payload.get("resultSet1"), getVenusRecord());
+    assertRecords(payload.get("resultSet2"), getEarthRecord(), getMarsRecord());
   }
 
   @Override

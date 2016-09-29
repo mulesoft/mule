@@ -15,7 +15,10 @@
             <set-payload value="#[payload.get(0)['DETAILS']]"/>
 
             <db:update>
-                <db:sql>update REGION_MANAGERS set DETAILS = #[payload] where REGION_NAME = 'Northwest'</db:sql>
+                <db:sql>update REGION_MANAGERS set DETAILS = :details where REGION_NAME = 'Northwest'</db:sql>
+                <db:input-parameters>
+                    <db:input-parameter key="details" value="#[payload]"/>
+                </db:input-parameters>
             </db:update>
 
             <db:select>

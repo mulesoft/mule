@@ -57,13 +57,13 @@ public class DbPoolingProfile implements DatabasePoolingProfile {
   private int preparedStatementCacheSize = 5;
 
   /**
-   * The number of milliseconds a client trying to obtain a connection waits for it to be checked-in or acquired when the pool is
+   * The amount of time a client trying to obtain a connection waits for it to be acquired when the pool is
    * exhausted. Zero (default) means wait indefinitely
    */
   @Parameter
-  @Optional(defaultValue = "30")
+  @Optional(defaultValue = "0")
   @Expression(NOT_SUPPORTED)
-  private int maxWait = 30;
+  private int maxWait = 0;
 
   /**
    * A {@link TimeUnit} which qualifies the {@link #maxWait}.
