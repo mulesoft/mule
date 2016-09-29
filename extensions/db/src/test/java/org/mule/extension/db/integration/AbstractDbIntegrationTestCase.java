@@ -19,11 +19,11 @@ import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
-
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
+import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.connection.DbConnectionProvider;
 import org.mule.functional.junit4.FlowRunner;
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
@@ -40,6 +40,7 @@ import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.registry.RegistrationException;
+import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.runtime.ConfigurationProvider;
@@ -83,11 +84,12 @@ public abstract class AbstractDbIntegrationTestCase extends MuleArtifactFunction
   protected DataSource getDefaultDataSource(String configName) {
     try {
       ConfigurationProvider configurationProvider = muleContext.getRegistry().get(configName);
-      DbConnectionProvider connectionProvider =
-          (DbConnectionProvider) configurationProvider
+      ConnectionProviderWrapper<DbConnection> connectionProviderWrapper =
+          (ConnectionProviderWrapper<DbConnection>) configurationProvider
               .get(testEvent())
               .getConnectionProvider().get();
-      return connectionProvider.getConfiguredDataSource();
+
+      return ((DbConnectionProvider) connectionProviderWrapper.getDelegate()).getConfiguredDataSource();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

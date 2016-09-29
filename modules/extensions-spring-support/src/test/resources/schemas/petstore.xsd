@@ -144,6 +144,7 @@
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-service-threading-profile"></xs:element>
                         <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
                     </xs:sequence>

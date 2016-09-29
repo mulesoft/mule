@@ -63,10 +63,10 @@ final class ConnectionProviderSchemaDelegate {
     choice.setMinOccurs(ZERO);
     choice.setMaxOccurs(UNBOUNDED);
 
+    builder.addRetryPolicy(choice);
     ConnectionManagementType managementType = providerModel.getConnectionManagementType();
     if (managementType == POOLING || managementType == CACHED) {
       addValidationFlag(providerType);
-      builder.addRetryPolicy(choice);
     }
     if (managementType == POOLING) {
       addConnectionProviderPoolingProfile(choice);

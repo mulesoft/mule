@@ -11,8 +11,8 @@ import static org.hamcrest.Matchers.is;
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionExceptionCode;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
-import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.extension.api.annotation.Alias;
@@ -34,6 +34,7 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
 
   public static final String CONNECTION_FAIL = "Connection fail";
   public static final String CONNECTION_FAIL_DOT = "Connection fail.";
+
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
@@ -91,13 +92,13 @@ public class PetStoreRetryPolicyConnectionTestCase extends ExtensionFunctionalTe
 
   @Alias("valid")
   public static class PooledPetStoreConnectionProviderWithValidConnection extends PetStoreConnectionProvider<PetStoreClient>
-      implements PoolingConnectionProvider<PetStoreClient> {
+      implements ConnectionProvider<PetStoreClient> {
 
   }
 
   @Alias("invalid")
   public static class PooledPetStoreConnectionProviderWithFailureInvalidConnection
-      extends PetStoreConnectionProvider<PetStoreClient> implements PoolingConnectionProvider<PetStoreClient> {
+      extends PetStoreConnectionProvider<PetStoreClient> implements ConnectionProvider<PetStoreClient> {
 
     @Override
     public ConnectionValidationResult validate(PetStoreClient connection) {
