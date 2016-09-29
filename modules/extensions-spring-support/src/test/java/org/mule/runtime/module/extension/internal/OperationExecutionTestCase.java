@@ -39,6 +39,7 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.extension.api.ExtensionManager;
 import org.mule.runtime.extension.api.runtime.operation.ParameterResolver;
+import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.model.CarDealer;
@@ -51,9 +52,12 @@ import org.mule.test.heisenberg.extension.model.SaleInfo;
 import org.mule.test.heisenberg.extension.model.Weapon;
 import org.mule.test.heisenberg.extension.model.types.WeaponType;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
+import org.mule.test.vegan.extension.VeganExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -85,12 +89,12 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
 
   @Override
   protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class<?>[] {HeisenbergExtension.class};
+    return new Class<?>[] {HeisenbergExtension.class, VeganExtension.class};
   }
 
   @Override
-  protected String getConfigFile() {
-    return "heisenberg-operation-config.xml";
+  protected String[] getConfigFiles() {
+    return new String[] {"heisenberg-operation-config.xml", "vegan-config.xml"};
   }
 
   @Test
@@ -437,6 +441,19 @@ public class OperationExecutionTestCase extends ExtensionFunctionalTestCase {
   @Test
   public void parameterResolverWithDefaultValue() throws Exception {
     assertExpressionResolverWeapon("processWeaponWithDefaultValue", PAYLOAD, WEAPON_MATCHER);
+  }
+
+  @Test
+  public void listOfMapsAsParameter() throws Exception {
+    String expectedMessage = "an Apple";
+    List<Map<String, String>> listOfMaps = new ArrayList<>();
+    Map<String, String> map = new HashMap<>();
+    map.put(Apple.class.getSimpleName(), expectedMessage);
+    listOfMaps.add(map);
+    Event event = flowRunner("eatComplexListOfMaps").withPayload(listOfMaps).run();
+    List<Map<String, String>> result = (List<Map<String, String>>) event.getMessage().getPayload().getValue();
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0).get(Apple.class.getSimpleName()), is(expectedMessage));
   }
 
   @Test

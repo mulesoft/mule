@@ -9,6 +9,9 @@ package org.mule.test.vegan.extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.tck.testmodels.fruit.Fruit;
 
+import java.util.List;
+import java.util.Map;
+
 public class VeganFidelityOperation {
 
   public String tryEat(@XmlHints(allowReferences = false) Object food) {
@@ -17,6 +20,13 @@ public class VeganFidelityOperation {
     }
 
     throw new IllegalArgumentException("I SHALL NEVER EAT " + food.toString());
+  }
+
+  public List<Map<String, String>> tryToEatThisListOfMaps(List<Map<String, String>> food) {
+    if (food != null) {
+      return food;
+    }
+    throw new IllegalArgumentException("I CAN'T EAT THAT TYPE, IS IMPOSSIBLE!");
   }
 
 }
