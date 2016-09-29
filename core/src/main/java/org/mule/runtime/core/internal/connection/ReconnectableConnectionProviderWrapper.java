@@ -26,6 +26,7 @@ public class ReconnectableConnectionProviderWrapper<C> extends ConnectionProvide
 
   /**
    * Creates a new instance
+   *
    * @param delegate the {@link ConnectionProvider} to be wrapped
    * @param disableValidation whether to skip connection validation upon invocations of {@link #validate(Object)}
    * @param retryPolicyTemplate The {@link RetryPolicyTemplate} for retrying failed connection attempts
