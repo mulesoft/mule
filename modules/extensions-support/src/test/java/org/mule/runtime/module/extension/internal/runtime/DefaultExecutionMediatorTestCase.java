@@ -24,12 +24,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
-import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.runtime.extension.api.introspection.Interceptable;
@@ -139,9 +139,9 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     mediator = new DefaultExecutionMediator(extensionModel, operationModel, new DefaultConnectionManager(muleContext));
 
-    final CachedConnectionProviderWrapper<Object> connectionProviderWrapper =
-        new CachedConnectionProviderWrapper<>(null, false, new SimpleRetryPolicyTemplate(10, RETRY_COUNT));
-    LifecycleUtils.initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
+    final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
+        new ReconnectableConnectionProviderWrapper<>(null, false, new SimpleRetryPolicyTemplate(10, RETRY_COUNT));
+    initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
     Optional<ConnectionProvider> connectionProvider = Optional.of(connectionProviderWrapper);
 
     when(configurationInstance.getConnectionProvider()).thenReturn(connectionProvider);

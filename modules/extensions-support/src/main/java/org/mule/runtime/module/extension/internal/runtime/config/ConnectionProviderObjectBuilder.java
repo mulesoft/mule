@@ -6,17 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.NONE;
 import static org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.injectConfigName;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.connection.CachedConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
+import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionManagementType;
 import org.mule.runtime.extension.api.introspection.connection.RuntimeConnectionProviderModel;
 import org.mule.runtime.module.extension.internal.runtime.ParameterGroupAwareObjectBuilder;
@@ -40,10 +38,10 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
   /**
    * Creates a new instances which produces instances based on the given {@code providerModel} and {@code resolverSet}
    *
-   * @param providerModel the {@link RuntimeConnectionProviderModel} which describes the instances to be produced
-   * @param resolverSet a {@link ResolverSet} to populate the values
+   * @param providerModel     the {@link RuntimeConnectionProviderModel} which describes the instances to be produced
+   * @param resolverSet       a {@link ResolverSet} to populate the values
    * @param connectionManager a {@link ConnectionManagerAdapter} to obtain the default {@link RetryPolicyTemplate} in case of none
-   *        is provided
+   *                          is provided
    */
   public ConnectionProviderObjectBuilder(RuntimeConnectionProviderModel providerModel, ResolverSet resolverSet,
                                          ConnectionManagerAdapter connectionManager) {
@@ -69,10 +67,8 @@ public final class ConnectionProviderObjectBuilder extends ParameterGroupAwareOb
     final ConnectionManagementType connectionManagementType = providerModel.getConnectionManagementType();
     if (connectionManagementType == POOLING) {
       provider = new PoolingConnectionProviderWrapper(provider, poolingProfile, disableValidation, retryPolicyTemplate);
-    } else if (connectionManagementType == CACHED) {
-      provider = new CachedConnectionProviderWrapper(provider, disableValidation, retryPolicyTemplate);
-    } else if (connectionManagementType != NONE) {
-      throw new IllegalArgumentException("Unknown connection management type: " + connectionManagementType);
+    } else {
+      provider = new ReconnectableConnectionProviderWrapper(provider, disableValidation, retryPolicyTemplate);
     }
 
     return provider;

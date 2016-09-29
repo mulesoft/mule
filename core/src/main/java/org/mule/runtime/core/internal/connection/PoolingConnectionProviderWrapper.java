@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.connection;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.policies.AbstractPolicyTemplate;
 
@@ -20,11 +19,9 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-public final class PoolingConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
+public final class PoolingConnectionProviderWrapper<C> extends ReconnectableConnectionProviderWrapper<C> {
 
   private final PoolingProfile poolingProfile;
-  private final boolean disableValidation;
-  private final RetryPolicyTemplate retryPolicyTemplate;
 
   /**
    * Creates a new instance
@@ -36,34 +33,8 @@ public final class PoolingConnectionProviderWrapper<C> extends ConnectionProvide
    */
   public PoolingConnectionProviderWrapper(ConnectionProvider<C> delegate, PoolingProfile poolingProfile,
                                           boolean disableValidation, RetryPolicyTemplate retryPolicyTemplate) {
-    super(delegate);
+    super(delegate, disableValidation, retryPolicyTemplate);
     this.poolingProfile = poolingProfile;
-    this.disableValidation = disableValidation;
-    this.retryPolicyTemplate = retryPolicyTemplate;
-  }
-
-  /**
-   * Delegates the responsibility of validating the connection to the delegated {@link ConnectionProvider} If
-   * {@link #disableValidation} if {@code true} then the validation is skipped, returning
-   * {@link ConnectionValidationResult#success()}
-   *
-   * @param connection a given connection
-   * @return A {@link ConnectionValidationResult} returned by the delegated {@link ConnectionProvider}
-   */
-  @Override
-  public ConnectionValidationResult validate(C connection) {
-    if (disableValidation) {
-      return ConnectionValidationResult.success();
-    }
-    return getDelegate().validate(connection);
-  }
-
-  /**
-   * @return a {@link RetryPolicyTemplate} with the configured values in the Mule Application.
-   */
-  @Override
-  public RetryPolicyTemplate getRetryPolicyTemplate() {
-    return retryPolicyTemplate;
   }
 
   @Override

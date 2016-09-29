@@ -310,6 +310,7 @@
             <xs:complexContent>
                 <xs:extension base="extension:abstractConnectionProviderType">
                     <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
                         <xs:element minOccurs="0" maxOccurs="1" name="abstract-shape">
                             <xs:complexType>
                                 <xs:choice minOccurs="1" maxOccurs="1">

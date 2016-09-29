@@ -6,45 +6,49 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 
-import java.util.Optional;
-
 /**
- * A {@link ConnectionProviderWrapper} which decorates the {@link #delegate} with a user configured {@link #disableValidation}
- * flag value.
- * <p>
- * The purpose of this class is, in case of a {@link #disableValidation} with {@code true} as value, is to delegate the validation
- * the actual connection to the {@link #delegate}. If {@link #disableValidation} is {@code false}, the validation will return a
- * {@link ConnectionValidationResult} with a valid status.
+ * A {@link ConnectionProviderWrapper} which includes a {@link RetryPolicyTemplate}
+ * for reconnecting in case of problems establishing the connection.
  *
- * @since 4.0
+ * It also contains the ability to skip connection validation.
+ *
+ * @param <C> The generic type of the connections provided by the {@link #delegate}
+ *           @since 4.0
  */
-public final class CachedConnectionProviderWrapper<Connection> extends ConnectionProviderWrapper<Connection> {
+public class ReconnectableConnectionProviderWrapper<C> extends ConnectionProviderWrapper<C> {
 
   private final boolean disableValidation;
   private final RetryPolicyTemplate retryPolicyTemplate;
 
-  public CachedConnectionProviderWrapper(ConnectionProvider<Connection> provider, boolean disableValidation,
-                                         RetryPolicyTemplate retryPolicyTemplate) {
-    super(provider);
+  /**
+   * Creates a new instance
+   *
+   * @param delegate the {@link ConnectionProvider} to be wrapped
+   * @param disableValidation whether to skip connection validation upon invocations of {@link #validate(Object)}
+   * @param retryPolicyTemplate The {@link RetryPolicyTemplate} for retrying failed connection attempts
+   */
+  public ReconnectableConnectionProviderWrapper(ConnectionProvider<C> delegate,
+                                                boolean disableValidation,
+                                                RetryPolicyTemplate retryPolicyTemplate) {
+    super(delegate);
     this.disableValidation = disableValidation;
     this.retryPolicyTemplate = retryPolicyTemplate;
   }
 
   /**
-   * Delegates the responsibility of validating the connection to the delegated {@link ConnectionProvider} If
-   * {@link #disableValidation} if {@code true} then the validation is skipped, returning
+   * Delegates the responsibility of validating the connection to the delegated {@link ConnectionProvider}.
+   * If {@link #disableValidation} is {@code true}, then the validation is skipped, returning
    * {@link ConnectionValidationResult#success()}
    *
    * @param connection a given connection
    * @return A {@link ConnectionValidationResult} returned by the delegated {@link ConnectionProvider}
    */
   @Override
-  public ConnectionValidationResult validate(Connection connection) {
+  public ConnectionValidationResult validate(C connection) {
     if (disableValidation) {
       return ConnectionValidationResult.success();
     }
@@ -58,9 +62,4 @@ public final class CachedConnectionProviderWrapper<Connection> extends Connectio
     return retryPolicyTemplate;
   }
 
-  @Override
-  public Optional<PoolingProfile> getPoolingProfile() {
-    return Optional.empty();
-  }
 }
-
