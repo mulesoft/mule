@@ -4,13 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.classloader;
+package org.mule.module.artifact.classloader;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
+
+import org.mule.runtime.module.artifact.classloader.ResourceReleaser;
 
 import java.lang.reflect.Field;
 import java.sql.Driver;
@@ -24,6 +26,13 @@ import javax.management.ObjectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Default implementation used for every artifact created on the container.
+ * <p/>
+ * IMPORTANT: this class is on a different package than the rest of the classes in this module. The reason of that is that this
+ * class must be loaded by each artifact class loader that is being disposed. So, it cannot contain any of the prefixes that force
+ * a class to be loaded from the container.
+ */
 public class DefaultResourceReleaser implements ResourceReleaser {
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
