@@ -20,6 +20,8 @@ import java.util.List;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Resolves the {@link ArtifactClassificationType} for an {@link org.eclipse.aether.artifact.Artifact}.
@@ -31,8 +33,9 @@ public class ArtifactClassificationTypeResolver {
   private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
   private static final String MULE_EXTENSION_CLASSIFIER = "mule-extension";
   private static final String MULE_MODULE_PROPERTIES = "META-INF/mule-module.properties";
-  private static final String PLUGIN_PROPERTIES = "META-INF/plugin.properties";
   private static final String JAR_EXTENSION = "jar";
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private DependencyResolver dependencyResolver;
 
@@ -54,56 +57,24 @@ public class ArtifactClassificationTypeResolver {
    * @return {@link ArtifactClassificationType} for the artifact given
    */
   public ArtifactClassificationType resolveArtifactClassificationType(Artifact artifact) {
-    URLClassLoader artifactClassLoader = createArtifactClassLoader(artifact);
-
-    if (isMulePlugin(artifact, artifactClassLoader)) {
+    if (isMulePlugin(artifact)) {
       return PLUGIN;
     }
-    if (isMuleModule(artifact, artifactClassLoader)) {
+    if (isMuleModule(artifact)) {
       return MODULE;
     }
     return APPLICATION;
   }
 
-  /**
-   * @param artifact {@link Artifact} to check if it is a plugin
-   * @param artifactClassLoader {@link ClassLoader} for the given artifact
-   * @return true if it is classified as {@value #MULE_PLUGIN_CLASSIFIER} or {@value #MULE_EXTENSION_CLASSIFIER} or it has a
-   *         {@value #PLUGIN_PROPERTIES} file.
-   */
-  private boolean isMulePlugin(Artifact artifact, ClassLoader artifactClassLoader) {
-    return artifact.getExtension().equals(MULE_PLUGIN_CLASSIFIER) || artifact.getExtension().equals(MULE_EXTENSION_CLASSIFIER)
-        || hasResource(artifactClassLoader, PLUGIN_PROPERTIES);
+  private boolean isMulePlugin(Artifact artifact) {
+    return artifact.getExtension().equals(MULE_PLUGIN_CLASSIFIER) || artifact.getExtension().equals(MULE_EXTENSION_CLASSIFIER);
   }
 
-  /**
-   * @param artifact {@link Artifact} to check if it is a plugin.
-   * @param artifactClassLoader {@link ClassLoader} for the given artifact.
-   * @return true if it has a {@value #MULE_MODULE_PROPERTIES} file.
-   */
-  private boolean isMuleModule(Artifact artifact, ClassLoader artifactClassLoader) {
-    return hasResource(artifactClassLoader, MULE_MODULE_PROPERTIES);
-  }
-
-  /**
-   * Checks if the {@link ClassLoader} has the resource given.
-   *
-   * @param classLoader {@link ClassLoader} in order to check if the resource exists, can be null.
-   * @param resource name of the resource to look for.
-   * @return
-   */
-  private boolean hasResource(ClassLoader classLoader, String resource) {
-    if (classLoader == null) {
-      return false;
-    }
-    return classLoader.getResource(resource) != null;
-  }
-
-  private URLClassLoader createArtifactClassLoader(Artifact artifact) {
+  private boolean isMuleModule(Artifact artifact) {
     try {
-      return new URLClassLoader(new URL[] {resolveRootArtifactUrls(artifact)}, null);
+      return new URLClassLoader(new URL[] {resolveRootArtifactUrls(artifact)}, null).getResource(MULE_MODULE_PROPERTIES) != null;
     } catch (ArtifactResolutionException e) {
-      return null;
+      return false;
     }
   }
 

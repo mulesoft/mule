@@ -91,8 +91,7 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
     pluginProperties.setProperty(ARTIFACT_EXPORT_CLASS_PACKAGES_KEY,
                                  join(",", newArrayList(ORG_MULE_TEST_RUNNER, ORG_MULE_TEST_RUNNER_API)));
 
-    File metaInf = temporaryFolder.newFolder("META-INF");
-    File pluginPropertiesFile = new File(metaInf, PLUGIN_PROPERTIES);
+    File pluginPropertiesFile = temporaryFolder.newFile(PLUGIN_PROPERTIES);
     pluginProperties.store(new FileWriter(pluginPropertiesFile), "Writing " + PLUGIN_PROPERTIES);
     URL classPathUrl = temporaryFolder.getRoot().toURI().toURL();
     List<URL> urls = newArrayList(classPathUrl);
