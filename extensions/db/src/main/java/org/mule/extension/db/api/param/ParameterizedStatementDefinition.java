@@ -10,6 +10,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import org.mule.runtime.extension.api.annotation.Parameter;
+import org.mule.runtime.extension.api.annotation.dsl.xml.XmlHints;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 
@@ -39,6 +40,7 @@ public abstract class ParameterizedStatementDefinition<T extends ParameterizedSt
   @Optional
   //@Content TODO: MULE-10641 re-enable datasense for these parameter
   @Placement(order = 2)
+  @XmlHints(allowReferences = false)
   protected LinkedHashMap<String, Object> inputParameters = new LinkedHashMap<>();
 
   /**
