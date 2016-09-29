@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 
 import org.junit.Test;
 
-public class JmsRequestRespondTestCase extends AbstractJmsFunctionalTestCase
+public class JmsRequestResponseTestCase extends AbstractJmsFunctionalTestCase
 {
 
     @Override
@@ -25,48 +25,48 @@ public class JmsRequestRespondTestCase extends AbstractJmsFunctionalTestCase
 
 
     @Test
-    public void testNotSendingCorrelationIDWhenIsNotSettedUpTemporaryQueue() throws Exception
+    public void testNotSendiningCorrelationIDWithTemporaryQueue() throws Exception
     {
         MuleMessage response = runFlow("JMSNoCorrelationIDTemporaryQueue", TEST_MESSAGE).getMessage();
         verify("JMSNoCorrelationIDTemporaryQueue");
-        verify("JMSInNoCorrelationID");
+        verify("JMSNoCorrelationIDTarget");
         assertEchoResponse(response);
     }
 
     @Test
-    public void testNotSendingCorrelationIDWhenIsNotSettedUpFixedQueue() throws Exception
+    public void testNotSendiningCorrelationIDWithFixedQueue() throws Exception
     {
         MuleMessage response = runFlow("JMSNoCorrelationIDFixedQueue", TEST_MESSAGE).getMessage();
         verify("JMSNoCorrelationIDFixedQueue");
-        verify("JMSInNoCorrelationID");
+        verify("JMSNoCorrelationIDTarget");
         assertEchoResponse(response);
     }
 
     @Test
-    public void testSendingCorrelationIDWhenIsSettedUpTemporaryQueue() throws Exception
+    public void testSendiningCorrelationIDWithTemporaryQueue() throws Exception
     {
         MuleMessage response = runFlow("JMSCorrelationIDTemporaryQueue", TEST_MESSAGE).getMessage();
         verify("JMSCorrelationIDTemporaryQueue");
-        verify("JMSInCustomCorrelationID");
+        verify("JMSCorrelationIDTarget");
         assertFixedEchoResponse(response);
     }
 
     @Test
-    public void testSendingCorrelationIDWhenIsSettedUpFixedQueue() throws Exception
+    public void testSendiningCorrelationIDWithFixedQueue() throws Exception
     {
         MuleMessage response = runFlow("JMSCorrelationIDFixedQueue", TEST_MESSAGE).getMessage();
         verify("JMSCorrelationIDFixedQueue");
-        verify("JMSInCustomCorrelationID");
+        verify("JMSCorrelationIDTarget");
         assertFixedEchoResponse(response);
     }
 
     private void assertEchoResponse(MuleMessage response) throws Exception
     {
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE + " " + "JMSInNoCorrelationID"));
+        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE + " " + "JMSNoCorrelationIDTarget"));
     }
 
     private void assertFixedEchoResponse(MuleMessage response) throws Exception
     {
-        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE + " " + "JMSInCustomCorrelationID"));
+        assertThat(response.getPayloadAsString(), equalTo(TEST_MESSAGE + " " + "JMSCorrelationIDTarget"));
     }
 }

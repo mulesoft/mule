@@ -8,8 +8,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
 
-    <!-- Testing with ActiveMq -->
-    <!--jms:activemq-connector name="jmsConnector1" disableTemporaryReplyToDestinations="true"/-->
     <jms:activemq-connector name="jmsConnector1" />
 
 </mule>

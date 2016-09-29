@@ -16,18 +16,16 @@
 
     <flow name="JMSNoCorrelationIDFixedQueue">
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID == null]"/>
-        <set-property propertyName="JMSReplyTo" value="other"/>
+        <set-property propertyName="JMSReplyTo" value="other1"/>
         <jms:outbound-endpoint exchange-pattern="request-response" queue="in" connector-ref="jmsConnector1"/>
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID != null]"/>
     </flow>
 
-    <flow name="JMSInNoCorrelationID">
+    <flow name="JMSNoCorrelationIDTarget">
         <jms:inbound-endpoint exchange-pattern="request-response" queue="in" connector-ref="jmsConnector1" />
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID == null]"/>
         <test:component appendString=" #[context:serviceName]" logMessageDetails="true" waitTime="50"/>
     </flow>
-
-
 
     <flow name="JMSCorrelationIDTemporaryQueue">
         <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid"/>
@@ -36,18 +34,16 @@
     </flow>
 
     <flow name="JMSCorrelationIDFixedQueue">
-        <set-property propertyName="JMSReplyTo" value="other"/>
+        <set-property propertyName="JMSReplyTo" value="other2"/>
         <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid"/>
         <jms:outbound-endpoint exchange-pattern="request-response" queue="inFixed" connector-ref="jmsConnector1"/>
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID == 'custom-cid']"/>
     </flow>
 
-    <flow name="JMSInCustomCorrelationID">
+    <flow name="JMSCorrelationIDTarget">
         <jms:inbound-endpoint exchange-pattern="request-response" queue="inFixed" connector-ref="jmsConnector1" />
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID == 'custom-cid']"/>
         <test:component appendString=" #[context:serviceName]" logMessageDetails="true" waitTime="50"/>
     </flow>
-
-
 
 </mule>

@@ -163,6 +163,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             }
 
             jmsMessage.setStringProperty(MULE_CORRELATION_ID_PROPERTY, resolveMuleCorrelationId(event));
+            // For the "One-way" scenario, we can resolve the Correlation ID.
+            // For the "Request-Response" scenario, this cannot be done because we are supporting only the
+            // JMS Message ID Pattern. In Mule 4 JMS should support this pattern, and the JMS Correlation ID Pattern
             if(!endpoint.getExchangePattern().hasResponse())
             {
                 jmsMessage.setJMSCorrelationID(resolveJmsCorrelationId(event));
@@ -543,18 +546,17 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         //If we're not using
         if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
         {
-            if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic))
+            // Since we are supporting the JMS Message ID Pattern for request-response, the correlationID will be null
+            // if it is not manually setted up, and the selector must be set to the messageID.
+            String jmsCorrelationId = jmsMessage.getJMSCorrelationID();
+            if (jmsCorrelationId == null)
             {
-                String jmsCorrelationId = jmsMessage.getJMSCorrelationID();
-                if (jmsCorrelationId == null)
-                {
-                    jmsCorrelationId = jmsMessage.getJMSMessageID();
-                }
-                selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
-                if (logger.isDebugEnabled())
-                {
+                jmsCorrelationId = jmsMessage.getJMSMessageID();
+            }
+            selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
+            if (logger.isDebugEnabled())
+            {
                     logger.debug("ReplyTo Selector is: " + selector);
-                }
             }
         }
 
