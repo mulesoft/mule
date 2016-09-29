@@ -35,4 +35,8 @@
         <logger/>
     </flow>
 
+    <flow name="eatComplexListOfMaps">
+        <vegan:try-to-eat-this-list-of-maps food="#[payload]"/>
+    </flow>
+
 </mule>
