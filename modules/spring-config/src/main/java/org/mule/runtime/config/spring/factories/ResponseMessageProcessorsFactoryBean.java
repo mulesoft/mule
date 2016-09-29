@@ -34,7 +34,7 @@ public class ResponseMessageProcessorsFactoryBean extends AbstractAnnotatedObjec
 
   @Override
   public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'response' child processor chain");
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {

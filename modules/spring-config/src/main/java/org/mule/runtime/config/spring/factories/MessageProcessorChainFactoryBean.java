@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class MessageProcessorChainFactoryBean implements FactoryBean, MuleContex
   }
 
   protected MessageProcessorChainBuilder getBuilderInstance() {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
+    ExplicitMessageProcessorChainBuilder builder = new ExplicitMessageProcessorChainBuilder();
     builder.setName("processor chain '" + name + "'");
     return builder;
   }

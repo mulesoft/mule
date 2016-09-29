@@ -6,15 +6,31 @@
  */
 package org.mule.runtime.core.api.processor;
 
+import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.api.meta.NamedObject;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.context.MuleContextAware;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
 
 import java.util.List;
 
 /**
- *
+ * A chain of {@link Processor}'s. All implementioans should propagate {@link MuleContext}, {@link FlowConstruct} and lifecycle to
+ * {@link Processor}'s in the chains. Message processor chains are also {@link MessageProcessorContainer}'s and responsible for
+ * adding the correct {@link MessageProcessorPathElement}'s.
  */
-public interface MessageProcessorChain extends Processor, NamedObject {
+public interface MessageProcessorChain
+    extends Processor, Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorContainer {
 
+  /**
+   * Obtain the list of {@link Processor}'s that this chains was created from. Not that this is the linear view of all processors
+   * that the chains was constructed from and does not represent in any way the structure of the chain once
+   * {@link InterceptingMessageProcessor}'s have been taken into account.
+   *
+   * @return list of processors.
+   */
   List<Processor> getMessageProcessors();
 
 }

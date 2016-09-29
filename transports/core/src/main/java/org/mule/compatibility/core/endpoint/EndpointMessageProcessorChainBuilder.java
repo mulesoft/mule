@@ -11,43 +11,33 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
-import org.mule.runtime.core.processor.chain.SimpleMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessorChainBuilder {
+public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
   protected ImmutableEndpoint endpoint;
 
-  public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct) {
-    super(flowConstruct);
-    this.endpoint = endpoint;
-  }
-
   public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint) {
-    super(endpoint.getMuleContext());
     this.endpoint = endpoint;
   }
 
   @Override
-  protected Processor initializeMessageProcessor(Object processor) throws MuleException {
+  protected Processor initializeMessageProcessor(Object processor) {
     if (processor instanceof AbstractMessageProcessorChain) {
       processor = new EndpointAwareMessageProcessorChain((AbstractMessageProcessorChain) processor);
     } else if (processor instanceof SecurityFilterMessageProcessor) {
@@ -61,8 +51,8 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
     return super.initializeMessageProcessor(processor);
   }
 
-  private class EndpointAwareMessageProcessorChain implements NonBlockingMessageProcessor, MessageProcessorChain, Lifecycle,
-      FlowConstructAware, MuleContextAware, EndpointAware, MessageProcessorContainer, MessagingExceptionHandlerAware {
+  private class EndpointAwareMessageProcessorChain
+      implements NonBlockingMessageProcessor, MessageProcessorChain, EndpointAware, MessagingExceptionHandlerAware {
 
     private AbstractMessageProcessorChain chain;
 
@@ -90,11 +80,6 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
     @Override
     public Event process(Event event) throws MuleException {
       return chain.process(event);
-    }
-
-    @Override
-    public String getName() {
-      return chain.getName();
     }
 
     @Override
@@ -221,9 +206,5 @@ public class EndpointMessageProcessorChainBuilder extends SimpleMessageProcessor
       return sfmp.toString();
     }
 
-    @Override
-    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-      sfmp.addMessageProcessorPathElements(pathElement);
-    }
   }
 }

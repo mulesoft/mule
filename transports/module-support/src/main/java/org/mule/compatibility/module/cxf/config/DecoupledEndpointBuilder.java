@@ -11,6 +11,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.module.cxf.CxfInboundMessageProcessor;
@@ -23,8 +24,7 @@ import org.apache.cxf.Bus;
 
 public class DecoupledEndpointBuilder {
 
-  public static void build(MuleContext muleContext, String decoupledEndpoint, CxfOutboundMessageProcessor processor, Bus bus)
-      throws MuleException {
+  public static void build(MuleContext muleContext, String decoupledEndpoint, CxfOutboundMessageProcessor processor, Bus bus) {
     if (decoupledEndpoint != null) {
       processor.setDecoupledEndpoint(decoupledEndpoint);
 
@@ -35,12 +35,16 @@ public class DecoupledEndpointBuilder {
       List<Processor> mps = new ArrayList<Processor>();
       mps.add(cxfInboundMP);
 
-      EndpointBuilder ep = getEndpointFactory(muleContext).getEndpointBuilder(decoupledEndpoint);
+      try {
+        EndpointBuilder ep = getEndpointFactory(muleContext).getEndpointBuilder(decoupledEndpoint);
 
-      Flow flow = new Flow("decoupled-" + ep.toString(), muleContext);
-      flow.setMessageProcessors(mps);
-      flow.setMessageSource(ep.buildInboundEndpoint());
-      muleContext.getRegistry().registerObject(flow.getName(), flow);
+        Flow flow = new Flow("decoupled-" + ep.toString(), muleContext);
+        flow.setMessageProcessors(mps);
+        flow.setMessageSource(ep.buildInboundEndpoint());
+        muleContext.getRegistry().registerObject(flow.getName(), flow);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(e);
+      }
     }
 
   }

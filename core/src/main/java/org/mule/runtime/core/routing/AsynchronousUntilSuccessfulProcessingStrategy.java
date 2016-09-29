@@ -57,7 +57,6 @@ public class AsynchronousUntilSuccessfulProcessingStrategy extends AbstractUntil
     implements Initialisable, Startable, Stoppable, MessagingExceptionHandlerAware {
 
   private static final String UNTIL_SUCCESSFUL_MSG_PREFIX = "until-successful retries exhausted. Last exception message was: %s";
-  private static final Random random = new Random();
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
   private MessagingExceptionHandler messagingExceptionHandler;
   private ExecutorService pool;

@@ -8,21 +8,23 @@
 package org.mule.runtime.core.routing;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
-
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.config.ThreadingProfile;
 import org.mule.runtime.core.api.connector.DispatchException;
 import org.mule.runtime.core.api.context.WorkManager;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.MessageRouter;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.AggregationContext;
 import org.mule.runtime.core.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.api.routing.ResponseTimeoutException;
@@ -31,9 +33,10 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.Preconditions;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.work.ProcessingMuleEventWork;
@@ -100,7 +103,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   /**
    * chains built around the routes
    */
-  private List<Processor> routeChains;
+  private List<MessageProcessorChain> routeChains;
 
   /**
    * The aggregation strategy. By default is this instance
@@ -289,14 +292,14 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
     routes.remove(processor);
   }
 
-  private void buildRouteChains() throws MuleException {
+  private void buildRouteChains() {
     Preconditions.checkState(routes.size() > 1, "At least 2 routes are required for ScatterGather");
     routeChains = new ArrayList<>(routes.size());
     for (Processor route : routes) {
-      if (route instanceof MessageProcessorChain) {
-        routeChains.add(route);
+      if (route instanceof ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain) {
+        routeChains.add((MessageProcessorChain) route);
       } else {
-        routeChains.add(new DefaultMessageProcessorChainBuilder(muleContext).chain(route).build());
+        routeChains.add(newExplicitChain(route));
       }
     }
   }
@@ -308,7 +311,7 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   @Override
   protected List<Processor> getOwnedMessageProcessors() {
-    return routeChains;
+    return routeChains.stream().map(messageProcessorChain -> (Processor) messageProcessorChain).collect(toList());
   }
 
   public void setAggregationStrategy(AggregationStrategy aggregationStrategy) {
@@ -326,4 +329,13 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
   public void setRoutes(List<Processor> routes) {
     this.routes = routes;
   }
+
+  @Override
+  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    pathElement = pathElement.addChild(this);
+    for (MessageProcessorChain route : routeChains) {
+      NotificationUtils.addMessageProcessorPathElements(route, pathElement);
+    }
+  }
+
 }

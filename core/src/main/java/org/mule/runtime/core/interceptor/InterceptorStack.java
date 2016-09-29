@@ -12,6 +12,7 @@ import org.mule.runtime.core.api.interceptor.Interceptor;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -24,7 +25,7 @@ import java.util.List;
 public class InterceptorStack extends AbstractInterceptingMessageProcessor implements Interceptor, Initialisable, Disposable {
 
   private List<Interceptor> interceptors;
-  private Processor chain;
+  private MessageProcessorChain chain;
 
   public InterceptorStack() {
     // For spring
@@ -49,7 +50,7 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor imple
 
   @Override
   public void initialise() throws InitialisationException {
-    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(muleContext);
+    DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
     chainBuilder.setName("interceptor stack");
     for (Interceptor interceptor : interceptors) {
       if (interceptor instanceof Initialisable) {
@@ -60,11 +61,10 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor imple
     if (next != null) {
       chainBuilder.chain(next);
     }
-    try {
-      chain = chainBuilder.build();
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
+    chain = chainBuilder.build();
+    chain.setMuleContext(muleContext);
+    chain.setFlowConstruct(flowConstruct);
+    chain.initialise();
   }
 
   @Override

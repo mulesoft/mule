@@ -34,21 +34,8 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
 
-  public AbstractMessageProcessorChainBuilder() {
-    // empty
-  }
-
-  public AbstractMessageProcessorChainBuilder(FlowConstruct flowConstruct, MuleContext muleContext) {
-    this.flowConstruct = flowConstruct;
-    this.muleContext = muleContext;
-  }
-
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
-  protected Processor initializeMessageProcessor(Object processor) throws MuleException {
-    // TODO DF: FlowConstuct should be injected here but there is an issue with spring not have reference
-    // to it. For now we inject it once the MessageProcessor is built and this works, but
-    // MessageProcessorBuilders should have FlowConstuct available when building really.
-
+  protected Processor initializeMessageProcessor(Object processor) {
     if (processor instanceof MessageProcessorBuilder) {
       return ((MessageProcessorBuilder) processor).build();
     } else {

@@ -40,7 +40,7 @@ public class AsyncMessageProcessorsFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'async' child chain");
 
     for (Object processor : messageProcessors) {

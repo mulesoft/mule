@@ -12,12 +12,14 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -201,13 +203,16 @@ public class ForeachTestCase extends AbstractMuleContextTestCase {
   public void addProcessorPathElementsBeforeInit() throws MuleException {
     Foreach foreachMp = new Foreach();
     foreachMp.setMuleContext(muleContext);
+    foreachMp.setFlowConstruct(mock(Flow.class));
     List<Processor> processors = getSimpleMessageProcessors();
     foreachMp.setMessageProcessors(processors);
 
-    MessageProcessorPathElement mpPathElement = mock(MessageProcessorPathElement.class);
-    foreachMp.addMessageProcessorPathElements(mpPathElement);
+    MessageProcessorPathElement parentElement = mock(MessageProcessorPathElement.class);
+    MessageProcessorPathElement foreachElement = mock(MessageProcessorPathElement.class);
+    when(parentElement.addChild(any(Processor.class))).thenReturn(foreachElement);
+    foreachMp.addMessageProcessorPathElements(parentElement);
 
-    assertAddedPathElements(processors, mpPathElement);
+    assertAddedPathElements(processors, foreachElement);
   }
 
   protected void assertAddedPathElements(List<Processor> processors, MessageProcessorPathElement mpPathElement) {

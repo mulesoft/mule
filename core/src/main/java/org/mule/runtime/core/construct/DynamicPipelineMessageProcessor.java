@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.construct;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.NonBlockingSupported;
@@ -14,13 +15,12 @@ import org.mule.runtime.core.api.processor.DynamicPipeline;
 import org.mule.runtime.core.api.processor.DynamicPipelineBuilder;
 import org.mule.runtime.core.api.processor.DynamicPipelineException;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.AbstractInterceptingMessageProcessor;
-import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.chain.SimpleMessageProcessorChain;
 import org.mule.runtime.core.util.StringUtils;
 import org.mule.runtime.core.util.UUID;
 
@@ -35,11 +35,11 @@ import java.util.List;
  * If more than one client tries to use the functionality the 2nd one will fail due to pipeline ID verification.
  */
 public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements DynamicPipeline, NonBlockingSupported {
+    implements DynamicPipeline, NonBlockingSupported, InternalMessageProcessor {
 
   private String pipelineId;
-  private AbstractMessageProcessorChain preChain;
-  private AbstractMessageProcessorChain postChain;
+  private MessageProcessorChain preChain;
+  private MessageProcessorChain postChain;
   private Processor staticChain;
   private Flow flow;
 
@@ -57,7 +57,7 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
     if (staticChain == null) {
       if (next instanceof InterceptingMessageProcessor) {
         // wrap with chain to avoid intercepting the postChain
-        staticChain = new SimpleMessageProcessorChain(next);
+        staticChain = event -> next.process(event);
       } else {
         staticChain = next;
       }
@@ -71,23 +71,23 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
     checkPipelineId(id);
 
     // build new dynamic chains
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flow);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.chain(preMessageProcessors);
 
     builder.chain(staticChain);
     builder.chain(postMessageProcessors);
-    MessageProcessorChain newChain = builder.build();
+    MessageProcessorChain from = builder.build();
+    from.setFlowConstruct(flowConstruct);
+    from.setMuleContext(muleContext);
 
     Lifecycle preChainOld = preChain;
     Lifecycle postChainOld = postChain;
-    preChain = new SimpleMessageProcessorChain(preMessageProcessors);
-    preChain.setMuleContext(muleContext);
-    postChain = new SimpleMessageProcessorChain(postMessageProcessors);
-    postChain.setMuleContext(muleContext);
+    preChain = newChain(preMessageProcessors);
+    postChain = newChain(postMessageProcessors);
     initDynamicChains();
 
     // hook chain as last step to avoid synchronization
-    super.setListener(newChain);
+    super.setListener(from);
 
     // dispose old dynamic chains
     disposeDynamicChains(preChainOld, postChainOld);

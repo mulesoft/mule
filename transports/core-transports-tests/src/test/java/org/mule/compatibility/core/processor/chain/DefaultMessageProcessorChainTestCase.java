@@ -36,6 +36,7 @@ import org.mule.runtime.core.construct.flow.DefaultFlowProcessingStrategy;
 import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -50,9 +51,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @SmallTest
 @SuppressWarnings("deprecation")
-public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
-
-  protected MuleContext muleContext;
+public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTestCase {
 
   protected MessageExchangePattern exchangePattern;
   protected boolean nonBlocking;
@@ -76,16 +75,6 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     this.synchronous = synchronous;
   }
 
-  @Before
-  public void before() {
-    muleContext = mock(MuleContext.class);
-    MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
-    when(muleConfiguration.isContainerMode()).thenReturn(false);
-    when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
-    when(muleConfiguration.getShutdownTimeout()).thenReturn(1000);
-    when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
-  }
-
   @Test
   public void testOneWayOutboundEndpointWithService() throws Exception {
     Event event = getTestEventUsingFlow("");
@@ -94,8 +83,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     OutboundEndpoint outboundEndpoint = (OutboundEndpoint) mp;
     when(outboundEndpoint.getExchangePattern()).thenReturn(ONE_WAY);
 
-    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
-    Event response = chain.process(event);
+    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
+    Event response = process(chain, event);
     assertNull(response);
 
     assertEquals(1, threads);
@@ -114,8 +103,8 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase {
     });
     when(mp.process(any(Event.class))).thenReturn(VoidMuleEvent.getInstance());
 
-    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder(muleContext).chain(mp).build();
-    Event response = chain.process(event);
+    MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(mp).build();
+    Event response = process(chain, event);
     assertThat(event.getMessage(), is(response.getMessage()));
 
     assertEquals(1, threads);

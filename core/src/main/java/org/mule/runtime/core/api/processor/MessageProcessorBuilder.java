@@ -15,5 +15,5 @@ import org.mule.runtime.core.api.MuleException;
  */
 public interface MessageProcessorBuilder {
 
-  Processor build() throws MuleException;
+  Processor build();
 }

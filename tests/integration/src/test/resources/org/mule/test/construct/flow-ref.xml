@@ -88,48 +88,49 @@
         <processor ref="ProcessorPathAssertingProcessor" />
     </sub-flow>
 
-    <flow name="NonBlockingFlow1" processingStrategy="non-blocking">
-        <httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefBasic"/>
-        <processor ref="NonBlockingFlow1SensingProcessor" />
-        <flow-ref name="NonBlockingFlow2"/>
-    </flow>
-    <flow name="NonBlockingFlow2">
-        <processor ref="NonBlockingFlow2SensingProcessor" />
-        <httpn:request config-ref="requestConfig" path="echo" method="POST"/>
-    </flow>
+    <!-- TODO MULE-10618 -->
+    <!--<flow name="NonBlockingFlow1" processingStrategy="non-blocking">-->
+        <!--<httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefBasic"/>-->
+        <!--<processor ref="NonBlockingFlow1SensingProcessor" />-->
+        <!--<flow-ref name="NonBlockingFlow2"/>-->
+    <!--</flow>-->
+    <!--<flow name="NonBlockingFlow2">-->
+        <!--<processor ref="NonBlockingFlow2SensingProcessor" />-->
+        <!--<httpn:request config-ref="requestConfig" path="echo" method="POST"/>-->
+    <!--</flow>-->
 
-    <flow name="NonBlockingToAsyncFlow1" processingStrategy="non-blocking">
-        <httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefToAsyncFlow"/>
-        <processor ref="NonBlockingToAsyncFlow1SensingProcessor" />
-        <flow-ref name="NonBlockingToAsyncFlow2"/>
-    </flow>
-    <flow name="NonBlockingToAsyncFlow2" processingStrategy="asynchronous">
-        <processor ref="NonBlockingToAsyncFlow2SensingProcessor"/>
-        <httpn:request config-ref="requestConfig" path="echo" method="POST"/>
-    </flow>
+    <!--<flow name="NonBlockingToAsyncFlow1" processingStrategy="non-blocking">-->
+        <!--<httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefToAsyncFlow"/>-->
+        <!--<processor ref="NonBlockingToAsyncFlow1SensingProcessor" />-->
+        <!--<flow-ref name="NonBlockingToAsyncFlow2"/>-->
+    <!--</flow>-->
+    <!--<flow name="NonBlockingToAsyncFlow2" processingStrategy="asynchronous">-->
+        <!--<processor ref="NonBlockingToAsyncFlow2SensingProcessor"/>-->
+        <!--<httpn:request config-ref="requestConfig" path="echo" method="POST"/>-->
+    <!--</flow>-->
 
-    <flow name="NonBlockingToSyncFlow1" processingStrategy="non-blocking">
-        <httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefToSyncFlow"/>
-        <processor ref="NonBlockingToSyncFlow1SensingProcessor" />
-        <flow-ref name="NonBlockingToSyncFlow2"/>
-    </flow>
-    <flow name="NonBlockingToSyncFlow2" processingStrategy="synchronous">
-        <processor ref="NonBlockingToSyncFlow2SensingProcessor"/>
-        <httpn:request config-ref="requestConfig" path="echo" method="POST"/>
-    </flow>
+    <!--<flow name="NonBlockingToSyncFlow1" processingStrategy="non-blocking">-->
+        <!--<httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefToSyncFlow"/>-->
+        <!--<processor ref="NonBlockingToSyncFlow1SensingProcessor" />-->
+        <!--<flow-ref name="NonBlockingToSyncFlow2"/>-->
+    <!--</flow>-->
+    <!--<flow name="NonBlockingToSyncFlow2" processingStrategy="synchronous">-->
+        <!--<processor ref="NonBlockingToSyncFlow2SensingProcessor"/>-->
+        <!--<httpn:request config-ref="requestConfig" path="echo" method="POST"/>-->
+    <!--</flow>-->
 
-    <flow name="NonBlockingExceptionFlow1" processingStrategy="non-blocking">
-        <httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefErrorHandling"/>
-        <flow-ref name="NonBlockingExceptionFlow2"/>
-    </flow>
-    <flow name="NonBlockingExceptionFlow2">
-        <test:component throwException="true"/>
-        <error-handler>
-            <on-error-continue>
-                <set-payload value="ERROR"/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
+    <!--<flow name="NonBlockingExceptionFlow1" processingStrategy="non-blocking">-->
+        <!--<httpn:listener config-ref="listenerConfig" path="nonBlockingFlowRefErrorHandling"/>-->
+        <!--<flow-ref name="NonBlockingExceptionFlow2"/>-->
+    <!--</flow>-->
+    <!--<flow name="NonBlockingExceptionFlow2">-->
+        <!--<test:component throwException="true"/>-->
+        <!--<error-handler>-->
+            <!--<on-error-continue>-->
+                <!--<set-payload value="ERROR"/>-->
+            <!--</on-error-continue>-->
+        <!--</error-handler>-->
+    <!--</flow>-->
 
     <flow name="httpEcho">
         <httpn:listener config-ref="listenerConfig" path="echo"/>

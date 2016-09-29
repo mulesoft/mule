@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.introspection;
 
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeAllIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.safeStopIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -97,7 +97,7 @@ public abstract class AbstractInterceptable implements Interceptable, Lifecycle 
 
   @Override
   public void dispose() {
-    disposeAllIfNeeded(interceptors, LOGGER);
+    disposeIfNeeded(interceptors, LOGGER);
   }
 
   /**

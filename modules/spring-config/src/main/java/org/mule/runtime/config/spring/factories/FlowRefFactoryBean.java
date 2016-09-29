@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
 import org.mule.runtime.api.meta.AnnotatedObject;
@@ -20,16 +27,24 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
+import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
+import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -44,7 +59,8 @@ import org.springframework.context.ApplicationContextAware;
 public class FlowRefFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware, Initialisable, Disposable {
 
-  private abstract class FlowRefMessageProcessor implements NonBlockingMessageProcessor, AnnotatedObject, FlowConstructAware {
+  private abstract class FlowRefMessageProcessor
+      implements NonBlockingMessageProcessor, AnnotatedObject, FlowConstructAware, MessageProcessorContainer {
 
     protected FlowConstruct flowConstruct;
 
@@ -67,6 +83,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     public void setFlowConstruct(FlowConstruct flowConstruct) {
       this.flowConstruct = flowConstruct;
     }
+
   }
 
   private abstract class FlowRefMessageProcessorContainer extends FlowRefMessageProcessor
@@ -134,12 +151,68 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public Processor getObject() throws Exception {
-    if (referencedMessageProcessor != null) {
-      return referencedMessageProcessor;
-    } else {
-      return createDynamicReferenceMessageProcessor(refName);
-    }
+    Processor processor =
+        referencedMessageProcessor != null ? referencedMessageProcessor : createDynamicReferenceMessageProcessor(refName);
+    return new AbstractMessageProcessorChain(singletonList(processor)) {
+
+      @Override
+      public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+        NotificationUtils.addMessageProcessorPathElements(processor, pathElement.addChild(processor));
+      }
+    };
   }
+
+  // class DelegateProcessor implements Processor, FlowConstructAware, MuleContextAware, Lifecycle, MessageProcessorContainer {
+  //
+  // private Processor processor;
+  //
+  // DelegateProcessor(Processor processor) {
+  // this.processor = processor;
+  // }
+  //
+  // @Override
+  // public Event process(Event event) throws MuleException {
+  // return processor.process(event);
+  // }
+  //
+  // @Override
+  // public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+  // NotificationUtils.addMessageProcessorPathElements(processor, pathElement.addChild(processor));
+  // }
+  //
+  // @Override
+  // public void setFlowConstruct(FlowConstruct flowConstruct) {
+  // setFlowConstructIfNeeded(processor, flowConstruct);
+  // }
+  //
+  // @Override
+  // public void setMuleContext(MuleContext context) {
+  // setMuleContextIfNeeded(processor, context);
+  // }
+  //
+  // @Override
+  // public void stop() throws MuleException {
+  // stopIfNeeded(processor);
+  // }
+  //
+  // @Override
+  // public void dispose() {
+  // disposeIfNeeded(processor, null);
+  //
+  // }
+  //
+  // @Override
+  // public void start() throws MuleException {
+  // startIfNeeded(processor);
+  // }
+  //
+  // @Override
+  // public void initialise() throws InitialisationException {
+  // initialiseIfNeeded(processor);
+  //
+  // }
+  // }
+  //
 
   protected Processor createDynamicReferenceMessageProcessor(String name) throws MuleException {
     if (name == null) {
@@ -213,6 +286,11 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
     if (referencedFlow instanceof FlowConstruct) {
       return new FlowRefMessageProcessor() {
+
+        @Override
+        public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+          NotificationUtils.addMessageProcessorPathElements(referencedFlow, pathElement);
+        }
 
         @Override
         public Event process(Event event) throws MuleException {

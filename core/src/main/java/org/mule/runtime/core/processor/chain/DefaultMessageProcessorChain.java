@@ -6,71 +6,30 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import static java.util.Arrays.asList;
-import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
-
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import static java.util.Collections.singletonList;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
 
-  protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
+  private Processor head;
+  private List<Processor> processorsForLifecycle;
 
-  protected DefaultMessageProcessorChain(List<Processor> processors) {
-    super(null, processors);
-  }
-
-  protected DefaultMessageProcessorChain(Processor... processors) {
-    super(null, new ArrayList<>(asList(processors)));
-  }
-
-  protected DefaultMessageProcessorChain(String name, List<Processor> processors) {
+  DefaultMessageProcessorChain(String name, Processor head, List<Processor> processors,
+                               List<Processor> processorsForLifecycle) {
     super(name, processors);
-  }
-
-  protected DefaultMessageProcessorChain(String name, Processor... processors) {
-    super(name, new ArrayList<>(asList(processors)));
-  }
-
-  public static DefaultMessageProcessorChain from(MuleContext muleContext, Processor messageProcessor) {
-    final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(messageProcessor);
-    chain.setMuleContext(muleContext);
-    return chain;
-  }
-
-  public static MessageProcessorChain from(MuleContext muleContext, Processor... messageProcessors) throws MuleException {
-    return new DefaultMessageProcessorChainBuilder(muleContext).chain(messageProcessors).build();
-  }
-
-  public static MessageProcessorChain from(MuleContext muleContext, List<Processor> messageProcessors)
-      throws MuleException {
-    return new DefaultMessageProcessorChainBuilder(muleContext).chain(messageProcessors).build();
+    this.head = head;
+    this.processorsForLifecycle = processorsForLifecycle;
   }
 
   @Override
-  protected Event doProcess(Event event) throws MuleException {
-    return new ProcessorExecutorFactory()
-        .createProcessorExecutor(event, processors, messageProcessorExecutionTemplate, true, flowConstruct)
-        .execute();
+  protected List<Processor> getMessageProcessorsForLifecycle() {
+    return processorsForLifecycle;
   }
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
-    messageProcessorExecutionTemplate.setMuleContext(context);
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    super.setFlowConstruct(flowConstruct);
-    messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
+  protected List<Processor> getProcessorsToExecute() {
+    return singletonList(head);
   }
 }

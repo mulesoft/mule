@@ -21,10 +21,10 @@ import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.exception.AbstractExceptionListener;
-import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.tck.testmodels.fruit.FruitCleaner;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
@@ -60,9 +60,8 @@ public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends Fu
     assertNotNull(responseTransformers);
     assertFalse(responseTransformers.isEmpty());
     final Object responseTransformer = responseTransformers.get(0);
-    assertTrue(responseTransformer instanceof InterceptingChainLifecycleWrapper);
-    assertTrue(((InterceptingChainLifecycleWrapper) responseTransformer).getMessageProcessors()
-        .get(0) instanceof TestCompressionTransformer);
+    assertTrue(responseTransformer instanceof MessageProcessorChain);
+    assertTrue(((MessageProcessorChain) responseTransformer).getMessageProcessors().get(0) instanceof TestCompressionTransformer);
   }
 
   @Test

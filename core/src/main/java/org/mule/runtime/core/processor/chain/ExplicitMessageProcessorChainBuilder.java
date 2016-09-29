@@ -22,46 +22,27 @@ import java.util.List;
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
  */
-public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
+public class ExplicitMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
   protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
                                                           List<Processor> processorForLifecycle) {
-    return new SubflowMessageProcessorChain(name, head, processors, processorForLifecycle);
+    return new ExplicitMessageProcessorChain(name, head, processors, processorForLifecycle);
   }
 
   /**
    * Generates message processor identfiers specific for subflows.
    */
-  static class SubflowMessageProcessorChain extends ExplicitMessageProcessorChain implements SubFlowMessageProcessor {
+  public static class ExplicitMessageProcessorChain extends DefaultMessageProcessorChain {
 
-    private String subFlowName;
-
-    SubflowMessageProcessorChain(String name, Processor head, List<Processor> processors,
-                                 List<Processor> processorsForLifecycle) {
+    protected ExplicitMessageProcessorChain(String name, Processor head, List<Processor> processors,
+                                            List<Processor> processorsForLifecycle) {
       super(name, head, processors, processorsForLifecycle);
-      this.subFlowName = name;
     }
 
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-      MessageProcessorPathElement subprocessors = pathElement.addChild(name).addChild("subprocessors");
-      NotificationUtils.addMessageProcessorPathElements(processors, subprocessors);
+      NotificationUtils.addMessageProcessorPathElements(processors, pathElement.addChild(this));
     }
 
-    @Override
-    public Event process(Event event) throws MuleException {
-      ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(getSubFlowName(), null));
-
-      try {
-        return super.process(event);
-      } finally {
-        ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
-      }
-    }
-
-    @Override
-    public String getSubFlowName() {
-      return subFlowName;
-    }
   }
 }

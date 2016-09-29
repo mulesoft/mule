@@ -6,14 +6,15 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedSet;
 
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -82,23 +83,22 @@ public class NotificationUtils {
       return;
     }
     for (Processor mp : processors) {
-      if (!(mp instanceof InternalMessageProcessor)) {
-
-        MessageProcessorPathElement messageProcessorPathElement;
-
-        // To avoid adding a level in some path elements:
-        if (!(mp instanceof InterceptingChainLifecycleWrapperPathSkip)) {
-          messageProcessorPathElement = parentElement.addChild(mp);
-        } else {
-          messageProcessorPathElement = parentElement;
-        }
-        if (mp instanceof MessageProcessorContainer) {
-          ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
-        }
-      }
-
+      addMessageProcessorPathElements(mp, parentElement);
     }
+  }
 
+  public static void addMessageProcessorPathElements(Processor processor,
+                                                     MessageProcessorPathElement parentElement) {
+    if (processor == null || parentElement == null) {
+      return;
+    }
+    if (!(processor instanceof InternalMessageProcessor)) {
+      if (processor instanceof MessageProcessorContainer) {
+        ((MessageProcessorContainer) processor).addMessageProcessorPathElements(parentElement);
+      } else {
+        parentElement.addChild(processor);
+      }
+    }
   }
 
   /**

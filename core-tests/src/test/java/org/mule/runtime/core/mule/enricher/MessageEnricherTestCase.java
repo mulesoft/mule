@@ -30,12 +30,12 @@ import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.enricher.MessageEnricher;
 import org.mule.runtime.core.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
 import org.mule.runtime.core.processor.strategy.NonBlockingProcessingStrategy;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SensingNullReplyToHandler;
@@ -296,7 +296,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
   }
 
   private Event processEnricherInChain(MessageEnricher enricher, final Event in) throws MuleException {
-    return DefaultMessageProcessorChain.from(muleContext, enricher, event -> {
+    return MessageProcessors.newChain(enricher, event -> {
       assertThat(event.getMessage(), is(sameInstance(in.getMessage())));
       return event;
     }).process(in);

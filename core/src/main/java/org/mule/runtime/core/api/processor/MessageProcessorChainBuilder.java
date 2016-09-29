@@ -17,4 +17,7 @@ public interface MessageProcessorChainBuilder extends MessageProcessorBuilder {
   MessageProcessorChainBuilder chain(Processor... processors);
 
   MessageProcessorChainBuilder chain(MessageProcessorBuilder... builders);
+
+  @Override
+  MessageProcessorChain build();
 }

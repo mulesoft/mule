@@ -7,10 +7,13 @@
 package org.mule.runtime.core.processor.chain;
 
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -33,14 +36,6 @@ import java.util.List;
  */
 public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcessorChainBuilder {
 
-  public DefaultMessageProcessorChainBuilder(MuleContext muleContext) {
-    super(null, muleContext);
-  }
-
-  public DefaultMessageProcessorChainBuilder(FlowConstruct flowConstruct) {
-    super(flowConstruct, flowConstruct.getMuleContext());
-  }
-
   /**
    * This builder supports the chaining together of message processors that intercept and also those that don't. While one can
    * iterate over message processor intercepting message processors need to be chained together. One solution is make all message
@@ -53,57 +48,49 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
    * we continue with the algorithm
    */
   @Override
-  public MessageProcessorChain build() throws MuleException {
+  public MessageProcessorChain build() {
     LinkedList<Processor> tempList = new LinkedList<>();
 
-    final LinkedList<Processor> builtProcessors = new LinkedList<>();
+    final LinkedList<Processor> processorsForLifecycle = new LinkedList<>();
 
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
-      builtProcessors.addFirst(processor);
       if (processor instanceof InterceptingMessageProcessor) {
         InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
         // Processor is intercepting so we can't simply iterate
         if (i + 1 < processors.size()) {
           // Wrap processors in chain, unless single processor that is already a chain
-          if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
-            interceptingProcessor.setListener(tempList.get(0));
-          } else {
-            final DefaultMessageProcessorChain innerChain = createInnerChain(tempList);
-            innerChain.setMuleContext(muleContext);
-            interceptingProcessor.setListener(innerChain);
-          }
+          final MessageProcessorChain innerChain = createSimpleChain(tempList);
+          processorsForLifecycle.addFirst(innerChain);
+          interceptingProcessor.setListener(innerChain);
         }
         tempList = new LinkedList<>(singletonList(processor));
       } else {
         // Processor is not intercepting so we can invoke it using iteration
         // (add to temp list)
-        tempList.addFirst(initializeMessageProcessor(processor));
+        tempList.addFirst(processor);
       }
     }
     // Create the final chain using the current tempList after reserve iteration is complete. This temp
     // list contains the first n processors in the chain that are not intercepting.. with processor n+1
     // having been injected as the listener of processor n
-    final InterceptingChainLifecycleWrapper chain = buildMessageProcessorChain(createOuterChain(tempList), builtProcessors);
-    chain.setMuleContext(muleContext);
-    chain.setFlowConstruct(flowConstruct);
-    return chain;
+    Processor head = tempList.size() == 1 ? tempList.get(0) : createSimpleChain(tempList);
+    processorsForLifecycle.addFirst(head);
+    return createInterceptingChain(head, processors, processorsForLifecycle);
   }
 
-  protected InterceptingChainLifecycleWrapper buildMessageProcessorChain(DefaultMessageProcessorChain chain,
-                                                                         List<Processor> builtProcessors) {
-    // Wrap with something that can apply lifecycle to all processors which are otherwise not visable from
-    // DefaultMessageProcessorChain
-    return new InterceptingChainLifecycleWrapper(chain, builtProcessors, "wrapper for " + name);
+  protected MessageProcessorChain createSimpleChain(List<Processor> tempList) {
+    if (tempList.size() == 1 && tempList.get(0) instanceof SimpleMessageProcessorChain) {
+      return (MessageProcessorChain) tempList.get(0);
+    } else {
+      return new SimpleMessageProcessorChain("(inner chain) of " + name, new ArrayList<>(tempList));
+    }
   }
 
-  protected DefaultMessageProcessorChain createInnerChain(LinkedList<Processor> tempList) {
-    return new DefaultMessageProcessorChain("(inner iterating chain) of " + name, new ArrayList<>(tempList));
-  }
-
-  protected DefaultMessageProcessorChain createOuterChain(LinkedList<Processor> tempList) {
-    return new DefaultMessageProcessorChain("(inner iterating chain) of " + name, new ArrayList<>(tempList));
+  protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
+                                                          List<Processor> processorsForLifecycle) {
+    return new DefaultMessageProcessorChain("(outer intercepting chain) of " + name, head, processors, processorsForLifecycle);
   }
 
   @Override
@@ -137,5 +124,17 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   public DefaultMessageProcessorChainBuilder chainBefore(MessageProcessorBuilder builder) {
     this.processors.add(0, builder);
     return this;
+  }
+
+  static class SimpleMessageProcessorChain extends AbstractMessageProcessorChain {
+
+    SimpleMessageProcessorChain(String name, List<Processor> processors) {
+      super(name, processors);
+    }
+
+    @Override
+    protected List<Processor> getProcessorsToExecute() {
+      return processors;
+    }
   }
 }

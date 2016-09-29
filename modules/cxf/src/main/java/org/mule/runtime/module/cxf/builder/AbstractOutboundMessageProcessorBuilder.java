@@ -10,6 +10,7 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
@@ -61,23 +62,23 @@ public abstract class AbstractOutboundMessageProcessorBuilder implements Message
   private WsSecurity wsSecurity;
 
   @Override
-  public CxfOutboundMessageProcessor build() throws MuleException {
+  public CxfOutboundMessageProcessor build() {
     if (muleContext == null) {
       throw new IllegalStateException("MuleContext must be supplied.");
     }
 
-    if (configuration == null) {
-      configuration = CxfConfiguration.getConfiguration(muleContext);
-    }
-
-    // set the thread default bus so the JAX-WS Service implementation (or other bits of CXF code
-    // which I don't know about, but may depend on it) can use it when creating a Client -- DD
-    BusFactory.setThreadDefaultBus(getBus());
-
     try {
+      if (configuration == null) {
+        configuration = CxfConfiguration.getConfiguration(muleContext);
+      }
+
+      // set the thread default bus so the JAX-WS Service implementation (or other bits of CXF code
+      // which I don't know about, but may depend on it) can use it when creating a Client -- DD
+      BusFactory.setThreadDefaultBus(getBus());
+
       client = createClient();
     } catch (Exception e) {
-      throw new DefaultMuleException(e);
+      throw new MuleRuntimeException(e);
     }
 
     addInterceptors(client.getInInterceptors(), inInterceptors);

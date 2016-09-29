@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * of setNext and holds the next message processor as an attribute.
  */
 public abstract class AbstractInterceptingMessageProcessorBase extends AbstractAnnotatedObject
-    implements Processor, MuleContextAware, FlowConstructAware, MessageProcessorContainer {
+    implements Processor, MuleContextAware, FlowConstructAware {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -48,9 +48,6 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     this.flowConstruct = flowConstruct;
-    if (next instanceof FlowConstructAware) {
-      ((FlowConstructAware) next).setFlowConstruct(flowConstruct);
-    }
   }
 
   public final Processor getListener() {
@@ -94,16 +91,4 @@ public abstract class AbstractInterceptingMessageProcessorBase extends AbstractA
     return event != null && !(event instanceof VoidMuleEvent);
   }
 
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    if (next instanceof InternalMessageProcessor) {
-      return;
-    }
-    if (next instanceof MessageProcessorChain) {
-      NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(),
-                                                        pathElement.getParent());
-    } else if (next != null) {
-      NotificationUtils.addMessageProcessorPathElements(Arrays.asList(next), pathElement.getParent());
-    }
-  }
 }

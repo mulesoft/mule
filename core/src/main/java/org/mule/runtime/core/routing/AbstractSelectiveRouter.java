@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.routing;
 
+import static java.util.Collections.singletonList;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -21,6 +22,7 @@ import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
@@ -192,7 +194,7 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
       return conditionalMessageProcessors;
     }
 
-    return ListUtils.union(conditionalMessageProcessors, Collections.singletonList(defaultProcessor));
+    return ListUtils.union(conditionalMessageProcessors, singletonList(defaultProcessor));
   }
 
   private <O> O transitionLifecycleManagedObjectForAddition(O managedObject) {
@@ -288,12 +290,20 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    pathElement = pathElement.addChild(this);
     List<Processor> messageProcessors = new ArrayList<>();
     for (MessageProcessorFilterPair cmp : conditionalMessageProcessors) {
       messageProcessors.add(cmp.getMessageProcessor());
     }
     messageProcessors.add(defaultProcessor);
-    NotificationUtils.addMessageProcessorPathElements(messageProcessors, pathElement);
+    for (Processor route : messageProcessors) {
+      if (route instanceof MessageProcessorChain) {
+        MessageProcessorChain chain = (MessageProcessorChain) route;
+        NotificationUtils.addMessageProcessorPathElements(chain.getMessageProcessors(), pathElement.addChild(chain));
+      } else {
+        NotificationUtils.addMessageProcessorPathElements(route, pathElement.addChild(route));
+      }
+    }
   }
 
   @Override

@@ -21,17 +21,17 @@ public class OutboundEndpointMessageProcessorChainBuilder extends DefaultMessage
   protected ImmutableEndpoint endpoint;
 
   public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct) {
-    super(flowConstruct);
+    super();
     this.endpoint = endpoint;
   }
 
   public OutboundEndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint) {
-    super(endpoint.getMuleContext());
+    super();
     this.endpoint = endpoint;
   }
 
   @Override
-  protected Processor initializeMessageProcessor(Object processor) throws MuleException {
+  protected Processor initializeMessageProcessor(Object processor) {
     if (processor instanceof EndpointAware) {
       ((EndpointAware) processor).setEndpoint(endpoint);
     }

@@ -7,18 +7,11 @@
 package org.mule.runtime.core.api.processor;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.lifecycle.Disposable;
-import org.mule.runtime.core.api.lifecycle.Initialisable;
-import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChain;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
+
+import java.util.List;
 
 /**
  * Some convenience methods for message processors.
@@ -29,69 +22,66 @@ public class MessageProcessors {
     // do not instantiate
   }
 
-  public static MessageProcessorChain singletonChain(MuleContext muleContext, Processor mp) {
-    return DefaultMessageProcessorChain.from(muleContext, mp);
-  }
-
-  public static Processor lifecyleAwareMessageProcessorWrapper(final Processor mp) {
-    return new LifecyleAwareMessageProcessorWrapper(mp);
-  }
-
-  private static class LifecyleAwareMessageProcessorWrapper
-      implements Processor, Lifecycle, MuleContextAware, FlowConstructAware {
-
-    private Processor delegate;
-
-
-    public LifecyleAwareMessageProcessorWrapper(Processor delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public void initialise() throws InitialisationException {
-      if (delegate instanceof Initialisable) {
-        ((Initialisable) delegate).initialise();
-      }
-    }
-
-    @Override
-    public void start() throws MuleException {
-      if (delegate instanceof Startable) {
-        ((Startable) delegate).start();
-      }
-    }
-
-    @Override
-    public void stop() throws MuleException {
-      if (delegate instanceof Stoppable) {
-        ((Stoppable) delegate).stop();
-      }
-    }
-
-    @Override
-    public void dispose() {
-      if (delegate instanceof Disposable) {
-        ((Disposable) delegate).dispose();
-      }
-    }
-
-    @Override
-    public void setFlowConstruct(FlowConstruct flowConstruct) {
-      if (delegate instanceof FlowConstructAware) {
-        ((FlowConstructAware) delegate).setFlowConstruct(flowConstruct);
-      }
-    }
-
-    @Override
-    public void setMuleContext(MuleContext context) {
-      if (delegate instanceof MuleContextAware) {
-        ((MuleContextAware) delegate).setMuleContext(context);
-      }
-    }
-
-    @Override
-    public Event process(Event event) throws MuleException {
-      return delegate.process(event);
+  /**
+   * Creates a new {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs chains construction
+   * but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
+   *
+   * @param processors processors to construct chains from.
+   * @return new {@link MessageProcessorChain} instance.
+   */
+  public static MessageProcessorChain newChain(Processor... processors) {
+    if (processors.length == 1 && processors[0] instanceof MessageProcessorChain) {
+      return (MessageProcessorChain) processors[0];
+    } else {
+      return new DefaultMessageProcessorChainBuilder().chain(processors).build();
     }
   }
+
+  /**
+   * Creates a new {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs chains
+   * construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle.
+   *
+   * @param processors list of processors to construct chains from.
+   * @return new {@link MessageProcessorChain} instance.
+   */
+  public static MessageProcessorChain newChain(List<Processor> processors) {
+    if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
+      return (MessageProcessorChain) processors.get(0);
+    } else {
+      return new DefaultMessageProcessorChainBuilder().chain(processors).build();
+    }
+  }
+
+  /**
+   * Creates a new explicit {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs
+   * chains construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle. An explicit
+   * chain differs in that it has a {@link MessageProcessorPathElement} associated with.
+   *
+   * @param processors list of processors to construct chains from.
+   * @return new {@link MessageProcessorChain} instance.
+   */
+  public static MessageProcessorChain newExplicitChain(Processor... processors) {
+    if (processors.length == 1 && processors[0] instanceof ExplicitMessageProcessorChainBuilder) {
+      return (MessageProcessorChain) processors[0];
+    } else {
+      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+    }
+  }
+
+  /**
+   * Creates a new explicit {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs
+   * chains construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle. An explicit
+   * chain differs in that it has a {@link MessageProcessorPathElement} associated with.
+   *
+   * @param processors list of processors to construct chains from.
+   * @return new {@link MessageProcessorChain} instance.
+   */
+  public static MessageProcessorChain newExplicitChain(List<Processor> processors) {
+    if (processors.size() == 1 && processors.get(0) instanceof ExplicitMessageProcessorChainBuilder) {
+      return (MessageProcessorChain) processors.get(0);
+    } else {
+      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
+    }
+  }
+
 }

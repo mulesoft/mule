@@ -7,6 +7,8 @@
 package org.mule.runtime.core.processor;
 
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -19,6 +21,7 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.Processor;
@@ -106,12 +109,14 @@ public class ResponseMessageProcessorAdapter extends AbstractRequestResponseMess
   @Override
   public void setFlowConstruct(FlowConstruct flowConstruct) {
     super.setFlowConstruct(flowConstruct);
+    setFlowConstructIfNeeded(responseProcessor, flowConstruct);
     messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
   }
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    super.setMuleContext(context);
-    messageProcessorExecutionTemplate.setMuleContext(context);
+  public void setMuleContext(MuleContext muleContext) {
+    super.setMuleContext(muleContext);
+    setMuleContextIfNeeded(responseProcessor, muleContext);
+    messageProcessorExecutionTemplate.setMuleContext(muleContext);
   }
 }

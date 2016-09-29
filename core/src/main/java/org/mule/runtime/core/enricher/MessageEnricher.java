@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.enricher;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
 
 import org.mule.runtime.core.NonBlockingVoidMuleEvent;
@@ -26,8 +28,8 @@ import org.mule.runtime.core.metadata.DefaultTypedValue;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
-import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
 import org.mule.runtime.core.session.DefaultMuleSession;
+import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
 
 import java.util.ArrayList;
@@ -94,12 +96,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
   }
 
   public void setEnrichmentMessageProcessor(Processor enrichmentProcessor) {
-    if (!(enrichmentProcessor instanceof MessageProcessorChain)) {
-      this.enrichmentProcessor = MessageProcessors.singletonChain(muleContext, enrichmentProcessor);
-      ((MuleContextAware) this.enrichmentProcessor).setMuleContext(muleContext);
-    } else {
-      this.enrichmentProcessor = enrichmentProcessor;
-    }
+    this.enrichmentProcessor = newChain(enrichmentProcessor);
+    ((MuleContextAware) this.enrichmentProcessor).setMuleContext(muleContext);
   }
 
   /**
@@ -159,11 +157,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    if (enrichmentProcessor instanceof InterceptingChainLifecycleWrapper) {
-      super.addMessageProcessorPathElements(pathElement);
-    } else {
-      ((MessageProcessorContainer) enrichmentProcessor).addMessageProcessorPathElements(pathElement);
-    }
+    NotificationUtils.addMessageProcessorPathElements(enrichmentProcessor, pathElement.addChild(this));
   }
 
   /**

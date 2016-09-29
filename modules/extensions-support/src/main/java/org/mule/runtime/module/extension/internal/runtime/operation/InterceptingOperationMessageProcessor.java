@@ -187,7 +187,7 @@ public class InterceptingOperationMessageProcessor extends OperationMessageProce
       NotificationUtils.addMessageProcessorPathElements(((MessageProcessorChain) next).getMessageProcessors(),
                                                         pathElement.getParent());
     } else if (next != null) {
-      NotificationUtils.addMessageProcessorPathElements(asList(next), pathElement.getParent());
+      NotificationUtils.addMessageProcessorPathElements(next, pathElement.getParent());
     }
   }
 }

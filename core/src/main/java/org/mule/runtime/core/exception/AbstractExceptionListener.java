@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.security.SecurityException;
 import org.mule.runtime.core.config.ExceptionHelper;
@@ -32,6 +33,7 @@ import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.outbound.MulticastingRouter;
 import org.mule.runtime.core.transaction.TransactionCoordination;
+import org.mule.runtime.core.util.NotificationUtils;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -340,4 +342,10 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
       }
     }
   }
+
+  @Override
+  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement);
+  }
+
 }

@@ -19,7 +19,9 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -57,7 +59,7 @@ public class LifecycleUtils {
    *
    * @param object the object you're trying to initialise
    * @param muleContext a {@link MuleContext}
-   * @param flowConstruct the {@link org.mule.runtime.core.api.construct.FlowConstruct} in which the object is defined.
+   * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
    * @throws InitialisationException
    */
   public static void initialiseIfNeeded(Object object, MuleContext muleContext, FlowConstruct flowConstruct)
@@ -248,7 +250,7 @@ public class LifecycleUtils {
    * @param objects the list of objects to be stopped
    * @throws MuleException
    */
-  public static void disposeAllIfNeeded(Collection<? extends Object> objects, Logger logger) {
+  public static void disposeIfNeeded(Collection<? extends Object> objects, Logger logger) {
     try {
       doApplyPhase(Disposable.PHASE_NAME, objects, null, logger);
     } catch (Exception e) {
@@ -268,6 +270,56 @@ public class LifecycleUtils {
     if (muleContext.isStopped() || muleContext.isStopping()) {
       throw new IllegalStateException(errorMessage);
     }
+  }
+
+  /**
+   * Sets an objects {@link FlowConstruct} it implements {@link FlowConstructAware}.
+   *
+   * @param object the object you're trying to set the flow construct
+   * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
+   * @throws InitialisationException
+   */
+  public static void setFlowConstructIfNeeded(Object object, FlowConstruct flowConstruct) {
+    object = unwrap(object);
+    if (object != null && object instanceof FlowConstructAware) {
+      ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
+    }
+  }
+
+  /**
+   * Sets an objects {@link FlowConstruct} it implements {@link FlowConstructAware}.
+   *
+   * @param objects the object you're trying to set the flow construct
+   * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
+   * @throws InitialisationException
+   */
+  public static void setFlowConstructIfNeeded(Collection<? extends Object> objects, FlowConstruct flowConstruct) {
+    objects.forEach(o -> setFlowConstructIfNeeded(o, flowConstruct));
+  }
+
+  /**
+   * Sets an objects {@link MuleContext} it implements {@link MuleContextAware}.
+   *
+   * @param object the object you're trying to set the flow construct
+   * @param muleContext the {@link MuleContext} in which the object is defined.
+   * @throws InitialisationException
+   */
+  public static void setMuleContextIfNeeded(Object object, MuleContext muleContext) {
+    object = unwrap(object);
+    if (object != null && object instanceof MuleContextAware) {
+      ((MuleContextAware) object).setMuleContext(muleContext);
+    }
+  }
+
+  /**
+   * Sets an objects {@link FlowConstruct} it implements {@link MuleContextAware}.
+   *
+   * @param objects the object you're trying to set the flow construct
+   * @param muleContext the {@link FlowConstruct} in which the object is defined.
+   * @throws InitialisationException
+   */
+  public static void setMuleContextIfNeeded(Collection<? extends Object> objects, MuleContext muleContext) {
+    objects.forEach(o -> setMuleContextIfNeeded(o, muleContext));
   }
 
   private static void doApplyPhase(String phase, Collection<? extends Object> objects, MuleContext muleContext, Logger logger)

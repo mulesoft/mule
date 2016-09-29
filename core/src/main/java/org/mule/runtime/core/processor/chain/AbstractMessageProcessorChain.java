@@ -6,26 +6,28 @@
  */
 package org.mule.runtime.core.processor.chain;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.execution.MessageProcessorExecutionTemplate.createExecutionTemplate;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.construct.FlowConstructAware;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
-import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
-import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.execution.MessageProcessorExecutionTemplate;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringUtils;
@@ -35,20 +37,25 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
  * nested in another chain the next MessageProcessor in the parent chain is not injected into the first in the nested chain.
  */
 public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObject
-    implements NonBlockingMessageProcessor, MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware,
-    MessageProcessorContainer, MessagingExceptionHandlerAware {
+    implements NonBlockingMessageProcessor, MessageProcessorChain, MessagingExceptionHandlerAware {
 
-  protected final transient Logger log = LoggerFactory.getLogger(getClass());
+  private static final Logger log = getLogger(AbstractMessageProcessorChain.class);
+
   protected String name;
   protected List<Processor> processors;
   protected FlowConstruct flowConstruct;
+  protected MuleContext muleContext;
+  protected MessageProcessorExecutionTemplate messageProcessorExecutionTemplate = createExecutionTemplate();
+
+  public AbstractMessageProcessorChain(List<Processor> processors) {
+    this(null, processors);
+  }
 
   public AbstractMessageProcessorChain(String name, List<Processor> processors) {
     this.name = name;
@@ -67,68 +74,14 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     return doProcess(event);
   }
 
-  protected abstract Event doProcess(Event event) throws MuleException;
-
-  @Override
-  public void initialise() throws InitialisationException {
-    for (Processor processor : processors) {
-      // MULE-5002 TODO review MP Lifecycle
-      initialiseIfNeeded(processor);
-    }
+  protected Event doProcess(Event event) throws MuleException {
+    return new ProcessorExecutorFactory()
+        .createProcessorExecutor(event, getProcessorsToExecute(), messageProcessorExecutionTemplate, true, flowConstruct)
+        .execute();
   }
 
-  @Override
-  public void start() throws MuleException {
-    List<Processor> startedProcessors = new ArrayList<>();
-    try {
-      for (Processor processor : processors) {
-        if (processor instanceof Startable) {
-          ((Startable) processor).start();
-          startedProcessors.add(processor);
-        }
-      }
-    } catch (MuleException e) {
-      stop(startedProcessors);
-      throw e;
-    }
-  }
-
-  private void stop(List<Processor> processorsToStop) throws MuleException {
-    for (Processor processor : processorsToStop) {
-      if (processor instanceof Stoppable) {
-        ((Stoppable) processor).stop();
-      }
-    }
-  }
-
-  @Override
-  public void stop() throws MuleException {
-    stop(processors);
-  }
-
-  @Override
-  public void dispose() {
-    for (Processor processor : processors) {
-      if (processor instanceof Disposable) {
-        ((Disposable) processor).dispose();
-      }
-    }
-    processors.clear();
-  }
-
-  @Override
-  public void setFlowConstruct(FlowConstruct flowConstruct) {
-    for (Processor processor : processors) {
-      if (processor instanceof FlowConstructAware) {
-        ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
-      }
-    }
-    this.flowConstruct = flowConstruct;
-  }
-
-  @Override
-  public String getName() {
-    return name;
+  protected List<Processor> getProcessorsToExecute() {
+    return processors;
   }
 
   @Override
@@ -165,10 +118,13 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
     return processors;
   }
 
+  protected List<Processor> getMessageProcessorsForLifecycle() {
+    return processors;
+  }
+
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
     NotificationUtils.addMessageProcessorPathElements(getMessageProcessors(), pathElement);
-
   }
 
   @Override
@@ -181,12 +137,48 @@ public abstract class AbstractMessageProcessorChain extends AbstractAnnotatedObj
   }
 
   @Override
-  public void setMuleContext(MuleContext context) {
-    for (Processor processor : processors) {
-      if (processor instanceof MuleContextAware) {
-        ((MuleContextAware) processor).setMuleContext(context);
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+    this.messageProcessorExecutionTemplate.setMuleContext(muleContext);
+    setMuleContextIfNeeded(getMessageProcessorsForLifecycle(), muleContext);
+  }
+
+  @Override
+  public void setFlowConstruct(FlowConstruct flowConstruct) {
+    this.flowConstruct = flowConstruct;
+    this.messageProcessorExecutionTemplate.setFlowConstruct(flowConstruct);
+    setFlowConstructIfNeeded(getMessageProcessorsForLifecycle(), flowConstruct);
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(getMessageProcessorsForLifecycle());
+  }
+
+  @Override
+  public void start() throws MuleException {
+    List<Processor> startedProcessors = new ArrayList<>();
+    try {
+      for (Processor processor : getMessageProcessorsForLifecycle()) {
+        if (processor instanceof Startable) {
+          ((Startable) processor).start();
+          startedProcessors.add(processor);
+        }
       }
+    } catch (MuleException e) {
+      stopIfNeeded(getMessageProcessorsForLifecycle());
+      throw e;
     }
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    stopIfNeeded(getMessageProcessorsForLifecycle());
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(getMessageProcessorsForLifecycle(), log);
   }
 
 }
