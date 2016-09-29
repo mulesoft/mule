@@ -10,6 +10,7 @@ package org.mule.test.runner.api;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
@@ -39,6 +40,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
@@ -196,23 +198,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                     List<PluginUrlClassification> pluginUrlClassifications,
                                                     ArtifactClassificationType rootArtifactType) {
     directDependencies = directDependencies.stream()
-        .filter(directDep -> directDep.getScope().equals(PROVIDED))
+        .filter(getContainerDirectDependenciesFilter(rootArtifactType))
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
 
-    Set<Dependency> managedDependencies = directDependencies.stream()
-        .map(directDep -> {
-          try {
-            return dependencyResolver.readArtifactDescriptor(directDep.getArtifact()).getManagedDependencies();
-          } catch (ArtifactDescriptorException e) {
-            throw new IllegalStateException("Couldn't read artifact: '" + directDep.getArtifact() + "'", e);
-          }
-        })
-        .flatMap(l -> l.stream())
-        .collect(toSet());
+    Set<Dependency> managedDependencies = selectContainerManagedDependencies(context, directDependencies, rootArtifactType);
 
     logger.debug("Collected managed dependencies from direct provided dependencies to be used for resolving container "
         + "dependency graph: {}", managedDependencies);
@@ -257,6 +250,59 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     resolveSnapshotVersionsToTimestampedFromClassPath(containerUrls, context.getClassPathURLs());
 
     return containerUrls;
+  }
+
+  /**
+   * Creates the {@link Set} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies.
+   * If the rootArtifact is a {@link ArtifactClassificationType#MODULE} it will use its managed dependencies, other case it
+   * collects managed dependencies for each direct dependencies selected for Container.
+   *
+   * @param context {@link ClassPathClassifierContext} with settings for the classification process
+   * @param directDependencies {@link List} of {@link Dependency} with direct dependencies for the rootArtifact
+   * @param rootArtifactType {@link ArtifactClassificationType} for rootArtifact
+   * @return {@link Set} of {@link Dependency} to be used as managed dependencies when resolving Container dependencies
+   */
+  private Set<Dependency> selectContainerManagedDependencies(ClassPathClassifierContext context,
+                                                             List<Dependency> directDependencies,
+                                                             ArtifactClassificationType rootArtifactType) {
+    Set<Dependency> managedDependencies;
+    if (!rootArtifactType.equals(MODULE)) {
+      managedDependencies = directDependencies.stream()
+          .map(directDep -> {
+            try {
+              return dependencyResolver.readArtifactDescriptor(directDep.getArtifact()).getManagedDependencies();
+            } catch (ArtifactDescriptorException e) {
+              throw new IllegalStateException("Couldn't read artifact: '" + directDep.getArtifact() +
+                  "' while collecting managed dependencies for Container", e);
+            }
+          })
+          .flatMap(l -> l.stream())
+          .collect(toSet());
+    } else {
+      try {
+        managedDependencies = newHashSet(
+                                         dependencyResolver.readArtifactDescriptor(context.getRootArtifact())
+                                             .getManagedDependencies());
+      } catch (ArtifactDescriptorException e) {
+        throw new IllegalStateException("Couldn't collect managed dependencies for rootArtifact", e);
+      }
+    }
+    return managedDependencies;
+  }
+
+  /**
+   * Gets the direct dependencies filter to be used when collecting Container dependencies.
+   * If the rootArtifact is a {@link ArtifactClassificationType#MODULE} it will include
+   * {@value org.eclipse.aether.util.artifact.JavaScopes#COMPILE} dependencies too if not just
+   * {@value org.eclipse.aether.util.artifact.JavaScopes#PROVIDED}.
+   *
+   * @param rootArtifactType the {@link ArtifactClassificationType} for rootArtifact
+   * @return {@link Predicate} for selecting direct dependencies for the Container.
+   */
+  private Predicate<Dependency> getContainerDirectDependenciesFilter(ArtifactClassificationType rootArtifactType) {
+    return rootArtifactType.equals(MODULE)
+        ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
+        : directDep -> directDep.getScope().equals(PROVIDED);
   }
 
   /**

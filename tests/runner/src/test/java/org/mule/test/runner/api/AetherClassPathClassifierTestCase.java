@@ -117,7 +117,11 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(artifactClassificationTypeResolver.resolveArtifactClassificationType(rootArtifact))
         .thenReturn(MODULE);
 
-    ArtifactDescriptorResult defaultArtifactDescriptorResult = noManagedDependencies();
+    ArtifactDescriptorResult artifactDescriptorResult = mock(ArtifactDescriptorResult.class);
+    List<Dependency> managedDependencies = newArrayList(guavaDep);
+    when(artifactDescriptorResult.getManagedDependencies()).thenReturn(managedDependencies);
+    when(dependencyResolver.readArtifactDescriptor(any(Artifact.class))).thenReturn(artifactDescriptorResult);
+
 
     File rootArtifactFile = temporaryFolder.newFile();
     File fooCoreArtifactFile = temporaryFolder.newFile();
@@ -134,7 +138,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     when(dependencyResolver.resolveDependencies(argThat(nullValue(Dependency.class)),
                                                 (List<Dependency>) argThat(hasItems(equalTo(compileMuleCoreDep),
                                                                                     equalTo(compileMuleArtifactDep))),
-                                                (List<Dependency>) argThat(empty()),
+                                                (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                 argThat(instanceOf(DependencyFilter.class))))
                                                     .thenReturn(newArrayList(fooCoreArtifactFile, fooToolsArtifactFile));
 
@@ -148,13 +152,13 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
                hasItems(fooCoreArtifactFile.toURI().toURL(), fooToolsArtifactFile.toURI().toURL(),
                         rootArtifactFile.toURI().toURL()));
 
-    verify(defaultArtifactDescriptorResult, atLeastOnce()).getManagedDependencies();
+    verify(artifactDescriptorResult, atLeastOnce()).getManagedDependencies();
     verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class));
     verify(dependencyResolver).resolveDependencies(argThat(nullValue(Dependency.class)),
                                                    (List<Dependency>) argThat(
                                                                               hasItems(equalTo(compileMuleCoreDep),
                                                                                        equalTo(compileMuleArtifactDep))),
-                                                   (List<Dependency>) argThat(empty()),
+                                                   (List<Dependency>) argThat(hasItems(equalTo(guavaDep))),
                                                    argThat(instanceOf(DependencyFilter.class)));
     verify(artifactClassificationTypeResolver).resolveArtifactClassificationType(rootArtifact);
     verify(rootArtifactResult).getArtifact();
