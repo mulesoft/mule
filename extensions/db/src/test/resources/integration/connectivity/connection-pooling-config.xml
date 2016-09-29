@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:db="http://www.mulesoft.org/schema/mule/db"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+            http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+
+    <flow name="queryAndJoin">
+        <block transactionalAction="ALWAYS_BEGIN">
+            <db:delete config-ref="pooledJdbcConfig">
+                <db:sql>delete from PLANET</db:sql>
+            </db:delete>
+            <set-payload value="OK" />
+            <component class="org.mule.extension.db.integration.connectivity.DataSourcePoolingTestCase$JoinRequests"/>
+            <error-handler>
+                <on-error-continue>
+                    <set-payload value="FAIL" />
+                    <component class="org.mule.extension.db.integration.connectivity.DataSourcePoolingTestCase$JoinRequests"/>
+                </on-error-continue>
+            </error-handler>
+        </block>
+    </flow>
+</mule>
