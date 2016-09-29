@@ -95,6 +95,11 @@ public class ExceptionStrategyConfigurationFailuresTestCase extends AbstractMule
     loadConfiguration("org/mule/test/integration/exceptions/unknown-error-filtering-config.xml");
   }
 
+  @Test(expected = InitialisationException.class)
+  public void criticalErrorFilteringNotAllowed() throws Exception {
+    loadConfiguration("org/mule/test/integration/exceptions/critical-error-filtering-config.xml");
+  }
+
   private void loadConfiguration(String configuration) throws MuleException, InterruptedException {
     MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
     List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>();

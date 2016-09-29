@@ -42,7 +42,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
       if (exception instanceof MessagingException) {
         //Use same exception, but make sure whether a new error is needed
         messagingException = (MessagingException) exception;
-        Exception causeException = exception.getCause() != null ? (Exception) exception.getCause() : exception;
+        Throwable causeException = exception.getCause() != null ? exception.getCause() : exception;
         Optional<Error> error = messagingException.getEvent().getError();
         // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
         // messagingException.causedExactlyBy(..) condition.
@@ -75,9 +75,9 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
     }
   }
 
-  private ErrorType getErrorTypeFromFailingProcessor(Processor messageProcessor, Exception exception) {
+  private ErrorType getErrorTypeFromFailingProcessor(Processor messageProcessor, Throwable exception) {
     ErrorType errorType;
-    Exception causeException =
+    Throwable causeException =
         exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getException()
             : exception;
     if (AnnotatedObject.class.isAssignableFrom(messageProcessor.getClass())) {

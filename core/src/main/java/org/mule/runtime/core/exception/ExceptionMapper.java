@@ -8,13 +8,12 @@ package org.mule.runtime.core.exception;
 
 import static java.lang.String.format;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.api.MuleRuntimeException;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.api.MuleRuntimeException;
 
 /**
  * Defines a set of mappings between exception types and error types. Such configuration is later used to resolve the
@@ -49,7 +48,7 @@ public class ExceptionMapper {
    * @param exception the exception used to resolve the error type.
    * @return optional created with the found error type, if any, or an empty optional.
    */
-  public Optional<ErrorType> resolveErrorType(Exception exception) {
+  public Optional<ErrorType> resolveErrorType(Throwable exception) {
     return exceptionMappings.stream()
         .filter(exceptionMapping -> exceptionMapping.matches(exception))
         .findFirst().map(matchingExceptionMapping -> matchingExceptionMapping.getErrorType());
@@ -80,7 +79,7 @@ public class ExceptionMapper {
      * @param errorType the error type.
      * @return {@code this} builder
      */
-    public Builder addExceptionMapping(Class<? extends Exception> exceptionType, ErrorType errorType) {
+    public Builder addExceptionMapping(Class<? extends Throwable> exceptionType, ErrorType errorType) {
       if (!exceptionMappings.add(new ExceptionMapping(exceptionType, errorType))) {
         throw new MuleRuntimeException(createStaticMessage(format("Cannot build an %s with a repeated mapping for exception %s",
                                                                   ExceptionMapper.class.getName(),

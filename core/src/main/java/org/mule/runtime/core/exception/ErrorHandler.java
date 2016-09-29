@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.exception;
 
-import org.mule.runtime.core.api.GlobalNameableObject;
+import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.CRITICAL_ERROR_TYPE;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Lifecycle;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -35,6 +36,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     implements MessagingExceptionHandlerAcceptor, MuleContextAware, Lifecycle, MessageProcessorContainer, GlobalNameableObject {
 
   private List<MessagingExceptionHandlerAcceptor> exceptionListeners;
+  private ErrorTypeMatcher criticalMatcher = new SingleErrorTypeMatcher(CRITICAL_ERROR_TYPE);
 
   protected String globalName;
 
@@ -53,6 +55,9 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     event = Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .build();
+    if (criticalMatcher.match(exception.getEvent().getError().get().getErrorType())) {
+      return event;
+    }
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
       if (exceptionListener.accept(event)) {
         return exceptionListener.handleException(exception, event);

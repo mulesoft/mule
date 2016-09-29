@@ -8,6 +8,7 @@ package org.mule.runtime.core.message;
 
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.exception.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.util.Preconditions.checkState;
 import org.mule.runtime.api.message.ErrorType;
 
@@ -71,10 +72,14 @@ public final class ErrorTypeBuilder {
   public ErrorType build() {
     checkState(identifier != null, "string representation cannot be null");
     checkState(namespace != null, "namespace representation cannot be null");
-    if (!(identifier.equals(ANY_IDENTIFIER) && namespace.equals(CORE_NAMESPACE_NAME))) {
+    if (!isOrphan()) {
       checkState(parentErrorType != null, "parent error type cannot be null");
     }
     return new ErrorTypeImplementation(identifier, namespace, parentErrorType);
+  }
+
+  private boolean isOrphan() {
+    return (identifier.equals(ANY_IDENTIFIER) || identifier.equals(CRITICAL_IDENTIFIER)) && namespace.equals(CORE_NAMESPACE_NAME);
   }
 
   /**

@@ -9,6 +9,7 @@ package org.mule.runtime.core.exception;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.exception.Errors.CORE_NAMESPACE_NAME;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.config.ComponentIdentifier;
@@ -20,13 +21,13 @@ public class SingleErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTest
   @Test
   public void anyMatchsAll() {
     ErrorType mockErrorType = mock(ErrorType.class);
+    when(mockErrorType.getParentErrorType()).thenReturn(transformationErrorType);
     ErrorTypeMatcher anyMatcher = new SingleErrorTypeMatcher(anyErrorType);
 
     assertThat(anyMatcher.match(anyErrorType), is(true));
     assertThat(anyMatcher.match(transformationErrorType), is(true));
     assertThat(anyMatcher.match(expressionErrorType), is(true));
     assertThat(anyMatcher.match(mockErrorType), is(true));
-
   }
 
   @Test

@@ -9,14 +9,13 @@ package org.mule.runtime.core.exception;
 import static java.util.Optional.empty;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.util.Preconditions.checkState;
+import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.core.config.ComponentIdentifier;
 
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.collections.map.HashedMap;
-
-import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.core.config.ComponentIdentifier;
 
 /**
  * Locator for error types.
@@ -50,7 +49,7 @@ public class ErrorTypeLocator {
    * @return the error type related to the exception. If there's no mapping then the error type related to UNKNOWN will be
    *         returned.
    */
-  public ErrorType lookupErrorType(Exception exception) {
+  public ErrorType lookupErrorType(Throwable exception) {
     return defaultExceptionMapper.resolveErrorType(exception).get();
   }
 
@@ -58,14 +57,14 @@ public class ErrorTypeLocator {
    * Finds the {@code ErrorType} related to a component defined by the {@link ComponentIdentifier} based on the exception thrown
    * by the component and the mappings configured in the {@code ErrorTypeLocator}.
    * 
-   * If no mapping is available then the {@link #lookupErrorType(Exception)} rules applies.
+   * If no mapping is available then the {@link #lookupErrorType(Throwable)} rules applies.
    * 
    * @param componentIdentifier the identifier of the component that throw the exception.
    * @param exception the exception thrown by the component.
    * @return the error type related to the exception based on the component mappings. If there's no mapping then the error type
    *         related to UNKNOWN will be returned.
    */
-  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Exception exception) {
+  public ErrorType lookupComponentErrorType(ComponentIdentifier componentIdentifier, Throwable exception) {
     ExceptionMapper exceptionMapper = componentExceptionMappers.get(componentIdentifier);
     Optional<ErrorType> errorType = empty();
     if (exceptionMapper != null) {
