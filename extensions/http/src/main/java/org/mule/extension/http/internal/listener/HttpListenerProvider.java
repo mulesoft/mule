@@ -7,16 +7,16 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
-import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.TLS;
 import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
-import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -71,7 +71,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
    */
   @Parameter
   @Expression(NOT_SUPPORTED)
-  @Placement(group = URL_CONFIGURATION, order = 2)
+  @Placement(group = CONNECTION, order = 2)
   private String host;
 
   /**
@@ -80,7 +80,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
    */
   @Parameter
   @Expression(NOT_SUPPORTED)
-  @Placement(group = URL_CONFIGURATION, order = 3)
+  @Placement(group = CONNECTION, order = 3)
   private Integer port;
 
   /**
@@ -91,7 +91,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Parameter
   @Optional(defaultValue = "HTTP")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = URL_CONFIGURATION, order = 1)
+  @Placement(group = CONNECTION, order = 1)
   private HttpConstants.Protocols protocol;
 
   /**
@@ -101,7 +101,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Optional
   @Expression(NOT_SUPPORTED)
   @DisplayName(TLS_CONFIGURATION)
-  @Placement(group = TLS_CONFIGURATION, tab = TLS)
+  @Placement(tab = TLS, group = TLS_CONFIGURATION)
   private TlsContextFactory tlsContext;
 
   /**
@@ -111,7 +111,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Parameter
   @Optional(defaultValue = "30000")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 2)
   private Integer connectionIdleTimeout;
 
   /**
@@ -120,7 +120,7 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Parameter
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
   private Boolean usePersistentConnections;
 
   @Inject

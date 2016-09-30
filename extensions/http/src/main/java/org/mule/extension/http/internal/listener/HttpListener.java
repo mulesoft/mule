@@ -6,7 +6,8 @@
  */
 package org.mule.extension.http.internal.listener;
 
-import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.CONFIGURATION_OVERRIDES;
+import static org.mule.extension.http.internal.HttpConnector.RESPONSE_SETTINGS;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
@@ -15,7 +16,6 @@ import static org.mule.runtime.extension.api.annotation.param.display.Placement.
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.BAD_REQUEST;
 import static org.mule.runtime.module.http.api.HttpConstants.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
-
 import org.mule.extension.http.api.HttpRequestAttributes;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -87,13 +87,12 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 @Alias("listener")
-@MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
+@MetadataScope(outputResolver = HttpMetadataResolver.class)
 public class HttpListener extends Source<Object, HttpRequestAttributes> implements Initialisable, Disposable {
 
   private static final Logger logger = LoggerFactory.getLogger(HttpListener.class);
   private static final String SERVER_PROBLEM = "Server encountered a problem";
   private static final String ERROR_RESPONSE_SETTINGS = "Error Response Settings";
-  private static final String RESPONSE_SETTINGS = "Response Settings";
 
   @UseConfig
   private HttpListenerConfig config;
@@ -121,7 +120,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
    */
   @Parameter
   @Optional(defaultValue = "AUTO")
-  @Placement(tab = ADVANCED, group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS)
   private HttpStreamingType responseStreamingMode;
 
   /**
@@ -131,7 +130,7 @@ public class HttpListener extends Source<Object, HttpRequestAttributes> implemen
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED, group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = CONFIGURATION_OVERRIDES)
   private Boolean parseRequest;
 
   @Parameter

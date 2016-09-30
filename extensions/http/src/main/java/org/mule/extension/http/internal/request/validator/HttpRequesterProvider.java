@@ -8,13 +8,13 @@ package org.mule.extension.http.internal.request.validator;
 
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnector.AUTHENTICATION;
-import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.TLS;
 import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
-import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -73,7 +73,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
    */
   @Parameter
   @Optional
-  @Placement(group = URL_CONFIGURATION, order = 2)
+  @Placement(group = CONNECTION, order = 2)
   private Function<Event, String> host;
 
   /**
@@ -82,7 +82,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
    */
   @Parameter
   @Optional
-  @Placement(group = URL_CONFIGURATION, order = 3)
+  @Placement(group = CONNECTION, order = 3)
   private Function<Event, Integer> port;
 
   /**
@@ -95,7 +95,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Optional(defaultValue = "HTTP")
   @Expression(NOT_SUPPORTED)
   @Summary("Protocol to use for communication. Valid values are HTTP and HTTPS")
-  @Placement(group = URL_CONFIGURATION, order = 1)
+  @Placement(group = CONNECTION, order = 1)
   private HttpConstants.Protocols protocol;
 
   /**
@@ -124,6 +124,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Parameter
   @Optional(defaultValue = "-1")
   @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 2)
   private Integer maxConnections;
 
   /**
@@ -133,7 +134,7 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Parameter
   @Optional(defaultValue = "30000")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 3)
   private Integer connectionIdleTimeout;
 
   /**
@@ -142,13 +143,13 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Parameter
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
   private Boolean usePersistentConnections;
 
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = "Sockets")
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 4)
   private TcpClientSocketProperties clientSocketProperties;
 
   /**

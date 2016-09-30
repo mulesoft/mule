@@ -8,7 +8,10 @@ package org.mule.extension.http.internal.request.validator;
 
 import static org.mule.extension.http.internal.HttpConnector.API_CONFIGURATION;
 import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.REQUEST_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -55,7 +58,7 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional(defaultValue = "true")
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 1)
   private Function<Event, Boolean> followRedirects;
 
   /**
@@ -65,7 +68,7 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional(defaultValue = "true")
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS, order = 1)
   @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
   private Function<Event, Boolean> parseResponse;
 
@@ -76,7 +79,7 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional(defaultValue = "AUTO")
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 3)
   @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, "
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
   private Function<Event, HttpStreamingType> requestStreamingMode;
@@ -87,7 +90,7 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional(defaultValue = "AUTO")
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 2)
   private Function<Event, HttpSendBodyMode> sendBodyMode;
 
   /**
@@ -96,7 +99,7 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS, order = 2)
   private Function<Event, Integer> responseTimeout;
 
   /**
@@ -105,7 +108,7 @@ public class HttpRequesterConfig implements Initialisable {
   @Parameter
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = OTHER_SETTINGS)
   private boolean enableCookies;
 
   /**
