@@ -63,6 +63,10 @@ abstract class AbstractQueryResolver<T extends StatementDefinition> implements Q
   protected abstract List<QueryParamValue> resolveParams(T statementDefinition, QueryTemplate template);
 
   protected QueryTemplate createQueryTemplate(T statementDefinition, DbConnector connector, DbConnection connection) {
+    if (isBlank(statementDefinition.getSql())) {
+      throw new IllegalArgumentException("Statement doesn't contain a SQL query. Please provide one or reference a template which does");
+    }
+
     QueryTemplate queryTemplate = queryTemplateParser.parse(statementDefinition.getSql());
     if (needsParamTypeResolution(queryTemplate)) {
       Map<Integer, DbType> paramTypes = getParameterTypes(connector, connection, queryTemplate);

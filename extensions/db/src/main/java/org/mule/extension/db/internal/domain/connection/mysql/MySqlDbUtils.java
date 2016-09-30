@@ -43,7 +43,7 @@ final class MySqlDbUtils {
   }
 
   private static String addProperties(String url, Map<String, String> connectionProperties) {
-    if (connectionProperties.isEmpty()) {
+    if (connectionProperties != null && connectionProperties.isEmpty()) {
       return url;
     }
 
@@ -60,14 +60,16 @@ final class MySqlDbUtils {
 
   private static String buildQueryParams(Map<String, String> connectionProperties) {
     StringBuilder params = new StringBuilder(128);
-    for (Map.Entry<String, String> entry : connectionProperties.entrySet()) {
-      if (params.length() > 0) {
-        params.append('&');
-      }
+    if (connectionProperties != null) {
+      for (Map.Entry<String, String> entry : connectionProperties.entrySet()) {
+        if (params.length() > 0) {
+          params.append('&');
+        }
 
-      params.append(entry.getKey())
-          .append('=')
-          .append(entry.getValue());
+        params.append(entry.getKey())
+            .append('=')
+            .append(entry.getValue());
+      }
     }
 
     return params.toString();
