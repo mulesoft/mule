@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:email="http://www.mulesoft.org/schema/mule/email"
-      xmlns:spring="http://www.springframework.org/schema/beans" xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 
@@ -73,9 +73,20 @@
     </flow>
 
     <flow name="retrieveAndDelete">
+        <email:list-imap config-ref="config" deleteAfterRetrieve="true"/>
+    </flow>
+
+    <flow name="retrieveAndDeleteSelected">
         <email:list-imap config-ref="config"/>
         <foreach>
-            <email:delete config-ref="config" emailId="#[payload.attributes.get().id]"/>
+            <choice>
+                <when expression="#[payload.attributes.get().id > 5]">
+                    <email:delete config-ref="config" emailId="#[payload.attributes.get().id]"/>
+                </when>
+                <otherwise>
+                    <logger/>
+                </otherwise>
+            </choice>
         </foreach>
     </flow>
 

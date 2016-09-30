@@ -16,7 +16,7 @@ import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.predicate.IMAPEmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.ExpungeCommand;
 import org.mule.extension.email.internal.commands.ListCommand;
-import org.mule.extension.email.internal.commands.SetFlagByUID;
+import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.commands.StoreCommand;
 import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
@@ -41,7 +41,7 @@ public class IMAPOperations {
   private final ExpungeCommand expungeCommand = new ExpungeCommand();
   private final ListCommand listCommand = new ListCommand();
   private final StoreCommand storeCommand = new StoreCommand();
-  private final SetFlagByUID setFlagByUID = new SetFlagByUID();
+  private final SetFlagCommand setFlagCommand = new SetFlagCommand();
 
   /**
    * List all the emails in the configured imap mailBoxFolder that match with the specified {@code imapMatcher} criteria.
@@ -50,6 +50,7 @@ public class IMAPOperations {
    * @param connection    The corresponding {@link MailboxConnection} instance.
    * @param mailboxFolder Mailbox folder where the emails are going to be fetched
    * @param imapMatcher   Email Matcher which gives the capability of filter the retrieved emails
+   * @param deleteAfterRetrieve Specifies if the returned emails must be deleted after being retrieved or not.
    * @return an {@link OperationResult} {@link List} carrying all the emails content
    * and it's corresponding {@link IMAPEmailAttributes}.
    */
@@ -57,8 +58,19 @@ public class IMAPOperations {
   public List<OperationResult<Object, IMAPEmailAttributes>> listImap(@UseConfig IMAPConfiguration config,
                                                                      @Connection MailboxConnection connection,
                                                                      @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
-                                                                     @DisplayName("Matcher") @Optional IMAPEmailPredicateBuilder imapMatcher) {
-    return listCommand.list(config, connection, mailboxFolder, imapMatcher);
+                                                                     @DisplayName("Matcher") @Optional IMAPEmailPredicateBuilder imapMatcher,
+                                                                     @Optional(
+                                                                         defaultValue = "false") boolean deleteAfterRetrieve) {
+    List<OperationResult<Object, IMAPEmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, imapMatcher);
+    if (deleteAfterRetrieve) {
+      emails.forEach(e -> {
+        long uid = e.getAttributes()
+            .orElseThrow(() -> new EmailException("Could not find attributes in retrieved email"))
+            .getId();
+        delete(connection, mailboxFolder, uid);
+      });
+    }
+    return emails;
   }
 
   /**
@@ -73,7 +85,7 @@ public class IMAPOperations {
   public void markAsRead(@Connection MailboxConnection connection,
                          @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                          @Summary("Email ID Number of the email to mark as read") @DisplayName("Email ID") long emailId) {
-    setFlagByUID.set(connection, mailboxFolder, SEEN, emailId);
+    setFlagCommand.setByUID(connection, mailboxFolder, SEEN, emailId);
   }
 
   /**
@@ -93,7 +105,7 @@ public class IMAPOperations {
   public void markAsDeleted(@Connection MailboxConnection connection,
                             @Optional(defaultValue = INBOX_FOLDER) String mailboxFolder,
                             @Summary("Email ID Number of the email to mark as deleted") @DisplayName("Email ID") long emailId) {
-    setFlagByUID.set(connection, mailboxFolder, DELETED, emailId);
+    setFlagCommand.setByUID(connection, mailboxFolder, DELETED, emailId);
   }
 
   /**

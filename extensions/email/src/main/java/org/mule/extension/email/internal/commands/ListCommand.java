@@ -37,17 +37,17 @@ public final class ListCommand {
   /**
    * Retrieves all the emails in the specified {@code folderName}.
    * <p>
-   * A new {@link Message} is created for each fetched email from the folder, where the payload is the text body of the email
+   * A new {@link OperationResult} is created for each fetched email from the folder, where the payload is the text body of the email
    * and the other metadata is carried by an {@link BaseEmailAttributes} instance.
    * <p>
    * For folder implementations (like IMAP) that support fetching without reading the content, if the content should NOT be read
    * ({@code shouldReadContent} = false) the SEEN flag is not going to be set.
    *
-   * @param configuration  The {@link MailboxAccessConfiguration} associated to this operation.
-   * @param connection     the associated {@link MailboxConnection}.
-   * @param folderName     the name of the folder where the emails are stored.
-   * @param matcherBuilder a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
-   *                       {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
+   * @param configuration       The {@link MailboxAccessConfiguration} associated to this operation.
+   * @param connection          the associated {@link MailboxConnection}.
+   * @param folderName          the name of the folder where the emails are stored.
+   * @param matcherBuilder      a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
+   *                            {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
    */
   public <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(MailboxAccessConfiguration configuration,
                                                                                MailboxConnection connection,
@@ -56,7 +56,7 @@ public final class ListCommand {
     Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);
-      List<OperationResult<Object, T>> list = new LinkedList<>();
+      List<OperationResult<Object, T>> retrievedEmails = new LinkedList<>();
       for (javax.mail.Message m : folder.getMessages()) {
         Object emailContent = "";
         T attributes = configuration.parseAttributesFromMessage(m, folder);
@@ -70,10 +70,10 @@ public final class ListCommand {
               .output(emailContent)
               .attributes(attributes)
               .build();
-          list.add(operationResult);
+          retrievedEmails.add(operationResult);
         }
       }
-      return list;
+      return retrievedEmails;
     } catch (MessagingException me) {
       throw new EmailException("Error while retrieving emails: " + me.getMessage(), me);
     }
