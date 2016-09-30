@@ -11,9 +11,8 @@ import static javax.mail.Folder.READ_WRITE;
 import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
 
-import com.sun.mail.imap.IMAPFolder;
-
 import javax.mail.Flags.Flag;
+import javax.mail.Folder;
 import javax.mail.MessagingException;
 import javax.mail.UIDFolder;
 
@@ -28,7 +27,7 @@ import javax.mail.UIDFolder;
  *
  * @since 4.0
  */
-public class SetFlagByUID {
+public class SetFlagCommand {
 
   /**
    * Sets the specified {@code flag} into the email of UID (unique identifier) {@code emailId}.
@@ -40,9 +39,9 @@ public class SetFlagByUID {
    * @param flag       the {@link Flag} that wants to be set in the email message.
    * @param emailId    the unique identifier of the email in the corresponding {@link UIDFolder} of name {@code folderName}
    */
-  public void set(MailboxConnection connection, String folderName, Flag flag, long emailId) {
+  public void setByUID(MailboxConnection connection, String folderName, Flag flag, long emailId) {
     try {
-      IMAPFolder folder = (IMAPFolder) connection.getFolder(folderName, READ_WRITE);
+      UIDFolder folder = (UIDFolder) connection.getFolder(folderName, READ_WRITE);
       javax.mail.Message message = folder.getMessageByUID(emailId);
       if (message == null) {
         throw new EmailException(format("No email was found with id:[%s]", emailId));
@@ -50,6 +49,29 @@ public class SetFlagByUID {
       message.setFlag(flag, true);
     } catch (MessagingException e) {
       throw new EmailException(format("Error while setting [%s] flag in email of id [%s]", flag.toString(), emailId), e);
+    }
+  }
+
+  /**
+   * Sets the specified {@code flag} to the email of mailbox number {@code number}
+   * <p>
+   * This method only works for {@link UIDFolder}s, that are handled by the IMAP protocol
+   *
+   * @param connection the associated {@link MailboxConnection}.
+   * @param folderName the name of the folder where the emails are stored.
+   * @param flag       the {@link Flag} that wants to be set in the email message.
+   * @param number     the number of the email in the corresponding {@link Folder} of name {@code folderName}
+   */
+  public void setByNumber(MailboxConnection connection, String folderName, Flag flag, int number) {
+    try {
+      Folder folder = connection.getFolder(folderName, READ_WRITE);
+      javax.mail.Message message = folder.getMessage(number);
+      if (message == null) {
+        throw new EmailException(format("No email was found in the mailbox of number:[%s]", number));
+      }
+      message.setFlag(flag, true);
+    } catch (MessagingException e) {
+      throw new EmailException(format("Error while setting [%s] flag in email number:[%s]", flag.toString(), number), e);
     }
   }
 }

@@ -54,6 +54,7 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
   private static final String RETRIEVE_AND_DELETE_INCOMING_AND_SCHEDULED = "retrieveAndDeleteIncomingAndScheduled";
   private static final String RETRIEVE_MATCH_RECENT = "retrieveOnlyRecentEmails";
   private static final String FAIL_MARKING_FLAG = "failMarkingEmail";
+  private static final String RETRIEVE_DELETE_SELECTED = "retrieveAndDeleteSelected";
 
   @Parameterized.Parameter
   public String protocol;
@@ -159,6 +160,13 @@ public class IMAPTestCase extends AbstractEmailRetrieverTestCase {
     assertThat(storedEmails, is(not(nullValue())));
     assertThat(storedEmails, arrayWithSize(1));
     assertStoredEmail(storedEmails[0]);
+  }
+
+  @Test
+  public void retrieveAndDeleteSelectedEmails() throws Exception {
+    assertThat(server.getReceivedMessages(), arrayWithSize(10));
+    runFlow(RETRIEVE_DELETE_SELECTED);
+    assertThat(server.getReceivedMessages(), arrayWithSize(5));
   }
 
   private void testMatcherFlag(String flowName, Flag flag, boolean flagState) throws Exception {
