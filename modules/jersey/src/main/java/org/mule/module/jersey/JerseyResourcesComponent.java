@@ -7,6 +7,7 @@
 
 package org.mule.module.jersey;
 
+import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.component.JavaComponent;
@@ -60,6 +61,23 @@ public class JerseyResourcesComponent extends AbstractComponent
 {
 
     protected static final String JERSEY_RESPONSE = "jersey_response";
+
+    public static final String EXTERNAL_ENTITIES_PROPERTY =
+            SYSTEM_PROPERTY_PREFIX + "xml.expandExternalEntities";
+    public static final String EXPAND_ENTITIES_PROPERTY =
+            SYSTEM_PROPERTY_PREFIX + "xml.expandInternalEntities";
+
+    public static Boolean isExternalEntitiesEnabled()
+    {
+        String externalEntitiesValue = System.getProperty(EXTERNAL_ENTITIES_PROPERTY, "false");
+        return Boolean.parseBoolean(externalEntitiesValue);
+    }
+
+    public static Boolean isExpandEntitiesEnabled()
+    {
+        String expandInternalEntitiesValue = System.getProperty(EXPAND_ENTITIES_PROPERTY, "false");
+        return Boolean.parseBoolean(expandInternalEntitiesValue);
+    }
 
     /**
      * Default dummy security context.
