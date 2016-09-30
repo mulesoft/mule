@@ -92,4 +92,8 @@
         </db:select>
     </flow>
 
+    <flow name="missingSQL">
+        <db:select />
+    </flow>
+
 </mule>

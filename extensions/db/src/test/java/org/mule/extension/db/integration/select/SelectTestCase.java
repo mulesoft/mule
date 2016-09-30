@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mule.extension.db.integration.TestRecordUtil.assertMessageContains;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.extension.db.integration.TestRecordUtil.getAllPlanetRecords;
@@ -18,7 +19,6 @@ import static org.mule.extension.db.integration.TestRecordUtil.getEarthRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getMarsRecord;
 import static org.mule.extension.db.integration.TestRecordUtil.getVenusRecord;
 import static org.mule.extension.db.integration.model.Planet.MARS;
-
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
@@ -27,12 +27,15 @@ import org.mule.extension.db.integration.model.Planet;
 import org.mule.extension.db.integration.model.Record;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.message.MuleEvent;
+import org.mule.runtime.core.exception.MessagingException;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.hamcrest.CoreMatchers;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runners.Parameterized;
 
 public class SelectTestCase extends AbstractDbIntegrationTestCase {
@@ -45,6 +48,9 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
   public static List<Object[]> parameters() {
     return TestDbConfig.getResources();
   }
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Override
   protected String[] getFlowConfigurationResources() {
@@ -126,4 +132,10 @@ public class SelectTestCase extends AbstractDbIntegrationTestCase {
     });
   }
 
+  @Test
+  public void missingSQL() throws Exception {
+    expectedException.expect(MessagingException.class);
+    expectedException.expectCause(instanceOf(IllegalArgumentException.class));
+    flowRunner("missingSQL").run();
+  }
 }
