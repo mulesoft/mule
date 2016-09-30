@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration.insert;
 
+import static java.sql.Statement.SUCCESS_NO_INFO;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.AnyOf.anyOf;
@@ -18,7 +19,6 @@ import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,14 +57,15 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
 
   private List<Map<String, Object>> values() {
     List<Map<String, Object>> values = new ArrayList<>();
-    addRecord(values, "name", "Pluto");
-    addRecord(values, "name", "Saturn");
+    addRecord(values, "Pluto", 777);
+    addRecord(values, "Saturn", 777);
     return values;
   }
 
-  private void addRecord(List<Map<String, Object>> values, String key, Object value) {
+  private void addRecord(List<Map<String, Object>> values, String planetName, int position) {
     Map<String, Object> record = new HashMap<>();
-    record.put(key, value);
+    record.put("name", planetName);
+    record.put("position", position);
     values.add(record);
   }
 
@@ -72,8 +73,8 @@ public class BulkInsertTestCase extends AbstractDbIntegrationTestCase {
     assertTrue(payload instanceof int[]);
     int[] counters = (int[]) payload;
     assertThat(counters.length, is(2));
-    assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
-    assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+    assertThat(counters[0], anyOf(equalTo(1), equalTo(SUCCESS_NO_INFO)));
+    assertThat(counters[1], anyOf(equalTo(1), equalTo(SUCCESS_NO_INFO)));
     assertPlanetRecordsFromQuery("Pluto", "Saturn");
   }
 }

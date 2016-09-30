@@ -7,15 +7,16 @@
 
     <flow name="bulkInsert">
         <db:bulk-insert parameterValues="#[payload]">
-            <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</db:sql>
+            <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
         </db:bulk-insert>
     </flow>
 
     <flow name="bulkInsertWithOverriddenType">
         <db:bulk-insert parameterValues="#[payload]">
-            <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (777, :name)</db:sql>
+            <db:sql>INSERT INTO PLANET(POSITION, NAME) VALUES (:position, :name)</db:sql>
             <db:parameter-types>
                 <db:parameter-type key="name" type="VARCHAR" />
+                <db:parameter-type key="position" type="INTEGER" />
             </db:parameter-types>
         </db:bulk-insert>
     </flow>

@@ -21,12 +21,12 @@
     </flow>
 
     <flow name="updateBulkAfterSelect">
-        <db:select>
+        <db:select target="select">
             <db:sql>select * from PLANET</db:sql>
         </db:select>
 
         <db:bulk-update parameterValues="#[payload]">
-            <db:sql>update PLANET set NAME='Mercury' where POSITION=:position</db:sql>
+            <db:sql>update PLANET set NAME='Mercury' where NAME= :name</db:sql>
         </db:bulk-update>
     </flow>
 </mule>
