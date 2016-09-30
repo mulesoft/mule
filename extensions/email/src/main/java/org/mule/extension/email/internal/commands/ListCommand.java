@@ -6,7 +6,6 @@
  */
 package org.mule.extension.email.internal.commands;
 
-import static javax.mail.Flags.Flag.DELETED;
 import static javax.mail.Folder.READ_ONLY;
 import static org.mule.runtime.core.message.DefaultMultiPartPayload.BODY_ATTRIBUTES;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
@@ -35,8 +34,6 @@ import javax.mail.MessagingException;
  */
 public final class ListCommand {
 
-  private SetFlagCommand setFlagCommand = new SetFlagCommand();
-
   /**
    * Retrieves all the emails in the specified {@code folderName}.
    * <p>
@@ -51,13 +48,11 @@ public final class ListCommand {
    * @param folderName          the name of the folder where the emails are stored.
    * @param matcherBuilder      a {@link Predicate} of {@link BaseEmailAttributes} used to filter the output list @return a
    *                            {@link List} of {@link Message} carrying all the emails and it's corresponding attributes.
-   * @param deleteAfterRetrieve Specifies if the returned emails must be deleted after being retrieved or not.
    */
   public <T extends BaseEmailAttributes> List<OperationResult<Object, T>> list(MailboxAccessConfiguration configuration,
                                                                                MailboxConnection connection,
                                                                                String folderName,
-                                                                               BaseEmailPredicateBuilder matcherBuilder,
-                                                                               boolean deleteAfterRetrieve) {
+                                                                               BaseEmailPredicateBuilder matcherBuilder) {
     Predicate<BaseEmailAttributes> matcher = matcherBuilder != null ? matcherBuilder.build() : e -> true;
     try {
       Folder folder = connection.getFolder(folderName, READ_ONLY);
@@ -78,24 +73,10 @@ public final class ListCommand {
           retrievedEmails.add(operationResult);
         }
       }
-      if (deleteAfterRetrieve) {
-        deleteRetrieved(connection, folderName, retrievedEmails);
-      }
       return retrievedEmails;
     } catch (MessagingException me) {
       throw new EmailException("Error while retrieving emails: " + me.getMessage(), me);
     }
-  }
-
-  private <T extends BaseEmailAttributes> void deleteRetrieved(MailboxConnection connection, String folderName,
-                                                               List<OperationResult<Object, T>> retrievedEmails) {
-    retrievedEmails.forEach(e -> {
-      int number = e.getAttributes()
-          .orElseThrow(() -> new EmailException("Could not find attributes in retrieved email"))
-          .getNumber();
-      setFlagCommand.setByNumber(connection, folderName, DELETED, number);
-    });
-    connection.closeFolder(true);
   }
 
   private Object readContent(javax.mail.Message m) {

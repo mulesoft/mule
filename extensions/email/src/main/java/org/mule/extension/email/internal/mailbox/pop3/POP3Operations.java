@@ -6,11 +6,14 @@
  */
 package org.mule.extension.email.internal.mailbox.pop3;
 
+import static javax.mail.Flags.Flag.DELETED;
 import static org.mule.extension.email.internal.util.EmailConnectorConstants.INBOX_FOLDER;
 import org.mule.extension.email.api.attributes.BaseEmailAttributes;
 import org.mule.extension.email.api.attributes.POP3EmailAttributes;
+import org.mule.extension.email.api.exception.EmailException;
 import org.mule.extension.email.api.predicate.POP3EmailPredicateBuilder;
 import org.mule.extension.email.internal.commands.ListCommand;
+import org.mule.extension.email.internal.commands.SetFlagCommand;
 import org.mule.extension.email.internal.mailbox.MailboxAccessConfiguration;
 import org.mule.extension.email.internal.mailbox.MailboxConnection;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -30,6 +33,7 @@ import java.util.List;
 public class POP3Operations {
 
   private final ListCommand listCommand = new ListCommand();
+  private final SetFlagCommand setFlagCommand = new SetFlagCommand();
 
   /**
    * List all the emails in the configured pop3 mailBoxFolder that match with the specified {@code pop3Matcher} criteria.
@@ -52,6 +56,16 @@ public class POP3Operations {
                                                                      @DisplayName("Matcher") @Optional POP3EmailPredicateBuilder pop3Matcher,
                                                                      @Optional(
                                                                          defaultValue = "false") boolean deleteAfterRetrieve) {
-    return listCommand.list(config, connection, mailboxFolder, pop3Matcher, deleteAfterRetrieve);
+    List<OperationResult<Object, POP3EmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, pop3Matcher);
+    if (deleteAfterRetrieve) {
+      emails.forEach(e -> {
+        int number = e.getAttributes()
+            .orElseThrow(() -> new EmailException("Could not find attributes in retrieved email"))
+            .getNumber();
+        setFlagCommand.setByNumber(connection, mailboxFolder, DELETED, number);
+      });
+      connection.closeFolder(true);
+    }
+    return emails;
   }
 }

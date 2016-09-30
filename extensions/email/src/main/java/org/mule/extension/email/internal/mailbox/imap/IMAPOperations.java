@@ -61,7 +61,16 @@ public class IMAPOperations {
                                                                      @DisplayName("Matcher") @Optional IMAPEmailPredicateBuilder imapMatcher,
                                                                      @Optional(
                                                                          defaultValue = "false") boolean deleteAfterRetrieve) {
-    return listCommand.list(config, connection, mailboxFolder, imapMatcher, deleteAfterRetrieve);
+    List<OperationResult<Object, IMAPEmailAttributes>> emails = listCommand.list(config, connection, mailboxFolder, imapMatcher);
+    if (deleteAfterRetrieve) {
+      emails.forEach(e -> {
+        long uid = e.getAttributes()
+            .orElseThrow(() -> new EmailException("Could not find attributes in retrieved email"))
+            .getId();
+        delete(connection, mailboxFolder, uid);
+      });
+    }
+    return emails;
   }
 
   /**
