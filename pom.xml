@@ -1693,7 +1693,6 @@
                             <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
                             <exclude>**/__artifactId__IBean.java</exclude>
                             <exclude>**/__artifactId__IBeanTestCase.java</exclude>
-
                         </excludes>
                         <includes>
                             <include>**/*.java</include>

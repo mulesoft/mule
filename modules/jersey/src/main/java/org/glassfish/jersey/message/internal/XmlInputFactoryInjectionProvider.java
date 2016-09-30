@@ -40,11 +40,11 @@
 package org.glassfish.jersey.message.internal;
 
 import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
-import org.mule.module.jersey.JerseyResourcesComponent;
-
-import javax.ws.rs.core.Configuration;
+import static org.mule.module.jersey.JerseyResourcesComponent.isExpandEntitiesEnabled;
+import static org.mule.module.jersey.JerseyResourcesComponent.isExternalEntitiesEnabled;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.Configuration;
 import javax.xml.stream.XMLInputFactory;
 
 import org.glassfish.hk2.api.Factory;
@@ -75,8 +75,8 @@ public class XmlInputFactoryInjectionProvider extends AbstractXmlFactory impleme
         XMLInputFactory factory = XMLInputFactory.newInstance();
 
         if (!isXmlSecurityDisabled()) {
-            factory.setProperty(IS_REPLACING_ENTITY_REFERENCES, JerseyResourcesComponent.isExternalEntitiesEnabled());
-            factory.setProperty(IS_REPLACING_ENTITY_REFERENCES, JerseyResourcesComponent.isExpandEntitiesEnabled());
+            factory.setProperty(IS_REPLACING_ENTITY_REFERENCES, isExternalEntitiesEnabled());
+            factory.setProperty(IS_REPLACING_ENTITY_REFERENCES, isExpandEntitiesEnabled());
         }
 
         return factory;

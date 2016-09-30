@@ -39,7 +39,8 @@
  */
 package org.glassfish.jersey.message.internal;
 
-import org.mule.module.jersey.JerseyResourcesComponent;
+import static org.mule.module.jersey.JerseyResourcesComponent.isExpandEntitiesEnabled;
+import static org.mule.module.jersey.JerseyResourcesComponent.isExternalEntitiesEnabled;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Configuration;
@@ -80,8 +81,8 @@ public class DocumentBuilderFactoryInjectionProvider extends AbstractXmlFactory 
 
         if (!isXmlSecurityDisabled())
         {
-            Boolean externalEntities = JerseyResourcesComponent.isExternalEntitiesEnabled();
-            Boolean expandEntities = JerseyResourcesComponent.isExpandEntitiesEnabled();
+            Boolean externalEntities = isExternalEntitiesEnabled();
+            Boolean expandEntities = isExpandEntitiesEnabled();
 
             f.setExpandEntityReferences(externalEntities);
             f.setExpandEntityReferences(expandEntities);

@@ -179,7 +179,7 @@ public class JerseyResourcesComponent extends AbstractComponent
 
         for (String pkg : packages)
         {
-             resourceConfig.packages(pkg);
+            resourceConfig.packages(pkg);
         }
 
         resourceConfig.addProperties(properties)

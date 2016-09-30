@@ -14,6 +14,10 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Before;
 import org.junit.Rule;
 
+/**
+ * Test for XML Billion Laughs attack
+ * https://en.wikipedia.org/wiki/Billion_laughs
+ */
 public class XmlBlBase extends FunctionalTestCase
 {
 

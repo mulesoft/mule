@@ -14,7 +14,7 @@ import static org.mule.module.http.api.HttpConstants.HttpStatus.OK;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.OperationOptions;
-import org.mule.module.http.api.HttpConstants;
+import org.mule.module.http.api.HttpConstants.ResponseProperties;
 
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ public class XmlBlDisabledTestCase extends XmlBlBase
         OperationOptions options = newOptions().method("POST").disableStatusCodeValidation().build();
         MuleMessage result = client.send(url, testMuleMessage, options);
 
-        int status = result.getInboundProperty(HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY);
+        int status = result.getInboundProperty(ResponseProperties.HTTP_STATUS_PROPERTY);
         assertThat(status, not(is(OK.getStatusCode())));
         assertThat(result.getPayloadAsString(), not(containsString("0101")));
     }
