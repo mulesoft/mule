@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.internal.domain.executor;
 
+import static java.lang.String.format;
 import org.mule.extension.db.internal.domain.logger.DefaultQueryLoggerFactory;
 import org.mule.extension.db.internal.domain.logger.QueryLoggerFactory;
 import org.mule.extension.db.internal.domain.logger.SingleQueryLogger;
@@ -48,7 +49,7 @@ public abstract class AbstractExecutor {
     for (int paramIndex = 1, inputParamsSize = queryTemplate.getParams().size(); paramIndex <= inputParamsSize; paramIndex++) {
       QueryParam queryParam = queryTemplate.getParams().get(paramIndex - 1);
       if (queryParam instanceof InputQueryParam) {
-        QueryParamValue param = paramValues.get(valueIndex);
+        QueryParamValue param = getParamValue(paramValues, queryParam.getName());
 
         queryLogger.addParameter(queryTemplate.getInputParams().get(valueIndex), param.getValue());
 
@@ -68,5 +69,11 @@ public abstract class AbstractExecutor {
 
   private void processOutputParam(CallableStatement statement, int index, DbType type) throws SQLException {
     type.registerOutParameter(statement, index);
+  }
+
+  private QueryParamValue getParamValue(List<QueryParamValue> paramValues, String paramName) {
+    return paramValues.stream().filter(p -> p.getName().equals(paramName)).findFirst().orElseThrow(
+                                                                                                   () -> new IllegalArgumentException(format("SQL Query references parameter '%s' which was not supplied as an input parameter",
+                                                                                                                                             paramName)));
   }
 }

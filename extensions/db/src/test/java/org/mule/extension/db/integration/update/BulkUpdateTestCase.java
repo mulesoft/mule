@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration.update;
 
+import static java.sql.Statement.SUCCESS_NO_INFO;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -17,7 +18,6 @@ import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.extension.db.integration.model.Planet.EARTH;
 import static org.mule.extension.db.integration.model.Planet.MARS;
 import static org.mule.extension.db.integration.model.Planet.VENUS;
-
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
@@ -25,7 +25,6 @@ import org.mule.extension.db.integration.model.Record;
 import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +63,7 @@ public class BulkUpdateTestCase extends AbstractDbIntegrationTestCase {
 
   @Test
   public void updateBulkAfterSelect() throws Exception {
-    Message response = flowRunner("updateBulkAfterSelect").run().getMessage();
+    Message response = flowRunner("updateBulkAfterSelect").withPayload(values()).run().getMessage();
     assertBulkUpdate(response);
   }
 
@@ -86,9 +85,9 @@ public class BulkUpdateTestCase extends AbstractDbIntegrationTestCase {
   private void assertBulkUpdate(Message response) throws SQLException {
     assertTrue(response.getPayload().getValue() instanceof int[]);
     int[] counters = (int[]) response.getPayload().getValue();
-    assertThat(counters[0], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
-    assertThat(counters[1], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
-    assertThat(counters[2], anyOf(equalTo(1), equalTo(Statement.SUCCESS_NO_INFO)));
+    assertThat(counters[0], anyOf(equalTo(1), equalTo(SUCCESS_NO_INFO)));
+    assertThat(counters[1], anyOf(equalTo(1), equalTo(SUCCESS_NO_INFO)));
+    assertThat(counters[2], anyOf(equalTo(1), equalTo(SUCCESS_NO_INFO)));
 
     List<Map<String, String>> result = selectData("select * from PLANET order by ID", getDefaultDataSource());
     assertRecords(result, new Record(new Field("NAME", "Mercury"), new Field("POSITION", 2)),
