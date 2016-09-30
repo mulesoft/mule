@@ -7,6 +7,7 @@
 package org.mule.runtime.core.exception;
 
 import static org.mule.runtime.core.exception.ErrorTypeLocatorFactory.CRITICAL_ERROR_TYPE;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.GlobalNameableObject;
 import org.mule.runtime.core.api.MuleRuntimeException;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.processor.AbstractMuleObjectOwner;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Selects which "on error" handler to execute based on filtering. Replaces the choice-exception-strategy from Mule 3. On error
@@ -55,7 +57,7 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
     event = Event.builder(event)
         .message(InternalMessage.builder(event.getMessage()).exceptionPayload(new DefaultExceptionPayload(exception)).build())
         .build();
-    if (criticalMatcher.match(exception.getEvent().getError().get().getErrorType())) {
+    if (isCriticalException(exception)) {
       return event;
     }
     for (MessagingExceptionHandlerAcceptor exceptionListener : exceptionListeners) {
@@ -64,6 +66,11 @@ public class ErrorHandler extends AbstractMuleObjectOwner<MessagingExceptionHand
       }
     }
     throw new MuleRuntimeException(CoreMessages.createStaticMessage("Default exception strategy must accept any event."));
+  }
+
+  private boolean isCriticalException(MessagingException exception) {
+    Optional<Error> error = exception.getEvent().getError();
+    return error.isPresent() && criticalMatcher.match(error.get().getErrorType());
   }
 
   public void setExceptionListeners(List<MessagingExceptionHandlerAcceptor> exceptionListeners) {
