@@ -128,9 +128,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     ArtifactClassificationType rootArtifactType = artifactClassificationTypeResolver
         .resolveArtifactClassificationType(context.getRootArtifact());
     if (rootArtifactType == null) {
-      throw new IllegalStateException("Couldn't be identified the rootArtifact type");
+      throw new IllegalStateException("Couldn't be identified type for rootArtifact: " + context.getRootArtifact());
     }
-    logger.debug("rootArtifact identified as {} type", rootArtifactType);
+    logger.debug("rootArtifact {} identified as {} type", context.getRootArtifact(), rootArtifactType);
 
     List<URL> pluginSharedLibUrls = buildPluginSharedLibClassification(context, directDependencies);
     List<PluginUrlClassification> pluginUrlClassifications =
@@ -231,7 +231,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, newArrayList(managedDependencies),
                                                                    dependencyFilter));
     } catch (Exception e) {
-      throw new IllegalStateException("Couldn't resolve dependencies for container", e);
+      throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
     containerUrls = containerUrls.stream().filter(url -> {
       String file = url.getFile();
@@ -242,7 +242,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     if (MODULE.equals(rootArtifactType)) {
       File rootArtifactOutputFile = resolveRootArtifactFile(context.getRootArtifact());
       if (rootArtifactOutputFile == null) {
-        throw new IllegalStateException("rootArtifact identified as MODULE but doesn't have an output");
+        throw new IllegalStateException("rootArtifact (" + context.getRootArtifact()
+            + ") identified as MODULE but doesn't have an output");
       }
       containerUrls.add(toUrl(rootArtifactOutputFile));
     }
@@ -280,11 +281,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .collect(toSet());
     } else {
       try {
-        managedDependencies = newHashSet(
-                                         dependencyResolver.readArtifactDescriptor(context.getRootArtifact())
-                                             .getManagedDependencies());
+        managedDependencies = newHashSet(dependencyResolver.readArtifactDescriptor(context.getRootArtifact())
+            .getManagedDependencies());
       } catch (ArtifactDescriptorException e) {
-        throw new IllegalStateException("Couldn't collect managed dependencies for rootArtifact", e);
+        throw new IllegalStateException("Couldn't collect managed dependencies for rootArtifact (" + context.getRootArtifact()
+            + ")", e);
       }
     }
     return managedDependencies;
@@ -487,7 +488,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     if (!context.getRootArtifact().equals(pluginArtifact)) {
       if (!findDirectDependency(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), rootArtifactDirectDependencies)
           .isPresent()) {
-        throw new IllegalStateException("Plugin '" + pluginArtifact + "' has to be defined as direct dependency");
+        throw new IllegalStateException("Plugin '" + pluginArtifact
+            + "' has to be defined as direct dependency of your Maven project (" + context.getRootArtifact() + ")");
       }
     }
   }
@@ -552,7 +554,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     Optional<Dependency> pluginSharedLibDependency = discoverDependency(pluginSharedLibCoords, rootArtifact, directDependencies);
     if (!pluginSharedLibDependency.isPresent() || !pluginSharedLibDependency.get().getScope().equals(TEST)) {
       throw new IllegalStateException("Plugin shared lib artifact '" + pluginSharedLibCoords +
-          "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project");
+          "' in order to be resolved has to be declared as " + TEST + " dependency of your Maven project (" + rootArtifact + ")");
     }
 
     return pluginSharedLibDependency.get();
@@ -573,7 +575,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     Optional<Dependency> pluginDependency = discoverDependency(pluginCoords, rootArtifact, directDependencies);
     if (!pluginDependency.isPresent() || !pluginDependency.get().getScope().equals(PROVIDED)) {
       throw new IllegalStateException("Plugin '" + pluginCoords + "' in order to be resolved has to be declared as " + PROVIDED +
-          " dependency of your Maven project");
+          " dependency of your Maven project (" + rootArtifact + ")");
     }
 
     return pluginDependency.get().getArtifact();
