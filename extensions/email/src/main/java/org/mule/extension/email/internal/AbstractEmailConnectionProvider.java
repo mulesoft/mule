@@ -26,27 +26,6 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractEmailConnectionProvider<T> implements ConnectionProvider<T> {
 
   private static final String TIMEOUT_CONFIGURATION = "Timeout Configuration";
-  /**
-   * The socket read timeout value. This attribute works in tandem with {@link #timeoutUnit}.
-   * <p>
-   * Defaults to {@code 5}
-   */
-  @Parameter
-  @Optional(defaultValue = "5")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
-  @Summary("Socket read timeout")
-  protected int readTimeout;
-
-  /**
-   * The socket write timeout value. This attribute works in tandem with {@link #timeoutUnit}.
-   * <p>
-   * Defaults to {@code 5}
-   */
-  @Parameter
-  @Optional(defaultValue = "5")
-  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
-  @Summary("The socket write timeout value")
-  protected int writeTimeout;
 
   /**
    * A {@link TimeUnit} which qualifies the {@link #connectionTimeout}, {@link #writeTimeout} and {@link #readTimeout} attributes.
@@ -71,11 +50,33 @@ public abstract class AbstractEmailConnectionProvider<T> implements ConnectionPr
   private int connectionTimeout;
 
   /**
+   * The socket read timeout value. This attribute works in tandem with {@link #timeoutUnit}.
+   * <p>
+   * Defaults to {@code 5}
+   */
+  @Parameter
+  @Optional(defaultValue = "5")
+  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 3)
+  @Summary("Socket read timeout")
+  private int readTimeout;
+
+  /**
+   * The socket write timeout value. This attribute works in tandem with {@link #timeoutUnit}.
+   * <p>
+   * Defaults to {@code 5}
+   */
+  @Parameter
+  @Optional(defaultValue = "5")
+  @Placement(tab = ADVANCED, group = TIMEOUT_CONFIGURATION, order = 4)
+  @Summary("The socket write timeout value")
+  private int writeTimeout;
+
+  /**
    * An additional custom set of properties to configure the connection session.
    */
   @Parameter
   @Optional
-  @Placement(tab = ADVANCED, group = GENERAL)
+  @Placement(tab = ADVANCED, group = GENERAL, order = 5)
   private Map<String, String> properties;
 
   /**
