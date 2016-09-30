@@ -1675,6 +1675,7 @@
 
                             <exclude>**/org/apache/**</exclude>
                             <exclude>**/org/springframework/**</exclude>
+                            <exclude>**/org/glassfish/jersey/**</exclude>
                             <exclude>**/HttpTransactionContext.java</exclude>
                             <exclude>**/HttpConnection.java</exclude>
                             <exclude>**/BndMojo.java</exclude>
@@ -1692,6 +1693,7 @@
                             <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
                             <exclude>**/__artifactId__IBean.java</exclude>
                             <exclude>**/__artifactId__IBeanTestCase.java</exclude>
+
                         </excludes>
                         <includes>
                             <include>**/*.java</include>
