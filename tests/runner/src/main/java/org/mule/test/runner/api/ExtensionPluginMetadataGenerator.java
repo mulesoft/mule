@@ -108,7 +108,7 @@ public class ExtensionPluginMetadataGenerator {
    */
   public Class scanForExtensionAnnotatedClasses(Artifact plugin, List<URL> urls) {
     logger.debug("Scanning plugin '{}' for annotated Extension class", plugin);
-    ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
+    ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
     scanner.addIncludeFilter(new AnnotationTypeFilter(Extension.class));
     scanner.setResourceLoader(new PathMatchingResourcePatternResolver(new URLClassLoader(urls.toArray(new URL[0]), null)));
     Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
