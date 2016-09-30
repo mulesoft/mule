@@ -13,6 +13,6 @@ import org.springframework.stereotype.Component;
  * Just a class for testing class path scanning.
  */
 @Component
-public class AnnotatedComponentTestClass {
+public class SpringAnnotatedComponent {
 
 }
