@@ -74,4 +74,14 @@
         </error-handler>
     </flow>
 
+    <flow name="propagatesCriticalErrors">
+        <append-string-transformer message=" critical"/>
+        <custom-processor class="org.mule.test.integration.exceptions.ErrorHandlerTestCase$ThrowErrorProcessor"/>
+        <error-handler>
+            <on-error-continue type="ANY">
+                <append-string-transformer message=" nope"/>
+            </on-error-continue>
+        </error-handler>
+    </flow>
+
 </mule>

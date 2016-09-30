@@ -15,6 +15,7 @@ import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.RETRY_
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.ROUTING;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.SECURITY;
 import static org.mule.runtime.core.exception.Errors.ComponentIdentifiers.TRANSFORMATION;
+import static org.mule.runtime.core.exception.Errors.Identifiers.CRITICAL_IDENTIFIER;
 import static org.mule.runtime.core.exception.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.ErrorType;
@@ -43,6 +44,14 @@ public class ErrorTypeLocatorFactory {
           .parentErrorType(ANY_ERROR_TYPE).build();
 
   /**
+   * Error type for which there will be no handling since it represents an error so critical it should not be handled.
+   * If such an error occurs it will always be propagated.
+   */
+  public static final ErrorType CRITICAL_ERROR_TYPE =
+      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(CRITICAL_IDENTIFIER)
+          .parentErrorType(null).build();
+
+  /**
    * Creates the default {@link ErrorTypeLocator} to use in mule.
    * 
    * @param errorTypeRepository error type repository. Commonly created using {@link ErrorTypeRepositoryFactory}.
@@ -61,6 +70,7 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(SecurityException.class, errorTypeRepository.lookupErrorType(SECURITY))
             .addExceptionMapping(MessageRedeliveredException.class, errorTypeRepository.lookupErrorType(REDELIVERY_EXHAUSTED))
             .addExceptionMapping(Exception.class, UNKNOWN_ERROR_TYPE)
+            .addExceptionMapping(Error.class, CRITICAL_ERROR_TYPE)
             .build())
         .build();
   }

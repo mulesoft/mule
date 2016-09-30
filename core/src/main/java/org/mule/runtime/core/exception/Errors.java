@@ -21,7 +21,7 @@ import org.mule.runtime.core.config.ComponentIdentifier;
  */
 public abstract class Errors {
 
-  public static final String CORE_NAMESPACE_NAME = "mule";
+  public static final String CORE_NAMESPACE_NAME = "MULE";
 
   public static final class Identifiers {
 
@@ -33,6 +33,7 @@ public abstract class Errors {
     public static final String CONNECTIVITY_ERROR_IDENTIFIER = "CONNECTIVITY";
     public static final String SECURITY_ERROR_IDENTIFIER = "SECURITY";
     public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
+    public static final String CRITICAL_IDENTIFIER = "CRITICAL";
     public static final String ANY_IDENTIFIER = "ANY";
 
   }

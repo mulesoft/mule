@@ -30,6 +30,7 @@ import org.mule.runtime.core.component.ComponentException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.config.i18n.I18nMessage;
 import org.mule.runtime.core.exception.MessageRedeliveredException;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.retry.RetryPolicyExhaustedException;
 import org.mule.test.AbstractIntegrationTestCase;
 
@@ -165,6 +166,13 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
     callTypeAndThrowException(new DefaultMuleException(mockMessage), expectedMessage);
   }
 
+  @Test
+  public void criticalNotHandled() throws Exception {
+    MessagingException exception = flowRunner("propagatesCriticalErrors").runExpectingException();
+    assertThat(exception.getEvent().getError().isPresent(), is(true));
+    assertThat(exception.getEvent().getError().get().getErrorType().getIdentifier(), is("CRITICAL"));
+  }
+
   private void callTypeAndThrowException(Exception exception, String expectedMessage) throws Exception {
     InternalMessage response = flowRunner("matchesHandlerUsingType")
         .withPayload("0")
@@ -224,6 +232,15 @@ public class ErrorHandlerTestCase extends AbstractIntegrationTestCase {
         throw (RuntimeException) exception;
       }
       return event;
+    }
+
+  }
+
+  public static class ThrowErrorProcessor implements Processor {
+
+    @Override
+    public Event process(Event event) throws MuleException {
+      throw new AssertionError("validation failed");
     }
 
   }

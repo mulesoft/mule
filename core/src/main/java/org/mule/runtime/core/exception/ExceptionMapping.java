@@ -17,7 +17,7 @@ import org.mule.runtime.api.message.ErrorType;
  */
 public class ExceptionMapping implements Comparable<ExceptionMapping> {
 
-  private Class<? extends Exception> exceptionType;
+  private Class<? extends Throwable> exceptionType;
   private ErrorType errorType;
 
   /**
@@ -26,7 +26,7 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
    * @param exceptionType exception type to related to the error type.
    * @param errorType error type associated with the exception type.
    */
-  ExceptionMapping(Class<? extends Exception> exceptionType, ErrorType errorType) {
+  ExceptionMapping(Class<? extends Throwable> exceptionType, ErrorType errorType) {
     checkState(exceptionType != null, "exceptionType type cannot be null");
     checkState(errorType != null, "error type cannot be null");
     this.exceptionType = exceptionType;
@@ -37,7 +37,7 @@ public class ExceptionMapping implements Comparable<ExceptionMapping> {
    * @param exception exception to check if it matches with this mapping.
    * @return true if the exception type is associated with this mapping.
    */
-  public boolean matches(Exception exception) {
+  public boolean matches(Throwable exception) {
     return this.exceptionType.isAssignableFrom(exception.getClass());
   }
 
