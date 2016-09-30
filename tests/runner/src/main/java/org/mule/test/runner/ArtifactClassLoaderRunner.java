@@ -156,7 +156,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     ArtifactIsolatedClassLoaderBuilder builder = new ArtifactIsolatedClassLoaderBuilder();
     final File rootArtifactClassesFolder = new File(targetTestClassesFolder.getParentFile(), "classes");
     builder.setRootArtifactClassesFolder(rootArtifactClassesFolder);
-    builder.setPluginResourcesFolder(targetTestClassesFolder);
+    builder.setPluginResourcesFolder(targetTestClassesFolder.getParentFile());
 
     builder.setProvidedExclusions(readAttribute("providedExclusions", klass));
     builder.setProvidedInclusions(readAttribute("providedInclusions", klass));

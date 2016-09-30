@@ -115,6 +115,10 @@ public class ExtensionsTestInfrastructureDiscoverer {
   }
 
   public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory) {
+    return generateDslResources(generatedResourcesDirectory, null);
+  }
+
+  public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory, RuntimeExtensionModel forExtensionModel) {
     DslResolvingContext context =
         extensionManager.getExtensions().stream().anyMatch(e -> e.getModelProperty(ImportedTypesModelProperty.class).isPresent())
             ? name -> extensionManager.getExtension(name).map(e -> e)
@@ -123,7 +127,9 @@ public class ExtensionsTestInfrastructureDiscoverer {
     ExtensionsTestDslResourcesGenerator dslResourceGenerator =
         new ExtensionsTestDslResourcesGenerator(getDslResourceFactories(), generatedResourcesDirectory, context);
 
-    extensionManager.getExtensions().forEach(dslResourceGenerator::generateFor);
+    extensionManager.getExtensions().stream()
+        .filter(runtimeExtensionModel -> forExtensionModel != null ? runtimeExtensionModel.equals(forExtensionModel) : true)
+        .forEach(dslResourceGenerator::generateFor);
 
     return dslResourceGenerator.dumpAll();
   }
