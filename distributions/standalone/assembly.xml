@@ -153,7 +153,6 @@
                 <include>org.mule.modules:mule-module-scripting-jruby</include>
                 <include>org.mule.modules:mule-module-schedulers</include>
                 <include>org.mule.modules:mule-module-spring-config</include>
-                <include>org.mule.modules:mule-module-spring-extras</include>
                 <include>org.mule.modules:mule-module-spring-security</include>
                 <include>org.mule.modules:mule-module-sockets</include>
                 <include>org.mule.modules:mule-module-tls</include>
@@ -224,7 +223,6 @@
                 <exclude>org.mule.modules:mule-module-scripting-jruby</exclude>
                 <exclude>org.mule.modules:mule-module-schedulers</exclude>
                 <exclude>org.mule.modules:mule-module-spring-config</exclude>
-                <exclude>org.mule.modules:mule-module-spring-extras</exclude>
                 <exclude>org.mule.modules:mule-module-spring-security</exclude>
                 <exclude>org.mule.modules:mule-module-sockets</exclude>
                 <exclude>org.mule.modules:mule-module-tls</exclude>
