@@ -28,6 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
               JmsQueueWithCompressionTestCase.class,
               JmsQueueWithTransactionTestCase.class,
               JmsRemoteSyncMule2868TestCase.class,
+              JmsRequestResponseTestCase.class,
               JmsSingleTransactionAlwaysBeginConfigurationTestCase.class,
               JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase.class,
               JmsSingleTransactionComponentTestCase.class,

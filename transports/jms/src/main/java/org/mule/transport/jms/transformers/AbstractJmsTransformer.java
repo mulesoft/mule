@@ -160,6 +160,12 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
                 setJmsPropertySanitizeKeyIfNecessary(msg, key, value);
             }
         }
+
+        // MULE-6577: Copy Mule message correlation id to JMS message correlation id.
+        if (message.getCorrelationId() != null)
+        {
+            msg.setJMSCorrelationID(message.getCorrelationId());
+        }
     }
 
     protected void setJmsPropertySanitizeKeyIfNecessary(Message msg, String key, Object value)
