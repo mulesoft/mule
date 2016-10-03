@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.introspection.parameter.ParameterModel.RESERVED_NAMES;
@@ -32,9 +31,7 @@ import org.mule.runtime.extension.api.introspection.declaration.type.annotation.
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 import org.mule.runtime.module.extension.internal.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.module.extension.internal.model.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.util.MetadataTypeUtils;
@@ -171,9 +168,7 @@ public final class ParameterModelValidator implements ModelValidator {
   }
 
   private SubTypesMappingContainer loadSubtypesMapping(ExtensionModel extensionModel) {
-    Optional<SubTypesMappingContainer> typesMapping = extensionModel.getModelProperty(SubTypesModelProperty.class)
-        .map(p -> new SubTypesMappingContainer(p.getSubTypesMapping()));
-    return typesMapping.isPresent() ? typesMapping.get() : new SubTypesMappingContainer(emptyMap());
+    return new SubTypesMappingContainer(extensionModel.getSubTypes());
   }
 
   private boolean supportsGlobalReferences(MetadataType type) {
@@ -185,11 +180,10 @@ public final class ParameterModelValidator implements ModelValidator {
   }
 
   private boolean supportsGlobalReferences(ParameterModel parameter) {
-    return parameter.getModelProperty(XmlHintsModelProperty.class).map(XmlHintsModelProperty::allowsReferences).orElse(true);
+    return parameter.getDslModel().allowsReferences();
   }
 
   private boolean supportsInlineDefinition(ParameterModel parameter) {
-    return parameter.getModelProperty(XmlHintsModelProperty.class).map(XmlHintsModelProperty::allowsInlineDefinition)
-        .orElse(true);
+    return parameter.getDslModel().allowsInlineDefinition();
   }
 }

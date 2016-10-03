@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.extension.xml.dsl.api.resolver.DslResolvingContext;
 
 /**
@@ -23,10 +23,10 @@ public class SchemaResourceFactory extends AbstractXmlResourceFactory {
    * {@inheritDoc}
    */
   @Override
-  protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlModelProperty xmlModelProperty,
+  protected GeneratedResource generateXmlResource(ExtensionModel extensionModel, XmlDslModel xmlDslModel,
                                                   DslResolvingContext context) {
 
-    String schema = new SchemaGenerator().generate(extensionModel, xmlModelProperty, context);
-    return new GeneratedResource(xmlModelProperty.getXsdFileName(), schema.getBytes());
+    String schema = new SchemaGenerator().generate(extensionModel, xmlDslModel, context);
+    return new GeneratedResource(xmlDslModel.getXsdFileName(), schema.getBytes());
   }
 }

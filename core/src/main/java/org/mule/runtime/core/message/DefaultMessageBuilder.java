@@ -62,8 +62,6 @@ import org.slf4j.LoggerFactory;
 public class DefaultMessageBuilder
     implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultMessageBuilder.class);
-
   private Object payload;
   private DataType dataType;
   private Attributes attributes = NULL_ATTRIBUTES;

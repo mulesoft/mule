@@ -105,7 +105,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
    * Creates a new instance and uses the given {@code serviceRegistry} to locate instances of {@link ModelEnricher}
    *
    * @param serviceRegistry a {@link ServiceRegistry}
-   * @param classLoader the {@link ClassLoader} on which the {@code serviceRegistry} will search into
+   * @param classLoader     the {@link ClassLoader} on which the {@code serviceRegistry} will search into
    */
   public DefaultExtensionFactory(ServiceRegistry serviceRegistry, ClassLoader classLoader) {
     modelEnrichers = ImmutableList.copyOf(serviceRegistry.lookupProviders(ModelEnricher.class, classLoader));
@@ -168,7 +168,11 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                              toOperations(extensionDeclaration.getOperations()),
                                              toConnectionProviders(extensionDeclaration.getConnectionProviders()),
                                              toMessageSources(extensionDeclaration.getMessageSources()),
+                                             extensionDeclaration.getDisplayModel(),
+                                             extensionDeclaration.getXmlDslModel(),
+                                             extensionDeclaration.getSubTypes(),
                                              extensionDeclaration.getTypes(),
+                                             extensionDeclaration.getImportedTypes(),
                                              extensionDeclaration.getModelProperties(),
                                              extensionDeclaration.getExceptionEnricherFactory());
 
@@ -222,6 +226,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                                     toOperations(declaration.getOperations()),
                                                                     toConnectionProviders(declaration.getConnectionProviders()),
                                                                     toMessageSources(declaration.getMessageSources()),
+                                                                    declaration.getDisplayModel(),
                                                                     declaration.getModelProperties(),
                                                                     declaration.getInterceptorFactories()));
     }
@@ -236,11 +241,14 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                              toParameters(declaration.getParameters()),
                                                              toOutputModel(declaration.getOutput()),
                                                              toOutputModel(declaration.getOutputAttributes()),
-                                                             declaration.getSourceFactory(), declaration.getModelProperties(),
+                                                             declaration.getSourceFactory(),
+                                                             declaration.getDisplayModel(),
+                                                             declaration.getModelProperties(),
                                                              declaration.getInterceptorFactories(),
                                                              declaration.getExceptionEnricherFactory(),
-                                                             getMetadataResolverFactory(declaration
-                                                                 .getMetadataResolverFactory())));
+                                                             getMetadataResolverFactory(
+                                                                                        declaration
+                                                                                            .getMetadataResolverFactory())));
     }
 
     private List<OperationModel> toOperations(List<OperationDeclaration> declarations) {
@@ -261,6 +269,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                   parameterModels,
                                                   toOutputModel(declaration.getOutput()),
                                                   toOutputModel(declaration.getOutputAttributes()),
+                                                  declaration.getDisplayModel(),
                                                   declaration.getModelProperties(),
                                                   declaration.getInterceptorFactories(),
                                                   declaration.getExceptionEnricherFactory(),
@@ -286,6 +295,7 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                                                          declaration.getFactory(),
                                                                          toParameters(declaration.getParameters()),
                                                                          declaration.getConnectionManagementType(),
+                                                                         declaration.getDisplayModel(),
                                                                          declaration.getModelProperties()));
     }
 
@@ -323,6 +333,9 @@ public final class DefaultExtensionFactory implements ExtensionFactory {
                                          parameter.isRequired(),
                                          parameter.getExpressionSupport(),
                                          parameter.getDefaultValue(),
+                                         parameter.getDslModel(),
+                                         parameter.getDisplayModel(),
+                                         parameter.getLayoutModel(),
                                          parameter.getModelProperties());
     }
 

@@ -63,7 +63,7 @@ import org.mule.runtime.core.registry.SpiServiceRegistry;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.core.util.collection.ImmutableListCollector;
 import org.mule.runtime.extension.api.ExtensionManager;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 
 import com.google.common.collect.ImmutableList;
 
@@ -494,9 +494,9 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
       if (extensionManager != null) {
         extensionNamespaces = extensionManager.getExtensions().stream()
             .map(ext -> {
-              XmlModelProperty xmlModelProperty = ext.getModelProperty(XmlModelProperty.class).orElse(null);
-              return xmlModelProperty != null
-                  ? new StaticXmlNamespaceInfo(xmlModelProperty.getNamespaceUri(), xmlModelProperty.getNamespace()) : null;
+              XmlDslModel xmlDslModel = ext.getXmlDslModel();
+              return xmlDslModel != null
+                  ? new StaticXmlNamespaceInfo(xmlDslModel.getNamespaceUri(), xmlDslModel.getNamespace()) : null;
             })
             .filter(info -> info != null)
             .collect(new ImmutableListCollector<>());

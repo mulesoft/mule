@@ -29,7 +29,7 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel
 import org.mule.runtime.extension.api.introspection.property.ExportModelProperty;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -89,12 +89,9 @@ final class ExportedArtifactsCollector {
   }
 
   private void collectXmlSupportResources() {
-    XmlModelProperty xml = extensionModel.getModelProperty(XmlModelProperty.class).orElse(null);
-    if (xml == null) {
-      return;
-    }
+    XmlDslModel languageModel = extensionModel.getXmlDslModel();
 
-    addMetaInfResource(xml.getXsdFileName());
+    addMetaInfResource(languageModel.getXsdFileName());
     addMetaInfResource("spring.handlers");
     addMetaInfResource("spring.schemas");
 

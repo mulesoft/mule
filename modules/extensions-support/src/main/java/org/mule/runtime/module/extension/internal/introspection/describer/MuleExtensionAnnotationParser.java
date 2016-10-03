@@ -15,9 +15,9 @@ import org.mule.runtime.extension.api.annotation.param.display.Password;
 import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.mule.runtime.extension.api.annotation.param.display.Text;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
+import org.mule.runtime.extension.api.introspection.display.LayoutModel.LayoutModelBuilder;
 import org.mule.runtime.extension.api.introspection.exception.ExceptionEnricherFactory;
-import org.mule.runtime.extension.api.introspection.property.LayoutModelProperty;
-import org.mule.runtime.extension.api.introspection.property.LayoutModelPropertyBuilder;
+import org.mule.runtime.extension.api.introspection.display.LayoutModel;
 import org.mule.runtime.module.extension.internal.introspection.describer.model.WithAnnotations;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.exception.DefaultExceptionEnricherFactory;
@@ -105,36 +105,29 @@ public final class MuleExtensionAnnotationParser {
     return map;
   }
 
-  private static void parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelPropertyBuilder builder) {
+  private static void doParseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
     Password passwordAnnotation = annotatedElement.getAnnotation(Password.class);
     if (passwordAnnotation != null) {
-      builder.withPassword(true);
+      builder.asPassword();
     }
     Text textAnnotation = annotatedElement.getAnnotation(Text.class);
     if (textAnnotation != null) {
-      builder.withText(true);
+      builder.asText();
     }
   }
 
-  private static void parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelPropertyBuilder builder) {
+  private static void doParseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
     java.util.Optional<Password> passwordAnnotation = annotatedElement.getAnnotation(Password.class);
     if (passwordAnnotation.isPresent()) {
-      builder.withPassword(true);
+      builder.asPassword();
     }
     java.util.Optional<Text> textAnnotation = annotatedElement.getAnnotation(Text.class);
     if (textAnnotation.isPresent()) {
-      builder.withText(true);
+      builder.asText();
     }
   }
 
-  private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, LayoutModelPropertyBuilder builder) {
-    Placement placementAnnotation = annotatedElement.getAnnotation(Placement.class);
-    if (placementAnnotation != null) {
-      builder.order(placementAnnotation.order()).groupName(placementAnnotation.group()).tabName(placementAnnotation.tab());
-    }
-  }
-
-  private static void parsePlacementAnnotation(WithAnnotations annotatedElement, LayoutModelPropertyBuilder builder) {
+  private static void parsePlacementAnnotation(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
     java.util.Optional<Placement> placementAnnotation = annotatedElement.getAnnotation(Placement.class);
     if (placementAnnotation.isPresent()) {
       Placement placement = placementAnnotation.get();
@@ -142,28 +135,33 @@ public final class MuleExtensionAnnotationParser {
     }
   }
 
-  static LayoutModelProperty parseLayoutAnnotations(AnnotatedElement annotatedElement, String name) {
-    return parseLayoutAnnotations(annotatedElement, name, LayoutModelPropertyBuilder.create());
+  private static void parsePlacementAnnotation(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
+    Placement placement = annotatedElement.getAnnotation(Placement.class);
+    if (placement != null) {
+      builder.order(placement.order()).groupName(placement.group()).tabName(placement.tab());
+    }
   }
 
-  static LayoutModelProperty parseLayoutAnnotations(WithAnnotations annotatedElement, String name) {
-    return parseLayoutAnnotations(annotatedElement, name, LayoutModelPropertyBuilder.create());
+  static LayoutModel parseLayoutAnnotations(AnnotatedElement annotatedElement) {
+    return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
   }
 
-  static LayoutModelProperty parseLayoutAnnotations(WithAnnotations annotatedElement, String name,
-                                                    LayoutModelPropertyBuilder builder) {
+  static LayoutModel parseLayoutAnnotations(WithAnnotations annotatedElement) {
+    return parseLayoutAnnotations(annotatedElement, LayoutModel.builder());
+  }
+
+  static LayoutModel parseLayoutAnnotations(WithAnnotations annotatedElement, LayoutModelBuilder builder) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
-      parseLayoutAnnotations(annotatedElement, builder);
+      doParseLayoutAnnotations(annotatedElement, builder);
       parsePlacementAnnotation(annotatedElement, builder);
       return builder.build();
     }
     return null;
   }
 
-  static LayoutModelProperty parseLayoutAnnotations(AnnotatedElement annotatedElement, String name,
-                                                    LayoutModelPropertyBuilder builder) {
+  static LayoutModel parseLayoutAnnotations(AnnotatedElement annotatedElement, LayoutModelBuilder builder) {
     if (isDisplayAnnotationPresent(annotatedElement)) {
-      parseLayoutAnnotations(annotatedElement, builder);
+      doParseLayoutAnnotations(annotatedElement, builder);
       parsePlacementAnnotation(annotatedElement, builder);
       return builder.build();
     }

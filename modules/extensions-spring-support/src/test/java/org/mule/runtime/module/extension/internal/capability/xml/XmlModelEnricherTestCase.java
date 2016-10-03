@@ -12,9 +12,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.extension.api.util.NameUtils.hyphenize;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.introspection.XmlDslModel;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlModelProperty;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.enricher.XmlModelEnricher;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingTypeModelProperty;
@@ -46,28 +46,28 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase {
   @Test
   public void enrichWithCustomValues() {
     extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
-    XmlModelProperty xmlProperty = enrich(XmlSupport.class);
+    XmlDslModel dslModel = enrich(XmlSupport.class);
 
-    assertThat(xmlProperty, is(notNullValue()));
-    assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(xmlProperty.getNamespace(), is(NAMESPACE));
-    assertThat(xmlProperty.getNamespaceUri(), is(NAMESPACE_LOCATION));
-    assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
-    assertThat(xmlProperty.getSchemaLocation(),
+    assertThat(dslModel, is(notNullValue()));
+    assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
+    assertThat(dslModel.getNamespace(), is(NAMESPACE));
+    assertThat(dslModel.getNamespaceUri(), is(NAMESPACE_LOCATION));
+    assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
+    assertThat(dslModel.getSchemaLocation(),
                is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE_LOCATION, String.format(XSD_FILENAME_MASK, NAMESPACE))));
   }
 
   @Test
   public void enrichWithDefaultValues() {
     extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
-    XmlModelProperty xmlProperty = enrich(NoXmlSupport.class);
+    XmlDslModel dslModel = enrich(NoXmlSupport.class);
 
-    assertThat(xmlProperty, is(notNullValue()));
-    assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(xmlProperty.getNamespace(), is(EXTENSION_HYPHENAZED_NAME));
-    assertThat(xmlProperty.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME)));
-    assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, EXTENSION_HYPHENAZED_NAME)));
-    assertThat(xmlProperty.getSchemaLocation(),
+    assertThat(dslModel, is(notNullValue()));
+    assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
+    assertThat(dslModel.getNamespace(), is(EXTENSION_HYPHENAZED_NAME));
+    assertThat(dslModel.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME)));
+    assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, EXTENSION_HYPHENAZED_NAME)));
+    assertThat(dslModel.getSchemaLocation(),
                is(String.format(DEFAULT_SCHEMA_LOCATION_MASK,
                                 String.format(DEFAULT_NAMESPACE_LOCATION_MASK, EXTENSION_HYPHENAZED_NAME),
                                 String.format(XSD_FILENAME_MASK, EXTENSION_HYPHENAZED_NAME))));
@@ -76,14 +76,14 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase {
   @Test
   public void enrichWithCustomNamespaceValue() {
     extensionDeclarer.named(EXTENSION_NAME).onVersion(EXTENSION_VERSION);
-    XmlModelProperty xmlProperty = enrich(DefaultXmlExtension.class);
+    XmlDslModel dslModel = enrich(DefaultXmlExtension.class);
 
-    assertThat(xmlProperty, is(notNullValue()));
-    assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(xmlProperty.getNamespace(), is(NAMESPACE));
-    assertThat(xmlProperty.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE)));
-    assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
-    assertThat(xmlProperty.getSchemaLocation(),
+    assertThat(dslModel, is(notNullValue()));
+    assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
+    assertThat(dslModel.getNamespace(), is(NAMESPACE));
+    assertThat(dslModel.getNamespaceUri(), equalTo(String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE)));
+    assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, NAMESPACE)));
+    assertThat(dslModel.getSchemaLocation(),
                is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, String.format(DEFAULT_NAMESPACE_LOCATION_MASK, NAMESPACE),
                                 String.format(XSD_FILENAME_MASK, NAMESPACE))));
   }
@@ -91,21 +91,21 @@ public class XmlModelEnricherTestCase extends AbstractMuleTestCase {
   @Test
   public void enrichWithCustomSchemaLocationValue() {
     extensionDeclarer.named(EXTENSION).onVersion(EXTENSION_VERSION);
-    XmlModelProperty xmlProperty = enrich(CustomSchemaLocationXmlExtension.class);
+    XmlDslModel dslModel = enrich(CustomSchemaLocationXmlExtension.class);
 
-    assertThat(xmlProperty, is(notNullValue()));
-    assertThat(xmlProperty.getSchemaVersion(), is(EXTENSION_VERSION));
-    assertThat(xmlProperty.getNamespace(), is(EXTENSION.toLowerCase()));
-    assertThat(xmlProperty.getNamespaceUri(), equalTo(NAMESPACE_LOCATION));
-    assertThat(xmlProperty.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION))));
-    assertThat(xmlProperty.getSchemaLocation(), is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE_LOCATION,
-                                                                 String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION)))));
+    assertThat(dslModel, is(notNullValue()));
+    assertThat(dslModel.getSchemaVersion(), is(EXTENSION_VERSION));
+    assertThat(dslModel.getNamespace(), is(EXTENSION.toLowerCase()));
+    assertThat(dslModel.getNamespaceUri(), equalTo(NAMESPACE_LOCATION));
+    assertThat(dslModel.getXsdFileName(), is(String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION))));
+    assertThat(dslModel.getSchemaLocation(), is(String.format(DEFAULT_SCHEMA_LOCATION_MASK, NAMESPACE_LOCATION,
+                                                              String.format(XSD_FILENAME_MASK, hyphenize(EXTENSION)))));
   }
 
-  private XmlModelProperty enrich(Class<?> type) {
+  private XmlDslModel enrich(Class<?> type) {
     extensionDeclarer.withModelProperty(new ImplementingTypeModelProperty(type));
     modelEnricher.enrich(new DefaultDescribingContext(extensionDeclarer, type.getClassLoader()));
-    return extensionDeclarer.getDeclaration().getModelProperty(XmlModelProperty.class).get();
+    return extensionDeclarer.getDeclaration().getXmlDslModel();
   }
 
   @Xml(namespace = NAMESPACE, namespaceLocation = NAMESPACE_LOCATION)

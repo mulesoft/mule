@@ -6,7 +6,10 @@
  */
 package org.mule.test.module.extension.internal.util;
 
+import static com.google.common.collect.ImmutableSet.copyOf;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.of;
+import static org.apache.commons.lang.ArrayUtils.isEmpty;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -15,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -25,11 +27,13 @@ import org.mule.metadata.api.model.DictionaryType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.handler.TypeHandlerManager;
 import org.mule.metadata.java.api.utils.ParsingContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.ExtensionManager;
+import org.mule.runtime.extension.api.introspection.ElementDslModel;
 import org.mule.runtime.extension.api.introspection.EnrichableModel;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
+import org.mule.runtime.extension.api.introspection.SubTypesModel;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeHandlerManagerFactory;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
@@ -44,7 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.Difference;
@@ -89,7 +92,7 @@ public abstract class ExtensionsTestUtils {
   public static ValueResolver getResolver(Object value, Event event, boolean dynamic, Class<?>... extraInterfaces)
       throws Exception {
     ValueResolver resolver;
-    if (ArrayUtils.isEmpty(extraInterfaces)) {
+    if (isEmpty(extraInterfaces)) {
       resolver = mock(ValueResolver.class);
     } else {
       resolver = mock(ValueResolver.class, withSettings().extraInterfaces(extraInterfaces));
@@ -106,6 +109,7 @@ public abstract class ExtensionsTestUtils {
     when(parameterModel.getName()).thenReturn(name);
     when(parameterModel.getType()).thenReturn(toMetadataType(type));
     when(parameterModel.getModelProperty(any())).thenReturn(Optional.empty());
+    when(parameterModel.getDslModel()).thenReturn(ElementDslModel.getDefaultInstance());
 
     return parameterModel;
   }
@@ -177,6 +181,14 @@ public abstract class ExtensionsTestUtils {
 
     if (requiresConnection) {
       when(model.getModelProperty(ConnectivityModelProperty.class)).thenReturn(of(mock(ConnectivityModelProperty.class)));
+    }
+  }
+
+  public static void mockSubTypes(ExtensionModel mockModel, SubTypesModel... subtypes) {
+    if (isEmpty(subtypes)) {
+      when(mockModel.getSubTypes()).thenReturn(emptySet());
+    } else {
+      when(mockModel.getSubTypes()).thenReturn(copyOf(subtypes));
     }
   }
 }

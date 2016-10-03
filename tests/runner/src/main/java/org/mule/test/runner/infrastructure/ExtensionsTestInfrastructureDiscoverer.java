@@ -19,7 +19,6 @@ import org.mule.runtime.extension.api.introspection.ExtensionFactory;
 import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.declaration.DescribingContext;
 import org.mule.runtime.extension.api.introspection.declaration.spi.Describer;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
@@ -120,7 +119,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
 
   public List<GeneratedResource> generateDslResources(File generatedResourcesDirectory, RuntimeExtensionModel forExtensionModel) {
     DslResolvingContext context =
-        extensionManager.getExtensions().stream().anyMatch(e -> e.getModelProperty(ImportedTypesModelProperty.class).isPresent())
+        extensionManager.getExtensions().stream().anyMatch(e -> !e.getImportedTypes().isEmpty())
             ? name -> extensionManager.getExtension(name).map(e -> e)
             : name -> Optional.empty();
 

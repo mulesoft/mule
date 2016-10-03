@@ -6,22 +6,22 @@
  */
 package org.mule.runtime.module.extension.internal.introspection.validation;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.when;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockSubTypes;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.introspection.ExtensionModel;
-import org.mule.runtime.extension.api.introspection.property.ImportedTypesModelProperty;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
+import org.mule.runtime.extension.api.introspection.SubTypesModel;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.google.common.collect.ImmutableSet;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,39 +40,32 @@ public class SubtypesModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void validSubtypes() {
-    Map<MetadataType, List<MetadataType>> subtypes = new HashMap<>();
-    subtypes.put(toMetadataType(BaseAbstractPojo.class), asList(toMetadataType(Pojo.class)));
-    subtypes.put(toMetadataType(BaseCustomInterface.class), asList(toMetadataType(Pojo.class)));
-
-    when(extensionModel.getModelProperty(SubTypesModelProperty.class))
-        .thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
-    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+    mockSubTypes(extensionModel,
+                 new SubTypesModel(toMetadataType(BaseAbstractPojo.class), singleton(toMetadataType(Pojo.class))),
+                 new SubTypesModel(toMetadataType(BaseCustomInterface.class), singleton(toMetadataType(Pojo.class))));
+    when(extensionModel.getImportedTypes()).thenReturn(emptySet());
 
     validator.validate(extensionModel);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void invalidAbstractSubtypes() {
-    Map<MetadataType, List<MetadataType>> subtypes = new HashMap<>();
-    subtypes.put(toMetadataType(BaseAbstractPojo.class), asList(toMetadataType(AbstractPojo.class)));
-    subtypes.put(toMetadataType(BaseCustomInterface.class), asList(toMetadataType(CustomInterface.class)));
+    Set<SubTypesModel> subTypes = new LinkedHashSet<>();
+    subTypes.add(new SubTypesModel(toMetadataType(BaseAbstractPojo.class), singleton(toMetadataType(AbstractPojo.class))));
+    subTypes.add(new SubTypesModel(toMetadataType(BaseCustomInterface.class), singleton(toMetadataType(CustomInterface.class))));
 
-    when(extensionModel.getModelProperty(SubTypesModelProperty.class))
-        .thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
-    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+    when(extensionModel.getSubTypes()).thenReturn(subTypes);
+    when(extensionModel.getImportedTypes()).thenReturn(emptySet());
 
     validator.validate(extensionModel);
   }
 
   @Test(expected = IllegalModelDefinitionException.class)
   public void invalidNotSubtypesOfBaseType() {
-    Map<MetadataType, List<MetadataType>> subtypes = new HashMap<>();
-    subtypes.put(toMetadataType(BaseCustomInterface.class),
-                 asList(toMetadataType(AbstractPojo.class), toMetadataType(CustomInterface.class)));
-
-    when(extensionModel.getModelProperty(SubTypesModelProperty.class))
-        .thenReturn(Optional.of(new SubTypesModelProperty(subtypes)));
-    when(extensionModel.getModelProperty(ImportedTypesModelProperty.class)).thenReturn(Optional.empty());
+    mockSubTypes(extensionModel, new SubTypesModel(toMetadataType(BaseCustomInterface.class),
+                                                   ImmutableSet.of(toMetadataType(AbstractPojo.class),
+                                                                   toMetadataType(CustomInterface.class))));
+    when(extensionModel.getImportedTypes()).thenReturn(emptySet());
 
     validator.validate(extensionModel);
   }
@@ -112,10 +105,12 @@ public class SubtypesModelValidatorTestCase extends AbstractMuleTestCase {
     }
   }
 
+
   private interface BaseCustomInterface {
 
     String getBaseField();
   }
+
 
   private interface CustomInterface extends BaseCustomInterface {
 

@@ -23,7 +23,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Extension
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOperationsDeclaration;
-import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.runtime.extension.api.introspection.display.DisplayModel;
 import org.mule.runtime.module.extension.internal.DefaultDescribingContext;
 import org.mule.runtime.module.extension.internal.introspection.describer.AnnotationsBasedDescriber;
 import org.mule.runtime.module.extension.internal.introspection.version.StaticVersionResolver;
@@ -101,13 +101,13 @@ public class DisplayModelEnricherTestCase extends AbstractMuleTestCase {
   }
 
   private void assertParameterDisplayName(ParameterDeclaration param, String displayName) {
-    DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.class).get();
-    assertThat(display.getDisplayName().get(), is(displayName));
+    DisplayModel display = param.getDisplayModel();
+    assertThat(display.getDisplayName(), is(displayName));
   }
 
   private void assertParameterSummary(ParameterDeclaration param, String summary) {
-    DisplayModelProperty display = param.getModelProperty(DisplayModelProperty.class).get();
-    assertThat(display.getSummary().get(), is(summary));
+    DisplayModel display = param.getDisplayModel();
+    assertThat(display.getSummary(), is(summary));
   }
 
   private OperationDeclaration getOperation(WithOperationsDeclaration declaration, final String operationName) {

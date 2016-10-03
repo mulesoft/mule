@@ -36,7 +36,6 @@ import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterizedModel;
 import org.mule.runtime.extension.api.introspection.source.HasSourceModels;
 import org.mule.runtime.extension.api.introspection.source.SourceModel;
-import org.mule.runtime.extension.xml.dsl.api.property.XmlHintsModelProperty;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedListMultimap;
@@ -162,10 +161,8 @@ public final class NameClashModelValidator implements ModelValidator {
 
       Collection<TopLevelParameter> foundParameters = topLevelParameters.get(parameter.getName());
       if (CollectionUtils.isEmpty(foundParameters)) {
-        Optional<XmlHintsModelProperty> hints = parameter.getModelProperty(XmlHintsModelProperty.class);
-        boolean allowsInline = hints.map(XmlHintsModelProperty::allowsInlineDefinition).orElse(true);
 
-        if (allowsInline) {
+        if (parameter.getDslModel().allowsInlineDefinition()) {
           topLevelParameters.put(parameter.getName(), new TopLevelParameter(parameter, ownerName, ownerType));
         }
       } else {
@@ -274,11 +271,8 @@ public final class NameClashModelValidator implements ModelValidator {
 
                            private void validateSingularizeNameClashWithOperationParameters() {
                              String singularName = singularize(p.getName());
-                             boolean allowInline = p.getModelProperty(XmlHintsModelProperty.class)
-                                 .map(XmlHintsModelProperty::allowsInlineDefinition)
-                                 .orElse(true);
 
-                             if (!singularName.equals(p.getName()) && allowInline) {
+                             if (!singularName.equals(p.getName()) && p.getDslModel().allowsInlineDefinition()) {
                                singularizedObjects.put(singularName, new DescribedParameter(p, model));
                                Optional<ParameterModel> clashParam =
                                    parameters.stream().filter(p -> p.getName().equals(singularName)).findAny();

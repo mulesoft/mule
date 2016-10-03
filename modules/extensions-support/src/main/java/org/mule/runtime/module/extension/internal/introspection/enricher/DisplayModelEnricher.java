@@ -22,7 +22,7 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.Parameter
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.WithOperationsDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.WithSourcesDeclaration;
-import org.mule.runtime.extension.api.introspection.property.DisplayModelProperty;
+import org.mule.runtime.extension.api.introspection.display.DisplayModel;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingMethodModelProperty;
 import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
@@ -33,7 +33,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
 /**
- * Enriches the {@link ExtensionDeclarer} with a {@link DisplayModelProperty} from annotated elements with {@link Summary} or
+ * Enriches the {@link ExtensionDeclarer} with a {@link DisplayModel} from annotated elements with {@link Summary} or
  * {@link DisplayName}
  *
  * @since 4.0
@@ -127,7 +127,10 @@ public final class DisplayModelEnricher extends AbstractAnnotatedModelEnricher {
     String displayName = displayNameAnnotation != null ? displayNameAnnotation.value() : null;
 
     if (summary != null || displayName != null) {
-      declaration.addModelProperty(new DisplayModelProperty(displayName, summary));
+      declaration.setDisplayModel(DisplayModel.builder()
+          .displayName(displayName)
+          .summary(summary)
+          .build());
     }
   }
 }
