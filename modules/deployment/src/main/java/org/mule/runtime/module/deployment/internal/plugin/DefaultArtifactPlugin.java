@@ -7,7 +7,9 @@
 
 package org.mule.runtime.module.deployment.internal.plugin;
 
+import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
+import static java.lang.System.identityHashCode;
 
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
@@ -56,6 +58,6 @@ public class DefaultArtifactPlugin implements ArtifactPlugin {
 
   @Override
   public String toString() {
-    return format("%s[%s]@%s", getClass().getName(), getArtifactName(), Integer.toHexString(System.identityHashCode(this)));
+    return format("%s[%s]@%s", getClass().getName(), getArtifactName(), toHexString(identityHashCode(this)));
   }
 }
