@@ -556,7 +556,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
             if (logger.isDebugEnabled())
             {
-                    logger.debug("ReplyTo Selector is: " + selector);
+                logger.debug("ReplyTo Selector is: " + selector);
             }
         }
 
