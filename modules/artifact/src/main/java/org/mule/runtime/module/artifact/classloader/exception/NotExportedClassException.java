@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Extends {@link ClassNotFoundException} providing additional trubleshooting information from the context of the
+ * Extends {@link ClassNotFoundException} providing additional troubleshooting information from the context of the
  * {@link FilteringArtifactClassLoader}.
  */
 public class NotExportedClassException extends ClassNotFoundException {
