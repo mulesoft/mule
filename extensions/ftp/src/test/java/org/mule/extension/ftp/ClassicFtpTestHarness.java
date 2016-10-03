@@ -163,6 +163,14 @@ public class ClassicFtpTestHarness extends AbstractFtpTestHarness {
    * {@inheritDoc}
    */
   @Override
+  public int getServerPort() throws Exception {
+    return ftpServer.getPort();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void assertAttributes(String path, FtpFileAttributes fileAttributes) throws Exception {
     FTPFile file = ftpClient.get(path);
 

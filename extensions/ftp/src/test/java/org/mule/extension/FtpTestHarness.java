@@ -95,6 +95,11 @@ public interface FtpTestHarness extends TestRule {
   String[] getFileList(String path) throws Exception;
 
   /**
+   * @return Returns Server Port
+   */
+  int getServerPort() throws Exception;
+
+  /**
    * Performs that the file at the given {@code path} is consistent with the expected {@code attributes}
    *
    * @param path the path to test
