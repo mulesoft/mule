@@ -9,17 +9,11 @@ package org.mule.transformers.xml.xslt;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.xml.transformer.AbstractXmlTransformer.EXPAND_INTERNAL_ENTITIES_PROPERTY;
-import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.junit.Rule;
 import org.junit.Test;
 
 public class XsltTransformerBLDisabledTestCase extends XsltTransformerBLTestCase
 {
-
-    @Rule
-    public final SystemProperty myPropertyHasMyValue = new SystemProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "false");
 
     @Test
     public void disabled() throws Exception
