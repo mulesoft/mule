@@ -6,6 +6,7 @@
  */
 package org.mule.extension.http.internal;
 
+import org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
