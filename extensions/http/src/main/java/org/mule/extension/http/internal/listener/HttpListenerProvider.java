@@ -67,6 +67,17 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   private String configName;
 
   /**
+   * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
+   * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at
+   * least the keystore in the tls:context child element of this listener-config.
+   */
+  @Parameter
+  @Optional(defaultValue = "HTTP")
+  @Expression(NOT_SUPPORTED)
+  @Placement(group = CONNECTION, order = 1)
+  private HttpConstants.Protocols protocol;
+
+  /**
    * Host where the requests will be sent.
    */
   @Parameter
@@ -84,17 +95,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   private Integer port;
 
   /**
-   * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
-   * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at
-   * least the keystore in the tls:context child element of this listener-config.
-   */
-  @Parameter
-  @Optional(defaultValue = "HTTP")
-  @Expression(NOT_SUPPORTED)
-  @Placement(group = CONNECTION, order = 1)
-  private HttpConstants.Protocols protocol;
-
-  /**
    * Reference to a TLS config element. This will enable HTTPS for this config.
    */
   @Parameter
@@ -105,6 +105,15 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   private TlsContextFactory tlsContext;
 
   /**
+   * If false, each connection will be closed after the first request is completed.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
+  private Boolean usePersistentConnections;
+
+  /**
    * The number of milliseconds that a connection can remain idle before it is closed. The value of this attribute is only used
    * when persistent connections are enabled.
    */
@@ -113,15 +122,6 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED, group = CONNECTION, order = 2)
   private Integer connectionIdleTimeout;
-
-  /**
-   * If false, each connection will be closed after the first request is completed.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
-  private Boolean usePersistentConnections;
 
   @Inject
   private HttpListenerConnectionManager connectionManager;

@@ -69,6 +69,19 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   private String configName;
 
   /**
+   * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
+   * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user can customize the
+   * tls/ssl configuration by defining the tls:context child element of this listener-config. If not tls:context is defined then
+   * the default JVM certificates are going to be used to establish communication.
+   */
+  @Parameter
+  @Optional(defaultValue = "HTTP")
+  @Expression(NOT_SUPPORTED)
+  @Summary("Protocol to use for communication. Valid values are HTTP and HTTPS")
+  @Placement(group = CONNECTION, order = 1)
+  private HttpConstants.Protocols protocol;
+
+  /**
    * Host where the requests will be sent.
    */
   @Parameter
@@ -84,19 +97,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Optional
   @Placement(group = CONNECTION, order = 3)
   private Function<Event, Integer> port;
-
-  /**
-   * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
-   * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user can customize the
-   * tls/ssl configuration by defining the tls:context child element of this listener-config. If not tls:context is defined then
-   * the default JVM certificates are going to be used to establish communication.
-   */
-  @Parameter
-  @Optional(defaultValue = "HTTP")
-  @Expression(NOT_SUPPORTED)
-  @Summary("Protocol to use for communication. Valid values are HTTP and HTTPS")
-  @Placement(group = CONNECTION, order = 1)
-  private HttpConstants.Protocols protocol;
 
   /**
    * Reference to a TLS config element. This will enable HTTPS for this config.
@@ -118,6 +118,15 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   private ProxyConfig proxyConfig;
 
   /**
+   * If false, each connection will be closed after the first request is completed.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
+  private Boolean usePersistentConnections;
+
+  /**
    * The maximum number of outbound connections that will be kept open at the same time. By default the number of connections is
    * unlimited.
    */
@@ -136,15 +145,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Expression(NOT_SUPPORTED)
   @Placement(tab = ADVANCED, group = CONNECTION, order = 3)
   private Integer connectionIdleTimeout;
-
-  /**
-   * If false, each connection will be closed after the first request is completed.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
-  private Boolean usePersistentConnections;
 
   @Parameter
   @Optional

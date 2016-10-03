@@ -62,15 +62,13 @@ public class HttpRequesterConfig implements Initialisable {
   private Function<Event, Boolean> followRedirects;
 
   /**
-   * By default, the response will be parsed (for example, a multipart response will be mapped as a Mule message with null payload
-   * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
-   * always contain the raw contents of the HTTP response.
+   * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
+   * send a body).
    */
   @Parameter
-  @Optional(defaultValue = "true")
-  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS, order = 1)
-  @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
-  private Function<Event, Boolean> parseResponse;
+  @Optional(defaultValue = "AUTO")
+  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 2)
+  private Function<Event, HttpSendBodyMode> sendBodyMode;
 
   /**
    * Defines if the request should be sent using streaming or not. If this attribute is not present, the behavior will depend on
@@ -85,13 +83,15 @@ public class HttpRequesterConfig implements Initialisable {
   private Function<Event, HttpStreamingType> requestStreamingMode;
 
   /**
-   * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
-   * send a body).
+   * By default, the response will be parsed (for example, a multipart response will be mapped as a Mule message with null payload
+   * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
+   * always contain the raw contents of the HTTP response.
    */
   @Parameter
-  @Optional(defaultValue = "AUTO")
-  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 2)
-  private Function<Event, HttpSendBodyMode> sendBodyMode;
+  @Optional(defaultValue = "true")
+  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS, order = 1)
+  @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
+  private Function<Event, Boolean> parseResponse;
 
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response. If this value is
