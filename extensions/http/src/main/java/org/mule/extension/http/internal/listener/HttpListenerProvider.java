@@ -7,16 +7,16 @@
 package org.mule.extension.http.internal.listener;
 
 import static java.lang.String.format;
-import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.TLS;
 import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
-import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.api.connection.ConnectionExceptionCode.UNKNOWN;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.core.api.config.ThreadingProfile.DEFAULT_THREADING_PROFILE;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -67,11 +67,22 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   private String configName;
 
   /**
+   * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
+   * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at
+   * least the keystore in the tls:context child element of this listener-config.
+   */
+  @Parameter
+  @Optional(defaultValue = "HTTP")
+  @Expression(NOT_SUPPORTED)
+  @Placement(group = CONNECTION, order = 1)
+  private HttpConstants.Protocols protocol;
+
+  /**
    * Host where the requests will be sent.
    */
   @Parameter
   @Expression(NOT_SUPPORTED)
-  @Placement(group = URL_CONFIGURATION, order = 2)
+  @Placement(group = CONNECTION, order = 2)
   private String host;
 
   /**
@@ -80,19 +91,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
    */
   @Parameter
   @Expression(NOT_SUPPORTED)
-  @Placement(group = URL_CONFIGURATION, order = 3)
+  @Placement(group = CONNECTION, order = 3)
   private Integer port;
-
-  /**
-   * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
-   * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at
-   * least the keystore in the tls:context child element of this listener-config.
-   */
-  @Parameter
-  @Optional(defaultValue = "HTTP")
-  @Expression(NOT_SUPPORTED)
-  @Placement(group = URL_CONFIGURATION, order = 1)
-  private HttpConstants.Protocols protocol;
 
   /**
    * Reference to a TLS config element. This will enable HTTPS for this config.
@@ -101,8 +101,17 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Optional
   @Expression(NOT_SUPPORTED)
   @DisplayName(TLS_CONFIGURATION)
-  @Placement(group = TLS_CONFIGURATION, tab = TLS)
+  @Placement(tab = TLS, group = TLS_CONFIGURATION)
   private TlsContextFactory tlsContext;
+
+  /**
+   * If false, each connection will be closed after the first request is completed.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
+  private Boolean usePersistentConnections;
 
   /**
    * The number of milliseconds that a connection can remain idle before it is closed. The value of this attribute is only used
@@ -111,17 +120,8 @@ public class HttpListenerProvider implements CachedConnectionProvider<Server>, I
   @Parameter
   @Optional(defaultValue = "30000")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 2)
   private Integer connectionIdleTimeout;
-
-  /**
-   * If false, each connection will be closed after the first request is completed.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
-  private Boolean usePersistentConnections;
 
   @Inject
   private HttpListenerConnectionManager connectionManager;

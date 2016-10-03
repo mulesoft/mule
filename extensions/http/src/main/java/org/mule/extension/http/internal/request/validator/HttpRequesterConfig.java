@@ -8,7 +8,10 @@ package org.mule.extension.http.internal.request.validator;
 
 import static org.mule.extension.http.internal.HttpConnector.API_CONFIGURATION;
 import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.REQUEST_SETTINGS;
+import static org.mule.extension.http.internal.HttpConnector.RESPONSE_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -55,19 +58,17 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional(defaultValue = "true")
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 1)
   private Function<Event, Boolean> followRedirects;
 
   /**
-   * By default, the response will be parsed (for example, a multipart response will be mapped as a Mule message with null payload
-   * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
-   * always contain the raw contents of the HTTP response.
+   * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
+   * send a body).
    */
   @Parameter
-  @Optional(defaultValue = "true")
-  @Placement(group = OTHER_SETTINGS)
-  @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
-  private Function<Event, Boolean> parseResponse;
+  @Optional(defaultValue = "AUTO")
+  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 2)
+  private Function<Event, HttpSendBodyMode> sendBodyMode;
 
   /**
    * Defines if the request should be sent using streaming or not. If this attribute is not present, the behavior will depend on
@@ -76,19 +77,21 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional(defaultValue = "AUTO")
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = REQUEST_SETTINGS, order = 3)
   @Summary("Defines if the request should be sent using streaming or not. If this attribute is not present, "
       + "the behavior will depend on the type of the payload (it will stream only for InputStream).")
   private Function<Event, HttpStreamingType> requestStreamingMode;
 
   /**
-   * Defines if the request should contain a body or not. If AUTO, it will depend on the method (GET, HEAD and OPTIONS will not
-   * send a body).
+   * By default, the response will be parsed (for example, a multipart response will be mapped as a Mule message with null payload
+   * and inbound attachments with each part). If this property is set to false, no parsing will be done, and the payload will
+   * always contain the raw contents of the HTTP response.
    */
   @Parameter
-  @Optional(defaultValue = "AUTO")
-  @Placement(group = OTHER_SETTINGS)
-  private Function<Event, HttpSendBodyMode> sendBodyMode;
+  @Optional(defaultValue = "true")
+  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS, order = 1)
+  @Summary("Indicates if the HTTP response should be parsed, or directly receive the raw content")
+  private Function<Event, Boolean> parseResponse;
 
   /**
    * Maximum time that the request element will block the execution of the flow waiting for the HTTP response. If this value is
@@ -96,7 +99,7 @@ public class HttpRequesterConfig implements Initialisable {
    */
   @Parameter
   @Optional
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = RESPONSE_SETTINGS, order = 2)
   private Function<Event, Integer> responseTimeout;
 
   /**
@@ -105,7 +108,7 @@ public class HttpRequesterConfig implements Initialisable {
   @Parameter
   @Optional(defaultValue = "true")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = OTHER_SETTINGS)
   private boolean enableCookies;
 
   /**

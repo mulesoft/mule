@@ -8,9 +8,9 @@ package org.mule.extension.http.internal.request;
 
 import static java.lang.Integer.MAX_VALUE;
 import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
-import static org.mule.extension.http.internal.HttpConnector.URL_OVERRIDE_CONFIGURATION;
+import static org.mule.extension.http.internal.HttpConnector.CONFIGURATION_OVERRIDES;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
-
+import org.mule.extension.http.api.HttpMetadataKey;
 import org.mule.extension.http.api.HttpResponseAttributes;
 import org.mule.extension.http.api.HttpSendBodyMode;
 import org.mule.extension.http.api.HttpStreamingType;
@@ -22,8 +22,8 @@ import org.mule.extension.http.api.request.validator.SuccessStatusCodeValidator;
 import org.mule.extension.http.internal.HttpConnector;
 import org.mule.extension.http.internal.HttpMetadataResolver;
 import org.mule.extension.http.internal.request.validator.HttpRequesterConfig;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -71,27 +71,34 @@ public class HttpRequestOperations {
    * @return an {@link OperationResult} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
-  @MetadataScope(keysResolver = HttpMetadataResolver.class, outputResolver = HttpMetadataResolver.class)
+  @MetadataScope(outputResolver = HttpMetadataResolver.class)
   public OperationResult<Object, HttpResponseAttributes> request(String path, @Optional(defaultValue = "GET") String method,
                                                                  @Optional @Placement(tab = ADVANCED,
-                                                                     group = URL_OVERRIDE_CONFIGURATION, order = 1) String host,
+                                                                     group = "Response Validation Settings") ResponseValidator responseValidator,
                                                                  @Optional @Placement(tab = ADVANCED,
-                                                                     group = URL_OVERRIDE_CONFIGURATION, order = 2) Integer port,
+                                                                     group = CONFIGURATION_OVERRIDES, order = 1) String host,
+                                                                 @Optional @Placement(tab = ADVANCED,
+                                                                     group = CONFIGURATION_OVERRIDES, order = 2) Integer port,
                                                                  @Optional String source,
                                                                  @Optional @Placement(tab = ADVANCED,
-                                                                     group = OTHER_SETTINGS) Boolean followRedirects,
+                                                                     group = CONFIGURATION_OVERRIDES,
+                                                                     order = 3) Boolean followRedirects,
                                                                  @Optional @Placement(tab = ADVANCED,
-                                                                     group = OTHER_SETTINGS) Boolean parseResponse,
+                                                                     group = CONFIGURATION_OVERRIDES,
+                                                                     order = 4) HttpSendBodyMode sendBodyMode,
                                                                  @Optional @Placement(tab = ADVANCED,
-                                                                     group = OTHER_SETTINGS) HttpStreamingType requestStreamingMode,
+                                                                     group = CONFIGURATION_OVERRIDES,
+                                                                     order = 5) HttpStreamingType requestStreamingMode,
                                                                  @Optional @Placement(tab = ADVANCED,
-                                                                     group = OTHER_SETTINGS) HttpSendBodyMode sendBodyMode,
+                                                                     group = CONFIGURATION_OVERRIDES,
+                                                                     order = 6) Boolean parseResponse,
                                                                  @Optional @Placement(tab = ADVANCED,
-                                                                     group = OTHER_SETTINGS) Integer responseTimeout,
-                                                                 @Optional @Placement(tab = ADVANCED,
-                                                                     group = "Status Code Settings") ResponseValidator responseValidator,
+                                                                     group = CONFIGURATION_OVERRIDES,
+                                                                     order = 7) Integer responseTimeout,
                                                                  @Optional HttpRequesterRequestBuilder requestBuilder,
-                                                                 @MetadataKeyId @Optional(defaultValue = "ANY") String outputType,
+                                                                 @MetadataKeyId @Optional(defaultValue = "ANY") @Placement(
+                                                                     tab = ADVANCED,
+                                                                     group = OTHER_SETTINGS) HttpMetadataKey outputType,
                                                                  @Connection HttpClient client,
                                                                  @UseConfig HttpRequesterConfig config, Event muleEvent)
       throws MuleException {

@@ -8,13 +8,13 @@ package org.mule.extension.http.internal.request.validator;
 
 import static java.lang.String.format;
 import static org.mule.extension.http.internal.HttpConnector.AUTHENTICATION;
-import static org.mule.extension.http.internal.HttpConnector.OTHER_SETTINGS;
 import static org.mule.extension.http.internal.HttpConnector.TLS;
 import static org.mule.extension.http.internal.HttpConnector.TLS_CONFIGURATION;
-import static org.mule.extension.http.internal.HttpConnector.URL_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.util.concurrent.ThreadNameHelper.getPrefix;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED;
+import static org.mule.runtime.extension.api.annotation.param.display.Placement.CONNECTION;
 import static org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTP;
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
@@ -69,23 +69,6 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   private String configName;
 
   /**
-   * Host where the requests will be sent.
-   */
-  @Parameter
-  @Optional
-  @Placement(group = URL_CONFIGURATION, order = 2)
-  private Function<Event, String> host;
-
-  /**
-   * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the
-   * protocol attribute is HTTPS then the default value is 443.
-   */
-  @Parameter
-  @Optional
-  @Placement(group = URL_CONFIGURATION, order = 3)
-  private Function<Event, Integer> port;
-
-  /**
    * Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP
    * communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user can customize the
    * tls/ssl configuration by defining the tls:context child element of this listener-config. If not tls:context is defined then
@@ -95,8 +78,25 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Optional(defaultValue = "HTTP")
   @Expression(NOT_SUPPORTED)
   @Summary("Protocol to use for communication. Valid values are HTTP and HTTPS")
-  @Placement(group = URL_CONFIGURATION, order = 1)
+  @Placement(group = CONNECTION, order = 1)
   private HttpConstants.Protocols protocol;
+
+  /**
+   * Host where the requests will be sent.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION, order = 2)
+  private Function<Event, String> host;
+
+  /**
+   * Port where the requests will be sent. If the protocol attribute is HTTP (default) then the default value is 80, if the
+   * protocol attribute is HTTPS then the default value is 443.
+   */
+  @Parameter
+  @Optional
+  @Placement(group = CONNECTION, order = 3)
+  private Function<Event, Integer> port;
 
   /**
    * Reference to a TLS config element. This will enable HTTPS for this config.
@@ -118,12 +118,22 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   private ProxyConfig proxyConfig;
 
   /**
+   * If false, each connection will be closed after the first request is completed.
+   */
+  @Parameter
+  @Optional(defaultValue = "true")
+  @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 1)
+  private Boolean usePersistentConnections;
+
+  /**
    * The maximum number of outbound connections that will be kept open at the same time. By default the number of connections is
    * unlimited.
    */
   @Parameter
   @Optional(defaultValue = "-1")
   @Expression(NOT_SUPPORTED)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 2)
   private Integer maxConnections;
 
   /**
@@ -133,22 +143,13 @@ public class HttpRequesterProvider implements CachedConnectionProvider<HttpClien
   @Parameter
   @Optional(defaultValue = "30000")
   @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 3)
   private Integer connectionIdleTimeout;
-
-  /**
-   * If false, each connection will be closed after the first request is completed.
-   */
-  @Parameter
-  @Optional(defaultValue = "true")
-  @Expression(NOT_SUPPORTED)
-  @Placement(group = OTHER_SETTINGS)
-  private Boolean usePersistentConnections;
 
   @Parameter
   @Optional
   @Expression(NOT_SUPPORTED)
-  @Placement(tab = "Sockets")
+  @Placement(tab = ADVANCED, group = CONNECTION, order = 4)
   private TcpClientSocketProperties clientSocketProperties;
 
   /**

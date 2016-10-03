@@ -53,7 +53,9 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 public class HttpConnector {
 
   public static final String URL_CONFIGURATION = "URL Configuration";
-  public static final String URL_OVERRIDE_CONFIGURATION = "URL Override Configuration";
+  public static final String RESPONSE_SETTINGS = "Response Settings";
+  public static final String REQUEST_SETTINGS = "Request Settings";
+  public static final String CONFIGURATION_OVERRIDES = "Configuration Overrides";
   public static final String API_CONFIGURATION = "API Configuration";
   public static final String TLS_CONFIGURATION = "TLS Configuration";
   public static final String OTHER_SETTINGS = "Other Settings";
