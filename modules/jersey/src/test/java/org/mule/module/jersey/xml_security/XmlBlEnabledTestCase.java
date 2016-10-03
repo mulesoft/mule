@@ -12,34 +12,31 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.mule.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 import static org.mule.module.jersey.JerseyResourcesComponent.EXPAND_ENTITIES_PROPERTY;
-import static org.mule.module.jersey.JerseyResourcesComponent.EXTERNAL_ENTITIES_PROPERTY;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.OperationOptions;
+import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class XmlBlEnabledTestCase extends XmlBlBase
 {
+
+    @Rule
+    public final SystemProperty expandEntities = new SystemProperty(EXPAND_ENTITIES_PROPERTY, "true");
+
     @Test
     public void expandsEntitiesWhenEnabled() throws Exception
     {
-        System.setProperty(EXPAND_ENTITIES_PROPERTY, "true");
+        MuleMessage testMuleMessage = getTestMuleMessage(TEST_MESSAGE);
+        testMuleMessage.setPayload(xmlWithEntities);
+        testMuleMessage.setProperty("Content-Type", "application/xml");
 
-        try {
-            MuleMessage testMuleMessage = getTestMuleMessage(TEST_MESSAGE);
-            testMuleMessage.setPayload(xmlWithEntities);
-            testMuleMessage.setProperty("Content-Type", "application/xml");
+        OperationOptions options = newOptions().method("POST").build();
+        MuleMessage result = client.send(format("http://localhost:%d/service/customer", port.getNumber()), testMuleMessage, options);
 
-            OperationOptions options = newOptions().method("POST").build();
-            MuleMessage result = client.send(format("http://localhost:%d/service/customer", port.getNumber()), testMuleMessage, options);
-
-            assertThat(result.getPayloadAsString(), not(containsString("password")));
-            assertThat(result.getPayloadAsString(), containsString("0101"));
-        }
-        finally
-        {
-            System.clearProperty(EXTERNAL_ENTITIES_PROPERTY);
-        }
+        assertThat(result.getPayloadAsString(), not(containsString("password")));
+        assertThat(result.getPayloadAsString(), containsString("0101"));
     }
 }
 
