@@ -46,10 +46,9 @@ public class ExtensionPluginMetadataGenerator {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final ExtensionsTestInfrastructureDiscoverer extensionsInfrastructure;
-  private final File baseResourcesFolder;
   private final File generatedResourcesBase;
 
-  private List<File> extensionsResourcesFolders = newArrayList();
+  private List<ExtensionGeneratorEntry> extensionGeneratorEntries = newArrayList();
 
   /**
    * Creates an instance that will generated metadata for extensions on the baseResourcesFolder
@@ -58,7 +57,6 @@ public class ExtensionPluginMetadataGenerator {
    */
   public ExtensionPluginMetadataGenerator(File baseResourcesFolder) {
     this.extensionsInfrastructure = new ExtensionsTestInfrastructureDiscoverer(createExtensionManager());
-    this.baseResourcesFolder = baseResourcesFolder;
     generatedResourcesBase = getGeneratedResourcesBase(baseResourcesFolder);
   }
 
@@ -152,10 +150,11 @@ public class ExtensionPluginMetadataGenerator {
 
     File generatedResourcesDirectory = new File(generatedResourcesBase, plugin.getArtifactId() + separator + "META-INF");
     generatedResourcesDirectory.mkdirs();
+    final RuntimeExtensionModel extensionModel = getExtensionModel(plugin, extensionClass);
     extensionsInfrastructure
-        .generateLoaderResources(getExtensionModel(plugin, extensionClass), generatedResourcesDirectory);
+        .generateLoaderResources(extensionModel, generatedResourcesDirectory);
 
-    extensionsResourcesFolders.add(generatedResourcesDirectory);
+    extensionGeneratorEntries.add(new ExtensionGeneratorEntry(extensionModel, generatedResourcesDirectory));
 
     return generatedResourcesDirectory.getParentFile();
   }
@@ -163,7 +162,7 @@ public class ExtensionPluginMetadataGenerator {
   /**
    * Generates DSL resources for the plugins where extension manifest were generated. This method should be called after all
    * extensions manifest where generated.
-   * 
+   *
    * <pre>
    *   spring.schemas
    *   spring.handlers
@@ -172,10 +171,31 @@ public class ExtensionPluginMetadataGenerator {
    * <p/>
    * These files are going to be generated for each extension registered here.
    */
-  // TODO (gfernandes) MULE-10513 Check with AMarra how to generate only the DSL resources for one extension only
   public void generateDslResources() {
-    extensionsResourcesFolders.stream()
-        .forEach(resourcesFolder -> extensionsInfrastructure.generateDslResources(resourcesFolder));
+    extensionGeneratorEntries.stream()
+        .forEach(entry -> extensionsInfrastructure.generateDslResources(entry.getResourcesFolder(),
+                                                                        entry.getRuntimeExtensionModel()));
   }
 
+  /**
+   * Entry class for generating resources for an Extension.
+   */
+  class ExtensionGeneratorEntry {
+
+    private RuntimeExtensionModel runtimeExtensionModel;
+    private File resourcesFolder;
+
+    public ExtensionGeneratorEntry(RuntimeExtensionModel runtimeExtensionModel, File resourcesFolder) {
+      this.runtimeExtensionModel = runtimeExtensionModel;
+      this.resourcesFolder = resourcesFolder;
+    }
+
+    public RuntimeExtensionModel getRuntimeExtensionModel() {
+      return this.runtimeExtensionModel;
+    }
+
+    public File getResourcesFolder() {
+      return this.resourcesFolder;
+    }
+  }
 }
