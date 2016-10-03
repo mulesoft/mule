@@ -7,8 +7,12 @@
 
 package org.mule.runtime.module.deployment.internal.plugin;
 
-import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
+import static java.lang.Integer.toHexString;
+import static java.lang.String.format;
+import static java.lang.System.identityHashCode;
+
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
+import org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 
 import java.io.File;
@@ -50,5 +54,10 @@ public class DefaultArtifactPlugin implements ArtifactPlugin {
   @Override
   public ArtifactClassLoader getArtifactClassLoader() {
     return classLoader;
+  }
+
+  @Override
+  public String toString() {
+    return format("%s[%s]@%s", getClass().getName(), getArtifactName(), toHexString(identityHashCode(this)));
   }
 }

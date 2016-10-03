@@ -7,9 +7,14 @@
 
 package org.mule.runtime.module.artifact.classloader;
 
+import static java.lang.Integer.toHexString;
+import static java.lang.String.format;
+import static java.lang.System.identityHashCode;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
+
 import org.mule.runtime.core.util.ClassUtils;
+import org.mule.runtime.module.artifact.classloader.exception.ClassNotFoundInRegionException;
 import org.mule.runtime.module.artifact.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
@@ -108,9 +113,13 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
       final ArtifactClassLoader artifactClassLoader = packageMapping.get(packageName);
       if (artifactClassLoader != null) {
-        return artifactClassLoader.findLocalClass(name);
+        try {
+          return artifactClassLoader.findLocalClass(name);
+        } catch (ClassNotFoundException e) {
+          throw new ClassNotFoundInRegionException(name, getArtifactName(), artifactClassLoader.getArtifactName(), e);
+        }
       } else {
-        throw new ClassNotFoundException(name);
+        throw new ClassNotFoundInRegionException(name, getArtifactName());
       }
     }
   }
@@ -182,5 +191,11 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
 
   private ArtifactClassLoader getOwnerClassLoader() {
     return filteredClassLoaders.get(0);
+  }
+
+  @Override
+  public String toString() {
+    return format("%s[%s] -> %s@%s", getClass().getName(), getArtifactName(), packageMapping.toString(),
+                  toHexString(identityHashCode(this)));
   }
 }
