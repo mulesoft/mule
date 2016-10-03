@@ -17,7 +17,7 @@
 
     <flow name="JMSNoCorrelationIDFixedQueue">
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID == null]"/>
-        <set-property propertyName="JMSReplyTo" value="other1"/>
+        <set-property propertyName="JMSReplyTo" value="middle"/>
         <outbound-endpoint ref="in"/>
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID != null]"/>
     </flow>
@@ -35,7 +35,7 @@
     </flow>
 
     <flow name="JMSCorrelationIDFixedQueue">
-        <set-property propertyName="JMSReplyTo" value="other2"/>
+        <set-property propertyName="JMSReplyTo" value="middle1"/>
         <set-property propertyName="#[org.mule.api.config.MuleProperties.MULE_CORRELATION_ID_PROPERTY]" value="custom-cid"/>
         <outbound-endpoint ref="inFixed"/>
         <test:assert expression="#[message.inboundProperties.JMSCorrelationID == 'custom-cid']"/>
