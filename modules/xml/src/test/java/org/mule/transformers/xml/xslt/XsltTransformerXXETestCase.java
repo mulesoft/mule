@@ -31,7 +31,7 @@ import org.junit.Test;
 public class XsltTransformerXXETestCase extends FunctionalTestCase
 {
 
-    // enable entity expansion as it's required     to test external entity expansion
+    // enable entity expansion as it's required to test external entity expansion
     @Rule
     public final SystemProperty myPropertyHasMyValue = new SystemProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "true");
 
