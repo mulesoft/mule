@@ -80,7 +80,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, acceptExternalEntities);
         useStaxSource = !acceptExternalEntities;
 
-        String expandInternalEntitiesValue = System.getProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "true");
+        String expandInternalEntitiesValue = System.getProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "false");
         expandInternalEntities = Boolean.parseBoolean(expandInternalEntitiesValue);
         xmlInputFactory.setProperty(IS_REPLACING_ENTITY_REFERENCES, expandInternalEntities);
 
