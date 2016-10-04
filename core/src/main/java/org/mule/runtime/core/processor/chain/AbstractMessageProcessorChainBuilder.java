@@ -27,28 +27,15 @@ import java.util.List;
  * The MessageProcessor instance that this builder builds can be nested in other chains as required.
  * </p>
  */
-public abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorChainBuilder {
+abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorChainBuilder {
 
   protected List processors = new ArrayList();
   protected String name;
   protected FlowConstruct flowConstruct;
   protected MuleContext muleContext;
 
-  public AbstractMessageProcessorChainBuilder() {
-    // empty
-  }
-
-  public AbstractMessageProcessorChainBuilder(FlowConstruct flowConstruct, MuleContext muleContext) {
-    this.flowConstruct = flowConstruct;
-    this.muleContext = muleContext;
-  }
-
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
-  protected Processor initializeMessageProcessor(Object processor) throws MuleException {
-    // TODO DF: FlowConstuct should be injected here but there is an issue with spring not have reference
-    // to it. For now we inject it once the MessageProcessor is built and this works, but
-    // MessageProcessorBuilders should have FlowConstuct available when building really.
-
+  protected Processor initializeMessageProcessor(Object processor) {
     if (processor instanceof MessageProcessorBuilder) {
       return ((MessageProcessorBuilder) processor).build();
     } else {

@@ -25,14 +25,14 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends AbstractI
   public void testInterceptingComposite() throws Exception {
     Processor composite = muleContext.getRegistry().lookupObject("composite1");
     assertEquals("0123",
-                 composite.process(eventBuilder().message(InternalMessage.of("0")).build()).getMessageAsString(muleContext));
+                 process(composite, eventBuilder().message(InternalMessage.of("0")).build()).getMessageAsString(muleContext));
   }
 
   @Test
   public void testInterceptingNestedComposite() throws Exception {
     Processor composite = muleContext.getRegistry().lookupObject("composite2");
     assertEquals("01abc2",
-                 composite.process(eventBuilder().message(InternalMessage.of("0")).build()).getMessageAsString(muleContext));
+                 process(composite, eventBuilder().message(InternalMessage.of("0")).build()).getMessageAsString(muleContext));
   }
 
 }

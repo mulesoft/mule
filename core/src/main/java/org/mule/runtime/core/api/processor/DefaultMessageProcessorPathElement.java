@@ -20,7 +20,7 @@ public class DefaultMessageProcessorPathElement implements MessageProcessorPathE
   public DefaultMessageProcessorPathElement(Processor messageProcessor, String name) {
     this.messageProcessor = messageProcessor;
     this.name = escape(name);
-    this.children = new ArrayList<MessageProcessorPathElement>();
+    this.children = new ArrayList<>();
   }
 
   @Override

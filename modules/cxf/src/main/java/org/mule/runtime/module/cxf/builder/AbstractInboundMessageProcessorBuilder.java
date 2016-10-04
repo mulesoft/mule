@@ -11,6 +11,7 @@ import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -83,24 +84,25 @@ public abstract class AbstractInboundMessageProcessorBuilder extends AbstractAnn
   private WsSecurity wsSecurity;
 
   @Override
-  public CxfInboundMessageProcessor build() throws MuleException {
+  public CxfInboundMessageProcessor build() {
     if (muleContext == null) {
       throw new IllegalStateException("MuleContext must be supplied.");
     }
 
-    if (configuration == null) {
-      configuration = CxfConfiguration.getConfiguration(muleContext);
-    }
-
-    if (configuration == null) {
-      throw new IllegalStateException("A CxfConfiguration object must be supplied.");
-    }
-
     ServerFactoryBean sfb;
+
     try {
+      if (configuration == null) {
+        configuration = CxfConfiguration.getConfiguration(muleContext);
+      }
+
+      if (configuration == null) {
+        throw new IllegalStateException("A CxfConfiguration object must be supplied.");
+      }
+
       sfb = createServerFactory();
     } catch (Exception e) {
-      throw new DefaultMuleException(e);
+      throw new MuleRuntimeException(e);
     }
 
     // The binding - i.e. SOAP, XML, HTTP Binding, etc

@@ -7,7 +7,6 @@
 package org.mule.runtime.config.spring.factories;
 
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
-import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.SubflowMessageProcessorChainBuilder;
 
 /**
@@ -17,7 +16,7 @@ public class SubflowMessageProcessorChainFactoryBean extends MessageProcessorCha
 
   @Override
   protected MessageProcessorChainBuilder getBuilderInstance() {
-    AbstractMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder(muleContext);
+    SubflowMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder();
     builder.setName(name);
     return builder;
   }

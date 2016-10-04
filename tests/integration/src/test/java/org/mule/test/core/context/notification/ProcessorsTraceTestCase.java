@@ -240,7 +240,7 @@ public class ProcessorsTraceTestCase extends AbstractIntegrationTestCase {
     assertThat(ProcessorsTraceAsserter.processorsTraceToAssert, not(nullValue()));
 
     assertThat(ProcessorsTraceAsserter.processorsTraceToAssert,
-               hasExecutedProcessors("/subFlowStaticWithEnricher/processors/0",
+               hasExecutedProcessors("/subFlowStaticWithEnricher/processors/0", "/subFlowStaticWithEnricher/processors/0/0",
                                      "/subFlowStaticWithEnricher/processors/0/0/subFlow/subprocessors/0"));
   }
 
@@ -331,8 +331,8 @@ public class ProcessorsTraceTestCase extends AbstractIntegrationTestCase {
     assertThat(ProcessorsTraceAsserter.processorsTraceToAssert,
                hasExecutedProcessorsNoOrder("/subFlowStaticWithScatterGather/processors/0",
                                             "/subFlowStaticWithScatterGather/processors/0/0/0",
-                                            "/subFlowStaticWithScatterGather/processors/0/1",
-                                            "/subFlowStaticWithScatterGather/processors/0/1/subFlow/subprocessors/0"));
+                                            "/subFlowStaticWithScatterGather/processors/0/1/0",
+                                            "/subFlowStaticWithScatterGather/processors/0/1/0/subFlow/subprocessors/0"));
   }
 
   @Ignore("MULE-6926: flaky test")

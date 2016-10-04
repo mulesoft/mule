@@ -16,6 +16,7 @@ import org.mule.runtime.core.VoidResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.construct.FlowConstructAware;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -182,7 +183,7 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
     }
 
     lifecycleManager.fireInitialisePhase((phaseName, object) -> {
-      DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(flowConstruct);
+      DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
       chainBuilder.setName("Component interceptor processor chain for :" + getName());
       for (Interceptor interceptor : interceptors) {
         chainBuilder.chain(interceptor);
@@ -197,6 +198,9 @@ public abstract class AbstractComponent extends AbstractAnnotatedObject
   protected void applyLifecycleAndDependencyInjection(Object object) throws InitialisationException {
     if (object instanceof MuleContextAware) {
       ((MuleContextAware) object).setMuleContext(muleContext);
+    }
+    if (object instanceof FlowConstructAware) {
+      ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
     }
     if (object instanceof MessagingExceptionHandlerAware) {
       ((MessagingExceptionHandlerAware) object).setMessagingExceptionHandler(messagingExceptionHandler);

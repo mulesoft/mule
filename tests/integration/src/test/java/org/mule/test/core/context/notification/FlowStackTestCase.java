@@ -199,7 +199,7 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
 
     assertStackElements(FlowStackAsserter.stackToAssert,
                         isFlowStackElement("subFlow", "/subFlowStaticWithEnricher/processors/0/0/subFlow/subprocessors/0"),
-                        isFlowStackElement("subFlowStaticWithEnricher", "/subFlowStaticWithEnricher/processors/0"));
+                        isFlowStackElement("subFlowStaticWithEnricher", "/subFlowStaticWithEnricher/processors/0/0"));
   }
 
   @Test
@@ -282,8 +282,8 @@ public class FlowStackTestCase extends AbstractIntegrationTestCase {
     assertThat(FlowStackAsserter.stackToAssert, not(nullValue()));
 
     assertStackElements(FlowStackAsserter.stackToAssert,
-                        isFlowStackElement("subFlow", "/subFlowStaticWithScatterGather/processors/0/1/subFlow/subprocessors/0"),
-                        isFlowStackElement("subFlowStaticWithScatterGather", "/subFlowStaticWithScatterGather/processors/0/1"));
+                        isFlowStackElement("subFlow", "/subFlowStaticWithScatterGather/processors/0/1/0/subFlow/subprocessors/0"),
+                        isFlowStackElement("subFlowStaticWithScatterGather", "/subFlowStaticWithScatterGather/processors/0/1/0"));
   }
 
   @Test

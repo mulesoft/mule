@@ -41,7 +41,7 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean<Messag
 
   @Override
   public MessageProcessorFilterPair getObject() throws Exception {
-    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
+    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     for (Object processor : messageProcessors) {
       if (processor instanceof Processor) {
         builder.chain((Processor) processor);

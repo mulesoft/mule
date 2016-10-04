@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.exception;
 
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_END;
 import static org.mule.runtime.core.context.notification.ExceptionStrategyNotification.PROCESS_START;
-
 import org.mule.runtime.core.VoidMuleEvent;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,7 +25,6 @@ import org.mule.runtime.core.context.notification.ExceptionStrategyNotification;
 import org.mule.runtime.core.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.processor.AbstractRequestResponseMessageProcessor;
-import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
@@ -176,13 +175,9 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
   @Override
   protected void doInitialise(MuleContext muleContext) throws InitialisationException {
     super.doInitialise(muleContext);
-    DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder =
-        new DefaultMessageProcessorChainBuilder(this.flowConstruct);
-    try {
-      configuredMessageProcessors = defaultMessageProcessorChainBuilder.chain(getMessageProcessors()).build();
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
+    configuredMessageProcessors = newChain(getMessageProcessors());
+    configuredMessageProcessors.setFlowConstruct(flowConstruct);
+    configuredMessageProcessors.setMuleContext(muleContext);
   }
 
   public void setWhen(String when) {

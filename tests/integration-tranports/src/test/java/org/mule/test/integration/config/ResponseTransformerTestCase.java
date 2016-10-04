@@ -12,9 +12,9 @@ import static org.junit.Assert.assertFalse;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.api.meta.NameableObject;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapper;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ResponseTransformerTestCase extends FunctionalTestCase {
     checkNames("normal", endpoint.getMessageProcessors());
     assertFalse(endpoint.getResponseMessageProcessors().isEmpty());
     final List<Processor> messageProcessors =
-        ((InterceptingChainLifecycleWrapper) endpoint.getResponseMessageProcessors().get(0)).getMessageProcessors();
+        ((MessageProcessorChain) endpoint.getResponseMessageProcessors().get(0)).getMessageProcessors();
     assertEquals(2, messageProcessors.size());
     checkNames("response", messageProcessors);
   }

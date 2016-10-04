@@ -26,6 +26,7 @@ import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.routing.OutboundRouter;
 import org.mule.runtime.core.api.routing.RouterResultsHandler;
@@ -39,6 +40,7 @@ import org.mule.runtime.core.management.stats.RouterStatistics;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.routing.AbstractRoutingStrategy;
 import org.mule.runtime.core.routing.DefaultRouterResultsHandler;
+import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.StringMessageUtils;
 
 import java.util.Collections;
@@ -311,4 +313,10 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     super.setFlowConstruct(flowConstruct);
     notificationTemplate.setFlowConstruct(flowConstruct);
   }
+
+  @Override
+  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement.addChild(this));
+  }
+
 }

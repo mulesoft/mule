@@ -19,6 +19,7 @@ import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.component.JavaComponent;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.RegistrationException;
 import org.mule.runtime.core.api.schedule.Scheduler;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.component.AbstractJavaComponent;
 import org.mule.runtime.core.config.i18n.I18nMessageFactory;
 import org.mule.runtime.core.construct.AbstractPipeline;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.chain.SubflowInterceptingChainLifecycleWrapper;
 import org.mule.runtime.core.util.IOUtils;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -232,8 +232,8 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  protected SubflowInterceptingChainLifecycleWrapper getSubFlow(String subflowName) {
-    return (SubflowInterceptingChainLifecycleWrapper) muleContext.getRegistry().lookupObject(subflowName);
+  protected MessageProcessorChain getSubFlow(String subflowName) {
+    return (MessageProcessorChain) muleContext.getRegistry().lookupObject(subflowName);
   }
 
   protected void runSchedulersOnce(String flowConstructName) throws Exception {

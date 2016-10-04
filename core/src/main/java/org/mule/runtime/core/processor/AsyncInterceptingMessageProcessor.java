@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.exception.MessagingExceptionHandlerAware;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.context.notification.AsyncMessageNotification;
 import org.mule.runtime.core.exception.MessagingException;
@@ -39,7 +40,7 @@ import org.mule.runtime.core.work.MuleWorkManager;
  * configured on the inbound endpoint. If a transaction is present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Startable, Stoppable, MessagingExceptionHandlerAware, NonBlockingSupported {
+    implements Startable, Stoppable, MessagingExceptionHandlerAware, NonBlockingSupported, InternalMessageProcessor {
 
   public static final String SYNCHRONOUS_NONBLOCKING_EVENT_ERROR_MESSAGE =
       "Unable to process a synchronous or non-blocking event asynchronously";

@@ -111,7 +111,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    Event result = component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    Event result = process(component, Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.of(""))
         .build());
 
@@ -136,7 +136,7 @@ public class InterceptorTestCase extends AbstractMuleContextTestCase {
     flow.initialise();
     flow.start();
 
-    Event result = component.process(Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
+    Event result = process(component, Event.builder(DefaultEventContext.create(flow, TEST_CONNECTOR))
         .message(InternalMessage.of(""))
         .build());
 

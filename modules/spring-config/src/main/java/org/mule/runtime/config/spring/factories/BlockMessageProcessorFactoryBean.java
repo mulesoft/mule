@@ -48,7 +48,7 @@ public class BlockMessageProcessorFactoryBean extends AbstractAnnotatedObject im
 
   @Override
   public Object getObject() throws Exception {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'transaction' child processor chain");
     TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
     txProcessor.setAnnotations(getAnnotations());

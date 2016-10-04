@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -29,9 +30,12 @@ import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.lifecycle.Startable;
 import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.config.i18n.I18nMessage;
+import org.mule.runtime.core.context.notification.ConnectorMessageNotification;
 import org.mule.runtime.core.processor.ResponseMessageProcessorAdapter;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 import org.mule.runtime.core.transformer.simple.StringAppendTransformer;
@@ -44,8 +48,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 public class FlowTestCase extends AbstractFlowConstuctTestCase {
 
@@ -69,7 +75,8 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase {
       Object[] args = invocation.getArguments();
       return (Event) args[0];
     });
-
+    doAnswer(invocation -> ((MessageProcessorPathElement) invocation.getArguments()[0]).addChild(dynamicProcessorContainer))
+        .when(dynamicProcessorContainer).addMessageProcessorPathElements(any(MessageProcessorPathElement.class));
     List<Processor> processors = new ArrayList<>();
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("f")));
     processors.add(new ResponseMessageProcessorAdapter(new StringAppendTransformer("e")));

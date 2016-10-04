@@ -6,6 +6,7 @@
  */
 package org.mule.tck.junit4;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 
@@ -463,5 +464,10 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    */
   protected <T> T getPayload(InternalMessage message, Class<T> clazz) throws Exception {
     return (T) getPayload(message, DataType.fromType(clazz));
+  }
+
+  protected Event process(Processor processor, Event event) throws Exception {
+    setMuleContextIfNeeded(processor, muleContext);
+    return processor.process(event);
   }
 }

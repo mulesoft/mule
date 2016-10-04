@@ -86,14 +86,10 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
       nameSource = ((StageNameSourceProvider) flowConstruct).getAsyncStageNameSource();
     }
 
-    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
+    MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.configureProcessors(Collections.singletonList(delegate), nameSource, builder,
                                            muleContext);
-    try {
-      target = builder.build();
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
+    target = builder.build();
     super.initialise();
   }
 
@@ -146,11 +142,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    if (delegate instanceof MessageProcessorContainer) {
-      ((MessageProcessorContainer) delegate).addMessageProcessorPathElements(pathElement);
-    } else {
-      NotificationUtils.addMessageProcessorPathElements(Collections.singletonList(delegate), pathElement);
-    }
+    NotificationUtils.addMessageProcessorPathElements(delegate, pathElement.addChild(this));
   }
 
 }

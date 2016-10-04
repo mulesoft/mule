@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.config.spring.factories;
 
+import static java.util.Collections.singletonList;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
-
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -21,13 +21,17 @@ import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.MessageProcessors;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
+import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
+import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
 import java.util.Map;
@@ -44,7 +48,8 @@ import org.springframework.context.ApplicationContextAware;
 public class FlowRefFactoryBean extends AbstractAnnotatedObject
     implements FactoryBean<Processor>, ApplicationContextAware, MuleContextAware, Initialisable, Disposable {
 
-  private abstract class FlowRefMessageProcessor implements NonBlockingMessageProcessor, AnnotatedObject, FlowConstructAware {
+  private abstract class FlowRefMessageProcessor
+      implements NonBlockingMessageProcessor, AnnotatedObject, FlowConstructAware, MessageProcessorContainer {
 
     protected FlowConstruct flowConstruct;
 
@@ -67,6 +72,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     public void setFlowConstruct(FlowConstruct flowConstruct) {
       this.flowConstruct = flowConstruct;
     }
+
   }
 
   private abstract class FlowRefMessageProcessorContainer extends FlowRefMessageProcessor
@@ -134,11 +140,16 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
 
   @Override
   public Processor getObject() throws Exception {
-    if (referencedMessageProcessor != null) {
-      return referencedMessageProcessor;
-    } else {
-      return createDynamicReferenceMessageProcessor(refName);
-    }
+    Processor processor =
+        referencedMessageProcessor != null ? referencedMessageProcessor : createDynamicReferenceMessageProcessor(refName);
+    // Wrap in chain to ensure the flow-ref element always has a path element and lifecycle will be propgated to child sub-flows
+    return new AbstractMessageProcessorChain(singletonList(processor)) {
+
+      @Override
+      public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+        NotificationUtils.addMessageProcessorPathElements(processor, pathElement.addChild(processor));
+      }
+    };
   }
 
   protected Processor createDynamicReferenceMessageProcessor(String name) throws MuleException {
@@ -213,6 +224,11 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
     }
     if (referencedFlow instanceof FlowConstruct) {
       return new FlowRefMessageProcessor() {
+
+        @Override
+        public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+          NotificationUtils.addMessageProcessorPathElements(referencedFlow, pathElement);
+        }
 
         @Override
         public Event process(Event event) throws MuleException {

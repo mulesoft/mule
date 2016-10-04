@@ -8,13 +8,14 @@ package org.mule.runtime.core.interceptor;
 
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.management.stats.ProcessingTime;
 
 /**
  * Calculate and record the processing time for a message processing chain
  */
-public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor {
+public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor implements InternalMessageProcessor {
 
   public ProcessingTimeInterceptor() {
     super();

@@ -102,8 +102,10 @@ public class FlowConfiguringMessageProcessor
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    pathElement = pathElement.addChild(getWrappedMessageProcessor());
     if (getWrappedMessageProcessor() instanceof MessageProcessorContainer) {
-      ((MessageProcessorContainer) getWrappedMessageProcessor()).addMessageProcessorPathElements(pathElement);
+      ((MessageProcessorContainer) getWrappedMessageProcessor())
+          .addMessageProcessorPathElements(pathElement.addChild(getWrappedMessageProcessor()));
     }
   }
 }

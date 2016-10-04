@@ -50,7 +50,7 @@ public class BlockMessageProcessor extends TransactionalInterceptingMessageProce
 
   @Override
   public void initialise() throws InitialisationException {
-    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(muleContext);
+    DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
     builder.setName("'transaction' child processor chain");
     TransactionalInterceptingMessageProcessor txProcessor = new TransactionalInterceptingMessageProcessor();
     txProcessor.setExceptionListener(this.exceptionListener);
@@ -69,11 +69,7 @@ public class BlockMessageProcessor extends TransactionalInterceptingMessageProce
         ((MessagingExceptionHandlerAware) processor).setMessagingExceptionHandler(exceptionListener);
       }
     }
-    try {
-      delegate = builder.build();
-    } catch (MuleException e) {
-      throw new InitialisationException(e, this);
-    }
+    delegate = builder.build();
     super.initialise();
   }
 

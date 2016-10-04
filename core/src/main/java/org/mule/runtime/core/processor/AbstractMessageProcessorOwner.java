@@ -48,9 +48,5 @@ public abstract class AbstractMessageProcessorOwner extends AbstractMuleObjectOw
 
   protected abstract List<Processor> getOwnedMessageProcessors();
 
-  @Override
-  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement);
-  }
 }
 

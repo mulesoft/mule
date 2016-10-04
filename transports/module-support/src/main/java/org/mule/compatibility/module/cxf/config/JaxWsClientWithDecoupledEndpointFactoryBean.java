@@ -15,7 +15,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class JaxWsClientWithDecoupledEndpointFactoryBean extends JaxWsClientMessageProcessorBuilder implements FactoryBean {
 
   @Override
-  public CxfOutboundMessageProcessor build() throws MuleException {
+  public CxfOutboundMessageProcessor build() {
     final CxfOutboundMessageProcessor processor = super.build();
 
     DecoupledEndpointBuilder.build(muleContext, decoupledEndpoint, processor, getBus());

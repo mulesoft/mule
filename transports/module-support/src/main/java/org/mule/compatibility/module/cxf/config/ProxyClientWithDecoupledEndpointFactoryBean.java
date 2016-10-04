@@ -15,7 +15,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class ProxyClientWithDecoupledEndpointFactoryBean extends ProxyClientMessageProcessorBuilder implements FactoryBean {
 
   @Override
-  public CxfOutboundMessageProcessor build() throws MuleException {
+  public CxfOutboundMessageProcessor build() {
     final CxfOutboundMessageProcessor processor = super.build();
 
     DecoupledEndpointBuilder.build(muleContext, decoupledEndpoint, processor, getBus());

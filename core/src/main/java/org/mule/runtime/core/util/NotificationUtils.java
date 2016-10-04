@@ -6,14 +6,16 @@
  */
 package org.mule.runtime.core.util;
 
+import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedSet;
 
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.runtime.core.processor.chain.InterceptingChainLifecycleWrapperPathSkip;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -76,29 +78,48 @@ public class NotificationUtils {
 
   private NotificationUtils() {}
 
+  /**
+   * Adds the processor paths for a list of {@link Processor}'s to the provided parent {@link MessageProcessorPathElement} as
+   * children. {@link InternalMessageProcessor} implementations are ignored. Where a {@link Processor} implements
+   * {@link MessageProcessorContainer} it will not automatically be added as a child here, but rather this logic and the decision
+   * regarding what child elements should be added is deletagted to the {@link MessageProcessorContainer} via it's
+   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method. TODO MULE-10708
+   * Replace MessageProcessorContainer/MessageProcessorElementPath mechanism for paths with parser provided path information.
+   * 
+   * @param processors the {@link Processor}'s whose paths are to add to the parent element.
+   * @param parentElement the parent {@link MessageProcessorPathElement}
+   */
   public static void addMessageProcessorPathElements(List<Processor> processors,
                                                      MessageProcessorPathElement parentElement) {
     if (processors == null) {
       return;
     }
-    for (Processor mp : processors) {
-      if (!(mp instanceof InternalMessageProcessor)) {
+    processors.forEach(processor -> addMessageProcessorPathElements(processor, parentElement));
+  }
 
-        MessageProcessorPathElement messageProcessorPathElement;
-
-        // To avoid adding a level in some path elements:
-        if (!(mp instanceof InterceptingChainLifecycleWrapperPathSkip)) {
-          messageProcessorPathElement = parentElement.addChild(mp);
-        } else {
-          messageProcessorPathElement = parentElement;
-        }
-        if (mp instanceof MessageProcessorContainer) {
-          ((MessageProcessorContainer) mp).addMessageProcessorPathElements(messageProcessorPathElement);
-        }
-      }
-
+  /**
+   * Adds the processor path for a specific {@link Processor}'s to the provided parent {@link MessageProcessorPathElement} as a
+   * child. {@link InternalMessageProcessor} implementations are ignored. Where a {@link Processor} implements
+   * {@link MessageProcessorContainer} it will not automatically be added as a child here, but rather this logic and the decision
+   * regarding what child elements should be added is deletagted to the {@link MessageProcessorContainer} via it's
+   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method. TODO MULE-10708
+   * Replace MessageProcessorContainer/MessageProcessorElementPath mechanism for paths with parser provided path information.
+   *
+   * @param processor the {@link Processor} whose path is to be added to the parent element.
+   * @param parentElement the parent {@link MessageProcessorPathElement}
+   */
+  public static void addMessageProcessorPathElements(Processor processor,
+                                                     MessageProcessorPathElement parentElement) {
+    if (processor == null || parentElement == null) {
+      return;
     }
-
+    if (!(processor instanceof InternalMessageProcessor)) {
+      if (processor instanceof MessageProcessorContainer) {
+        ((MessageProcessorContainer) processor).addMessageProcessorPathElements(parentElement);
+      } else {
+        parentElement.addChild(processor);
+      }
+    }
   }
 
   /**

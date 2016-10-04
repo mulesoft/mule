@@ -28,10 +28,12 @@ import org.mule.runtime.core.api.NonBlockingSupported;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.GroupCorrelation;
 import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.transformer.AbstractTransformer;
+import org.mule.runtime.core.util.NotificationUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -342,5 +344,9 @@ public class HttpResponseBuilder extends AbstractMessageProcessorOwner
     ownedMessageProcessor.add(bodyTransformer);
   }
 
+  @Override
+  public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+    NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement.addChild(this));
+  }
 
 }

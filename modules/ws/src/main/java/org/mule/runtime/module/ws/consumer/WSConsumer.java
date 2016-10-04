@@ -27,6 +27,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.registry.RegistrationException;
@@ -143,7 +144,7 @@ public class WSConsumer
    * transformer, a CXF client proxy and and outbound endpoint.
    */
   private Processor createMessageProcessor() throws MuleException {
-    MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(muleContext);
+    MessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
 
     chainBuilder.chain(createCopyAttachmentsMessageProcessor());
 
@@ -157,7 +158,10 @@ public class WSConsumer
 
     chainBuilder.chain(config.createOutboundMessageProcessor(flowConstruct));
 
-    return chainBuilder.build();
+    MessageProcessorChain chain = chainBuilder.build();
+    chain.setFlowConstruct(flowConstruct);
+    chain.setMuleContext(muleContext);
+    return chain;
   }
 
   private Processor createCopyAttachmentsMessageProcessor() {

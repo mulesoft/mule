@@ -6,23 +6,62 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleException;
+import org.mule.runtime.core.api.context.notification.FlowStackElement;
+import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
+import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.util.NotificationUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Constructs a custom chain for subflows using the subflow name as the chain name.
  */
-public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
+public class SubflowMessageProcessorChainBuilder extends ExplicitMessageProcessorChainBuilder {
 
-  public SubflowMessageProcessorChainBuilder(MuleContext muleContext) {
-    super(muleContext);
+  protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
+                                                          List<Processor> processorForLifecycle) {
+    return new SubflowMessageProcessorChain(name, head, processors, processorForLifecycle);
   }
 
-  @Override
-  protected InterceptingChainLifecycleWrapper buildMessageProcessorChain(DefaultMessageProcessorChain chain,
-                                                                         List<Processor> builtProcessors) {
-    return new SubflowInterceptingChainLifecycleWrapper(chain, builtProcessors, name);
+  /**
+   * Generates message processor identfiers specific for subflows.
+   */
+  static class SubflowMessageProcessorChain extends ExplicitMessageProcessorChain implements SubFlowMessageProcessor {
+
+    private String subFlowName;
+
+    SubflowMessageProcessorChain(String name, Processor head, List<Processor> processors,
+                                 List<Processor> processorsForLifecycle) {
+      super(name, head, processors, processorsForLifecycle);
+      this.subFlowName = name;
+    }
+
+    @Override
+    public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+      MessageProcessorPathElement subprocessors = pathElement.addChild(name).addChild("subprocessors");
+      NotificationUtils.addMessageProcessorPathElements(processors, subprocessors);
+    }
+
+    @Override
+    public Event process(Event event) throws MuleException {
+      ((DefaultFlowCallStack) event.getFlowCallStack()).push(new FlowStackElement(getSubFlowName(), null));
+
+      try {
+        return super.process(event);
+      } finally {
+        ((DefaultFlowCallStack) event.getFlowCallStack()).pop();
+      }
+    }
+
+    @Override
+    public String getSubFlowName() {
+      return subFlowName;
+    }
   }
 }
