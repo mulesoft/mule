@@ -67,7 +67,8 @@ public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends Fu
     assertThat(responseTransformers.isEmpty(), is(false));
     final Object responseTransformer = responseTransformers.get(0);
     assertThat(responseTransformer, instanceOf(MessageProcessorChain.class));
-    assertThat(((MessageProcessorChain) responseTransformer).getMessageProcessors().get(0), instanceOf(TestCompressionTransformer.class));
+    assertThat(((MessageProcessorChain) responseTransformer).getMessageProcessors().get(0),
+               instanceOf(TestCompressionTransformer.class));
   }
 
   @Test
