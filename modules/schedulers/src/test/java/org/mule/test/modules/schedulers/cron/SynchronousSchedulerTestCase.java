@@ -4,12 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.cron;
+package org.mule.test.modules.schedulers.cron;
 
 
 import static junit.framework.Assert.assertEquals;
-
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ import org.junit.Test;
  * Validates that a synchronous flow processing strategy implies a synchronous poll execution
  * </p>
  */
-public class SynchronousSchedulerTestCase extends FunctionalTestCase {
+public class SynchronousSchedulerTestCase extends MuleArtifactFunctionalTestCase {
 
   private static List<String> foo = new ArrayList<String>();
 

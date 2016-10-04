@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.modules.schedulers.cron;
 
+import static java.lang.Thread.currentThread;
 import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNotCreateScheduler;
 import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNotPauseSchedulers;
 import static org.mule.runtime.modules.schedulers.i18n.SchedulerMessages.couldNotScheduleJob;
@@ -20,6 +21,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.source.polling.PollingWorker;
 import org.mule.runtime.core.source.polling.schedule.PollScheduler;
+import org.mule.runtime.modules.schedulers.internal.cron.CronJob;
 
 import java.util.Properties;
 import java.util.TimeZone;
@@ -186,7 +188,17 @@ public class CronScheduler extends PollScheduler<PollingWorker> implements MuleC
   private Scheduler createScheduler() throws SchedulerException {
     SchedulerFactory factory = new StdSchedulerFactory(withFactoryProperties());
 
-    return factory.getScheduler();
+    final Scheduler scheduler;
+    final ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+    try {
+      // Quartz factory uses Thread's context classLoader to load the scheduler class. At this point the Mule application
+      // classloader is configured, so it must changed to use the container's.
+      currentThread().setContextClassLoader(getClass().getClassLoader());
+      scheduler = factory.getScheduler();
+    } finally {
+      currentThread().setContextClassLoader(contextClassLoader);
+    }
+    return scheduler;
   }
 
   private Properties withFactoryProperties() {

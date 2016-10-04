@@ -17,7 +17,7 @@ import org.mule.runtime.core.source.polling.PollingWorker;
 
 import org.junit.Test;
 
-public class CronSchedulerFactoryTest {
+public class CronSchedulerFactoryTestCase {
 
   @Test
   public void testSchedulerCreation() {

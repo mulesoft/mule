@@ -4,15 +4,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.cron;
+package org.mule.test.modules.schedulers.cron;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +26,7 @@ import org.junit.Test;
  * Uses the API to stop and start cron schedulers.
  * </p>
  */
-public class CronsSchedulerTest extends FunctionalTestCase {
+public class CronsSchedulerTestCase extends MuleArtifactFunctionalTestCase {
 
   private static List<String> foo = new ArrayList<String>();
   private static List<String> bar = new ArrayList<String>();

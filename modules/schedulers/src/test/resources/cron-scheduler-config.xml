@@ -22,7 +22,7 @@
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
             <flow-ref name="echo"/>
         </poll>
-        <component class="org.mule.runtime.modules.schedulers.cron.CronsSchedulerTest$FooComponent"/>
+        <component class="org.mule.test.modules.schedulers.cron.CronsSchedulerTestCase$FooComponent"/>
     </flow>
 
 
@@ -33,7 +33,7 @@
                 <return-data>bar</return-data>
             </static-component>
         </poll>
-       <component class="org.mule.runtime.modules.schedulers.cron.CronsSchedulerTest$BarComponent"/>
+       <component class="org.mule.test.modules.schedulers.cron.CronsSchedulerTestCase$BarComponent"/>
     </flow>
 
 </mule>

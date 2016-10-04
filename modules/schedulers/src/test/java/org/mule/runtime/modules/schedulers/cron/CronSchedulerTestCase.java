@@ -24,7 +24,7 @@ import java.util.TimeZone;
 import org.junit.Test;
 
 
-public class CronSchedulerTest extends AbstractMuleContextTestCase {
+public class CronSchedulerTestCase extends AbstractMuleContextTestCase {
 
   private Prober pollingProber = new PollingProber(1000, 0l);
 
