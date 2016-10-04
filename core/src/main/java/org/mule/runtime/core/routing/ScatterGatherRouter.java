@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.resource.spi.work.WorkException;
 
@@ -294,14 +295,8 @@ public class ScatterGatherRouter extends AbstractMessageProcessorOwner implement
 
   private void buildRouteChains() {
     Preconditions.checkState(routes.size() > 1, "At least 2 routes are required for ScatterGather");
-    routeChains = new ArrayList<>(routes.size());
-    for (Processor route : routes) {
-      if (route instanceof ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain) {
-        routeChains.add((MessageProcessorChain) route);
-      } else {
-        routeChains.add(newExplicitChain(route));
-      }
-    }
+    routeChains = routes.stream().map(route -> route instanceof ExplicitMessageProcessorChainBuilder.ExplicitMessageProcessorChain
+        ? (MessageProcessorChain) route : newExplicitChain(route)).collect(toList());
   }
 
   private void checkNotInitialised() {

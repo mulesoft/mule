@@ -53,7 +53,7 @@ public class MessageProcessors {
   }
 
   /**
-   * Creates a new explicit {@link MessageProcessorChain} from a {@link List} of {@link Processor}'s. Note that this performs
+   * Creates a new explicit {@link MessageProcessorChain} from one or more {@link Processor}'s. Note that this performs
    * chains construction but wil not inject {@link MuleContext} or {@link FlowConstruct} or perform any lifecycle. An explicit
    * chain differs in that it has a {@link MessageProcessorPathElement} associated with.
    *

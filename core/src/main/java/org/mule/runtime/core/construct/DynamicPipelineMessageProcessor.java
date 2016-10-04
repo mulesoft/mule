@@ -76,9 +76,9 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
 
     builder.chain(staticChain);
     builder.chain(postMessageProcessors);
-    MessageProcessorChain from = builder.build();
-    from.setFlowConstruct(flowConstruct);
-    from.setMuleContext(muleContext);
+    MessageProcessorChain newChain = builder.build();
+    newChain.setFlowConstruct(flowConstruct);
+    newChain.setMuleContext(muleContext);
 
     Lifecycle preChainOld = preChain;
     Lifecycle postChainOld = postChain;
@@ -87,7 +87,7 @@ public class DynamicPipelineMessageProcessor extends AbstractInterceptingMessage
     initDynamicChains();
 
     // hook chain as last step to avoid synchronization
-    super.setListener(from);
+    super.setListener(newChain);
 
     // dispose old dynamic chains
     disposeDynamicChains(preChainOld, postChainOld);

@@ -83,7 +83,8 @@ public class NotificationUtils {
    * children. {@link InternalMessageProcessor} implementations are ignored. Where a {@link Processor} implements
    * {@link MessageProcessorContainer} it will not automatically be added as a child here, but rather this logic and the decision
    * regarding what child elements should be added is deletagted to the {@link MessageProcessorContainer} via it's
-   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method.
+   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method. TODO MULE-10708
+   * Replace MessageProcessorContainer/MessageProcessorElementPath mechanism for paths with parser provided path information.
    * 
    * @param processors the {@link Processor}'s whose paths are to add to the parent element.
    * @param parentElement the parent {@link MessageProcessorPathElement}
@@ -101,7 +102,8 @@ public class NotificationUtils {
    * child. {@link InternalMessageProcessor} implementations are ignored. Where a {@link Processor} implements
    * {@link MessageProcessorContainer} it will not automatically be added as a child here, but rather this logic and the decision
    * regarding what child elements should be added is deletagted to the {@link MessageProcessorContainer} via it's
-   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method.
+   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method. TODO MULE-10708
+   * Replace MessageProcessorContainer/MessageProcessorElementPath mechanism for paths with parser provided path information.
    *
    * @param processor the {@link Processor} whose path is to be added to the parent element.
    * @param parentElement the parent {@link MessageProcessorPathElement}

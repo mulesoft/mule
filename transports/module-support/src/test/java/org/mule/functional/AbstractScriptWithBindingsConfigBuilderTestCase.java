@@ -6,9 +6,14 @@
  */
 package org.mule.functional;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.component.InterfaceBinding;
@@ -30,6 +35,7 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends FunctionalTestCase {
@@ -49,19 +55,19 @@ public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends Fu
   public void testEndpointConfig() throws MuleException {
     // test that targets have been resolved on targets
     ImmutableEndpoint endpoint = getEndpointFactory(muleContext).getInboundEndpoint("waterMelonEndpoint");
-    assertNotNull(endpoint);
+    assertThat(endpoint, notNullValue());
     // aliases no longer possible
-    assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
+    assertThat(endpoint.getEndpointURI().getAddress(), equalTo("test.queue"));
 
     Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("orangeComponent");
     ImmutableEndpoint ep = (ImmutableEndpoint) ((CompositeMessageSource) flow.getMessageSource()).getSources().get(0);
     assertNotNull(ep);
     final List responseTransformers = ep.getResponseMessageProcessors();
-    assertNotNull(responseTransformers);
-    assertFalse(responseTransformers.isEmpty());
+    assertThat(responseTransformers, notNullValue());
+    assertThat(responseTransformers.isEmpty(), is(false));
     final Object responseTransformer = responseTransformers.get(0);
-    assertTrue(responseTransformer instanceof MessageProcessorChain);
-    assertTrue(((MessageProcessorChain) responseTransformer).getMessageProcessors().get(0) instanceof TestCompressionTransformer);
+    assertThat(responseTransformer, instanceOf(MessageProcessorChain.class));
+    assertThat(((MessageProcessorChain) responseTransformer).getMessageProcessors().get(0), instanceOf(TestCompressionTransformer.class));
   }
 
   @Test

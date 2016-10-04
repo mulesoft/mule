@@ -273,9 +273,9 @@ public class LifecycleUtils {
   }
 
   /**
-   * Sets an objects {@link FlowConstruct} it implements {@link FlowConstructAware}.
+   * Sets an objects {@link FlowConstruct} if it implements {@link FlowConstructAware}.
    *
-   * @param object the object you're trying to set the flow construct
+   * @param object the object to inject the {@link FlowConstruct} into.
    * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
    * @throws InitialisationException
    */
@@ -287,9 +287,9 @@ public class LifecycleUtils {
   }
 
   /**
-   * Sets an objects {@link FlowConstruct} it implements {@link FlowConstructAware}.
+   * Sets an objects {@link FlowConstruct} if it implements {@link FlowConstructAware}.
    *
-   * @param objects the object you're trying to set the flow construct
+   * @param objects the objects to inject the {@link FlowConstruct} into.
    * @param flowConstruct the {@link FlowConstruct} in which the object is defined.
    * @throws InitialisationException
    */
@@ -298,9 +298,9 @@ public class LifecycleUtils {
   }
 
   /**
-   * Sets an objects {@link MuleContext} it implements {@link MuleContextAware}.
+   * Sets an objects {@link MuleContext} if it implements {@link MuleContextAware}.
    *
-   * @param object the object you're trying to set the mule context
+   * @param object the object to inject the {@link MuleContext} into.
    * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */
@@ -312,9 +312,9 @@ public class LifecycleUtils {
   }
 
   /**
-   * Sets an objects {@link MuleContext} it implements {@link MuleContextAware}.
+   * Sets an objects {@link MuleContext} if it implements {@link MuleContextAware}.
    *
-   * @param objects the object you're trying to set the mule context
+   * @param objects the objects to inject the {@link MuleContext} into.
    * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */

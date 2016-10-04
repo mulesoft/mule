@@ -7,7 +7,8 @@
 package org.mule.runtime.core.api.processor;
 
 /**
- * Identifies Constructs that contain Message Processors configured by the user.
+ * Identifies Constructs that contain Message Processors configured by the user. TODO MULE-10708 Replace
+ * MessageProcessorContainer/MessageProcessorElementPath mechanism for paths with parser provided path information.
  */
 public interface MessageProcessorContainer {
 

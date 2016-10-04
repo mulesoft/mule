@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.enricher;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.api.processor.MessageProcessors.newExplicitChain;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.setCurrentEvent;
@@ -17,6 +18,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
@@ -97,7 +99,7 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements No
 
   public void setEnrichmentMessageProcessor(Processor enrichmentProcessor) {
     this.enrichmentProcessor = newChain(enrichmentProcessor);
-    ((MuleContextAware) this.enrichmentProcessor).setMuleContext(muleContext);
+    setMuleContextIfNeeded(this.enrichmentProcessor, muleContext);
   }
 
   /**

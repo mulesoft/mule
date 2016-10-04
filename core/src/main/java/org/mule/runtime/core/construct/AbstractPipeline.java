@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.construct;
 
-import static java.util.Collections.singletonList;
+import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_COMPLETE;
+import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_END;
+import static org.mule.runtime.core.context.notification.PipelineMessageNotification.PROCESS_START;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
 
 import org.mule.runtime.core.api.GlobalNameableObject;
@@ -19,7 +21,6 @@ import org.mule.runtime.core.api.construct.FlowConstructInvalidException;
 import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.processor.DefaultMessageProcessorPathElement;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.InternalMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorBuilder;
@@ -27,7 +28,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorChainBuilder;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.ProcessingStrategy;
-import org.mule.runtime.core.api.processor.StageNameSource;
 import org.mule.runtime.core.api.source.ClusterizableMessageSource;
 import org.mule.runtime.core.api.source.CompositeMessageSource;
 import org.mule.runtime.core.api.source.MessageSource;
@@ -51,7 +51,6 @@ import org.mule.runtime.core.util.CollectionUtils;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.PathResolver;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -137,7 +136,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   }
 
   protected void configurePostProcessors(MessageProcessorChainBuilder builder) throws MuleException {
-    builder.chain(new processEndProcessor());
+    builder.chain(new ProcessEndProcessor());
   }
 
   @Override
@@ -348,13 +347,12 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     super.doDispose();
   }
 
-  private class processEndProcessor implements Processor, InternalMessageProcessor {
+  private class ProcessEndProcessor implements Processor, InternalMessageProcessor {
 
     @Override
     public Event process(Event event) throws MuleException {
       muleContext.getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event,
-                                                            PipelineMessageNotification.PROCESS_END));
+          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_END));
       return event;
     }
   }
@@ -366,16 +364,14 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     @Override
     protected Event processRequest(Event event) throws MuleException {
       muleContext.getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event,
-                                                            PipelineMessageNotification.PROCESS_START));
+          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_START));
       return super.processRequest(event);
     }
 
     @Override
     protected void processFinally(Event event, MessagingException exception) {
       muleContext.getNotificationManager()
-          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event,
-                                                            PipelineMessageNotification.PROCESS_COMPLETE, exception));
+          .fireNotification(new PipelineMessageNotification(AbstractPipeline.this, event, PROCESS_COMPLETE, exception));
     }
   }
 }
