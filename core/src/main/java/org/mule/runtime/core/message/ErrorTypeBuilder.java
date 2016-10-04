@@ -120,6 +120,12 @@ public final class ErrorTypeBuilder {
     public ErrorType getParentErrorType() {
       return parentErrorType;
     }
+
+    @Override
+    public String toString() {
+      return String.format("%s:%s", namespace, identifier);
+    }
+
   }
 
 }
