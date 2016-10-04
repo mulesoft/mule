@@ -15,7 +15,7 @@
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
             <logger message="Logger started"/>
         </poll>
-        <component class="org.mule.runtime.modules.schedulers.cron.SynchronousSchedulerTestCase$FooComponent"/>
+        <component class="org.mule.test.modules.schedulers.cron.SynchronousSchedulerTestCase$FooComponent"/>
     </flow>
 
 

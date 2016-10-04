@@ -9,9 +9,8 @@
                http://www.mulesoft.org/schema/mule/schedulers http://www.mulesoft.org/schema/mule/schedulers/current/mule-schedulers.xsd
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-
     <spring:beans>
-        <spring:bean class="org.mule.runtime.modules.schedulers.cron.PollSchedulerFactoryPostProcessor"/>
+        <spring:bean class="org.mule.test.modules.schedulers.cron.StoppedCronSchedulerTestCase$TestSchedulerFactoryPostProcessor"/>
     </spring:beans>
 
     <flow name="pollfoo" processingStrategy="synchronous">
@@ -19,10 +18,6 @@
             <schedulers:cron-scheduler expression="0/1 * * * * ?"/>
             <logger message="Logger started"/>
         </poll>
-        <component class="org.mule.runtime.modules.schedulers.cron.StoppedCronSchedulerTestCase$FooComponent"/>
+        <component class="org.mule.test.modules.schedulers.cron.StoppedCronSchedulerTestCase$FooComponent"/>
     </flow>
-
-
-
-
 </mule>

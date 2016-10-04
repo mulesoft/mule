@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.cron;
+package org.mule.runtime.modules.schedulers.internal.cron;
 
 import org.mule.runtime.core.source.polling.PollingWorker;
+import org.mule.runtime.modules.schedulers.cron.CronScheduler;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -29,7 +30,6 @@ public class CronJob implements StatefulJob {
     if (work != null) {
       work.run();
     }
-
   }
 
   private Object getSchedulerWork(JobExecutionContext context) {

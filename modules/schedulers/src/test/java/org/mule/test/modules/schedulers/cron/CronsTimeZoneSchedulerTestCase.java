@@ -4,24 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.modules.schedulers.cron;
+package org.mule.test.modules.schedulers.cron;
 
 import static java.util.TimeZone.getTimeZone;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
-
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.api.schedule.Scheduler;
 import org.mule.runtime.core.api.schedule.Schedulers;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.modules.schedulers.cron.CronScheduler;
 
 import java.util.Collection;
 
 import org.junit.Test;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-
-public class CronsTimeZoneSchedulerTest extends FunctionalTestCase {
+public class CronsTimeZoneSchedulerTestCase extends MuleArtifactFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

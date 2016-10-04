@@ -5,20 +5,20 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.modules.schedulers.cron;
+package org.mule.test.modules.schedulers.cron;
 
+import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
-import org.mule.runtime.core.util.concurrent.Latch;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class MultipleSchedulersTestCase extends FunctionalTestCase {
+public class MultipleSchedulersTestCase extends MuleArtifactFunctionalTestCase {
 
   private static CountDownLatch firstRequest = new CountDownLatch(2);
   private static Latch stoppedFlowLatch = new Latch();
