@@ -150,33 +150,38 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
       }
 
       jmsMessage.setStringProperty(MULE_CORRELATION_ID_PROPERTY, resolveMuleCorrelationId(event));
-      jmsMessage.setJMSCorrelationID(resolveJmsCorrelationId(event));
+      // For the "One-way" scenario, we can resolve the Correlation ID.
+      // For the "Request-Response" scenario, this cannot be done because we are supporting only the
+      // JMS Message ID Pattern. In Mule 4 JMS should support this pattern, and the JMS Correlation ID Pattern
+      if (!endpoint.getExchangePattern().hasResponse()) {
+        jmsMessage.setJMSCorrelationID(resolveJmsCorrelationId(event));
+      } else {
+        jmsMessage.setJMSCorrelationID(event.getLegacyCorrelationId());
+      }
 
       // Allow overrides to alter the message if necessary
       processMessage(jmsMessage, event);
 
       if (useReplyToDestination && replyTo != null) {
-        final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
         final int timeout = endpoint.getResponseTimeout();
 
         if (completionHandler != null) {
-          internalNonBlockingSendAndReceive(session, producer, consumer, replyTo, jmsMessage, topic, ttl, priority, persistent,
-                                            transacted, timeout, completionHandler);
+          internalNonBlockingSendAndReceive(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent, transacted,
+                                            timeout, completionHandler, event);
           delayedCleanup = true;
           return null;
         } else {
           try {
             if (topic) {
-              return internalBlockingSendAndAwait(consumer, producer, replyTo, jmsMessage, topic, ttl, priority, persistent,
-                                                  timeout);
-            }
+              return internalBlockingSendAndAwait(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent,
+                                                  timeout, event);
 
-            else {
-              return internalBlockingSendAndReceive(producer, consumer, replyTo, jmsMessage, topic, ttl, priority, persistent,
-                                                    timeout);
+            } else {
+              return internalBlockingSendAndReceive(session, producer, replyTo, jmsMessage, topic, ttl, priority, persistent,
+                                                    timeout, event);
             }
           } finally {
-            closeConsumer(session, consumer, replyTo);
+            closeReplyQueue(session, replyTo);
           }
         }
       } else {
@@ -197,48 +202,60 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return returnOriginalMessageAsReply ? createMuleMessage(jmsMessage) : null;
   }
 
-  private InternalMessage internalBlockingSendAndAwait(MessageConsumer consumer, MessageProducer producer, Destination replyTo,
+  private InternalMessage internalBlockingSendAndAwait(Session session, MessageProducer producer, Destination replyTo,
                                                        Message jmsMessage, boolean topic, long ttl, int priority,
-                                                       boolean persistent,
-                                                       int timeout)
+                                                       boolean persistent, int timeout, Event event)
       throws Exception {
-    // need to register a listener for a topic
-    Latch latch = new Latch();
-    LatchReplyToListener listener = new LatchReplyToListener(latch);
-    consumer.setMessageListener(listener);
-
     connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("Waiting for response event for: " + timeout + " ms on " + replyTo);
-    }
+    final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
 
-    latch.await(timeout, TimeUnit.MILLISECONDS);
-    consumer.setMessageListener(null);
-    listener.release();
-    return createResponseMuleMessage(listener.getMessage(), replyTo);
+    try {
+      // need to register a listener for a topic
+      Latch latch = new Latch();
+      LatchReplyToListener listener = new LatchReplyToListener(latch);
+      consumer.setMessageListener(listener);
+
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Waiting for response event for: " + timeout + " ms on " + replyTo);
+      }
+
+      latch.await(timeout, TimeUnit.MILLISECONDS);
+      consumer.setMessageListener(null);
+      listener.release();
+      return createResponseMuleMessage(listener.getMessage(), replyTo);
+    } finally {
+      closeConsumer(consumer);
+    }
   }
 
-  private InternalMessage internalBlockingSendAndReceive(MessageProducer producer, MessageConsumer consumer, Destination replyTo,
+  private InternalMessage internalBlockingSendAndReceive(Session session, MessageProducer producer, Destination replyTo,
                                                          Message jmsMessage, boolean topic, long ttl, int priority,
-                                                         boolean persistent, int timeout)
+                                                         boolean persistent, int timeout, Event event)
       throws Exception {
     connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
 
     if (logger.isDebugEnabled()) {
       logger.debug("Waiting for non-blocking response event for: " + timeout + " ms on " + replyTo);
     }
-
-    Message result = consumer.receive(timeout);
-    return createResponseMuleMessage(result, replyTo);
+    final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
+    try {
+      Message result = consumer.receive(timeout);
+      return createResponseMuleMessage(result, replyTo);
+    } finally {
+      closeConsumer(consumer);
+    }
   }
 
-  private void internalNonBlockingSendAndReceive(final Session session, final MessageProducer producer,
-                                                 final MessageConsumer consumer, final Destination replyTo, Message jmsMessage,
-                                                 boolean topic, long ttl, int priority, boolean persistent,
+  private void internalNonBlockingSendAndReceive(final Session session, final MessageProducer producer, final Destination replyTo,
+                                                 Message jmsMessage, boolean topic, long ttl, int priority, boolean persistent,
                                                  final boolean transacted, int timeout,
-                                                 final CompletionHandler<InternalMessage, Exception, Void> completionHandler)
+                                                 final CompletionHandler<InternalMessage, Exception, Void> completionHandler,
+                                                 Event event)
       throws JMSException {
+    connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
+    final MessageConsumer consumer = createReplyToConsumer(jmsMessage, event, session, replyTo, topic);
     final TimerTask closeConsumerTask = new TimerTask() {
 
       @Override
@@ -254,6 +271,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         }
       }
     };
+
+    connector.scheduleTimeoutTask(closeConsumerTask, endpoint.getResponseTimeout());
     consumer.setMessageListener(new CompletionHandlerReplyToListener(new CompletionHandler<Message, Exception, Void>() {
 
       @Override
@@ -276,15 +295,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
           cleanup(producer, session, consumer, replyTo);
         }
       }
-
     }));
-    connector.getJmsSupport().send(producer, jmsMessage, persistent, priority, ttl, topic, endpoint);
-    connector.scheduleTimeoutTask(closeConsumerTask, endpoint.getResponseTimeout());
   }
 
   private void cleanup(MessageProducer producer, Session session, MessageConsumer consumer, Destination replyTo) {
     closeProducer(producer);
-    closeConsumer(session, consumer, replyTo);
+    closeConsumer(consumer);
+    closeReplyQueue(session, replyTo);
     closeSession(session);
   }
 
@@ -311,9 +328,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     return (muleTx != null && muleTx.hasResource(connector.getConnection()) || endpoint.getTransactionConfig().isTransacted());
   }
 
-  private void closeConsumer(Session session, MessageConsumer consumer, Destination replyTo) {
-    connector.closeQuietly(consumer);
-
+  private void closeReplyQueue(Session session, Destination replyTo) {
     if (replyTo != null && (replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic)) {
       if (replyTo instanceof TemporaryQueue) {
         connector.closeQuietly((TemporaryQueue) replyTo);
@@ -321,6 +336,10 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
         connector.closeQuietly((TemporaryTopic) replyTo);
       }
     }
+  }
+
+  private void closeConsumer(MessageConsumer consumer) {
+    connector.closeQuietly(consumer);
   }
 
   private void closeProducer(MessageProducer producer) {
@@ -437,7 +456,13 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     String durableName;
     // If we're not using
     if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic)) {
-      selector = "JMSCorrelationID='" + jmsMessage.getJMSCorrelationID() + "'";
+      // Since we are supporting the JMS Message ID Pattern for request-response, the correlationID will be null
+      // if it is not manually setted up, and the selector must be set to the messageID.
+      String jmsCorrelationId = jmsMessage.getJMSCorrelationID();
+      if (jmsCorrelationId == null) {
+        jmsCorrelationId = jmsMessage.getJMSMessageID();
+      }
+      selector = "JMSCorrelationID='" + jmsCorrelationId + "'";
       if (logger.isDebugEnabled()) {
         logger.debug("ReplyTo Selector is: " + selector);
       }

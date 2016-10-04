@@ -245,6 +245,13 @@ public interface Event extends MuleEvent {
   SecurityContext getSecurityContext();
 
   /**
+   * @return the correlation id to use for this event.
+   * @deprecated TODO MULE-xxxxx MULE 4 - New JMS Model
+   */
+  @Deprecated
+  String getLegacyCorrelationId();
+
+  /**
    * Create new {@link Builder}.
    *
    * @param context the context to create event instance with.

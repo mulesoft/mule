@@ -169,4 +169,9 @@ public class VoidMuleEvent implements Event {
     throw new UnsupportedOperationException();
   }
 
+  @Override
+  public String getLegacyCorrelationId() {
+    throw new UnsupportedOperationException();
+  }
+
 }
