@@ -11,10 +11,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -26,13 +29,20 @@ public class PropertiesBootstrapServiceDiscovererTestCase extends AbstractMuleTe
   @Test
   public void discoversServiceOnDefaultClassLoader() throws Exception {
     final ClassLoader classLoader = mock(ClassLoader.class);
+    final Enumeration enumeration = mock(Enumeration.class);
+    when(enumeration.hasMoreElements()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
+    final URL resource = getClass().getClassLoader().getResource(BOOTSTRAP_PROPERTIES);
+    when(enumeration.nextElement()).thenReturn(resource);
+    when(enumeration.nextElement()).thenReturn(resource);
+    when(enumeration.nextElement()).thenReturn(resource);
+    when(classLoader.getResources(BOOTSTRAP_PROPERTIES)).thenReturn(enumeration);
 
     final PropertiesBootstrapServiceDiscoverer propertiesBootstrapServiceDiscoverer =
         new PropertiesBootstrapServiceDiscoverer(classLoader);
 
     final List<BootstrapService> services = propertiesBootstrapServiceDiscoverer.discover();
 
-    assertThat(services.size(), is(1));
+    assertThat(services.size(), is(3));
   }
 
   @Test

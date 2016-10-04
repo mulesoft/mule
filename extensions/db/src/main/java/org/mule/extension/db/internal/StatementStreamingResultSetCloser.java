@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.extension.db.api;
+package org.mule.extension.db.internal;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import org.mule.extension.db.internal.domain.connection.DbConnection;

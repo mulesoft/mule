@@ -409,5 +409,12 @@ public interface MuleContext extends Lifecycle {
    *         artifact.
    */
   ErrorTypeRepository getErrorTypeRepository();
+
+  /**
+   * Sets application wide instance of {@link BootstrapServiceDiscoverer}
+   *
+   * @param bootstrapServiceDiscoverer bootstrap service discoverer instance. Non null.
+   */
+  void setBootstrapServiceDiscoverer(BootstrapServiceDiscoverer bootstrapServiceDiscoverer);
 }
 

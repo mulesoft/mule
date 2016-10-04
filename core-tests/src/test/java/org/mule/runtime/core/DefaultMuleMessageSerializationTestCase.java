@@ -13,7 +13,7 @@ import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementat
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;

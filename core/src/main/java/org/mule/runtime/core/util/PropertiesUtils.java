@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.util;
 
-import static org.mule.runtime.core.util.ClassUtils.getResources;
 import static org.mule.runtime.core.util.Preconditions.checkArgument;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.config.i18n.CoreMessages;
@@ -302,9 +301,9 @@ public final class PropertiesUtils {
     checkArgument(!StringUtils.isEmpty(resource), "Resource cannot be empty");
     checkArgument(classLoader != null, "ClassLoader cannot be null");
 
-    List<Properties> result = new LinkedList<Properties>();
+    List<Properties> result = new LinkedList<>();
 
-    Enumeration<URL> allPropertiesResources = getResources(resource, classLoader);
+    Enumeration<URL> allPropertiesResources = classLoader.getResources(resource);
     while (allPropertiesResources.hasMoreElements()) {
       URL propertiesResource = allPropertiesResources.nextElement();
       if (logger.isDebugEnabled()) {

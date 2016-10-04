@@ -236,6 +236,7 @@ public class ArtifactContextBuilder {
     try {
       return withContextClassLoader(executionClassLoader, () -> {
         List<ConfigurationBuilder> builders = new LinkedList<>();
+        builders.add(new ArtifactBootstrapServiceDiscovererContextBuilder(artifactPlugins));
         builders.add(new ApplicationExtensionsManagerConfigurationBuilder(artifactPlugins));
         builders.add(createConfigurationBuilderFromApplicationProperties());
         SpringXmlConfigurationBuilder mainBuilder =

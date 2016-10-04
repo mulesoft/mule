@@ -45,6 +45,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getContainerAppPlug
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.core.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
@@ -1448,6 +1449,25 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
     startDeployment();
 
     assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @Test
+  public void deploysAppWithPluginBootstrapProperty() throws Exception {
+    final ArtifactPluginFileBuilder pluginFileBuilder = new ArtifactPluginFileBuilder("bootstrapPlugin")
+        .containingResource("plugin-bootstrap.properties", BOOTSTRAP_PROPERTIES).containingClass("org/foo/EchoTest.clazz");
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("app-with-plugin-bootstrap")
+        .definedBy("app-with-plugin-bootstrap.xml").containingPlugin(pluginFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    final Application application = findApp(applicationFileBuilder.getId(), 1);
+    final Object lookupObject = application.getMuleContext().getRegistry().lookupObject("plugin.echotest");
+    assertThat(lookupObject, is(not(nullValue())));
+    assertThat(lookupObject.getClass().getName(), equalTo("org.foo.EchoTest"));
   }
 
   @Test

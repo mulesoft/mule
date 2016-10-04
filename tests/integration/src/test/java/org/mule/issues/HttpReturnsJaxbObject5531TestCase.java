@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.lifecycle.Callable;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.transformer.simple.ObjectToString;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Ignore;

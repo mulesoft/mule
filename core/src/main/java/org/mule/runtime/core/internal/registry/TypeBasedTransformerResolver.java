@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.registry;
+package org.mule.runtime.core.internal.registry;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
@@ -23,8 +23,8 @@ import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.transformer.TransformerChain;
 import org.mule.runtime.core.transformer.TransformerWeighting;
 import org.mule.runtime.core.transformer.graph.GraphTransformerResolver;
-import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.transformer.simple.ObjectToString;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 
 import java.util.ArrayList;
 import java.util.Arrays;

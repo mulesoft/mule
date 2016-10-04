@@ -4,8 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.validation.api.el;
+package org.mule.extension.validation.internal.el;
 
+import org.mule.extension.validation.api.el.ValidatorElContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.el.ExpressionLanguageContext;
 import org.mule.runtime.core.api.el.ExpressionLanguageExtension;
