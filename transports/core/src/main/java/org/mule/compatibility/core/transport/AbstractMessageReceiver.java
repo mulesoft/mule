@@ -418,7 +418,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     if (resultEvent != null
         && !VoidMuleEvent.getInstance().equals(resultEvent)
         && resultEvent.getError().isPresent()
-        && resultEvent.getError().get().getException() instanceof FilterUnacceptedException) {
+        && resultEvent.getError().get().getCause() instanceof FilterUnacceptedException) {
       handleUnacceptedFilter(muleEvent.getMessage());
       return muleEvent;
     }

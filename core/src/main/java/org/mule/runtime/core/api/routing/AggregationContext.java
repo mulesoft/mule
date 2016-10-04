@@ -90,7 +90,7 @@ public final class AggregationContext {
     for (int i = 0; i < this.events.size(); i++) {
       Event event = this.events.get(i);
       if (failedEventsPredicate.evaluate(event)) {
-        routes.put(i, event.getError().get().getException());
+        routes.put(i, event.getError().get().getCause());
       }
     }
 

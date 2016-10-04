@@ -29,6 +29,6 @@ public interface ErrorMessageAwareException {
    *
    * @return the actual exception that occurred
    */
-  Exception getException();
+  Throwable getRootCause();
 
 }

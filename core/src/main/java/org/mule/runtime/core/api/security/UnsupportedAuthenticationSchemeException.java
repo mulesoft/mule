@@ -39,7 +39,7 @@ public class UnsupportedAuthenticationSchemeException extends SecurityException 
   }
 
   @Override
-  public Exception getException() {
+  public Throwable getRootCause() {
     return this;
   }
 }

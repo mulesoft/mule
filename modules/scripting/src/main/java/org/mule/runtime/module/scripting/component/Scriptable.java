@@ -237,7 +237,7 @@ public class Scriptable implements Initialisable, MuleContextAware, FlowConstruc
 
     // Only add exception is present
     if (event.getError().isPresent()) {
-      bindings.put(BINDING_EXCEPTION, event.getError().get().getException());
+      bindings.put(BINDING_EXCEPTION, event.getError().get().getCause());
     } else {
       bindings.put(BINDING_EXCEPTION, null);
     }

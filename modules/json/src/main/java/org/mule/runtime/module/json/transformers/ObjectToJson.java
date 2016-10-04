@@ -80,7 +80,7 @@ public class ObjectToJson extends AbstractJsonTransformer {
       if (logger.isDebugEnabled()) {
         logger.debug("Found exception with null payload");
       }
-      src = this.getException(event.getError().get().getException());
+      src = this.getException(event.getError().get().getCause());
     }
 
     StringWriter writer = new StringWriter();

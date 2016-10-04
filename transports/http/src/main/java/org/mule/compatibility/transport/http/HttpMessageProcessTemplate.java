@@ -173,8 +173,8 @@ public class HttpMessageProcessTemplate extends AbstractTransportMessageProcessT
     MessagingException e = messagingException;
     if (response != null &&
         response.getError().isPresent() &&
-        response.getError().get().getException() instanceof MessagingException) {
-      e = (MessagingException) response.getError().get().getException();
+        response.getError().get().getCause() instanceof MessagingException) {
+      e = (MessagingException) response.getError().get().getCause();
     }
     return e;
   }

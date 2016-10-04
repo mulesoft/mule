@@ -41,7 +41,7 @@ public class EntryPointResolverCacheTestCase extends AbstractIntegrationTestCase
         .run().getMessage();
     payload = response.getPayload().getValue();
     if ((payload == null) || (responseEvent.getError().isPresent())) {
-      Throwable exception = responseEvent.getError().get().getException();
+      Throwable exception = responseEvent.getError().get().getCause();
       if (exception != null) {
         fail(exception.getMessage());
       } else {

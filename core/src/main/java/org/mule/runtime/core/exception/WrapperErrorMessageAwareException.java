@@ -18,19 +18,19 @@ import org.mule.runtime.core.api.exception.ErrorMessageAwareException;
 public class WrapperErrorMessageAwareException extends MuleException implements ErrorMessageAwareException {
 
   private Message errorMessage;
-  private Exception exception;
+  private Throwable exception;
 
-  public WrapperErrorMessageAwareException(Message errorMessage, Exception exception) {
+  public WrapperErrorMessageAwareException(Message errorMessage, Throwable exception) {
     super(exception);
     this.errorMessage = errorMessage;
     this.exception = exception;
   }
 
-  public Exception getException() {
-    return exception;
-  }
-
   public Message getErrorMessage() {
     return errorMessage;
+  }
+
+  public Throwable getRootCause() {
+    return exception;
   }
 }

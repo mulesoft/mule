@@ -26,14 +26,14 @@ public final class MuleTestUtils {
   public static final String APPLE_FLOW = "appleFlow";
 
   /**
-   * Creates an {@link Error} mock that will return the provided exception when calling {@link Error#getException()}
+   * Creates an {@link Error} mock that will return the provided exception when calling {@link Error#getCause()}
    * 
    * @param exception the exception to use to create the mock
    * @return a mocked {@link Error}
    */
   public static Error createErrorMock(Exception exception) {
     Error errorMock = mock(Error.class);
-    when(errorMock.getException()).thenReturn(exception);
+    when(errorMock.getCause()).thenReturn(exception);
     return errorMock;
   }
 

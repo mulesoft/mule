@@ -65,7 +65,7 @@ public class HttpRequestStatusCodesTestCase extends AbstractHttpRequestTestCase 
     MessagingException e =
         flowRunner(flowName).withPayload(TEST_MESSAGE).withVariable("code", statusCode).runExpectingException();
 
-    assertThat(e.getEvent().getError().get().getException(), instanceOf(ResponseValidatorException.class));
+    assertThat(e.getEvent().getError().get().getCause(), instanceOf(ResponseValidatorException.class));
   }
 
   @Override

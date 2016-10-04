@@ -46,8 +46,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         Optional<Error> error = messagingException.getEvent().getError();
         // TODO - MULE-10266 - Once we remove the usage of MessagingException from within the mule component we can get rid of the
         // messagingException.causedExactlyBy(..) condition.
-        if (!error.isPresent() || !error.get().getException().equals(causeException)
-            || !messagingException.causedExactlyBy(error.get().getException().getClass())) {
+        if (!error.isPresent() || !error.get().getCause().equals(causeException)
+            || !messagingException.causedExactlyBy(error.get().getCause().getClass())) {
           ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, causeException);
           event = Event.builder(messagingException.getEvent())
               .error(ErrorBuilder.builder(causeException).errorType(errorType).build()).build();
@@ -55,8 +55,8 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
         }
       } else {
         //Create a ME and an error, both using the exception
-        Exception causeException = exception instanceof ErrorMessageAwareException
-            ? ((ErrorMessageAwareException) exception).getException()
+        Throwable causeException = exception instanceof ErrorMessageAwareException
+            ? ((ErrorMessageAwareException) exception).getRootCause()
             : exception;
         messagingException = new MessagingException(event, causeException, messageProcessor);
         ErrorType errorType = getErrorTypeFromFailingProcessor(messageProcessor, causeException);
@@ -78,7 +78,7 @@ public class ExceptionToMessagingExceptionExecutionInterceptor implements Messag
   private ErrorType getErrorTypeFromFailingProcessor(Processor messageProcessor, Throwable exception) {
     ErrorType errorType;
     Throwable causeException =
-        exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getException()
+        exception instanceof WrapperErrorMessageAwareException ? ((WrapperErrorMessageAwareException) exception).getRootCause()
             : exception;
     if (AnnotatedObject.class.isAssignableFrom(messageProcessor.getClass())) {
       ComponentIdentifier componentIdentifier =
