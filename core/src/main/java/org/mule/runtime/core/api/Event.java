@@ -246,7 +246,7 @@ public interface Event extends MuleEvent {
 
   /**
    * @return the correlation id to use for this event.
-   * @deprecated TODO MULE-xxxxx MULE 4 - New JMS Model
+   * @deprecated TODO MULE-10706 Mule 4: remove this
    */
   @Deprecated
   String getLegacyCorrelationId();

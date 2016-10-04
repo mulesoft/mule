@@ -457,7 +457,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher {
     // If we're not using
     if (!(replyTo instanceof TemporaryQueue || replyTo instanceof TemporaryTopic)) {
       // Since we are supporting the JMS Message ID Pattern for request-response, the correlationID will be null
-      // if it is not manually setted up, and the selector must be set to the messageID.
+      // if it is not manually set up, and the selector must be set to the messageID.
       String jmsCorrelationId = jmsMessage.getJMSCorrelationID();
       if (jmsCorrelationId == null) {
         jmsCorrelationId = jmsMessage.getJMSMessageID();
