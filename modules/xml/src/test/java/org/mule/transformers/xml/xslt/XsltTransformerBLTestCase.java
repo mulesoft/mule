@@ -9,8 +9,11 @@ package org.mule.transformers.xml.xslt;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
+import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -24,6 +27,10 @@ import org.junit.Test;
 public class XsltTransformerBLTestCase extends FunctionalTestCase
 {
 
+    // this is disabled (secure) by default, so we need to change it for the test
+    @Rule
+    public final SystemProperty expandEntities = new SystemProperty(EXPAND_ENTITIES_PROPERTY, "true");
+
     @Override
     protected String getConfigFile()
     {
@@ -33,12 +40,12 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase
     protected String makeInput()
     {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-               "<!DOCTYPE foo [<!ENTITY xxe1 \"01\">" +
-                 "<!ENTITY xxe2 \"&xxe1;&xxe1;\">" +
-                 "<!ENTITY xxe3 \"&xxe2;&xxe2;\">" +
-                 "<!ENTITY xxe4 \"&xxe3;&xxe3;\">" +
+               "<!DOCTYPE foo [<!ENTITY lol1 \"01\">" +
+                 "<!ENTITY lol2 \"&lol1;&lol1;\">" +
+                 "<!ENTITY lol3 \"&lol2;&lol2;\">" +
+                 "<!ENTITY lol4 \"&lol3;&lol3;\">" +
                "]> \n" +
-               "<entityName>Hello123456890 &xxe4;&xxe4;&xxe4;</entityName>";
+               "<entityName>Hello123456890 &lol4;&lol4;&lol4;</entityName>";
     }
 
     @Test
