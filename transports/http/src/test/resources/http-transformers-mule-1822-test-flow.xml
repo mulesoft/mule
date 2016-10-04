@@ -61,14 +61,13 @@
 
     <!-- grand finale - innies and outies together! -->
     <flow name="bothService1">
-        <http:inbound-endpoint ref="both">
-            <!--//TODO(pablo.kraan): bootstrap - this test fail when next line is uncommented. I don't know why-->
-            <!--<object-to-string-transformer/>-->
+        <transports:inbound-endpoint ref="both">
+            <object-to-string-transformer/>
             <transformer ref="appendString"/>
             <transports:response>
                 <transformer ref="appendResponse"/>
             </transports:response>
-        </http:inbound-endpoint>
+        </transports:inbound-endpoint>
         <transports:outbound-endpoint address="vm://echo3" exchange-pattern="request-response"/>
     </flow>
 
