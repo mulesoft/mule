@@ -28,7 +28,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * //TODO
+ * Base implementation for the Metadata service delegate implementations that are used
+ * by the {@link MetadataMediator}
+ *
+ * @since 4.0
  */
 class BaseMetadataDelegate {
 

@@ -35,7 +35,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * //TODO
+ * Metadata service delegate implementations that handles the resolution
+ * of a {@link RuntimeComponentModel} {@link MetadataKeysContainer}
+ *
+ * @since 4.0
  */
 class MetadataKeysDelegate extends BaseMetadataDelegate {
 

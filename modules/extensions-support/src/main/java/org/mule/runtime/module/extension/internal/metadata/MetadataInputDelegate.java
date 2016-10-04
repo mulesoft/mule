@@ -31,7 +31,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * //TODO
+ * Metadata service delegate implementations that handles the resolution
+ * of a {@link RuntimeComponentModel} {@link InputMetadataDescriptor}
+ *
+ * @since 4.0
  */
 class MetadataInputDelegate extends BaseMetadataDelegate {
 

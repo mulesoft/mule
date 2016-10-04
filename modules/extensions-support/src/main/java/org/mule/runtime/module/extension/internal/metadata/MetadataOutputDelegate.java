@@ -27,7 +27,10 @@ import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 /**
- * //TODO
+ * Metadata service delegate implementations that handles the resolution
+ * of a {@link RuntimeComponentModel} {@link OutputMetadataDescriptor}
+ *
+ * @since 4.0
  */
 class MetadataOutputDelegate extends BaseMetadataDelegate {
 

@@ -67,14 +67,6 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
     return inputResolvers.getOrDefault(parameterName, new NullMetadataResolver());
   }
 
-  ///**
-  // * {@inheritDoc}
-  // */
-  //@Override
-  //public <T> InputTypeResolver<T> getInputResolver() {
-  //  return metadataContentResolver;
-  //}
-
   /**
    * {@inheritDoc}
    */
