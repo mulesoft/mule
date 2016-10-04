@@ -66,7 +66,7 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
     when(lookupPolicy.getLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_ONLY);
 
     expected.expect(CompositeClassNotFoundException.class);
-    expected.expectMessage(startsWith("Cannot load class '" + TEST_CLASS_NAME + "': [ERROR" + lineSeparator() + "]"));
+    expected.expectMessage(startsWith("Cannot load class '" + TEST_CLASS_NAME + "': [" + lineSeparator() + "\t" + "ERROR]"));
     expected.expect(expressionMatches((e) -> ((CompositeClassNotFoundException) e).getExceptions(),
                                       contains(sameInstance(thrownException))));
 
