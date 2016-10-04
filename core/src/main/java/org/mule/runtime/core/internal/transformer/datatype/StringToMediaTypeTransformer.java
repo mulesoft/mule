@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.transformer.datatype;
+package org.mule.runtime.core.internal.transformer.datatype;
 
 import static org.mule.runtime.core.config.i18n.I18nMessageFactory.createStaticMessage;
 
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
+import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractTransformer;
@@ -17,23 +18,23 @@ import org.mule.runtime.core.transformer.AbstractTransformer;
 import java.nio.charset.Charset;
 
 /**
- * Converts strings to {@link Charset} instances. See {@link DataTypeBuilder#charset(String)}
+ * Converts strings to {@link MediaType} instances. See {@link DataTypeBuilder#mediaType(String)}
  */
-public class StringToCharsetTransformer extends AbstractTransformer implements DiscoverableTransformer {
+public class StringToMediaTypeTransformer extends AbstractTransformer implements DiscoverableTransformer {
 
   private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
-  public StringToCharsetTransformer() {
+  public StringToMediaTypeTransformer() {
     this.registerSourceType(DataType.STRING);
-    this.setReturnDataType(DataType.builder().type(Charset.class).build());
+    this.setReturnDataType(DataType.builder().type(MediaType.class).build());
   }
 
   @Override
   protected Object doTransform(Object src, Charset enc) throws TransformerException {
     try {
-      return DataType.builder().charset((String) src).build().getMediaType().getCharset().get();
+      return DataType.builder().mediaType((String) src).build().getMediaType();
     } catch (Exception e) {
-      throw new TransformerException(createStaticMessage("Exception transforming to Charset."), e);
+      throw new TransformerException(createStaticMessage("Exception transforming to MediaType."), e);
     }
   }
 

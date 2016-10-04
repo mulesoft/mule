@@ -31,6 +31,7 @@ import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -102,7 +103,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
   private static String userHome = System.getProperty(USER_HOME);
   private static ArtifactClassLoaderHolder artifactClassLoaderHolder;
   private static Exception errorCreatingClassLoaderTestRunner;
-  private static boolean pluginClassLoadersInjected = false;
+  private static boolean staticFieldsInjected = false;
 
   private final Runner delegate;
 
@@ -137,10 +138,12 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
         .buildRunner(AnnotationUtils.getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"),
                      isolatedTestClass);
 
-    if (!pluginClassLoadersInjected) {
+    if (!staticFieldsInjected) {
       injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-      pluginClassLoadersInjected = true;
+      injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+      staticFieldsInjected = true;
     }
+
   }
 
   /**
@@ -285,30 +288,61 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
    */
   private static void injectPluginsClassLoaders(ArtifactClassLoaderHolder artifactClassLoaderHolder, Class<?> isolatedTestClass)
       throws Throwable {
+    final Class<PluginClassLoadersAware> pluginClassLoadersAwareClass = PluginClassLoadersAware.class;
+    final String expectedParamType = "List<" + ArtifactClassLoader.class + ">";
+    final FrameworkMethod method =
+        getAnnotatedMethod(artifactClassLoaderHolder, isolatedTestClass, pluginClassLoadersAwareClass, expectedParamType);
+
+    final Object valueToInject = artifactClassLoaderHolder.getPluginsClassLoaders();
+    doFieldInjection(pluginClassLoadersAwareClass, method, valueToInject, expectedParamType);
+  }
+
+  private static void injectContainerClassLoader(ArtifactClassLoaderHolder artifactClassLoaderHolder, Class<?> isolatedTestClass)
+      throws Throwable {
+    final Class<ContainerClassLoaderAware> containerClassLoaderAwareClass = ContainerClassLoaderAware.class;
+    final String expectedParamType = ArtifactClassLoader.class.getName();
+    final FrameworkMethod method = getAnnotatedMethod(artifactClassLoaderHolder, isolatedTestClass,
+                                                      containerClassLoaderAwareClass, expectedParamType);
+    final Object containerClassLoader = artifactClassLoaderHolder.getContainerClassLoader();
+    final Field artifactClassLoaderField =
+        containerClassLoader.getClass().getSuperclass().getDeclaredField("artifactClassLoader");
+    artifactClassLoaderField.setAccessible(true);
+    final Object valueToInject = artifactClassLoaderField.get(containerClassLoader);
+    doFieldInjection(containerClassLoaderAwareClass, method, valueToInject, expectedParamType);
+  }
+
+  private static void doFieldInjection(Class<? extends Annotation> containerClassLoaderAwareClass, FrameworkMethod method,
+                                       Object value, String expectedParamType)
+      throws Throwable {
+    method.getMethod().setAccessible(true);
+    try {
+      method.invokeExplosively(null, value);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalStateException("Method marked with annotation " + containerClassLoaderAwareClass.getName()
+          + " should receive a parameter of type " + expectedParamType);
+    } finally {
+      method.getMethod().setAccessible(false);
+    }
+  }
+
+  private static FrameworkMethod getAnnotatedMethod(ArtifactClassLoaderHolder artifactClassLoaderHolder,
+                                                    Class<?> isolatedTestClass,
+                                                    Class<? extends Annotation> annotationClass, String expectedParamType)
+      throws ClassNotFoundException {
     TestClass testClass = new TestClass(isolatedTestClass);
     Class<? extends Annotation> artifactContextAwareAnn = (Class<? extends Annotation>) artifactClassLoaderHolder
-        .loadClassWithApplicationClassLoader(PluginClassLoadersAware.class.getName());
+        .loadClassWithApplicationClassLoader(annotationClass.getName());
     List<FrameworkMethod> contextAwareMethods = testClass.getAnnotatedMethods(artifactContextAwareAnn);
     if (contextAwareMethods.size() != 1) {
       throw new IllegalStateException("Isolation tests need to have one method marked with annotation "
-          + PluginClassLoadersAware.class.getName());
+          + annotationClass.getName());
     }
-    for (FrameworkMethod method : contextAwareMethods) {
-      if (!method.isStatic() || method.isPublic()) {
-        throw new IllegalStateException("Method marked with annotation " + PluginClassLoadersAware.class.getName()
-            + " should be private static and it should receive a parameter of type List<"
-            + ArtifactClassLoader.class + ">");
-      }
-      method.getMethod().setAccessible(true);
-      try {
-        method.invokeExplosively(null, artifactClassLoaderHolder.getPluginsClassLoaders());
-      } catch (IllegalArgumentException e) {
-        throw new IllegalStateException("Method marked with annotation " + PluginClassLoadersAware.class.getName()
-            + " should receive a parameter of type List<" + ArtifactClassLoader.class + ">");
-      } finally {
-        method.getMethod().setAccessible(false);
-      }
+    final FrameworkMethod method = contextAwareMethods.get(0);
+    if (!method.isStatic() || method.isPublic()) {
+      throw new IllegalStateException("Method marked with annotation " + annotationClass.getName()
+          + " should be private static and receive a parameter of type " + expectedParamType);
     }
+    return method;
   }
 
   private Class<?> getTestClass(Class<?> clazz) throws InitializationError {

@@ -264,7 +264,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   }
 
   protected BootstrapServiceDiscoverer createBootstrapDiscoverer() {
-    return new PropertiesBootstrapServiceDiscoverer(Thread.currentThread().getContextClassLoader());
+    return new PropertiesBootstrapServiceDiscoverer(DefaultMuleContextBuilder.class.getClassLoader());
   }
 
   protected DefaultMuleConfiguration createMuleConfiguration() {

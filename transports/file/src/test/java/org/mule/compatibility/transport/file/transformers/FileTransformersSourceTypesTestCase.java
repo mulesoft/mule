@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.transformer.simple.ObjectToString;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.tck.junit4.AbstractMuleContextEndpointTestCase;
 
 import java.io.File;

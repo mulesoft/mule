@@ -13,6 +13,8 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.transformer.TransformerException;
+import org.mule.runtime.core.internal.transformer.datatype.StringToCharsetTransformer;
+import org.mule.runtime.core.internal.transformer.datatype.StringToMediaTypeTransformer;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

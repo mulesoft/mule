@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.model.EntryPointResolverSet;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.runtime.core.registry.JSR250ValidatorProcessor;
+import org.mule.runtime.core.internal.registry.JSR250ValidatorProcessor;
 import org.mule.runtime.core.util.annotation.AnnotationMetaData;
 import org.mule.runtime.core.util.annotation.AnnotationUtils;
 
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * and/or {@link javax.annotation.PreDestroy} (for disposal of the object). Only one of each annotation can be used per component
  * object.
  *
- * @see org.mule.runtime.core.registry.JSR250ValidatorProcessor for details about the rules for using JSR-250 lifecycle
+ * @see JSR250ValidatorProcessor for details about the rules for using JSR-250 lifecycle
  *      annotations
  */
 public class DefaultComponentLifecycleAdapter implements LifecycleAdapter {

@@ -55,9 +55,7 @@ import java.util.Locale;
     NumberValidationOperation.class})
 @Extensible(alias = "validator-message-processor")
 @Export(
-    resources = {"/META-INF/services/org/mule/runtime/core/i18n/validation-messages.properties",
-        "/META-INF/services/org/mule/runtime/core/config/registry-bootstrap.properties"},
-    classes = {org.mule.extension.validation.api.el.ValidationElExtension.class})
+    resources = {"/META-INF/services/org/mule/runtime/core/i18n/validation-messages.properties"})
 public class ValidationExtension extends AbstractAnnotatedObject implements Config, NamedObject, Initialisable, MuleContextAware {
 
   public static final String DEFAULT_LOCALE = Locale.getDefault().getLanguage();

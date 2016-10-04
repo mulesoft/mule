@@ -30,7 +30,7 @@ public class PropertiesBootstrapServiceDiscoverer implements BootstrapServiceDis
    * @param classLoader classLoader used to search for bootstrap.properties files
    */
   public PropertiesBootstrapServiceDiscoverer(ClassLoader classLoader) {
-    this(classLoader, new ClassPathRegistryBootstrapDiscoverer());
+    this(classLoader, new ClassLoaderRegistryBootstrapDiscoverer(classLoader));
   }
 
   public PropertiesBootstrapServiceDiscoverer(ClassLoader classLoader, RegistryBootstrapDiscoverer registryBootstrapDiscoverer) {

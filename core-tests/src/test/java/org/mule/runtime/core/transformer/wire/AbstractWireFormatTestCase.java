@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
-import org.mule.runtime.core.transformer.simple.ObjectToString;
+import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
