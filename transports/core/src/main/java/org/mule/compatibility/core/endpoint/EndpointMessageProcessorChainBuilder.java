@@ -20,7 +20,6 @@ import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.SecurityFilterMessageProcessor;
-import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
 import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
@@ -38,8 +37,8 @@ public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcesso
 
   @Override
   protected Processor initializeMessageProcessor(Object processor) {
-    if (processor instanceof AbstractMessageProcessorChain) {
-      processor = new EndpointAwareMessageProcessorChain((AbstractMessageProcessorChain) processor);
+    if (processor instanceof MessageProcessorChain) {
+      processor = new EndpointAwareMessageProcessorChain((MessageProcessorChain) processor);
     } else if (processor instanceof SecurityFilterMessageProcessor) {
       processor = new EndpointAwareSecurityFilterMessageProcessor((SecurityFilterMessageProcessor) processor);
     }
@@ -54,11 +53,11 @@ public class EndpointMessageProcessorChainBuilder extends DefaultMessageProcesso
   private class EndpointAwareMessageProcessorChain
       implements NonBlockingMessageProcessor, MessageProcessorChain, EndpointAware, MessagingExceptionHandlerAware {
 
-    private AbstractMessageProcessorChain chain;
+    private MessageProcessorChain chain;
 
     private ImmutableEndpoint endpoint;
 
-    public EndpointAwareMessageProcessorChain(AbstractMessageProcessorChain chain) {
+    public EndpointAwareMessageProcessorChain(MessageProcessorChain chain) {
       this.chain = chain;
     }
 

@@ -142,11 +142,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    if (delegate instanceof MessageProcessorContainer) {
-      ((MessageProcessorContainer) delegate).addMessageProcessorPathElements(pathElement.addChild(this));
-    } else {
-      NotificationUtils.addMessageProcessorPathElements(delegate, pathElement);
-    }
+    NotificationUtils.addMessageProcessorPathElements(delegate, pathElement.addChild(this));
   }
 
 }

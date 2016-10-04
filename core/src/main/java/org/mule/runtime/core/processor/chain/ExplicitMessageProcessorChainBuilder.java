@@ -6,21 +6,16 @@
  */
 package org.mule.runtime.core.processor.chain;
 
-import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.context.notification.FlowStackElement;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.util.NotificationUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Constructs a custom chain for subflows using the subflow name as the chain name.
+ * Constructs a {@link MessageProcessorChain} in the same way that the {@link DefaultMessageProcessorChainBuilder} constructs
+ * chains but
  */
 public class ExplicitMessageProcessorChainBuilder extends DefaultMessageProcessorChainBuilder {
 
@@ -34,13 +29,15 @@ public class ExplicitMessageProcessorChainBuilder extends DefaultMessageProcesso
    */
   public static class ExplicitMessageProcessorChain extends DefaultMessageProcessorChain {
 
-    protected ExplicitMessageProcessorChain(String name, Processor head, List<Processor> processors,
-                                            List<Processor> processorsForLifecycle) {
+    ExplicitMessageProcessorChain(String name, Processor head, List<Processor> processors,
+                                  List<Processor> processorsForLifecycle) {
       super(name, head, processors, processorsForLifecycle);
     }
 
     @Override
     public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
+      // As this is an explicit chain a MessageProcessorPathElement needs to exist for the chain itself and not just it's child
+      // processors.
       NotificationUtils.addMessageProcessorPathElements(processors, pathElement.addChild(this));
     }
 

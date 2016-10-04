@@ -7,6 +7,7 @@
 package org.mule.runtime.core.routing;
 
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 import org.mule.runtime.core.AbstractAnnotatedObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
@@ -40,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.ListUtils;
 
@@ -291,18 +293,12 @@ public abstract class AbstractSelectiveRouter extends AbstractAnnotatedObject im
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
     pathElement = pathElement.addChild(this);
-    List<Processor> messageProcessors = new ArrayList<>();
-    for (MessageProcessorFilterPair cmp : conditionalMessageProcessors) {
-      messageProcessors.add(cmp.getMessageProcessor());
-    }
+    List<Processor> messageProcessors =
+        conditionalMessageProcessors.stream().map(MessageProcessorFilterPair::getMessageProcessor).collect(toList());
     messageProcessors.add(defaultProcessor);
     for (Processor route : messageProcessors) {
-      if (route instanceof MessageProcessorChain) {
-        MessageProcessorChain chain = (MessageProcessorChain) route;
-        NotificationUtils.addMessageProcessorPathElements(chain.getMessageProcessors(), pathElement.addChild(chain));
-      } else {
-        NotificationUtils.addMessageProcessorPathElements(route, pathElement.addChild(route));
-      }
+      // Add additional child for each route, as the route represents the 'when' container in XML.
+      NotificationUtils.addMessageProcessorPathElements(route, pathElement.addChild(route));
     }
   }
 

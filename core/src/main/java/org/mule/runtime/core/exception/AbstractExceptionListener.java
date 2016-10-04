@@ -345,7 +345,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
   @Override
   public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-    NotificationUtils.addMessageProcessorPathElements(getOwnedMessageProcessors(), pathElement);
+    NotificationUtils.addMessageProcessorPathElements(messageProcessors, pathElement);
   }
 
 }

@@ -22,15 +22,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.metadata.MediaType.JSON;
 import static org.mule.runtime.core.MessageExchangePattern.REQUEST_RESPONSE;
+import static org.mule.runtime.core.api.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.message.DefaultEventBuilder.EventImplementation.getCurrentEvent;
-
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.connector.ReplyToHandler;
 import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.processor.MessageProcessors;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.enricher.MessageEnricher;
@@ -296,7 +295,7 @@ public class MessageEnricherTestCase extends AbstractMuleContextTestCase {
   }
 
   private Event processEnricherInChain(MessageEnricher enricher, final Event in) throws MuleException {
-    return MessageProcessors.newChain(enricher, event -> {
+    return newChain(enricher, event -> {
       assertThat(event.getMessage(), is(sameInstance(in.getMessage())));
       return event;
     }).process(in);

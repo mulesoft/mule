@@ -7,18 +7,11 @@
 package org.mule.runtime.config.spring.factories;
 
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setFlowConstructIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.util.NotificationUtils.buildPathResolver;
-
 import org.mule.runtime.api.meta.AnnotatedObject;
 import org.mule.runtime.core.AbstractAnnotatedObject;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.MuleRuntimeException;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -27,24 +20,20 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.lifecycle.Initialisable;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.lifecycle.Lifecycle;
-import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.lifecycle.Startable;
-import org.mule.runtime.core.api.processor.InternalMessageProcessor;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
+import org.mule.runtime.core.api.processor.MessageProcessors;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.config.i18n.CoreMessages;
 import org.mule.runtime.core.processor.NonBlockingMessageProcessor;
 import org.mule.runtime.core.processor.chain.AbstractMessageProcessorChain;
+import org.mule.runtime.core.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
-import org.mule.runtime.core.processor.chain.ExplicitMessageProcessorChainBuilder;
 import org.mule.runtime.core.util.NotificationUtils;
 import org.mule.runtime.core.util.NotificationUtils.FlowMap;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -153,6 +142,7 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
   public Processor getObject() throws Exception {
     Processor processor =
         referencedMessageProcessor != null ? referencedMessageProcessor : createDynamicReferenceMessageProcessor(refName);
+    // Wrap in chain to ensure the flow-ref element always has a path element and lifecycle will be propgated to child sub-flows
     return new AbstractMessageProcessorChain(singletonList(processor)) {
 
       @Override
@@ -161,58 +151,6 @@ public class FlowRefFactoryBean extends AbstractAnnotatedObject
       }
     };
   }
-
-  // class DelegateProcessor implements Processor, FlowConstructAware, MuleContextAware, Lifecycle, MessageProcessorContainer {
-  //
-  // private Processor processor;
-  //
-  // DelegateProcessor(Processor processor) {
-  // this.processor = processor;
-  // }
-  //
-  // @Override
-  // public Event process(Event event) throws MuleException {
-  // return processor.process(event);
-  // }
-  //
-  // @Override
-  // public void addMessageProcessorPathElements(MessageProcessorPathElement pathElement) {
-  // NotificationUtils.addMessageProcessorPathElements(processor, pathElement.addChild(processor));
-  // }
-  //
-  // @Override
-  // public void setFlowConstruct(FlowConstruct flowConstruct) {
-  // setFlowConstructIfNeeded(processor, flowConstruct);
-  // }
-  //
-  // @Override
-  // public void setMuleContext(MuleContext context) {
-  // setMuleContextIfNeeded(processor, context);
-  // }
-  //
-  // @Override
-  // public void stop() throws MuleException {
-  // stopIfNeeded(processor);
-  // }
-  //
-  // @Override
-  // public void dispose() {
-  // disposeIfNeeded(processor, null);
-  //
-  // }
-  //
-  // @Override
-  // public void start() throws MuleException {
-  // startIfNeeded(processor);
-  // }
-  //
-  // @Override
-  // public void initialise() throws InitialisationException {
-  // initialiseIfNeeded(processor);
-  //
-  // }
-  // }
-  //
 
   protected Processor createDynamicReferenceMessageProcessor(String name) throws MuleException {
     if (name == null) {

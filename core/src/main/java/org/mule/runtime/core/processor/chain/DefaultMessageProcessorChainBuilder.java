@@ -137,4 +137,27 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       return processors;
     }
   }
+
+  static class DefaultMessageProcessorChain extends AbstractMessageProcessorChain {
+
+    private Processor head;
+    private List<Processor> processorsForLifecycle;
+
+    DefaultMessageProcessorChain(String name, Processor head, List<Processor> processors,
+                                 List<Processor> processorsForLifecycle) {
+      super(name, processors);
+      this.head = head;
+      this.processorsForLifecycle = processorsForLifecycle;
+    }
+
+    @Override
+    protected List<Processor> getMessageProcessorsForLifecycle() {
+      return processorsForLifecycle;
+    }
+
+    @Override
+    protected List<Processor> getProcessorsToExecute() {
+      return singletonList(head);
+    }
+  }
 }

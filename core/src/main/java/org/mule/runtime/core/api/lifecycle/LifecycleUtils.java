@@ -300,7 +300,7 @@ public class LifecycleUtils {
   /**
    * Sets an objects {@link MuleContext} it implements {@link MuleContextAware}.
    *
-   * @param object the object you're trying to set the flow construct
+   * @param object the object you're trying to set the mule context
    * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */
@@ -312,10 +312,10 @@ public class LifecycleUtils {
   }
 
   /**
-   * Sets an objects {@link FlowConstruct} it implements {@link MuleContextAware}.
+   * Sets an objects {@link MuleContext} it implements {@link MuleContextAware}.
    *
-   * @param objects the object you're trying to set the flow construct
-   * @param muleContext the {@link FlowConstruct} in which the object is defined.
+   * @param objects the object you're trying to set the mule context
+   * @param muleContext the {@link MuleContext} in which the object is defined.
    * @throws InitialisationException
    */
   public static void setMuleContextIfNeeded(Collection<? extends Object> objects, MuleContext muleContext) {

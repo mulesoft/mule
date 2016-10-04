@@ -14,6 +14,7 @@ import org.mule.runtime.core.api.processor.MessageProcessorChain;
 import org.mule.runtime.core.api.processor.MessageProcessorContainer;
 import org.mule.runtime.core.api.processor.MessageProcessorPathElement;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.processor.AbstractMessageProcessorOwner;
 import org.mule.runtime.core.processor.chain.DynamicMessageProcessorContainer;
 
 import java.util.Collection;
@@ -77,16 +78,34 @@ public class NotificationUtils {
 
   private NotificationUtils() {}
 
+  /**
+   * Adds the processor paths for a list of {@link Processor}'s to the provided parent {@link MessageProcessorPathElement} as
+   * children. {@link InternalMessageProcessor} implementations are ignored. Where a {@link Processor} implements
+   * {@link MessageProcessorContainer} it will not automatically be added as a child here, but rather this logic and the decision
+   * regarding what child elements should be added is deletagted to the {@link MessageProcessorContainer} via it's
+   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method.
+   * 
+   * @param processors the {@link Processor}'s whose paths are to add to the parent element.
+   * @param parentElement the parent {@link MessageProcessorPathElement}
+   */
   public static void addMessageProcessorPathElements(List<Processor> processors,
                                                      MessageProcessorPathElement parentElement) {
     if (processors == null) {
       return;
     }
-    for (Processor mp : processors) {
-      addMessageProcessorPathElements(mp, parentElement);
-    }
+    processors.forEach(processor -> addMessageProcessorPathElements(processor, parentElement));
   }
 
+  /**
+   * Adds the processor path for a specific {@link Processor}'s to the provided parent {@link MessageProcessorPathElement} as a
+   * child. {@link InternalMessageProcessor} implementations are ignored. Where a {@link Processor} implements
+   * {@link MessageProcessorContainer} it will not automatically be added as a child here, but rather this logic and the decision
+   * regarding what child elements should be added is deletagted to the {@link MessageProcessorContainer} via it's
+   * {@link MessageProcessorContainer#addMessageProcessorPathElements(MessageProcessorPathElement)} method.
+   *
+   * @param processor the {@link Processor} whose path is to be added to the parent element.
+   * @param parentElement the parent {@link MessageProcessorPathElement}
+   */
   public static void addMessageProcessorPathElements(Processor processor,
                                                      MessageProcessorPathElement parentElement) {
     if (processor == null || parentElement == null) {

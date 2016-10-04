@@ -61,11 +61,7 @@ public class MessageProcessors {
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newExplicitChain(Processor... processors) {
-    if (processors.length == 1 && processors[0] instanceof ExplicitMessageProcessorChainBuilder) {
-      return (MessageProcessorChain) processors[0];
-    } else {
-      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
-    }
+    return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
   }
 
   /**
@@ -77,11 +73,7 @@ public class MessageProcessors {
    * @return new {@link MessageProcessorChain} instance.
    */
   public static MessageProcessorChain newExplicitChain(List<Processor> processors) {
-    if (processors.size() == 1 && processors.get(0) instanceof ExplicitMessageProcessorChainBuilder) {
-      return (MessageProcessorChain) processors.get(0);
-    } else {
-      return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
-    }
+    return new ExplicitMessageProcessorChainBuilder().chain(processors).build();
   }
 
 }
