@@ -245,6 +245,13 @@ public interface Event extends MuleEvent {
   SecurityContext getSecurityContext();
 
   /**
+   * @return the correlation id to use for this event.
+   * @deprecated TODO MULE-10706 Mule 4: remove this
+   */
+  @Deprecated
+  String getLegacyCorrelationId();
+
+  /**
    * Create new {@link Builder}.
    *
    * @param context the context to create event instance with.

@@ -18,7 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({JmsClientAcknowledgeTransactionTestCase.class, JmsConnectorJndiTestCase.class, JmsDurableTopicTestCase.class,
     JmsDeadLetterQueueTestCase.class, JmsMessageAwareTransformersMule2685TestCase.class, JmsMuleSideDurableTopicTestCase.class,
     JmsQueueTestCase.class, JmsQueueMessageTypesTestCase.class, JmsQueueWithCompressionTestCase.class,
-    JmsQueueWithTransactionTestCase.class, JmsRemoteSyncMule2868TestCase.class,
+    JmsQueueWithTransactionTestCase.class, JmsRemoteSyncMule2868TestCase.class, JmsRequestResponseTestCase.class,
     JmsSingleTransactionAlwaysBeginConfigurationTestCase.class, JmsSingleTransactionBeginOrJoinAndAlwaysBeginTestCase.class,
     JmsSingleTransactionComponentTestCase.class, JmsSingleTransactionNoneTestCase.class,
     JmsSingleTransactionRecieveAndSendTestCase.class, JmsTemporaryReplyToTestCase.class, JmsTopicTestCase.class,
