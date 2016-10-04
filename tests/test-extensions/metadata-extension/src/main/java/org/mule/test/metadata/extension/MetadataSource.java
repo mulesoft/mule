@@ -14,16 +14,14 @@ import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.tck.message.StringAttributes;
-import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestContentAndOutputWithAttributesResolverWithKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver;
+import org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver;
 
 import java.util.Map;
 
 
-@MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-    outputResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class,
-    attributesResolver = TestContentAndOutputWithAttributesResolverWithKeyResolver.class)
+@MetadataScope(keysResolver = TestInputAndOutputResolverWithKeyResolver.class,
+    outputResolver = TestInputAndOutputWithAttributesResolverWithKeyResolver.class)
 public class MetadataSource extends Source<Map<String, Object>, StringAttributes> {
 
   @MetadataKeyId

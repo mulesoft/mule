@@ -20,7 +20,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 
 import java.net.URL;
 import java.sql.Blob;
@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BaseDbMetadataResolver implements MetadataContentResolver<String> {
+public class BaseDbMetadataResolver implements InputTypeResolver<String> {
 
   protected BaseTypeBuilder typeBuilder;
   protected ClassTypeLoader typeLoader;
@@ -49,11 +49,11 @@ public class BaseDbMetadataResolver implements MetadataContentResolver<String> {
 
   @Override
   public String getCategoryName() {
-    return "BaseDbCategory";
+    return "DbCategory";
   }
 
   @Override
-  public MetadataType getContentMetadata(MetadataContext context, String query)
+  public MetadataType getInputMetadata(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
 
     this.typeLoader = context.getTypeLoader();

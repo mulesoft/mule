@@ -19,6 +19,7 @@ import org.mule.runtime.api.metadata.SourceId;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.construct.Flow;
+import org.mule.tck.message.StringAttributes;
 
 import java.util.Set;
 
@@ -61,12 +62,7 @@ public class SourceMetadataTestCase extends MetadataExtensionFunctionalTestCase 
   @Test
   public void getSourceDynamicOutputMetadata() throws Exception {
     final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, personType);
+    assertExpectedOutput(componentMetadata.getOutputMetadata(), personType, typeLoader.load(StringAttributes.class));
   }
 
-  @Test
-  public void sourceDoesNotSupportDynamicContentMetadata() throws Exception {
-    final ComponentMetadataDescriptor componentMetadata = getComponentDynamicMetadata(PERSON_METADATA_KEY);
-    assertThat(componentMetadata.getContentMetadata().isPresent(), is(false));
-  }
 }

@@ -10,7 +10,6 @@ import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtil
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.APPLICATION_JAVA_MIME_TYPE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
-import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getKeys;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -20,16 +19,16 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.FailureCode;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 
 public class TestResolverWithCache
-    implements MetadataContentResolver<String>, MetadataOutputResolver<String>, MetadataKeysResolver {
+    implements InputTypeResolver<String>, OutputTypeResolver<String>, TypeKeysResolver {
 
   public static final String MISSING_ELEMENT_ERROR_MESSAGE =
       "Missing element in the cache. There was no element in the cache for the key: " + BRAND;
@@ -43,7 +42,7 @@ public class TestResolverWithCache
   }
 
   @Override
-  public MetadataType getContentMetadata(MetadataContext context, String key)
+  public MetadataType getInputMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
     MetadataCache cache = context.getCache();
     Optional<? extends Serializable> element = cache.get(BRAND);
@@ -55,7 +54,7 @@ public class TestResolverWithCache
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, String key)
+  public MetadataType getOutputType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
     MetadataCache cache = context.getCache();
     Optional<String> brand = cache.get(BRAND);
@@ -73,9 +72,9 @@ public class TestResolverWithCache
   }
 
   @Override
-  public Set<MetadataKey> getMetadataKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
+  public Set<MetadataKey> getKeys(MetadataContext context) throws MetadataResolvingException, ConnectionException {
     context.getCache().put(AGE, AGE_VALUE);
     context.getCache().put(NAME, NAME_VALUE);
-    return getKeys(context);
+    return TestMetadataResolverUtils.getKeys(context);
   }
 }

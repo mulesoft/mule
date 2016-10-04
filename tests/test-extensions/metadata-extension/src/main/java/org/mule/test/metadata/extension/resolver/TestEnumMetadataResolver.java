@@ -12,13 +12,13 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.animals.SwordFish;
 
-public class TestEnumMetadataResolver implements MetadataContentResolver<AnimalClade> {
+public class TestEnumMetadataResolver implements InputTypeResolver<AnimalClade> {
 
   public static final ClassTypeLoader loader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
@@ -28,7 +28,7 @@ public class TestEnumMetadataResolver implements MetadataContentResolver<AnimalC
   }
 
   @Override
-  public MetadataType getContentMetadata(MetadataContext context, AnimalClade key)
+  public MetadataType getInputMetadata(MetadataContext context, AnimalClade key)
       throws MetadataResolvingException, ConnectionException {
     switch (key) {
       case MAMMAL:

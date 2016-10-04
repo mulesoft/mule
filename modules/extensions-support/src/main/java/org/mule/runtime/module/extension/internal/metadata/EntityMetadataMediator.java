@@ -17,9 +17,9 @@ import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
-import org.mule.runtime.api.metadata.resolving.MetadataContentResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataKeysResolver;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.QueryEntityResolver;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
@@ -31,8 +31,8 @@ import java.util.Set;
  * Resolves a Component's Metadata by coordinating the several moving parts that are affected by the Metadata fetching process, so
  * that such pieces can remain decoupled.
  * <p/>
- * This mediator will coordinate the resolvers: {@link MetadataResolverFactory}, {@link MetadataKeysResolver},
- * {@link MetadataContentResolver} and {@link MetadataOutputResolver}, and the descriptors that represent their results:
+ * This mediator will coordinate the resolvers: {@link MetadataResolverFactory}, {@link TypeKeysResolver},
+ * {@link InputTypeResolver} and {@link OutputTypeResolver}, and the descriptors that represent their results:
  * {@link ComponentMetadataDescriptor}, {@link OutputMetadataDescriptor} and {@link TypeMetadataDescriptor}
  *
  * @since 4.0

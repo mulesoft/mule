@@ -47,8 +47,6 @@ public class StoreProcedureOutputMetadataTestCase extends AbstractDbIntegrationT
     MetadataResult<TypeMetadataDescriptor> output = metadata.get().getOutputMetadata().get().getPayloadMetadata();
     assertThat(output.isSuccess(), is(true));
 
-    assertThat(output.get().getType(), is(typeBuilder.dictionaryType()
-        .ofKey(typeBuilder.stringType())
-        .ofValue(typeBuilder.anyType()).build()));
+    assertThat(output.get().getType(), is(typeBuilder.objectType().build()));
   }
 }

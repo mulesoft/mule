@@ -89,10 +89,6 @@
         <metadata:content-only-cache-resolver config-ref="config" type="PERSON"/>
     </flow>
 
-    <flow name="resolverTypeKeysWithContextClassLoader">
-        <metadata:resolver-type-keys-with-context-class-loader type="PERSON"/>
-    </flow>
-
     <flow name="resolverContentWithContextClassLoader">
         <metadata:resolver-content-with-context-class-loader type="PERSON"/>
     </flow>
@@ -147,6 +143,10 @@
 
     <flow name="outputAttributesWithDynamicMetadata">
         <metadata:output-attributes-with-dynamic-metadata type="PERSON"/>
+    </flow>
+
+    <flow name="outputAndMultipleInputWithKeyId">
+        <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
     </flow>
 
     <flow name="simpleMultiLevelKeyResolver">

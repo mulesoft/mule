@@ -20,7 +20,7 @@ import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.message.MultiPartPayload;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.core.model.ParameterMap;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 
@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @since 4.0
  */
-public class HttpMetadataResolver implements MetadataOutputResolver<HttpMetadataKey> {
+public class HttpMetadataResolver implements OutputTypeResolver<HttpMetadataKey> {
 
   private static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
 
@@ -59,7 +59,7 @@ public class HttpMetadataResolver implements MetadataOutputResolver<HttpMetadata
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, HttpMetadataKey key)
+  public MetadataType getOutputType(MetadataContext context, HttpMetadataKey key)
       throws MetadataResolvingException, ConnectionException {
     return types.get(key);
   }

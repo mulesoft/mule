@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.metadata;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
@@ -32,6 +33,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
+import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.test.metadata.extension.MetadataExtension;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
@@ -95,6 +97,7 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected static final String BOOLEAN_METADATA_KEY = "booleanMetadataKey";
   protected static final String METADATA_KEY_DEFAULT_VALUE = "metadataKeyDefaultValue";
   protected static final String MULTILEVEL_METADATA_KEY_DEFAULT_VALUE = "multilevelMetadataKeyDefaultValue";
+  protected static final String OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID = "outputAndMultipleInputWithKeyId";
 
   protected static final String CONTINENT = "continent";
   protected static final String COUNTRY = "country";
@@ -104,11 +107,12 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
   protected final static NullMetadataKey NULL_METADATA_KEY = new NullMetadataKey();
   protected final static ClassTypeLoader TYPE_LOADER = ExtensionsTestUtils.TYPE_LOADER;
 
+
   protected MetadataType personType;
   protected ComponentId componentId;
   protected Event event;
   protected MetadataManager metadataManager;
-  protected ClassTypeLoader typeLoader;
+  protected ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
   protected BaseTypeBuilder typeBuilder = BaseTypeBuilder.create(JAVA);
 
   @Override
@@ -181,21 +185,37 @@ public abstract class MetadataExtensionFunctionalTestCase extends ExtensionFunct
     if (!StringUtils.isBlank(name)) {
       assertThat(descriptor.get().getName(), is(name));
     }
+    assertThat(descriptor.get().isDynamic(), is(false));
   }
 
   protected void assertExpectedType(MetadataResult<TypeMetadataDescriptor> descriptor, MetadataType type) throws IOException {
     assertThat(descriptor.get().getType(), is(type));
   }
 
-  protected void assertExpectedType(MetadataResult<ParameterMetadataDescriptor> descriptor, String name, MetadataType type)
+  protected void assertExpectedType(MetadataResult<ParameterMetadataDescriptor> descriptor, String name, MetadataType type,
+                                    boolean isDynamic)
       throws IOException {
+    assertThat(descriptor.isSuccess(), is(true));
     assertThat(descriptor.get().getType(), is(type));
     if (!StringUtils.isBlank(name)) {
       assertThat(descriptor.get().getName(), is(name));
     }
+    assertThat(descriptor.get().isDynamic(), is(isDynamic));
   }
 
   protected Set<MetadataKey> getKeysFromContainer(MetadataKeysContainer metadataKeysContainer) {
     return metadataKeysContainer.getKeys(metadataKeysContainer.getCategories().iterator().next()).get();
+  }
+
+  protected void assertSuccess(MetadataResult<?> metadata) {
+    if (!metadata.isSuccess()) {
+      if (metadata.getFailure().isPresent()) {
+        fail(metadata.getFailure().get().getFailureCode() + " : " +
+            metadata.getFailure().get().getMessage() + " : " +
+            metadata.getFailure().get().getReason());
+      }
+
+      fail("Expected result to be success but it failed without error information");
+    }
   }
 }

@@ -46,6 +46,7 @@ import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.Named;
 import org.mule.runtime.extension.api.introspection.config.ConfigurationModel;
 import org.mule.runtime.extension.api.introspection.connection.ConnectionProviderModel;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.operation.OperationModel;
 import org.mule.runtime.extension.api.introspection.parameter.ExpressionSupport;
@@ -58,6 +59,7 @@ import org.mule.runtime.extension.api.runtime.operation.OperationResult;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.module.extension.internal.introspection.describer.MuleExtensionAnnotationParser;
 import org.mule.runtime.module.extension.internal.model.property.DeclaringMemberModelProperty;
+import org.mule.runtime.module.extension.internal.model.property.ImplementingParameterModelProperty;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -528,5 +530,23 @@ public final class IntrospectionUtils {
     }
 
     throw new IllegalArgumentException(format("Model '%s' is not a named type"));
+  }
+
+  public static java.util.Optional<AnnotatedElement> getAnnotatedElement(BaseDeclaration<?> declaration) {
+    final java.util.Optional<DeclaringMemberModelProperty> declaringMember =
+        declaration.getModelProperty(DeclaringMemberModelProperty.class);
+    final java.util.Optional<ImplementingParameterModelProperty> implementingParameter =
+        declaration.getModelProperty(ImplementingParameterModelProperty.class);
+
+    AnnotatedElement annotatedElement = null;
+    if (declaringMember.isPresent()) {
+      annotatedElement = declaringMember.get().getDeclaringField();
+    }
+
+    if (implementingParameter.isPresent()) {
+      annotatedElement = implementingParameter.get().getParameter();
+    }
+
+    return java.util.Optional.ofNullable(annotatedElement);
   }
 }

@@ -43,7 +43,7 @@ public class DsqlQueryMetadataResolverTestCase {
   @Test
   public void getTrimmedOutputMetadata() throws MetadataResolvingException, ConnectionException {
     DsqlQuery dsqlQuery = dsqlParser.parse("dsql:SELECT id FROM Circle WHERE (diameter < 18)");
-    MetadataType outputMetadata = getQueryMetadataResolver().getOutputMetadata(context, dsqlQuery);
+    MetadataType outputMetadata = getQueryMetadataResolver().getOutputType(context, dsqlQuery);
 
     ObjectType type = getAndAssertArrayTypeOf(outputMetadata);
     assertThat(type.getFields(), hasSize(1));
@@ -55,7 +55,7 @@ public class DsqlQueryMetadataResolverTestCase {
   @Test
   public void getFullOutputMetadata() throws MetadataResolvingException, ConnectionException {
     DsqlQuery dsqlQuery = dsqlParser.parse("dsql:SELECT * FROM Circle WHERE (diameter < 18)");
-    MetadataType outputMetadata = getQueryMetadataResolver().getOutputMetadata(context, dsqlQuery);
+    MetadataType outputMetadata = getQueryMetadataResolver().getOutputType(context, dsqlQuery);
 
     ObjectType type = getAndAssertArrayTypeOf(outputMetadata);
     assertThat(type.getFields(), hasSize(3));

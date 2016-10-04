@@ -23,7 +23,6 @@ import org.mule.extension.db.internal.DbConnector;
 import org.mule.extension.db.internal.domain.connection.DbConnection;
 import org.mule.extension.db.internal.domain.executor.SelectExecutor;
 import org.mule.extension.db.internal.domain.executor.StoredProcedureExecutor;
-import org.mule.extension.db.internal.domain.metadata.BaseDbMetadataResolver;
 import org.mule.extension.db.internal.domain.metadata.SelectMetadataResolver;
 import org.mule.extension.db.internal.domain.metadata.StoredProcedureMetadataResolver;
 import org.mule.extension.db.internal.domain.query.Query;
@@ -39,7 +38,7 @@ import org.mule.extension.db.internal.result.statement.StatementResultHandler;
 import org.mule.extension.db.internal.result.statement.StreamingStatementResultHandler;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.ParameterGroup;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -57,7 +56,6 @@ import javax.inject.Inject;
  *
  * @since 4.0
  */
-@MetadataScope(contentResolver = BaseDbMetadataResolver.class)
 public class DmlOperations extends BaseDbOperations {
 
   @Inject
@@ -77,7 +75,7 @@ public class DmlOperations extends BaseDbOperations {
    * @return depending on the value of {@code streaming}, it can be a {@link List} or {@link Iterator} of maps
    * @throws SQLException if an error is produced
    */
-  @MetadataScope(outputResolver = SelectMetadataResolver.class, contentResolver = SelectMetadataResolver.class)
+  @OutputResolver(SelectMetadataResolver.class)
   public InterceptingCallback<Object> select(@ParameterGroup QueryDefinition query,
                                              @Optional(defaultValue = "false") @Expression(NOT_SUPPORTED) boolean streaming,
                                              @ParameterGroup StatementAttributes statementAttributes,
@@ -167,7 +165,7 @@ public class DmlOperations extends BaseDbOperations {
    * @return A {@link Map} with the procedure's output
    * @throws SQLException if an error is produced
    */
-  @MetadataScope(outputResolver = StoredProcedureMetadataResolver.class)
+  @OutputResolver(StoredProcedureMetadataResolver.class)
   public InterceptingCallback<Map<String, Object>> storedProcedure(@ParameterGroup StoredProcedureCall call,
                                                                    @Optional(
                                                                        defaultValue = "false") @Expression(NOT_SUPPORTED) boolean streaming,

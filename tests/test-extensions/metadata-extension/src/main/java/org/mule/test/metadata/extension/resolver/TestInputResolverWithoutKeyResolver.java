@@ -4,19 +4,24 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.extension.db.internal.domain.metadata;
+package org.mule.test.metadata.extension.resolver;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 
-public class StoredProcedureMetadataResolver extends BaseDbMetadataResolver implements OutputTypeResolver<String> {
+public class TestInputResolverWithoutKeyResolver implements InputTypeResolver<String> {
 
   @Override
-  public MetadataType getOutputType(MetadataContext context, String query)
+  public MetadataType getInputMetadata(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
-    return context.getTypeBuilder().objectType().build();
+    return TestMetadataResolverUtils.getMetadata(key);
+  }
+
+  @Override
+  public String getCategoryName() {
+    return "MetadataExtensionResolver";
   }
 }

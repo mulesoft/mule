@@ -10,12 +10,12 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-public class TestOutputResolverWithoutKeyResolver implements MetadataOutputResolver<String> {
+public class TestOutputResolverWithoutKeyResolver implements OutputTypeResolver<String> {
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, String key)
+  public MetadataType getOutputType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
     return TestMetadataResolverUtils.getMetadata(key);
   }

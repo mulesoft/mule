@@ -11,9 +11,8 @@ import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Parameter;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.SubTypeMapping;
-import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.connector.ConnectionProviders;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.Bear;
@@ -24,7 +23,6 @@ import org.mule.test.metadata.extension.model.shapes.Circle;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
 import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.model.shapes.Square;
-import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWithKeyResolver;
 
 @Extension(name = "Metadata")
 @Operations({MetadataOperations.class, MetadataFailureOperations.class, MetadataInheritedExtensionResolversOperations.class,
@@ -37,9 +35,6 @@ import org.mule.test.metadata.extension.resolver.TestContentAndOutputResolverWit
     subTypes = {AnimalsOutputAttributes.class, ShapeOutputAttributes.class})
 @SubTypeMapping(baseType = Rectangle.class, subTypes = {Square.class})
 @Xml(namespaceLocation = "http://www.mulesoft.org/schema/mule/metadata", namespace = "metadata")
-@MetadataScope(keysResolver = TestContentAndOutputResolverWithKeyResolver.class,
-    contentResolver = TestContentAndOutputResolverWithKeyResolver.class,
-    outputResolver = TestContentAndOutputResolverWithKeyResolver.class)
 public class MetadataExtension {
 
   @Parameter

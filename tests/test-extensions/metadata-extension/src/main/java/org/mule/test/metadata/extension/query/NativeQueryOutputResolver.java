@@ -11,11 +11,11 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.resolving.MetadataOutputResolver;
+import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.test.metadata.extension.model.animals.Bear;
 
-public class NativeQueryOutputResolver implements MetadataOutputResolver<String> {
+public class NativeQueryOutputResolver implements OutputTypeResolver<String> {
 
   public static final String NATIVE_QUERY = "SELECT FIELDS: field-id FROM TYPE: Circle DO WHERE field-diameter < 18";
   private static final ClassTypeLoader LOADER = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -26,7 +26,7 @@ public class NativeQueryOutputResolver implements MetadataOutputResolver<String>
   }
 
   @Override
-  public MetadataType getOutputMetadata(MetadataContext context, String key)
+  public MetadataType getOutputType(MetadataContext context, String key)
       throws MetadataResolvingException, ConnectionException {
 
     if (!key.equals(NATIVE_QUERY)) {

@@ -27,7 +27,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
-import org.mule.runtime.extension.api.annotation.metadata.MetadataScope;
+import org.mule.runtime.extension.api.annotation.metadata.OutputResolver;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.UseConfig;
@@ -71,7 +71,7 @@ public class HttpRequestOperations {
    * @return an {@link OperationResult} with {@link HttpResponseAttributes}
    */
   @Summary("Executes a HTTP Request")
-  @MetadataScope(outputResolver = HttpMetadataResolver.class)
+  @OutputResolver(HttpMetadataResolver.class)
   public OperationResult<Object, HttpResponseAttributes> request(String path, @Optional(defaultValue = "GET") String method,
                                                                  @Optional @Placement(tab = ADVANCED,
                                                                      group = "Response Validation Settings") ResponseValidator responseValidator,
@@ -96,9 +96,10 @@ public class HttpRequestOperations {
                                                                      group = CONFIGURATION_OVERRIDES,
                                                                      order = 7) Integer responseTimeout,
                                                                  @Optional HttpRequesterRequestBuilder requestBuilder,
-                                                                 @MetadataKeyId @Optional(defaultValue = "ANY") @Placement(
-                                                                     tab = ADVANCED,
-                                                                     group = OTHER_SETTINGS) HttpMetadataKey outputType,
+                                                                 @MetadataKeyId @Optional(
+                                                                     defaultValue = "ANY") @Placement(
+                                                                         tab = ADVANCED,
+                                                                         group = OTHER_SETTINGS) HttpMetadataKey outputType,
                                                                  @Connection HttpClient client,
                                                                  @UseConfig HttpRequesterConfig config, Event muleEvent)
       throws MuleException {
