@@ -10,15 +10,17 @@ package org.mule.module.json.transformers;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.XMLSecureFactories;
+
+import java.io.File;
+import java.io.Reader;
+import java.net.URL;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stax.StAXSource;
-import java.io.File;
-import java.io.Reader;
-import java.net.URL;
 
 import de.odysseus.staxon.json.JsonXMLOutputFactory;
 import org.w3c.dom.Document;
@@ -46,7 +48,7 @@ public class XmlToJson  extends AbstractToFromXmlTransformer
     @Override
     protected Object doTransform(Object src, String enc) throws TransformerException
     {
-        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        XMLInputFactory inputFactory = new XMLSecureFactories().createXmlInputFactory();
         inputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
 
         TransformerInputs inputs = null;

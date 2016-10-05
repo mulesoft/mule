@@ -39,13 +39,14 @@
  */
 package org.glassfish.jersey.message.internal;
 
-import static org.mule.module.jersey.JerseyResourcesComponent.isExpandEntitiesEnabled;
-import static org.mule.module.jersey.JerseyResourcesComponent.isExternalEntitiesEnabled;
+import org.mule.util.XMLSecureFactories;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Configuration;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.PerThread;
 
@@ -58,6 +59,8 @@ import org.glassfish.hk2.api.PerThread;
  */
 public class DocumentBuilderFactoryInjectionProvider extends AbstractXmlFactory implements Factory<DocumentBuilderFactory>
 {
+
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
     /**
      * Create new document builder factory provider.
@@ -77,16 +80,11 @@ public class DocumentBuilderFactoryInjectionProvider extends AbstractXmlFactory 
     {
         DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
 
-        f.setNamespaceAware(true);
-
-        if (!isXmlSecurityDisabled())
-        {
-            Boolean externalEntities = isExternalEntitiesEnabled();
-            Boolean expandEntities = isExpandEntitiesEnabled();
-
-            f.setExpandEntityReferences(externalEntities);
-            f.setExpandEntityReferences(expandEntities);
+        if (!isXmlSecurityDisabled()) {
+            f = new XMLSecureFactories().createDocumentBuilderFactory();
         }
+
+        f.setNamespaceAware(true);
 
         return f;
     }
