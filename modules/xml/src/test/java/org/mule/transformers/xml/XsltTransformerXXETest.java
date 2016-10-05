@@ -7,13 +7,15 @@
 package org.mule.transformers.xml;
 
 import static junit.framework.Assert.assertTrue;
-
+import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -27,6 +29,10 @@ import org.junit.Test;
  */
 public class XsltTransformerXXETest extends FunctionalTestCase
 {
+
+    // enable entity expansion as it's required to test XXE
+    @Rule
+    public final SystemProperty expandEntities = new SystemProperty(EXPAND_ENTITIES_PROPERTY, "true");
 
     @Override
     protected String getConfigFile()

@@ -6,12 +6,14 @@
  */
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,12 +40,13 @@ import org.dom4j.io.DocumentResult;
  */
 public abstract class AbstractXmlTransformer extends AbstractMessageTransformer implements Initialisable
 {
+
     private String outputEncoding;
     private XMLInputFactory xmlInputFactory;
     private XMLOutputFactory xmlOutputFactory;
     private boolean useStaxSource = false;
     private boolean acceptExternalEntities = false;
-    
+
     public AbstractXmlTransformer()
     {
         registerSourceType(DataTypeFactory.STRING);
@@ -59,20 +62,13 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         registerSourceType(DataTypeFactory.create(javax.xml.stream.XMLStreamReader.class));
         registerSourceType(DataTypeFactory.create(org.mule.module.xml.transformer.DelayedResult.class));
         setReturnDataType(DataTypeFactory.BYTE_ARRAY);
-        
     }
 
     @Override
     public final void initialise() throws InitialisationException
     {
-        xmlInputFactory = XMLInputFactory.newInstance();
-
-        if (!acceptExternalEntities)
-        {
-            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
-            useStaxSource = true;
-        }
-
+        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, null).createXmlInputFactory();
+        useStaxSource = !acceptExternalEntities;
         xmlOutputFactory = XMLOutputFactory.newInstance();
 
         this.doInitialise();
