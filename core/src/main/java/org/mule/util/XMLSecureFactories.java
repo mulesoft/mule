@@ -64,7 +64,7 @@ public class XMLSecureFactories
         }
         catch (Exception e)
         {
-            logger.warn("Can't configure XML entity expansion for SAXParserFactory");
+            logger.warn("Can't configure XML entity expansion for DocumentBuilderFactory, this could introduce XXE and BL vulnerabilities");
         }
 
         return factory;
@@ -82,7 +82,7 @@ public class XMLSecureFactories
         }
         catch (Exception e)
         {
-            logger.warn("Can't configure XML entity expansion for SAXParserFactory");
+            logger.warn("Can't configure XML entity expansion for SAXParserFactory, this could introduce XXE and BL vulnerabilities");
         }
 
         return factory;
