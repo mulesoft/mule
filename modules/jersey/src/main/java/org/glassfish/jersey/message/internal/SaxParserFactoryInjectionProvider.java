@@ -39,9 +39,7 @@
  */
 package org.glassfish.jersey.message.internal;
 
-import static java.lang.String.format;
-import static org.mule.module.jersey.JerseyResourcesComponent.EXPAND_ENTITIES_PROPERTY;
-import static org.mule.module.jersey.JerseyResourcesComponent.isExpandEntitiesEnabled;
+import org.mule.util.XMLSecureFactories;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Configuration;
@@ -80,22 +78,11 @@ public class SaxParserFactoryInjectionProvider extends AbstractXmlFactory implem
     public SAXParserFactory provide() {
         SAXParserFactory factory = SAXParserFactory.newInstance();
 
-        factory.setNamespaceAware(true);
-
         if (!isXmlSecurityDisabled()) {
-            factory = new SecureSaxParserFactory(factory);
-
-            Boolean expandEntities = isExpandEntitiesEnabled();
-            try
-            {
-                factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", !expandEntities);
-            }
-            catch (Exception e)
-            {
-                logger.warn(format("Can't configure XML entity expansion (set to %s) for active SAX parser", expandEntities));
-            }
-
+            factory = new XMLSecureFactories().createSaxParserFactory();
         }
+
+        factory.setNamespaceAware(true);
 
         return factory;
     }

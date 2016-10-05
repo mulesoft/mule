@@ -6,9 +6,6 @@
  */
 package org.mule.module.xml.transformer;
 
-import static javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES;
-import static javax.xml.stream.XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES;
-import static org.mule.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -17,6 +14,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.XMLSecureFactories;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,16 +42,13 @@ import org.dom4j.io.DocumentResult;
  */
 public abstract class AbstractXmlTransformer extends AbstractMessageTransformer implements Initialisable
 {
-    public static final String EXPAND_INTERNAL_ENTITIES_PROPERTY =
-        SYSTEM_PROPERTY_PREFIX + "xml.expandInternalEntities";
 
     private String outputEncoding;
     private XMLInputFactory xmlInputFactory;
     private XMLOutputFactory xmlOutputFactory;
     private boolean useStaxSource = false;
     private boolean acceptExternalEntities = false;
-    private boolean expandInternalEntities = false;
-    
+
     public AbstractXmlTransformer()
     {
         registerSourceType(DataTypeFactory.STRING);
@@ -69,21 +64,13 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
         registerSourceType(DataTypeFactory.create(javax.xml.stream.XMLStreamReader.class));
         registerSourceType(DataTypeFactory.create(org.mule.module.xml.transformer.DelayedResult.class));
         setReturnDataType(DataTypeFactory.BYTE_ARRAY);
-        
     }
 
     @Override
     public final void initialise() throws InitialisationException
     {
-        xmlInputFactory = XMLInputFactory.newInstance();
-
-        xmlInputFactory.setProperty(IS_SUPPORTING_EXTERNAL_ENTITIES, acceptExternalEntities);
+        xmlInputFactory = XMLSecureFactories.createWithConfig(acceptExternalEntities, null).createXmlInputFactory();
         useStaxSource = !acceptExternalEntities;
-
-        String expandInternalEntitiesValue = System.getProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "false");
-        expandInternalEntities = Boolean.parseBoolean(expandInternalEntitiesValue);
-        xmlInputFactory.setProperty(IS_REPLACING_ENTITY_REFERENCES, expandInternalEntities);
-
         xmlOutputFactory = XMLOutputFactory.newInstance();
 
         this.doInitialise();
@@ -160,7 +147,8 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer 
 
             try
             {
-                result = new DOMResult(DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument());
+                DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
+                result = new DOMResult(factory.newDocumentBuilder().newDocument());
             }
             catch (Exception e)
             {

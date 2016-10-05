@@ -14,6 +14,7 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.XMLSecureFactories;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
             }
             else if (Document.class.isAssignableFrom(getReturnClass()))
             {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
                 Document doc = factory.newDocumentBuilder().newDocument();
                 m.marshal(src, doc);
                 return doc;

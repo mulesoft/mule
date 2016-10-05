@@ -7,8 +7,7 @@
 package org.mule.transformers.xml.xslt;
 
 import static junit.framework.Assert.assertTrue;
-import static org.mule.module.xml.transformer.AbstractXmlTransformer.EXPAND_INTERNAL_ENTITIES_PROPERTY;
-
+import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -31,9 +30,9 @@ import org.junit.Test;
 public class XsltTransformerXXETestCase extends FunctionalTestCase
 {
 
-    // enable entity expansion as it's required to test external entity expansion
+    // enable entity expansion as it's required to test XXE
     @Rule
-    public final SystemProperty myPropertyHasMyValue = new SystemProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "true");
+    public final SystemProperty expandEntities = new SystemProperty(EXPAND_ENTITIES_PROPERTY, "true");
 
     @Override
     protected String getConfigFile()

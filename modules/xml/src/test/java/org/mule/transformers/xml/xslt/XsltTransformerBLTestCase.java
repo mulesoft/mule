@@ -28,11 +28,11 @@ public class XsltTransformerBLTestCase extends FunctionalTestCase
     protected String makeInput()
     {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-               "<!DOCTYPE foo [<!ENTITY xxe1 \"01\">" +
-                 "<!ENTITY xxe2 \"&xxe1;&xxe1;\">" +
-                 "<!ENTITY xxe3 \"&xxe2;&xxe2;\">" +
-                 "<!ENTITY xxe4 \"&xxe3;&xxe3;\">" +
+               "<!DOCTYPE foo [<!ENTITY lol1 \"01\">" +
+                 "<!ENTITY lol2 \"&lol1;&lol1;\">" +
+                 "<!ENTITY lol3 \"&lol2;&lol2;\">" +
+                 "<!ENTITY lol4 \"&lol3;&lol3;\">" +
                "]> \n" +
-               "<entityName>Hello123456890 &xxe4;&xxe4;&xxe4;</entityName>";
+               "<entityName>Hello123456890 &lol4;&lol4;&lol4;</entityName>";
     }
 }
