@@ -8,8 +8,7 @@ package org.mule.transformers.xml.xslt;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
-import static org.mule.module.xml.transformer.AbstractXmlTransformer.EXPAND_INTERNAL_ENTITIES_PROPERTY;
-
+import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Rule;
@@ -19,7 +18,7 @@ public class XsltTransformerBLEnabledTestCase extends XsltTransformerBLTestCase
 {
 
     @Rule
-    public final SystemProperty myPropertyHasMyValue = new SystemProperty(EXPAND_INTERNAL_ENTITIES_PROPERTY, "true");
+    public final SystemProperty myPropertyHasMyValue = new SystemProperty(EXPAND_ENTITIES_PROPERTY, "true");
 
     @Test
     public void enabled() throws Exception

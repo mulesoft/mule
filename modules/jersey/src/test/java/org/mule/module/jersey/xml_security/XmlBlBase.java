@@ -30,11 +30,11 @@ public class XmlBlBase extends FunctionalTestCase
     protected final String xmlWithEntities =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n" +
             "<!DOCTYPE foo[ \n" +
-            "<!ENTITY xxe1 \"0101\"> \n" +
+            "<!ENTITY lol1 \"0101\"> \n" +
             "]> \n" +
             "<Quote> \n" +
             "<fName>FIRST NAME</fName> \n" +
-            "<lName>LAST NAME &xxe1;</lName> \n" +
+            "<lName>LAST NAME &lol1;</lName> \n" +
             "</Quote>";
 
     @Override

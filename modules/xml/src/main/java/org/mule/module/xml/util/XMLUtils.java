@@ -16,6 +16,7 @@ import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.XMLSecureFactories;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -264,8 +265,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     private static org.w3c.dom.Document parseXML(InputSource source) throws Exception
     {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        DocumentBuilderFactory factory = new XMLSecureFactories().createDocumentBuilderFactory();
         return factory.newDocumentBuilder().parse(source);
     }
 
@@ -457,7 +457,7 @@ public class XMLUtils extends org.mule.util.XMLUtils
 
     public static Node toDOMNode(Object src, MuleEvent event) throws Exception
     {
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilderFactory builderFactory = new XMLSecureFactories().createDocumentBuilderFactory();
         builderFactory.setNamespaceAware(true);
 
         return toDOMNode(src, event, builderFactory);
