@@ -9,11 +9,8 @@ package org.mule.transformers.xml.xslt;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
-import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.tck.junit4.FunctionalTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -26,10 +23,6 @@ import org.junit.Test;
  */
 public class XsltTransformerBLTestCase extends FunctionalTestCase
 {
-
-    // this is disabled (secure) by default, so we need to change it for the test
-    @Rule
-    public final SystemProperty expandEntities = new SystemProperty(EXPAND_ENTITIES_PROPERTY, "true");
 
     @Override
     protected String getConfigFile()

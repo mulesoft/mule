@@ -36,8 +36,8 @@ public class XMLSecureFactories
     {
         XMLSecureFactories factory = new XMLSecureFactories();
 
-        factory.externalEntities = factory.externalEntities && externalEntities;
-        factory.expandEntities = factory.expandEntities && expandEntities;
+        factory.externalEntities = externalEntities;
+        factory.expandEntities = expandEntities;
 
         return factory;
     }
