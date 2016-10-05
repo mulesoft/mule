@@ -13,12 +13,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.util.XMLSecureFactories.EXPAND_ENTITIES_PROPERTY;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.RegistrationException;
 import org.mule.module.xml.expression.JXPathExpressionEvaluator;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -29,6 +31,7 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 @SuppressWarnings("deprecation") // we're testing a deprecated class
@@ -42,6 +45,10 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
                                                                 "<z:length>120</z:length>" +
                                                                 "</z:table>" +
                                                                 "</root>";
+
+    // this is disabled (secure) by default, so we need to change it for the test
+    @Rule
+    public final SystemProperty expandEntities = new SystemProperty(EXPAND_ENTITIES_PROPERTY, "true");
 
     @Test
     public void testBean()
