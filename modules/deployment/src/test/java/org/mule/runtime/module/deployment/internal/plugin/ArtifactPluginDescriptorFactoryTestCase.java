@@ -18,7 +18,6 @@ import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassL
 import static org.mule.runtime.core.util.FileUtils.stringToFile;
 import static org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter.NULL_CLASSLOADER_FILTER;
 import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PLUGIN_PROPERTIES;
-import static org.mule.runtime.module.deployment.internal.plugin.ArtifactPluginDescriptorFactory.PROPERTY_LOADER_OVERRIDE;
 
 import org.mule.runtime.module.artifact.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.classloader.ArtifactClassLoaderFilter;
@@ -175,7 +174,6 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   private static class PluginPropertiesBuilder {
 
     private final File pluginFolder;
-    private String overrides;
     private String exportedClassPackages;
     private String exportedResources;
 
@@ -201,7 +199,6 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
         throw new IllegalStateException(String.format("File '%s' already exists", pluginProperties.getAbsolutePath()));
       }
 
-      addDescriptorProperty(pluginProperties, PROPERTY_LOADER_OVERRIDE, this.overrides);
       addDescriptorProperty(pluginProperties, EXPORTED_CLASS_PACKAGES_PROPERTY, this.exportedClassPackages);
       addDescriptorProperty(pluginProperties, EXPORTED_RESOURCE_PROPERTY, this.exportedResources);
 
