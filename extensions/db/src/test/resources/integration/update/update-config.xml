@@ -43,7 +43,7 @@
             <db:sql>
                 MERGE INTO PLANET p1
                 USING PLANET p2
-                ON p1.Id = p2.ID
+                ON (p1.Id = p2.ID)
                 WHEN MATCHED
                 THEN UPDATE SET p1.name = 'merged'
             </db:sql>

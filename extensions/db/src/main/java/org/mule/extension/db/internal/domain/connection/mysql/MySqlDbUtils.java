@@ -37,25 +37,29 @@ final class MySqlDbUtils {
       buf.append(port);
     }
     buf.append("/");
-    buf.append(database);
+    if (database != null) {
+      buf.append(database);
+    }
     url = buf.toString();
     return url;
   }
 
   private static String addProperties(String url, Map<String, String> connectionProperties) {
-    if (connectionProperties != null && connectionProperties.isEmpty()) {
-      return url;
+    if (connectionProperties != null && !connectionProperties.isEmpty()) {
+      final StringBuilder effectiveUrl = new StringBuilder(url);
+      final String queryParams = buildQueryParams(connectionProperties);
+
+      if (getUri(url).getQuery() == null) {
+        effectiveUrl.append("?");
+      } else {
+        effectiveUrl.append("&");
+      }
+      effectiveUrl.append(queryParams);
+
+      return effectiveUrl.toString();
     }
 
-    StringBuilder effectiveUrl = new StringBuilder(url);
-
-    if (getUri(url).getQuery() == null) {
-      effectiveUrl.append("?");
-    } else {
-      effectiveUrl.append("&");
-    }
-
-    return effectiveUrl.append(buildQueryParams(connectionProperties)).toString();
+    return url;
   }
 
   private static String buildQueryParams(Map<String, String> connectionProperties) {

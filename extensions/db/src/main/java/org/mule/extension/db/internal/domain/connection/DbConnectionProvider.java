@@ -90,7 +90,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   private DataSource dataSource;
 
   @Override
-  public final DbConnection connect() throws ConnectionException {
+  public DbConnection connect() throws ConnectionException {
     try {
       Connection jdbcConnection = jdbcConnectionFactory.createConnection(dataSource, resolvedCustomTypes);
 
@@ -168,7 +168,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
 
   public abstract java.util.Optional<DataSourceConfig> getDataSourceConfig();
 
-  private DbConnection createDbConnection(Connection connection) throws Exception {
+  protected DbConnection createDbConnection(Connection connection) throws Exception {
     return new DefaultDbConnection(connection, resolvedCustomTypes);
   }
 
@@ -192,7 +192,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
     return dataSourceFactory.create(dataSourceConfig, poolingProfile);
   }
 
-  private List<DbType> resolveCustomTypes() {
+  protected List<DbType> resolveCustomTypes() {
     return customDataTypes.stream().map(type -> {
       final String name = type.getTypeName();
       final int id = type.getId();

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized;
+import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 
 public class SelectJavaUdtTestCase extends AbstractDbIntegrationTestCase {
 

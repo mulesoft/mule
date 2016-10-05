@@ -15,7 +15,10 @@
             <set-payload value="#[payload.get(0)['ZIPS']]"/>
 
             <db:update>
-                <db:sql>update REGIONS set ZIPS = #[payload] where REGION_NAME = 'Southwest'</db:sql>
+                <db:sql>update REGIONS set ZIPS = :zip where REGION_NAME = 'Southwest'</db:sql>
+                <db:input-parameters>
+                    <db:input-parameter key="zip" value="#[payload]"/>
+                </db:input-parameters>
             </db:update>
 
             <db:select>
@@ -37,7 +40,10 @@
             <set-payload value="#[payload.get(0)['DETAILS']]"/>
 
             <db:update>
-                <db:sql>update contacts set DETAILS = #[payload] where CONTACT_NAME = 'Contact1'</db:sql>
+                <db:sql>update contacts set DETAILS = :detail where CONTACT_NAME = 'Contact1'</db:sql>
+                <db:input-parameters>
+                    <db:input-parameter key="detail" value="#[payload]"/>
+                </db:input-parameters>
             </db:update>
 
             <db:select>

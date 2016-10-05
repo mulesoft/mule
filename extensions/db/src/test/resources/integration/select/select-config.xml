@@ -53,7 +53,7 @@
 
     <flow name="selectParameterizedQuery">
         <db:select>
-            <db:sql>select * from Planet where name = :name</db:sql>
+            <db:sql>select * from PLANET where name = :name</db:sql>
             <db:input-parameters>
                 <db:input-parameter key="name" value="#[payload]"/>
             </db:input-parameters>

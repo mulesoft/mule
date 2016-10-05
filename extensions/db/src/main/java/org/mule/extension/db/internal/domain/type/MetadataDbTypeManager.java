@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public class MetadataDbTypeManager implements DbTypeManager {
         Number dataType = (Number) typeRecord.get(METADATA_TYPE_ID_COLUMN);
         String typeName = (String) typeRecord.get(METADATA_TYPE_NAME_COLUMN);
 
-        DbType resolvedDbType = dataType.equals(Types.BLOB)
+        DbType resolvedDbType = Objects.equals(Types.BLOB, dataType.intValue())
             ? new BlobDbType(dataType.intValue(), typeName)
             : new ResolvedDbType(dataType.intValue(), typeName);
 

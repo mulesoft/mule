@@ -6,7 +6,7 @@
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
     <db:query name="selectQuery">
-        <db:sql>select * from Planet where name = :name</db:sql>
+        <db:sql>select * from PLANET where name = :name</db:sql>
         <db:input-parameters>
             <db:input-parameter key="name" value="#[payload]" type="VARCHAR"/>
         </db:input-parameters>

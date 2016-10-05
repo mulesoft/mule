@@ -15,6 +15,11 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link DefaultDbConnection} implementation for Oracle databases
+ *
+ * @since 4.0
+ */
 public class OracleDbConnection extends DefaultDbConnection {
 
   private static final int CURSOR_TYPE_ID = -10;

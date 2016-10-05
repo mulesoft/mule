@@ -66,7 +66,7 @@ public class MySqlTestDatabase extends AbstractTestDatabase {
     executeDdl(dataSource, "DROP PROCEDURE IF EXISTS countTestRecords;\n");
 
     final String sql = "CREATE DEFINER=CURRENT_USER PROCEDURE countTestRecords(OUT pResult INT)\n" + "BEGIN\n"
-        + "select count(*) into pResult from Planet;\n" + "END";
+        + "select count(*) into pResult from PLANET;\n" + "END";
 
     createStoredProcedure(dataSource, sql);
   }
@@ -116,10 +116,5 @@ public class MySqlTestDatabase extends AbstractTestDatabase {
     final String sql = "CREATE FUNCTION DELAY(seconds INTEGER) RETURNS INTEGER\n" + "BEGIN\n" + " DO SLEEP(seconds * 1000);\n"
         + " RETURN 1;\n" + "END;";
     createStoredProcedure(dataSource, sql);
-  }
-
-  @Override
-  public MetadataType getIdFieldMetaDataType() {
-    return BaseTypeBuilder.create(MetadataFormat.JAVA).stringType().build();
   }
 }

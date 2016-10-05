@@ -35,7 +35,11 @@ public class BlobDbType extends ResolvedDbType {
    */
   @Override
   public void setParameterValue(PreparedStatement statement, int index, Object value) throws SQLException {
-    if (value instanceof InputStream) {
+    if (value instanceof byte[]) {
+      Blob blob = statement.getConnection().createBlob();
+      blob.setBytes(1, (byte[]) value);
+      value = blob;
+    } else if (value instanceof InputStream) {
       try {
         Blob blob = statement.getConnection().createBlob();
         blob.setBytes(1, toByteArray((InputStream) value));

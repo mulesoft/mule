@@ -57,6 +57,7 @@ public class SelectMetadataOutputTestCase extends AbstractDbIntegrationTestCase 
     assertFieldOfType(record, "ID", testDatabase.getIdFieldMetaDataType());
     assertFieldOfType(record, "POSITION", testDatabase.getPositionFieldMetaDataType());
     assertFieldOfType(record, "NAME", typeBuilder.stringType().build());
+    //The following assertion will fail in MySQL due that Blob is communicated as a byte[]
     assertFieldOfType(record, "PICTURE", typeLoader.load(Blob.class));
   }
 

@@ -46,6 +46,7 @@ public class UpdateTestCase extends AbstractDbIntegrationTestCase {
     return new String[] {"integration/update/update-config.xml"};
   }
 
+  //This test will fail with MySQL due that doesn't support the MERGE statement
   @Test
   public void mergesTables() throws Exception {
     assertMergeResult(flowRunner("merge").run().getMessage());

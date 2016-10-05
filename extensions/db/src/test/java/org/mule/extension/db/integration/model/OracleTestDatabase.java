@@ -305,7 +305,7 @@ public class OracleTestDatabase extends AbstractTestDatabase {
   @Override
   protected void createRegionManagersTable(Connection connection) throws SQLException {
     String ddl = "create table REGION_MANAGERS(" + "REGION_NAME varchar(32) NOT NULL," + "MANAGER_NAME varchar(32) NOT NULL,"
-        + "DETAILS CONTACT_DETAILS NOT NULL," + "PRIMARY KEY (REGION_NAME));";
+        + "DETAILS CONTACT_DETAILS NOT NULL," + "PRIMARY KEY (REGION_NAME))";
 
     executeDdl(connection, ddl);
   }

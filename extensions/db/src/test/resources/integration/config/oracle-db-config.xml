@@ -5,6 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
             http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 
-    <db:oracle-config name="dbConfig" host="192.168.1.104" port="1521" instance="XE" user="pocholo"
-                      password="password"/>
+    <db:config name="dbConfig">
+        <db:oracle-connection host="192.168.99.100" port="1521" instance="xe" user="system" password="oracle" />
+    </db:config>
 </mule>

@@ -10,7 +10,7 @@
             <db:stored-procedure>
                 <db:sql>{ CALL getZipCodes('Southwest', :out) }</db:sql>
                 <db:output-parameters>
-                    <db:output-parameter key="out" type="ZIPARRAY"/>
+                    <db:output-parameter key="out" customType="ZIPARRAY"/>
                 </db:output-parameters>
             </db:stored-procedure>
 
@@ -24,7 +24,7 @@
             <db:stored-procedure>
                 <db:sql>{ CALL getContactDetails('Contact1', :out) }</db:sql>
                 <db:output-parameters>
-                    <db:output-parameter key="out" type="CONTACT_DETAILS_ARRAY"/>
+                    <db:output-parameter key="out" customType="CONTACT_DETAILS_ARRAY"/>
                 </db:output-parameters>
             </db:stored-procedure>
 
