@@ -7,7 +7,6 @@
 package org.mule.transformers.xml.xslt;
 
 import static junit.framework.Assert.assertTrue;
-
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
