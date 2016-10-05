@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+    <mulexml:jaxb-context name="JAXB_Context" packageNames="org.mule.jaxb.model"/>
+    <flow name="testFlow">
+        <byte-array-to-string-transformer/>
+        <mulexml:jaxb-xml-to-object-transformer returnClass="org.mule.jaxb.model.Foo" jaxbContext-ref="JAXB_Context"/>
+        <mulexml:jaxb-object-to-xml-transformer jaxbContext-ref="JAXB_Context"/>
+        <object-to-string-transformer/>
+        <logger message="final: #[payload]" level="INFO"/>
+    </flow>
+</mule>

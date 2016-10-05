@@ -12,6 +12,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.json.validation.ValidateJsonSchemaMessageProcessor;
+import org.mule.util.XMLSecureFactories;
 
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class JsonSchemaValidationFilter implements JsonSchemaFilter
     private ErrorHandler errorHandler;
     private boolean returnResult;
     private boolean useStaxSource;
-    private XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    private XMLInputFactory xmlInputFactory = new XMLSecureFactories().createXmlInputFactory();
     private Map<String, Object> validatorProperties;
     private Map<String, Boolean> validatorFeatures;
 
