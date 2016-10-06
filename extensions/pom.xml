@@ -19,7 +19,6 @@
 
     <properties>
         <mule.extensions.maven.plugin.version>1.0.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <allure.junit.version>1.4.23.HOTFIX1</allure.junit.version>
     </properties>
 
     <modules>
@@ -63,18 +62,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
             <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-junit-adaptor</artifactId>
-            <version>${allure.junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ru.yandex.qatools.allure</groupId>
-            <artifactId>allure-java-annotations</artifactId>
-            <version>${allure.junit.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
