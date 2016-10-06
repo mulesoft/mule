@@ -83,13 +83,14 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
 
             connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(), event.getMessage());
 
+            if (!event.getMuleContext().waitUntilStarted(event.getTimeout()))
+            {
+                throw new MessagingException(
+                  MessageFactory.createStaticMessage("Timeout waiting for mule context to be completely started"), event, this);
+            }
+
             if (hasResponse)
             {
-                if (!event.getMuleContext().waitUntilStarted(event.getTimeout()))
-                {
-                    throw new MessagingException(MessageFactory.createStaticMessage("Timeout waiting for mule context to be completely started"), event, this);
-                }
-
                 if (isNonBlocking(event))
                 {
                     doSendNonBlocking(event, new NonBlockingSendCompletionHandler(event, ((Flow) event.getFlowConstruct()).getWorkManager(), connector));

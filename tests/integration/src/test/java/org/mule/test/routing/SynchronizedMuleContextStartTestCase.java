@@ -30,7 +30,7 @@ import org.junit.Test;
 public class SynchronizedMuleContextStartTestCase extends FunctionalTestCase
 {
 
-    private static volatile int processedMessageCounter = 0;
+    protected static volatile int processedMessageCounter = 0;
     private static Latch waitMessageInProgress = new Latch();
 
     public SynchronizedMuleContextStartTestCase()
