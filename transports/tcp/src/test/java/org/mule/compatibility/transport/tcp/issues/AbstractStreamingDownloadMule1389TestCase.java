@@ -11,13 +11,13 @@ import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.tcp.integration.AbstractStreamingCapacityTestCase;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public abstract class AbstractStreamingDownloadMule1389TestCase extends FunctionalTestCase {
+public abstract class AbstractStreamingDownloadMule1389TestCase extends CompatibilityFunctionalTestCase {
 
   @Test
   public void testDownloadSpeed() throws Exception {

@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.file;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WorkDirectoryPropertiesTestCase extends FunctionalTestCase {
+public class WorkDirectoryPropertiesTestCase extends CompatibilityFunctionalTestCase {
 
   private File dataFolder;
 

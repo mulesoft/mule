@@ -12,9 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_POSTFIX;
 import static org.mule.runtime.core.api.el.ExpressionLanguage.DEFAULT_EXPRESSION_PREFIX;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.component.Component;
-import org.mule.runtime.core.api.el.ExpressionLanguage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.runtime.core.routing.filters.logic.NotFilter;
@@ -23,7 +22,7 @@ import java.text.MessageFormat;
 
 import org.junit.Test;
 
-public class RestServiceComponentFlowTestCase extends FunctionalTestCase {
+public class RestServiceComponentFlowTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String FLOW_NAME = "WORMS";
   public static final String FLOW_URL =

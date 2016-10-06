@@ -6,9 +6,10 @@
  */
 package org.mule.test.integration.transaction.xa;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,11 +17,10 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
-public class EndpointToEndpointXaTransactionTestCase extends FunctionalTestCase {
+@RunnerDelegateTo(Parameterized.class)
+public class EndpointToEndpointXaTransactionTestCase extends CompatibilityFunctionalTestCase {
 
   public static String transactionManagerConfigFile =
       "org/mule/test/integration/transaction/xa/jboss-transaction-manager-config.xml";

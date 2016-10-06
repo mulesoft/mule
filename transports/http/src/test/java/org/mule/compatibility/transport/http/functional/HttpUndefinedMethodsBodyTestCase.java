@@ -15,25 +15,23 @@ import static org.mule.runtime.module.http.api.HttpConstants.Methods.DELETE;
 import static org.mule.runtime.module.http.api.HttpConstants.Methods.GET;
 
 import org.mule.extension.http.api.HttpResponseAttributes;
-import org.mule.extension.http.internal.HttpConnector;
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.test.runner.RunnerDelegateTo;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
-public class HttpUndefinedMethodsBodyTestCase extends ExtensionFunctionalTestCase {
+@RunnerDelegateTo(Parameterized.class)
+public class HttpUndefinedMethodsBodyTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port");
@@ -44,11 +42,6 @@ public class HttpUndefinedMethodsBodyTestCase extends ExtensionFunctionalTestCas
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {{GET.name()}, {DELETE.name()}});
-  }
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, HttpConnector.class};
   }
 
   @Override

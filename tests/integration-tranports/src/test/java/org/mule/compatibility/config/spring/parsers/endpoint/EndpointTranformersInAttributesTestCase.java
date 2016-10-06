@@ -13,10 +13,10 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.MessageProcessorChain;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.transformer.codec.Base64Decoder;
 import org.mule.runtime.core.transformer.codec.Base64Encoder;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase {
+public class EndpointTranformersInAttributesTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

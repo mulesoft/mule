@@ -11,27 +11,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.construct.FlowConstruct;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
-import org.mule.runtime.core.processor.AbstractRedeliveryPolicy;
 import org.mule.runtime.core.processor.IdempotentRedeliveryPolicy;
 import org.mule.runtime.core.util.store.SimpleMemoryObjectStore;
 
 import java.io.Serializable;
 
-import org.hamcrest.core.IsInstanceOf;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Tests for all object stores that can be configured on an {@link org.mule.routing.IdempotentMessageFilter}.
  */
-public class RedeliveryPolicyNamespaceHandlerTestCase extends FunctionalTestCase {
+@Ignore("MULE-10725")
+public class RedeliveryPolicyNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   public RedeliveryPolicyNamespaceHandlerTestCase() {
     // we just test the wiring of the objects, no need to start the MuleContext

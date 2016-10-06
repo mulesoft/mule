@@ -15,11 +15,11 @@ import org.mule.compatibility.core.api.registry.LegacyServiceType;
 import org.mule.compatibility.core.api.transport.ReceiveException;
 import org.mule.compatibility.core.config.ConnectorConfiguration;
 import org.mule.compatibility.core.endpoint.SimpleEndpointCache;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.RequestCacheKey;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.registry.ServiceException;
 import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
@@ -93,6 +93,6 @@ public class ConnectorEndpointProvider extends AbstractPriorizableConnectorMessa
 
   @Override
   public int priority() {
-    return ConnectorConfiguration.useTransportForUris(muleContext) ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+    return ConnectorConfiguration.useTransportForUris(muleContext) ? BASE_PRIORITY : -BASE_PRIORITY;
   }
 }

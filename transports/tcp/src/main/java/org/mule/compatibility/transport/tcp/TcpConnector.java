@@ -13,12 +13,12 @@ import org.mule.compatibility.core.config.i18n.TransportCoreMessages;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPool;
 import org.mule.compatibility.transport.tcp.protocols.SafeProtocol;
-import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.model.streaming.CallbackOutputStream;
 import org.mule.runtime.core.util.concurrent.ThreadNameHelper;
 import org.mule.runtime.core.util.monitor.ExpiryMonitor;
@@ -391,7 +391,7 @@ public class TcpConnector extends AbstractConnector {
     this.socketFactory = socketFactory;
   }
 
-  protected AbstractTcpSocketFactory getSocketFactory() {
+  public AbstractTcpSocketFactory getSocketFactory() {
     return socketFactory;
   }
 

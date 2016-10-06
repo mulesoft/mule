@@ -6,10 +6,10 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.junit.Assert.assertFalse;
-import static org.mule.runtime.core.util.FileUtils.writeStringToFile;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -22,7 +22,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileAutoDeleteOnExceptionTestCase extends FunctionalTestCase {
+public class FileAutoDeleteOnExceptionTestCase extends CompatibilityFunctionalTestCase {
 
   public String testFolder1;
   public String testFolder2;

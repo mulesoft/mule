@@ -14,12 +14,11 @@ import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPool;
 import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPoolFactory;
 import org.mule.compatibility.core.transport.DefaultConfigurableKeyedObjectPool;
 import org.mule.compatibility.core.transport.DefaultConfigurableKeyedObjectPoolFactory;
-import org.mule.compatibility.transport.tcp.TcpConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class TcpDispatcherPoolFactoryTestCase extends FunctionalTestCase {
+public class TcpDispatcherPoolFactoryTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

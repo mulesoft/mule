@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mule.runtime.core.api.security.tls.TlsConfiguration.DISABLE_SYSTEM_PROPERTIES_MAPPING_PROPERTY;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -35,7 +35,7 @@ import org.junit.Test;
  * The system property "mule.tls.disableSystemPropertiesMapping" disables this behavior, and this test verifies that the two
  * connectors will not interfere when this property is set.
  */
-public class HttpsMultipleConnectorsTestCase extends FunctionalTestCase {
+public class HttpsMultipleConnectorsTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String TRUST_STORE_SYSTEM_PROPERTY = "javax.net.ssl.trustStore";
 

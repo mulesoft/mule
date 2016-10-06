@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.compatibility.core.context.notification.EndpointMessageNotification;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.runtime.core.util.IOUtils;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class FileAppendConnectorTestCase extends FunctionalTestCase
+public class FileAppendConnectorTestCase extends CompatibilityFunctionalTestCase
     implements EndpointMessageNotificationListener<EndpointMessageNotification> {
 
   protected static final String OUTPUT_DIR = "myout";

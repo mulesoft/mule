@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.security.cert.Certificate;
@@ -26,7 +26,7 @@ import org.junit.Test;
  * A different version of {@link org.mule.compatibility.transport.ssl.SslCertificateTestCase} to see if we can get different
  * timing.
  */
-public class SslCertificatesTestCase extends FunctionalTestCase {
+public class SslCertificatesTestCase extends CompatibilityFunctionalTestCase {
 
   private static int NUM_MESSAGES = 100;
 

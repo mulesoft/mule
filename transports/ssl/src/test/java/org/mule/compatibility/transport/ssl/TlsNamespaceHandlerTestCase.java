@@ -10,12 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.transport.ssl.SslConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class TlsNamespaceHandlerTestCase extends FunctionalTestCase {
+public class TlsNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

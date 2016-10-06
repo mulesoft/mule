@@ -17,7 +17,7 @@ import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.activemq.ActiveMQJmsConnector;
 import org.mule.compatibility.transport.jms.redelivery.JmsXRedeliveryHandler;
 import org.mule.compatibility.transport.jms.test.TestRedeliveryHandler;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Session;
@@ -26,7 +26,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
 import org.springframework.jms.connection.CachingConnectionFactory;
 
-public class ActiveMQJmsConnectorTestCase extends FunctionalTestCase {
+public class ActiveMQJmsConnectorTestCase extends CompatibilityFunctionalTestCase {
 
   private static String USERNAME = "username";
   private static String PASSWORD = "password";

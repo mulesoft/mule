@@ -9,9 +9,9 @@ package org.mule.test.integration.messaging.meps;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("This test causes HttpsSharePortTestCase to fail")
-public class InOutOutInTestCase extends FunctionalTestCase {
+public class InOutOutInTestCase extends CompatibilityFunctionalTestCase {
 
   public static final long TIMEOUT = 3000;
 

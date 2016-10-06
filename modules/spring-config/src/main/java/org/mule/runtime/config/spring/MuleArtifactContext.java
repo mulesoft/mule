@@ -24,6 +24,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 import static org.springframework.context.annotation.AnnotationConfigUtils.AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME;
 import static org.springframework.context.annotation.AnnotationConfigUtils.REQUIRED_ANNOTATION_PROCESSOR_BEAN_NAME;
+
 import org.mule.runtime.config.spring.dsl.api.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.config.spring.dsl.api.config.ArtifactConfiguration;
 import org.mule.runtime.config.spring.dsl.api.xml.StaticXmlNamespaceInfo;
@@ -149,11 +150,12 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     this.artifactType = artifactType;
     this.artifactConfiguration = artifactConfiguration;
 
-    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class).forEach(componentBuildingDefinitionProvider -> {
-      componentBuildingDefinitionProvider.init(muleContext);
-      componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream()
-          .forEach(componentBuildingDefinitionRegistry::register);
-    });
+    serviceRegistry.lookupProviders(ComponentBuildingDefinitionProvider.class)
+        .forEach(componentBuildingDefinitionProvider -> {
+          componentBuildingDefinitionProvider.init(muleContext);
+          componentBuildingDefinitionProvider.getComponentBuildingDefinitions().stream()
+              .forEach(componentBuildingDefinitionRegistry::register);
+        });
 
     ErrorTypeRepository errorTypeRepository = createDefaultErrorTypeRepository();
     ErrorTypeLocator errorTypeLocator = createComponentErrorTypeLocator(errorTypeRepository);
@@ -285,7 +287,7 @@ public class MuleArtifactContext extends AbstractXmlApplicationContext {
     if (useNewParsingMechanism) {
       createApplicationComponents(beanFactory, applicationModel, true);
     } else {
-      //TODO MULE-9638 - Remove log line
+      // TODO MULE-9638 - Remove log line
       logger
           .info("Using mixed mechanism to load configuration since there are some components that were not yet migrated to the new mechanism: "
               + getOldParsingMechanismComponentIdentifiers());

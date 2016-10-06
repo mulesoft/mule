@@ -7,10 +7,9 @@
 
 package org.mule.compatibility.transport.file;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.File;
@@ -19,7 +18,7 @@ import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FileNoRecursiveConnectorTestCase extends FunctionalTestCase {
+public class FileNoRecursiveConnectorTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

@@ -12,8 +12,9 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import org.mule.compatibility.module.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.message.InternalMessage;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
 
-public class HttpConnectionTimeoutTestCase extends FunctionalTestCase {
+public class HttpConnectionTimeoutTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

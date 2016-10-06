@@ -10,6 +10,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
+import org.mule.compatibility.transport.file.FileContentsMuleMessageFactory;
+import org.mule.compatibility.transport.file.ReceiverFileInputStream;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.IOUtils;
 

@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -22,7 +22,7 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase {
+public class TwoEndpointsSinglePortTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");
@@ -60,7 +60,7 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase {
   protected void sendWithResponse(String flowName, String message, String response, int noOfMessages) throws Exception {
     MuleClient client = muleContext.getClient();
 
-    List<Object> results = new ArrayList<Object>();
+    List<Object> results = new ArrayList<>();
     for (int i = 0; i < noOfMessages; i++) {
       results.add(getPayloadAsBytes(client
           .send(((InboundEndpoint) ((Flow) muleContext.getRegistry().lookupObject(flowName)).getMessageSource()).getAddress(),

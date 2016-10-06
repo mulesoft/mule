@@ -9,15 +9,14 @@ package org.mule.compatibility.transport.jms;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.filters.JmsSelectorFilter;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class JmsSelectorDetectionTestCase extends FunctionalTestCase {
+public class JmsSelectorDetectionTestCase extends CompatibilityFunctionalTestCase {
 
   public JmsSelectorDetectionTestCase() {
     setStartContext(false);

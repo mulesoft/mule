@@ -8,7 +8,8 @@ package org.mule.test.integration.transport.jms;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -23,7 +24,7 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.junit.Test;
 
-public class QosHeadersTestCase extends FunctionalTestCase {
+public class QosHeadersTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

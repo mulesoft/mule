@@ -13,12 +13,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.transport.AbstractConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.construct.AbstractFlowConstruct;
 
 import org.junit.Test;
 
-public class FlowStateEndpointTestCase extends FunctionalTestCase {
+public class FlowStateEndpointTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

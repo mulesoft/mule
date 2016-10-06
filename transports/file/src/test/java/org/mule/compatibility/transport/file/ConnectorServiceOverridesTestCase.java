@@ -20,7 +20,7 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.service.DefaultEndpointAwareTransformer;
 import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.transformer.TransformerUtils;
 import org.mule.runtime.core.transformer.simple.ByteArrayToSerializable;
@@ -28,7 +28,7 @@ import org.mule.runtime.core.transformer.simple.SerializableToByteArray;
 
 import org.junit.Test;
 
-public class ConnectorServiceOverridesTestCase extends FunctionalTestCase {
+public class ConnectorServiceOverridesTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

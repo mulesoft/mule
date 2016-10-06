@@ -14,16 +14,14 @@ import static org.mockito.Mockito.mock;
 import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.compatibility.transport.jms.DefaultJmsTopicResolver;
-import org.mule.compatibility.transport.jms.JmsConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import javax.jms.Queue;
 import javax.jms.Topic;
 
 import org.junit.Test;
 
-public class DefaultJmsTopicResolverTestCase extends FunctionalTestCase {
+public class DefaultJmsTopicResolverTestCase extends CompatibilityFunctionalTestCase {
 
   private JmsConnector connector;
   private DefaultJmsTopicResolver resolver;

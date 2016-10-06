@@ -10,9 +10,9 @@ package org.mule.compatibility.transport.http.functional;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
@@ -21,7 +21,7 @@ import org.mule.tck.probe.Prober;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpDispatcherLifecycleTestCase extends FunctionalTestCase {
+public class HttpDispatcherLifecycleTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("httpPort");

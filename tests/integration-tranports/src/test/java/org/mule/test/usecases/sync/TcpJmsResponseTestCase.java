@@ -9,15 +9,15 @@ package org.mule.test.usecases.sync;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpJmsResponseTestCase extends FunctionalTestCase {
+public class TcpJmsResponseTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort httpPort = new DynamicPort("port");

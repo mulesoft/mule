@@ -13,16 +13,16 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.junit.Test;
-
 import org.mule.compatibility.module.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.FutureMessageResult;
 import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.util.concurrent.TimeoutException;
 
-public class TcpConnectionTimeoutTestCase extends FunctionalTestCase {
+import org.junit.Test;
+
+public class TcpConnectionTimeoutTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

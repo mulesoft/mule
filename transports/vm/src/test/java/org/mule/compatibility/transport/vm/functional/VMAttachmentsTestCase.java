@@ -9,10 +9,10 @@ package org.mule.compatibility.transport.vm.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.File;
 
@@ -21,7 +21,7 @@ import javax.activation.FileDataSource;
 
 import org.junit.Test;
 
-public class VMAttachmentsTestCase extends FunctionalTestCase {
+public class VMAttachmentsTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

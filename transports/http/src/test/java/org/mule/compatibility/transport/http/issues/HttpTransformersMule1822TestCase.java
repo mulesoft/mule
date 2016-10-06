@@ -9,17 +9,17 @@ package org.mule.compatibility.transport.http.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.StringAppendTestTransformer;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpTransformersMule1822TestCase extends FunctionalTestCase {
+public class HttpTransformersMule1822TestCase extends CompatibilityFunctionalTestCase {
 
   public static final String OUTBOUND_MESSAGE = "Test message";
 

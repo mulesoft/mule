@@ -16,7 +16,7 @@ import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.EndpointURI;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.transport.vm.VMConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.config.QueueProfile;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
@@ -28,7 +28,7 @@ import org.junit.Test;
 /**
  * Tests the Spring XML namespace for the VM transport.
  */
-public class VmNamespaceHandlerTestCase extends FunctionalTestCase {
+public class VmNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

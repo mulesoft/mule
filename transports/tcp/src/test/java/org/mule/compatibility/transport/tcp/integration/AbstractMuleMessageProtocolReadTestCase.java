@@ -10,10 +10,10 @@ import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.core.util.SystemUtils.getDefaultEncoding;
 
 import org.mule.compatibility.transport.tcp.TcpProtocol;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.wire.WireFormat;
 import org.mule.runtime.core.transformer.wire.SerializedMuleMessageWireFormat;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -26,7 +26,7 @@ import java.net.Socket;
 import org.junit.Rule;
 import org.junit.Test;
 
-public abstract class AbstractMuleMessageProtocolReadTestCase extends FunctionalTestCase {
+public abstract class AbstractMuleMessageProtocolReadTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port = new DynamicPort("port");

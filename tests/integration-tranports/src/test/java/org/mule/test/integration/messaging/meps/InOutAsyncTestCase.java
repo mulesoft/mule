@@ -10,13 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-public class InOutAsyncTestCase extends FunctionalTestCase {
+public class InOutAsyncTestCase extends CompatibilityFunctionalTestCase {
 
   public static final long TIMEOUT = 3000;
 
@@ -26,6 +27,7 @@ public class InOutAsyncTestCase extends FunctionalTestCase {
   }
 
   @Test
+  @Ignore("MULE-10184 - ArtifactClassLoaderRunner: groovy issue")
   public void testExchange() throws Exception {
     MuleClient client = muleContext.getClient();
 

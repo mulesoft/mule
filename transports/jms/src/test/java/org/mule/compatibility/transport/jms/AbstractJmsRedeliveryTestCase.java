@@ -12,25 +12,25 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.CounterCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleEventContext;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
-import org.mule.runtime.core.exception.MessageRedeliveredException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.ExceptionNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
+import org.mule.runtime.core.exception.MessageRedeliveredException;
 import org.mule.runtime.core.message.ExceptionMessage;
 import org.mule.runtime.core.util.concurrent.Latch;
 
 import org.junit.After;
 import org.junit.Before;
 
-public abstract class AbstractJmsRedeliveryTestCase extends FunctionalTestCase {
+public abstract class AbstractJmsRedeliveryTestCase extends CompatibilityFunctionalTestCase {
 
   protected static final String JMS_INPUT_QUEUE = "jms://in?connector=jmsConnectorLimitedRedelivery";
   protected static final String JMS_INPUT_QUEUE2 = "jms://in2?connector=jmsConnectorNoRedelivery";

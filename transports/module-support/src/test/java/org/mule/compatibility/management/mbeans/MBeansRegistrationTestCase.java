@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.compatibility.module.management.agent.TransportsJmxApplicationAgent;
 import org.mule.compatibility.module.management.agent.mbean.ConnectorService;
 import org.mule.compatibility.module.management.agent.mbean.EndpointService;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
 import org.mule.runtime.module.management.support.JmxSupport;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import org.junit.Test;
 /**
  * Verify that expected MBeans are registered based on the config.
  */
-public class MBeansRegistrationTestCase extends FunctionalTestCase {
+public class MBeansRegistrationTestCase extends UsesHttpExtensionFunctionalTestCase {
 
   private MBeanServer mBeanServer;
   private String domainName;
@@ -73,7 +73,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase {
   protected List<String> getMBeanClasses() throws MalformedObjectNameException {
     Set<ObjectInstance> mbeans = getMBeans();
     Iterator<ObjectInstance> it = mbeans.iterator();
-    List<String> mbeanClasses = new ArrayList<String>();
+    List<String> mbeanClasses = new ArrayList<>();
     while (it.hasNext()) {
       mbeanClasses.add(it.next().getClassName());
     }

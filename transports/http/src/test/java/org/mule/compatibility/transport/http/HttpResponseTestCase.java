@@ -12,8 +12,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.extension.socket.api.SocketsExtension;
-import org.mule.functional.junit4.ExtensionFunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -30,7 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 
-public class HttpResponseTestCase extends ExtensionFunctionalTestCase {
+public class HttpResponseTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String HTTP_BODY = "<html><head></head><body><p>This is the response body</p></body></html>";
 
@@ -39,11 +38,6 @@ public class HttpResponseTestCase extends ExtensionFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort2 = new DynamicPort("port2");
-
-  @Override
-  protected Class<?>[] getAnnotatedExtensionClasses() {
-    return new Class[] {SocketsExtension.class, org.mule.extension.http.internal.HttpConnector.class};
-  }
 
   @Override
   protected String getConfigFile() {

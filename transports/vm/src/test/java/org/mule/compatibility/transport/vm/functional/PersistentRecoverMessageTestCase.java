@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.vm.functional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.queue.DefaultQueueConfiguration;
@@ -17,7 +17,7 @@ import org.mule.runtime.core.util.queue.TransactionalQueueManager;
 
 import org.junit.Test;
 
-public class PersistentRecoverMessageTestCase extends FunctionalTestCase {
+public class PersistentRecoverMessageTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String TEST_QUEUE_NAME = "flowOut";
 

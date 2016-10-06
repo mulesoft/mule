@@ -8,26 +8,25 @@ package org.mule.test.integration.exceptions;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.functional.listener.ExceptionListener;
 import org.mule.functional.listener.SystemExceptionListener;
-import org.mule.runtime.core.exception.MessagingException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.transaction.TransactionCoordination;
 
 import org.junit.Test;
 
-public class OnErrorContinueTransactionTestCase extends FunctionalTestCase {
+public class OnErrorContinueTransactionTestCase extends CompatibilityFunctionalTestCase {
 
   private static final int TIMEOUT = 5000;
   private static final int SHORT_TIMEOUT = 100;

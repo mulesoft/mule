@@ -8,15 +8,15 @@
 package org.mule.functional.client;
 
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.client.AbstractConnectorMessageProcessorProvider;
 import org.mule.runtime.core.api.client.OperationOptions;
 import org.mule.runtime.core.api.client.RequestCacheKey;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.client.AbstractPriorizableConnectorMessageProcessorProvider;
 
 /**
  * Provider for operations of the Test Connector.
  */
-public class TestConnectorMessageProcessorProvider extends AbstractConnectorMessageProcessorProvider {
+public class TestConnectorMessageProcessorProvider extends AbstractPriorizableConnectorMessageProcessorProvider {
 
   public static final String TEST_URL_PREFIX = "test://";
 
@@ -31,5 +31,10 @@ public class TestConnectorMessageProcessorProvider extends AbstractConnectorMess
   @Override
   public boolean supportsUrl(String url) {
     return url.startsWith(TEST_URL_PREFIX);
+  }
+
+  @Override
+  public int priority() {
+    return 2 * BASE_PRIORITY;
   }
 }

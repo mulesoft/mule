@@ -12,14 +12,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.construct.FlowConstructAware;
+import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.runtime.core.api.message.InternalMessage.Builder;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.message.ds.StringDataSource;
 
@@ -30,7 +30,7 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 
-public class AttachmentsPropagationTestCase extends FunctionalTestCase {
+public class AttachmentsPropagationTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String ATTACHMENT_CONTENT = "<content>";
 

@@ -8,16 +8,17 @@ package org.mule.compatibility.transport.vm.functional;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
 /**
  * Test the propagation of a property in different scopes and in synchronous vs. asynchronous flows.
  */
-public class PropertyScopesTestCase extends FunctionalTestCase {
+public class PropertyScopesTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

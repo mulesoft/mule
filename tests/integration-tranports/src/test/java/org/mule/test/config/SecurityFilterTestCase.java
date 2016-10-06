@@ -12,7 +12,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.processor.Processor;
@@ -31,7 +31,7 @@ import org.junit.Test;
 /**
  * Test configuration of security filters
  */
-public class SecurityFilterTestCase extends FunctionalTestCase {
+public class SecurityFilterTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

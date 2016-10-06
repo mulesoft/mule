@@ -8,9 +8,9 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.CounterCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class PollingReceiversRestartTestCase extends FunctionalTestCase {
+public class PollingReceiversRestartTestCase extends CompatibilityFunctionalTestCase {
 
   private static final int WAIT_TIME = 3000;
 

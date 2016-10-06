@@ -9,9 +9,10 @@ package org.mule.test.integration.transport.jms.scripting;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ import org.junit.Test;
  * endpoints are jms ones. Subclasses must provide the service configuration through the implementation of
  * {@link FunctionalTestCase#getConfigFile()}.
  */
-public abstract class AbstractJmsRequestFromScriptTestCase extends FunctionalTestCase {
+public abstract class AbstractJmsRequestFromScriptTestCase extends CompatibilityFunctionalTestCase {
 
   /**
    * Requests jms message from inside a groovy script which run as part of a service defined using jms endpoints. The first part

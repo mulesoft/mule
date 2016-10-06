@@ -10,16 +10,16 @@ package org.mule.test.usecases.routing.response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
 /**
  * Test the request-reply construct in flows
  */
-public class RequestReplyInFlowTestCase extends FunctionalTestCase {
+public class RequestReplyInFlowTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

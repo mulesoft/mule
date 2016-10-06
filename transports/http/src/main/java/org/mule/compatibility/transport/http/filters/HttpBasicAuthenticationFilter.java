@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * <code>HttpBasicAuthenticationFilter</code> TODO
  */
-public class HttpBasicAuthenticationFilter extends org.mule.runtime.module.http.internal.filter.HttpBasicAuthenticationFilter {
+public class HttpBasicAuthenticationFilter extends org.mule.extension.http.api.listener.HttpBasicAuthenticationFilter {
 
   /**
    * logger used by this class

@@ -8,7 +8,7 @@ package org.mule.compatibility.transport.http;
 
 import static org.junit.Assert.fail;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.runtime.core.api.MuleContext;
 
@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class ConflictedHttpsTlsConfigTestCase extends FunctionalTestCase {
+public class ConflictedHttpsTlsConfigTestCase extends CompatibilityFunctionalTestCase {
 
   private int configNumber;
 
@@ -44,7 +44,7 @@ public class ConflictedHttpsTlsConfigTestCase extends FunctionalTestCase {
   }
 
   public void assertExceptionIsOfType(Throwable ex, Class<? extends Throwable> type) {
-    Set<Throwable> seen = new HashSet<Throwable>();
+    Set<Throwable> seen = new HashSet<>();
 
     while (true) {
       if (type.isInstance(ex)) {

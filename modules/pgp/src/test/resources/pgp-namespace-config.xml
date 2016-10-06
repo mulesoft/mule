@@ -14,7 +14,7 @@
         <spring:property name="secretAliasId" value="6247672658342245276"/>
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
-    <spring:bean id="fakeCredentialAccessor" class="org.mule.runtime.module.pgp.FakeCredentialAccessor" />
+    <spring:bean id="fakeCredentialAccessor" class="org.mule.test.module.pgp.FakeCredentialAccessor" />
 
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>

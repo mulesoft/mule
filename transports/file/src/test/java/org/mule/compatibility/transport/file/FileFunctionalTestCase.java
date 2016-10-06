@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.compatibility.transport.file.FileConnector;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.io.BufferedReader;

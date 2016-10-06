@@ -9,10 +9,11 @@ package org.mule.compatibility.transport.tcp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -23,7 +24,7 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TcpRemoteSyncTestCase extends FunctionalTestCase {
+public class TcpRemoteSyncTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String message = "mule";
 

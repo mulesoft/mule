@@ -9,14 +9,14 @@ package org.mule.test.integration.transport.jms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public class ComponentBindingTestCase extends FunctionalTestCase {
+public class ComponentBindingTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

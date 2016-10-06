@@ -6,15 +6,15 @@
  */
 package org.mule.compatibility.transport.file;
 
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mule.runtime.core.util.FileUtils.newFile;
-import static org.mule.runtime.core.util.FileUtils.writeStringToFile;
 
 import org.mule.compatibility.core.api.transport.Connector;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-public class FileComparatorTestCase extends FunctionalTestCase {
+public class FileComparatorTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String FILE_CONNECTOR_NAME = "fileConnector";
   public static final int TIMEOUT = 50000;

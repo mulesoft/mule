@@ -9,10 +9,11 @@ package org.mule.compatibility.transport.http;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.message.ds.ByteArrayDataSource;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -22,7 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class FileAttachmentNameTestCase extends FunctionalTestCase {
+public class FileAttachmentNameTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();

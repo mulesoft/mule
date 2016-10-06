@@ -17,6 +17,7 @@ import static org.mule.runtime.module.http.api.HttpConstants.RequestProperties.H
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
 
 import org.mule.functional.exceptions.FunctionalTestException;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.client.MuleClient;
@@ -28,7 +29,6 @@ import org.mule.runtime.core.util.CharSetUtils;
 import org.mule.runtime.core.util.concurrent.Latch;
 import org.mule.runtime.module.http.api.client.HttpRequestOptions;
 import org.mule.tck.junit4.rule.DynamicPort;
-import org.mule.test.HttpExtensionFuntionalTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +42,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class OnErrorPropagateTestCase extends HttpExtensionFuntionalTestCase {
+public class OnErrorPropagateTestCase extends CompatibilityFunctionalTestCase {
 
   public static final int TIMEOUT = 5000;
   public static final String JSON_REQUEST = "{\"userId\":\"15\"}";

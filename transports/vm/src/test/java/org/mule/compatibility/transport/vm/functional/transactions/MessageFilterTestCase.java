@@ -6,20 +6,20 @@
  */
 package org.mule.compatibility.transport.vm.functional.transactions;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.client.DefaultLocalMuleClient.MESSAGE_FILTERED_ERROR_MESSAGE;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.DefaultMuleException;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.processor.Processor;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * Test transaction behavior when "joinExternal" is set to disallow joining external transactions There is one test per legal
  * transactional behavior (e.g. ALWAYS_BEGIN).
  */
-public class MessageFilterTestCase extends FunctionalTestCase {
+public class MessageFilterTestCase extends CompatibilityFunctionalTestCase {
 
   protected static final Logger logger = LoggerFactory.getLogger(MessageFilterTestCase.class);
 
@@ -45,15 +45,15 @@ public class MessageFilterTestCase extends FunctionalTestCase {
     MuleClient client = muleContext.getClient();
 
     assertThat(client.send("vm://order.validation", "OK", null).getLeft().getDescription(),
-               Is.is(MESSAGE_FILTERED_ERROR_MESSAGE));
+               is(MESSAGE_FILTERED_ERROR_MESSAGE));
     assertEquals("OK(rejected!-1)", rejectMesage);
 
     assertThat(client.send("vm://order.validation", "OK-ABC", null).getLeft().getDescription(),
-               Is.is(MESSAGE_FILTERED_ERROR_MESSAGE));
+               is(MESSAGE_FILTERED_ERROR_MESSAGE));
     assertEquals("OK-ABC(rejected!-2)", rejectMesage);
 
     assertThat(client.send("vm://order.validation", "OK-DEF", null).getLeft().getDescription(),
-               Is.is(MESSAGE_FILTERED_ERROR_MESSAGE));
+               is(MESSAGE_FILTERED_ERROR_MESSAGE));
     assertEquals("OK-DEF(rejected!-1)", rejectMesage);
     rejectMesage = null;
 

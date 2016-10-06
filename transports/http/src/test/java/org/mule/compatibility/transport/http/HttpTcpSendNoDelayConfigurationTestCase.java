@@ -10,12 +10,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.transport.http.HttpConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class HttpTcpSendNoDelayConfigurationTestCase extends FunctionalTestCase {
+public class HttpTcpSendNoDelayConfigurationTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

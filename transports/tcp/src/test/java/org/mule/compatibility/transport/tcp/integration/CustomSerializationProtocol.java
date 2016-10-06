@@ -6,12 +6,17 @@
  */
 package org.mule.compatibility.transport.tcp.integration;
 
+import static java.lang.Thread.currentThread;
+
 import org.mule.compatibility.transport.tcp.protocols.DirectProtocol;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.io.input.ClassLoaderObjectInputStream;
+import org.apache.commons.lang.SerializationException;
 import org.apache.commons.lang.SerializationUtils;
 
 public class CustomSerializationProtocol extends DirectProtocol {
@@ -37,7 +42,13 @@ public class CustomSerializationProtocol extends DirectProtocol {
     if (tmp == null) {
       return null;
     } else {
-      MessageObject serializableObject = (MessageObject) SerializationUtils.deserialize(tmp);
+      MessageObject serializableObject;
+      try (ClassLoaderObjectInputStream ois =
+          new ClassLoaderObjectInputStream(currentThread().getContextClassLoader(), new ByteArrayInputStream(tmp))) {
+        serializableObject = ((MessageObject) ois.readObject());
+      } catch (ClassNotFoundException e) {
+        throw new SerializationException(e);
+      }
       return new NonSerializableMessageObject(serializableObject.i, serializableObject.s, serializableObject.b);
     }
   }

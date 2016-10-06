@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.module.spring.security;
 
-import org.mule.runtime.module.spring.security.SecureHttpPollingFunctionalTestCase;
+import org.mule.test.module.spring.security.SecureHttpPollingFunctionalTestCase;
 
 public class SSSecureHttpPollingFunctionalTestCase extends SecureHttpPollingFunctionalTestCase {
 

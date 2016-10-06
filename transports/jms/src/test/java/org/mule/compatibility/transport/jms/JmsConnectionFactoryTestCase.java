@@ -10,15 +10,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.compatibility.transport.jms.JmsConnector;
 import org.mule.compatibility.transport.jms.test.TestConnectionFactory;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import javax.jms.ConnectionFactory;
 
 import org.junit.Test;
 
-public class JmsConnectionFactoryTestCase extends FunctionalTestCase {
+public class JmsConnectionFactoryTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

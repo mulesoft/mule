@@ -10,12 +10,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
 
 import org.junit.Test;
 
-public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase {
+public class InheritedPropertiesMule2458TestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

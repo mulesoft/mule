@@ -11,9 +11,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalStreamingTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
  */
-public class StreamingTestCase extends FunctionalTestCase {
+public class StreamingTestCase extends CompatibilityFunctionalTestCase {
 
   public static final int TIMEOUT = 300000;
   public static final String TEST_MESSAGE = "Test TCP Request";

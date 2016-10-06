@@ -8,16 +8,15 @@ package org.mule.compatibility.transport.jms.integration.routing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class ComponentBindingTestCase extends FunctionalTestCase {
+public class ComponentBindingTestCase extends CompatibilityFunctionalTestCase {
 
   private static final int number = 0xC0DE;
 

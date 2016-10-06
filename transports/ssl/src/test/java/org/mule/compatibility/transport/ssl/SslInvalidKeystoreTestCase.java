@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.ssl;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.connector.ConnectException;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
@@ -18,7 +18,7 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SslInvalidKeystoreTestCase extends FunctionalTestCase implements ExceptionCallback {
+public class SslInvalidKeystoreTestCase extends CompatibilityFunctionalTestCase implements ExceptionCallback {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");

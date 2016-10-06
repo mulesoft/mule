@@ -17,7 +17,7 @@ import org.mule.compatibility.transport.jms.mulemq.MuleMQJmsConnector;
 import org.mule.compatibility.transport.jms.mulemq.MuleMQXAJmsConnector;
 import org.mule.compatibility.transport.jms.weblogic.WeblogicJmsConnector;
 import org.mule.compatibility.transport.jms.websphere.WebsphereJmsConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import javax.jms.ConnectionFactory;
 
@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * Tests the "jms" namespace for vendor-specific configs.
  */
-public class JmsVendorNamespaceHandlerTestCase extends FunctionalTestCase {
+public class JmsVendorNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   public JmsVendorNamespaceHandlerTestCase() {
     setStartContext(false);

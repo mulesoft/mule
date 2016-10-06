@@ -13,6 +13,7 @@ import static org.mule.compatibility.core.api.config.MuleEndpointProperties.OBJE
 import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.registerEndpoint;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REMOTE_SYNC_PROPERTY;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
@@ -20,10 +21,9 @@ import org.mule.compatibility.core.endpoint.EndpointURIEndpointBuilder;
 import org.mule.compatibility.core.endpoint.URIBuilder;
 import org.mule.compatibility.module.client.MuleClient;
 import org.mule.compatibility.transport.jms.JmsTransactionFactory;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
-import org.mule.runtime.core.api.execution.ExecutionCallback;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.execution.TransactionalExecutionTemplate;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class MuleClientTransactionTestCase extends FunctionalTestCase {
+public class MuleClientTransactionTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
@@ -68,18 +68,14 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase {
 
     ExecutionTemplate<Void> executionTemplate =
         TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
-    executionTemplate.execute(new ExecutionCallback<Void>() {
-
-      @Override
-      public Void process() throws Exception {
-        for (int i = 0; i < 100; i++) {
-          client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
-        }
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        assertNotNull(tx);
-        tx.setRollbackOnly();
-        return null;
+    executionTemplate.execute(() -> {
+      for (int i = 0; i < 100; i++) {
+        client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
       }
+      Transaction tx = TransactionCoordination.getInstance().getTransaction();
+      assertNotNull(tx);
+      tx.setRollbackOnly();
+      return null;
     });
 
     InternalMessage result = client.request("jms://replyTo.queue", 2000);
@@ -113,15 +109,11 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase {
     ExecutionTemplate<Void> executionTemplate =
         TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
     try {
-      executionTemplate.execute(new ExecutionCallback<Void>() {
-
-        @Override
-        public Void process() throws Exception {
-          for (int i = 0; i < 100; i++) {
-            client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
-          }
-          throw new Exception();
+      executionTemplate.execute(() -> {
+        for (int i = 0; i < 100; i++) {
+          client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
         }
+        throw new Exception();
       });
       fail();
     } catch (Exception e) {
@@ -159,15 +151,11 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase {
 
     ExecutionTemplate<Void> executionTemplate =
         TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
-    executionTemplate.execute(new ExecutionCallback<Void>() {
-
-      @Override
-      public Void process() throws Exception {
-        for (int i = 0; i < 100; i++) {
-          client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
-        }
-        return null;
+    executionTemplate.execute(() -> {
+      for (int i = 0; i < 100; i++) {
+        client.send("jms://test.queue", "Test Client Dispatch message " + i, props);
       }
+      return null;
     });
 
     for (int i = 0; i < 100; i++) {
@@ -184,16 +172,12 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase {
     tc.setFactory(new JmsTransactionFactory());
     ExecutionTemplate<Void> executionTemplate =
         TransactionalExecutionTemplate.createTransactionalExecutionTemplate(muleContext, tc);
-    executionTemplate.execute(new ExecutionCallback<Void>() {
-
-      @Override
-      public Void process() throws Exception {
-        while (client.request("jms://replyTo.queue", 2000) != null) {
-          // munch..
-        }
-
-        return null;
+    executionTemplate.execute(() -> {
+      while (client.request("jms://replyTo.queue", 2000) != null) {
+        // munch..
       }
+
+      return null;
     });
   }
 

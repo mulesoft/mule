@@ -8,7 +8,7 @@ package org.mule.test.integration.streaming;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.PollingProber;
@@ -21,7 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("MULE-6926: Flaky test - fails on build server")
-public class FileToTcpStreamingTestCase extends FunctionalTestCase {
+public class FileToTcpStreamingTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort port1 = new DynamicPort("port1");

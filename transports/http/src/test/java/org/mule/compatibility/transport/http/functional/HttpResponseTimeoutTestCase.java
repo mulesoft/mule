@@ -8,15 +8,15 @@ package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.module.http.api.client.HttpRequestOptionsBuilder.newOptions;
+
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.connector.DispatchException;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.runtime.core.util.ExceptionUtils;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -31,7 +31,7 @@ import org.junit.Test;
  * See MULE-4491 "Http outbound endpoint does not use responseTimeout attribute" See MULE-4743 "MuleClient.send() timeout is not
  * respected with http transport"
  */
-public class HttpResponseTimeoutTestCase extends FunctionalTestCase {
+public class HttpResponseTimeoutTestCase extends CompatibilityFunctionalTestCase {
 
   protected static String PAYLOAD = "Eugene";
   protected static int DEFAULT_RESPONSE_TIMEOUT = 2000;

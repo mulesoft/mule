@@ -10,11 +10,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.mule.compatibility.module.client.MuleClient;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class OutboundTransactionsTestCase extends FunctionalTestCase {
+public class OutboundTransactionsTestCase extends CompatibilityFunctionalTestCase {
 
   private static final int TIMEOUT = 2000;
 

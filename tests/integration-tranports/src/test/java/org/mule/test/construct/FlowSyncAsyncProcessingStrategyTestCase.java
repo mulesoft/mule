@@ -6,7 +6,7 @@
  */
 package org.mule.test.construct;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.listener.FlowExecutionListener;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.util.FileUtils;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import junit.framework.Assert;
 
-public class FlowSyncAsyncProcessingStrategyTestCase extends FunctionalTestCase {
+public class FlowSyncAsyncProcessingStrategyTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String SLEEP_TIME = "sleepTime";
   private static final String FILE_PATH = "./test/testfile.txt";

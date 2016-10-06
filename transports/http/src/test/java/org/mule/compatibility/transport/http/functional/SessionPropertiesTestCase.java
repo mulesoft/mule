@@ -7,11 +7,10 @@
 package org.mule.compatibility.transport.http.functional;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.io.Serializable;
@@ -23,7 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Session properties are not supported anymore")
-public class SessionPropertiesTestCase extends FunctionalTestCase {
+public class SessionPropertiesTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort1 = new DynamicPort("port1");

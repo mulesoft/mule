@@ -11,11 +11,11 @@ import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.Event;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.transformer.AbstractMessageTransformer;
 import org.mule.tck.junit4.rule.DynamicPort;
@@ -25,7 +25,7 @@ import java.nio.charset.Charset;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpOutboundDataTypeTestCase extends FunctionalTestCase {
+public class HttpOutboundDataTypeTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort httpPort = new DynamicPort("httpPort");

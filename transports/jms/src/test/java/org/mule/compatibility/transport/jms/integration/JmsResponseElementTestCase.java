@@ -9,14 +9,15 @@ package org.mule.compatibility.transport.jms.integration;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_PROPERTY;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.hamcrest.core.Is;
 import org.junit.Test;
 
-public class JmsResponseElementTestCase extends FunctionalTestCase {
+public class JmsResponseElementTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String MESSAGE = "A Message";
   public static final String EXPECTED_MODIFIED_MESSAGE = "A Message jms flow content";

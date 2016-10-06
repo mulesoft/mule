@@ -13,13 +13,13 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
 
 import org.junit.Test;
 
-public class DefaultRetryPolicyTestCase extends FunctionalTestCase {
+public class DefaultRetryPolicyTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

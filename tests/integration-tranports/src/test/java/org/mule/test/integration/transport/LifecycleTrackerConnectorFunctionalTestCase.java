@@ -9,11 +9,11 @@ package org.mule.test.integration.transport;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 
 import org.junit.Test;
 
-public class LifecycleTrackerConnectorFunctionalTestCase extends FunctionalTestCase {
+public class LifecycleTrackerConnectorFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

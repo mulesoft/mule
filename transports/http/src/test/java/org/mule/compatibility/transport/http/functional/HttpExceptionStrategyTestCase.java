@@ -16,9 +16,9 @@ import static org.junit.Assert.assertThat;
 import static org.mule.compatibility.transport.http.HttpConstants.SC_FORBIDDEN;
 import static org.mule.runtime.module.http.api.HttpConstants.ResponseProperties.HTTP_STATUS_PROPERTY;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.ExceptionPayload;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
+import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.MessagingException;
@@ -27,7 +27,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class HttpExceptionStrategyTestCase extends FunctionalTestCase {
+public class HttpExceptionStrategyTestCase extends CompatibilityFunctionalTestCase {
 
   private static final int TIMEOUT = 3000;
 

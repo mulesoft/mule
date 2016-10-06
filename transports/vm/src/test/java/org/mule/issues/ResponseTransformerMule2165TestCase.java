@@ -9,14 +9,14 @@ package org.mule.issues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import org.junit.Test;
 
-public class ResponseTransformerMule2165TestCase extends FunctionalTestCase {
+public class ResponseTransformerMule2165TestCase extends CompatibilityFunctionalTestCase {
 
   public static final long TIMEOUT = 2000L;
   public static final String MESSAGE = "a message";

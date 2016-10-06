@@ -11,9 +11,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 
 import java.io.File;
 
@@ -22,7 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore("This is abstract")
-public class AbstractFileRecursiveFilterTestCase extends FunctionalTestCase {
+public class AbstractFileRecursiveFilterTestCase extends CompatibilityFunctionalTestCase {
 
   @Before
   public void setUpFile() throws Exception {

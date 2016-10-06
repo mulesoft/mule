@@ -6,8 +6,7 @@
  */
 package org.mule.compatibility.transport.file;
 
-import org.mule.compatibility.transport.file.FileConnector;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.util.FileUtils;
 import org.mule.tck.probe.PollingProber;
@@ -24,7 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class FileMoveToFunctionalTestCase extends FunctionalTestCase {
+public class FileMoveToFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String INPUT_DIRECTORY_PROPERTY = "FileMoveToFunctionalTestCase-inputDirectory";
 
@@ -88,7 +87,7 @@ public class FileMoveToFunctionalTestCase extends FunctionalTestCase {
   }
 
   private List<File> createFiles(TemporaryFolder folder, int amount, int size) throws IOException {
-    List<File> files = new ArrayList<File>(size);
+    List<File> files = new ArrayList<>(size);
 
     for (int i = 0; i < amount; i++) {
       File tempInputFile = createFile(folder, String.valueOf(i), size);

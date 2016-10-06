@@ -13,7 +13,7 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 
 import org.mule.compatibility.core.transport.AbstractConnector;
 import org.mule.compatibility.core.transport.service.DefaultEndpointAwareTransformer;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.transformer.NoActionTransformer;
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -22,7 +22,7 @@ import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 
 import org.junit.Test;
 
-public class ServiceOverridesMule1770TestCase extends FunctionalTestCase {
+public class ServiceOverridesMule1770TestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

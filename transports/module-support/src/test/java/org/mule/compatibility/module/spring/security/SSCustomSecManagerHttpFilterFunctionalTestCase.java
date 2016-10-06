@@ -6,7 +6,7 @@
  */
 package org.mule.compatibility.module.spring.security;
 
-import org.mule.runtime.module.spring.security.CustomSecManagerHttpFilterFunctionalTestCase;
+import org.mule.test.module.spring.security.CustomSecManagerHttpFilterFunctionalTestCase;
 
 public class SSCustomSecManagerHttpFilterFunctionalTestCase extends CustomSecManagerHttpFilterFunctionalTestCase {
 

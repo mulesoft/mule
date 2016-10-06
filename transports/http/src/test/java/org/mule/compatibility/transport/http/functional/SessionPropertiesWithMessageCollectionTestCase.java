@@ -9,7 +9,7 @@ package org.mule.compatibility.transport.http.functional;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.DefaultEventContext;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleEventContext;
@@ -29,7 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @Ignore("Session properties are not supported anymore")
-public class SessionPropertiesWithMessageCollectionTestCase extends FunctionalTestCase {
+public class SessionPropertiesWithMessageCollectionTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort1 = new DynamicPort("port1");

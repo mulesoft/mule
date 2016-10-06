@@ -9,16 +9,16 @@ package org.mule.issues;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.EventCallback;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 
-public class MulticastRouterMule2112TestCase extends FunctionalTestCase {
+public class MulticastRouterMule2112TestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

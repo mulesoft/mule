@@ -11,7 +11,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -22,7 +21,7 @@ import org.mule.compatibility.core.api.config.MuleEndpointProperties;
 import org.mule.compatibility.core.api.endpoint.EndpointFactory;
 import org.mule.compatibility.core.api.endpoint.ImmutableEndpoint;
 import org.mule.compatibility.core.api.endpoint.OutboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.UsesHttpExtensionFunctionalTestCase;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.component.JavaComponent;
@@ -35,10 +34,9 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 
 import java.util.List;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
-public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends FunctionalTestCase {
+public abstract class AbstractScriptWithBindingsConfigBuilderTestCase extends UsesHttpExtensionFunctionalTestCase {
 
   // use legacy entry point resolver?
   private boolean legacy;

@@ -13,8 +13,7 @@ import static org.mockito.Mockito.verify;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.compatibility.transport.jms.XaTransactedJmsMessageReceiver;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.CreateException;
 import org.mule.tck.probe.PollingProber;
@@ -24,7 +23,7 @@ import javax.jms.MessageConsumer;
 
 import org.junit.Test;
 
-public class XaPollingTimeoutTestCase extends FunctionalTestCase {
+public class XaPollingTimeoutTestCase extends CompatibilityFunctionalTestCase {
 
   private static MessageConsumer messageConsumer = mock(MessageConsumer.class);
 

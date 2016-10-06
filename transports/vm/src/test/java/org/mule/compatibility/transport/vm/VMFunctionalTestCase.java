@@ -9,13 +9,12 @@ package org.mule.compatibility.transport.vm;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.store.QueueStore;
 import org.mule.runtime.core.util.queue.DelegateQueueManager;
@@ -27,7 +26,7 @@ import java.io.Serializable;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class VMFunctionalTestCase extends FunctionalTestCase {
+public class VMFunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public SystemProperty useOldQueueMode = new SystemProperty(DelegateQueueManager.MULE_QUEUE_OLD_MODE_KEY, "true");

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.construct.Flow;
 import org.mule.tck.junit4.rule.DynamicPort;
 
@@ -26,7 +26,7 @@ import org.junit.Test;
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
  */
-public class Http10FunctionalTestCase extends FunctionalTestCase {
+public class Http10FunctionalTestCase extends CompatibilityFunctionalTestCase {
 
   @Rule
   public DynamicPort dynamicPort = new DynamicPort("port1");

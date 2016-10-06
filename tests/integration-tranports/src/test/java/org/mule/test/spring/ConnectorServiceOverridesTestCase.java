@@ -14,7 +14,7 @@ import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
 import org.mule.compatibility.core.api.transport.MessageReceiver;
 import org.mule.compatibility.core.api.transport.MuleMessageFactory;
 import org.mule.compatibility.core.transport.service.TransportServiceDescriptor;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.MessageExchangePattern;
 import org.mule.runtime.core.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.transaction.XaTransactionFactory;
@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class ConnectorServiceOverridesTestCase extends FunctionalTestCase {
+public class ConnectorServiceOverridesTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

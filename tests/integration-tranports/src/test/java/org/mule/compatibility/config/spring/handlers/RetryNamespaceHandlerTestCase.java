@@ -11,9 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.mule.compatibility.core.api.transport.Connector;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.test.config.spring.handlers.TestRetryNotifier;
-import org.mule.test.config.spring.handlers.TestRetryPolicyTemplate;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.RetryPolicyTemplate;
 import org.mule.runtime.core.retry.async.AsynchronousRetryTemplate;
@@ -21,10 +19,12 @@ import org.mule.runtime.core.retry.notifiers.ConnectNotifier;
 import org.mule.runtime.core.retry.policies.NoRetryPolicyTemplate;
 import org.mule.runtime.core.retry.policies.RetryForeverPolicyTemplate;
 import org.mule.runtime.core.retry.policies.SimpleRetryPolicyTemplate;
+import org.mule.test.config.spring.handlers.TestRetryNotifier;
+import org.mule.test.config.spring.handlers.TestRetryPolicyTemplate;
 
 import org.junit.Test;
 
-public class RetryNamespaceHandlerTestCase extends FunctionalTestCase {
+public class RetryNamespaceHandlerTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

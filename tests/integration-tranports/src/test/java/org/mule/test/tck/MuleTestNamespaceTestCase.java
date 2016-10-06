@@ -14,12 +14,12 @@ import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPool;
 import org.mule.compatibility.core.transport.ConfigurableKeyedObjectPoolFactory;
 import org.mule.compatibility.core.transport.DefaultConfigurableKeyedObjectPool;
 import org.mule.compatibility.core.transport.DefaultConfigurableKeyedObjectPoolFactory;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.junit.Test;
 
-public class MuleTestNamespaceTestCase extends FunctionalTestCase {
+public class MuleTestNamespaceTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

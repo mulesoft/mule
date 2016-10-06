@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.util.FileUtils;
@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class KeepOriginalFilePropertiesTestCase extends FunctionalTestCase {
+public class KeepOriginalFilePropertiesTestCase extends CompatibilityFunctionalTestCase {
 
   private static final String OUT_QUEUE = "vm://file.outbox";
   private static final String TEST_FILENAME = "original.txt";

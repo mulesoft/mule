@@ -10,12 +10,12 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.functional.functional.FunctionalTestComponent;
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.api.client.MuleClient;
 import org.mule.runtime.core.api.context.notification.ExceptionNotificationListener;
 import org.mule.runtime.core.api.context.notification.TransactionNotificationListener;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.context.notification.TransactionNotification;
 import org.mule.runtime.core.util.concurrent.Latch;
 
@@ -27,7 +27,7 @@ import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ExceptionStrategyExceptionPatternTestCase extends FunctionalTestCase {
+public class ExceptionStrategyExceptionPatternTestCase extends CompatibilityFunctionalTestCase {
 
   public static final String PAYLOAD = "some text";
   public static final int TIMEOUT = 5000;

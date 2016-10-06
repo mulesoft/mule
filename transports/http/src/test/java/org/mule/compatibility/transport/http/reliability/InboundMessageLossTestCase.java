@@ -9,14 +9,8 @@ package org.mule.compatibility.transport.http.reliability;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethodBase;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.Rule;
-import org.junit.Test;
-
 import org.mule.compatibility.transport.http.HttpConstants;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.runtime.core.exception.AbstractMessagingExceptionStrategy;
@@ -26,6 +20,12 @@ import org.mule.runtime.core.message.DefaultExceptionPayload;
 import org.mule.runtime.core.routing.filters.WildcardFilter;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Rule;
+import org.junit.Test;
+
 /**
  * Verify that no inbound messages are lost when exceptions occur. The message must either make it all the way to the SEDA queue
  * (in the case of an asynchronous inbound endpoint), or be restored/rolled back at the source.
@@ -33,7 +33,7 @@ import org.mule.tck.junit4.rule.DynamicPort;
  * In the case of the HTTP transport, there is no way to restore the source message so an exception is simply returned to the
  * client.
  */
-public class InboundMessageLossTestCase extends FunctionalTestCase {
+public class InboundMessageLossTestCase extends CompatibilityFunctionalTestCase {
 
   protected HttpClient httpClient = new HttpClient();
 

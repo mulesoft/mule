@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 import org.mule.runtime.core.api.MuleException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
-public class ForEachSessionVarTestCase extends FunctionalTestCase {
+public class ForEachSessionVarTestCase extends CompatibilityFunctionalTestCase {
 
   protected static Event event;
   private static final String MY_SESSION_LIST = "mySessionList";

@@ -8,9 +8,9 @@ package org.mule.test.core;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import org.mule.functional.junit4.FunctionalTestCase;
+
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.Event;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTestCase {
+public class SessionPropertiesInExceptionStrategyTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {
@@ -27,7 +27,7 @@ public class SessionPropertiesInExceptionStrategyTestCase extends FunctionalTest
 
   @Test
   public void sessionPropertyIsNotLost() throws Exception {
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     list.add("one");
     list.add("two");
     list.add("three");

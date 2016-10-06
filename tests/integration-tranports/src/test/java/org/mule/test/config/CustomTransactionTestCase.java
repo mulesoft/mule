@@ -13,13 +13,13 @@ import static org.mule.compatibility.core.registry.MuleRegistryTransportHelper.l
 
 import org.mule.compatibility.core.api.endpoint.EndpointBuilder;
 import org.mule.compatibility.core.api.endpoint.InboundEndpoint;
-import org.mule.functional.junit4.FunctionalTestCase;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import org.junit.Test;
 
-public class CustomTransactionTestCase extends FunctionalTestCase {
+public class CustomTransactionTestCase extends CompatibilityFunctionalTestCase {
 
   @Override
   protected String getConfigFile() {

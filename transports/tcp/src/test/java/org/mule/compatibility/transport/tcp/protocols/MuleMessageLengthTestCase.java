@@ -8,15 +8,15 @@ package org.mule.compatibility.transport.tcp.protocols;
 
 import static org.junit.Assert.assertEquals;
 
-import org.mule.functional.junit4.FunctionalTestCase;
-import org.mule.runtime.core.api.message.InternalMessage;
+import org.mule.functional.extensions.CompatibilityFunctionalTestCase;
 import org.mule.runtime.core.api.client.MuleClient;
+import org.mule.runtime.core.api.message.InternalMessage;
 import org.mule.tck.junit4.rule.DynamicPort;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MuleMessageLengthTestCase extends FunctionalTestCase {
+public class MuleMessageLengthTestCase extends CompatibilityFunctionalTestCase {
 
   protected static String TEST_MESSAGE = "Test TCP Request";
 
