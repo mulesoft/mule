@@ -11,7 +11,6 @@ import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescripto
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.isVoid;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.subTypesUnion;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -24,7 +23,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.extension.api.introspection.OutputModel;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 /**
  * Metadata service delegate implementations that handles the resolution
@@ -34,11 +32,8 @@ import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
  */
 class MetadataOutputDelegate extends BaseMetadataDelegate {
 
-  private final SubTypesMappingContainer typesMapping;
-
-  public MetadataOutputDelegate(RuntimeComponentModel componentModel, SubTypesMappingContainer subTypesMappingContainer) {
+  public MetadataOutputDelegate(RuntimeComponentModel componentModel) {
     super(componentModel);
-    typesMapping = subTypesMappingContainer;
   }
 
   /**
@@ -83,10 +78,10 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
   private MetadataResult<MetadataType> getOutputMetadata(final MetadataContext context, final Object key) {
     OutputModel output = component.getOutput();
     if (isVoid(output.getType()) || !output.hasDynamicType()) {
-      return success(subTypesUnion(output.getType(), typesMapping));
+      return success(output.getType());
     }
 
-    return resolveMetadataType(false, subTypesUnion(output.getType(), typesMapping),
+    return resolveMetadataType(false, output.getType(),
                                () -> resolverFactory.getOutputResolver().getOutputType(context, key), "Output");
   }
 
@@ -101,10 +96,10 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
   private MetadataResult<MetadataType> getOutputAttributesMetadata(final MetadataContext context, Object key) {
     OutputModel attributes = component.getOutputAttributes();
     if (isVoid(attributes.getType()) || !attributes.hasDynamicType()) {
-      return success(subTypesUnion(attributes.getType(), typesMapping));
+      return success(attributes.getType());
     }
 
-    return resolveMetadataType(false, subTypesUnion(attributes.getType(), typesMapping),
+    return resolveMetadataType(false, attributes.getType(),
                                () -> resolverFactory.getOutputAttributesResolver().getAttributesMetadata(context, key),
                                "OutputAttributes");
   }

@@ -28,17 +28,11 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.introspection.ComponentModel;
-import org.mule.runtime.extension.api.introspection.ExtensionModel;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
-import org.mule.runtime.extension.api.introspection.RuntimeExtensionModel;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
 import org.mule.runtime.extension.api.introspection.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.extension.api.introspection.property.SubTypesModelProperty;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-
-import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 
@@ -63,15 +57,14 @@ public class MetadataMediator {
 
 
 
-  public MetadataMediator(RuntimeExtensionModel extensionModel, RuntimeComponentModel componentModel) {
+  public MetadataMediator(RuntimeComponentModel componentModel) {
     this.component = componentModel;
     this.metadataKeyParts = getMetadataKeyParts(componentModel);
     this.keyIdObjectResolver = new MetadataKeyIdObjectResolver(componentModel, metadataKeyParts);
     this.keysDelegate = new MetadataKeysDelegate(componentModel, metadataKeyParts);
 
-    SubTypesMappingContainer subTypesMappingContainer = getSubTypesMappingContainer(extensionModel);
-    this.outputDelegate = new MetadataOutputDelegate(componentModel, subTypesMappingContainer);
-    this.inputDelegate = new MetadataInputDelegate(componentModel, subTypesMappingContainer);
+    this.outputDelegate = new MetadataOutputDelegate(componentModel);
+    this.inputDelegate = new MetadataInputDelegate(componentModel);
   }
 
   /**
@@ -156,15 +149,6 @@ public class MetadataMediator {
         .build();
 
     return mergeResults(componentDescriptor, output, input);
-  }
-
-
-  /**
-   * @return the {@link SubTypesMappingContainer} associated to the extensionModel.
-   */
-  private SubTypesMappingContainer getSubTypesMappingContainer(ExtensionModel extensionModel) {
-    return new SubTypesMappingContainer(extensionModel.getModelProperty(SubTypesModelProperty.class)
-        .map(SubTypesModelProperty::getSubTypesMapping).orElse(ImmutableMap.of()));
   }
 
   private List<ParameterModel> getMetadataKeyParts(RuntimeComponentModel componentModel) {

@@ -33,12 +33,10 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.impl.DefaultUnionType;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
@@ -53,13 +51,12 @@ import org.mule.runtime.core.internal.metadata.DefaultMetadataCache;
 import org.mule.runtime.core.internal.metadata.MuleMetadataManager;
 import org.mule.runtime.extension.api.introspection.metadata.NullMetadataKey;
 import org.mule.tck.message.StringAttributes;
+import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.animals.SwordFish;
-import org.mule.test.metadata.extension.model.attribute.AnimalsOutputAttributes;
-import org.mule.test.metadata.extension.model.attribute.ShapeOutputAttributes;
-import org.mule.test.metadata.extension.model.shapes.Circle;
+import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
-import org.mule.test.metadata.extension.model.shapes.Square;
+import org.mule.test.metadata.extension.model.shapes.Shape;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
@@ -76,6 +73,7 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
 
   private static final String MESSAGE_ATTRIBUTES_PERSON_TYPE_METADATA = "messageAttributesPersonTypeMetadata";
   private static final String MESSAGE_ATTRIBUTES_NULL_TYPE_METADATA = "messageAttributesNullTypeMetadata";
+  private static final String PAGED_OPERATION_METADATA = "pagedOperationMetadata";
   private static final String CONFIG = "config";
   private static final String ALTERNATIVE_CONFIG = "alternative-config";
 
@@ -258,19 +256,8 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   public void attributesUnionTypeMetadata() throws Exception {
     componentId = new ProcessorId(OUTPUT_ATTRIBUTES_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
 
-    final ComponentMetadataDescriptor metadataDescriptor = getComponentDynamicMetadata();
-
-    MetadataType shapeType = metadataDescriptor.getOutputMetadata().get().getPayloadMetadata().get().getType();
-    assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
-    assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
-    assertThat(((DefaultUnionType) shapeType).getTypes(),
-               hasItems(toMetadataType(Circle.class), toMetadataType(Rectangle.class)));
-
-    MetadataType attributesType = metadataDescriptor.getOutputMetadata().get().getAttributesMetadata().get().getType();
-    assertThat(attributesType, is(instanceOf(DefaultUnionType.class)));
-    assertThat(((DefaultUnionType) attributesType).getTypes(), hasSize(2));
-    assertThat(((DefaultUnionType) attributesType).getTypes(),
-               hasItems(toMetadataType(ShapeOutputAttributes.class), toMetadataType(AnimalsOutputAttributes.class)));
+    final ComponentMetadataDescriptor descriptor = getComponentDynamicMetadata();
+    assertExpectedOutput(descriptor.getOutputMetadata(), Shape.class, AbstractOutputAttributes.class);
   }
 
   @Test
@@ -398,11 +385,10 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
 
   @Test
   public void pagedOperationMetadataTestCase() throws Exception {
-    componentId = new ProcessorId("pagedOperationMetadata", FIRST_PROCESSOR_INDEX);
+    componentId = new ProcessorId(PAGED_OPERATION_METADATA, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> componentMetadata = metadataManager.getMetadata(componentId);
     assertSuccess(componentMetadata);
-    assertExpectedType(componentMetadata.get().getInputMetadata().get().getParameterMetadata("animal"), "animal",
-                       TYPE_LOADER.load(Bear.class), true);
+    assertExpectedType(componentMetadata.get().getInputMetadata().get().getParameterMetadata("animal"), "animal", Animal.class);
   }
 
   @Test
@@ -431,49 +417,16 @@ public class MetadataOperationTestCase extends MetadataExtensionFunctionalTestCa
   }
 
   @Test
-  public void abstractClassWithSubtypesMetadataType() {
+  public void componentWithStaticInputs() throws IOException {
     componentId = new ProcessorId(TYPE_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
     MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId);
     assertSuccess(metadata);
 
-    MetadataResult<ParameterMetadataDescriptor> shapeMetadata =
-        metadata.get().getInputMetadata().get().getParameterMetadata("plainShape");
+    InputMetadataDescriptor input = metadata.get().getInputMetadata().get();
 
-    assertThat(shapeMetadata.get().getName(), is("plainShape"));
-    MetadataType shapeType = shapeMetadata.get().getType();
-    assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
-    assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
-    assertThat(((DefaultUnionType) shapeType).getTypes(),
-               hasItems(toMetadataType(Circle.class), toMetadataType(Rectangle.class)));
-  }
-
-  @Test
-  public void instantiableClassWithSubtypesMetadataType() {
-    componentId = new ProcessorId(TYPE_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId);
-    assertSuccess(metadata);
-
-    MetadataResult<ParameterMetadataDescriptor> rectangleMetadata =
-        metadata.get().getInputMetadata().get().getParameterMetadata("rectangleSubtype");
-    assertThat(rectangleMetadata.get().getName(), is("rectangleSubtype"));
-
-    MetadataType shapeType = rectangleMetadata.get().getType();
-    assertThat(shapeType, is(instanceOf(DefaultUnionType.class)));
-    assertThat(((DefaultUnionType) shapeType).getTypes(), hasSize(2));
-    assertThat(((DefaultUnionType) shapeType).getTypes(),
-               hasItems(toMetadataType(Rectangle.class), toMetadataType(Square.class)));
-  }
-
-  @Test
-  public void interfaceWithSubtypesMetadataType() {
-    componentId = new ProcessorId(TYPE_WITH_DECLARED_SUBTYPES_METADATA, FIRST_PROCESSOR_INDEX);
-    MetadataResult<ComponentMetadataDescriptor> metadata = metadataManager.getMetadata(componentId);
-    assertSuccess(metadata);
-
-    MetadataResult<ParameterMetadataDescriptor> animalMetadata =
-        metadata.get().getInputMetadata().get().getParameterMetadata("animal");
-    assertThat(animalMetadata.get().getName(), is("animal"));
-    assertThat(animalMetadata.get().getType(), is(toMetadataType(Bear.class)));
+    assertExpectedType(input.getParameterMetadata("plainShape"), "plainShape", Shape.class);
+    assertExpectedType(input.getParameterMetadata("animal"), "animal", Animal.class);
+    assertExpectedType(input.getParameterMetadata("rectangleSubtype"), "rectangleSubtype", Rectangle.class);
   }
 
   @Test

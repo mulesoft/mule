@@ -48,9 +48,9 @@ public final class MetadataScopeAdapter {
     Optional<MetadataKeyId> keyId = locateMetadataKeyId(declaration);
 
     inputResolvers = declaration.getParameters().stream()
-            .filter(p -> getAnnotatedElement(p).map(e -> e.isAnnotationPresent(TypeResolver.class)).orElse(false))
-            .collect(toMap(NamedDeclaration::getName,
-                           p -> getAnnotatedElement(p).get().getAnnotation(TypeResolver.class).value()));
+        .filter(p -> getAnnotatedElement(p).map(e -> e.isAnnotationPresent(TypeResolver.class)).orElse(false))
+        .collect(toMap(NamedDeclaration::getName,
+                       p -> getAnnotatedElement(p).get().getAnnotation(TypeResolver.class).value()));
 
     if (outputResolverDeclaration != null || !inputResolvers.isEmpty()) {
       if (outputResolverDeclaration != null) {

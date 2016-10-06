@@ -196,6 +196,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(keyParamMock.getModelProperty(QueryParameterModelProperty.class)).thenReturn(empty());
 
     when(contentMock.getName()).thenReturn("content");
+    when(contentMock.hasDynamicType()).thenReturn(true);
     when(contentMock.getType()).thenReturn(stringType);
     when(contentMock.getModelProperty(MetadataContentModelProperty.class))
         .thenReturn(of(new MetadataContentModelProperty()));

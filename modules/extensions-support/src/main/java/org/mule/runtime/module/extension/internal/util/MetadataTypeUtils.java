@@ -10,22 +10,15 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.NameUtils.getAliasName;
 import org.mule.metadata.api.annotation.EnumAnnotation;
-import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
-import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.ExtensibleTypeAnnotation;
 import org.mule.runtime.extension.api.introspection.declaration.type.annotation.TypeAliasAnnotation;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
-
-import com.google.common.collect.ImmutableList;
 
 import java.lang.reflect.Modifier;
-import java.util.List;
 
 /**
  * Set of utility operations to handle {@link MetadataType}
@@ -67,46 +60,6 @@ public final class MetadataTypeUtils {
         .orElse(metadataType.getMetadataFormat().equals(JAVA)
             ? getAliasName(defaultName, getType(metadataType).getAnnotation(Alias.class))
             : defaultName);
-  }
-
-  /**
-   * Provides a unique way to generate an {@link UnionType} from the SubTypes Mapping declaration for a given {@link MetadataType
-   * baseType}.
-   * <p>
-   * If no subType mapping exists for the given {@link MetadataType baseType}, then the {@code baseType} is returned, without
-   * wrapping it in a new {@link UnionType}.
-   * <p>
-   * When there is a single subtype mapped, then instead of returning an {@link UnionType} of a single {@link MetadataType}, the
-   * subtype is returned.
-   * <p>
-   * In all cases, if the {@link MetadataType baseType} is a concrete implementation, it is also added as a part of the
-   * {@link UnionType}.
-   *
-   * @param baseType the base {@link MetadataType} for which subtypes could be mapped
-   * @param subtypesContainer the {@link SubTypesMappingContainer} used to look for mapped subtypes for the given {@code baseType}
-   * @return The {@code baseType} if no subtypes were present, its subtype if only one mapping is defined, or the {@link UnionType
-   *         union} of all the mapped subtypes for the given {@code baseType}
-   */
-  public static MetadataType subTypesUnion(MetadataType baseType, SubTypesMappingContainer subtypesContainer) {
-    List<MetadataType> subTypes = subtypesContainer.getSubTypes(baseType);
-    if (subTypes.isEmpty()) {
-      return baseType;
-    }
-
-    boolean baseIsInstantiable = isInstantiable(baseType);
-    if (subTypes.size() == 1 && !baseIsInstantiable) {
-      // avoid single type union
-      return subTypes.get(0);
-    }
-
-    ImmutableList.Builder<MetadataType> union = ImmutableList.<MetadataType>builder().addAll(subTypes);
-    if (baseIsInstantiable) {
-      union.add(baseType);
-    }
-
-    UnionTypeBuilder<?> unionTypeBuilder = BaseTypeBuilder.create(baseType.getMetadataFormat()).unionType();
-    union.build().forEach(unionTypeBuilder::of);
-    return unionTypeBuilder.build();
   }
 
   public static boolean isInstantiable(MetadataType metadataType) {

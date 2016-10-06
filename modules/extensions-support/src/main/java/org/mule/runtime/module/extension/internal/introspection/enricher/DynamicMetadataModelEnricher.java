@@ -163,8 +163,8 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
     if (metadataScope.hasInputResolvers()) {
       Set<String> dynamicParameters = metadataScope.getInputResolvers().keySet();
       declaration.getParameters().stream()
-        .filter(p -> dynamicParameters.contains(p.getName()))
-        .forEach(this::declareDynamicType);
+          .filter(p -> dynamicParameters.contains(p.getName()))
+          .forEach(this::declareDynamicType);
     }
   }
 

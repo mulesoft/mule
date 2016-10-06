@@ -10,7 +10,6 @@ import static org.mule.runtime.api.metadata.descriptor.builder.MetadataDescripto
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.mergeResults;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
-import static org.mule.runtime.module.extension.internal.util.MetadataTypeUtils.subTypesUnion;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -25,7 +24,6 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
 import org.mule.runtime.extension.api.introspection.RuntimeComponentModel;
 import org.mule.runtime.extension.api.introspection.parameter.ParameterModel;
-import org.mule.runtime.extension.api.util.SubTypesMappingContainer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,11 +37,8 @@ import java.util.Optional;
  */
 class MetadataInputDelegate extends BaseMetadataDelegate {
 
-  private final SubTypesMappingContainer typesMapping;
-
-  MetadataInputDelegate(RuntimeComponentModel componentModel, SubTypesMappingContainer subTypesMappingContainer) {
+  MetadataInputDelegate(RuntimeComponentModel componentModel) {
     super(componentModel);
-    typesMapping = subTypesMappingContainer;
   }
 
   /**
@@ -85,7 +80,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
                                                                                      MetadataContext context, Object key) {
 
     ParameterMetadataDescriptorBuilder descriptorBuilder = parameterDescriptor(parameter.getName());
-    if (!parameter.hasDynamicType()){
+    if (!parameter.hasDynamicType()) {
       return success(descriptorBuilder.withType(parameter.getType()).build());
     }
 
@@ -109,7 +104,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    */
   private MetadataResult<MetadataType> getParameterMetadata(ParameterModel parameter, MetadataContext context, Object key) {
     boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);
-    return resolveMetadataType(allowsNullType, subTypesUnion(parameter.getType(), typesMapping),
+    return resolveMetadataType(allowsNullType, parameter.getType(),
                                () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key),
                                parameter.getName());
   }
