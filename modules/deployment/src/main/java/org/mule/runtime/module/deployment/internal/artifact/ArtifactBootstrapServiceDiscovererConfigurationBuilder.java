@@ -19,6 +19,7 @@ import org.mule.runtime.core.util.PropertiesUtils;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -30,7 +31,7 @@ import java.util.Properties;
  * the container and will create a {@link BootstrapServiceDiscoverer} for each plugin deployed in the artifact. All the discovered
  * services will then used to configure the context.
  */
-public class ArtifactBootstrapServiceDiscovererContextBuilder extends AbstractConfigurationBuilder {
+public class ArtifactBootstrapServiceDiscovererConfigurationBuilder extends AbstractConfigurationBuilder {
 
   private final List<ArtifactPlugin> artifactPlugins;
 
@@ -39,7 +40,7 @@ public class ArtifactBootstrapServiceDiscovererContextBuilder extends AbstractCo
    *
    * @param artifactPlugins artifact plugins deployed inside an artifact. Non null.
    */
-  public ArtifactBootstrapServiceDiscovererContextBuilder(List<ArtifactPlugin> artifactPlugins) {
+  public ArtifactBootstrapServiceDiscovererConfigurationBuilder(List<ArtifactPlugin> artifactPlugins) {
     checkArgument(artifactPlugins != null, "ArtifactPlugins cannot be null");
     this.artifactPlugins = artifactPlugins;
   }
@@ -53,9 +54,10 @@ public class ArtifactBootstrapServiceDiscovererContextBuilder extends AbstractCo
     bootstrapServices.addAll(propertiesBootstrapServiceDiscoverer.discover());
 
     for (ArtifactPlugin artifactPlugin : artifactPlugins) {
-      final URL localResource = artifactPlugin.getArtifactClassLoader().findResource(BOOTSTRAP_PROPERTIES);
+      final Enumeration<URL> resources = artifactPlugin.getArtifactClassLoader().findResources(BOOTSTRAP_PROPERTIES);
 
-      if (localResource != null) {
+      while (resources.hasMoreElements()) {
+        final URL localResource = resources.nextElement();
         final Properties properties = PropertiesUtils.loadProperties(localResource);
         final BootstrapService pluginBootstrapService =
             new PropertiesBootstrapService(artifactPlugin.getArtifactClassLoader().getClassLoader(), properties);

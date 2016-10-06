@@ -21,6 +21,8 @@ import org.mule.runtime.module.artifact.classloader.ArtifactClassLoader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -33,7 +35,7 @@ import java.util.Properties;
  * {@link BootstrapServiceDiscoverer} for the test itself. All the discovered services will then used to configure the context.
  */
 
-public class TestBootstrapServiceDiscovererContextBuilder extends AbstractConfigurationBuilder {
+public class TestBootstrapServiceDiscovererConfigurationBuilder extends AbstractConfigurationBuilder {
 
   private final ClassLoader containerClassLoader;
   private final ClassLoader executionClassLoader;
@@ -46,8 +48,8 @@ public class TestBootstrapServiceDiscovererContextBuilder extends AbstractConfig
    * @param executionClassLoader class loader corresponding to the isolates test. Non null
    * @param pluginClassLoaders class loaders corresponding to plugins deployed in the test (without any filtering). Non null.
    */
-  public TestBootstrapServiceDiscovererContextBuilder(ClassLoader containerClassLoader, ClassLoader executionClassLoader,
-                                                      List<ArtifactClassLoader> pluginClassLoaders) {
+  public TestBootstrapServiceDiscovererConfigurationBuilder(ClassLoader containerClassLoader, ClassLoader executionClassLoader,
+                                                            List<ArtifactClassLoader> pluginClassLoaders) {
     checkArgument(containerClassLoader != null, "ContainerClassLoader cannot be null");
     checkArgument(executionClassLoader != null, "ExecutionClassLoader cannot be null");
     checkArgument(pluginClassLoaders != null, "PluginClassLoaders cannot be null");
@@ -66,35 +68,35 @@ public class TestBootstrapServiceDiscovererContextBuilder extends AbstractConfig
 
     // Uses Object instead of ArtifactClassLoader because that class was originally loaded from a different class loader
     for (Object pluginClassLoader : pluginClassLoaders) {
-
-      BootstrapService pluginBootstrapService = getArtifactBootstrapService(pluginClassLoader);
-      if (pluginBootstrapService != null) {
-        bootstrapServices.add(pluginBootstrapService);
-      }
+      List<BootstrapService> pluginBootstrapServices = getArtifactBootstrapService(pluginClassLoader);
+      bootstrapServices.addAll(pluginBootstrapServices);
     }
 
-    BootstrapService appBootstrapService = getArtifactBootstrapService(executionClassLoader);
-    if (appBootstrapService != null) {
-      bootstrapServices.add(appBootstrapService);
-    }
+    List<BootstrapService> appBootstrapServices = getArtifactBootstrapService(executionClassLoader);
+    bootstrapServices.addAll(appBootstrapServices);
 
     muleContext.setBootstrapServiceDiscoverer(() -> bootstrapServices);
   }
 
-  private BootstrapService getArtifactBootstrapService(Object pluginClassLoader)
+  private List<BootstrapService> getArtifactBootstrapService(Object artifactClassLoader)
       throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, IOException {
     // Uses reflection to access the class loader as classes were loaded from different class loaders so they cannot be casted
     ClassLoader classLoader =
-        (ClassLoader) pluginClassLoader.getClass().getMethod("getClassLoader").invoke(pluginClassLoader);
-    final URL localResource =
-        (URL) classLoader.getClass().getMethod("findResource", String.class).invoke(classLoader, BOOTSTRAP_PROPERTIES);
+        (ClassLoader) artifactClassLoader.getClass().getMethod("getClassLoader").invoke(artifactClassLoader);
+    final Enumeration<URL> resources =
+        (Enumeration<URL>) classLoader.getClass().getMethod("findResources", String.class).invoke(classLoader,
+                                                                                                  BOOTSTRAP_PROPERTIES);
 
-    BootstrapService pluginBootstrapService = null;
-    if (localResource != null) {
-      final Properties properties = PropertiesUtils.loadProperties(localResource);
-      pluginBootstrapService = new PropertiesBootstrapService(classLoader, properties);
+    final List<BootstrapService> bootstrapServices = new ArrayList<>();
+    if (resources.hasMoreElements()) {
+      while (resources.hasMoreElements()) {
+        final URL localResource = resources.nextElement();
+        final Properties properties = PropertiesUtils.loadProperties(localResource);
+        final PropertiesBootstrapService propertiesBootstrapService = new PropertiesBootstrapService(classLoader, properties);
+        bootstrapServices.add(propertiesBootstrapService);
+      }
     }
 
-    return pluginBootstrapService;
+    return bootstrapServices;
   }
 }
