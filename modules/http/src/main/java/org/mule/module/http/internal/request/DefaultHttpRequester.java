@@ -237,7 +237,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
                                  @Override
                                  public void onFailure(Exception exception)
                                  {
-                                     MessagingException msgException = new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"),
+                                     MessagingException msgException = new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)),
                                                                                               resetMuleEventForNewThread(muleEvent),
                                                                                               exception,
                                                                                               DefaultHttpRequester.this);
@@ -328,7 +328,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
         catch (Exception e)
         {
             checkIfRemotelyClosed(e);
-            throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e, this);
+            throw new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)), muleEvent, e, this);
         }
 
         httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
@@ -344,6 +344,11 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor im
             validateResponse(muleEvent);
         }
         return muleEvent;
+    }
+
+    private String getErrorMessage(HttpRequest httpRequest)
+    {
+        return String.format("Error sending HTTP request to %s", httpRequest.getUri());
     }
 
     private HttpClient getHttpClient()
