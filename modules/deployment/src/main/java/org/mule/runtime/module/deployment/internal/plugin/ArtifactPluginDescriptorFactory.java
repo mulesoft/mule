@@ -32,7 +32,6 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 public class ArtifactPluginDescriptorFactory implements ArtifactDescriptorFactory<ArtifactPluginDescriptor> {
 
-  public static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
   public static final String PLUGIN_PROPERTIES = "plugin.properties";
   public static final String PLUGIN_DEPENDENCIES = "plugin.dependencies";
 
