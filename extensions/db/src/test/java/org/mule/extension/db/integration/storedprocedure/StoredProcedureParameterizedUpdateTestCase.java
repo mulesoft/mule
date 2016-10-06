@@ -7,29 +7,14 @@
 package org.mule.extension.db.integration.storedprocedure;
 
 import static org.junit.Assume.assumeThat;
-import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import org.mule.extension.db.integration.matcher.SupportsReturningStoredProcedureResultsWithoutParameters;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
-
-import java.util.List;
-
-import org.junit.runners.Parameterized;
 
 public class StoredProcedureParameterizedUpdateTestCase extends AbstractStoredProcedureParameterizedUpdateTestCase {
-
-  public StoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
 
   @Override
   public void setupStoredProcedure() throws Exception {
     assumeThat(getDefaultDataSource(), new SupportsReturningStoredProcedureResultsWithoutParameters());
     super.setupStoredProcedure();
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return getResources();
   }
 
   @Override

@@ -36,4 +36,8 @@ public class DbTestUtil {
     assertTrue(format("Update count is neither the expected one %s nor Statement.SUCCESS_NO_INFO", expected),
                expected == actual || Statement.SUCCESS_NO_INFO == actual);
   }
+
+  public enum DbType {
+    MYSQL, ORACLE, DERBY
+  }
 }

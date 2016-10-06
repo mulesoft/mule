@@ -12,8 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import org.mule.extension.db.api.StatementResult;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.TestDbConfig;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
 
 import java.sql.SQLException;
@@ -21,18 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class InsertTestCase extends AbstractDbIntegrationTestCase {
-
-  public InsertTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return TestDbConfig.getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

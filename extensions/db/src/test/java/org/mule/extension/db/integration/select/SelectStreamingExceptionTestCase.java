@@ -12,8 +12,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mule.extension.db.integration.DbTestUtil.DbType.DERBY;
+
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
 import org.mule.runtime.core.exception.MessagingException;
 import org.mule.runtime.core.api.message.InternalMessage;
@@ -29,13 +30,11 @@ public class SelectStreamingExceptionTestCase extends AbstractDbIntegrationTestC
 
   private static final int POOL_CONNECTIONS = 2;
 
-  public SelectStreamingExceptionTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{2}")
   public static List<Object[]> parameters() {
-    return singletonList(new Object[] {"integration/config/derby-pooling-db-config.xml", new DerbyTestDatabase()});
+    final DerbyTestDatabase derbyTestDatabase = new DerbyTestDatabase();
+    return singletonList(new Object[] {"integration/config/derby-pooling-db-config.xml", derbyTestDatabase,
+        derbyTestDatabase.getDbType()});
   }
 
   @Override

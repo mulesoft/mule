@@ -11,10 +11,6 @@ import org.mule.extension.db.integration.model.AbstractTestDatabase;
 
 public class UpdateTimeoutTestCase extends AbstractQueryTimeoutTestCase {
 
-  public UpdateTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
   protected String[] getFlowConfigurationResources() {
     return new String[] {"integration/update/update-timeout-config.xml"};
   }

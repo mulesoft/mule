@@ -18,7 +18,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
 import org.mule.extension.db.integration.TestDbConfig;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.metadata.api.model.ObjectFieldType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
@@ -31,10 +30,6 @@ import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 public class SelectMetadataInputTestCase extends AbstractDbIntegrationTestCase {
-
-  public SelectMetadataInputTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
 
   @Parameterized.Parameters
   public static List<Object[]> parameters() {

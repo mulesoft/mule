@@ -90,7 +90,7 @@ public abstract class DbConnectionProvider implements ConnectionProvider<DbConne
   private DataSource dataSource;
 
   @Override
-  public DbConnection connect() throws ConnectionException {
+  public final DbConnection connect() throws ConnectionException {
     try {
       Connection jdbcConnection = jdbcConnectionFactory.createConnection(dataSource, resolvedCustomTypes);
 

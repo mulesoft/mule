@@ -14,7 +14,6 @@ import static org.mule.extension.db.integration.model.Contact.CONTACT2;
 import static org.mule.extension.db.integration.model.Region.NORTHWEST;
 import static org.mule.extension.db.integration.model.Region.SOUTHWEST;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
 import org.mule.extension.db.integration.model.Record;
@@ -28,16 +27,14 @@ import org.junit.runners.Parameterized;
 
 public class SelectJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
 
-  public SelectJavaArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{2}")
   public static List<Object[]> parameters() {
     List<Object[]> params = new LinkedList<>();
 
     if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
+      final OracleTestDatabase oracleTestDatabase = new OracleTestDatabase();
+      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", oracleTestDatabase,
+          oracleTestDatabase.getDbType()});
     }
 
     return params;

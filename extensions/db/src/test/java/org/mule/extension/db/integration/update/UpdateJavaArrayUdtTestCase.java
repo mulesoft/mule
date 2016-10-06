@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.is;
 import static org.mule.extension.db.integration.TestDbConfig.getOracleResource;
 
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.ContactDetails;
 import org.mule.extension.db.integration.model.OracleTestDatabase;
 import org.mule.runtime.api.message.Message;
@@ -27,16 +26,14 @@ import org.junit.runners.Parameterized;
 
 public class UpdateJavaArrayUdtTestCase extends AbstractDbIntegrationTestCase {
 
-  public UpdateJavaArrayUdtTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{2}")
   public static List<Object[]> parameters() {
     List<Object[]> params = new LinkedList<>();
 
     if (!getOracleResource().isEmpty()) {
-      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", new OracleTestDatabase()});
+      final OracleTestDatabase oracleTestDatabase = new OracleTestDatabase();
+      params.add(new Object[] {"integration/config/oracle-mapped-udt-db-config.xml", oracleTestDatabase,
+          oracleTestDatabase.getDbType()});
     }
 
     return params;

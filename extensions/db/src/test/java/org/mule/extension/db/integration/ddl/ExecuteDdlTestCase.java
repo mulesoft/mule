@@ -10,11 +10,9 @@ package org.mule.extension.db.integration.ddl;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
-import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
 
 import java.sql.Connection;
@@ -27,18 +25,8 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class ExecuteDdlTestCase extends AbstractDbIntegrationTestCase {
-
-  public ExecuteDdlTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return getResources();
-  }
 
   @Override
   protected String[] getFlowConfigurationResources() {

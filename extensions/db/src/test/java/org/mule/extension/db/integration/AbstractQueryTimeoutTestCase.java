@@ -11,29 +11,16 @@ import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.MuleEvent;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.exception.MessagingException;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public abstract class AbstractQueryTimeoutTestCase extends AbstractDbIntegrationTestCase {
 
-  public static final String QUERY_TIMEOUT_FLOW = "queryTimeout";
-
-  public AbstractQueryTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return TestDbConfig.getResources();
-  }
+  private static final String QUERY_TIMEOUT_FLOW = "queryTimeout";
 
   /**
    * Verifies that queryTimeout is used and query execution is aborted with an error. As different DB drivers thrown different

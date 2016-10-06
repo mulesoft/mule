@@ -18,6 +18,8 @@ import java.util.Optional;
 
 import javax.sql.DataSource;
 
+import static java.util.Optional.empty;
+
 /**
  * Creates connections to a Oracle database
  *
@@ -37,7 +39,7 @@ public class OracleDbConnectionProvider extends DbConnectionProvider {
 
   @Override
   public Optional<DataSource> getDataSource() {
-    return Optional.empty();
+    return empty();
   }
 
   @Override

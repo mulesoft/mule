@@ -22,7 +22,6 @@ public class TestDbConfig {
   private static boolean USE_MYSQL = false;
   private static boolean USE_ORACLE = false;
 
-
   public static List<Object[]> getResources() {
     List<Object[]> result = new ArrayList<>();
 
@@ -35,7 +34,9 @@ public class TestDbConfig {
 
   public static List<Object[]> getDerbyResource() {
     if (USE_DERBY) {
-      return singletonList(new Object[] {"integration/config/derby-datasource.xml", new DerbyTestDatabase()});
+      final DerbyTestDatabase derbyTestDatabase = new DerbyTestDatabase();
+      return singletonList(new Object[] {"integration/config/derby-datasource.xml", derbyTestDatabase,
+          derbyTestDatabase.getDbType()});
     } else {
       return emptyList();
     }
@@ -43,7 +44,9 @@ public class TestDbConfig {
 
   public static List<Object[]> getMySqlResource() {
     if (USE_MYSQL) {
-      return singletonList(new Object[] {"integration/config/mysql-db-config.xml", new MySqlTestDatabase()});
+      final MySqlTestDatabase mySqlTestDatabase = new MySqlTestDatabase();
+      return singletonList(new Object[] {"integration/config/mysql-db-config.xml", mySqlTestDatabase,
+          mySqlTestDatabase.getDbType()});
     } else {
       return emptyList();
     }
@@ -51,7 +54,9 @@ public class TestDbConfig {
 
   public static List<Object[]> getOracleResource() {
     if (USE_ORACLE) {
-      return singletonList(new Object[] {"integration/config/oracle-db-config.xml", new OracleTestDatabase()});
+      final OracleTestDatabase oracleTestDatabase = new OracleTestDatabase();
+      return singletonList(new Object[] {"integration/config/oracle-db-config.xml", oracleTestDatabase,
+          oracleTestDatabase.getDbType()});
     } else {
       return emptyList();
     }

@@ -8,23 +8,15 @@ package org.mule.extension.db.integration.storedprocedure;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.db.integration.TestDbConfig.getResources;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 
-import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
 
 public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
-
-  public StoredProcedureTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
 
   @Before
   public void setupStoredProcedure() throws Exception {
@@ -32,11 +24,6 @@ public class StoredProcedureTestCase extends AbstractDbIntegrationTestCase {
     testDatabase.createStoredProcedureConcatenateStrings(getDefaultDataSource());
     testDatabase.createStoredProcedureCountRecords(getDefaultDataSource());
     testDatabase.createStoredProcedureMultiplyInts(getDefaultDataSource());
-  }
-
-  @Parameterized.Parameters
-  public static List<Object[]> parameters() {
-    return getResources();
   }
 
   @Override

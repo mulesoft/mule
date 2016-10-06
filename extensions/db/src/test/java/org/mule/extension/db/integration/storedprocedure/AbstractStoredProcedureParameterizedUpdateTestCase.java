@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.DbTestUtil.selectData;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.DerbyTestDatabase;
 import org.mule.extension.db.integration.model.Field;
 import org.mule.extension.db.integration.model.Record;
@@ -25,10 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public abstract class AbstractStoredProcedureParameterizedUpdateTestCase extends AbstractDbIntegrationTestCase {
-
-  public AbstractStoredProcedureParameterizedUpdateTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
 
   @Test
   public void update() throws Exception {

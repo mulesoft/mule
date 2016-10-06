@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.TestRecordUtil.assertRecords;
 import static org.mule.extension.db.integration.TestRecordUtil.getAllPlanetRecords;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.extension.db.integration.model.MySqlTestDatabase;
 
 import java.util.Map;
@@ -21,10 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public abstract class AbstractStoredProcedureReturningResultsetTestCase extends AbstractDbIntegrationTestCase {
-
-  public AbstractStoredProcedureReturningResultsetTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
 
   @Test
   public void testRequestResponse() throws Exception {

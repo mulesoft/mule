@@ -12,7 +12,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.extension.db.integration.TestDbConfig.getDerbyResource;
 import org.mule.extension.db.integration.AbstractDbIntegrationTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 import org.mule.runtime.api.message.Message;
 
 import java.util.List;
@@ -27,16 +26,11 @@ import org.junit.runners.Parameterized;
 
 public class DataSourcePoolingTestCase extends AbstractDbIntegrationTestCase {
 
-  protected static final int TIMEOUT = 10;
-  protected static final TimeUnit TIMEOUT_UNIT = SECONDS;
-  protected static CountDownLatch connectionLatch;
+  private static final int TIMEOUT = 10;
+  private static final TimeUnit TIMEOUT_UNIT = SECONDS;
+  private static CountDownLatch connectionLatch;
 
-  public DataSourcePoolingTestCase(String dataSourceConfigResource,
-                                   AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
-
-  @Parameterized.Parameters
+  @Parameterized.Parameters(name = "{2}")
   public static List<Object[]> parameters() {
     return getDerbyResource();
   }

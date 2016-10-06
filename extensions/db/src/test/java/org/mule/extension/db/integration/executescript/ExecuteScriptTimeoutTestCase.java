@@ -7,13 +7,8 @@
 package org.mule.extension.db.integration.executescript;
 
 import org.mule.extension.db.integration.AbstractQueryTimeoutTestCase;
-import org.mule.extension.db.integration.model.AbstractTestDatabase;
 
 public class ExecuteScriptTimeoutTestCase extends AbstractQueryTimeoutTestCase {
-
-  public ExecuteScriptTimeoutTestCase(String dataSourceConfigResource, AbstractTestDatabase testDatabase) {
-    super(dataSourceConfigResource, testDatabase);
-  }
 
   protected String[] getFlowConfigurationResources() {
     return new String[] {"integration/executescript/execute-script-timeout-config.xml"};

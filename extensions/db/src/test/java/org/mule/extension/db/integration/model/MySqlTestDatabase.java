@@ -7,6 +7,7 @@
 
 package org.mule.extension.db.integration.model;
 
+import org.mule.extension.db.integration.DbTestUtil;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
@@ -18,6 +19,10 @@ import javax.sql.DataSource;
 
 public class MySqlTestDatabase extends AbstractTestDatabase {
 
+  @Override
+  public DbTestUtil.DbType getDbType() {
+    return DbTestUtil.DbType.MYSQL;
+  }
 
   public static String SQL_CREATE_SP_UPDATE_TEST_TYPE_1 = "CREATE DEFINER=CURRENT_USER PROCEDURE updateTestType1()\n" + "BEGIN\n"
       + "    UPDATE PLANET SET NAME='Mercury' WHERE POSITION=4;\n" + "END;";
