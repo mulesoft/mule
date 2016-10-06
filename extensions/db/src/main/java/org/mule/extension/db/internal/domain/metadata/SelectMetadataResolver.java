@@ -28,6 +28,11 @@ public class SelectMetadataResolver extends BaseDbMetadataResolver implements Ou
       "Query metadata contains multiple columns with the same label. Define column aliases to resolve this problem";
 
   @Override
+  public String getCategoryName() {
+    return "DbCategory";
+  }
+
+  @Override
   public MetadataType getOutputType(MetadataContext context, String query)
       throws MetadataResolvingException, ConnectionException {
 

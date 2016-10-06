@@ -19,6 +19,7 @@ import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.builder.InputMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.descriptor.builder.MetadataDescriptorBuilder;
+import org.mule.runtime.api.metadata.descriptor.builder.ParameterMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.annotation.metadata.Content;
@@ -37,7 +38,6 @@ import java.util.Optional;
  * @since 4.0
  */
 class MetadataInputDelegate extends BaseMetadataDelegate {
-
 
   private final SubTypesMappingContainer typesMapping;
 
@@ -84,12 +84,16 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
                                                                                      MetadataContext context, Object key) {
 
+    ParameterMetadataDescriptorBuilder descriptorBuilder = parameterDescriptor(parameter.getName());
+    if (!parameter.hasDynamicType()){
+      return success(descriptorBuilder.withType(parameter.getType()).build());
+    }
+
+    descriptorBuilder.dynamic(true);
+
     MetadataResult<MetadataType> inputMetadataResult = getParameterMetadata(parameter, context, key);
     MetadataType type = inputMetadataResult.get() == null ? parameter.getType() : inputMetadataResult.get();
-    ParameterMetadataDescriptor descriptor = parameterDescriptor(parameter.getName())
-        .withType(type)
-        .dynamic(!parameter.getType().equals(type))
-        .build();
+    ParameterMetadataDescriptor descriptor = descriptorBuilder.withType(type).build();
 
     return inputMetadataResult.isSuccess() ? success(descriptor) : failure(descriptor, inputMetadataResult);
   }

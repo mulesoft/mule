@@ -42,7 +42,6 @@ import java.util.Set;
  */
 class MetadataKeysDelegate extends BaseMetadataDelegate {
 
-
   private static final int INITIAL_PART_LEVEL = 1;
   private final List<ParameterModel> keyParts;
 

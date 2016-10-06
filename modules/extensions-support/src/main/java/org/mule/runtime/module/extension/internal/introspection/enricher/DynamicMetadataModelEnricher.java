@@ -22,10 +22,10 @@ import org.mule.runtime.extension.api.introspection.declaration.fluent.BaseDecla
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.extension.api.introspection.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.extension.api.introspection.declaration.fluent.SourceDeclaration;
+import org.mule.runtime.extension.api.introspection.declaration.fluent.TypedDeclaration;
 import org.mule.runtime.extension.api.introspection.declaration.spi.ModelEnricher;
 import org.mule.runtime.extension.api.introspection.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.introspection.metadata.MetadataResolverFactory;
@@ -46,6 +46,7 @@ import org.mule.runtime.module.extension.internal.util.IdempotentDeclarationWalk
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * {@link ModelEnricher} implementation that walks through a {@link ExtensionDeclaration} and looks for components (Operations and
@@ -120,8 +121,9 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
                                               MetadataScopeAdapter metadataScope) {
     MetadataResolverFactory metadataResolverFactory = getMetadataResolverFactory(metadataScope);
     declaration.setMetadataResolverFactory(metadataResolverFactory);
-    declareComponentMetadataKeyId(declaration);
-    declareOutput(declaration, metadataScope);
+    declareMetadataKeyId(declaration);
+    declareOutputResolvers(declaration, metadataScope);
+    declareInputResolvers(declaration, metadataScope);
   }
 
   private void enrichWithDsql(OperationDeclaration declaration, Method method) {
@@ -129,8 +131,8 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
     declaration.setMetadataResolverFactory(new QueryMetadataResolverFactory(query.nativeOutputResolver(),
                                                                             query.entityResolver()));
     addQueryModelProperties(declaration, query);
-    declareOutputType(declaration.getOutput());
-    declareComponentMetadataKeyId(declaration);
+    declareDynamicType(declaration.getOutput());
+    declareMetadataKeyId(declaration);
   }
 
 
@@ -151,28 +153,36 @@ public class DynamicMetadataModelEnricher extends AbstractAnnotatedModelEnricher
 
   private MetadataResolverFactory getMetadataResolverFactory(MetadataScopeAdapter scope) {
 
-    return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), scope.getInputResolver(),
+    return scope.isCustomScope() ? new DefaultMetadataResolverFactory(scope.getKeysResolver(), scope.getInputResolvers(),
                                                                       scope.getOutputResolver(), scope.getAttributesResolver())
         : new NullMetadataResolverFactory();
 
   }
 
-  private void declareOutput(ComponentDeclaration declaration,
-                             MetadataScopeAdapter metadataScope) {
+  private void declareInputResolvers(ComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
+    if (metadataScope.hasInputResolvers()) {
+      Set<String> dynamicParameters = metadataScope.getInputResolvers().keySet();
+      declaration.getParameters().stream()
+        .filter(p -> dynamicParameters.contains(p.getName()))
+        .forEach(this::declareDynamicType);
+    }
+  }
+
+  private void declareOutputResolvers(ComponentDeclaration<?> declaration, MetadataScopeAdapter metadataScope) {
     if (metadataScope.hasOutputResolver()) {
-      declareOutputType(declaration.getOutput());
+      declareDynamicType(declaration.getOutput());
     }
 
     if (metadataScope.hasAttributesResolver()) {
-      declareOutputType(declaration.getOutputAttributes());
+      declareDynamicType(declaration.getOutputAttributes());
     }
   }
 
-  private void declareOutputType(OutputDeclaration component) {
+  private void declareDynamicType(TypedDeclaration component) {
     component.setType(component.getType(), true);
   }
 
-  private void declareComponentMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
+  private void declareMetadataKeyId(ComponentDeclaration<? extends ComponentDeclaration> component) {
 
     Optional<MetadataType> keyId = component.getParameters().stream()
         .filter(p -> getAnnotatedElement(p).map(element -> element.isAnnotationPresent(MetadataKeyId.class)).orElse(false))

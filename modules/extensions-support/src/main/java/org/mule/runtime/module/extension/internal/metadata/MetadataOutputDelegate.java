@@ -55,11 +55,12 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
     MetadataResult<MetadataType> outputMetadataResult = getOutputMetadata(context, key);
     MetadataResult<MetadataType> attributesMetadataResult = getOutputAttributesMetadata(context, key);
 
-    MetadataResult<TypeMetadataDescriptor> outputDescriptor = toTypeMetadataDescriptorResult(component.getOutput().getType(),
-                                                                                             outputMetadataResult);
+    MetadataResult<TypeMetadataDescriptor> outputDescriptor = toMetadataDescriptorResult(component.getOutput().getType(),
+                                                                                         component.getOutput().hasDynamicType(),
+                                                                                         outputMetadataResult);
     MetadataResult<TypeMetadataDescriptor> attributesDescriptor =
-        toTypeMetadataDescriptorResult(component.getOutputAttributes().getType(),
-                                       attributesMetadataResult);
+        toMetadataDescriptorResult(component.getOutputAttributes().getType(), false,
+                                   attributesMetadataResult);
 
     OutputMetadataDescriptor descriptor =
         outputDescriptor().withReturnType(outputDescriptor).withAttributesType(attributesDescriptor).build();
@@ -108,13 +109,13 @@ class MetadataOutputDelegate extends BaseMetadataDelegate {
                                "OutputAttributes");
   }
 
-  private MetadataResult<TypeMetadataDescriptor> toTypeMetadataDescriptorResult(MetadataType type,
-                                                                                MetadataResult<MetadataType> result) {
+  private MetadataResult<TypeMetadataDescriptor> toMetadataDescriptorResult(MetadataType type, boolean isDynamic,
+                                                                            MetadataResult<MetadataType> result) {
     MetadataType resultingType = result.get() == null ? type : result.get();
 
     TypeMetadataDescriptor descriptor = typeDescriptor()
         .withType(resultingType)
-        .dynamic(!type.equals(resultingType))
+        .dynamic(isDynamic)
         .build();
 
     if (result.isSuccess()) {

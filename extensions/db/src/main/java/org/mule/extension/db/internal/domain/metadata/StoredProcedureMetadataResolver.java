@@ -12,7 +12,12 @@ import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-public class StoredProcedureMetadataResolver extends BaseDbMetadataResolver implements OutputTypeResolver<String> {
+public class StoredProcedureMetadataResolver implements OutputTypeResolver<String> {
+
+  @Override
+  public String getCategoryName() {
+    return "DbCategory";
+  }
 
   @Override
   public MetadataType getOutputType(MetadataContext context, String query)
