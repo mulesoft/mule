@@ -6,6 +6,7 @@
  */
 package org.mule.module.xml.transformer;
 
+import static org.mule.transformer.types.DataTypeFactory.create;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
@@ -28,6 +29,11 @@ import org.xml.sax.ContentHandler;
 public class XmlToDomDocument extends AbstractXmlTransformer implements DiscoverableTransformer
 {
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
+
+    public XmlToDomDocument()
+    {
+        setReturnDataType(create(Document.class));
+    }
 
     @Override
     public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
