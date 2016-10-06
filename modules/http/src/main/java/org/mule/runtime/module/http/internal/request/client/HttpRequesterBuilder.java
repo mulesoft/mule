@@ -8,6 +8,7 @@ package org.mule.runtime.module.http.internal.request.client;
 
 import static org.mule.runtime.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.runtime.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
+
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.MuleException;
@@ -23,6 +24,8 @@ import org.mule.runtime.module.http.internal.request.DefaultHttpRequesterConfig;
 public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequesterBuilder> {
 
   public static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "_muleDefaultHttpRequestConfig";
+
+  private static final Object REGISTRY_LOCK = new Object();
 
   private final DefaultHttpRequester httpRequester;
   private final MuleContext muleContext;
@@ -118,7 +121,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
       DefaultHttpRequesterConfig requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
 
       if (requestConfig == null) {
-        synchronized (this) {
+        synchronized (REGISTRY_LOCK) {
           requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
           if (requestConfig == null) {
             requestConfig = (DefaultHttpRequesterConfig) new HttpRequesterConfigBuilder(muleContext).build();
