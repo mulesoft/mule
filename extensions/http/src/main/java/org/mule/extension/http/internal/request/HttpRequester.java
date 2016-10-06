@@ -85,7 +85,7 @@ public class HttpRequester {
       response = client.send(httpRequest, responseTimeout, followRedirects, resolveAuthentication(authentication));
     } catch (Exception e) {
       checkIfRemotelyClosed(e, client.getDefaultUriParameters());
-      throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e);
+      throw new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)), muleEvent, e);
     }
 
     HttpResponseToMuleMessage httpResponseToMuleMessage = new HttpResponseToMuleMessage(config, parseResponse, muleContext);
@@ -102,6 +102,10 @@ public class HttpRequester {
     notificationHelper.fireNotification(this, muleEvent, httpRequest.getUri(), flowConstruct, MESSAGE_REQUEST_END);
     responseValidator.validate(responseMessage, muleContext);
     return responseMessage;
+  }
+
+  private String getErrorMessage(HttpRequest httpRequest) {
+    return String.format("Error sending HTTP request to %s", httpRequest.getUri());
   }
 
   private boolean resendRequest(Event muleEvent, boolean retry, HttpAuthentication authentication) throws MuleException {

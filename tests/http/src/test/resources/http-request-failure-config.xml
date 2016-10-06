@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:httpn="http://www.mulesoft.org/schema/mule/httpn"
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/httpn http://www.mulesoft.org/schema/mule/httpn/current/mule-httpn.xsd">
+
+    <httpn:request-config name="simpleConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}"/>
+    </httpn:request-config>
+
+    <httpn:request-config name="basicAuthConfig">
+        <httpn:request-connection host="localhost" port="${httpPort}">
+            <httpn:authentication>
+                <httpn:basic-authentication username="mule" password="man"/>
+            </httpn:authentication>
+        </httpn:request-connection>
+    </httpn:request-config>
+
+    <httpn:request-config name="httpsConfig" basePath="test">
+        <httpn:request-connection protocol="HTTPS" host="localhost" port="${httpsPort}"/>
+    </httpn:request-config>
+
+    <flow name="simple">
+        <httpn:request config-ref="simpleConfig" path="testPath">
+            <httpn:request-builder>
+                <httpn:query-params>
+                    <httpn:query-param key="testName1" value="testValue1" />
+                </httpn:query-params>
+            </httpn:request-builder>
+        </httpn:request>
+    </flow>
+
+    <flow name="basicAuth">
+        <httpn:request config-ref="basicAuthConfig" path="testPath"/>
+    </flow>
+
+    <flow name="secure">
+        <httpn:request config-ref="httpsConfig" path="testPath"/>
+    </flow>
+
+</mule>

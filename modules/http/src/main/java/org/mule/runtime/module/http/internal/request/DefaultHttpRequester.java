@@ -217,7 +217,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                            @Override
                            public void onFailure(Exception exception) {
                              MessagingException msgException =
-                                 new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"),
+                                 new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)),
                                                         resetMuleEventForNewThread(muleEvent),
                                                         exception,
                                                         DefaultHttpRequester.this);
@@ -261,6 +261,10 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                          }, getWorkManager(muleEvent));
   }
 
+  private String getErrorMessage(HttpRequest httpRequest) {
+    return String.format("Error sending HTTP request to %s", httpRequest.getUri());
+  }
+
   private void checkIfRemotelyClosed(Exception exception) {
     if (requestConfig.getTlsContext() != null && containsIgnoreCase(exception.getMessage(), REMOTELY_CLOSED)) {
       logger.error("Remote host closed connection. Possible SSL/TLS handshake issue."
@@ -287,7 +291,7 @@ public class DefaultHttpRequester extends AbstractNonBlockingMessageProcessor
                                       followRedirects.resolveBooleanValue(muleEvent), resolveAuthentication(muleEvent));
     } catch (Exception e) {
       checkIfRemotelyClosed(e);
-      throw new MessagingException(CoreMessages.createStaticMessage("Error sending HTTP request"), muleEvent, e, this);
+      throw new MessagingException(CoreMessages.createStaticMessage(getErrorMessage(httpRequest)), muleEvent, e, this);
     }
 
     muleEvent = httpResponseToMuleEvent.convert(muleEvent, response, httpRequest.getUri());
