@@ -8,6 +8,7 @@ package org.mule.module.http.internal.request.client;
 
 import static org.mule.module.http.api.HttpConstants.Protocols.HTTPS;
 import static org.mule.module.http.internal.request.SuccessStatusCodeValidator.NULL_VALIDATOR;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.module.http.api.client.HttpRequestOptions;
@@ -136,7 +137,7 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
             if (requestConfig == null)
             {
-                synchronized (this)
+                synchronized (DEFAULT_HTTP_REQUEST_CONFIG_NAME)
                 {
                     requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
                     if (requestConfig == null)
