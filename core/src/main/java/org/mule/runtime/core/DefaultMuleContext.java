@@ -38,7 +38,6 @@ import static org.mule.runtime.core.context.notification.MuleContextNotification
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.context.notification.MuleContextNotification.CONTEXT_STOPPING;
 import static org.mule.runtime.core.util.JdkVersionUtils.getSupportedJdks;
-
 import org.mule.runtime.config.spring.DefaultCustomizationService;
 import org.mule.runtime.core.api.CustomizationService;
 import org.mule.runtime.core.api.Injector;
@@ -85,6 +84,7 @@ import org.mule.runtime.core.connector.PollingController;
 import org.mule.runtime.core.context.notification.MuleContextNotification;
 import org.mule.runtime.core.context.notification.NotificationException;
 import org.mule.runtime.core.context.notification.ServerNotificationManager;
+import org.mule.runtime.core.el.v2.MuleExpressionLanguage;
 import org.mule.runtime.core.exception.DefaultMessagingExceptionStrategy;
 import org.mule.runtime.core.exception.DefaultSystemExceptionStrategy;
 import org.mule.runtime.core.exception.ErrorTypeLocator;
@@ -232,6 +232,7 @@ public class DefaultMuleContext implements MuleContext {
 
   private ErrorTypeLocator errorTypeLocator;
   private ErrorTypeRepository errorTypeRepository;
+  private org.mule.runtime.core.api.el.v2.ExpressionLanguage expressionLanguageV2;
 
   /**
    * @deprecated Use empty constructor instead and use setter for dependencies.
@@ -888,6 +889,14 @@ public class DefaultMuleContext implements MuleContext {
       this.expressionLanguage = registryBroker.lookupObject(OBJECT_EXPRESSION_LANGUAGE);
     }
     return this.expressionLanguage;
+  }
+
+  @Override
+  public org.mule.runtime.core.api.el.v2.ExpressionLanguage getExpressionLanguageV2() {
+    if (this.expressionLanguageV2 == null) {
+      this.expressionLanguageV2 = new MuleExpressionLanguage();
+    }
+    return this.expressionLanguageV2;
   }
 
   @Override

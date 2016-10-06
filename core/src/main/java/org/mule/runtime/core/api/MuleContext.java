@@ -16,6 +16,7 @@ import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotification;
 import org.mule.runtime.core.api.context.notification.ServerNotificationListener;
 import org.mule.runtime.core.api.el.ExpressionLanguage;
+import org.mule.runtime.core.api.el.v2.ExpressionExecutor;
 import org.mule.runtime.core.api.exception.MessagingExceptionHandler;
 import org.mule.runtime.core.api.exception.RollbackSourceCallback;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
@@ -318,6 +319,13 @@ public interface MuleContext extends Lifecycle {
    * @return
    */
   ExpressionLanguage getExpressionLanguage();
+
+  /**
+   * Expression Language for evaluating expressions using Mule as the context
+   *
+   * @return the {@link ExpressionLanguage} to be used
+   */
+  org.mule.runtime.core.api.el.v2.ExpressionLanguage getExpressionLanguageV2();
 
   /**
    * Factory for creating locks for synchronizing mule components.
