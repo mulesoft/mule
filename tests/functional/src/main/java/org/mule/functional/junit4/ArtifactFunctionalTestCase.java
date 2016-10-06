@@ -109,9 +109,10 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
 
     if (pluginClassLoaders != null && !pluginClassLoaders.isEmpty()) {
       builders.add(0, new IsolatedClassLoaderExtensionsManagerConfigurationBuilder(pluginClassLoaders));
-      builders.add(0, new TestBootstrapServiceDiscovererConfigurationBuilder(containerClassLoader, getExecutionClassLoader(),
-                                                                             pluginClassLoaders));
     }
+
+    builders.add(0, new TestBootstrapServiceDiscovererConfigurationBuilder(containerClassLoader, getExecutionClassLoader(),
+                                                                           pluginClassLoaders));
   }
 
 }
