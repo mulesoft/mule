@@ -25,6 +25,8 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 {
     public static final String DEFAULT_HTTP_REQUEST_CONFIG_NAME = "_muleDefaultHttpRequestConfig";
 
+    private static final Object REGISTRY_LOCK = new Object();
+
     private final DefaultHttpRequester httpRequester;
     private final MuleContext muleContext;
     private TlsContextFactory tlsContextFactory;
@@ -136,8 +138,15 @@ public class HttpRequesterBuilder implements HttpRequestOperationConfig<HttpRequ
 
             if (requestConfig == null)
             {
-                requestConfig = new DefaultHttpRequesterConfig();
-                muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+                synchronized (REGISTRY_LOCK)
+                {
+                    requestConfig = muleContext.getRegistry().get(DEFAULT_HTTP_REQUEST_CONFIG_NAME);
+                    if (requestConfig == null)
+                    {
+                        requestConfig = new DefaultHttpRequesterConfig();
+                        muleContext.getRegistry().registerObject(DEFAULT_HTTP_REQUEST_CONFIG_NAME, requestConfig);
+                    }
+                }
             }
 
             httpRequester.setConfig(requestConfig);
